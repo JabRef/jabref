@@ -22,14 +22,10 @@ import org.jabref.model.openoffice.style.PageInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OOBibStyleTestHelper {
-    /*
-     * Minimal implementation for CitationMarkerNumericEntry
-     */
+    // Minimal implementation for CitationMarkerNumericEntry
     static class CitationMarkerNumericEntryImpl implements CitationMarkerNumericEntry {
 
-        /*
-         * The number encoding "this entry is unresolved" for the constructor.
-         */
+        // The number encoding "this entry is unresolved" for the constructor.
         public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
         private final String citationKey;

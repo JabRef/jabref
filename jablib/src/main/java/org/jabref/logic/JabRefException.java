@@ -1,12 +1,13 @@
 package org.jabref.logic;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefException extends Exception {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefException.class);
-    private String localizedMessage;
+    @Nullable private String localizedMessage;
 
     public JabRefException(String message) {
         super(message);
@@ -16,12 +17,12 @@ public class JabRefException extends Exception {
         super(message, cause);
     }
 
-    public JabRefException(String message, String localizedMessage) {
+    public JabRefException(String message, @Nullable String localizedMessage) {
         super(message);
         this.localizedMessage = localizedMessage;
     }
 
-    public JabRefException(String message, String localizedMessage, Throwable cause) {
+    public JabRefException(String message, @Nullable String localizedMessage, Throwable cause) {
         super(message, cause);
         this.localizedMessage = localizedMessage;
     }

@@ -14,6 +14,7 @@
 
     <VBox>
         <CheckBox fx:id="cleanupDoi" text="%Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" />
+        <CheckBox fx:id="cleanupArXivDoi" text="%For arXiv entries, keep the DOI and remove the redundant 'eprint' fields" />
         <CheckBox fx:id="cleanupEprint" text="%Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" />
         <CheckBox fx:id="cleanupUrl" text="%Move URL in 'note' field to 'URL' field" />
         <CheckBox fx:id="cleanupBibLaTeX" text="%Convert to biblatex format (e.g., store publication date in date field)" />

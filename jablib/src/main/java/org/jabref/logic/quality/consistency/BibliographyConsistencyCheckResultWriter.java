@@ -53,7 +53,7 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
     protected final List<String> columnNames;
     protected final int columnCount;
 
-    private final List<Field> allReportedFields;
+    protected final List<Field> allReportedFields;
 
     public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain) {
         this(result, writer, isPorcelain, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);

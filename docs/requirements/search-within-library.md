@@ -39,6 +39,9 @@ When searching for "author" "Demo" should match `art_1` only.
 
 It is possible by regular expressions, but the user asked for "quickly".
 
+> Currently, no implementation is linked
+{: .prompt-note}
+
 ## Search for citation key
 `req~jabgui.search.syntax.citation-key~1`
 

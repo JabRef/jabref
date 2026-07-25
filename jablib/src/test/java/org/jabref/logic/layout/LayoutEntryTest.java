@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -106,13 +107,7 @@ class LayoutEntryTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "2",
-            "3",
-            "4",
-            "6",
-            "7"
-    })
+    @ValueSource(ints = {2, 3, 4, 6, 7})
     void unsupportedOperationTypes(int type) {
         List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
                 new StringInt("testString", 0));

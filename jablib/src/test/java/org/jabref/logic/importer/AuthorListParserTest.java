@@ -21,6 +21,8 @@ class AuthorListParserTest {
     private static Stream<Arguments> parseSingleAuthorCorrectly() {
         return Stream.of(
                 Arguments.of("王, 军", new Author("军", "军.", null, "王", null)),
+                Arguments.of("हिंदी, परीक्षण", new Author("परीक्षण", "प.", null, "हिंदी", null)),
+                Arguments.of("العربية, اختبار", new Author("اختبار", "ا.", null, "العربية", null)),
                 Arguments.of("Doe, John", new Author("John", "J.", null, "Doe", null)),
                 Arguments.of("von Berlichingen zu Hornberg, Johann Gottfried", new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)),
                 Arguments.of("{Robert and Sons, Inc.}", new Author(null, null, null, "{Robert and Sons, Inc.}", null)),

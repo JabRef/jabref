@@ -92,31 +92,6 @@ class MultiSelectionMenuBuilderTest {
         }
     }
 
-    @Nested
-    class MoveToDefaultDir {
-
-        @Test
-        void isMovableToDefaultDirReturnsTrueWhenLocalExistingAndGeneratedPathDiffers() {
-            Path path = Path.of("c.pdf");
-            LinkedFileViewModel movable = mockOfflineExistingFileViewModel(path);
-            when(movable.isGeneratedPathSameAsOriginal()).thenReturn(false);
-            assertTrue(builder.isMovableToDefaultDir(movable));
-        }
-
-        @Test
-        void isMovableToDefaultDirReturnsFalseWhenPathsSame() {
-            Path path = Path.of("c.pdf");
-            LinkedFileViewModel samePath = mockOfflineExistingFileViewModel(path);
-            when(samePath.isGeneratedPathSameAsOriginal()).thenReturn(true);
-            assertFalse(builder.isMovableToDefaultDir(samePath));
-        }
-
-        @Test
-        void isMovableToDefaultDirReturnsFalseForOnlineLink() {
-            assertFalse(builder.isMovableToDefaultDir(mockOnlineLinkViewModel("https://x")));
-        }
-    }
-
     private LinkedFileViewModel mockOfflineExistingFileViewModel(Path path) {
         LinkedFile linkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
         when(linkedFile.isOnlineLink()).thenReturn(false);

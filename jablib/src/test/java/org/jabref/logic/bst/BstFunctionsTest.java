@@ -9,6 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,17 +49,17 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -73,9 +74,9 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(3, vm.getStack().pop());
-        assertEquals(2, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(3, vm.getContext().stack().pop());
+        assertEquals(2, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -110,16 +111,16 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals("Johnny.}", vm.getStack().pop());
-        assertEquals("Johnny?}", vm.getStack().pop());
-        assertEquals("Johnny!}", vm.getStack().pop());
-        assertEquals("Johnny.}", vm.getStack().pop());
-        assertEquals("Johnny?", vm.getStack().pop());
-        assertEquals("Johnny!", vm.getStack().pop());
-        assertEquals("Johnny.", vm.getStack().pop());
-        assertEquals("Johnny.", vm.getStack().pop());
-        assertEquals("Hello", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("Johnny.}", vm.getContext().stack().pop());
+        assertEquals("Johnny?}", vm.getContext().stack().pop());
+        assertEquals("Johnny!}", vm.getContext().stack().pop());
+        assertEquals("Johnny.}", vm.getContext().stack().pop());
+        assertEquals("Johnny?", vm.getContext().stack().pop());
+        assertEquals("Johnny!", vm.getContext().stack().pop());
+        assertEquals("Johnny.", vm.getContext().stack().pop());
+        assertEquals("Johnny.", vm.getContext().stack().pop());
+        assertEquals("Hello", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -141,11 +142,11 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertEquals("test", vm.getStack().pop());      // cite
-        assertEquals(BstVM.TRUE, vm.getStack().pop());          // missing title
-        assertEquals("canh05", vm.getStack().pop());    // cite
-        assertEquals(BstVM.FALSE, vm.getStack().pop());         // missing title
-        assertEquals(0, vm.getStack().size());
+        assertEquals("test", vm.getContext().stack().pop());      // cite
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());          // missing title
+        assertEquals("canh05", vm.getContext().stack().pop());    // cite
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());         // missing title
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -160,9 +161,9 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(2, vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(2, vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -183,16 +184,16 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals("78", vm.getStack().pop());
-        assertEquals("789", vm.getStack().pop());
-        assertEquals("9", vm.getStack().pop());
-        assertEquals("123", vm.getStack().pop());
-        assertEquals("123456789", vm.getStack().pop());
-        assertEquals("123456789", vm.getStack().pop());
-        assertEquals("123456789", vm.getStack().pop());
-        assertEquals("456789", vm.getStack().pop());
-        assertEquals("2", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("78", vm.getContext().stack().pop());
+        assertEquals("789", vm.getContext().stack().pop());
+        assertEquals("9", vm.getContext().stack().pop());
+        assertEquals("123", vm.getContext().stack().pop());
+        assertEquals("123456789", vm.getContext().stack().pop());
+        assertEquals("123456789", vm.getContext().stack().pop());
+        assertEquals("123456789", vm.getContext().stack().pop());
+        assertEquals("456789", vm.getContext().stack().pop());
+        assertEquals("2", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @ParameterizedTest
@@ -214,7 +215,9 @@ class BstFunctionsTest {
         bstVMContext.stack().push(full);
         bstVMContext.stack().push(start);
         bstVMContext.stack().push(length);
-        bstFunctions.bstSubstring(null, null);
+        bstFunctions.bstSubstring(
+                new BstVMVisitor(new BstVMContext(List.of(), new BibDatabase(), null), new StringBuilder(0)),
+                ParserRuleContext.EMPTY);
         assertEquals(expected, bstVMContext.stack().pop());
     }
 
@@ -237,12 +240,12 @@ class BstFunctionsTest {
 
         vm.render(testEntry);
 
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -255,8 +258,8 @@ class BstFunctionsTest {
 
         vm.render(v);
 
-        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -278,9 +281,9 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
-        assertEquals("Annabi, H?", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getContext().stack().pop());
+        assertEquals("Annabi, H?", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -306,11 +309,11 @@ class BstFunctionsTest {
         vm.render(List.of());
 
         assertEquals("{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
-                vm.getStack().pop());
-        assertEquals("", vm.getStack().pop());
-        assertEquals("Hello world", vm.getStack().pop());
-        assertEquals("Hello world", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+                vm.getContext().stack().pop());
+        assertEquals("", vm.getContext().stack().pop());
+        assertEquals("Hello world", vm.getContext().stack().pop());
+        assertEquals("Hello world", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -331,15 +334,15 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(11, vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(8, vm.getStack().pop());
-        assertEquals(0, vm.getStack().pop());
-        assertEquals(11, vm.getStack().pop());
-        assertEquals(11, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(11, vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(8, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().pop());
+        assertEquals(11, vm.getContext().stack().pop());
+        assertEquals(11, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -351,9 +354,9 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals("9999", vm.getStack().pop());
-        assertEquals("3", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("9999", vm.getContext().stack().pop());
+        assertEquals("3", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -365,8 +368,8 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(72, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(72, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -378,8 +381,8 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals("H", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("H", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -400,11 +403,11 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertEquals("inproceedings", vm.getStack().pop());
-        assertEquals("misc", vm.getStack().pop());
-        assertEquals("book", vm.getStack().pop());
-        assertEquals("article", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("inproceedings", vm.getContext().stack().pop());
+        assertEquals("misc", vm.getContext().stack().pop());
+        assertEquals("book", vm.getContext().stack().pop());
+        assertEquals("article", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -427,11 +430,11 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertEquals("Book called on Test", vm.getStack().pop());
+        assertEquals("Book called on Test", vm.getContext().stack().pop());
         assertEquals(
                 "InProceedings called on Effective work practices for floss development: A model and propositions",
-                vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+                vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -444,9 +447,9 @@ class BstFunctionsTest {
         List<BibEntry> v = List.of();
         vm.render(v);
 
-        assertEquals(3, vm.getStack().pop());
-        assertEquals("Hallo", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(3, vm.getContext().stack().pop());
+        assertEquals("Hallo", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -459,10 +462,10 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.getContext().functions();
         assertTrue(functions.containsKey("test.func"));
         assertNotNull(functions.get("test.func"));
-        assertEquals(1, vm.latestContext.integers().get("test.var"));
+        assertEquals(1, vm.getContext().integers().get("test.var"));
     }
 
     @Test
@@ -479,9 +482,9 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(0, vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(0, vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -503,10 +506,10 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(1, vm.getStack().pop());
-        assertEquals(2, vm.getStack().pop());
-        assertEquals(3, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals(2, vm.getContext().stack().pop());
+        assertEquals(3, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -550,8 +553,8 @@ class BstFunctionsTest {
 
         vm.render(v);
 
-        assertEquals(1, vm.getStack().size());
-        assertEquals("HELLO--WORLD", vm.getStack().pop());
+        assertEquals(1, vm.getContext().stack().size());
+        assertEquals("HELLO--WORLD", vm.getContext().stack().pop());
     }
 
     @Test
@@ -577,17 +580,17 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.FALSE, vm.getStack().pop());
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     /// See also {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
@@ -629,8 +632,8 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertTrue(vm.latestContext.integers().containsKey("longest.label.width"));
-        assertEquals("\\begin{thebibliography}{1}", vm.getStack().pop());
+        assertTrue(vm.getContext().integers().containsKey("longest.label.width"));
+        assertEquals("\\begin{thebibliography}{1}", vm.getContext().stack().pop());
     }
 
     @Test
@@ -651,9 +654,9 @@ class BstFunctionsTest {
 
         vm.render(List.of());
 
-        assertEquals("{\\em Hello}", vm.getStack().pop());
-        assertEquals("", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals("{\\em Hello}", vm.getContext().stack().pop());
+        assertEquals("", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test

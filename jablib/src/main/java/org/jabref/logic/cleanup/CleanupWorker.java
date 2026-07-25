@@ -81,6 +81,8 @@ public class CleanupWorker {
         return switch (action) {
             case CLEAN_UP_DOI ->
                     new DoiCleanup();
+            case CLEAN_UP_ARXIV_DOI ->
+                    new ArXivDoiCleanup();
             case CLEANUP_EPRINT ->
                     new EprintCleanup();
             case CLEAN_UP_URL ->

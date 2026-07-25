@@ -11,9 +11,13 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.os.OS;
 
 public class OpenOfficePreferences {
 
@@ -39,6 +43,9 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceAfter;
+    private final ObservableList<String> externalBstStyles;
+    private final StringProperty pandocPath;
+    private final ObjectProperty<BstCitationFormat> bstCitationFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -51,7 +58,10 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
-                                 boolean addSpaceAfter) {
+                                 boolean addSpaceAfter,
+                                 List<String> externalBstStyles,
+                                 String pandocPath,
+                                 BstCitationFormat bstCitationFormat) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -64,6 +74,35 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+        this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
+        this.pandocPath = new SimpleStringProperty(pandocPath);
+        this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
+    }
+
+    private OpenOfficePreferences() {
+        this(
+                OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
+                           : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
+                                     : DEFAULT_LINUX_EXEC_PATH,
+                true,                             // useAllDatabases
+                false,                                          // syncWhenCiting
+                List.of(),                                      // externalJStyles
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
+                CSLStyleLoader.getDefaultStyle(),               // currentStyle
+                false,                                          // alwaysAddCitedOnPages
+                "References",                                   // cslBibliographyTitle
+                "Heading 2",                                    // cslBibliographyHeaderFormat
+                "Text body",                                    // cslBibliographyBodyFormat
+                List.of(),                                      // externalCslStyles
+                true,                                           // addSpaceAfter
+                List.of(),                                      // externalBstStyles
+                "pandoc",                                       // pandocPath
+                BstCitationFormat.NUMERIC                       // bstCitationFormat
+        );
+    }
+
+    public static OpenOfficePreferences getDefault() {
+        return new OpenOfficePreferences();
     }
 
     public void clearConnectionSettings() {
@@ -119,8 +158,7 @@ public class OpenOfficePreferences {
     }
 
     public void setExternalJStyles(List<String> list) {
-        externalJStyles.clear();
-        externalJStyles.addAll(list);
+        externalJStyles.setAll(list);
     }
 
     /// path to the used style file
@@ -204,8 +242,7 @@ public class OpenOfficePreferences {
     }
 
     public void setExternalCslStyles(List<String> paths) {
-        externalCslStyles.clear();
-        externalCslStyles.addAll(paths);
+        externalCslStyles.setAll(paths);
     }
 
     public boolean getAddSpaceAfter() {
@@ -218,5 +255,40 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceAfter(boolean addSpaceAfter) {
         this.addSpaceAfter.setValue(addSpaceAfter);
+    }
+
+    /// List of paths to external BST style files.
+    public ObservableList<String> getExternalBstStyles() {
+        return externalBstStyles;
+    }
+
+    public void setExternalBstStyles(List<String> paths) {
+        externalBstStyles.setAll(paths);
+    }
+
+    /// Path to the pandoc executable used for BST bibliography rendering.
+    /// Defaults to `"pandoc"` (system PATH). Users can override via the OO settings menu.
+    public String getPandocPath() {
+        return pandocPath.get();
+    }
+
+    public StringProperty pandocPathProperty() {
+        return pandocPath;
+    }
+
+    public void setPandocPath(String path) {
+        this.pandocPath.set(path);
+    }
+
+    public BstCitationFormat getBstCitationFormat() {
+        return bstCitationFormat.get();
+    }
+
+    public ObjectProperty<BstCitationFormat> bstCitationFormatProperty() {
+        return bstCitationFormat;
+    }
+
+    public void setBstCitationFormat(BstCitationFormat format) {
+        this.bstCitationFormat.set(format);
     }
 }

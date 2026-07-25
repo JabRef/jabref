@@ -22,8 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -154,7 +154,7 @@ class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
+    @ValueSource(strings = {"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
     void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
@@ -164,7 +164,7 @@ class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
+    @ValueSource(strings = {"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
             "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
     void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
@@ -172,6 +172,26 @@ class BibtexImporterTest {
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
+    }
+
+    private static Stream<Arguments> parsingUtf16FilesWithAndWithoutBom() {
+        return Stream.of(
+                Arguments.of("tiny-BE-withBOM.bib", StandardCharsets.UTF_16BE),
+                Arguments.of("tiny-BE-noBOM.bib", StandardCharsets.UTF_16BE),
+                Arguments.of("tiny-LE-withBOM.bib", StandardCharsets.UTF_16LE),
+                Arguments.of("tiny-LE-noBOM.bib", StandardCharsets.UTF_16LE)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parsingUtf16FilesWithAndWithoutBom(String filename, Charset expectedEncoding) throws URISyntaxException, IOException {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        assertEquals(expectedEncoding, parserResult.getMetaData().getEncoding().orElseThrow());
+        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+        assertEquals("Verwilghen+vanGalen+Wilke2011", parserResult.getDatabase().getEntries().getFirst().getCitationKey().orElseThrow());
     }
 
     private static Stream<Arguments> encodingExplicitlySuppliedCorrectlyDetermined() {

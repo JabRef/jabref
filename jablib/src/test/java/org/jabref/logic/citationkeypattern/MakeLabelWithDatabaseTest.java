@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /// Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
@@ -270,7 +270,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Problem:NoAuthorProvided"), entry.getCitationKey());
+        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCitationKey());
     }
 
     @Test

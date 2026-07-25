@@ -5,6 +5,8 @@ import java.util.StringJoiner;
 
 import org.jspecify.annotations.Nullable;
 
+import static java.util.function.Predicate.not;
+
 public class CitationProperties {
 
     private @Nullable LocatorType locatorType;
@@ -49,7 +51,7 @@ public class CitationProperties {
     public Optional<String> getPrefix() {
         return Optional.ofNullable(prefix)
                        .map(String::strip)
-                       .filter(s -> !s.isEmpty());
+                       .filter(not(String::isEmpty));
     }
 
     public CitationProperties withPrefix(@Nullable String prefix) {
@@ -64,7 +66,7 @@ public class CitationProperties {
     public Optional<String> getSuffix() {
         return Optional.ofNullable(suffix)
                        .map(String::strip)
-                       .filter(s -> !s.isEmpty());
+                       .filter(not(String::isEmpty));
     }
 
     public CitationProperties withSuffix(@Nullable String suffix) {

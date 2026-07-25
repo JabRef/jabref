@@ -54,7 +54,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -91,16 +90,15 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double NUMBER_COL_WIDTH = 60d;
-    private static final double EXPANSION_COL_WIDTH = 20d;
-    private static final double ADD_SUBGROUP_COL_WIDTH = 28d;
-    private static final double SCROLLBAR_WIDTH = 15d;
+    private static final double NUMBER_COL_WIDTH = 60D;
+    private static final double EXPANSION_COL_WIDTH = 20D;
+    private static final double ADD_SUBGROUP_COL_WIDTH = 28D;
+    private static final double SCROLLBAR_WIDTH = 15D;
 
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -133,7 +131,6 @@ public class GroupTreeView extends BorderPane {
                          AiService aiService,
                          UndoManager undoManager,
                          FileUpdateMonitor fileUpdateMonitor,
-                         AdaptVisibleTabs adaptVisibleTabs,
                          TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
@@ -142,7 +139,6 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
@@ -212,7 +208,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
+        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, dialogService, aiService, localDragboard, taskExecutor);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -278,8 +274,8 @@ public class GroupTreeView extends BorderPane {
 
         // "Add subgroup" button shown on row hover
         addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        addSubgroupColumn.setCellFactory(col -> {
-            Button button = IconTheme.JabRefIcons.ADD.asButton();
+        addSubgroupColumn.setCellFactory(_ -> {
+            Button button = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD);
             button.setVisible(false);
             button.managedProperty().bind(button.visibleProperty());
             StackPane pane = new StackPane(button);
@@ -384,6 +380,7 @@ public class GroupTreeView extends BorderPane {
                     }
 
                     if (shouldDisplayGroupCount) {
+                        group.ensureMatchedEntriesLoaded();
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
@@ -662,7 +659,7 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
-        if (preferences.getAiPreferences().getEnableAi()) {
+        if (preferences.getAiPreferences().getAiFeaturesEnabled() && preferences.getGroupsPreferences().showAiChatButton()) {
             contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
         }
 

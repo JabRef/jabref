@@ -18,7 +18,6 @@ import javafx.scene.control.DialogPane;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
@@ -151,10 +150,10 @@ public interface DialogService extends NotificationService {
     /// @param dialog dialog to show
     void showCustomDialog(BaseDialog<?> dialog);
 
-    /// Shows a custom window.
+    /// Shows a custom dialog as a window: does not block the main window.
     ///
-    /// @param window window to show
-    void showCustomWindow(BaseWindow window);
+    /// @param dialog dialog to show
+    void showCustomDialogModal(BaseDialog<?> dialog);
 
     /// This will create and display a new dialog of the specified
     /// {@link Alert.AlertType} but with user defined buttons as optional

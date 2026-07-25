@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -201,7 +200,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyStartAtRootFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -234,7 +233,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyStartAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -272,7 +271,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyStartMatchingTwoFilesAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -317,7 +316,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyStartMatchingTwoFilesAtSubFolderAndOneMatchABrokenLinkedFileName(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -365,7 +364,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyExactAtRootFolderDoesNotWorkWithNotExactName(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -396,7 +395,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyExactAtRootFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -429,7 +428,7 @@ class AutoSetFileLinksUtilTest {
                 @Test
                 void autoLinkByCitationKeyExactAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                    when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                     String citationKey = "thisIsACitationKey";
 
@@ -471,7 +470,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void noAutoLinkByCitationKeyStartAtRootFolderWithSuffixMismatch(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 String citationKey = "WeDoNotCare";
 
@@ -509,7 +508,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void autoLinkMoveFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -548,7 +547,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void autoLinkMoveFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -589,7 +588,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void autoLinkMoveFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -631,7 +630,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void noAutoLinkCopyFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -671,7 +670,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -713,7 +712,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");
@@ -760,7 +759,7 @@ class AutoSetFileLinksUtilTest {
             @Test
             void autoLinkMoveFileFromRootFolderToSubFolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
                 when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
                 // File and folder before moving
                 Path folderA = root.resolve("A");
                 Files.createDirectory(folderA);
@@ -799,7 +798,7 @@ class AutoSetFileLinksUtilTest {
             @Test
             void autoLinkMoveFileFromSubFolderToRootFolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
                 when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
                 // File and folder before moving
                 Path folderA = root.resolve("A");
                 Files.createDirectory(folderA);
@@ -840,7 +839,7 @@ class AutoSetFileLinksUtilTest {
             /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToSubfolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
-                when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
 
                 // File and folder before moving
                 Path folderA = root.resolve("A");

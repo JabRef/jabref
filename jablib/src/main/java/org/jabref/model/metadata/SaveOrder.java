@@ -113,12 +113,8 @@ public class SaveOrder {
         return res;
     }
 
-    public static class SortCriterion {
-
-        public final Field field;
-
-        public final boolean descending;
-
+    public record
+    SortCriterion(Field field, boolean descending) {
         /// Given field sorted ascending
         public SortCriterion(Field field) {
             this(field, false);
@@ -127,38 +123,14 @@ public class SaveOrder {
         /// @param field      The field
         /// @param descending Must be a boolean value as string, e.g. "true", "false"
         public SortCriterion(Field field, String descending) {
-            this.field = field;
-            this.descending = Boolean.parseBoolean(descending);
-        }
-
-        public SortCriterion(Field field, boolean descending) {
-            this.field = field;
-            this.descending = descending;
+            this(field, Boolean.parseBoolean(descending));
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "SortCriterion{" + "field='" + field + '\'' +
                     ", descending=" + descending +
                     '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if ((o == null) || (getClass() != o.getClass())) {
-                return false;
-            }
-            SortCriterion that = (SortCriterion) o;
-            return Objects.equals(descending, that.descending) &&
-                    Objects.equals(field, that.field);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(field, descending);
         }
     }
 

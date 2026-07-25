@@ -45,7 +45,7 @@ public class FXDialog extends Alert {
     public FXDialog(AlertType type, boolean isModal) {
         super(type);
 
-        setDialogIcon(IconTheme.getJabRefImage());
+        setDialogIcon(IconTheme.getJabRefIcon());
 
         Stage dialogWindow = getDialogWindow();
         dialogWindow.setOnCloseRequest(evt -> this.close());

@@ -118,6 +118,9 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                             return true;
                         }
                         LocalDateTime lastRun = insertionTimeStampMap.get(doiString + citationFetcherPropertyType.get().getName());
+                        if (lastRun == null) {
+                            return true;
+                        }
                         return lastRun.isBefore(now.minusDays(storeTTLInDays));
                     })
                     // No DOI existing - allow update

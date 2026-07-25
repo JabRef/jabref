@@ -142,7 +142,7 @@ For UI changes, we know that test cases are hard to write.
 Therefore, you can omit them.
 However, please at least add a screenshot showing your changes to the request.
 
-<!-- In case you do not have time to add a test case, we nevertheless ask you to at least run `gradlew check` to ensure that your change does not break anything else. -->
+<!-- In case you do not have time to add a test case, we nevertheless ask you to at least run `./gradlew check` to ensure that your change does not break anything else. -->
 
 #### Write a good commit message
 
@@ -201,6 +201,11 @@ After all the basic checks are green, maintainers will look at your pull request
 Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
 The pull request may be approved immediately, or a reviewer may request changes and/or have discussions regarding your approach.
 In that case, you are expected to answer any questions and implement the requested changes.
+
+> [!IMPORTANT]
+> Do **not** resolve review discussions yourself after addressing the feedback.
+> Resolving a conversation is reserved for the maintainer who started it, so they can verify the fix.
+> As a contributor, reply to the comment to indicate it has been addressed, then leave the conversation open.
 
 Please – **never ever close a pull request and open a new one** -
 This causes unnecessary work on our side, and is not in the style of the GitHub Open Source community.

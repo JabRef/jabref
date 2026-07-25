@@ -3,14 +3,14 @@ package org.jabref.logic.search.query;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SearchQueryTest {
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             "term",
             "term1 term2",
             "term1 term2 term3",
@@ -52,7 +52,7 @@ public class SearchQueryTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             "!term", // =!~() should be escaped with a backslash
             "t~erm",
             "t(erm",

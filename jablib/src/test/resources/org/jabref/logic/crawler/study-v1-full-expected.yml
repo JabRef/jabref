@@ -1,0 +1,12 @@
+version: 2.0.0
+authors:
+- Oscar Wilde
+title: TestStudyName
+research-questions:
+- Question1
+queries:
+- query: Quantum
+catalogs:
+- name: Springer
+  enabled: true
+  reason: ""

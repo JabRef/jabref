@@ -37,6 +37,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private final Optional<Path> monitoredPath;
     private LibraryTab saveState;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
@@ -53,10 +54,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.monitoredPath = this.database.getDatabasePath();
 
         this.listeners = new ArrayList<>();
 
-        this.database.getDatabasePath().ifPresent(path -> {
+        monitoredPath.ifPresent(path -> {
             try {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
@@ -134,6 +136,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        database.getDatabasePath().ifPresent(file -> fileMonitor.removeListener(file, this));
+        monitoredPath.ifPresent(path -> fileMonitor.removeListener(path, this));
     }
 }

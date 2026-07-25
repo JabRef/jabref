@@ -8,6 +8,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
@@ -82,6 +85,18 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchByEmptyQueryFindsNothing() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void performRawSearchQueryPagedFindsEntry() throws FetcherException {
+        Page<BibEntry> page = fetcher.performRawSearchQueryPaged("isbn:9783862065752", 0);
+        assertFalse(page.getContent().isEmpty());
     }
 
     @Test

@@ -21,9 +21,8 @@ More information:
 * JabRef issue discussing Yes/No/Cancel: [koppor#149](https://github.com/koppor/jabref/issues/149).
 
 ### Name your buttons for the actions
-`req~ui.dialogs.confirmation.naming~1`
 
-Needs: impl
+See requirement [`req~ui.dialogs.confirmation.naming~1`](../requirements/ux.md).
 
 ## Form validation
 

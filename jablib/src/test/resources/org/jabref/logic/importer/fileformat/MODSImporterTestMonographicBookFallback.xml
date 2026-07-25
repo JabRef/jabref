@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods xmlns="http://www.loc.gov/mods/v3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      version="3.8"
+      xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-8.xsd">
+<titleInfo>
+<title>Developing high quality data models</title>
+</titleInfo>
+<name type="personal" usage="primary">
+<namePart>West, Matthew,</namePart>
+<namePart type="date">1953-</namePart>
+</name>
+<typeOfResource>text</typeOfResource>
+<genre authority="rdacontent">text</genre>
+<originInfo>
+<place>
+<placeTerm authority="marccountry" type="code">mau</placeTerm>
+</place>
+<dateIssued encoding="marc">2011</dateIssued>
+<issuance>monographic</issuance>
+<place>
+<placeTerm type="text">Burlington, MA</placeTerm>
+</place>
+<dateIssued>c2011</dateIssued>
+</originInfo>
+<language>
+<languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+</language>
+<note type="statement of responsibility">Matthew West.</note>
+<note>Includes index.</note>
+<identifier type="isbn">9780123751065</identifier>
+<identifier type="isbn">0123751063</identifier>
+</mods>

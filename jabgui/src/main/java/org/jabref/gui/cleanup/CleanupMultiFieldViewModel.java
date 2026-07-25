@@ -11,6 +11,7 @@ public class CleanupMultiFieldViewModel {
 
     public static final EnumSet<CleanupPreferences.CleanupStep> MULTI_FIELD_JOBS = EnumSet.of(
             CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
+            CleanupPreferences.CleanupStep.CLEAN_UP_ARXIV_DOI,
             CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
             CleanupPreferences.CleanupStep.CLEAN_UP_URL,
             CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
@@ -20,6 +21,7 @@ public class CleanupMultiFieldViewModel {
     );
 
     public final BooleanProperty doiSelected = new SimpleBooleanProperty();
+    public final BooleanProperty arXivDoiSelected = new SimpleBooleanProperty();
     public final BooleanProperty eprintSelected = new SimpleBooleanProperty();
     public final BooleanProperty urlSelected = new SimpleBooleanProperty();
     public final BooleanProperty bibTexSelected = new SimpleBooleanProperty();
@@ -29,6 +31,7 @@ public class CleanupMultiFieldViewModel {
 
     public CleanupMultiFieldViewModel(CleanupPreferences preferences) {
         doiSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+        arXivDoiSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ARXIV_DOI));
         eprintSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
         urlSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
         bibTexSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
@@ -70,6 +73,9 @@ public class CleanupMultiFieldViewModel {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
         if (doiSelected.get()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DOI);
+        }
+        if (arXivDoiSelected.get()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ARXIV_DOI);
         }
         if (eprintSelected.get()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);

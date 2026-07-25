@@ -358,10 +358,12 @@ public class Backend52 {
                             .getRawCursorForCitationGroup(group, doc)
                             .orElseThrow(IllegalStateException::new);
                     String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
-                    Optional<String> pageInfo = group.numberOfCitations() > 0
-                                                ? (getPageInfoFromData(group)
-                            .map(e -> OOText.toString(e)))
-                                                : Optional.empty();
+                    Optional<String> pageInfo;
+                    if (group.numberOfCitations() == 0) {
+                        pageInfo = Optional.empty();
+                    } else {
+                        pageInfo = getPageInfoFromData(group).map(e -> OOText.toString(e));
+                    }
                     CitationEntry entry = new CitationEntry(name, context, pageInfo);
                     citations.add(entry);
                 }

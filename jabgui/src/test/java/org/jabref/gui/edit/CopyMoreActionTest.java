@@ -111,7 +111,7 @@ class CopyMoreActionTest {
                         Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Title")),
 
                 Arguments.of(StandardActions.COPY_CITATION_KEY,
-                        (Consumer<BibEntry>) BibEntry::clearCiteKey,
+                        (Consumer<BibEntry>) BibEntry::clearCitationKey,
                         Localization.lang("None of the selected entries have citation keys."),
                         Localization.lang("Warning: %0 out of %1 entries have undefined citation key.", "1", "2")),
 

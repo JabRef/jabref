@@ -1,10 +1,16 @@
 package org.jabref.gui.entryeditor;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tab;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
+import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,32 +18,71 @@ public abstract class EntryEditorTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
-    protected BibEntry currentEntry;
+    private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
 
-    /// Needed to track for which type of entry this tab was build and to rebuild it if the type changes
-    private EntryType currentEntryType;
+    /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel}.
+    private final ObjectProperty<@Nullable BibEntry> currentEntry = new SimpleObjectProperty<>();
 
-    /// Decide whether to show this tab for the given entry.
-    public abstract boolean shouldShow(BibEntry entry);
+    /// The entry (and its type) the tab content was last rendered for.
+    /// Tab is lazily rebuild in {@link #notifyAboutFocus(BibEntry)}.
+    private @Nullable BibEntry renderedEntry;
+    private @Nullable EntryType renderedEntryType;
 
-    /// Updates the view with the contents of the given entry.
-    protected abstract void bindToEntry(BibEntry entry);
+    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory}.
+    private ObservableValue<Boolean> preferenceDrivenVisibility = ALWAYS_VISIBLE;
 
-    /// The tab just got the focus. Override this method if you want to perform a special action on focus (like selecting
-    /// the first field in the editor)
-    protected void handleFocus() {
-        // Do nothing by default
+    /// Content-driven visibility gate for tabs that only make sense for certain entries.
+    private ObservableValue<Boolean> contentDrivenVisibility = ALWAYS_VISIBLE;
+
+    /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
+    private @Nullable ObservableValue<Boolean> combinedVisibility;
+
+    public void setPreferenceDrivenVisibility(ObservableValue<Boolean> preferenceDrivenVisibility) {
+        this.preferenceDrivenVisibility = preferenceDrivenVisibility;
+        this.combinedVisibility = null;
     }
 
-    /// Notifies the tab that it got focus and should display the given entry.
+    protected void setContentDrivenVisibility(ObservableValue<Boolean> contentDrivenVisibility) {
+        this.contentDrivenVisibility = contentDrivenVisibility;
+        this.combinedVisibility = null;
+    }
+
+    public final ObservableValue<Boolean> visibility() {
+        // Built once and cached; JavaFX Application Thread only (no synchronization on the lazy init).
+        if (combinedVisibility == null) {
+            combinedVisibility = EasyBind.combine(
+                    preferenceDrivenVisibility,
+                    contentDrivenVisibility,
+                    (preference, content) -> preference && content
+            );
+        }
+
+        return combinedVisibility;
+    }
+
+    public @Nullable BibEntry getCurrentEntry() {
+        return currentEntry.get();
+    }
+
+    public ObjectProperty<@Nullable BibEntry> currentEntryProperty() {
+        return currentEntry;
+    }
+
+    protected abstract void bindToEntry(BibEntry entry);
+
+    /// Override to perform a special action on focus (like selecting the first field in the editor).
+    protected void handleFocus() {
+    }
+
     public void notifyAboutFocus(BibEntry entry) {
-        if (!entry.equals(currentEntry) || !entry.getType().equals(currentEntryType)) {
-            // TODO: Shouldn't "bindToEntry" called when changing the entry?
+        // currentEntry is bound to the view model and updates on its own; rebuild content only when the
+        // entry or its type actually changed (intentionally lazy: not on every push to the property).
+        if (!entry.equals(renderedEntry) || !entry.getType().equals(renderedEntryType)) {
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
-            LOGGER.trace("Different entry: {}", entry.equals(currentEntry));
-            LOGGER.trace("Different entry type: {}", !entry.getType().equals(currentEntryType));
-            currentEntry = entry;
-            currentEntryType = entry.getType();
+            LOGGER.trace("Different entry: {}", !entry.equals(renderedEntry));
+            LOGGER.trace("Different entry type: {}", !entry.getType().equals(renderedEntryType));
+            renderedEntry = entry;
+            renderedEntryType = entry.getType();
             bindToEntry(entry);
         }
         handleFocus();

@@ -78,6 +78,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         this.redoAction = redoAction;
         this.preferences = preferences;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+
+        // Visible when the current entry (of its type) has at least one field to display in this tab.
+        setContentDrivenVisibility(EasyBind.map(currentEntryProperty(),
+                entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty()));
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -107,6 +111,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 .map(field -> createLabelAndEditor(bibDatabaseContext, entry, field))
                 .toList();
 
+        layoutEditors(bibDatabaseContext, entry, compressed, labels);
+    }
+
+    /// Arranges the created labels and editors inside [#gridPane]. The default layout stretches the
+    /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.
+    protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
 
@@ -187,15 +197,23 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         }
     }
 
+    /// `true` (default): content fills the tab height, rows share the space (classic category tabs).
+    /// `false`: content keeps its natural height and the tab scrolls vertically (single-list tab).
+    protected boolean stretchContentToTabHeight() {
+        return true;
+    }
+
+    /// The node placed inside the tab's ScrollPane. By default the field grid itself;
+    /// subclasses may wrap [#gridPane] in a larger structure (e.g. with collapsible
+    /// sections) and return that instead. Called once from `initPanel()`.
+    protected Node getEditorContent() {
+        return gridPane;
+    }
+
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
         }
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return !determineFieldsToShow(entry).isEmpty();
     }
 
     @Override
@@ -221,9 +239,9 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-            scrollPane.setContent(gridPane);
+            scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToHeight(stretchContentToTabHeight());
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);

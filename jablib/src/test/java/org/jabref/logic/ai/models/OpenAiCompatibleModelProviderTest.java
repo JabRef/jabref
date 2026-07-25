@@ -3,7 +3,7 @@ package org.jabref.logic.ai.models;
 import java.util.List;
 
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

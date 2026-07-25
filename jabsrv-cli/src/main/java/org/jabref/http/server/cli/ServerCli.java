@@ -1,5 +1,6 @@
 package org.jabref.http.server.cli;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -44,7 +45,7 @@ public class ServerCli implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws InterruptedException {
+    public Void call() throws InterruptedException, IOException {
         // The server serves the last opened files (see org.jabref.http.server.resources.LibraryResource.getLibraryPath)
         final List<Path> filesToServe = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
 
@@ -56,13 +57,6 @@ public class ServerCli implements Callable<Void> {
                                          .toList();
             LOGGER.info("Adding following files to the list of opened libraries: {}", filesToAdd);
             filesToServe.addAll(0, filesToAdd);
-        }
-
-        // If we are on Windows and checked-out JabRef at the location given in the workspace setup guideline, we can serve Chocolate.bib, too
-        // Required by rest-api.http
-        Path exampleChocolateBib = Path.of("C:\\git-repositories\\JabRef\\jablib\\src\\main\\resources\\Chocolate.bib");
-        if (Files.exists(exampleChocolateBib)) {
-            filesToServe.add(exampleChocolateBib);
         }
 
         LOGGER.debug("Libraries to serve: {}", filesToServe);

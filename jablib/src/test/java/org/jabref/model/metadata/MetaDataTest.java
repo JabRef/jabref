@@ -25,4 +25,11 @@ class MetaDataTest {
     void getLatexFileDirectoryReturnsEmptyWhenNotSet() {
         assertEquals(Optional.empty(), metaData.getLatexFileDirectory("user-host"));
     }
+
+    @Test
+    void storesAiLibraryId() {
+        metaData.setAiLibraryId("test-ai-library-id");
+
+        assertEquals(Optional.of("test-ai-library-id"), metaData.getAiLibraryId());
+    }
 }

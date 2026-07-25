@@ -48,7 +48,7 @@ public class PseudonymizeAction extends SimpleCommand {
     private void pseudonymizeDatabase(Path outputFilePath) {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new IllegalStateException("No active database found."));
         Path inputFile = database.getDatabasePath().orElseThrow(() -> new IllegalStateException("Database has no file path"));
-        Pseudonymization.Result result = new Pseudonymization().pseudonymizeLibrary(database);
+        Pseudonymization.Result result = new Pseudonymization(preferences.getBibEntryPreferences().getKeywordSeparator()).pseudonymizeLibrary(database);
 
         String fileName = FileUtil.getBaseName(inputFile) + PSEUDO_SUFFIX;
         Path pseudoBibPath = outputFilePath.resolve(fileName + BIB_EXTENSION);

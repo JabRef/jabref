@@ -14,7 +14,7 @@ jobs:
     # ubuntu-slim does not offer Java (required by the update action)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Update Gradle Wrapper

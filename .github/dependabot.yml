@@ -8,6 +8,8 @@ updates:
       - "/"              # plugins
     schedule:
       interval: daily
+    cooldown:
+      default-days: 1
     open-pull-requests-limit: 10
     labels: [ ]
     ignore:
@@ -17,21 +19,78 @@ updates:
       - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
         versions:
           - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 1
     schedule:
       interval: weekly
       day: wednesday
     labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/check-formatting"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/format-java"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/jbang-check"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/package"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/pr-gate"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/setup-gradle"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+
   - package-ecosystem: "gitsubmodule"
     directory: "/"
+    cooldown:
+      default-days: 1
     schedule:
       interval: weekly
       day: wednesday
     labels: [ ]
+
   - package-ecosystem: "maven"
     directories:
       - "jablib-examples/maven3/doi-to-bibtex"
+    cooldown:
+      default-days: 1
     schedule:
       interval: weekly
       day: wednesday

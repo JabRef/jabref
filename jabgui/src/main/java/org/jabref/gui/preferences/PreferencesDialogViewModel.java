@@ -32,6 +32,7 @@ import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.ocr.OcrTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
@@ -77,6 +78,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomEntryTypesTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
+                new OcrTab(),
                 new ExportTab(),
                 new AutoCompletionTab(),
                 new ProtectedTermsTab(),

@@ -12,6 +12,15 @@ public class ProtectedTermsPreferences {
     private final ObservableList<String> disabledInternalTermLists;
     private final ObservableList<String> disabledExternalTermLists;
 
+    private ProtectedTermsPreferences() {
+        this(
+                ProtectedTermsLoader.getInternalLists(), // Enabled internal term lists
+                List.of(),                               // Enabled external term lists
+                List.of(),                               // Disabled internal term lists
+                List.of()                                // Disabled external term lists
+        );
+    }
+
     public ProtectedTermsPreferences(List<String> enabledInternalTermLists,
                                      List<String> enabledExternalTermLists,
                                      List<String> disabledInternalTermLists,
@@ -20,6 +29,10 @@ public class ProtectedTermsPreferences {
         this.disabledInternalTermLists = FXCollections.observableArrayList(disabledInternalTermLists);
         this.enabledExternalTermLists = FXCollections.observableArrayList(enabledExternalTermLists);
         this.disabledExternalTermLists = FXCollections.observableArrayList(disabledExternalTermLists);
+    }
+
+    public static ProtectedTermsPreferences getDefault() {
+        return new ProtectedTermsPreferences();
     }
 
     public ObservableList<String> getEnabledInternalTermLists() {

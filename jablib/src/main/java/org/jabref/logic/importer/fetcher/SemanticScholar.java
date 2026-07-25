@@ -122,18 +122,35 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     String getURLBySource(String source) throws IOException, FetcherException {
         URLDownload download = new URLDownload(source);
+        importerPreferences.getApiKey(getName()).ifPresent(
+                key -> download.addHeader("x-api-key", key));
         JSONObject json = new JSONObject(download.asString());
-        LOGGER.debug("URL for source: {}", json.get("url").toString());
-        if (!json.has("url")) {
-            throw new FetcherException("Page does not contain field \"url\"");
+        if (!json.has("paperId")) {
+            throw new FetcherException("Page does not contain field \"paperId\"");
         }
-        return json.get("url").toString();
+        String paperId = json.get("paperId").toString();
+        LOGGER.debug("URL for source: https://www.semanticscholar.org/paper/{}", paperId);
+        return "https://www.semanticscholar.org/paper/" + paperId;
     }
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `query` parameter, so raw queries
+    /// bypass [DefaultQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        uriBuilder.addParameter("query", query);
         uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified

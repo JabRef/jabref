@@ -13,7 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,5 +41,15 @@ class ImportFormatReaderParameterlessTest {
     @Test
     void importFromFileWithUnknownFormatThrowsException() {
         assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
+    }
+
+    @Test
+    void hasImporterForFileReturnsFalseForUnsupportedExtension() {
+        assertFalse(reader.hasImporterForFile(Path.of("dropped-file.csv")));
+    }
+
+    @Test
+    void hasImporterForFileReturnsTrueForSupportedExtension() {
+        assertTrue(reader.hasImporterForFile(Path.of("dropped-file.ris")));
     }
 }

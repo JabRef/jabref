@@ -167,7 +167,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 databaseContext,
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
-                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                preferences.getAbbreviationPreferences().shouldUseFJournalField(),
                 journalAbbreviationRepository
         );
 

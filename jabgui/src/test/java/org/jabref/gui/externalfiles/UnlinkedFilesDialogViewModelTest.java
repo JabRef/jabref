@@ -15,6 +15,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -53,6 +57,17 @@ public class UnlinkedFilesDialogViewModelTest {
         MockitoAnnotations.openMocks(this);
 
         // Mock a base directory
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, org.mockito.Answers.RETURNS_DEEP_STUBS);
+        when(guiPreferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(guiPreferences.getExternalApplicationsPreferences()).thenReturn(mock(org.jabref.gui.frame.ExternalApplicationsPreferences.class, org.mockito.Answers.RETURNS_DEEP_STUBS));
+        when(guiPreferences.getImporterPreferences()).thenReturn(mock(ImporterPreferences.class, org.mockito.Answers.RETURNS_DEEP_STUBS));
+        when(guiPreferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class, org.mockito.Answers.RETURNS_DEEP_STUBS));
+
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(guiPreferences.getFieldPreferences()).thenReturn(fieldPreferences);
+
+        when(guiPreferences.getImporterPreferences().getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of("C:/test/base"));

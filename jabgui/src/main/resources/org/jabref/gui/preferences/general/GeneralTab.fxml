@@ -75,6 +75,8 @@
     <CheckBox fx:id="confirmHideTabBar" text="%Hide tab bar when single library is present"/>
     <CheckBox fx:id="donationNeverShow" text="%Do not show donation prompt again"/>
 
+    <CheckBox fx:id="usePostgresSearch" text="%Experimental search (Postgres)"/>
+
     <Label styleClass="sectionHeader" text="%Single instance" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="remoteServer" text="%Enforce single JabRef instance (and allow remote operations) using port" />

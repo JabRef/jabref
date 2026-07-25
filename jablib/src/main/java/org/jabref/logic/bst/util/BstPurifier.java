@@ -1,5 +1,6 @@
 package org.jabref.logic.bst.util;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /// contained in the control sequences associated with a special character, and
 /// pushes the resulting string. If the literal isn't a string, it complains and
 /// pushes the null string.
-///
+@NullMarked
 public class BstPurifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPurifier.class);
 

@@ -306,7 +306,7 @@ public class RisImporter extends Importer {
             }
 
             // Remove empty fields
-            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
+            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().isBlank());
 
             // Create final entry
             BibEntry entry = new BibEntry(type);

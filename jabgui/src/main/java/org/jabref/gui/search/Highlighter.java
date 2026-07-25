@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.search.query.SearchQueryConversion;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
@@ -29,10 +32,11 @@ import org.slf4j.LoggerFactory;
 public class Highlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);
 
-    /// Functions defined in {@link org.jabref.model.search.PostgreConstants#POSTGRES_FUNCTIONS}
+    /// Functions defined in {@link org.jabref.model.search.PostgresConstants#POSTGRES_FUNCTIONS}
     private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;
+    private static GuiPreferences guiPreferences;
 
     private Highlighter() {
         // prevent instantiation
@@ -62,8 +66,14 @@ public class Highlighter {
     }
 
     private static String highlightNode(String text, String searchPattern) {
+        if (!shouldUsePostgresSearch()) {
+            return text.replaceAll(
+                    "(?i)(" + searchPattern + ")",
+                    "<mark style=\"background: orange\">$1</mark>"
+            );
+        }
         if (connection == null) {
-            connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
+            connection = Injector.instantiateModelOrService(PostgresServer.class).getConnection();
         }
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_MARK)) {
@@ -82,8 +92,16 @@ public class Highlighter {
     }
 
     public static List<Range> findMatchPositions(String text, String pattern) {
+        if (!shouldUsePostgresSearch()) {
+            List<Range> positions = new ArrayList<>();
+            Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(text);
+            while (matcher.find()) {
+                positions.add(new Range(matcher.start() + 1, matcher.end())); // +1 for 1-based like Postgres
+            }
+            return positions;
+        }
         if (connection == null) {
-            connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
+            connection = Injector.instantiateModelOrService(PostgresServer.class).getConnection();
         }
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_POSITIONS)) {
@@ -133,5 +151,12 @@ public class Highlighter {
 
     public static Optional<String> buildSearchPattern(List<String> terms) {
         return terms.isEmpty() ? Optional.empty() : Optional.of(String.join("|", terms));
+    }
+
+    private static boolean shouldUsePostgresSearch() {
+        if (guiPreferences == null) {
+            guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
+        }
+        return guiPreferences.getSearchPreferences().shouldUsePostgresSearch();
     }
 }

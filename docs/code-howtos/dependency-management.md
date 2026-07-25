@@ -3,7 +3,7 @@ parent: Code Howtos
 ---
 # Dependency management
 
-The structrue and dependency management in the JabRef project uses the
+The structure and dependency management in the JabRef project uses the
 [Java Module System (JPMS)](https://www.oracle.com/corporate/features/understanding-java-9-modules.html)
 as the primary system for defining _modules_ and their _dependencies_. For a smooth integration of JPMS and Gradle's
 dependency management, the `org.gradlex.java-module-dependencies` plugin, and the additional notations it provides, are
@@ -55,8 +55,7 @@ If you use a 3rd party module like `tools.jackson.databind`, a version for that 
 be selected. For this, the `versions/build.gradle.kts`
 defines a so-called _Gradle platform_ (also called BOM) that contains the versions of all 3rd party
 modules used. If you want to upgrade the version of a module, do this here. If you need to use a new 3rd party module
-in a `src/main/java/module-info.java` file, you need to
-add the version here.
+in a `src/main/java/module-info.java` file, you need to add the version here.
 (If the new module is not completely JPMS compatible, you may also need to add or modify
 [patching rules](#patching-3rd-party-modules)).
 
@@ -77,15 +76,18 @@ If an issue in this area occurs after modifying dependency versions, you will se
 ```
 
 In these cases, first determine if adding the new 3rd party module is really needed/intended.
-If yes, there are two levels of patching that can be performed:
+If yes, there are three levels of mapping/patching that can be performed:
 
-1. Add missing (or modify existing) `module-info.class`:
+1. Add missing mapping to `modules.properties`:
+   In case the module is a real Java module, but not found by Gradle, you need to put a mapping from the _Module Name_ to the _Maven Coordinates_ (`group:name`) into `gradle/modules.properties`.
+   Furthermore, if it is a module available on Maven Central, file a pull request against [java-module-dependencies/.../modules.properties](https://github.com/gradlex-org/java-module-dependencies/blob/main/src/main/resources/org/gradlex/javamodule/dependencies/modules.properties)
+2. Add missing (or modify existing) `module-info.class`:
    This is done through the `org.gradlex.extra-java-module-info` plugin.
    Often it is sufficient to add a simple entry for the affected library. For example, to address the error
    above, you can add `module("javax.inject:javax.inject", "javax.inject")` to the `extraJavaModuleInfo` block.
    For more details, refer to the
    [org.gradlex.extra-java-module-info plugin documentation](https://github.com/gradlex-org/extra-java-module-info).
-2. Adjust metadata (POM file) of dependency:
+3. Adjust metadata (POM file) of dependency:
    This is required to solve more severe issues with the metadata of a library using the Gradle concept of
    _Component Metadata Rules_. For a convenient definition of such rules, we use the `patch` notation provided by the
    `org.gradlex.jvm-dependency-conflict-resolution` plugin.

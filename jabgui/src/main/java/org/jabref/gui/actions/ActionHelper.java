@@ -10,6 +10,7 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -142,5 +143,11 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
+    }
+
+    public static BooleanExpression noCatalogEnabled(ObservableList<StudyCatalogItem> catalogs) {
+        return Bindings.createBooleanBinding(
+                () -> catalogs.stream().noneMatch(StudyCatalogItem::isEnabled),
+                catalogs);
     }
 }

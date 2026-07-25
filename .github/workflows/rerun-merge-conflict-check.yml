@@ -17,8 +17,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: actions/checkout@v7
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: jq
           version: 1.0

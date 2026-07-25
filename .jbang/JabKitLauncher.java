@@ -1,24 +1,27 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 
-//DESCRIPTION jabkit - mange BibTeX files using JabRef
+//DESCRIPTION jabkit - manage BibTeX files using JabRef
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
+// mavenlocal is listed first so a locally built jablib (./gradlew :jablib:publishToMavenLocal)
+// takes precedence over the published 6.0-SNAPSHOT - needed when testing unreleased jablib changes.
 // raw is for https://github.com/unicode-org/icu/pull/2127
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
 //DEPS io.github.adr:e-adr:2.0.0
 
-// requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
+// requirements needed by jabkit project need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
 
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Check.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
@@ -29,12 +32,22 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
+
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/CitationFetcherFactory.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/ExportService.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/ImportService.java
+
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/CliException.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/CliExceptionHandler.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/ExportServiceException.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/ImportServiceException.java
 
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 

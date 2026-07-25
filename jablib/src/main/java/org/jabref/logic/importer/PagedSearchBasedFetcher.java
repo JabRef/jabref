@@ -25,6 +25,14 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         return this.performSearchPaged(SearchBasedFetcher.getQueryNode(searchQuery), pageNumber);
     }
 
+    /// @param rawQuery   catalog-native query string sent verbatim to the catalog
+    /// @param pageNumber requested site number indexed from 0
+    /// @return Page with search results
+    default Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        throw new UnsupportedOperationException(
+                getName() + " has not yet been migrated to performRawSearchQueryPaged");
+    }
+
     /// @return default pageSize
     default int getPageSize() {
         return 20;
@@ -37,5 +45,10 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     @Override
     default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());
+    }
+
+    @Override
+    default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        return new ArrayList<>(performRawSearchQueryPaged(rawQuery, 0).getContent());
     }
 }

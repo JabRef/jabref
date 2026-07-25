@@ -15,8 +15,8 @@ public class SortCriterionViewModel {
     private final BooleanProperty descendingProperty = new SimpleBooleanProperty();
 
     public SortCriterionViewModel(SaveOrder.SortCriterion criterion) {
-        this.fieldProperty.setValue(criterion.field);
-        this.descendingProperty.setValue(criterion.descending);
+        this.fieldProperty.setValue(criterion.field());
+        this.descendingProperty.setValue(criterion.descending());
     }
 
     public SortCriterionViewModel() {

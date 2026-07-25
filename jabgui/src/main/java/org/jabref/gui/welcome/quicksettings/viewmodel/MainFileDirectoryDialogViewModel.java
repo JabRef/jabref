@@ -30,25 +30,17 @@ public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
         return pathProperty;
     }
 
-    public String getPath() {
-        return pathProperty.get();
-    }
-
-    public void setPath(String path) {
-        pathProperty.set(path);
-    }
-
     public void browseForDirectory() {
         DirectoryDialogConfiguration dirConfig = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
         dialogService.showDirectorySelectionDialog(dirConfig)
-                     .ifPresent(selectedDir -> setPath(selectedDir.toString()));
+                     .ifPresent(selectedDir -> pathProperty.set(selectedDir.toString()));
     }
 
     public void saveSettings() {
-        filePreferences.setMainFileDirectory(getPath());
+        filePreferences.setMainFileDirectory(Path.of(pathProperty.get()));
         filePreferences.setStoreFilesRelativeToBibFile(false);
     }
 }

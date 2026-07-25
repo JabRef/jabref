@@ -331,8 +331,8 @@ public class BibDatabase {
     }
 
     /// Returns the string with the given id.
-    public BibtexString getString(String id) {
-        return bibtexStrings.get(id);
+    public Optional<BibtexString> getString(String id) {
+        return Optional.ofNullable(bibtexStrings.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -649,7 +649,7 @@ public class BibDatabase {
     /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
-    public int indexOf(BibEntry bibEntry) {
+    public int indexOf(@NonNull BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
         if (index >= 0) {
             return index;
@@ -658,8 +658,8 @@ public class BibDatabase {
         return -1;
     }
 
-    public BibEntry getEntryById(String id) {
-        return entriesId.get(id);
+    public Optional<BibEntry> getEntryById(String id) {
+        return Optional.ofNullable(entriesId.get(id));
     }
 
     @Override

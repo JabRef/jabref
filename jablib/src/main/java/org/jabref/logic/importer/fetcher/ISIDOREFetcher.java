@@ -95,19 +95,33 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
         String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse("");
+        URIBuilder uriBuilder = new URIBuilder(buildSearchURL(transformedQuery, pageNumber).toURI());
+        queryTransformer.getParameterMap().forEach(uriBuilder::addParameter);
+
+        URL url = uriBuilder.build().toURL();
+        LOGGER.debug("URl for query {}", url);
+        return url;
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `q` parameter, so raw queries
+    /// bypass [ISIDOREQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
-        uriBuilder.addParameter("q", transformedQuery);
+        uriBuilder.addParameter("q", query);
         if (pageNumber > 1) {
             uriBuilder.addParameter("page", String.valueOf(pageNumber));
         }
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
         uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
-        queryTransformer.getParameterMap().forEach(uriBuilder::addParameter);
-
-        URL url = uriBuilder.build().toURL();
-        LOGGER.debug("URl for query {}", url);
-        return url;
+        return uriBuilder.build().toURL();
     }
 
     private List<BibEntry> parseXMl(Element element) {

@@ -31,6 +31,7 @@ public class OpenUrlAction extends SimpleCommand {
         BooleanExpression fieldIsSet = ActionHelper.isAnyFieldSetForSelectedEntry(
                 List.of(StandardField.URL, StandardField.DOI, StandardField.URI, StandardField.EPRINT),
                 stateManager);
+        // [impl->req~ux.disabled-vs-hidden~1]
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager).and(fieldIsSet));
     }
 

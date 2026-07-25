@@ -75,4 +75,13 @@ public class Directories {
                                       "covers",
                                       OS.APP_DIR_APP_AUTHOR));
     }
+
+    public static Path getMscDirectory() {
+        return Path.of(
+                AppDirsFactory.getInstance()
+                              .getUserDataDir(
+                                      OS.APP_DIR_APP_NAME,
+                                      "msc",
+                                      OS.APP_DIR_APP_AUTHOR));
+    }
 }

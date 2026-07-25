@@ -1,0 +1,4 @@
+# Files in docs/decisions/ that are not ADRs and therefore not linted by madrlint.
+# See https://github.com/adr/madrlint
+adr-template.md
+index.md

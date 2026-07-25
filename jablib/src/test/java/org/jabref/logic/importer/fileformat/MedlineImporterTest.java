@@ -1,5 +1,8 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.IOException;
+
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,5 +40,10 @@ class MedlineImporterTest {
     @Test
     void sGetExtensions() {
         assertEquals(StandardFileType.MEDLINE, importer.getFileType());
+    }
+
+    @Test
+    void meshHeadingListIsParsedIntoIndividualKeywords() throws IOException, ImportException {
+        ImporterTestEngine.testImportEntries(importer, "MedlineImporterTestMeshHeadingList.xml", ".xml");
     }
 }

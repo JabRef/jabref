@@ -9,6 +9,8 @@ import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import static java.util.function.Predicate.not;
+
 /// Versatile author name formatter that takes arguments to control the formatting style.
 public class Authors extends AbstractParamLayoutFormatter {
 
@@ -250,10 +252,10 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     private void addSingleName(StringBuilder sb, Author a, boolean firstFirst) {
         StringBuilder lastNameSB = new StringBuilder();
-        a.getNamePrefix().filter(von -> !von.isEmpty()).ifPresent(von -> lastNameSB.append(von).append(' '));
+        a.getNamePrefix().filter(not(String::isEmpty)).ifPresent(von -> lastNameSB.append(von).append(' '));
         a.getFamilyName().ifPresent(lastNameSB::append);
         String jrSeparator = " ";
-        a.getNameSuffix().filter(jr -> !jr.isEmpty()).ifPresent(jr -> lastNameSB.append(jrSeparator).append(jr));
+        a.getNameSuffix().filter(not(String::isEmpty)).ifPresent(jr -> lastNameSB.append(jrSeparator).append(jr));
 
         String firstNameResult = "";
         if (a.getGivenName().isPresent()) {
@@ -269,7 +271,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                     if (index >= 0) {
                         firstNameResult = firstNameResult.substring(0, index + 1);
                         if (abbr.length() > 3) {
-                            firstNameResult = firstNameResult + abbr.substring(3);
+                            firstNameResult += abbr.substring(3);
                         }
                     }
                 }

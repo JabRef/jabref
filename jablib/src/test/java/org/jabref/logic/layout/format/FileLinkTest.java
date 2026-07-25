@@ -1,5 +1,6 @@
 package org.jabref.logic.layout.format;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,7 +19,7 @@ class FileLinkTest {
 
     @BeforeEach
     void setUp() {
-        fileLinkLayoutFormatter = new FileLink(List.of(), "");
+        fileLinkLayoutFormatter = new FileLink(List.of(), Path.of(""));
     }
 
     @ParameterizedTest

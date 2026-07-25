@@ -123,7 +123,7 @@ public record ClipboardContentGenerator(
 
         // Ensure trailing newline at end for consistency with other output formats/tests
         if (!markdown.endsWith(OS.NEWLINE)) {
-            markdown = markdown + OS.NEWLINE;
+            markdown += OS.NEWLINE;
         }
 
         ClipboardContent content = new ClipboardContent();

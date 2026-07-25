@@ -7,20 +7,17 @@ import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
     @FXML private CheckBox protect;
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
-
-    @Inject private CliPreferences preferences;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -36,7 +33,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferences);
+        this.viewModel = new SavingPropertiesViewModel(databaseContext, CleanupPreferences.getDefault().getFieldFormatterCleanups());
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());

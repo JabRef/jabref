@@ -174,7 +174,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                     + "&limit=1000";
             return Optional.of(new URI(apiUrl));
         } catch (URISyntaxException e) {
-            LOGGER.debug("Could not create API URI for endpoint {}: {}", endpoint, e);
+            LOGGER.debug("Could not create API URI for endpoint {}:", endpoint, e);
             return Optional.empty();
         }
     }

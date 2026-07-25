@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -46,6 +49,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.hc.core5.net.URIBuilder;
@@ -71,6 +75,10 @@ import org.xml.sax.SAXException;
 public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.class);
+    private static final Pattern LUCENE_STYLE_FIELD_QUERY = Pattern.compile("\\b(author|title|journal|doi|year|year-range)\\s*:\\s*");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern LEADING_OR_TRAILING_NON_ALNUM_PATTERN = Pattern.compile("^[^\\p{Alnum}]+|[^\\p{Alnum}]+$");
+    private static final Pattern NON_ALNUM_OR_SPACE_PATTERN = Pattern.compile("[^\\p{Alnum}\\s]+");
 
     // See https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/
     private static final String DOI_PREFIX = "10.48550/arXiv.";
@@ -113,6 +121,16 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     @Override
     public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         return arXiv.findFullText(entry);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+        return PagedSearchBasedFetcher.super.performSearch(normalizeSearchQuery(searchQuery));
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
+        return PagedSearchBasedFetcher.super.performSearchPaged(normalizeSearchQuery(searchQuery), pageNumber);
     }
 
     @Override
@@ -192,7 +210,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     /// Check if a specific DOI is user-assigned.
     private static boolean isManualDoi(String doi) {
-        return !doi.toLowerCase().contains(DOI_PREFIX.toLowerCase());
+        return !doi.regionMatches(true, 0, DOI_PREFIX, 0, DOI_PREFIX.length());
     }
 
     /// Get user-issued DOI from ArXiv Bibtex entry, if any
@@ -292,7 +310,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             automaticDoi = ArXivFetcher.getAutomaticDoi(arXivBibEntry.get());
-            automaticDoiBibEntryFuture = automaticDoi.map(arXiv::asyncPerformSearchById);
+            automaticDoiBibEntryFuture = automaticDoi.map(doiFetcher::asyncPerformSearchById);
         }
 
         manualDoi = ArXivFetcher.getManualDoi(arXivBibEntry.get());
@@ -311,28 +329,45 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// @return A list of entries matching the complex query
     @Override
     public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
-
         Page<BibEntry> result = arXiv.performSearchPaged(queryNode, pageNumber);
         if (this.doiFetcher == null) {
             return result;
         }
+        return enrichPageWithDoi(result);
+    }
 
-        ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        Page<BibEntry> result = arXiv.performRawSearchQueryPaged(rawQuery, pageNumber);
+        if (this.doiFetcher == null) {
+            return result;
+        }
+        return enrichPageWithDoi(result);
+    }
 
-        Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                           .stream()
-                                                                           .map(bibEntry ->
-                                                                                   CompletableFuture.supplyAsync(() -> {
-                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                       return bibEntry;
-                                                                                   }, executor))
-                                                                           .toList();
+    /// Enriches each entry in the page with additional metadata from ArXiv-issued and user-issued DOIs using parallel async requests.
+    private Page<BibEntry> enrichPageWithDoi(Page<BibEntry> result) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize())) {
+            // All futures must be submitted before any .join() is called, so that tasks run in parallel.
+            // Collecting to a list here forces full submission before the join step below.
+            Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
+                                                                               .stream()
+                                                                               .map(bibEntry ->
+                                                                                       CompletableFuture.supplyAsync(() -> {
+                                                                                           this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                           return bibEntry;
+                                                                                       }, executor))
+                                                                               .toList();
 
-        Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                                                      .map(CompletableFuture::join)
-                                                                      .collect(Collectors.toList());
+            List<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+                                                                    .map(CompletableFuture::join)
+                                                                    .toList();
 
-        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+            return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+        }
     }
 
     @Override
@@ -341,17 +376,79 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (this.doiFetcher != null) {
             inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
         }
-        return arXivBibEntryPromise.join();
+        Optional<BibEntry> result = arXivBibEntryPromise.join();
+        result.ifPresent(this::infuseWithInspireCitationKeyIfMissing);
+        return result;
+    }
+
+    /// If the entry has no "real" citation key yet, try to look up the paper on INSPIRE (the
+    /// standard literature database for high-energy physics) and adopt its curated texkey instead.
+    ///
+    /// A "real" key means anything other than absent or URL-shaped: when no manually-assigned
+    /// (journal) DOI is found to provide a "nicer" key (see [#CHOSEN_MANUAL_DOI_FIELDS]),
+    /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
+    /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
+    /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
+    /// Without this distinction, a plain "is a key present?" check would already be satisfied by
+    /// that URL and skip the INSPIRE lookup below entirely — leaving exactly the entries this
+    /// method exists to fix stuck with a DOI URL as their citation key.
+    ///
+    /// Most arXiv categories aren't indexed by INSPIRE, so a miss here is expected, not an error —
+    /// the entry is simply left with whatever citation key (if any) it already had.
+    ///
+    /// The entry's EPRINT field is expected to already be normalized by [ArXiv#performSearchById].
+    ///
+    /// @param entry The fetched arXiv entry to infuse, modified in place.
+    private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
+        if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
+            return;
+        }
+        entry.getField(StandardField.EPRINT).ifPresent(eprint -> lookUpInspireCitationKey(entry, eprint));
+    }
+
+    private void lookUpInspireCitationKey(BibEntry entry, String eprint) {
+        try {
+            // INSPIREFetcher only recognizes the lowercase "arxiv" value for this field
+            BibEntry inspireQuery = new BibEntry()
+                    .withField(StandardField.ARCHIVEPREFIX, "arxiv")
+                    .withField(StandardField.EPRINT, eprint);
+            new INSPIREFetcher(importFormatPreferences).performSearch(inspireQuery).stream()
+                                                       .findFirst()
+                                                       .flatMap(BibEntry::getCitationKey)
+                                                       .ifPresent(entry::setCitationKey);
+        } catch (FetcherClientException e) {
+            // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
+            LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}'", eprint, e);
+        }
+    }
+
+    private static boolean isUrlShaped(String key) {
+        return key.startsWith("http://") || key.startsWith("https://");
     }
 
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
+        Optional<ArXivIdentifier> arXivIdentifier = entry.getField(StandardField.DOI)
+                                                         .flatMap(DOI::parse)
+                                                         .map(DOI::asString)
+                                                         .filter(doi -> doi.regionMatches(true, 0, DOI_PREFIX, 0, DOI_PREFIX.length()))
+                                                         .map(doi -> doi.substring(DOI_PREFIX.length()))
+                                                         .flatMap(ArXivIdentifier::parse);
+        if (arXivIdentifier.isPresent()) {
+            return arXivIdentifier;
+        }
         return arXiv.findIdentifier(entry);
     }
 
     @Override
     public String getIdentifierName() {
         return arXiv.getIdentifierName();
+    }
+
+    private static String normalizeSearchQuery(String searchQuery) {
+        return LUCENE_STYLE_FIELD_QUERY.matcher(searchQuery).replaceAll("$1=");
     }
 
     /// Fetcher for the arXiv.
@@ -366,6 +463,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
+        private static final FetcherRateLimiter ARXIV_API_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("arXiv", 1, Duration.ofSeconds(3));
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
@@ -448,10 +546,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
                 query = "doi:" + doiString.get();
             } else {
-                // TODO: Use org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer
-                Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-                Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
-                query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+                query = new ArXivQueryTransformer().entryToQuery(entry).orElse("");
             }
 
             Optional<ArXivEntry> arxivEntry = searchForEntry(query);
@@ -522,6 +617,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
+                ARXIV_API_RATE_LIMITER.acquire(url.toString());
                 DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -582,7 +678,69 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
                     .collect(Collectors.toList());
 
+            if (searchResult.isEmpty()) {
+                searchResult = fallbackToBroadTitleQuery(queryNode, pageNumber);
+            }
+
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+        }
+
+        @Override
+        public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+            if (rawQuery.isBlank()) {
+                return new Page<>(rawQuery, pageNumber, List.of());
+            }
+            List<BibEntry> searchResult = searchForEntries(rawQuery, pageNumber)
+                    .stream()
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .toList();
+            return new Page<>(rawQuery, pageNumber, searchResult);
+        }
+
+        private List<BibEntry> fallbackToBroadTitleQuery(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
+            if (!(queryNode instanceof SearchQueryNode(
+                    Optional<Field> field,
+                    String requestedTitle
+            )) || field.isEmpty() || StandardField.TITLE != field.get()) {
+                return List.of();
+            }
+
+            String broadQuery = buildBroadTitleQuery(requestedTitle);
+            if (broadQuery.isBlank()) {
+                return List.of();
+            }
+
+            String normalizedRequestedTitle = normalizeForTitleMatching(requestedTitle);
+            return queryApi(broadQuery, List.of(), getPageSize() * pageNumber, getPageSize()).stream()
+                                                                                             .filter(arXivEntry -> arXivEntry.title()
+                                                                                                                             .map(ArXiv::normalizeForTitleMatching)
+                                                                                                                             .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
+                                                                                                                             .isPresent())
+                                                                                             .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                                                                                             .toList();
+        }
+
+        private static String buildBroadTitleQuery(String title) {
+            String[] rawTerms = WHITESPACE_PATTERN.split(title);
+            List<String> queryTerms = new ArrayList<>();
+            for (String rawTerm : rawTerms) {
+                String sanitizedTerm = LEADING_OR_TRAILING_NON_ALNUM_PATTERN.matcher(rawTerm).replaceAll("");
+                if (sanitizedTerm.length() < 4) {
+                    continue;
+                }
+                if (!sanitizedTerm.equals(StringUtil.stripAccents(sanitizedTerm))) {
+                    continue;
+                }
+                queryTerms.add("all:" + sanitizedTerm);
+            }
+            return String.join(" AND ", queryTerms);
+        }
+
+        private static String normalizeForTitleMatching(String title) {
+            String normalizedTitle = StringUtil.stripAccents(title);
+            normalizedTitle = NON_ALNUM_OR_SPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+            normalizedTitle = WHITESPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+            return normalizedTitle.trim().toLowerCase();
         }
 
         private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
@@ -625,6 +783,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         private static class ArXivEntry {
+            private static final Pattern SINGLE_LINE_BREAK_PATTERN = Pattern.compile("\\n(?!\\s*\\n)");
+            private static final Pattern SURROUNDING_LINE_BREAK_WHITESPACE_PATTERN = Pattern.compile("\\s*\\n\\s*");
+            private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile(" {2,}");
+            private static final Pattern LEADING_OR_TRAILING_WHITESPACE_PATTERN = Pattern.compile("(^\\s*|\\s+$)");
 
             private final Optional<String> title;
             private final Optional<String> urlAbstractPage;
@@ -696,10 +858,15 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                          .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
             }
 
+            public Optional<String> title() {
+                return title;
+            }
+
             public static String correctLineBreaks(String s) {
-                String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
-                result = result.replaceAll("\\s*\\n\\s*", "\n");
-                return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+                String result = SINGLE_LINE_BREAK_PATTERN.matcher(s).replaceAll(" ");
+                result = SURROUNDING_LINE_BREAK_WHITESPACE_PATTERN.matcher(result).replaceAll("\n");
+                result = MULTIPLE_SPACES_PATTERN.matcher(result).replaceAll(" ");
+                return LEADING_OR_TRAILING_WHITESPACE_PATTERN.matcher(result).replaceAll("");
             }
 
             /// Returns the url of the linked pdf

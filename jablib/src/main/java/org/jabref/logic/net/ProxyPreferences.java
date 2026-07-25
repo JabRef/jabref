@@ -50,16 +50,6 @@ public class ProxyPreferences {
         return new ProxyPreferences();
     }
 
-    public void setAll(ProxyPreferences preferences) {
-        this.useProxy.set(preferences.shouldUseProxy());
-        this.hostname.set(preferences.getHostname());
-        this.port.set(preferences.getPort());
-        this.useAuthentication.set(preferences.shouldUseAuthentication());
-        this.username.set(preferences.getUsername());
-        this.password.set(preferences.getPassword());
-        this.persistPassword.set(preferences.shouldPersistPassword());
-    }
-
     public final boolean shouldUseProxy() {
         return useProxy.getValue();
     }

@@ -12,7 +12,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.DragEvent;
+
+import org.jabref.gui.icon.JabRefIcon;
 
 public class ControlHelper {
 
@@ -22,6 +25,20 @@ public class ControlHelper {
     private static PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
 
     public enum EllipsisPosition { BEGINNING, CENTER, ENDING }
+
+    public static Button iconButton(JabRefIcon icon) {
+        Button button = new Button();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().add("icon-button");
+        return button;
+    }
+
+    public static ToggleButton iconToggleButton(JabRefIcon icon) {
+        ToggleButton button = new ToggleButton();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().add("icon-button");
+        return button;
+    }
 
     public static void setAction(ButtonType buttonType, DialogPane dialogPane, Consumer<Event> consumer) {
         Button button = (Button) dialogPane.lookupButton(buttonType);

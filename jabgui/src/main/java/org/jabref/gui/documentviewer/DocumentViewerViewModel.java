@@ -112,7 +112,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private boolean isPdfFile(LinkedFile file) {
-        if (file == null || file.getLink() == null || file.getLink().trim().isEmpty()) {
+        if (file == null || file.getLink() == null || file.getLink().isBlank()) {
             return false;
         }
 

@@ -3,19 +3,25 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.jspecify.annotations.NonNull;
@@ -25,19 +31,31 @@ record SingleSelectionMenuBuilder(
         BibDatabaseContext databaseContext,
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
-        LinkedFilesEditorViewModel viewModel
+        LinkedFilesEditorViewModel viewModel,
+        TaskExecutor taskExecutor,
+        FileUpdateMonitor fileUpdateMonitor,
+        UndoManager undoManager,
+        StateManager stateManager
 ) implements ContextMenuBuilder {
 
     SingleSelectionMenuBuilder(@NonNull DialogService dialogService,
                                @NonNull BibDatabaseContext databaseContext,
                                @NonNull ObservableOptionalValue<BibEntry> bibEntry,
                                @NonNull GuiPreferences preferences,
-                               @NonNull LinkedFilesEditorViewModel viewModel) {
+                               @NonNull LinkedFilesEditorViewModel viewModel,
+                               @NonNull TaskExecutor taskExecutor,
+                               @NonNull FileUpdateMonitor fileUpdateMonitor,
+                               @NonNull UndoManager undoManager,
+                               @NonNull StateManager stateManager) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.bibEntry = bibEntry;
         this.preferences = preferences;
         this.viewModel = viewModel;
+        this.taskExecutor = taskExecutor;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
     }
 
     @Override
@@ -76,18 +94,19 @@ record SingleSelectionMenuBuilder(
                 new ContextAction(StandardActions.DOWNLOAD_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
         items.add(factory.createMenuItem(
+                StandardActions.PERFORM_OCR,
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor, fileUpdateMonitor, undoManager, stateManager)));
+
+        items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,
                 new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_NAME,
                 new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        items.add(factory.createMenuItem(
-                StandardActions.MOVE_FILE_TO_FOLDER,
-                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
-        items.add(factory.createMenuItem(
-                StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME,
-                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+        MoveFileSubmenuFactory moveFileSubmenuFactory = new MoveFileSubmenuFactory(factory, databaseContext, preferences);
+        items.add(moveFileSubmenuFactory.createSingle(selectedLinkedFile));
+        items.add(moveFileSubmenuFactory.createSingleAndRename(selectedLinkedFile));
 
         items.add(factory.createMenuItem(
                 StandardActions.COPY_FILE_TO_FOLDER,

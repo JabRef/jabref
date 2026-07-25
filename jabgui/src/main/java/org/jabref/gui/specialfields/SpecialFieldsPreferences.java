@@ -22,10 +22,6 @@ public class SpecialFieldsPreferences {
         return new SpecialFieldsPreferences();
     }
 
-    public void setAll(SpecialFieldsPreferences preferences) {
-        this.specialFieldsEnabled.set(preferences.isSpecialFieldsEnabled());
-    }
-
     public boolean isSpecialFieldsEnabled() {
         return specialFieldsEnabled.getValue();
     }

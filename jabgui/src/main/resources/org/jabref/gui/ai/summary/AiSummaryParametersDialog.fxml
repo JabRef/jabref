@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import org.jabref.gui.ai.summary.AiSummaryParametersView?>
+<DialogPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.ai.summary.AiSummaryParametersDialog">
+    <content>
+        <AiSummaryParametersView
+                fx:id="aiSummaryParametersView"/>
+    </content>
+
+    <ButtonType
+            text="%Generate"
+            buttonData="OK_DONE"/>
+    <ButtonType
+            text="%Cancel"
+            buttonData="CANCEL_CLOSE"/>
+</DialogPane>

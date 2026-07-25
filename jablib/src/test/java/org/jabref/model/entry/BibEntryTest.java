@@ -244,6 +244,28 @@ class BibEntryTest {
     }
 
     @Test
+    void getFieldOrAliasLatexFreeAbstractWithNestedMathScriptsRemainsReadable() {
+        entry.setField(StandardField.ABSTRACT, """
+                Much progress has been made in classifying when the weak Lefschetz property holds for $A=\\mathbb{F}[x,y,z]/I$ where $\\text{char}(\\mathbb{F})=0$ and $I=(x^{d_{1}},y^{d_{2}},z^{d_{3}},x^{a_{1}}y^{a_{2}}z^{a_{3}})$ is a monomial almost complete intersection. We connect this problem to the setting of two variables through a certain relation. In so doing, we are led to determine explicit formulas for the generators of the colon ideal $(x^{d_{1}},y^{d_{2}}):(x+y)^{a_{3}}$. With these generators in hand, we construct a matrix and show that failure of WLP for $A$ is dictated by the vanishing of a certain polynomial (namely the determinant of our matrix) when $A$ is level. We further show in the level case that a conjecture first posed by Migliore, Miró-Roig, and Nagel is true in a few new cases.
+                """);
+
+        assertEquals(Optional.of("""
+                Much progress has been made in classifying when the weak Lefschetz property holds for A=𝔽[x,y,z]/I where char(𝔽)=0 and I=(xᵈ₁,yᵈ₂,zᵈ₃,xᵃ₁yᵃ₂zᵃ₃) is a monomial almost complete intersection. We connect this problem to the setting of two variables through a certain relation. In so doing, we are led to determine explicit formulas for the generators of the colon ideal (xᵈ₁,yᵈ₂):(x+y)ᵃ₃. With these generators in hand, we construct a matrix and show that failure of WLP for A is dictated by the vanishing of a certain polynomial (namely the determinant of our matrix) when A is level. We further show in the level case that a conjecture first posed by Migliore, Miró-Roig, and Nagel is true in a few new cases.
+                """.stripTrailing()), entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).map(String::stripTrailing));
+    }
+
+    @Test
+    void getFieldOrAliasLatexFreeAbstractWithTextLikeMathCommandsRemainsReadable() {
+        entry.setField(StandardField.ABSTRACT, """
+                Let $R$ be a standard graded algebra over an infinite field $\\mathsf k$, and let $\\mathbb{B}_{\\mathbb{Q}}(R)$ and $\\mathbb{B}_{\\mathbb{Q}}^{\\mathrm{pure}}(R)$ denote the rational cones spanned by the Betti tables of all finitely generated $R$-modules and of those with pure resolutions, respectively. We establish several necessary conditions for the equality $\\mathbb{B}_{\\mathbb{Q}}(R) = \\mathbb{B}_{\\mathbb{Q}}^{\\mathrm{pure}}(R)$. When $\\operatorname{edim}(R)\\ge 2$, we prove that $\\mathsf k$ has a pure resolution if and only if it has a linear resolution, and consequently, if the extremal rays of $\\mathbb{B}_{\\mathbb{Q}}(R)$ are pure, then $R$ is Koszul and good (in the sense of Roos). We show that if $R$ has depth zero, it must be Artinian for the equality of the two cones to hold. For rings with linear pairs of exact zerodivisors, we show that the equality of the cones implies that the $h$-polynomial has degree at most $2$, and use it to characterize generic Gorenstein Artin algebras satisfying $\\mathbb{B}_{\\mathbb{Q}}(R) = \\mathbb{B}_{\\mathbb{Q}}^{\\mathrm{pure}}(R)$. We also characterize algebras whose extremal rays are exactly the Betti tables of shifts of $R/\\mathfrak m^j$ and of pure modules $M$ with $\\operatorname{codim}(M)=\\operatorname{pdim}(M)$: apart from polynomial rings, these are precisely Cohen--Macaulay algebras of dimension at most one with minimal multiplicity. In addition, we obtain a characterization of Cohen--Macaulay algebras of minimal multiplicity in terms of the extremal rays of the Betti cone of maximal Cohen--Macaulay modules.
+                """);
+
+        assertEquals(Optional.of("""
+                Let R be a standard graded algebra over an infinite field k, and let 𝔹_ℚ(R) and 𝔹_ℚᵖᵘʳᵉ(R) denote the rational cones spanned by the Betti tables of all finitely generated R-modules and of those with pure resolutions, respectively. We establish several necessary conditions for the equality 𝔹_ℚ(R) = 𝔹_ℚᵖᵘʳᵉ(R). When edim(R)≥ 2, we prove that k has a pure resolution if and only if it has a linear resolution, and consequently, if the extremal rays of 𝔹_ℚ(R) are pure, then R is Koszul and good (in the sense of Roos). We show that if R has depth zero, it must be Artinian for the equality of the two cones to hold. For rings with linear pairs of exact zerodivisors, we show that the equality of the cones implies that the h-polynomial has degree at most 2, and use it to characterize generic Gorenstein Artin algebras satisfying 𝔹_ℚ(R) = 𝔹_ℚᵖᵘʳᵉ(R). We also characterize algebras whose extremal rays are exactly the Betti tables of shifts of R/𝔪ʲ and of pure modules M with codim(M)=pdim(M): apart from polynomial rings, these are precisely Cohen–Macaulay algebras of dimension at most one with minimal multiplicity. In addition, we obtain a characterization of Cohen–Macaulay algebras of minimal multiplicity in terms of the extremal rays of the Betti cone of maximal Cohen–Macaulay modules.
+                """.stripTrailing()), entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).map(String::stripTrailing));
+    }
+
+    @Test
     void getAndAddToLinkedFileList() {
         List<LinkedFile> files = entry.getFiles();
         files.add(new LinkedFile("", Path.of(""), ""));

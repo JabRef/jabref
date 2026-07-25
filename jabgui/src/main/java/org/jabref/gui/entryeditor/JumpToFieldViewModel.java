@@ -27,14 +27,13 @@ public class JumpToFieldViewModel extends AbstractViewModel {
             return List.of();
         }
 
-        List<String> fieldNames = entryEditor.getAllPossibleTabs().stream()
-                                             .filter(FieldsEditorTab.class::isInstance)
-                                             .map(FieldsEditorTab.class::cast)
-                                             .flatMap(tab -> tab.getShownFields().stream())
-                                             .map(Field::getName)
-                                             .distinct()
-                                             .sorted()
-                                             .collect(Collectors.toList());
-        return fieldNames;
+        return entryEditor.getAllPossibleTabs().stream()
+                          .filter(FieldsEditorTab.class::isInstance)
+                          .map(FieldsEditorTab.class::cast)
+                          .flatMap(tab -> tab.getShownFields().stream())
+                          .map(Field::getName)
+                          .distinct()
+                          .sorted()
+                          .collect(Collectors.toList());
     }
 }

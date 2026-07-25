@@ -2,6 +2,7 @@ package org.jabref.gui.shared;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
@@ -123,20 +124,45 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
+        EasyBind.subscribe(useSSL, selected -> {
+            String current = keystore.getValue();
+            keystore.setValue(null);
+            keystore.setValue(current);
+        });
+        EasyBind.subscribe(autosave, selected -> {
+            String current = folder.getValue();
+            folder.setValue(null);
+            folder.setValue(current);
+        });
 
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
+        Predicate<String> keyStoreRule = input -> !useSSL.get() || notEmptyAndfilesExist.test(input);
+        Predicate<String> folderRule = input -> {
+            if (!autosave.get()) {
+                return true;
+            } else if (input != null) {
+                try {
+                    Path p = Path.of(input.trim());
+                    p = p.getParent();
+                    return (p != null) && Files.isDirectory(p);
+                } catch (InvalidPathException e) {
+                    return false;
+                }
+            }
+            return false;
+        };
 
         databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
-        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
-        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
-        folderValidator = new FunctionBasedValidator<>(folder, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-        keystoreValidator = new FunctionBasedValidator<>(keystore, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        folderValidator = new FunctionBasedValidator<>(folder, folderRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        keystoreValidator = new FunctionBasedValidator<>(keystore, keyStoreRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator, folderValidator);
 
         applyPreferences();
     }

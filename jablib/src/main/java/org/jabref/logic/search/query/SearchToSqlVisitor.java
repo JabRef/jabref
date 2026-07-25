@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.search.PostgresConstants;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SqlQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
-import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgresConstants.FIELD_NAME;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_LITERAL;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_TRANSFORMED;
 import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
 import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
 import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
@@ -44,8 +44,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     public SearchToSqlVisitor(String table, EnumSet<SearchFlags> searchBarFlags) {
         this.searchBarFlags = searchBarFlags;
-        this.mainTableName = PostgreConstants.getMainTableSchemaReference(table);
-        this.splitValuesTableName = PostgreConstants.getSplitTableSchemaReference(table);
+        this.mainTableName = PostgresConstants.getMainTableSchemaReference(table);
+        this.splitValuesTableName = PostgresConstants.getSplitTableSchemaReference(table);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             } else {
                 setFlags(searchFlags, INEXACT_MATCH, isCaseSensitive, false);
             }
-            return getFieldQueryNode("any", term, searchFlags);
+            return getFieldQueryNode(SearchFieldConstants.ANY_FIELD, term, searchFlags);
         }
 
         // fielded expression
@@ -229,19 +229,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" ->
+            case SearchFieldConstants.KEY ->
                     InternalField.KEY_FIELD.getName();
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     StandardField.KEYWORDS.getName();
-            case "anyfield" ->
-                    "any";
+            case SearchFieldConstants.ANY_FIELD_ALIAS ->
+                    SearchFieldConstants.ANY_FIELD;
             default ->
                     field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
             return buildEntryIdQuery(term);
-        } else if ("any".equals(field)) {
+        } else if (SearchFieldConstants.ANY_FIELD.equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)

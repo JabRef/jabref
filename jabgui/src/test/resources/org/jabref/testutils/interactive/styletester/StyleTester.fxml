@@ -384,6 +384,7 @@
                                                visited="true"/>
                                     <Separator prefWidth="200.0"/>
                                     <ColorPicker/>
+                                    <JabRefIconView glyph="EXAMPLE_SVG_STAR" style="-fx-icon-color: #2d9d4f;"/>
                                 </children>
                             </VBox>
                             <Separator orientation="VERTICAL" prefHeight="200.0"/>

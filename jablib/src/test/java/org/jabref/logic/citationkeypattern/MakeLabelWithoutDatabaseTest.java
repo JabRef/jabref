@@ -32,7 +32,7 @@ class MakeLabelWithoutDatabaseTest {
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
-                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
                 new SimpleObjectProperty<>(','));
 

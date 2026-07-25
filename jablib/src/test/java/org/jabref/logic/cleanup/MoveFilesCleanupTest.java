@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -147,5 +148,18 @@ class MoveFilesCleanupTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         List<FieldChange> changes = cleanup.cleanup(entry);
         assertEquals(List.of(), changes);
+    }
+
+    @Test
+    void cleanupMoveFilesUsesMutationSchedulerForEntryUpdate() {
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        AtomicBoolean schedulerUsed = new AtomicBoolean(false);
+
+        cleanup.cleanup(entry, mutation -> {
+            schedulerUsed.set(true);
+            mutation.run();
+        });
+
+        assertTrue(schedulerUsed.get());
     }
 }

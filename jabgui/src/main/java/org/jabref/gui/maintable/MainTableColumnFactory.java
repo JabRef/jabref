@@ -34,7 +34,6 @@ import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -45,8 +44,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +79,10 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
     }
 
+    @Nullable
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
@@ -171,7 +170,7 @@ public class MainTableColumnFactory {
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
-        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.getStyleClass().add("align-center-right");
         column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
                 String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -194,7 +193,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
-        column.setStyle("-fx-padding: 0 0 0 0;");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }
@@ -211,7 +210,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupIconRegion)
                 .install(column);
-        column.setStyle("-fx-padding: 0 0 0 0;");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }
@@ -252,8 +251,11 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
-                                                   )
+                                                   .flatMap(group -> IconTheme.findJabRefIcon(group.getIconName().get())
+                                                                              .map(icon -> icon.withColor(group.getColor()
+                                                                                                               .map(Color::valueOf)
+                                                                                                               .orElse(IconTheme.DEFAULT_GROUP_COLOR)))
+                                                                              .stream())
                                                    .toList();
         if (!groupIcons.isEmpty()) {
             HBox container = new HBox();

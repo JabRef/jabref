@@ -7,15 +7,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
 
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 
@@ -25,22 +25,16 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     @FXML private CheckBox openOnNewEntry;
     @FXML private CheckBox defaultSource;
-    @FXML private CheckBox enableRelatedArticlesTab;
-    @FXML private CheckBox enableAiSummaryTab;
-    @FXML private CheckBox enableAiChatTab;
     @FXML private CheckBox acceptRecommendations;
-    @FXML private CheckBox enableLatexCitationsTab;
-    @FXML private CheckBox smartFileAnnotationsTab;
     @FXML private CheckBox enableValidation;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox journalPopupEnabled;
     @FXML private CheckBox autoLinkFilesEnabled;
-    @FXML private CheckBox enableSciteTab;
+    @FXML private CheckBox enableMscKeywordDescriptions;
     @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
-    @FXML private CheckBox showUserCommentsField;
 
-    @FXML private Button generalFieldsHelp;
-    @FXML private TextArea fieldsTextArea;
+    @FXML private ListView<EntryEditorTabModel> tabConfigsList;
+    @FXML private Button resetTabsButton;
 
     public EntryEditorTab() {
         ViewLoader.view(this)
@@ -54,36 +48,69 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
-        enableRelatedArticlesTab.selectedProperty().bindBidirectional(viewModel.enableRelatedArticlesTabProperty());
-        enableAiSummaryTab.selectedProperty().bindBidirectional(viewModel.enableAiSummaryTabProperty());
-        enableAiChatTab.selectedProperty().bindBidirectional(viewModel.enableAiChatTabProperty());
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
-        enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
-        smartFileAnnotationsTab.selectedProperty().bindBidirectional(viewModel.smartFileAnnotationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
         autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
-        enableSciteTab.selectedProperty().bindBidirectional(viewModel.enableSciteTabProperty());
+        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
+
         citationCountFetcherCombo.setItems(FXCollections.observableList(List.of(CitationCountFetcherType.values())));
         new ViewModelListCellFactory<CitationCountFetcherType>()
                 .withText(CitationCountFetcherType::getName)
                 .install(citationCountFetcherCombo);
         citationCountFetcherCombo.valueProperty().bindBidirectional(viewModel.citationCountFetcherTypeProperty());
-        showUserCommentsField.selectedProperty().bindBidirectional(viewModel.showUserCommentsProperty());
 
-        fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
-
-        ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), generalFieldsHelp);
+        tabConfigsList.setItems(viewModel.getTabModels());
+        tabConfigsList.setCellFactory(_ -> new TabConfigCell());
     }
 
     @FXML
     void resetToDefaults() {
         viewModel.resetToDefaults();
     }
+
+    // region Cell
+
+    /// A tab with its visibility checkbox.
+    private class TabConfigCell extends ListCell<EntryEditorTabModel> {
+
+        private final CheckBox checkBox = new CheckBox();
+        private final Label nameLabel = new Label();
+        private final HBox container = new HBox(checkBox, nameLabel);
+
+        private boolean updatingCell = false;
+
+        TabConfigCell() {
+            container.getStyleClass().add("entry-editor-tab-cell");
+            checkBox.selectedProperty().addListener((_, _, selected) -> {
+                if (updatingCell) {
+                    return;
+                }
+                viewModel.toggleTabVisibility(getItem());
+            });
+        }
+
+        @Override
+        protected void updateItem(EntryEditorTabModel config, boolean empty) {
+            super.updateItem(config, empty);
+            if (empty || (config == null)) {
+                setGraphic(null);
+                return;
+            }
+            updatingCell = true;
+            if (config instanceof EntryEditorTabModel.BuiltInTab builtIn) {
+                checkBox.setSelected(builtIn.visible());
+                nameLabel.setText(builtIn.type().displayName());
+            }
+            updatingCell = false;
+            setGraphic(container);
+        }
+    }
+
+    // endregion
 }

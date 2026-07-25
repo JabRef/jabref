@@ -2,19 +2,16 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.prefs.BackingStoreException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javafx.beans.InvalidationListener;
-import javafx.collections.ListChangeListener;
-import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.CoreGuiPreferences;
@@ -24,9 +21,10 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.identifier.MathSciNetPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
@@ -44,12 +42,13 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -61,7 +60,6 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -88,6 +86,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
 
+    // region keybindings - public because needed for pref migration
+    public static final String BIND_NAMES = "bindNames";
+    public static final String BINDINGS = "bindings";
+    // endregion
+
     // region column names
     // public because of migration
     // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
@@ -96,11 +99,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
     public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
     public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
-    // endregion
-
-    // region keybindings - public because needed for pref migration
-    public static final String BIND_NAMES = "bindNames";
-    public static final String BINDINGS = "bindings";
+    // The column list spans the COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES keys above; this synthetic key is never
+    // written to the backing store and only serves as the binding's reporting key in getPreferences()/getDefaults().
+    private static final String MAIN_TABLE_COLUMNS = "mainTableColumns";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
@@ -137,6 +138,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SEARCH_DIALOG_COLUMN_WIDTHS = "searchTableColumnWidths";
     private static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
     private static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
+    // The column list spans COLUMN_NAMES (shared with the main table) plus the SEARCH_DIALOG_COLUMN_WIDTHS/_SORT_TYPES
+    // keys; this synthetic key is never written to the backing store and only serves as the binding's reporting key.
+    private static final String SEARCH_DIALOG_COLUMNS = "searchDialogColumns";
     // endregion
 
     // region NameDisplayPreferences
@@ -170,15 +174,24 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     private static final String OO_SHOW_PANEL = "showOOPanel";
     private static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
+    // The visible panes span the three *_VISIBLE flags above and the preferred positions span the two
+    // SIDE_PANE_COMPONENT_* series; these synthetic keys are never written to the backing store and only serve as the
+    // respective bindings' reporting keys in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
+    private static final String SIDE_PANE_VISIBLE_PANES = "sidePaneVisiblePanes";
+    private static final String SIDE_PANE_PREFERRED_POSITIONS = "sidePanePreferredPositions";
     // endregion
 
     // region GroupsPreferences
     private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
+    // The view mode spans the three GROUP_VIEW_* flags above; this synthetic key is never written to the backing store
+    // and only serves as the binding's reporting key in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
+    private static final String GROUP_VIEW_MODE = "groupViewMode";
     private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
     private static final String GROUP_VIEW_FILTER = "groupFilter";
     private static final String GROUP_VIEW_INVERT = "groupInvert";
     private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
+    private static final String GROUP_SHOW_AI_CHAT = "groupShowAiChat";
     // endregion
 
     // region specialFieldsPreferences
@@ -209,14 +222,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     // region EntryEditorPreferences
-    private static final String CUSTOM_TAB_NAME = "customTabName_";
-    private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
+    // The tab list is persisted across the many SHOW_* flags below; this synthetic key is never written to the
+    // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
+    // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
+    private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
     private static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
-    private static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+    private static final String SHOW_FILE_ANNOTATIONS = "showFileAnnotations";
     private static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     private static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     private static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
@@ -224,9 +240,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String SHOW_SOURCE_TAB = "showSourceTab";
+    private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
+    // endregion
+
+    // region MathSciNetPreferences
+    private static final String MATHSCINET_SYNC_WITH_BROWSER = "mathSciNetSyncWithBrowser";
+    // endregion
+
+    // region MrDlibPreferences
+    private static final String MRDLIB_ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
+    private static final String MRDLIB_SEND_LANGUAGE_DATA = "sendLanguageData";
+    private static final String MRDLIB_SEND_OS_DATA = "sendOSData";
+    private static final String MRDLIB_SEND_TIMEZONE_DATA = "sendTimezoneData";
     // endregion
 
     private static JabRefGuiPreferences singleton;
@@ -250,6 +279,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
     private DonationPreferences donationPreferences;
+    private MrDlibPreferences mrDlibPreferences;
+    private MathSciNetPreferences mathSciNetPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -263,55 +294,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     @Override
-    public void clear() throws BackingStoreException {
-        super.clear();
-
-        getDonationPreferences().setAll(DonationPreferences.getDefault());
-        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
-        getGroupsPreferences().setAll(GroupsPreferences.getDefault());
-        getCopyToPreferences().setAll(CopyToPreferences.getDefault());
-        getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
-        getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
-        getExternalApplicationsPreferences().setAll(ExternalApplicationsPreferences.getDefault());
-        getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getMergeDialogPreferences().setAll(MergeDialogPreferences.getDefault());
-        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
-        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
-        getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
-        getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
-        getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
-        getSidePanePreferences().setAll(SidePanePreferences.getDefault());
-        getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
-        getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
-                getLayoutFormatterPreferences(),
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                Injector.instantiateModelOrService(BibEntryTypesManager.class)));
-    }
-
-    @Override
-    public void importPreferences(Path path) throws JabRefException {
-        super.importPreferences(path);
-
-        // in case of incomplete or corrupt xml fall back to current preferences
-        getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
-        getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
-        getCopyToPreferences().setAll(getCopyToPreferencesFromBackingStore(getCopyToPreferences()));
-        getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
-        getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
-        getExternalApplicationsPreferences().setAll(getExternalApplicationsPreferencesFromBackingStore(getExternalApplicationsPreferences()));
-        getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
-        getMergeDialogPreferences().setAll(getMergeDialogPreferencesFromBackingStore(getMergeDialogPreferences()));
-        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
-        getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
-        getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
-        getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
-        getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
-        getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
-        getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
-        getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
-        getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
+    protected void initializeAll() {
+        super.initializeAll();
+        getCopyToPreferences();
+        getEntryEditorPreferences();
+        getMergeDialogPreferences();
+        getAutoCompletePreferences();
+        getGuiPreferences();
+        getWorkspacePreferences();
+        getUnlinkedFilesDialogPreferences();
+        getSidePanePreferences();
+        getExternalApplicationsPreferences();
+        getGroupsPreferences();
+        getSpecialFieldsPreferences();
+        getPreviewPreferences();
+        getNameDisplayPreferences();
+        getMainTableColumnPreferences();
+        getMainTablePreferences();
+        getSearchDialogColumnPreferences();
+        getNewEntryPreferences();
+        getDonationPreferences();
+        getMrDlibPreferences();
+        getMathSciNetPreferences();
     }
 
     // region CopyToPreferences
@@ -319,19 +323,34 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (copyToPreferences != null) {
             return copyToPreferences;
         }
-        copyToPreferences = getCopyToPreferencesFromBackingStore(CopyToPreferences.getDefault());
 
-        EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (_, _, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
-        EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (_, _, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
+        CopyToPreferences defaultValues = CopyToPreferences.getDefault();
+
+        copyToPreferences = new CopyToPreferences(
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultValues.getShouldAskForIncludingCrossReferences()),
+                getBoolean(INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences()));
+
+        bindBoolean(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultValues.getShouldAskForIncludingCrossReferences());
+        bindBoolean(copyToPreferences.shouldIncludeCrossReferencesProperty(), INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences());
 
         return copyToPreferences;
     }
+    // endregion
 
-    private CopyToPreferences getCopyToPreferencesFromBackingStore(CopyToPreferences defaults) {
-        return new CopyToPreferences(
-                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaults.getShouldAskForIncludingCrossReferences()),
-                getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
-        );
+    // region MathSciNetPreferences
+    public MathSciNetPreferences getMathSciNetPreferences() {
+        if (mathSciNetPreferences != null) {
+            return mathSciNetPreferences;
+        }
+
+        MathSciNetPreferences defaultValues = MathSciNetPreferences.getDefault();
+
+        mathSciNetPreferences = new MathSciNetPreferences(
+                getBoolean(MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser()));
+
+        bindBoolean(mathSciNetPreferences.syncWithBrowserProperty(), MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser());
+
+        return mathSciNetPreferences;
     }
     // endregion
 
@@ -340,89 +359,107 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
-        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
-        // defaultEntryEditorTabs are read-only
-        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiSummaryTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_SUMMARY, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowFileAnnotationsTabProperty(), (_, _, newValue) -> putBoolean(SMART_FILE_ANNOTATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
-        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
-        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (_, _, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
-        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
-        EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
-        EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
-        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
-        EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
-        EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
-        EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
+        EntryEditorPreferences defaultValues = EntryEditorPreferences.getDefault();
+
+        entryEditorPreferences = new EntryEditorPreferences(
+                getEntryEditorTabs(defaultValues),
+                getBoolean(AUTO_OPEN_FORM, defaultValues.shouldOpenOnNewEntry()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaultValues.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaultValues.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaultValues.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaultValues.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaultValues.shouldEnableJournalPopup().name())),
+                CitationFetcherType.safeValueOf(get(CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType().name())),
+                CitationCountFetcherType.safeValueOf(get(CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType().name())),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition())
+        );
+
+        bindCustomList(entryEditorPreferences.getTabModels(), ENTRY_EDITOR_TABS, defaultValues.getTabModels(),
+                this::storeTabConfigs, () -> getEntryEditorTabs(defaultValues));
+        bindBoolean(entryEditorPreferences.shouldOpenOnNewEntryProperty(), AUTO_OPEN_FORM, defaultValues.shouldOpenOnNewEntry());
+        bindBoolean(entryEditorPreferences.showSourceTabByDefaultProperty(), DEFAULT_SHOW_SOURCE, defaultValues.showSourceTabByDefault());
+        bindBoolean(entryEditorPreferences.enableValidationProperty(), VALIDATE_IN_ENTRY_EDITOR, defaultValues.shouldEnableValidation());
+        bindBoolean(entryEditorPreferences.allowIntegerEditionBibtexProperty(), ALLOW_INTEGER_EDITION_BIBTEX, defaultValues.shouldAllowIntegerEditionBibtex());
+        bindBoolean(entryEditorPreferences.autoLinkEnabledProperty(), AUTOLINK_FILES_ENABLED, defaultValues.autoLinkFilesEnabled());
+        bindObject(entryEditorPreferences.enableJournalPopupProperty(), JOURNAL_POPUP, defaultValues.shouldEnableJournalPopup(),
+                EntryEditorPreferences.JournalPopupEnabled::name, EntryEditorPreferences.JournalPopupEnabled::fromString);
+        bindDouble(entryEditorPreferences.previewWidthDividerPositionProperty(), ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition());
+        bindObject(entryEditorPreferences.citationFetcherTypeProperty(), CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType(),
+                CitationFetcherType::name, CitationFetcherType::safeValueOf);
+        bindBoolean(entryEditorPreferences.showUserCommentsFieldsProperty(), SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields());
+        bindObject(entryEditorPreferences.citationCountFetcherTypeProperty(), CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType(),
+                CitationCountFetcherType::name, CitationCountFetcherType::safeValueOf);
+
         return entryEditorPreferences;
     }
 
-    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
-        return new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
-                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
-                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
-                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
-                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
-                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
-                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
-                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
-                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
-                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
-        );
+    /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
+    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.BuiltIn} order.
+    private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
+        List<EntryEditorTabModel> tabModels = new ArrayList<>();
+
+        // Always-present leading tab. Its visibility is owned by PreviewPreferences (PREVIEW_AS_TAB /
+        // showPreviewAsExtraTab) — the single source the factory gates on — so the model bit is a constant
+        // and is not persisted separately here.
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
+
+        tabModels.addAll(List.<EntryEditorTabModel>of(
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS,
+                        getBoolean(SHOW_ALL_FIELDS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.ALL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_SUMMARY,
+                        getBoolean(SHOW_AI_SUMMARY, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_SUMMARY))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_CHAT,
+                        getBoolean(SHOW_AI_CHAT, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_CHAT))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS,
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
+                        getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
+                        getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
+                        getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
+                        getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
+        ));
+
+        return tabModels;
     }
 
-    /// Get a Map of defined tab names to default tab fields.
-    ///
-    /// @return A map of the currently defined tabs in the entry editor
-    private Map<String, Set<Field>> getEntryEditorTabs() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
-        List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
-
-        if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            return EntryEditorPreferences.getDefaultEntryEditorTabs();
+    private void storeTabConfigs(List<EntryEditorTabModel> configs) {
+        for (EntryEditorTabModel config : configs) {
+            if (config instanceof EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
+                    boolean visible
+            )) {
+                switch (type) {
+                    case PREVIEW -> {
+                        // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
+                    }
+                    case ALL_FIELDS ->
+                            putBoolean(SHOW_ALL_FIELDS_TAB, visible);
+                    case RELATED_ARTICLES ->
+                            putBoolean(SHOW_RECOMMENDATIONS, visible);
+                    case AI_SUMMARY ->
+                            putBoolean(SHOW_AI_SUMMARY, visible);
+                    case AI_CHAT ->
+                            putBoolean(SHOW_AI_CHAT, visible);
+                    case FILE_ANNOTATIONS ->
+                            putBoolean(SHOW_FILE_ANNOTATIONS, visible);
+                    case LATEX_CITATIONS ->
+                            putBoolean(SHOW_LATEX_CITATIONS, visible);
+                    case CITATION_INFORMATION ->
+                            putBoolean(SHOW_SCITE_TAB, visible);
+                    case SOURCE ->
+                            putBoolean(SHOW_SOURCE_TAB, visible);
+                    case FULLTEXT_SEARCH_RESULTS ->
+                            putBoolean(SHOW_FULLTEXT_SEARCH_TAB, visible);
+                }
+            }
         }
-
-        for (int i = 0; i < tabNames.size(); i++) {
-            tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
-        }
-        return tabs;
-    }
-
-    /// Stores the defined tabs and corresponding fields in the preferences.
-    ///
-    /// @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-    private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
-                                                   .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
-        }
-
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        getEntryEditorTabs();
     }
     // endregion
 
@@ -433,32 +470,30 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mergeDialogPreferences;
         }
 
-        MergeDialogPreferences defaults = MergeDialogPreferences.getDefault();
+        MergeDialogPreferences defaultValues = MergeDialogPreferences.getDefault();
 
-        mergeDialogPreferences = getMergeDialogPreferencesFromBackingStore(defaults);
+        mergeDialogPreferences = new MergeDialogPreferences(
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode().name())),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff()),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff()),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords()),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly()),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries()),
+                DuplicateResolverDialog.DuplicateResolverResult.parse(
+                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision().name()))
+        );
 
-        EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (_, _, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowDiffProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeHighlightWordsProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), (_, _, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), (_, _, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
-        EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (_, _, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
+        bindObject(mergeDialogPreferences.mergeDiffModeProperty(), MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode(),
+                DiffMode::name, DiffMode::parse);
+        bindBoolean(mergeDialogPreferences.mergeShouldShowDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff());
+        bindBoolean(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff());
+        bindBoolean(mergeDialogPreferences.mergeHighlightWordsProperty(), MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords());
+        bindBoolean(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly());
+        bindBoolean(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries());
+        bindObject(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision(),
+                DuplicateResolverDialog.DuplicateResolverResult::name, DuplicateResolverDialog.DuplicateResolverResult::parse);
 
         return mergeDialogPreferences;
-    }
-
-    private MergeDialogPreferences getMergeDialogPreferencesFromBackingStore(MergeDialogPreferences defaults) {
-        return new MergeDialogPreferences(
-                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaults.getMergeDiffMode().name())),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaults.getMergeShouldShowDiff()),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaults.getMergeShouldShowUnifiedDiff()),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaults.getMergeHighlightWords()),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaults.shouldMergeShowChangedFieldsOnly()),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaults.shouldMergeApplyToAllEntries()),
-                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
-                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
-        );
     }
     // endregion
 
@@ -469,44 +504,29 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return autoCompletePreferences;
         }
 
-        autoCompletePreferences = getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences.getDefault());
+        AutoCompletePreferences defaultValues = AutoCompletePreferences.getDefault();
 
-        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (_, _, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
-        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (_, _, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
-        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) _ ->
-                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
-                                                                                    .map(Field::getName)
-                                                                                    .collect(Collectors.toList())));
-        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (_, _, _) -> {
-            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
-            }
-        });
+        autoCompletePreferences = new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE, defaultValues.shouldAutoComplete()),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE, defaultValues.getFirstNameMode().name())),
+                readExclusiveFlags(defaultValues.getNameFormat(), AutoCompletePreferences.NameFormat.BOTH,
+                        Map.entry(AUTOCOMPLETER_LAST_FIRST, AutoCompletePreferences.NameFormat.LAST_FIRST),
+                        Map.entry(AUTOCOMPLETER_FIRST_LAST, AutoCompletePreferences.NameFormat.FIRST_LAST)),
+                getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields()));
+
+        bindBoolean(autoCompletePreferences.autoCompleteProperty(), AUTO_COMPLETE, defaultValues.shouldAutoComplete());
+        bindObject(autoCompletePreferences.firstNameModeProperty(), AUTOCOMPLETER_FIRSTNAME_MODE, defaultValues.getFirstNameMode(),
+                AutoCompleteFirstNameMode::name, AutoCompleteFirstNameMode::parse);
+        // NameFormat.BOTH is the implicit value (both flags stored false); LAST_FIRST wins over FIRST_LAST on the
+        // non-canonical "both true" state, per readExclusiveFlags.
+        bindExclusiveFlags(autoCompletePreferences.nameFormatProperty(), defaultValues.getNameFormat(), AutoCompletePreferences.NameFormat.BOTH,
+                Map.entry(AUTOCOMPLETER_LAST_FIRST, AutoCompletePreferences.NameFormat.LAST_FIRST),
+                Map.entry(AUTOCOMPLETER_FIRST_LAST, AutoCompletePreferences.NameFormat.FIRST_LAST));
+        bindSet(autoCompletePreferences.getCompleteFields(), AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields(),
+                set -> putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, set.stream().map(Field::getName).collect(Collectors.toList())),
+                () -> getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields()));
 
         return autoCompletePreferences;
-    }
-
-    private AutoCompletePreferences getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences defaults) {
-        AutoCompletePreferences.NameFormat nameFormat = defaults.getNameFormat();
-        final boolean firstLast = getBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        final boolean lastFirst = getBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-        if (firstLast && !lastFirst) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
-        } else if (!firstLast && lastFirst) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
-        }
-
-        return new AutoCompletePreferences(getBoolean(AUTO_COMPLETE, defaults.shouldAutoComplete()),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE, defaults.getFirstNameMode().name())),
-                nameFormat,
-                getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaults.getCompleteFields()));
     }
     // endregion
 
@@ -516,28 +536,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return coreGuiPreferences;
         }
 
-        coreGuiPreferences = getCoreGuiPreferencesFromBackingStore(CoreGuiPreferences.getDefault());
+        CoreGuiPreferences defaultValues = CoreGuiPreferences.getDefault();
 
-        EasyBind.listen(coreGuiPreferences.positionXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.positionYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (_, _, newValue) -> putBoolean(MAIN_WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(coreGuiPreferences.horizontalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_SIDEPANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.getVerticalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_EDITOR_HEIGHT, newValue.doubleValue()));
+        coreGuiPreferences = new CoreGuiPreferences(
+                getDouble(MAIN_WINDOW_POS_X, defaultValues.getPositionX()),
+                getDouble(MAIN_WINDOW_POS_Y, defaultValues.getPositionY()),
+                getDouble(MAIN_WINDOW_WIDTH, defaultValues.getSizeX()),
+                getDouble(MAIN_WINDOW_HEIGHT, defaultValues.getSizeY()),
+                getBoolean(MAIN_WINDOW_MAXIMISED, defaultValues.isWindowMaximised()),
+                getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaultValues.getHorizontalDividerPosition()),
+                getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaultValues.getVerticalDividerPosition()));
+
+        bindDouble(coreGuiPreferences.positionXProperty(), MAIN_WINDOW_POS_X, defaultValues.getPositionX());
+        bindDouble(coreGuiPreferences.positionYProperty(), MAIN_WINDOW_POS_Y, defaultValues.getPositionY());
+        bindDouble(coreGuiPreferences.sizeXProperty(), MAIN_WINDOW_WIDTH, defaultValues.getSizeX());
+        bindDouble(coreGuiPreferences.sizeYProperty(), MAIN_WINDOW_HEIGHT, defaultValues.getSizeY());
+        bindBoolean(coreGuiPreferences.windowMaximisedProperty(), MAIN_WINDOW_MAXIMISED, defaultValues.isWindowMaximised());
+        bindDouble(coreGuiPreferences.horizontalDividerPositionProperty(), MAIN_WINDOW_SIDEPANE_WIDTH, defaultValues.getHorizontalDividerPosition());
+        bindDouble(coreGuiPreferences.getVerticalDividerPositionProperty(), MAIN_WINDOW_EDITOR_HEIGHT, defaultValues.getVerticalDividerPosition());
 
         return coreGuiPreferences;
-    }
-
-    private CoreGuiPreferences getCoreGuiPreferencesFromBackingStore(CoreGuiPreferences defaults) {
-        return new CoreGuiPreferences(
-                getDouble(MAIN_WINDOW_POS_X, defaults.getPositionX()),
-                getDouble(MAIN_WINDOW_POS_Y, defaults.getPositionY()),
-                getDouble(MAIN_WINDOW_WIDTH, defaults.getSizeX()),
-                getDouble(MAIN_WINDOW_HEIGHT, defaults.getSizeY()),
-                getBoolean(MAIN_WINDOW_MAXIMISED, defaults.isWindowMaximised()),
-                getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaults.getHorizontalDividerPosition()),
-                getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
     }
     // endregion
 
@@ -548,48 +566,43 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return workspacePreferences;
         }
 
-        workspacePreferences = getWorkspacePreferencesFromBackingStore(WorkspacePreferences.getDefault());
+        WorkspacePreferences defaultValues = WorkspacePreferences.getDefault();
 
-        EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
-            put(LANGUAGE, newValue.getId());
-            if (oldValue != newValue) {
-                Localization.setLanguage(newValue);
-            }
-        });
-
-        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (_, _, newValue) ->
-                putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (_, _, newValue) ->
-                putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (_, _, newValue) ->
-                put(THEME, newValue.getName()));
-        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (_, _, newValue) ->
-                putBoolean(THEME_SYNC_OS, newValue));
-        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (_, _, newValue) ->
-                putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (_, _, newValue) ->
-                putBoolean(SHOW_ADVANCED_HINTS, newValue));
-        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (_, _, newValue) ->
-                putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.hideTabBarProperty(), (_, _, newValue) ->
-                putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
-        workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) _ ->
-                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
-        return workspacePreferences;
-    }
-
-    private WorkspacePreferences getWorkspacePreferencesFromBackingStore(WorkspacePreferences defaults) {
-        return new WorkspacePreferences(
+        workspacePreferences = new WorkspacePreferences(
                 getLanguage(),
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
-                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize()),
+                getInt(MAIN_FONT_SIZE, defaultValues.getMainFontSize()),
                 new Theme(get(THEME, Theme.SYSTEM)),
-                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
-                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
-                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
-                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
-                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
+                getBoolean(THEME_SYNC_OS, defaultValues.shouldThemeSyncOs()),
+                getBoolean(OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited()),
+                getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
+                getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
+                getBoolean(CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar()),
                 getStringList(SELECTED_SLR_CATALOGS));
+
+        bindCustom(workspacePreferences.languageProperty(), LANGUAGE, defaultValues.getLanguage(),
+                (_, oldValue, newValue) -> {
+                    put(LANGUAGE, newValue.getId());
+                    if (oldValue != newValue) {
+                        Localization.setLanguage(newValue);
+                    }
+                },
+                () -> workspacePreferences.languageProperty().set(getLanguage()),
+                () -> workspacePreferences.languageProperty().set(defaultValues.getLanguage()));
+        bindBoolean(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize());
+        bindInt(workspacePreferences.mainFontSizeProperty(), MAIN_FONT_SIZE, defaultValues.getMainFontSize());
+        bindObject(workspacePreferences.themeProperty(), THEME, defaultValues.getTheme(),
+                Theme::getName, Theme::new);
+        bindBoolean(workspacePreferences.themeSyncOsProperty(), THEME_SYNC_OS, defaultValues.shouldThemeSyncOs());
+        bindBoolean(workspacePreferences.openLastEditedProperty(), OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited());
+        bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
+        bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
+        bindBoolean(workspacePreferences.hideTabBarProperty(), CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar());
+        bindCustomList(workspacePreferences.getSelectedSlrCatalogs(), SELECTED_SLR_CATALOGS, defaultValues.getSelectedSlrCatalogs(),
+                boundList -> putStringList(SELECTED_SLR_CATALOGS, boundList),
+                () -> getStringList(SELECTED_SLR_CATALOGS));
+
+        return workspacePreferences;
     }
     // endregion
 
@@ -600,21 +613,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return unlinkedFilesDialogPreferences;
         }
 
-        unlinkedFilesDialogPreferences = getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences.getDefault());
+        UnlinkedFilesDialogPreferences defaultValues = UnlinkedFilesDialogPreferences.getDefault();
 
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
+        unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
+                get(UNLINKED_FILES_SELECTED_EXTENSION, defaultValues.getUnlinkedFilesSelectedExtension()),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaultValues.getUnlinkedFilesSelectedDateRange().name())),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaultValues.getUnlinkedFilesSelectedSort().name()))
+        );
+
+        bindString(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), UNLINKED_FILES_SELECTED_EXTENSION, defaultValues.getUnlinkedFilesSelectedExtension());
+        bindObject(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), UNLINKED_FILES_SELECTED_DATE_RANGE, defaultValues.getUnlinkedFilesSelectedDateRange(),
+                DateRange::name, DateRange::parse);
+        bindObject(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), UNLINKED_FILES_SELECTED_SORT, defaultValues.getUnlinkedFilesSelectedSort(),
+                ExternalFileSorter::name, ExternalFileSorter::parse);
 
         return unlinkedFilesDialogPreferences;
-    }
-
-    private UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences defaults) {
-        return new UnlinkedFilesDialogPreferences(
-                get(UNLINKED_FILES_SELECTED_EXTENSION, defaults.getUnlinkedFilesSelectedExtension()),
-                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaults.getUnlinkedFilesSelectedDateRange().name())),
-                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaults.getUnlinkedFilesSelectedSort().name()))
-        );
     }
     // endregion
 
@@ -625,25 +638,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return sidePanePreferences;
         }
 
-        sidePanePreferences = getSidePanePreferencesFromBackingStore(SidePanePreferences.getDefault());
+        SidePanePreferences defaultValues = SidePanePreferences.getDefault();
 
-        sidePanePreferences.visiblePanes().addListener((InvalidationListener) _ ->
-                storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
-        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) _ ->
-                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
-        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (_, _, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
+        sidePanePreferences = new SidePanePreferences(
+                getVisibleSidePanes(defaultValues.visiblePanes()),
+                getSidePanePreferredPositions(defaultValues),
+                getInt(SELECTED_FETCHER_INDEX, defaultValues.getWebSearchFetcherSelected())
+        );
+
+        bindSet(sidePanePreferences.visiblePanes(), SIDE_PANE_VISIBLE_PANES, defaultValues.visiblePanes(),
+                this::storeVisibleSidePanes,
+                () -> getVisibleSidePanes(defaultValues.visiblePanes()));
+        bindMap(sidePanePreferences.getPreferredPositions(), SIDE_PANE_PREFERRED_POSITIONS, defaultValues.getPreferredPositions(),
+                _ -> storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()),
+                _ -> getSidePanePreferredPositions(defaultValues));
+        bindInt(sidePanePreferences.webSearchFetcherSelectedProperty(), SELECTED_FETCHER_INDEX, defaultValues.getWebSearchFetcherSelected());
 
         return sidePanePreferences;
-    }
-
-    private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults.visiblePanes());
-        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions(defaults);
-        return new SidePanePreferences(
-                backingStoreVisiblePanes,
-                backingStorePreferredPositions,
-                getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
-        );
     }
 
     private Set<SidePaneType> getVisibleSidePanes(Set<SidePaneType> defaults) {
@@ -715,39 +726,31 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return externalApplicationsPreferences;
         }
 
-        externalApplicationsPreferences = getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences.getDefault());
+        ExternalApplicationsPreferences defaultValues = ExternalApplicationsPreferences.getDefault();
 
-        EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
-                (_, _, newValue) -> put(EMAIL_SUBJECT, newValue));
-        EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
-                (_, _, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
-        EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
-        externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) _ ->
-                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalApplicationsPreferences.getExternalFileTypes())));
-        EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
-                (_, _, newValue) -> put(CONSOLE_COMMAND, newValue));
-        EasyBind.listen(externalApplicationsPreferences.useCustomFileBrowserProperty(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
-        EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
-                (_, _, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
-        EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
-                (_, _, newValue) -> put(KINDLE_EMAIL, newValue));
+        externalApplicationsPreferences = new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT, defaultValues.getEmailSubject()),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
+                get(CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
+                get(FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                get(KINDLE_EMAIL, defaultValues.getKindleEmail())
+        );
+
+        bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
+        bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
+        bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
+        bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
+        bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
+        bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
+        bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
+        bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
+                set -> put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(set)),
+                () -> ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))));
 
         return externalApplicationsPreferences;
-    }
-
-    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences defaults) {
-        return new ExternalApplicationsPreferences(
-                get(EMAIL_SUBJECT, defaults.getEmailSubject()),
-                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaults.shouldAutoOpenEmailAttachmentsFolder()),
-                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))),
-                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaults.useCustomTerminal()), // mind the !
-                get(CONSOLE_COMMAND, defaults.getCustomTerminalCommand()),
-                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaults.useCustomFileBrowser()), // mind the !
-                get(FILE_BROWSER_COMMAND, defaults.getCustomFileBrowserCommand()),
-                get(KINDLE_EMAIL, defaults.getKindleEmail())
-        );
     }
     // endregion
 
@@ -757,31 +760,48 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return groupsPreferences;
         }
 
-        groupsPreferences = getGroupsPreferencesFromBackingStore(GroupsPreferences.getDefault());
+        GroupsPreferences defaultValues = GroupsPreferences.getDefault();
 
-        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) _ -> {
-            putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
-            putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
-            putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
-        });
-        EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (_, _, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
-        EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (_, _, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
-        EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (_, _, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
+        groupsPreferences = new GroupsPreferences(
+                getBoolean(GROUP_VIEW_INTERSECTION, defaultValues.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
+                getBoolean(GROUP_VIEW_FILTER, defaultValues.groupViewModeProperty().contains(GroupViewMode.FILTER)),
+                getBoolean(GROUP_VIEW_INVERT, defaultValues.groupViewModeProperty().contains(GroupViewMode.INVERT)),
+                getBoolean(AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup()),
+                getBoolean(DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount()),
+                GroupHierarchyType.safeValueOf(get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())),
+                getBoolean(GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton())
+        );
+
+        bindSet(groupsPreferences.groupViewModeProperty(), GROUP_VIEW_MODE, defaultValues.groupViewModeProperty(),
+                this::storeGroupViewModes,
+                () -> getGroupViewModes(defaultValues));
+        bindBoolean(groupsPreferences.autoAssignGroupProperty(), AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup());
+        bindBoolean(groupsPreferences.displayGroupCountProperty(), DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount());
+        bindObject(groupsPreferences.defaultHierarchicalContextProperty(), DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext(),
+                GroupHierarchyType::name, GroupHierarchyType::safeValueOf);
+        bindBoolean(groupsPreferences.showAiChatButtonProperty(), GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton());
 
         return groupsPreferences;
     }
 
-    private GroupsPreferences getGroupsPreferencesFromBackingStore(GroupsPreferences defaults) {
-        return new GroupsPreferences(
-                getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
-                getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER)),
-                getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT)),
-                getBoolean(AUTO_ASSIGN_GROUP, defaults.shouldAutoAssignGroup()),
-                getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
-                GroupHierarchyType.valueOf(
-                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
-                )
-        );
+    private Set<GroupViewMode> getGroupViewModes(GroupsPreferences defaults) {
+        Set<GroupViewMode> modes = EnumSet.noneOf(GroupViewMode.class);
+        if (getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION))) {
+            modes.add(GroupViewMode.INTERSECTION);
+        }
+        if (getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER))) {
+            modes.add(GroupViewMode.FILTER);
+        }
+        if (getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT))) {
+            modes.add(GroupViewMode.INVERT);
+        }
+        return modes;
+    }
+
+    private void storeGroupViewModes(Set<GroupViewMode> modes) {
+        putBoolean(GROUP_VIEW_INTERSECTION, modes.contains(GroupViewMode.INTERSECTION));
+        putBoolean(GROUP_VIEW_FILTER, modes.contains(GroupViewMode.FILTER));
+        putBoolean(GROUP_VIEW_INVERT, modes.contains(GroupViewMode.INVERT));
     }
     // endregion
 
@@ -791,17 +811,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return specialFieldsPreferences;
         }
 
-        specialFieldsPreferences = getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences.getDefault());
+        SpecialFieldsPreferences defaultValues = SpecialFieldsPreferences.getDefault();
 
-        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (_, _, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
+        specialFieldsPreferences = new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED, defaultValues.isSpecialFieldsEnabled())
+        );
+
+        bindBoolean(specialFieldsPreferences.specialFieldsEnabledProperty(), SPECIALFIELDSENABLED, defaultValues.isSpecialFieldsEnabled());
 
         return specialFieldsPreferences;
-    }
-
-    private SpecialFieldsPreferences getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences defaults) {
-        return new SpecialFieldsPreferences(
-                getBoolean(SPECIALFIELDSENABLED, defaults.isSpecialFieldsEnabled())
-        );
     }
     // endregion
 
@@ -811,43 +829,67 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return previewPreferences;
         }
 
-        this.previewPreferences = getPreviewPreferencesFromBackingStore(PreviewPreferences.getDefault());
+        // The layout cycle's default (and thus reset target) is the styled default; it needs the injected repositories.
+        PreviewPreferences defaultValues = PreviewPreferences.getDefaultWithStyles(
+                getLayoutFormatterPreferences(),
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
-        previewPreferences.getLayoutCycle().addListener((InvalidationListener) _ -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(previewPreferences.getLayoutCycle())));
-        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue));
-        // must be stored with __NEWLINE__ instead of \n so that our migration correctly triggers, in getText it will be replaced by \n
-        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")));
-        EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (_, _, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
-        EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (_, _, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
-        previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) _ -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
-        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, newValue));
-        return this.previewPreferences;
-    }
-
-    private PreviewPreferences getPreviewPreferencesFromBackingStore(PreviewPreferences defaults) {
         // Mutable lists required
-        String customPreviewLayout = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout());
+        String customPreviewLayout = get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
         if (layouts.isEmpty()) {
-            layouts = new ArrayList<>(defaults.getLayoutCycle());
+            layouts = new ArrayList<>(defaultValues.getLayoutCycle());
         }
 
         List<Path> bstPaths;
         if (hasKey(PREVIEW_BST_LAYOUT_PATHS)) {
             bstPaths = getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).collect(Collectors.toList());
         } else {
-            bstPaths = new ArrayList<>(defaults.getBstPreviewLayoutPaths());
+            bstPaths = new ArrayList<>(defaultValues.getBstPreviewLayoutPaths());
         }
 
-        return new PreviewPreferences(
+        this.previewPreferences = new PreviewPreferences(
                 layouts,
-                getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaults.getLayoutCyclePosition())),
+                getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaultValues.getLayoutCyclePosition())),
                 customPreviewLayout,
-                getBoolean(PREVIEW_AS_TAB, defaults.shouldShowPreviewAsExtraTab()),
-                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.shouldShowPreviewEntryTableTooltip()),
+                getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
                 bstPaths,
-                getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaults.shouldDownloadCovers())
+                getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers())
         );
+
+        // Registered before layoutCyclePosition, so its import runs first and the position can be clamped against the loaded cycle.
+        bindCustomList(previewPreferences.getLayoutCycle(), PREVIEW_CYCLE, defaultValues.getLayoutCycle(),
+                boundList -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(boundList)),
+                () -> {
+                    List<PreviewLayout> stored = getPreviewLayouts(getStringList(PREVIEW_CYCLE), get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout()));
+                    return stored.isEmpty() ? defaultValues.getLayoutCycle() : stored;
+                });
+        // layoutCyclePosition is clamped to the current cycle on load, so it needs a custom binding.
+        bindCustom(previewPreferences.layoutCyclePositionProperty(), PREVIEW_CYCLE_POS, defaultValues.getLayoutCyclePosition(),
+                (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue.intValue()),
+                () -> previewPreferences.layoutCyclePositionProperty().set(getPreviewCyclePosition(previewPreferences.getLayoutCycle(), defaultValues.getLayoutCyclePosition())),
+                () -> previewPreferences.layoutCyclePositionProperty().set(defaultValues.getLayoutCyclePosition()));
+        // customPreviewLayout is stored with __NEWLINE__ instead of \n so that our migration correctly triggers; in getText it is replaced back by \n.
+        // FIXME: serializer/deserializer are not inverse: the persist listener encodes \n -> __NEWLINE__, but the load
+        //   does not decode __NEWLINE__ -> \n. The property therefore holds the encoded form after a load but the raw
+        //   \n form once the preview editor sets it, so PreferencesFilter reports a false deviation from the default.
+        //   Followup: pick one canonical in-memory form (decode on load, encode on persist, default in the same form).
+        bindCustom(previewPreferences.customPreviewLayoutProperty(), PREVIEW_STYLE, defaultValues.getCustomPreviewLayout(),
+                (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")),
+                () -> previewPreferences.customPreviewLayoutProperty().set(get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout())),
+                () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
+        bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
+        bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
+        bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
+                this::storeBstPaths,
+                () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
+                      ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
+                      : defaultValues.getBstPreviewLayoutPaths());
+        bindBoolean(previewPreferences.shouldDownloadCoversProperty(), PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers());
+
+        return this.previewPreferences;
     }
 
     private void storeBstPaths(List<Path> bstPaths) {
@@ -900,59 +942,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return nameDisplayPreferences;
         }
 
-        nameDisplayPreferences = getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences.getDefault());
+        NameDisplayPreferences defaultValues = NameDisplayPreferences.getDefault();
 
-        EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (_, _, newValue) -> {
-            putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
-            putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
-            putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
-        });
-        EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (_, _, newValue) -> {
-            putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
-            putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
-        });
+        nameDisplayPreferences = new NameDisplayPreferences(
+                readExclusiveFlags(defaultValues.getDisplayStyle(), NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME,
+                        Map.entry(NAMES_NATBIB, NameDisplayPreferences.DisplayStyle.NATBIB),
+                        Map.entry(NAMES_AS_IS, NameDisplayPreferences.DisplayStyle.AS_IS),
+                        Map.entry(NAMES_FIRST_LAST, NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME)),
+                readExclusiveFlags(defaultValues.getAbbreviationStyle(), NameDisplayPreferences.AbbreviationStyle.NONE,
+                        Map.entry(ABBR_AUTHOR_NAMES, NameDisplayPreferences.AbbreviationStyle.FULL),
+                        Map.entry(NAMES_LAST_ONLY, NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY)));
+
+        // displayStyle: LASTNAME_FIRSTNAME is the implicit value (all flags stored false).
+        bindExclusiveFlags(nameDisplayPreferences.displayStyleProperty(), defaultValues.getDisplayStyle(), NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME,
+                Map.entry(NAMES_NATBIB, NameDisplayPreferences.DisplayStyle.NATBIB),
+                Map.entry(NAMES_AS_IS, NameDisplayPreferences.DisplayStyle.AS_IS),
+                Map.entry(NAMES_FIRST_LAST, NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME));
+        // abbreviationStyle: NONE is the implicit value (all flags stored false).
+        bindExclusiveFlags(nameDisplayPreferences.abbreviationStyleProperty(), defaultValues.getAbbreviationStyle(), NameDisplayPreferences.AbbreviationStyle.NONE,
+                Map.entry(ABBR_AUTHOR_NAMES, NameDisplayPreferences.AbbreviationStyle.FULL),
+                Map.entry(NAMES_LAST_ONLY, NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY));
 
         return nameDisplayPreferences;
-    }
-
-    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences defaults) {
-        return new NameDisplayPreferences(
-                getNameDisplayStyleFromBackingStore(defaults),
-                getNameAbbreviationStyleFromBackingStore(defaults)
-        );
-    }
-
-    private NameDisplayPreferences.DisplayStyle getNameDisplayStyleFromBackingStore(NameDisplayPreferences defaults) {
-        if (!hasKey(NAMES_NATBIB) && !hasKey(NAMES_AS_IS) && !hasKey(NAMES_FIRST_LAST)) {
-            return defaults.getDisplayStyle();
-        }
-
-        if (getBoolean(NAMES_NATBIB, false)) {
-            return NameDisplayPreferences.DisplayStyle.NATBIB;
-        }
-        if (getBoolean(NAMES_AS_IS, false)) {
-            return NameDisplayPreferences.DisplayStyle.AS_IS;
-        }
-        if (getBoolean(NAMES_FIRST_LAST, false)) {
-            return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
-        }
-
-        return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
-    }
-
-    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyleFromBackingStore(NameDisplayPreferences defaults) {
-        if (!hasKey(ABBR_AUTHOR_NAMES) && !hasKey(NAMES_LAST_ONLY)) {
-            return defaults.getAbbreviationStyle();
-        }
-
-        if (getBoolean(ABBR_AUTHOR_NAMES, false)) {
-            return NameDisplayPreferences.AbbreviationStyle.FULL;
-        }
-        if (getBoolean(NAMES_LAST_ONLY, false)) {
-            return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
-        }
-
-        return NameDisplayPreferences.AbbreviationStyle.NONE;
     }
     // endregion
 
@@ -962,22 +973,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
+        MainTablePreferences defaultValues = MainTablePreferences.getDefault();
 
-        EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
-                (_, _, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
-        EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
-                (_, _, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
+        mainTablePreferences = new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaultValues.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaultValues.getExtraFileColumnsEnabled())
+        );
+
+        bindBoolean(mainTablePreferences.resizeColumnsToFitProperty(), AUTO_RESIZE_MODE, defaultValues.getResizeColumnsToFit());
+        bindBoolean(mainTablePreferences.extraFileColumnsEnabledProperty(), EXTRA_FILE_COLUMNS, defaultValues.getExtraFileColumnsEnabled());
 
         return mainTablePreferences;
-    }
-
-    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
-        return new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
-                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
-        );
     }
 
     public ColumnPreferences getMainTableColumnPreferences() {
@@ -985,26 +992,24 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTableColumnPreferences;
         }
 
-        mainTableColumnPreferences = getMainTableColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
 
-        mainTableColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
-            putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
-        });
-        mainTableColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
-                putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)));
-
-        return mainTableColumnPreferences;
-    }
-
-    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
         List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
         List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
-        return new ColumnPreferences(
-                columns.isEmpty() ? defaults.getColumns() : columns,
-                columnSortOrder.isEmpty() ? defaults.getColumnSortOrder() : columnSortOrder
+        mainTableColumnPreferences = new ColumnPreferences(
+                columns.isEmpty() ? defaultValues.getColumns() : columns,
+                columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
         );
+
+        // The columns list is persisted across COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES.
+        bindColumnPreferences(mainTableColumnPreferences, MAIN_TABLE_COLUMNS, COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, COLUMN_SORT_ORDER,
+                columnPreferences -> {
+                    putStringList(COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
+                    putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+                    putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
+                });
+
+        return mainTableColumnPreferences;
     }
     // endregion
 
@@ -1014,27 +1019,46 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return searchDialogColumnPreferences;
         }
 
-        searchDialogColumnPreferences = getSearchDialogColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
 
-        searchDialogColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
-            // MainTable and SearchResultTable use the same set of columnNames
-            // putStringList(SEARCH_DIALOG_COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
-        });
-        searchDialogColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
-                putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)));
+        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, columns);
+        searchDialogColumnPreferences = new ColumnPreferences(
+                columns.isEmpty() ? defaultValues.getColumns() : columns,
+                columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
+        );
+
+        // Column names are shared with the main table (COLUMN_NAMES) and owned there, so only widths and sort types are persisted here.
+        bindColumnPreferences(searchDialogColumnPreferences, SEARCH_DIALOG_COLUMNS, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER,
+                columnPreferences -> {
+                    putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+                    putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
+                });
 
         return searchDialogColumnPreferences;
     }
 
-    private ColumnPreferences getSearchDialogColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
-        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, columns);
-        return new ColumnPreferences(
-                columns.isEmpty() ? defaults.getColumns() : columns,
-                columnSortOrder.isEmpty() ? defaults.getColumnSortOrder() : columnSortOrder
-        );
+    private void bindColumnPreferences(ColumnPreferences columnPreferences,
+                                       String columnsReportKey,
+                                       String namesKey,
+                                       String widthsKey,
+                                       String sortTypesKey,
+                                       String sortOrderKey,
+                                       Consumer<ColumnPreferences> persistColumns) {
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
+
+        bindCustomList(columnPreferences.getColumns(), columnsReportKey, defaultValues.getColumns(),
+                _ -> persistColumns.accept(columnPreferences),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumns(namesKey, widthsKey, sortTypesKey, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
+                });
+        bindCustomList(columnPreferences.getColumnSortOrder(), sortOrderKey, defaultValues.getColumnSortOrder(),
+                _ -> putStringList(sortOrderKey, getColumnSortOrderAsStringList(columnPreferences)),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumnSortOrder(sortOrderKey, columnPreferences.getColumns());
+                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+                });
     }
     // endregion
 
@@ -1055,7 +1079,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         List<TableColumn.SortType> columnSortTypes = getStringList(sortTypeList)
                 .stream()
-                .map(TableColumn.SortType::valueOf).toList();
+                .map(sortType -> {
+                    // TableColumn.SortType is a JavaFX enum and has no safe parser; fall back to
+                    // ASCENDING on unknown/corrupted values so recovery operations (reset/import) do not fail.
+                    try {
+                        return TableColumn.SortType.valueOf(sortType);
+                    } catch (IllegalArgumentException e) {
+                        return TableColumn.SortType.ASCENDING;
+                    }
+                }).toList();
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
@@ -1115,45 +1147,52 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return newEntryPreferences;
         }
 
-        newEntryPreferences = getNewEntryPreferencesFromBackingStore(NewEntryPreferences.getDefault());
+        NewEntryPreferences defaultValues = NewEntryPreferences.getDefault();
 
-        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
-        EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));
-        EasyBind.listen(newEntryPreferences.typesOtherExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_OTHER, newValue));
-        EasyBind.listen(newEntryPreferences.typesCustomExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_CUSTOM, newValue));
-        EasyBind.listen(newEntryPreferences.latestImmediateTypeProperty(), (_, _, newValue) -> put(CREATE_ENTRY_IMMEDIATE_TYPE, newValue.getDisplayName()));
-        EasyBind.listen(newEntryPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, newValue));
-        EasyBind.listen(newEntryPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(CREATE_ENTRY_ID_FETCHER_NAME, newValue));
-        EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(CREATE_ENTRY_INTERPRET_PARSER_NAME, newValue));
+        newEntryPreferences = new NewEntryPreferences(
+                readNewEntryApproach(defaultValues.getLatestApproach()),
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, defaultValues.getTypesRecommendedExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER, defaultValues.getTypesOtherExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM, defaultValues.getTypesCustomExpanded()),
+                parseNewEntryImmediateType(get(CREATE_ENTRY_IMMEDIATE_TYPE, defaultValues.getLatestImmediateType().getDisplayName())),
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, defaultValues.getIdLookupGuessing()),
+                get(CREATE_ENTRY_ID_FETCHER_NAME, defaultValues.getLatestIdFetcher()),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME, defaultValues.getLatestInterpretParser())
+        );
+
+        // latestApproach is persisted as the index into NewEntryDialogTab.values(), so it needs a custom binding.
+        bindCustom(newEntryPreferences.latestApproachProperty(), CREATE_ENTRY_APPROACH, defaultValues.getLatestApproach(),
+                (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)),
+                () -> newEntryPreferences.latestApproachProperty().set(readNewEntryApproach(defaultValues.getLatestApproach())),
+                () -> newEntryPreferences.latestApproachProperty().set(defaultValues.getLatestApproach()));
+        bindBoolean(newEntryPreferences.typesRecommendedExpandedProperty(), CREATE_ENTRY_EXPAND_RECOMMENDED, defaultValues.getTypesRecommendedExpanded());
+        bindBoolean(newEntryPreferences.typesOtherExpandedProperty(), CREATE_ENTRY_EXPAND_OTHER, defaultValues.getTypesOtherExpanded());
+        bindBoolean(newEntryPreferences.typesCustomExpandedProperty(), CREATE_ENTRY_EXPAND_CUSTOM, defaultValues.getTypesCustomExpanded());
+        // latestImmediateType is persisted by its display name.
+        bindObject(newEntryPreferences.latestImmediateTypeProperty(), CREATE_ENTRY_IMMEDIATE_TYPE, defaultValues.getLatestImmediateType(),
+                EntryType::getDisplayName, this::parseNewEntryImmediateType);
+        bindBoolean(newEntryPreferences.idLookupGuessingProperty(), CREATE_ENTRY_ID_LOOKUP_GUESSING, defaultValues.getIdLookupGuessing());
+        bindString(newEntryPreferences.latestIdFetcherProperty(), CREATE_ENTRY_ID_FETCHER_NAME, defaultValues.getLatestIdFetcher());
+        bindString(newEntryPreferences.latestInterpretParserProperty(), CREATE_ENTRY_INTERPRET_PARSER_NAME, defaultValues.getLatestInterpretParser());
 
         return newEntryPreferences;
     }
 
-    private NewEntryPreferences getNewEntryPreferencesFromBackingStore(NewEntryPreferences defaults) {
-        final int approachIndex = getInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(defaults.getLatestApproach()));
-        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-                                     ? NewEntryDialogTab.values()[approachIndex]
-                                     : NewEntryDialogTab.values()[0];
+    private NewEntryDialogTab readNewEntryApproach(NewEntryDialogTab defaultValue) {
+        int approachIndex = getInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(defaultValue));
+        return NewEntryDialogTab.values().length > approachIndex
+               ? NewEntryDialogTab.values()[approachIndex]
+               : NewEntryDialogTab.values()[0];
+    }
 
-        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE, defaults.getLatestImmediateType().getDisplayName());
-        EntryType immediateType = StandardEntryType.Article;
+    /// Resolves a [StandardEntryType] from its display name, falling back to [StandardEntryType#Article].
+    private EntryType parseNewEntryImmediateType(String displayName) {
         for (StandardEntryType type : StandardEntryType.values()) {
-            if (type.getDisplayName().equals(immediateTypeName)) {
-                immediateType = type;
-                break;
+            if (type.getDisplayName().equals(displayName)) {
+                return type;
             }
         }
-
-        return new NewEntryPreferences(
-                approach,
-                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, defaults.getTypesRecommendedExpanded()),
-                getBoolean(CREATE_ENTRY_EXPAND_OTHER, defaults.getTypesOtherExpanded()),
-                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM, defaults.getTypesCustomExpanded()),
-                immediateType,
-                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, defaults.getIdLookupGuessing()),
-                get(CREATE_ENTRY_ID_FETCHER_NAME, defaults.getLatestIdFetcher()),
-                get(CREATE_ENTRY_INTERPRET_PARSER_NAME, defaults.getLatestInterpretParser())
-        );
+        return StandardEntryType.Article;
     }
     // endregion
 
@@ -1163,23 +1202,46 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return donationPreferences;
         }
 
-        donationPreferences = getDonationPreferencesFromBackingStore(DonationPreferences.getDefault());
+        DonationPreferences defaultValues = DonationPreferences.getDefault();
 
-        EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
-        EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
+        donationPreferences = new DonationPreferences(
+                getBoolean(DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain()),
+                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay()));
+
+        bindBoolean(donationPreferences.neverShowAgainProperty(), DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain());
+        bindInt(donationPreferences.lastShownEpochDayProperty(), DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay());
+
         return donationPreferences;
     }
+    // endregion
 
-    private DonationPreferences getDonationPreferencesFromBackingStore(DonationPreferences defaults) {
-        return new DonationPreferences(
-                getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
-                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
+    // region MrDlibPreferences
+    @Override
+    public MrDlibPreferences getMrDlibPreferences() {
+        if (mrDlibPreferences != null) {
+            return mrDlibPreferences;
+        }
+
+        MrDlibPreferences defaultValues = MrDlibPreferences.getDefault();
+
+        mrDlibPreferences = new MrDlibPreferences(
+                getBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, defaultValues.shouldAcceptRecommendations()),
+                getBoolean(MRDLIB_SEND_LANGUAGE_DATA, defaultValues.shouldSendLanguage()),
+                getBoolean(MRDLIB_SEND_OS_DATA, defaultValues.shouldSendOs()),
+                getBoolean(MRDLIB_SEND_TIMEZONE_DATA, defaultValues.shouldSendTimezone()));
+
+        bindBoolean(mrDlibPreferences.acceptRecommendationsProperty(), MRDLIB_ACCEPT_RECOMMENDATIONS, defaultValues.shouldAcceptRecommendations());
+        bindBoolean(mrDlibPreferences.sendLanguageProperty(), MRDLIB_SEND_LANGUAGE_DATA, defaultValues.shouldSendLanguage());
+        bindBoolean(mrDlibPreferences.sendOsProperty(), MRDLIB_SEND_OS_DATA, defaultValues.shouldSendOs());
+        bindBoolean(mrDlibPreferences.sendTimezoneProperty(), MRDLIB_SEND_TIMEZONE_DATA, defaultValues.shouldSendTimezone());
+
+        return mrDlibPreferences;
     }
     // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
-        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SaveOrder exportSaveOrder = getExportSaveOrder(ExportPreferences.getDefault().getExportSaveOrder());
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE ->
                     this.getSelfContainedTableSaveOrder();

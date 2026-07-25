@@ -43,7 +43,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
             case TABLE ->
                     exportInTableOrderProperty.setValue(true);
         }
-        sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
+        sortCriteriaProperty.setAll(exportSaveOrder.getSortCriteria().stream()
                                                    .map(SortCriterionViewModel::new)
                                                    .toList());
 

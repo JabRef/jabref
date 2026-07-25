@@ -33,6 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
+    // TODO: This is BibTeX - See org.jabref.model.entry.EntryConverter for mapping to BibLaTeX
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
             StandardField.KEY,
@@ -128,7 +129,6 @@ public class BibliographyConsistencyCheck {
 
             Set<Field> differingFields = new HashSet<>(filteredFieldsInAnyEntry);
             differingFields.removeAll(fieldsInAllEntries);
-            assert fieldsInAllEntries != null;
 
             Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
                                                                     .filter(def -> def.getType().equals(entryType))

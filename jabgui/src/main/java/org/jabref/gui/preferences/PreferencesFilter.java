@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.preferences.CliPreferences;
@@ -36,7 +37,7 @@ public class PreferencesFilter {
     }
 
     public enum PreferenceType {
-        BOOLEAN, INTEGER, STRING
+        BOOLEAN, INTEGER, DOUBLE, STRING, LIST, SET, MAP
     }
 
     public static class PreferenceOption implements Comparable<PreferenceOption> {
@@ -64,6 +65,14 @@ public class PreferencesFilter {
                 return PreferenceType.BOOLEAN;
             } else if (value instanceof Integer) {
                 return PreferenceType.INTEGER;
+            } else if (value instanceof Double) {
+                return PreferenceType.DOUBLE;
+            } else if (value instanceof Map) {
+                return PreferenceType.MAP;
+            } else if (value instanceof Set) {
+                return PreferenceType.SET;
+            } else if (value instanceof List) {
+                return PreferenceType.LIST;
             } else {
                 return PreferenceType.STRING;
             }

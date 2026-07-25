@@ -77,7 +77,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         Text startText = new Text(start);
         Text inBetweenText = new Text(inBetween);
-        inBetweenText.setStyle("-fx-font-weight: bold");
+        inBetweenText.getStyleClass().add("bold");
         Text endText = new Text(end);
 
         return new FlowPane(startText, inBetweenText, endText);

@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -56,6 +55,8 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 public class CitaviXmlImporter extends Importer implements Parser {
 
@@ -526,7 +527,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Optional.ofNullable(reference.citationKey())
                 .filter(key -> !key.isBlank())
                 .map(CitaviXmlImporter::sanitizeCitationKey)
-                .filter(key -> !key.isEmpty())
+                .filter(not(String::isEmpty))
                 .ifPresent(entry::setCitationKey);
         Optional.ofNullable(reference.title())
                 .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
@@ -617,11 +618,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
         for (KnowledgeItem knowledgeItem : relevantKnowledgeItems) {
             Optional.ofNullable(knowledgeItem.coreStatement())
-                    .filter(Predicate.not(String::isEmpty))
+                    .filter(not(String::isEmpty))
                     .ifPresent(t -> comment.add("# " + cleanUpText(t)));
 
             Optional.ofNullable(knowledgeItem.text())
-                    .filter(Predicate.not(String::isEmpty))
+                    .filter(not(String::isEmpty))
                     .ifPresent(t -> comment.add(cleanUpText(t)));
 
             try {

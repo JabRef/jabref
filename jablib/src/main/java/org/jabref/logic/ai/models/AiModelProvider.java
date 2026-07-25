@@ -2,7 +2,7 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

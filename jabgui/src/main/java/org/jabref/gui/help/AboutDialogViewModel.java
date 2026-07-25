@@ -1,6 +1,8 @@
 package org.jabref.gui.help;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -18,7 +20,6 @@ import org.jabref.gui.util.URLs;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
-import com.google.common.collect.Lists;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
             isDevelopmentVersion.set(false);
         } else {
             isDevelopmentVersion.set(true);
-            String dev = Lists.newArrayList(version).stream().filter(string -> !string.equals(version[0])).collect(
+            String dev = new ArrayList<>(Arrays.asList(version)).stream().filter(string -> !string.equals(version[0])).collect(
                     Collectors.joining("--"));
             developmentVersion.set(dev);
         }

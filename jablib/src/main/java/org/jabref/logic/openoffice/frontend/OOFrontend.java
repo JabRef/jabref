@@ -9,7 +9,10 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.backend.Backend52;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -28,8 +31,10 @@ import org.jabref.model.openoffice.style.OODataModel;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCursor;
+import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.util.OOListUtil;
+import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.sun.star.beans.IllegalTypeException;
@@ -60,6 +65,16 @@ public class OOFrontend {
         Map<CitationGroupId, CitationGroup> citationGroups =
                 readCitationGroupsFromDocument(this.backend, doc, citationGroupNames);
         this.citationGroups = new CitationGroups(citationGroups);
+    }
+
+    public static OOResult<OOFrontend, JabRefException> create(XTextDocument doc) {
+        try {
+            return OOResult.ok(new OOFrontend(doc));
+        } catch (NoDocumentException | WrappedTargetException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        } catch (RuntimeException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
     }
 
     public OODataModel getDataModel() {
@@ -270,7 +285,7 @@ public class OOFrontend {
     }
 
     /// @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
-    public List<RangeForOverlapCheck<CitationGroupId>> citationRanges(XTextDocument doc)
+    public List<RangeForOverlapCheck<CitationGroupId>> getJStyleCitationRanges(XTextDocument doc)
             throws
             NoDocumentException,
             WrappedTargetException {
@@ -280,12 +295,40 @@ public class OOFrontend {
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
             XTextRange range = this.getMarkRange(doc, group).orElseThrow(IllegalStateException::new);
-            String description = group.groupId.citationGroupIdAsString();
+            String description = range.getString();
             result.add(new RangeForOverlapCheck<>(range,
                     group.groupId,
                     RangeForOverlapCheck.REFERENCE_MARK_KIND,
                     description));
         }
+        return result;
+    }
+
+    private List<RangeForOverlapCheck<CitationGroupId>> getCSLCitationRanges(XTextDocument doc)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+
+        List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+
+        for (String name : UnoReferenceMark.getListOfNames(doc)) {
+            if (!ReferenceMark.isReferenceMarkName(name)) {
+                continue;
+            }
+
+            Optional<XTextRange> range = UnoReferenceMark.getAnchor(doc, name);
+            if (range.isEmpty()) {
+                continue;
+            }
+
+            XTextRange textRange = range.get();
+            String description = textRange.getString();
+            result.add(new RangeForOverlapCheck<>(textRange,
+                    new CitationGroupId(name),
+                    RangeForOverlapCheck.REFERENCE_MARK_KIND,
+                    description));
+        }
+
         return result;
     }
 
@@ -391,30 +434,37 @@ public class OOFrontend {
     public OOVoidResult<JabRefException>
     checkRangeOverlapsWithCursor(XTextDocument doc,
                                  List<RangeForOverlapCheck<CitationGroupId>> userRanges,
-                                 boolean requireSeparation)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
+                                 boolean requireSeparation,
+                                 OOStyle style) {
+        try {
+            List<RangeForOverlapCheck<CitationGroupId>> citationRanges;
+            if (style instanceof JStyle) {
+                citationRanges = getJStyleCitationRanges(doc);
+            } else {
+                citationRanges = getCSLCitationRanges(doc);
+            }
 
-        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = citationRanges(doc);
-        List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
+            List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
 
-        // ranges.addAll(userRanges);
-        ranges.addAll(bibliographyRanges(doc));
-        ranges.addAll(citationRanges);
-        ranges.addAll(footnoteMarkRanges(citationRanges));
+            // ranges.addAll(userRanges);
+            ranges.addAll(bibliographyRanges(doc));
+            ranges.addAll(citationRanges);
+            ranges.addAll(footnoteMarkRanges(citationRanges));
 
-        List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
-                RangeOverlapBetween.findFirst(doc,
-                        userRanges,
-                        ranges,
-                        requireSeparation);
+            List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
+                    RangeOverlapBetween.findFirst(doc,
+                            userRanges,
+                            ranges,
+                            requireSeparation);
 
-        if (overlaps.isEmpty()) {
-            return OOVoidResult.ok();
+            if (overlaps.isEmpty()) {
+                return OOVoidResult.ok();
+            }
+            return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
+                    rangeOverlapsToMessage(overlaps)));
+        } catch (NoDocumentException | WrappedTargetException e) {
+            return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         }
-        return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
-                rangeOverlapsToMessage(overlaps)));
     }
 
     /// @param requireSeparation Report range pairs that only share a boundary.
@@ -422,26 +472,26 @@ public class OOFrontend {
     public OOVoidResult<JabRefException> checkRangeOverlaps(XTextDocument doc,
                                                             List<RangeForOverlapCheck<CitationGroupId>> userRanges,
                                                             boolean requireSeparation,
-                                                            int reportAtMost)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
+                                                            int reportAtMost) {
+        try {
+            List<RangeForOverlapCheck<CitationGroupId>> citationRanges = getJStyleCitationRanges(doc);
+            List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
+            ranges.addAll(userRanges);
+            ranges.addAll(bibliographyRanges(doc));
+            ranges.addAll(citationRanges);
+            ranges.addAll(footnoteMarkRanges(citationRanges));
 
-        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = citationRanges(doc);
-        List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
-        ranges.addAll(userRanges);
-        ranges.addAll(bibliographyRanges(doc));
-        ranges.addAll(citationRanges);
-        ranges.addAll(footnoteMarkRanges(citationRanges));
+            List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
+                    RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
 
-        List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
-                RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
-
-        if (overlaps.isEmpty()) {
-            return OOVoidResult.ok();
+            if (overlaps.isEmpty()) {
+                return OOVoidResult.ok();
+            }
+            return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
+                    rangeOverlapsToMessage(overlaps)));
+        } catch (NoDocumentException | WrappedTargetException e) {
+            return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         }
-        return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
-                rangeOverlapsToMessage(overlaps)));
     }
 
     /// GUI: Get a list of CitationEntry objects corresponding to citations in the document.

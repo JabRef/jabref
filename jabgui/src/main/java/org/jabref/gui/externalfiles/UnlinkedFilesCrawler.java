@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /// Util class for searching files on the file system which are not linked to a provided {@link org.jabref.model.database.BibDatabase}.
 ///
-/// The result is used to create *new* entries. The user has then to use the duplicate check to merge the entries.
+/// The result is used to determine whether to link the files to an existing related entry or to create a new entry, according to the user's choice.
 ///
 /// Related: {@link org.jabref.gui.externalfiles.AutoSetFileLinksUtil#findAssociatedNotLinkedFiles}
 public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {

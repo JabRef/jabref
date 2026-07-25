@@ -12,10 +12,10 @@ import org.jabref.model.entry.LinkedFile;
 public class FileLink implements ParamLayoutFormatter {
 
     private final List<Path> fileDirectories;
-    private final String mainFileDirectory;
+    private final Path mainFileDirectory;
     private String fileType;
 
-    public FileLink(List<Path> fileDirectories, String mainFileDirectory) {
+    public FileLink(List<Path> fileDirectories, Path mainFileDirectory) {
         this.fileDirectories = fileDirectories;
         this.mainFileDirectory = mainFileDirectory;
     }
@@ -50,7 +50,7 @@ public class FileLink implements ParamLayoutFormatter {
 
         List<Path> dirs;
         if (fileDirectories.isEmpty()) {
-            dirs = List.of(Path.of(mainFileDirectory));
+            dirs = List.of(mainFileDirectory);
         } else {
             dirs = fileDirectories;
         }

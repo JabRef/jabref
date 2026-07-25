@@ -131,6 +131,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());
         jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
 
+        fileKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());

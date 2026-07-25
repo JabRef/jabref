@@ -71,7 +71,7 @@
                                            GridPane.rowIndex="8"/>
                                 <Label text="%Server Timezone:" GridPane.rowIndex="8"/>
                                 <CheckBox fx:id="expertMode" mnemonicParsing="false" text="%Use Expert mode" GridPane.rowIndex="9"/>
-                                <Label text="%Custom JDBC Url:" GridPane.rowIndex="10"/>
+                                <Label text="%Custom JDBC URL:" GridPane.rowIndex="10"/>
                                 <TextField fx:id="jdbcUrl" GridPane.columnIndex="1" GridPane.columnSpan="2"
                                            GridPane.rowIndex="10"/>
                                 <GridPane>

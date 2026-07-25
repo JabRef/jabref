@@ -20,6 +20,7 @@ public class ReferenceMark {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
+    private static final String ZOTERO_CITATION_PREFIX = "ZOTERO_ITEM CSL_CITATION ";
     private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile(
             "^(JABREF_[\\w-:—./–]+ CID_\\d+(?:, JABREF_[\\w-:—./–]+ CID_\\d+)*) (\\w+)(?: (" + IN_TEXT_MARKER + "|" + EMPTY_MARKER + "|" + NORMAL_MARKER + "))?$",
             Pattern.UNICODE_CHARACTER_CLASS);
@@ -118,6 +119,18 @@ public class ReferenceMark {
 
     public CSLCitationType getCitationType() {
         return citationType;
+    }
+
+    public static boolean isReferenceMarkName(String name) {
+        return isJabRefReferenceMarkName(name) || isZoteroReferenceMarkName(name);
+    }
+
+    public static boolean isJabRefReferenceMarkName(String name) {
+        return REFERENCE_MARK_FORMAT.matcher(name).matches();
+    }
+
+    public static boolean isZoteroReferenceMarkName(String name) {
+        return name.startsWith(ZOTERO_CITATION_PREFIX);
     }
 
     public static Optional<ReferenceMark> of(String name) {
