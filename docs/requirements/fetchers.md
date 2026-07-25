@@ -10,4 +10,9 @@ Fetchers with a documented request limit throttle requests across all fetcher in
 
 Needs: impl
 
+## Reject external entities in XML responses
+`req~fetchers.xml-xxe-prevention~1`
+
+MODS and Medline XML imports and PICA, MARC, ISIDORE, and arXiv XML fetcher responses disable DTD processing so that external entities cannot be resolved.
+
 <!-- markdownlint-disable-file MD022 -->

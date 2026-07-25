@@ -44,8 +44,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
-
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
 
     @Override
     public Parser getParser() {
@@ -64,7 +63,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 }
 
                 pushbackInputStream.unread(data);
-                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                DocumentBuilder builder = createDocumentBuilder();
                 Document document = builder.parse(pushbackInputStream);
 
                 // Assuming the root element represents an entry
@@ -82,6 +81,12 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
             }
             return List.of();
         };
+    }
+
+    private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(DISALLOW_DOCTYPE_DECLARATION, true);
+        return documentBuilderFactory.newDocumentBuilder();
     }
 
     @Override
