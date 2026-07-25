@@ -108,12 +108,14 @@ public class FrameDndHandler {
 
             boolean success = false;
             if (hasEntries(dragboard)) {
+                List<BibEntry> originalEntries = stateManager.getLocalDragboard().getBibEntries();
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 TransferMode mode = tabDragEvent.getTransferMode();
                 org.jabref.model.TransferMode modelTransferMode = toModelTransferMode(mode);
-                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies, modelTransferMode);
+
+                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, originalEntries, entryCopies, modelTransferMode);
                 success = true;
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
@@ -239,7 +241,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries), org.jabref.model.TransferMode.COPY);
+        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries), groupTreeNodeToCopy.getEntriesInGroup(allEntries), org.jabref.model.TransferMode.COPY);
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 

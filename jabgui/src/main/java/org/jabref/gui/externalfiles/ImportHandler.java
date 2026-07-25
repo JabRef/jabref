@@ -53,6 +53,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -348,7 +349,7 @@ public class ImportHandler {
                                               tracker.markSkipped();
                                               return;
                                           }
-                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
+                                          continueImportAfterDuplicateHandling(transferInformation, entry, tracker);
                                       })
                                       .exceptionally(exception -> {
                                           tracker.markSkipped();
@@ -372,6 +373,12 @@ public class ImportHandler {
                       .onSuccess(adjustedEntry -> {
                           importCleanedEntries(transferInformation, List.of(adjustedEntry));
                           tracker.markImported(adjustedEntry);
+                          if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()){
+                              BibDatabase sourceDatabase = transferInformation.bibDatabaseContext().getDatabase();
+                              List<BibEntry> sourceEntries = transferInformation.sourceEntries();
+                              sourceDatabase.removeEntries(sourceEntries);
+                          }
+
                       })
                       .executeWith(taskExecutor);
     }
