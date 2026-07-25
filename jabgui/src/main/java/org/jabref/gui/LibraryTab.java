@@ -931,7 +931,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd, TransferMode mode) {
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
         InsertUtil.FeedbackMessage successMessage;
         InsertUtil.FeedbackMessage partialMessage;
         if (mode == TransferMode.MOVE) {
@@ -942,7 +942,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             partialMessage = params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped", params);
         }
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, mode),
+                new TransferInformation(sourceBibDatabaseContext, mode, originalEntries),
                 entriesToAdd,
                 bibDatabaseContext,
                 successMessage,
