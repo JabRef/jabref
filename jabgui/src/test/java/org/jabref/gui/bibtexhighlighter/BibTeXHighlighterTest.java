@@ -92,11 +92,14 @@ class BibTeXHighlighterTest {
         when(model.getPlainText(1)).thenReturn("line2");
         when(syntaxHighlighter.computeHighlightRegions("line1\nline2")).thenReturn(List.of());
 
+        highlighter.handleChange(model, null, null, 0, 1, 0); // <-- cacheDirty = true yapar
+
         highlighter.createRichParagraph(model, 0);
 
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1");
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1\nline2");
     }
+
 
     @Test
     void addSearchHighlightsExecutesWithoutErrorsWhenQueryIsActive() {
