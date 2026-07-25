@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,6 +46,7 @@ public class DuplicateSearch extends SimpleCommand {
     private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
 
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
+    private final AtomicBoolean duplicateSearchCancelled = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
     private final SimpleStringProperty duplicateCountObservable = new SimpleStringProperty();
@@ -59,6 +61,7 @@ public class DuplicateSearch extends SimpleCommand {
 
     // For "apply to all entries" functionality.
     private DuplicateResolverResult rememberedDecision;
+    private Future<?> duplicateSearchTask;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
@@ -84,6 +87,7 @@ public class DuplicateSearch extends SimpleCommand {
         List<BibEntry> entries = database.getEntries();
         duplicates.clear();
         libraryAnalyzed.set(false);
+        duplicateSearchCancelled.set(false);
         autoRemoveExactDuplicates.set(false);
         duplicateCount.set(0);
         rememberedDecision = null;
@@ -94,7 +98,7 @@ public class DuplicateSearch extends SimpleCommand {
 
         duplicateCountObservable.addListener((obj, oldValue, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
 
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
+        duplicateSearchTask = HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(taskExecutor);
@@ -103,7 +107,7 @@ public class DuplicateSearch extends SimpleCommand {
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {
-                if (Thread.interrupted()) {
+                if (duplicateSearchCancelled.get() || Thread.interrupted()) {
                     return;
                 }
 
@@ -192,13 +196,22 @@ public class DuplicateSearch extends SimpleCommand {
             result.remove(first);
             result.replace(second, dialog.getNewRightEntry());
         } else if (resolverResult == DuplicateResolverResult.BREAK) {
-            libraryAnalyzed.set(true);
-            duplicates.clear();
+            cancelDuplicateSearch();
         } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
             result.replace(first, second, dialog.getMergedEntry());
         } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {
             result.replace(first, dialog.getNewLeftEntry());
             result.replace(second, dialog.getNewRightEntry());
+        }
+    }
+
+    private void cancelDuplicateSearch() {
+        duplicateSearchCancelled.set(true);
+        libraryAnalyzed.set(true);
+        duplicates.clear();
+
+        if (duplicateSearchTask != null) {
+            duplicateSearchTask.cancel(true);
         }
     }
 

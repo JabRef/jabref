@@ -1,7 +1,13 @@
 package org.jabref.gui.maintable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -21,8 +27,10 @@ import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -33,6 +41,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
@@ -40,6 +49,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -147,6 +157,131 @@ class MainTableDataModelTest {
     }
 
     @Test
+    void overlappingSearchCompletionKeepsLatestResults() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+
+        BibEntry quantumEntry = new BibEntry()
+                .withCitationKey("quantum")
+                .withField(StandardField.TITLE, "Quantum Physics");
+
+        BibEntry organicEntry = new BibEntry()
+                .withCitationKey("organic")
+                .withField(StandardField.TITLE, "Organic Chemistry");
+
+        bibDatabaseContext.getDatabase().insertEntries(
+                List.of(quantumEntry, organicEntry));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences())
+                .thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences())
+                .thenReturn(new SearchPreferences(
+                        SearchDisplayMode.FILTER,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        0,
+                        0,
+                        0));
+        when(preferences.getNameDisplayPreferences())
+                .thenReturn(NameDisplayPreferences.getDefault());
+
+        CompletableFuture<Void> firstSearchInProgress = new CompletableFuture<>();
+        CompletableFuture<Void> allowFirstSearchToFinish = new CompletableFuture<>();
+
+        SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
+        SearchContext searchContext = new SearchContext(
+                usePostgres,
+                () -> new InMemorySearchBackend(
+                        bibDatabaseContext,
+                        new BibEntryPreferences(',')),
+                () -> new InMemorySearchBackend(
+                        bibDatabaseContext,
+                        new BibEntryPreferences(','))) {
+            @Override
+            public SearchResults search(SearchQuery query) {
+                SearchResults results = super.search(query);
+
+                if (query.getSearchExpression().contains("Quantum")) {
+                    firstSearchInProgress.complete(null);
+                    allowFirstSearchToFinish.join();
+                }
+
+                return results;
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        List<Future<?>> submittedTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            BackgroundTask<?> task = invocation.getArgument(0);
+            Future<?> future = executorService.submit(() -> {
+                executeTask(task);
+                return null;
+            });
+            submittedTasks.add(future);
+            return future;
+        });
+
+        SimpleListProperty<GroupTreeNode> selectedGroups =
+                new SimpleListProperty<>(FXCollections.observableArrayList());
+
+        OptionalObjectProperty<SearchQuery> searchQueryProperty =
+                OptionalObjectProperty.empty();
+
+        IntegerProperty resultSize = new SimpleIntegerProperty();
+
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                searchContext,
+                selectedGroups,
+                searchQueryProperty,
+                resultSize);
+
+        BibEntryTableViewModel quantumViewModel =
+                model.getViewModelByCitationKey("quantum").orElseThrow();
+
+        BibEntryTableViewModel organicViewModel =
+                model.getViewModelByCitationKey("organic").orElseThrow();
+
+        try {
+            searchQueryProperty.setValue(
+                    Optional.of(new SearchQuery("title=Quantum")));
+
+            firstSearchInProgress.get(5, TimeUnit.SECONDS);
+
+            searchQueryProperty.setValue(
+                    Optional.of(new SearchQuery("title=Organic")));
+
+            assertEquals(2, submittedTasks.size());
+
+            submittedTasks.getLast().get(5, TimeUnit.SECONDS);
+
+            assertFalse(submittedTasks.getFirst().isDone());
+            assertFalse(quantumViewModel.isMatchedBySearch().get());
+            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertEquals(1, resultSize.get());
+
+            allowFirstSearchToFinish.complete(null);
+            submittedTasks.getFirst().get(5, TimeUnit.SECONDS);
+
+            assertFalse(quantumViewModel.isMatchedBySearch().get());
+            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertEquals(1, resultSize.get());
+        } finally {
+            allowFirstSearchToFinish.complete(null);
+            executorService.shutdownNow();
+        }
+    }
+
+    @Test
     void selectingGroupUpdatesMatchesAndVisibility() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
@@ -196,5 +331,13 @@ class MainTableDataModelTest {
 
     private static GroupTreeNode getKeywordGroup(Field field, String searchExpression) {
         return GroupTreeNode.fromGroup(new WordKeywordGroup(searchExpression, GroupHierarchyType.INDEPENDENT, field, searchExpression, true, ',', false));
+    }
+
+    private static <V> void executeTask(BackgroundTask<V> task) throws Exception {
+        V result = task.call();
+
+        if (task.getOnSuccess() != null) {
+            task.getOnSuccess().accept(result);
+        }
     }
 }

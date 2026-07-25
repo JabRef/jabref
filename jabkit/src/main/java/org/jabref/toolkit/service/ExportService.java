@@ -3,6 +3,7 @@ package org.jabref.toolkit.service;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -188,6 +189,41 @@ public class ExportService {
 
         Exporter exporter = getExporterByName(format);
         tryExportWithExporter(exporter, outputFile, databaseContext, entries, fileDirForDatabase);
+    }
+
+    public void exportParserResultToStdOut(
+            ParserResult parserResult,
+            String format) throws ExportServiceException {
+
+        Optional<Path> path = parserResult.getPath().map(Path::toAbsolutePath);
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
+        path.ifPresent(databaseContext::setDatabasePath);
+        List<Path> fileDirForDatabase = databaseContext
+                .getFileDirectories(cliPreferences.getFilePreferences());
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+        Exporter exporter = getExporterByName(format);
+        Path temporaryOutput = null;
+
+        try {
+            String extension = exporter.getFileType().getExtensions().getFirst();
+            temporaryOutput = Files.createTempFile("jabkit-", "." + extension);
+            JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+            exporter.export(databaseContext, temporaryOutput, entries, fileDirForDatabase, abbreviationRepository);
+            Files.copy(temporaryOutput, System.out);
+            System.out.flush();
+        } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
+            throw new ExportServiceException("Unable to write to stdout",
+                    Localization.lang("Unable to write to %0.", "stdout"),
+                    ex, CommandLine.ExitCode.SOFTWARE);
+        } finally {
+            if (temporaryOutput != null) {
+                try {
+                    Files.deleteIfExists(temporaryOutput);
+                } catch (IOException ex) {
+                    LOGGER.debug("Unable to delete temporary export file {}", temporaryOutput, ex);
+                }
+            }
+        }
     }
 
     private void tryExportWithExporter(
