@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.util.StandardFileType;
@@ -57,6 +57,6 @@ class MedlineImporterTest {
                 <PubmedArticleSet><PubmedArticle><PMID>&entity;</PMID></PubmedArticle></PubmedArticleSet>
                 """;
 
-        assertTrue(importer.importDatabase(new BufferedReader(new StringReader(xmlWithExternalEntity))).isInvalid());
+        assertTrue(importer.importDatabase(new BufferedReader(Reader.of(xmlWithExternalEntity))).isInvalid());
     }
 }

@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -55,6 +55,6 @@ class ModsImporterFilesTest {
                 """;
         ModsImporter importer = new ModsImporter(importFormatPreferences);
 
-        assertTrue(importer.importDatabase(new BufferedReader(new StringReader(xmlWithExternalEntity))).isInvalid());
+        assertTrue(importer.importDatabase(new BufferedReader(Reader.of(xmlWithExternalEntity))).isInvalid());
     }
 }
