@@ -143,7 +143,7 @@ public class SourceTab extends EntryEditorTab {
         });
         codeArea.getStyleClass().add("bibtex-code-area");
 
-        //codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
         codeArea.setSyntaxDecorator(bibTeXHighlighter);
