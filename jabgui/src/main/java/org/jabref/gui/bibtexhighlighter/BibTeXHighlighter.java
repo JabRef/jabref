@@ -54,8 +54,7 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
     /// Creates a new highlighter.
     ///
-    /// @param stateManager      used to read the currently active global search query so matches can
-    ///                                                                            be highlighted alongside syntax highlighting
+    /// @param stateManager      used to retrieve the active search query for term highlighting
     /// @param syntaxHighlighter the syntax highlighter used to compute highlight regions for BibTeX source code
     public BibTeXHighlighter(StateManager stateManager, BibTeXSyntaxHighlighter syntaxHighlighter) {
         this.stateManager = stateManager;
