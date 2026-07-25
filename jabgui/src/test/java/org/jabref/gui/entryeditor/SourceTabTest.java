@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.undo.CountingUndoManager;
