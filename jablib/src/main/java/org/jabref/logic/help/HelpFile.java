@@ -24,7 +24,6 @@ public enum HelpFile {
     FETCHER_ACM("collect/import-using-online-bibliographic-database#acm-portal"),
     FETCHER_BIBSONOMY_SCRAPER(""),
     FETCHER_BIODIVERSITY_HERITAGE_LIBRARY("collect/import-using-online-bibliographic-database#bibliotheksverbund-bayern-bvb"),
-    FETCHER_CITESEERX("collect/import-using-online-bibliographic-database#citeseerx"),
     FETCHER_COLLECTION_OF_COMPUTER_SCIENCE_BIBLIOGRAPHIES("collect/import-using-online-bibliographic-database#collection-of-computer-science-bibliographies-ccsb"),
     FETCHER_CROSSREF("collect/import-using-online-bibliographic-database#crossref-unpaywalll"),
     FETCHER_DBLP("collect/import-using-online-bibliographic-database#dblp"),
