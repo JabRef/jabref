@@ -60,6 +60,10 @@ public class BstStyleLoader {
             LOGGER.info("BST style already in list: {}", path);
             return false;
         }
+        if (externalStyles.stream().anyMatch(existing -> existing.getName().equals(style.getName()))) {
+            LOGGER.warn("A BST style with the same filename is already in the list: {}", path);
+            return false;
+        }
         externalStyles.add(style);
         storeExternalStyles();
         return true;
