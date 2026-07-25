@@ -1,0 +1,21 @@
+// Write unit tests for the modified classes and methods
+package org.jabref.ui.dialogs
+
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
+import org.jabref.ui.dialogs.MultiMergeDialog
+import org.jabref.ui.dialogs.MultiMergeDialogModel
+
+@RunWith(JUnit4::class)
+class MultiMergeDialogTest {
+    @Test
+    fun testCreateTable() {
+        val model = MultiMergeDialogModel()
+        val multiMergeDialog = MultiMergeDialog(model)
+        val table = multiMergeDialog.createTable()
+        assert(table.columns.size == 2)
+        assert(table.columns[0].text == "DOI")
+        assert(table.columns[1].text == "Other Identifiers")
+    }
+}
