@@ -917,11 +917,16 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
+            List<BibEntry> entries = databases.stream()
+                                              .flatMap(database -> database.getEntries().stream())
+                                              .toList();
+
+            cslCitationOOAdapter.linkZoteroCitations(new BibDatabaseContext(new BibDatabase(entries)));
+
             // Collect only cited entries from all databases
-            List<BibEntry> citedEntries = databases.stream()
-                                                   .flatMap(database -> database.getEntries().stream())
-                                                   .filter(cslCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toCollection(ArrayList::new));
+            List<BibEntry> citedEntries = entries.stream()
+                                                 .filter(cslCitationOOAdapter::isCitedEntry)
+                                                 .collect(Collectors.toCollection(ArrayList::new));
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {
