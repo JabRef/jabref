@@ -62,6 +62,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 import jfx.incubator.scene.control.richtext.CodeArea;
@@ -105,7 +106,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private BibTeXHighlighter bibTeXHighlighter;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     /// Creates an import dialog for entries from file sources.
     /// This constructor is used for importing entries from local files, BibTeX files,
@@ -467,7 +468,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
-        bibTeXData.setSyntaxDecorator(bibTeXHighlighter);
+        bibTeXData.setSyntaxDecorator(new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter));
     }
 
     public void unselectAll() {

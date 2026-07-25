@@ -25,6 +25,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
@@ -51,6 +52,7 @@ import org.jabref.model.util.Range;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
 
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
@@ -74,7 +76,7 @@ public class SourceTab extends EntryEditorTab {
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
-    private final BibTeXHighlighter bibTeXHighlighter;
+    private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -84,9 +86,9 @@ public class SourceTab extends EntryEditorTab {
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
                      StateManager stateManager,
-                     BibTeXHighlighter bibTeXHighlighter) {
+                     BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.stateManager = stateManager;
-        this.bibTeXHighlighter = bibTeXHighlighter;
+        this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
@@ -146,6 +148,8 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
+        BibTeXHighlighter bibTeXHighlighter = new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter);
+        bibTeXHighlighter.setFieldPositionsProvider(() -> fieldPositions != null ? fieldPositions : Map.of());
         codeArea.setSyntaxDecorator(bibTeXHighlighter);
 
         ActionFactory factory = new ActionFactory();

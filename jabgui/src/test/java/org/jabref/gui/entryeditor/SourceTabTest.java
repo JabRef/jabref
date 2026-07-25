@@ -68,7 +68,7 @@ class SourceTabTest {
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
                 stateManager,
-                new BibTeXHighlighter(stateManager, new BibTeXSyntaxHighlighter())
+                new BibTeXSyntaxHighlighter()
         );
         pane = new TabPane(
                 new Tab("main area", area),
