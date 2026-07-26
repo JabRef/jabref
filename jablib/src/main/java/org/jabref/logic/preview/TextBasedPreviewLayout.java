@@ -111,9 +111,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public static TextBasedPreviewLayout of(@NonNull String name,
-                                            @NonNull String style,
-                                            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                            @NonNull JournalAbbreviationRepository abbreviationRepository) {
+            @NonNull String style,
+            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
+            @NonNull JournalAbbreviationRepository abbreviationRepository) {
         return new TextBasedPreviewLayout(
                 name,
                 style,
@@ -122,9 +122,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public static TextBasedPreviewLayout of(
-                                            @NonNull String style,
-                                            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                            @NonNull JournalAbbreviationRepository abbreviationRepository) {
+            @NonNull String style,
+            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
+            @NonNull JournalAbbreviationRepository abbreviationRepository) {
         return new TextBasedPreviewLayout(
                 style,
                 layoutFormatterPreferences,

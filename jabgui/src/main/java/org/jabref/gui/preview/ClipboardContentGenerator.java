@@ -139,8 +139,8 @@ public record ClipboardContentGenerator(
         TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElseGet(() -> {
             List<TextBasedPreviewLayout> customLayouts = previewPreferences.getCustomPreviewLayouts();
             return customLayouts.isEmpty()
-                    ? TextBasedPreviewLayout.of("", layoutFormatterPreferences, abbreviationRepository)
-                    : customLayouts.getFirst();
+                   ? TextBasedPreviewLayout.of("", layoutFormatterPreferences, abbreviationRepository)
+                   : customLayouts.getFirst();
         });
 
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
