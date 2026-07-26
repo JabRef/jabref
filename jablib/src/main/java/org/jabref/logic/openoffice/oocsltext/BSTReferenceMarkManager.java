@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.openoffice.ReferenceMark;
+import org.jabref.logic.openoffice.JabRefReferenceMark;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -139,29 +140,34 @@ public class BSTReferenceMarkManager {
         XNameAccess marks = supplier.getReferenceMarks();
 
         for (String name : marks.getElementNames()) {
-            String[] parts = name.split(" ");
-            if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
-                XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+            if (!JabRefReferenceMark.isJabRefReferenceMarkName(name)) {
+                continue;
+            }
 
-                ReferenceMark referenceMark = new ReferenceMark(name);
-                List<String> identifiers = referenceMark.getCitationKeys();
-                List<Integer> citationNumbers = referenceMark.getCitationNumbers();
+            XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+            Optional<JabRefReferenceMark> referenceMark = JabRefReferenceMark.parse(name);
+            if (referenceMark.isEmpty()) {
+                LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
+                continue;
+            }
 
-                if (!identifiers.isEmpty() && !citationNumbers.isEmpty()) {
-                    BSTReferenceMark mark = new BSTReferenceMark(named, referenceMark);
-                    marksByName.put(name, mark);
-                    marksInOrder.add(mark);
-                    citationType = referenceMark.getCitationType();
+            List<String> identifiers = referenceMark.orElseThrow().getCitationKeys();
+            List<Integer> citationNumbers = referenceMark.orElseThrow().getCitationNumbers();
 
-                    for (int i = 0; i < identifiers.size(); i++) {
-                        String id = identifiers.get(i);
-                        int number = citationNumbers.get(i);
-                        identifierToNumber.put(id, number);
-                        highestCitationNumber = Math.max(highestCitationNumber, number);
-                    }
-                } else {
-                    LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
+            if (!identifiers.isEmpty() && !citationNumbers.isEmpty()) {
+                BSTReferenceMark mark = new BSTReferenceMark(named, referenceMark.orElseThrow());
+                marksByName.put(name, mark);
+                marksInOrder.add(mark);
+                citationType = referenceMark.orElseThrow().getCitationType();
+
+                for (int i = 0; i < identifiers.size(); i++) {
+                    String id = identifiers.get(i);
+                    int number = citationNumbers.get(i);
+                    identifierToNumber.put(id, number);
+                    highestCitationNumber = Math.max(highestCitationNumber, number);
                 }
+            } else {
+                LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
             }
         }
 
@@ -177,30 +183,13 @@ public class BSTReferenceMarkManager {
     }
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
-        String[] parts = oldName.split(" ");
-
-        /*
-         * e.g. "JABREF_Smith_2020 CID_1 abcd1234 EMPTY" is separated into 4 parts
-         * The last part is the citation type
-         * The second to last part is the uniqueId
-         */
-        String citationType = parts[parts.length - 1];
-        int uniqueIdIndex = parts.length - 2;
-
-        if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
-            StringBuilder newName = new StringBuilder();
-            for (int i = 0; i < uniqueIdIndex; i += 2) {
-                // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
-                if (i > 0) {
-                    newName.append(", ");
-                }
-                newName.append(parts[i]).append(" ");
-                newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
-            }
-            newName.append(" ").append(parts[uniqueIdIndex]).append(" ").append(citationType);
-            return newName.toString();
-        }
-        return oldName;
+        return JabRefReferenceMark.parse(oldName)
+                                  .map(referenceMark -> JabRefReferenceMark.buildReferenceMarkName(
+                                          referenceMark.getCitationKeys(),
+                                          newNumbers,
+                                          referenceMark.getUniqueId(),
+                                          referenceMark.getCitationType()))
+                                  .orElse(oldName);
     }
 
     private void updateAllCitationNumbers() throws Exception, CreationException {
@@ -230,26 +219,6 @@ public class BSTReferenceMarkManager {
 
         identifierToNumber = newIdentifierToNumber;
         highestCitationNumber = newIdentifierToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0);
-    }
-
-    public void applyNumberingOverride(Map<String, Integer> numbering) throws Exception, CreationException {
-        sortMarksInOrder();
-        for (BSTReferenceMark mark : marksInOrder) {
-            List<String> identifiers = mark.getCitationKeys();
-            List<Integer> assignedNumbers = new ArrayList<>(identifiers.size());
-            for (String identifier : identifiers) {
-                Integer numberOverride = numbering.get(identifier);
-                if (numberOverride == null) {
-                    // fallback to existing mapping to avoid breaking text
-                    numberOverride = identifierToNumber.getOrDefault(identifier, 0);
-                }
-                assignedNumbers.add(numberOverride);
-            }
-            mark.setCitationNumbers(assignedNumbers);
-            updateMarkAndTextWithNewNumbers(mark, assignedNumbers);
-        }
-        identifierToNumber = new HashMap<>(numbering);
-        highestCitationNumber = numbering.values().stream().mapToInt(Integer::intValue).max().orElse(0);
     }
 
     private String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
@@ -288,30 +257,6 @@ public class BSTReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
-    }
-
-    public void updateMarkAndTextWithNewStyle(BSTReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
-        String updatedName = mark.getName();
-        // Remove citation marker first
-        if (updatedName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.EMPTY_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.NORMAL_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
-        }
-
-        // Then add the new marker
-        String marker = switch (citationType) {
-            case IN_TEXT ->
-                    ReferenceMark.IN_TEXT_MARKER;
-            case EMPTY ->
-                    ReferenceMark.EMPTY_MARKER;
-            case NORMAL ->
-                    ReferenceMark.NORMAL_MARKER;
-        };
-
-        updateMarkAndText(mark, newText, updatedName + " " + marker);
     }
 
     private void updateMarkAndText(BSTReferenceMark mark, String newText, String markName) throws Exception, CreationException {
@@ -355,11 +300,6 @@ public class BSTReferenceMarkManager {
             return override;
         }
         return identifierToNumber.computeIfAbsent(identifier, _ -> ++highestCitationNumber);
-    }
-
-    public List<BSTReferenceMark> getMarksInOrder() {
-        sortMarksInOrder();
-        return marksInOrder;
     }
 
     public boolean hasCitationForIdentifier(String identifier) {
