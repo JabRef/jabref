@@ -115,8 +115,8 @@ public class GitStatusChecker {
     public static boolean isRemoteEmpty(GitHandler gitHandler) throws IOException, GitAPIException {
         try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
             LsRemoteCommand lsRemoteCommand = git.lsRemote()
-                                                .setRemote("origin")
-                                                .setHeads(true);
+                                                 .setRemote("origin")
+                                                 .setHeads(true);
             gitHandler.getCredentialsProvider().ifPresent(lsRemoteCommand::setCredentialsProvider);
             Iterable<Ref> heads = lsRemoteCommand.call();
             boolean empty = (heads == null) || !heads.iterator().hasNext();
