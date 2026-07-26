@@ -10,6 +10,7 @@ import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.preferences.GitPreferences;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchConfig;
@@ -111,12 +112,13 @@ public class GitStatusChecker {
         }
     }
 
-    public static boolean isRemoteEmpty(GitHandler gitHandler) {
+    public static boolean isRemoteEmpty(GitHandler gitHandler) throws IOException, GitAPIException {
         try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
-            Iterable<Ref> heads = git.lsRemote()
-                                     .setRemote("origin")
-                                     .setHeads(true)
-                                     .call();
+            LsRemoteCommand lsRemoteCommand = git.lsRemote()
+                                                 .setRemote("origin")
+                                                 .setHeads(true);
+            gitHandler.getCredentialsProvider().ifPresent(lsRemoteCommand::setCredentialsProvider);
+            Iterable<Ref> heads = lsRemoteCommand.call();
             boolean empty = (heads == null) || !heads.iterator().hasNext();
             if (empty) {
                 LOGGER.debug("ls-remote: origin has NO heads.");
@@ -124,9 +126,6 @@ public class GitStatusChecker {
                 LOGGER.debug("ls-remote: origin has heads.");
             }
             return empty;
-        } catch (IOException | GitAPIException e) {
-            LOGGER.debug("ls-remote failed when checking remote emptiness; assume NOT empty.", e);
-            return false;
         }
     }
 }

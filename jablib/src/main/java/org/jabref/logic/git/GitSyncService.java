@@ -149,6 +149,12 @@ public class GitSyncService {
 
         gitHandler.fetchOnCurrentBranch();
 
+        if (GitStatusChecker.isRemoteEmpty(gitHandler)) {
+            // [impl->req~ux.git-push.empty-remote~1]
+            gitHandler.pushCurrentBranchCreatingUpstream();
+            return PushResult.pushed();
+        }
+
         GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
 
         if (!status.tracking()) {
@@ -192,4 +198,3 @@ public class GitSyncService {
         }
     }
 }
-
