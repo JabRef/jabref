@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.List;
 
+import org.jabref.logic.openoffice.JabRefReferenceMark;
 import org.jabref.logic.openoffice.ReferenceMark;
 
 import com.sun.star.container.XNamed;
@@ -9,17 +10,16 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
-import io.github.thibaultmeyer.cuid.CUID;
 
 /// Class to model a reference mark for BST integration. See [BSTReferenceMarkManager] for usage/management.
 public class BSTReferenceMark {
-    private ReferenceMark referenceMark;
+    private JabRefReferenceMark referenceMark;
     private XTextContent textContent;
     private final List<String> citationKeys;
     private List<Integer> citationNumbers;
     private CSLCitationType citationType;
 
-    public BSTReferenceMark(XNamed named, ReferenceMark referenceMark) {
+    public BSTReferenceMark(XNamed named, JabRefReferenceMark referenceMark) {
         this.referenceMark = referenceMark;
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
         this.citationKeys = referenceMark.getCitationKeys();
@@ -28,35 +28,16 @@ public class BSTReferenceMark {
     }
 
     public static BSTReferenceMark of(List<String> citationKeys, List<Integer> citationNumbers, CSLCitationType citationType, XMultiServiceFactory factory) throws Exception {
-        String uniqueId = CUID.randomCUID2(8).toString();
-        String name = buildReferenceName(citationKeys, citationNumbers, uniqueId, citationType);
+        String uniqueId = ReferenceMark.generateRandomCUID(8);
+        JabRefReferenceMark referenceMark = new JabRefReferenceMark(
+                JabRefReferenceMark.buildReferenceMarkName(citationKeys, citationNumbers, uniqueId, citationType),
+                citationKeys,
+                citationNumbers,
+                uniqueId,
+                citationType);
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
-        named.setName(name);
-        ReferenceMark referenceMark = new ReferenceMark(name, citationKeys, citationNumbers, uniqueId, citationType);
+        named.setName(referenceMark.getName());
         return new BSTReferenceMark(named, referenceMark);
-    }
-
-    private static String buildReferenceName(List<String> citationKeys, List<Integer> citationNumbers, String uniqueId, CSLCitationType citationType) {
-        StringBuilder nameBuilder = new StringBuilder();
-        for (int i = 0; i < citationKeys.size(); i++) {
-            if (i > 0) {
-                nameBuilder.append(", ");
-            }
-            nameBuilder.append(ReferenceMark.PREFIXES[0]).append(citationKeys.get(i))
-                       .append(" ").append(ReferenceMark.PREFIXES[1]).append(citationNumbers.get(i));
-        }
-        nameBuilder.append(" ").append(uniqueId);
-
-        // Embed citation nature into reference mark
-        switch (citationType) {
-            case IN_TEXT ->
-                    nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
-            case EMPTY ->
-                    nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
-            case NORMAL ->
-                    nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
-        }
-        return nameBuilder.toString();
     }
 
     public List<String> getCitationKeys() {
@@ -80,6 +61,6 @@ public class BSTReferenceMark {
     }
 
     public void updateName(String newName) {
-        this.referenceMark = new ReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId(), this.citationType);
+        this.referenceMark = new JabRefReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId(), this.citationType);
     }
 }
