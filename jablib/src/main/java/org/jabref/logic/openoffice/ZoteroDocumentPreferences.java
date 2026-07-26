@@ -1,7 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public final class ZoteroDocumentPreferences {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            InputSource inputSource = new InputSource(new StringReader(serializedData));
+            InputSource inputSource = new InputSource(Reader.of(serializedData));
             return builder.parse(inputSource);
         } catch (ParserConfigurationException | SAXException e) {
             throw new IOException("Could not parse Zotero XML document data", e);
