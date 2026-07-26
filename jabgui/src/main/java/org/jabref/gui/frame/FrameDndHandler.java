@@ -37,7 +37,10 @@ public class FrameDndHandler {
     private final Supplier<OpenDatabaseAction> openDatabaseAction;
     private final StateManager stateManager;
 
-    public FrameDndHandler(TabPane tabPane, Supplier<Scene> scene, Supplier<OpenDatabaseAction> openDatabaseAction, StateManager stateManager) {
+    public FrameDndHandler(TabPane tabPane,
+                           Supplier<Scene> scene,
+                           Supplier<OpenDatabaseAction> openDatabaseAction,
+                           StateManager stateManager) {
         this.tabPane = tabPane;
         this.scene = scene;
         this.openDatabaseAction = openDatabaseAction;
@@ -89,7 +92,10 @@ public class FrameDndHandler {
 
             LibraryTab destinationLibraryTab = null;
             for (Tab tab : tabPane.getTabs()) {
-                if (tab.getId() != null && tab.getId().equals(destinationTabNode.getId()) && !tabPane.getSelectionModel().getSelectedItem().equals(tab) && tab instanceof LibraryTab libraryTab) {
+                if (tab.getId() != null
+                        && tab.getId().equals(destinationTabNode.getId())
+                        && !tabPane.getSelectionModel().getSelectedItem().equals(tab)
+                        && tab instanceof LibraryTab libraryTab) {
                     destinationLibraryTab = libraryTab;
                     break;
                 }
@@ -103,7 +109,8 @@ public class FrameDndHandler {
             boolean success = false;
             if (hasEntries(dragboard)) {
                 List<BibEntry> originalEntries = stateManager.getLocalDragboard().getBibEntries();
-                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream().map(BibEntry::new).toList();
+                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
+                                                         .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 TransferMode mode = tabDragEvent.getTransferMode();
                 org.jabref.model.TransferMode modelTransferMode = toModelTransferMode(mode);
@@ -141,12 +148,20 @@ public class FrameDndHandler {
 
         copyRootNode(destinationLibraryTab);
 
-        GroupTreeNode destinationLibraryGroupRoot = destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().get();
+        GroupTreeNode destinationLibraryGroupRoot = destinationLibraryTab
+                .getBibDatabaseContext()
+                .getMetaData()
+                .getGroups().get();
 
-        GroupTreeNode groupsTreeNode = stateManager.getActiveDatabase().get().getMetaData().getGroups().get();
+        GroupTreeNode groupsTreeNode = stateManager.getActiveDatabase().get()
+                                                   .getMetaData()
+                                                   .getGroups()
+                                                   .get();
 
         for (String pathToSource : groupPathToSources) {
-            GroupTreeNode groupTreeNodeToCopy = groupsTreeNode.getChildByPath(pathToSource).get();
+            GroupTreeNode groupTreeNodeToCopy = groupsTreeNode
+                    .getChildByPath(pathToSource)
+                    .get();
             copyGroupTreeNode(destinationLibraryTab, destinationLibraryGroupRoot, groupTreeNodeToCopy);
         }
     }
@@ -199,15 +214,22 @@ public class FrameDndHandler {
     }
 
     private void copyRootNode(LibraryTab destinationLibraryTab) {
-        if (destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isPresent() && stateManager.getActiveDatabase().isEmpty()) {
+        if (destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isPresent()
+                && stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 
         // a root (all entries) GroupTreeNode
-        GroupTreeNode currentLibraryGroupRoot = stateManager.getActiveDatabase().get().getMetaData().getGroups().get().copyNode();
+        GroupTreeNode currentLibraryGroupRoot = stateManager.getActiveDatabase().get()
+                                                            .getMetaData()
+                                                            .getGroups()
+                                                            .get()
+                                                            .copyNode();
 
         // add currentLibraryGroupRoot to the Library if it does not have a root.
-        destinationLibraryTab.getBibDatabaseContext().getMetaData().setGroups(currentLibraryGroupRoot);
+        destinationLibraryTab.getBibDatabaseContext()
+                             .getMetaData()
+                             .setGroups(currentLibraryGroupRoot);
     }
 
     private void copyGroupTreeNode(LibraryTab destinationLibraryTab, GroupTreeNode parent, GroupTreeNode groupTreeNodeToCopy) {
