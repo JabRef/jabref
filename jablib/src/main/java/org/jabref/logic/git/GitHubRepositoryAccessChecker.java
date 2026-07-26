@@ -1,6 +1,7 @@
 package org.jabref.logic.git;
 
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
@@ -21,7 +22,7 @@ public class GitHubRepositoryAccessChecker {
             URIish remote = new URIish(repositoryUrl);
             if (!"https".equalsIgnoreCase(remote.getScheme())
                     || !"github.com".equalsIgnoreCase(remote.getHost())
-                    || remote.getPath().isBlank()) {
+                    || Optional.ofNullable(remote.getPath()).filter(GitHubRepositoryAccessChecker::isRepositoryPath).isEmpty()) {
                 return GitHubRepositoryAccess.INVALID_REPOSITORY_URL;
             }
 
@@ -36,5 +37,23 @@ public class GitHubRepositoryAccessChecker {
         } catch (TransportException e) {
             return GitHubRepositoryAccess.REPOSITORY_NOT_ACCESSIBLE;
         }
+    }
+
+    private static boolean isRepositoryPath(String path) {
+        String normalizedPath = path.trim();
+        while (normalizedPath.startsWith("/")) {
+            normalizedPath = normalizedPath.substring(1);
+        }
+        while (normalizedPath.endsWith("/")) {
+            normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
+        }
+        if (normalizedPath.endsWith(".git")) {
+            normalizedPath = normalizedPath.substring(0, normalizedPath.length() - ".git".length());
+        }
+
+        String[] pathSegments = normalizedPath.split("/", -1);
+        return pathSegments.length == 2
+                && !pathSegments[0].isBlank()
+                && !pathSegments[1].isBlank();
     }
 }
