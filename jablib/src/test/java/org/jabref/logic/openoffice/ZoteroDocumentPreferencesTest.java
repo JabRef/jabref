@@ -65,8 +65,11 @@ class ZoteroDocumentPreferencesTest {
         String zoteroPreference = """
                 <data data-version="3" zotero-version="7.0">\
                 <session id="session-id"/>\
-                <style id="%s" hasBibliography="1" bibliographyStyleHasBeenSet="0"/>\
-                <prefs><pref name="fieldType" value="ReferenceMark"/></prefs>\
+                <style id="%s" hasBibliography="1" bibliographyStyleHasBeenSet="1"/>\
+                <prefs>\
+                <pref name="fieldType" value="ReferenceMark"/>\
+                <pref name="noteType" value="0"/>\
+                </prefs>\
                 </data>""".formatted(APA_STYLE_ID);
         document.putZoteroPreferenceChunks(zoteroPreference);
 
