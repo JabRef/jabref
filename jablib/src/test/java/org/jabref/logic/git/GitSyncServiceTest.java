@@ -295,14 +295,14 @@ class GitSyncServiceTest {
         Path localLibrary = localDirectory.resolve("library.bib");
 
         try (Git emptyRemote = Git.init()
-                                   .setBare(true)
-                                   .setInitialBranch("main")
-                                   .setDirectory(emptyRemoteDirectory.toFile())
-                                   .call();
+                                  .setBare(true)
+                                  .setInitialBranch("main")
+                                  .setDirectory(emptyRemoteDirectory.toFile())
+                                  .call();
              Git localGit = Git.init()
-                                .setInitialBranch("main")
-                                .setDirectory(localDirectory.toFile())
-                                .call()) {
+                               .setInitialBranch("main")
+                               .setDirectory(localDirectory.toFile())
+                               .call()) {
             RevCommit localCommit = writeAndCommit(initialContent, "Initial commit", alice, localLibrary, localGit);
             localGit.remoteAdd()
                     .setName("origin")
