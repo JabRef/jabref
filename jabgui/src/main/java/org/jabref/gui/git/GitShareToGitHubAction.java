@@ -26,6 +26,7 @@ public class GitShareToGitHubAction extends SimpleCommand {
     }
 
     private BooleanExpression enabledGitShare() {
+        // TODO: Revisit this condition once the sharing dialog reads the active library's configured remote 
         return ActionHelper.needsSavedLocalDatabase(stateManager);
     }
 }
