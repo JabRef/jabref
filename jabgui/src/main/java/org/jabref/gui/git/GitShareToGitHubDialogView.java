@@ -2,6 +2,7 @@ package org.jabref.gui.git;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -33,6 +34,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     @FXML private TextField username;
     @FXML private PasswordField personalAccessToken;
     @FXML private ButtonType shareButton;
+    @FXML private Button checkGitHubAccessButton;
     @FXML private Label patHelpIcon;
     @FXML private Tooltip patHelpTooltip;
     @FXML private CheckBox rememberSettingsCheck;
@@ -69,6 +71,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         this.viewModel = new GitShareToGitHubDialogViewModel(preferences.getGitPreferences(), stateManager, dialogService, taskExecutor, gitHandlerRegistry);
 
         this.setTitle(Localization.lang("Share this Library to GitHub"));
+        checkGitHubAccessButton.setText(Localization.lang("Check GitHub access"));
 
         // See "javafx.md"
         this.setResultConverter(button -> {
@@ -128,6 +131,11 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     @FXML
     private void shareToGitHub() {
-        viewModel.shareToGitHub(() -> this.close());
+        viewModel.shareToGitHub(this::close);
+    }
+
+    @FXML
+    private void checkGitHubAccess() {
+        viewModel.checkGitHubAccess();
     }
 }

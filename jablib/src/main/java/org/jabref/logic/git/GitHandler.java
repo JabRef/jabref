@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
@@ -28,7 +29,9 @@ import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -221,11 +224,10 @@ public class GitHandler {
     }
 
     /// Pushes all commits made to the branch that is tracked by the currently checked out branch.
-    /// If pushing to remote fails, it fails silently.
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
 
             boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
             if (needCreds && credsOpt.isEmpty()) {
@@ -233,10 +235,10 @@ public class GitHandler {
             }
 
             PushCommand pushCommand = git.push();
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing current branch to the configured remote.");
+            verifyPushResults(pushCommand.call());
+            LOGGER.info("Push to the configured remote completed.");
         }
     }
 
@@ -246,7 +248,7 @@ public class GitHandler {
             StoredConfig config = repo.getConfig();
             String remoteUrl = config.getString("remote", "origin", "url");
 
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             boolean needCreds = (remoteUrl != null) && requiresCredentialsForUrl(remoteUrl);
             if (needCreds && credsOpt.isEmpty()) {
                 throw new IOException("Missing Git credentials (username and Personal Access Token).");
@@ -258,14 +260,14 @@ public class GitHandler {
                                          .setRemote("origin")
                                          .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
 
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing branch {} to origin and configuring its upstream.", branch);
+            verifyPushResults(pushCommand.call());
 
             config.setString("branch", branch, "remote", "origin");
             config.setString("branch", branch, "merge", "refs/heads/" + branch);
             config.save();
+            LOGGER.info("Push to origin completed and upstream configured for branch {}.", branch);
         }
     }
 
@@ -274,11 +276,9 @@ public class GitHandler {
     /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             PullCommand pullCommand = git.pull();
-            if (credsOpt.isPresent()) {
-                pullCommand.setCredentialsProvider(credsOpt.get());
-            }
+            credsOpt.ifPresent(pullCommand::setCredentialsProvider);
             pullCommand.call();
         } catch (GitAPIException e) {
             LOGGER.info("Failed to pull.");
@@ -293,7 +293,7 @@ public class GitHandler {
 
     public void fetchOnCurrentBranch() throws JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credentials = getCredentials();
+            Optional<CredentialsProvider> credentials = getCredentialsProvider();
             boolean needCredentials = currentRemoteUrl(git.getRepository())
                     .map(GitHandler::requiresCredentialsForUrl)
                     .orElse(false);
@@ -372,7 +372,7 @@ public class GitHandler {
         }
     }
 
-    private Optional<CredentialsProvider> getCredentials() {
+    public Optional<CredentialsProvider> getCredentialsProvider() {
         if (gitPreferences.getPat().isEmpty()) {
             return Optional.empty();
         }
@@ -380,5 +380,39 @@ public class GitHandler {
                 new UsernamePasswordCredentialsProvider(
                         gitPreferences.getUsername(),
                         gitPreferences.getPat()));
+    }
+
+    private static void verifyPushResults(Iterable<PushResult> pushResults) throws JabRefException {
+        // [impl->req~ux.git-push.rejected-update-reporting~1]
+        for (PushResult pushResult : pushResults) {
+            String remoteMessage = pushResult.getMessages();
+            if (StringUtil.isNotBlank(remoteMessage)) {
+                LOGGER.info("Remote push response: {}", remoteMessage);
+            }
+            for (RemoteRefUpdate update : pushResult.getRemoteUpdates()) {
+                LOGGER.info("Push update for {} completed with status {}.", update.getRemoteName(), update.getStatus());
+                if (update.getStatus() != RemoteRefUpdate.Status.OK
+                        && update.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE) {
+                    String localizedMessage = getLocalizedPushRejectionMessage(update, remoteMessage);
+                    LOGGER.warn("Push update for {} was rejected with status {}. Update message: {}. Remote response: {}.",
+                            update.getRemoteName(), update.getStatus(), update.getMessage(), remoteMessage);
+                    throw new JabRefException("Git push rejected", localizedMessage);
+                }
+            }
+        }
+    }
+
+    private static String getLocalizedPushRejectionMessage(RemoteRefUpdate update, String remoteMessage) {
+        String updateMessage = update.getMessage();
+        if (StringUtil.isNotBlank(updateMessage) && StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2 %3", update.getRemoteName(), update.getStatus(), updateMessage, remoteMessage);
+        }
+        if (StringUtil.isNotBlank(updateMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), updateMessage);
+        }
+        if (StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), remoteMessage);
+        }
+        return Localization.lang("Push to %0 was rejected (%1).", update.getRemoteName(), update.getStatus());
     }
 }
