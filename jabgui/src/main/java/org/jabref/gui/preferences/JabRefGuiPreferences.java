@@ -935,6 +935,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             String encoded = Base64.getEncoder().encodeToString(customPreviewLayouts.get(i).getText().getBytes(StandardCharsets.UTF_8));
             put(previewCustomStyleContentKey(i), encoded);
         }
+
+        // Clean up leftover index keys from previous save that had more entries
+        int cleanupIndex = customPreviewLayouts.size();
+        while (hasKey(previewCustomStyleContentKey(cleanupIndex))) {
+            remove(previewCustomStyleContentKey(cleanupIndex));
+            cleanupIndex++;
+        }
     }
 
     private String previewCustomStyleContentKey(int index) {
