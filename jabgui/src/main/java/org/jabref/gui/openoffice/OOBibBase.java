@@ -183,7 +183,12 @@ public class OOBibBase {
         }
 
         try {
-            ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
+            boolean result = ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
+            if (!result) {
+                return OOVoidResult.error(new OOError(
+                        Localization.lang("Problem modifying citation"),
+                        Localization.lang("Could not update document preferences.")));
+            }
             return OOVoidResult.ok();
         } catch (IllegalTypeException | NotRemoveableException | PropertyVetoException | WrappedTargetException e) {
             LOGGER.warn("Could not update Zotero document preferences", e);
