@@ -78,6 +78,11 @@ public class UpdateCitationMarkers {
                 ZERO_WIDTH_SPACE = "\u200b";
             }
             citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
+            // Citation markers are overwritten in place whenever citations are updated. Without this,
+            // a superscript/subscript style (e.g. Nature, AMA) would compute its escapement relative to
+            // whatever escapement was left over from the previous update, shrinking a little more on
+            // every regeneration.
+            OOTextIntoOO.resetCharEscapement(cursor);
             OOTextIntoOO.write(doc, cursor, citationText2);
         } else {
             cursor.setString("");

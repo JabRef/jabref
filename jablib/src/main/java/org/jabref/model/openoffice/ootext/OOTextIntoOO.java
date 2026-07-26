@@ -63,6 +63,7 @@ public class OOTextIntoOO {
      */
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
+    private static final String CHAR_AUTO_ESCAPEMENT = "CharAutoEscapement";
     private static final String CHAR_STYLE_NAME = "CharStyleName";
     private static final String CHAR_UNDERLINE = "CharUnderline";
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
@@ -369,6 +370,26 @@ public class OOTextIntoOO {
                 continue;
             }
             LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '{}'", p.Name);
+        }
+    }
+
+    /// Reset only the super/subscript ("escapement") properties of the cursor to their default (baseline, 100%) values.
+    ///
+    /// [#setCharEscapement] computes super/subscript size and position relative to whatever escapement is
+    /// already present at the cursor. That is correct for nesting `<sup>`/`<sub>` inside each other within a
+    /// single [#write] call, but if the cursor is positioned over text that already carries a direct
+    /// escapement from an earlier `write` (e.g. a citation marker being regenerated), the new escapement
+    /// would be computed relative to the old one, shrinking (or growing) further on every regeneration.
+    ///
+    /// Call this before writing text whose escapement should always start from the normal baseline,
+    /// regardless of what was there before - e.g. citation markers, which are overwritten in place whenever
+    /// citations are updated.
+    public static void resetCharEscapement(XTextCursor cursor) {
+        XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
+        try {
+            mpss.setPropertiesToDefault(new String[] {CHAR_AUTO_ESCAPEMENT, CHAR_ESCAPEMENT, CHAR_ESCAPEMENT_HEIGHT});
+        } catch (UnknownPropertyException ex) {
+            LOGGER.warn("OOTextIntoOO.resetCharEscapement failed", ex);
         }
     }
 
