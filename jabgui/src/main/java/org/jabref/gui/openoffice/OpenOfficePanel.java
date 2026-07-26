@@ -218,9 +218,7 @@ public class OpenOfficePanel {
             updateButtonAvailability();
         } catch (IOException ex) {
             LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-            String msg = Localization.lang("Unable to reload style file")
-                    + "'" + jStyle.getPath() + "'"
-                    + "\n" + ex.getMessage();
+            String msg = Localization.lang("Unable to reload style file '%0'. %1", jStyle.getPath(), String.valueOf(ex.getMessage()));
             new OOError(title, msg, ex).showErrorDialog(dialogService);
             return FAIL;
         }
