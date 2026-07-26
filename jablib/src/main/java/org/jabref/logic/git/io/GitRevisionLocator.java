@@ -56,8 +56,7 @@ public class GitRevisionLocator {
             RevCommit remote = walk.parseCommit(remoteId);
             RevCommit base = findMergeBase(repo, local, remote);
 
-            assert base != null : "Could not determine merge base between local and remote.";
-
+            // [impl->req~ux.git-pull.unrelated-histories~1]
             return new RevisionTriple(Optional.ofNullable(base), local, remote);
         }
     }

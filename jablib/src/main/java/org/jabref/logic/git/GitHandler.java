@@ -28,7 +28,9 @@ import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -221,7 +223,6 @@ public class GitHandler {
     }
 
     /// Pushes all commits made to the branch that is tracked by the currently checked out branch.
-    /// If pushing to remote fails, it fails silently.
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
@@ -233,10 +234,10 @@ public class GitHandler {
             }
 
             PushCommand pushCommand = git.push();
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing current branch to the configured remote.");
+            verifyPushResults(pushCommand.call());
+            LOGGER.info("Push to the configured remote completed.");
         }
     }
 
@@ -258,14 +259,14 @@ public class GitHandler {
                                          .setRemote("origin")
                                          .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
 
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing branch {} to origin and configuring its upstream.", branch);
+            verifyPushResults(pushCommand.call());
 
             config.setString("branch", branch, "remote", "origin");
             config.setString("branch", branch, "merge", "refs/heads/" + branch);
             config.save();
+            LOGGER.info("Push to origin completed and upstream configured for branch {}.", branch);
         }
     }
 
@@ -276,9 +277,7 @@ public class GitHandler {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<CredentialsProvider> credsOpt = getCredentials();
             PullCommand pullCommand = git.pull();
-            if (credsOpt.isPresent()) {
-                pullCommand.setCredentialsProvider(credsOpt.get());
-            }
+            credsOpt.ifPresent(pullCommand::setCredentialsProvider);
             pullCommand.call();
         } catch (GitAPIException e) {
             LOGGER.info("Failed to pull.");
@@ -380,5 +379,29 @@ public class GitHandler {
                 new UsernamePasswordCredentialsProvider(
                         gitPreferences.getUsername(),
                         gitPreferences.getPat()));
+    }
+
+    private static void verifyPushResults(Iterable<PushResult> pushResults) throws JabRefException {
+        // [impl->req~ux.git-push.rejected-update-reporting~1]
+        for (PushResult pushResult : pushResults) {
+            String remoteMessage = pushResult.getMessages();
+            if (StringUtil.isNotBlank(remoteMessage)) {
+                LOGGER.info("Remote push response: {}", remoteMessage);
+            }
+            for (RemoteRefUpdate update : pushResult.getRemoteUpdates()) {
+                LOGGER.info("Push update for {} completed with status {}.", update.getRemoteName(), update.getStatus());
+                if (update.getStatus() != RemoteRefUpdate.Status.OK
+                        && update.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE) {
+                    String rejectionMessage = "Push to %s was rejected (%s).".formatted(update.getRemoteName(), update.getStatus());
+                    String message = Optional.ofNullable(update.getMessage())
+                                             .filter(StringUtil::isNotBlank)
+                                             .map(serverMessage -> "%s %s".formatted(rejectionMessage, serverMessage))
+                                             .orElse(rejectionMessage);
+                    message = StringUtil.isNotBlank(remoteMessage) ? "%s %s".formatted(message, remoteMessage) : message;
+                    LOGGER.warn("{}", message);
+                    throw new JabRefException(message);
+                }
+            }
+        }
     }
 }

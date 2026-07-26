@@ -33,6 +33,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -148,6 +149,27 @@ class GitHandlerTest {
             assertTrue(git.getRepository().getRefDatabase().hasRefs());
             assertTrue(git.getRepository().exactRef("refs/remotes/origin/main") != null);
         }
+    }
+
+    @Test
+    void pushReportsRejectedRemoteUpdate() throws IOException, GitAPIException {
+        try (Git cloneGit = Git.cloneRepository()
+                               .setURI(remoteRepoPath.toUri().toString())
+                               .setDirectory(clonePath.toFile())
+                               .call()) {
+            Files.writeString(clonePath.resolve("remote.txt"), "remote change");
+            cloneGit.add().addFilepattern("remote.txt").call();
+            cloneGit.commit().setMessage("Remote commit").call();
+            cloneGit.push().call();
+        }
+
+        Files.writeString(repositoryPath.resolve("local.txt"), "local change");
+        gitHandler.createCommitOnCurrentBranch("Local commit", false);
+
+        JabRefException exception = assertThrows(JabRefException.class, gitHandler::pushCommitsToRemoteRepository);
+
+        String errorMessage = Optional.ofNullable(exception.getMessage()).orElseThrow();
+        assertTrue(errorMessage.contains("REJECTED_NONFASTFORWARD"));
     }
 
     @Test
