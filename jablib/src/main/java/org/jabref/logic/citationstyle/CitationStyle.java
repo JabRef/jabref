@@ -55,7 +55,17 @@ public class CitationStyle implements OOStyle {
                          boolean usesHangingIndent,
                          @NonNull String source,
                          boolean isInternalStyle) {
-        this(filePath, "", "", title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, isInternalStyle);
+        this(
+                filePath,
+                "",                 // styleId
+                "",                 // styleClass
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                usesHangingIndent,
+                source,
+                isInternalStyle);
     }
 
     /// Creates a new citation style with an auto-determined internal/external state.
@@ -66,7 +76,14 @@ public class CitationStyle implements OOStyle {
                          boolean hasBibliography,
                          boolean usesHangingIndent,
                          @NonNull String source) {
-        this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
+        this(filePath,
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                usesHangingIndent,
+                source,
+                !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {

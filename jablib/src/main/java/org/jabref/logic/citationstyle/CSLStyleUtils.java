@@ -27,7 +27,13 @@ public final class CSLStyleUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
     /// Style information record (style id, style class, title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
-    public record StyleInfo(String styleId, String styleClass, String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent) {
+    public record StyleInfo(String styleId,
+                            String styleClass,
+                            String title,
+                            String shortTitle,
+                            boolean isNumericStyle,
+                            boolean hasBibliography,
+                            boolean usesHangingIndent) {
     }
 
     static {
@@ -177,7 +183,14 @@ public final class CSLStyleUtils {
             }
 
             if (hasCitation && title != null) {
-                return Optional.of(new StyleInfo(styleId, styleClass, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent));
+                return Optional.of(new StyleInfo(
+                        styleId,
+                        styleClass,
+                        title,
+                        shortTitle,
+                        isNumericStyle,
+                        hasBibliography,
+                        usesHangingIndent));
             } else {
                 LOGGER.debug("No valid title or citation found for file {}", filename);
                 return Optional.empty();
