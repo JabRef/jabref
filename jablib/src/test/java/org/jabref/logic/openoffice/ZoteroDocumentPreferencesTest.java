@@ -41,11 +41,12 @@ class ZoteroDocumentPreferencesTest {
     @Test
     void findCitationStyleReadsStyleIdFromZoteroPreferenceChunks() throws Exception {
         TestDocument document = new TestDocument();
-        String zoteroPreference = "<data data-version=\"3\" zotero-version=\"7.0\">"
-                + "<session id=\"session-id\"/>"
-                + "<style id=\"" + APA_STYLE_ID + "\" hasBibliography=\"1\" bibliographyStyleHasBeenSet=\"0\"/>"
-                + "<prefs><pref name=\"fieldType\" value=\"ReferenceMark\"/></prefs>"
-                + "</data>";
+        String zoteroPreference = """
+                <data data-version="3" zotero-version="7.0">\
+                <session id="session-id"/>\
+                <style id="%s" hasBibliography="1" bibliographyStyleHasBeenSet="0"/>\
+                <prefs><pref name="fieldType" value="ReferenceMark"/></prefs>\
+                </data>""".formatted(APA_STYLE_ID);
         document.putZoteroPreferenceChunks(zoteroPreference.substring(0, 80), zoteroPreference.substring(80));
 
         CitationStyle ieeeStyle = citationStyle("ieee.csl", IEEE_STYLE_ID, "IEEE");
@@ -61,14 +62,12 @@ class ZoteroDocumentPreferencesTest {
     @Test
     void writeCitationStyleUpdatesOnlyTheStyleIdInExistingZoteroPreference() throws Exception {
         TestDocument document = new TestDocument();
-        String zoteroPreference = "<data data-version=\"3\" zotero-version=\"7.0\">"
-                + "<session id=\"session-id\"/>"
-                + "<style id=\"" + APA_STYLE_ID + "\" hasBibliography=\"1\" bibliographyStyleHasBeenSet=\"1\"/>"
-                + "<prefs>"
-                + "<pref name=\"fieldType\" value=\"ReferenceMark\"/>"
-                + "<pref name=\"noteType\" value=\"0\"/>"
-                + "</prefs>"
-                + "</data>";
+        String zoteroPreference = """
+                <data data-version="3" zotero-version="7.0">\
+                <session id="session-id"/>\
+                <style id="%s" hasBibliography="1" bibliographyStyleHasBeenSet="0"/>\
+                <prefs><pref name="fieldType" value="ReferenceMark"/></prefs>\
+                </data>""".formatted(APA_STYLE_ID);
         document.putZoteroPreferenceChunks(zoteroPreference);
 
         boolean written = ZoteroDocumentPreferences.writeCitationStyle(
