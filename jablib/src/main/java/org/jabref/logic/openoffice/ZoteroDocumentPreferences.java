@@ -40,6 +40,7 @@ public final class ZoteroDocumentPreferences {
 
     private static final int MAX_LENGTH = 255;
     private static final String ZOTERO_PREF = "ZOTERO_PREF";
+    private static final String CSL_PREF = "CSL_PREF";
     private static final String STYLE = "style";
     private static final String STYLE_ID = "id";
     private static final String EMPTY_XML_DOCUMENT_DATA = """
@@ -166,12 +167,21 @@ public final class ZoteroDocumentPreferences {
 
     private static Optional<String> readSerializedData(XTextDocument document)
             throws WrappedTargetException {
+        Optional<String> serializedData = readChunkedProperty(document, ZOTERO_PREF);
+        if (serializedData.isEmpty()) {
+            serializedData = readChunkedProperty(document, CSL_PREF);
+        }
+        return serializedData;
+    }
+
+    private static Optional<String> readChunkedProperty(XTextDocument document, String propertyName)
+            throws WrappedTargetException {
         List<String> chunks = new ArrayList<>();
         int chunkIndex = 1;
 
         while (true) {
-            String propertyName = ZOTERO_PREF + "_" + chunkIndex;
-            Optional<String> chunk = UnoUserDefinedProperty.getStringValue(document, propertyName);
+            String chunkPropertyName = propertyName + "_" + chunkIndex;
+            Optional<String> chunk = UnoUserDefinedProperty.getStringValue(document, chunkPropertyName);
             if (chunk.isEmpty()) {
                 break;
             }
