@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javafx.scene.paint.Color;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.logic.util.strings.StringUtil;
@@ -81,8 +79,10 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         String text = model.getPlainText(index);
         RichParagraph.Builder builder = RichParagraph.builder();
 
-        addSyntaxSegments(builder, text, lineStarts[index]);
-        addSearchHighlights(builder, text, lineStarts[index]);
+        List<Range> matches = getSearchMatches(text, lineStarts[index]);
+
+        addSyntaxSegments(builder, text, lineStarts[index], matches);
+        addSearchHighlights(builder, text, matches);
 
         return builder.build();
     }
@@ -122,12 +122,13 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
     /// Adds the syntax-highlighted segments for the given line to the builder, translating each
     /// cached [BibTeXHighlightRegion] (expressed in offsets over the full document) into
-    /// offsets local to this line, and skipping regions that don't intersect the line.
+    /// offsets local to this line, and splitting segments if they overlap with search matches.
     ///
     /// @param builder   the paragraph builder to append segments to
     /// @param text      the plain text of the current line
     /// @param lineStart the offset of this line's first character within the full cached text
-    private void addSyntaxSegments(RichParagraph.Builder builder, String text, int lineStart) {
+    /// @param matches   list of active search match ranges within this line
+    private void addSyntaxSegments(RichParagraph.Builder builder, String text, int lineStart, List<Range> matches) {
         int lineEnd = lineStart + text.length();
         int cursor = 0;
 
@@ -143,31 +144,82 @@ public class BibTeXHighlighter implements SyntaxDecorator {
             int localEnd = Math.min(region.end() - lineStart, text.length());
 
             if (localStart > cursor) {
-                builder.addSegment(text.substring(cursor, localStart));
+                addSegmentWithSearchCheck(builder, text.substring(cursor, localStart), cursor, null, matches);
             }
             if (localEnd > localStart) {
                 String styleClass = BibTeXStyleClass.valueOf(region.category().name()).getStyleClass();
-                builder.addWithStyleNames(text.substring(localStart, localEnd), styleClass);
+                addSegmentWithSearchCheck(builder, text.substring(localStart, localEnd), localStart, styleClass, matches);
                 cursor = localEnd;
             }
         }
 
         if (cursor < text.length()) {
-            builder.addSegment(text.substring(cursor));
+            addSegmentWithSearchCheck(builder, text.substring(cursor), cursor, null, matches);
         }
     }
 
-    /// Overlays highlights for any matches of the currently active global search query within
-    /// the given line. Respects field-scoped search queries by checking global match positions
-    /// against available field ranges.
-    ///
-    /// @param builder   the paragraph builder to add highlights to
-    /// @param text      the plain text of the current line
-    /// @param lineStart the offset of this line's first character within the full cached text
-    private void addSearchHighlights(RichParagraph.Builder builder, String text, int lineStart) {
+    /// Helper to add a text segment, splitting it if it intersects with search matches to apply
+    /// the `search-highlight-text` CSS class dynamically.
+    private void addSegmentWithSearchCheck(RichParagraph.Builder builder, String segmentText, int segmentStart, @org.jspecify.annotations.Nullable String baseStyleClass, List<Range> matches) {
+        int segmentEnd = segmentStart + segmentText.length();
+        int cursor = segmentStart;
+
+        for (Range match : matches) {
+            int matchStart = match.start() - 1;
+            int matchEnd = match.end();
+
+            if (matchEnd <= cursor || matchStart >= segmentEnd) {
+                continue;
+            }
+
+            // Match overlaps with this segment
+            if (matchStart > cursor) {
+                // Segment part BEFORE match
+                String sub = segmentText.substring(cursor - segmentStart, matchStart - segmentStart);
+                appendSegment(builder, sub, baseStyleClass, false);
+            }
+
+            // Segment part INSIDE match
+            int overlapStart = Math.max(cursor, matchStart);
+            int overlapEnd = Math.min(segmentEnd, matchEnd);
+            String subMatch = segmentText.substring(overlapStart - segmentStart, overlapEnd - segmentStart);
+            appendSegment(builder, subMatch, baseStyleClass, true);
+
+            cursor = overlapEnd;
+        }
+
+        // Remaining segment part AFTER matches
+        if (cursor < segmentEnd) {
+            String sub = segmentText.substring(cursor - segmentStart);
+            appendSegment(builder, sub, baseStyleClass, false);
+        }
+    }
+
+    private void appendSegment(RichParagraph.Builder builder, String text, @org.jspecify.annotations.Nullable String baseStyleClass, boolean isSearchMatch) {
+        if (text.isEmpty()) {
+            return;
+        }
+
+        if (isSearchMatch) {
+            if (baseStyleClass != null) {
+                builder.addWithStyleNames(text, baseStyleClass, "search-highlight-text");
+            } else {
+                builder.addWithStyleNames(text, "search-highlight-text");
+            }
+        } else {
+            if (baseStyleClass != null) {
+                builder.addWithStyleNames(text, baseStyleClass);
+            } else {
+                builder.addSegment(text);
+            }
+        }
+    }
+
+    /// Finds search matches in the current line.
+    private List<Range> getSearchMatches(String text, int lineStart) {
         String query = stateManager.searchQueryProperty().get();
         if (StringUtil.isBlank(query)) {
-            return;
+            return List.of();
         }
 
         SearchQuery searchQuery = new SearchQuery(query);
@@ -193,12 +245,16 @@ public class BibTeXHighlighter implements SyntaxDecorator {
                         }
                     }
                 }));
+        return matches;
+    }
 
+    /// Adds background highlight rectangles for matches in the current line.
+    private void addSearchHighlights(RichParagraph.Builder builder, String text, List<Range> matches) {
         for (Range match : matches) {
             int start = match.start() - 1;
             int length = match.end() - match.start() + 1;
             if (start >= 0 && start + length <= text.length()) {
-                builder.addHighlight(start, length, Color.ORANGE);
+                builder.addHighlight(start, length, "search-highlight");
             }
         }
     }

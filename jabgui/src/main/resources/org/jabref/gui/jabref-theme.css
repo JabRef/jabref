@@ -2553,26 +2553,26 @@ journalInfo .grid-cell-b {
 }
 
 .bibtex-code-area .bibtex-keyword {
-    -fx-fill: -jr-purple !important;
+    -fx-fill: -jr-warn !important;
     -fx-font-weight: bold;
 }
 
 .bibtex-code-area .bibtex-type {
-    -fx-fill: -jr-purple !important;
+    -fx-fill: -jr-warn !important;
     -fx-font-weight: bold;
 }
 
 .bibtex-code-area .bibtex-field {
-    -fx-fill: -jr-green !important;
-    -fx-font-weight: bold;
+    -fx-fill: -jr-blue !important;
 }
 
 .bibtex-code-area .bibtex-key {
-    -fx-fill: -jr-orange !important;
+    -fx-fill: -jr-light-red !important;
+    -fx-font-weight: bold;
 }
 
 .bibtex-code-area .bibtex-string {
-    -fx-fill: -jr-red !important;
+    -fx-fill: -jr-green !important;
 }
 
 .bibtex-code-area .bibtex-number {
@@ -2582,4 +2582,14 @@ journalInfo .grid-cell-b {
 .bibtex-code-area .bibtex-comment {
     -fx-fill: -jr-light-green !important;
     -fx-font-style: italic;
+}
+
+.bibtex-code-area .search-highlight {
+    -fx-fill: -jr-orange !important;
+    -fx-stroke: transparent !important;
+}
+
+.bibtex-code-area .search-highlight-text {
+    -fx-fill: black !important;
+    -fx-text-fill: black !important;
 }
