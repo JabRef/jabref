@@ -1,0 +1,109 @@
+name: Qodo review threads acknowledged
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+
+
+jobs:
+  check-qodo-review-threads:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Check Qodo review threads
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pullRequestNumber = context.payload.pull_request.number;
+            const prAuthorLogin = context.payload.pull_request.user.login;
+            const qodoLogin = 'qodo-free-for-open-source-projects';
+
+            const query = `
+              query($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $pullRequestNumber) {
+                    reviewThreads(first: 100) {
+                      nodes {
+                        isResolved
+                        isOutdated
+                        comments(first: 100) {
+                          nodes {
+                            author {
+                              login
+                            }
+                            url
+                            createdAt
+                            body
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+
+            const result = await github.graphql(query, {
+              owner,
+              repo,
+              pullRequestNumber,
+            });
+
+            const threads = result.repository.pullRequest.reviewThreads.nodes;
+            const failingThreads = [];
+
+            for (const thread of threads) {
+              if (thread.isResolved || thread.isOutdated) {
+                continue;
+              }
+
+              const comments = [...thread.comments.nodes]
+                .filter(comment => comment.author && comment.author.login)
+                .sort((left, right) => new Date(left.createdAt) - new Date(right.createdAt));
+
+              if (comments.length === 0) {
+                continue;
+              }
+
+              const firstComment = comments[0];
+              if (firstComment.author.login !== qodoLogin) {
+                continue;
+              }
+
+              const latestQodoComment = [...comments]
+                .reverse()
+                .find(comment => comment.author.login === qodoLogin);
+
+              if (!latestQodoComment) {
+                continue;
+              }
+
+              const hasReplyFromPrAuthor = comments.some(comment =>
+                comment.author.login === prAuthorLogin
+                && new Date(comment.createdAt) > new Date(latestQodoComment.createdAt)
+              );
+
+              if (!hasReplyFromPrAuthor) {
+                const threadUrl = latestQodoComment.url || firstComment.url;
+                failingThreads.push(`- ${threadUrl}`);
+              }
+            }
+
+            if (failingThreads.length > 0) {
+              core.setFailed([
+                'Some active Qodo review threads still need acknowledgment from the PR author.',
+                '',
+                'Each Qodo-started review thread must be resolved, outdated, or have a PR-author reply after the latest Qodo comment.',
+                '',
+                ...failingThreads,
+              ].join('\n'));
+            }
