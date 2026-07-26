@@ -61,4 +61,16 @@ class GitShareToGitHubDialogViewModelTest {
                 Localization.lang("GitHub access"),
                 Localization.lang("The personal access token cannot push to this repository."));
     }
+
+    @Test
+    void checkGitHubAccessTrimsValuesBeforeCheckingAccess() {
+        viewModel.repositoryUrlProperty().set(" https://github.com/JabRef/jabref.git ");
+        viewModel.usernameProperty().set(" JabRef ");
+        viewModel.patProperty().set(" token ");
+        when(gitHubRepositoryAccessChecker.check(anyString(), anyString(), anyString())).thenReturn(GitHubRepositoryAccess.WRITE_ACCESS);
+
+        viewModel.checkGitHubAccess();
+
+        verify(gitHubRepositoryAccessChecker).check("https://github.com/JabRef/jabref.git", "JabRef", "token");
+    }
 }
