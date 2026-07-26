@@ -20,8 +20,11 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.rangesort.RangeSort;
+import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
+import org.jabref.model.openoffice.uno.UnoTextRange;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -546,15 +549,48 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<RangeSortEntry<CSLReferenceMark>> sortEntries = new ArrayList<>();
+
+        for (CSLReferenceMark mark : marksInOrder) {
+            XTextRange range = mark.getTextContent().getAnchor();
+            sortEntries.add(new RangeSortEntry<>(range, 0, mark));
+        }
+
+        RangeSort.RangePartitions<RangeSortEntry<CSLReferenceMark>> partitions =
+                RangeSort.partitionAndSortRanges(sortEntries);
+
+        for (List<RangeSortEntry<CSLReferenceMark>> partition : partitions.getPartitions()) {
+            int indexInPartition = 0;
+            for (RangeSortEntry<CSLReferenceMark> sortEntry : partition) {
+                sortEntry.setIndexInPosition(indexInPartition++);
+
+                Optional<XTextRange> footnoteMarkRange =
+                        UnoTextRange.getFootnoteMarkRange(sortEntry.getRange());
+                footnoteMarkRange.ifPresent(sortEntry::setRange);
+            }
+        }
+
+        sortEntries.sort(this::compareTextRanges);
+
+        marksInOrder.clear();
+        sortEntries.stream()
+                   .map(RangeSortEntry::getContent)
+                   .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(XTextRange r1, XTextRange r2) {
+    private int compareTextRanges(RangeSortEntry<CSLReferenceMark> first, RangeSortEntry<CSLReferenceMark> second) {
+        int rangeComparison;
         try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
+            rangeComparison = textRangeCompare.compareRegionStarts(second.getRange(), first.getRange());
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
-            return 0;
+            rangeComparison = 0;
         }
+
+        if (rangeComparison != 0) {
+            return rangeComparison;
+        }
+
+        return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
     }
 }
