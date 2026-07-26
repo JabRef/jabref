@@ -197,18 +197,22 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private void showGitHubAccessResult(GitHubRepositoryAccess access) {
         String title = Localization.lang("GitHub access");
         switch (access) {
-            case WRITE_ACCESS -> dialogService.showInformationDialogAndWait(
-                    title,
-                    Localization.lang("Personal access token has push access to this repository."));
-            case INVALID_TOKEN -> dialogService.showErrorDialogAndWait(
-                    title,
-                    Localization.lang("Personal access token is invalid."));
-            case REPOSITORY_NOT_ACCESSIBLE -> dialogService.showErrorDialogAndWait(
-                    title,
-                    Localization.lang("The personal access token cannot push to this repository."));
-            case INVALID_REPOSITORY_URL -> dialogService.showErrorDialogAndWait(
-                    title,
-                    Localization.lang("Please enter a valid GitHub repository URL."));
+            case WRITE_ACCESS ->
+                    dialogService.showInformationDialogAndWait(
+                            title,
+                            Localization.lang("Personal access token has push access to this repository."));
+            case INVALID_TOKEN ->
+                    dialogService.showErrorDialogAndWait(
+                            title,
+                            Localization.lang("Personal access token is invalid."));
+            case REPOSITORY_NOT_ACCESSIBLE ->
+                    dialogService.showErrorDialogAndWait(
+                            title,
+                            Localization.lang("The personal access token cannot push to this repository."));
+            case INVALID_REPOSITORY_URL ->
+                    dialogService.showErrorDialogAndWait(
+                            title,
+                            Localization.lang("Please enter a valid GitHub repository URL."));
         }
     }
 
