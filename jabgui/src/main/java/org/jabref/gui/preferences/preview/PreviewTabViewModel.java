@@ -218,8 +218,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         List<TextBasedPreviewLayout> allCustomLayouts = Stream.concat(
-                                                                     availableListProperty.getValue().stream(),
-                                                                     chosenListProperty.getValue().stream())
+                                                                      availableListProperty.getValue().stream(),
+                                                                      chosenListProperty.getValue().stream())
                                                               .filter(TextBasedPreviewLayout.class::isInstance)
                                                               .map(TextBasedPreviewLayout.class::cast)
                                                               .distinct()
@@ -338,8 +338,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
             if (isNameAlreadyUsed(name, null)) {
                 dialogService.showWarningDialogAndWait(
-                    Localization.lang("Add custom preview style"),
-                    Localization.lang("A custom preview style with this name already exists."));
+                        Localization.lang("Add custom preview style"),
+                        Localization.lang("A custom preview style with this name already exists."));
                 return;
             }
 

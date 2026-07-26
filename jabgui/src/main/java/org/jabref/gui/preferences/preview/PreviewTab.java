@@ -195,7 +195,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                 viewModel.setPreviewLayout(newValue));
 
         toRightButton.disableProperty().bind(
-                 viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNull()
+                viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNull()
                          .and(viewModel.availableSelectionModelPropertyCustom().getValue().selectedItemProperty().isNull()));
         toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -206,8 +206,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                 .or(viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNotNull())
-                                                 .or(viewModel.availableSelectionModelPropertyCustom().getValue().selectedItemProperty().isNotNull()));
+                                                      .or(viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNotNull())
+                                                      .or(viewModel.availableSelectionModelPropertyCustom().getValue().selectedItemProperty().isNotNull()));
         previewTab.setContent(previewViewer);
 
         editArea.clear();
