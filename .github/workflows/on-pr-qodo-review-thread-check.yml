@@ -8,7 +8,6 @@ on:
   pull_request_review_comment:
     types: [created, edited, deleted]
 
-
 jobs:
   check-qodo-review-threads:
     if: github.event.pull_request.draft == false
@@ -27,38 +26,102 @@ jobs:
             const prAuthorLogin = context.payload.pull_request.user.login;
             const qodoLogin = 'qodo-free-for-open-source-projects';
 
-            const query = `
-              query($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
-                repository(owner: $owner, name: $repo) {
-                  pullRequest(number: $pullRequestNumber) {
-                    reviewThreads(first: 100) {
-                      nodes {
-                        isResolved
-                        isOutdated
-                        comments(first: 100) {
+            async function fetchAllReviewThreads() {
+              const threads = [];
+              let reviewThreadsCursor = null;
+
+              do {
+                const query = `
+                  query($owner: String!, $repo: String!, $pullRequestNumber: Int!, $reviewThreadsCursor: String) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $pullRequestNumber) {
+                        reviewThreads(first: 100, after: $reviewThreadsCursor) {
+                          nodes {
+                            id
+                            isResolved
+                            isOutdated
+                            comments(first: 100) {
+                              nodes {
+                                author {
+                                  login
+                                }
+                                url
+                                createdAt
+                              }
+                              pageInfo {
+                                hasNextPage
+                                endCursor
+                              }
+                            }
+                          }
+                          pageInfo {
+                            hasNextPage
+                            endCursor
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+
+                const result = await github.graphql(query, {
+                  owner,
+                  repo,
+                  pullRequestNumber,
+                  reviewThreadsCursor,
+                });
+
+                const reviewThreads = result.repository.pullRequest.reviewThreads;
+                threads.push(...reviewThreads.nodes);
+                reviewThreadsCursor = reviewThreads.pageInfo.hasNextPage ? reviewThreads.pageInfo.endCursor : null;
+              } while (reviewThreadsCursor);
+
+              return threads;
+            }
+
+            async function fetchAllThreadComments(thread) {
+              const comments = [...thread.comments.nodes];
+              let commentsCursor = thread.comments.pageInfo.hasNextPage ? thread.comments.pageInfo.endCursor : null;
+
+              while (commentsCursor) {
+                const query = `
+                  query($threadId: ID!, $commentsCursor: String) {
+                    node(id: $threadId) {
+                      ... on PullRequestReviewThread {
+                        comments(first: 100, after: $commentsCursor) {
                           nodes {
                             author {
                               login
                             }
                             url
                             createdAt
-                            body
+                          }
+                          pageInfo {
+                            hasNextPage
+                            endCursor
                           }
                         }
                       }
                     }
                   }
-                }
+                `;
+
+                const result = await github.graphql(query, {
+                  threadId: thread.id,
+                  commentsCursor,
+                });
+
+                const threadComments = result.node.comments;
+                comments.push(...threadComments.nodes);
+                commentsCursor = threadComments.pageInfo.hasNextPage ? threadComments.pageInfo.endCursor : null;
               }
-            `;
 
-            const result = await github.graphql(query, {
-              owner,
-              repo,
-              pullRequestNumber,
-            });
+              return comments
+                .filter(comment => comment.author && comment.author.login)
+                .sort((left, right) => new Date(left.createdAt) - new Date(right.createdAt));
+            }
 
-            const threads = result.repository.pullRequest.reviewThreads.nodes;
+            const threads = await fetchAllReviewThreads();
             const failingThreads = [];
 
             for (const thread of threads) {
@@ -66,10 +129,7 @@ jobs:
                 continue;
               }
 
-              const comments = [...thread.comments.nodes]
-                .filter(comment => comment.author && comment.author.login)
-                .sort((left, right) => new Date(left.createdAt) - new Date(right.createdAt));
-
+              const comments = await fetchAllThreadComments(thread);
               if (comments.length === 0) {
                 continue;
               }
