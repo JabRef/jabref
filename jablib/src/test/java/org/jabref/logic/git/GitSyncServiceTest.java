@@ -315,7 +315,10 @@ class GitSyncServiceTest {
             config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, "main", ConfigConstants.CONFIG_KEY_MERGE, Constants.R_HEADS + "main");
             config.save();
 
-            GitHandlerRegistry emptyRemoteRegistry = new GitHandlerRegistry(GitPreferences.getDefault());
+            GitPreferences gitPreferences = mock(GitPreferences.class);
+            when(gitPreferences.getUsername()).thenReturn("user");
+            when(gitPreferences.getPat()).thenReturn("personal-access-token");
+            GitHandlerRegistry emptyRemoteRegistry = new GitHandlerRegistry(gitPreferences);
             GitSyncService syncService = GitSyncService.create(importFormatPreferences, emptyRemoteRegistry);
 
             PushResult result = syncService.push(new BibDatabaseContext(), localLibrary);

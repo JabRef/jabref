@@ -227,7 +227,7 @@ public class GitHandler {
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
 
             boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
             if (needCreds && credsOpt.isEmpty()) {
@@ -248,7 +248,7 @@ public class GitHandler {
             StoredConfig config = repo.getConfig();
             String remoteUrl = config.getString("remote", "origin", "url");
 
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             boolean needCreds = (remoteUrl != null) && requiresCredentialsForUrl(remoteUrl);
             if (needCreds && credsOpt.isEmpty()) {
                 throw new IOException("Missing Git credentials (username and Personal Access Token).");
@@ -276,7 +276,7 @@ public class GitHandler {
     /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             PullCommand pullCommand = git.pull();
             credsOpt.ifPresent(pullCommand::setCredentialsProvider);
             pullCommand.call();
@@ -293,7 +293,7 @@ public class GitHandler {
 
     public void fetchOnCurrentBranch() throws JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credentials = getCredentials();
+            Optional<CredentialsProvider> credentials = getCredentialsProvider();
             boolean needCredentials = currentRemoteUrl(git.getRepository())
                     .map(GitHandler::requiresCredentialsForUrl)
                     .orElse(false);
@@ -372,7 +372,7 @@ public class GitHandler {
         }
     }
 
-    private Optional<CredentialsProvider> getCredentials() {
+    public Optional<CredentialsProvider> getCredentialsProvider() {
         if (gitPreferences.getPat().isEmpty()) {
             return Optional.empty();
         }
