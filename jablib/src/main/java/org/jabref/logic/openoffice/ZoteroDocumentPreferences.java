@@ -42,11 +42,12 @@ public final class ZoteroDocumentPreferences {
     private static final String ZOTERO_PREF = "ZOTERO_PREF";
     private static final String STYLE = "style";
     private static final String STYLE_ID = "id";
-    private static final String EMPTY_XML_DOCUMENT_DATA = "<data data-version=\"3\" zotero-version=\"\">"
-            + "<session id=\"\"/>"
-            + "<style id=\"\" hasBibliography=\"0\" bibliographyStyleHasBeenSet=\"0\"/>"
-            + "<prefs><pref name=\"fieldType\" value=\"ReferenceMark\"/></prefs>"
-            + "</data>";
+    private static final String EMPTY_XML_DOCUMENT_DATA = """
+            <data data-version="3" zotero-version="">\
+            <session id=""/>\
+            <style id="" hasBibliography="0" bibliographyStyleHasBeenSet="0"/>\
+            <prefs><pref name="fieldType" value="ReferenceMark"/></prefs>\
+            </data>""";
 
     private ZoteroDocumentPreferences() {
     }
