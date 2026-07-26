@@ -63,6 +63,7 @@ public class MainTableDataModel {
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
+    private final ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     @Nullable private final SearchContext searchContext;
@@ -85,6 +86,7 @@ public class MainTableDataModel {
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new SearchIndexListener();
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
+        this.selectedGroupsProperty = selectedGroupsProperty;
 
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();
@@ -290,6 +292,12 @@ public class MainTableDataModel {
                     clearSearchMatches();
                 }
             }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+
+            // The search refresh above touches every remaining entry's search-match flags, but never
+            // its group-match flags. Without re-applying the currently selected groups here as well,
+            // entries outside the selected group(s) would incorrectly become visible again as soon as
+            // any entry is removed from the library.
+            updateGroupMatches(selectedGroupsProperty.get());
         }
     }
 }

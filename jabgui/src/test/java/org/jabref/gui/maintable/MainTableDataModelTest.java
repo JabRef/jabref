@@ -329,6 +329,62 @@ class MainTableDataModelTest {
         assertFalse(vmB.isVisibleByGroup().get());
     }
 
+    @Test
+    void removingEntryKeepsGroupFilterAppliedToRemainingEntries() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+
+        BibEntry bibEntryA = new BibEntry()
+                .withCitationKey("A")
+                .withField(StandardField.AUTHOR, "Alice");
+
+        BibEntry bibEntryB = new BibEntry()
+                .withCitationKey("B")
+                .withField(StandardField.AUTHOR, "Bob");
+
+        BibEntry bibEntryC = new BibEntry()
+                .withCitationKey("C")
+                .withField(StandardField.AUTHOR, "Alice");
+
+        bibDatabaseContext.getDatabase().insertEntries(List.of(bibEntryA, bibEntryB, bibEntryC));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        CurrentThreadTaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
+
+        SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        IntegerProperty resultSize = new SimpleIntegerProperty();
+
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                null,
+                selectedGroups,
+                searchQueryProperty,
+                resultSize);
+
+        BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
+
+        // Select a group that only matches Alice's entries (A and C). Bob's entry (B) is filtered out.
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
+
+        assertFalse(vmB.isVisibleByGroup().get());
+        assertEquals(2, resultSize.get());
+
+        // Remove one of the entries that *matches* the selected group (A). B should stay excluded by
+        // the group filter - it must not become visible again just because some entry was removed.
+        bibDatabaseContext.getDatabase().removeEntries(List.of(bibEntryA));
+
+        assertFalse(vmB.isVisibleByGroup().get());
+        assertFalse(vmB.isVisible());
+        assertEquals(1, resultSize.get());
+    }
+
     private static GroupTreeNode getKeywordGroup(Field field, String searchExpression) {
         return GroupTreeNode.fromGroup(new WordKeywordGroup(searchExpression, GroupHierarchyType.INDEPENDENT, field, searchExpression, true, ',', false));
     }
