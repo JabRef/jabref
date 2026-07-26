@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.NoopGitSystemReader;
+import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
@@ -21,6 +22,7 @@ import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
@@ -168,8 +170,9 @@ class GitHandlerTest {
 
         JabRefException exception = assertThrows(JabRefException.class, gitHandler::pushCommitsToRemoteRepository);
 
-        String errorMessage = Optional.ofNullable(exception.getMessage()).orElseThrow();
-        assertTrue(errorMessage.contains("REJECTED_NONFASTFORWARD"));
+        assertEquals(
+                Localization.lang("Push to %0 was rejected (%1).", "refs/heads/main", RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD),
+                exception.getLocalizedMessage());
     }
 
     @Test

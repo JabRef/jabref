@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
@@ -392,16 +393,26 @@ public class GitHandler {
                 LOGGER.info("Push update for {} completed with status {}.", update.getRemoteName(), update.getStatus());
                 if (update.getStatus() != RemoteRefUpdate.Status.OK
                         && update.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE) {
-                    String rejectionMessage = "Push to %s was rejected (%s).".formatted(update.getRemoteName(), update.getStatus());
-                    String message = Optional.ofNullable(update.getMessage())
-                                             .filter(StringUtil::isNotBlank)
-                                             .map(serverMessage -> "%s %s".formatted(rejectionMessage, serverMessage))
-                                             .orElse(rejectionMessage);
-                    message = StringUtil.isNotBlank(remoteMessage) ? "%s %s".formatted(message, remoteMessage) : message;
-                    LOGGER.warn("{}", message);
-                    throw new JabRefException(message);
+                    String localizedMessage = getLocalizedPushRejectionMessage(update, remoteMessage);
+                    LOGGER.warn("Push update for {} was rejected with status {}. Update message: {}. Remote response: {}.",
+                            update.getRemoteName(), update.getStatus(), update.getMessage(), remoteMessage);
+                    throw new JabRefException("Git push rejected", localizedMessage);
                 }
             }
         }
+    }
+
+    private static String getLocalizedPushRejectionMessage(RemoteRefUpdate update, String remoteMessage) {
+        String updateMessage = update.getMessage();
+        if (StringUtil.isNotBlank(updateMessage) && StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2 %3", update.getRemoteName(), update.getStatus(), updateMessage, remoteMessage);
+        }
+        if (StringUtil.isNotBlank(updateMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), updateMessage);
+        }
+        if (StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), remoteMessage);
+        }
+        return Localization.lang("Push to %0 was rejected (%1).", update.getRemoteName(), update.getStatus());
     }
 }
