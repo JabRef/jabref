@@ -885,8 +885,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
-                        ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
-                        : defaultValues.getBstPreviewLayoutPaths());
+                      ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
+                      : defaultValues.getBstPreviewLayoutPaths());
         bindBoolean(previewPreferences.shouldDownloadCoversProperty(), PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers());
 
         return this.previewPreferences;

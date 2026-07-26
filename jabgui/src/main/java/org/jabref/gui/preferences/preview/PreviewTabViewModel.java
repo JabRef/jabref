@@ -136,9 +136,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
-        LOGGER.info("Loaded chosen layout names: {}", chosenListProperty.getValue().stream().map(PreviewLayout::getName).toList());
-        LOGGER.info("Loaded customPreviewLayouts names: {}", previewPreferences.getCustomPreviewLayouts().stream().map(TextBasedPreviewLayout::getName).toList());
-        
+
         availableListProperty.clear();
         List<String> chosenNames = chosenListProperty.getValue().stream().map(PreviewLayout::getName).toList();
         previewPreferences.getCustomPreviewLayouts().stream()
@@ -350,7 +348,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 TextBasedPreviewLayout.DEFAULT,
                 preferences.getLayoutFormatterPreferences(),
                 abbreviationRepository);
-            availableListProperty.add(newLayout);        
+
+            availableListProperty.add(newLayout);
         });
     }
 
@@ -359,7 +358,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 Localization.lang("Rename custom preview style"),
                 Localization.lang("Enter name"),
                 layout.getName());
-        
+
+
         chosenName.ifPresent(name -> {
             if (name.isBlank() || name.equals(layout.getName())) {
                 return;
@@ -385,7 +385,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (chosenIndex >= 0) {
             chosenListProperty.set(chosenIndex, layout);
         }
-    }    
+
+    }
 
     private boolean isNameAlreadyUsed(String name, TextBasedPreviewLayout excluding) {
         return Stream.concat(availableListProperty.getValue().stream(), chosenListProperty.getValue().stream())
@@ -404,6 +405,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     ///
     /// @param text to parse and highlight
     /// @return highlighted span for codeArea
+
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
         final int GROUP_OPEN_BRACKET = 2;
         final int GROUP_ELEMENT_NAME = 3;
@@ -556,7 +558,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public FilteredList<PreviewLayout> getFilteredAvailableLayoutsCustom() {
         return this.filteredAvailableLayoutsCustom;
-    }    
+
+    }
 
     public void setAvailableFilter(String searchTerm) {
         filteredAvailableLayoutsCsl.setPredicate(
