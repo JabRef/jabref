@@ -16,7 +16,9 @@ on:
         type: number
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
+  # inputs.pr first: on workflow_dispatch, head_ref is empty and ref is just the workflow's
+  # ref, so every dispatch would share one group and cancel the previous PR's run.
+  group: "${{ github.workflow }}-${{ inputs.pr || github.head_ref || github.ref }}-${{ github.event_name }}"
   cancel-in-progress: true
 
 jobs:
