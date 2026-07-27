@@ -69,14 +69,27 @@ This section is about adding a command. For adding or upgrading a dependency, se
 
 [picocli](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) already generates metadata for `@Command` and `@Option` fields, so start with the command's runtime path instead of duplicating picocli-generated entries.
 
-Use this loop for JabKit commands:
+Collect metadata by running the command under the [tracing agent](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/). Use a real invocation with real arguments so the agent records the command's actual data path. Native Build Tools wires the agent into Gradle:
 
-1. Run the command's real code path on the JVM with the [tracing agent](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) enabled. `--help` covers startup; a new command's data path needs the real invocation with real arguments.
-2. Copy the relevant generated entries into the owning module's `reachability-metadata.json`; see [Where the metadata lives](#where-the-metadata-lives).
-3. Trim entries that do not belong to the command's runtime path.
-4. Build the binary: `./gradlew :jabkit:nativeCompile`.
-5. Run the same command path with the native binary. If it still fails, use GraalVM's [runtime error troubleshooting guide](https://www.graalvm.org/dev/reference-manual/native-image/guides/troubleshoot-run-time-errors/) or rerun the tracing agent on the missing path, then add the next minimal entry.
-6. Add a clitest case; see [Adding a smoke test](#adding-a-smoke-test).
+```shell
+./gradlew :jabkit:run -Pagent --args="check consistency path/to/library.bib"
+```
+
+The agent over-collects, so its output is a starting point. Then work through this loop:
+
+1. Copy the relevant generated entries into the owning module's `reachability-metadata.json`; see [Where the metadata lives](#where-the-metadata-lives).
+2. Trim entries that do not belong to the command's runtime path.
+3. Build the binary: `./gradlew :jabkit:nativeCompile`.
+4. Run the same command path with the native binary. If it still fails, use GraalVM's [runtime error troubleshooting guide](https://www.graalvm.org/dev/reference-manual/native-image/guides/troubleshoot-run-time-errors/) or rerun the agent on the missing path, then add the next minimal entry.
+5. Add a clitest case; see [Adding a smoke test](#adding-a-smoke-test).
+
+To find out why the agent collected a particular entry, build the installed distribution and rerun with origin tracking:
+
+```shell
+./gradlew :jabkit:installDist
+JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experimental-configuration-with-origins" \
+  ./jabkit/build/install/jabkit/bin/jabkit check consistency path/to/library.bib
+```
 
 ### Adding a smoke test
 
