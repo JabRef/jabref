@@ -34,7 +34,7 @@ public final class KeywordImportNormalizer {
         List<Character> importKeywordDelimiters = parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
 
         entry.getField(StandardField.KEYWORDS).ifPresent(rawKeywords -> {
-            KeywordList importedKeywords = KeywordList.parseImport(rawKeywords, importKeywordDelimiters);
+            KeywordList importedKeywords = KeywordList.parseWithMultipleDelimiters(rawKeywords, importKeywordDelimiters);
             entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
         });
     }

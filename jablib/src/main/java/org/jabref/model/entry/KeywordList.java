@@ -22,6 +22,11 @@ import org.jspecify.annotations.NonNull;
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class KeywordList implements Iterable<Keyword> {
 
+    private static final Character DEFAULT_KEYWORD_DELIMITER = ',';
+    private static final Character NO_KEYWORD_DELIMITER = '\0';
+    private static final char OPENING_BRACE = '{';
+    private static final char CLOSING_BRACE = '}';
+
     private final List<Keyword> keywordChains;
 
     public KeywordList() {
@@ -88,27 +93,27 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
-    /// Parses the keyword list for the importing process using all configured delimiters.
+    /// Parses the keyword list using multiple candidate delimiters.
     /// Delimiters are recognized only at top level, not when escaped or inside braces.
     ///
     /// @param keywordString a String of keywordChains
-    /// @param delimiters    a List of delimiters used for separating the keywords in the importing process
+    /// @param delimiters    a List of delimiters used for separating the keywords
     /// @return a parsed list containing the keywordChains
-    public static KeywordList parseImport(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+    public static KeywordList parseWithMultipleDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
         }
 
-        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(',') : delimiters;
-        List<String> keywordTokens = splitImportKeywords(keywordString, effectiveDelimiters);
+        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(DEFAULT_KEYWORD_DELIMITER) : delimiters;
+        List<String> keywordTokens = splitByDelimiters(keywordString, effectiveDelimiters);
         KeywordList keywordList = new KeywordList();
         for (String keywordToken : keywordTokens) {
-            parse(keywordToken, '\0').forEach(keywordList::add);
+            parse(keywordToken, NO_KEYWORD_DELIMITER).forEach(keywordList::add);
         }
         return keywordList;
     }
 
-    private static List<String> splitImportKeywords(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+    private static List<String> splitByDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
         List<String> keywordTokens = new ArrayList<>();
         StringBuilder currentToken = new StringBuilder();
         AtomicBoolean isEscaping = new AtomicBoolean(false);
@@ -121,26 +126,26 @@ public class KeywordList implements Iterable<Keyword> {
             } else if (currentChar == Keyword.DEFAULT_ESCAPE_SYMBOL) {
                 currentToken.append(currentChar);
                 isEscaping.set(true);
-            } else if (currentChar == '{') {
+            } else if (currentChar == OPENING_BRACE) {
                 currentToken.append(currentChar);
                 braceDepth++;
-            } else if (currentChar == '}') {
+            } else if (currentChar == CLOSING_BRACE) {
                 currentToken.append(currentChar);
                 if (braceDepth > 0) {
                     braceDepth--;
                 }
             } else if ((braceDepth == 0) && delimiters.contains(currentChar)) {
-                addImportToken(keywordTokens, currentToken);
+                addTokenIfNotBlank(keywordTokens, currentToken);
             } else {
                 currentToken.append(currentChar);
             }
         }
 
-        addImportToken(keywordTokens, currentToken);
+        addTokenIfNotBlank(keywordTokens, currentToken);
         return keywordTokens;
     }
 
-    private static void addImportToken(List<String> keywordTokens, StringBuilder currentToken) {
+    private static void addTokenIfNotBlank(List<String> keywordTokens, StringBuilder currentToken) {
         String keywordToken = currentToken.toString().trim();
         if (!keywordToken.isEmpty()) {
             keywordTokens.add(keywordToken);

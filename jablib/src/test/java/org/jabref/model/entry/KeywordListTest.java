@@ -86,39 +86,39 @@ class KeywordListTest {
     }
 
     @Test
-    void parseImportSingleKeyword() {
+    void parseWithMultipleDelimitersSingleKeyword() {
         assertEquals(new KeywordList("keywordOne"),
-                KeywordList.parseImport("keywordOne", List.of(';', ',')));
+                KeywordList.parseWithMultipleDelimiters("keywordOne", List.of(';', ',')));
     }
 
     @Test
-    void parseImportWithSemicolonDelimiter() {
+    void parseWithMultipleDelimitersWithSemicolonDelimiter() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parseImport("keywordOne; keywordTwo", List.of(';', ',')));
+                KeywordList.parseWithMultipleDelimiters("keywordOne; keywordTwo", List.of(';', ',')));
     }
 
     @Test
-    void parseImportWithCommaDelimiter() {
+    void parseWithMultipleDelimitersWithCommaDelimiter() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parseImport("keywordOne, keywordTwo", List.of(';', ',')));
+                KeywordList.parseWithMultipleDelimiters("keywordOne, keywordTwo", List.of(';', ',')));
     }
 
     @Test
-    void parseImportSplitsOnAllConfiguredDelimiters() {
+    void parseWithMultipleDelimitersSplitsOnAllConfiguredDelimiters() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"),
-                KeywordList.parseImport("keywordOne, keywordTwo; keywordThree", List.of(';', ',')));
+                KeywordList.parseWithMultipleDelimiters("keywordOne, keywordTwo; keywordThree", List.of(';', ',')));
     }
 
     @Test
-    void parseImportDoesNotSplitConfiguredDelimitersInsideBraces() {
+    void parseWithMultipleDelimitersDoesNotSplitConfiguredDelimitersInsideBraces() {
         assertEquals(new KeywordList("test1", "{2,1}", "test3"),
-                KeywordList.parseImport("test1; {2,1}; test3", List.of(';', ',')));
+                KeywordList.parseWithMultipleDelimiters("test1; {2,1}; test3", List.of(';', ',')));
     }
 
     @Test
-    void parseImportDoesNotSplitEscapedConfiguredDelimiters() {
+    void parseWithMultipleDelimitersDoesNotSplitEscapedConfiguredDelimiters() {
         assertEquals(new KeywordList("keyword#one", "keywordTwo"),
-                KeywordList.parseImport("keyword\\#one; keywordTwo", List.of(';', '#')));
+                KeywordList.parseWithMultipleDelimiters("keyword\\#one; keywordTwo", List.of(';', '#')));
     }
 
     @Test
@@ -129,10 +129,10 @@ class KeywordListTest {
     }
 
     @Test
-    void parseImportHierarchicalChain() {
+    void parseWithMultipleDelimitersHierarchicalChain() {
         Keyword expected = Keyword.of(List.of("Parent", "Node", "Child"));
 
-        assertEquals(new KeywordList(expected), KeywordList.parseImport("Parent > Node > Child", List.of(';', ',')));
+        assertEquals(new KeywordList(expected), KeywordList.parseWithMultipleDelimiters("Parent > Node > Child", List.of(';', ',')));
     }
 
     @Test
