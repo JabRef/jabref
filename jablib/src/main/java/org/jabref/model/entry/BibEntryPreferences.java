@@ -20,25 +20,21 @@ public class BibEntryPreferences {
 
     private BibEntryPreferences() {
         this(
-                ',',                                              // Keyword separator
-                DEFAULT_IMPORT_KEYWORD_DELIMITERS,                 // Import keyword delimiters
-                ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS // Import delimiter parsing strategy
+                ',',                                     // Keyword separator
+                DEFAULT_IMPORT_KEYWORD_DELIMITERS,                       // Import keyword delimiters
+                ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS   // Import delimiter parsing strategy
         );
     }
 
     public BibEntryPreferences(Character keywordSeparator) {
-        this(keywordSeparator, DEFAULT_IMPORT_KEYWORD_DELIMITERS,
-                ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
+        this(keywordSeparator, DEFAULT_IMPORT_KEYWORD_DELIMITERS, ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
     }
 
     public BibEntryPreferences(Character keywordSeparator, String importKeywordDelimiters) {
-        this(keywordSeparator, importKeywordDelimiters,
-                ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
+        this(keywordSeparator, importKeywordDelimiters, ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
     }
 
-    public BibEntryPreferences(Character keywordSeparator,
-                               String importKeywordDelimiters,
-                               ImportDelimiterParsingStrategy importDelimiterParsingStrategy) {
+    public BibEntryPreferences(Character keywordSeparator, String importKeywordDelimiters, ImportDelimiterParsingStrategy importDelimiterParsingStrategy) {
         this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
         this.importKeywordDelimiters = new SimpleStringProperty(importKeywordDelimiters);
         this.importDelimiterParsingStrategy = new SimpleObjectProperty<>(importDelimiterParsingStrategy);
