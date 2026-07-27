@@ -57,6 +57,9 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings. It
 /// replaces the FXML + controller pair: each call creates a control, binds it to a view-model
@@ -86,6 +89,7 @@ import org.jspecify.annotations.NullMarked;
 /// collected and applied once on the FX thread in {@link #build()}.
 @NullMarked
 public class PreferencesFormBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesFormBuilder.class);
 
     private static final double SHORT_FIELD_WIDTH = 100.0;
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
@@ -108,6 +112,7 @@ public class PreferencesFormBuilder {
 
     /// Element grid spanning multiple input elements to ensure correct alignment. Its next free row
     /// is the grid's own row count, so the builder keeps no row counter of its own.
+    @Nullable
     private GridPane currentGrid;
 
     private boolean built;
@@ -117,6 +122,7 @@ public class PreferencesFormBuilder {
     /// keep enrolling their radios in it too, which is what lets a {@code radioGroup} be wrapped in
     /// a {@code group} purely for styling without breaking the mutual exclusion. It is restored only
     /// when the owning {@link #radioGroup} call returns.
+    @Nullable
     private ToggleGroup currentToggleGroup;
 
     public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences) {
@@ -191,11 +197,11 @@ public class PreferencesFormBuilder {
         }));
     }
 
-    public PreferencesFormBuilder stringField(String label, StringProperty value) {
+    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value) {
         return stringField(label, value, noConfig());
     }
 
-    public PreferencesFormBuilder stringField(String label, StringProperty value, Consumer<InputElement<TextField>> config) {
+    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value, Consumer<InputElement<TextField>> config) {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
@@ -342,7 +348,7 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
-    private void addField(String label, Node control) {
+    private void addField(@Nullable String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();
         // Every field sits in a row of its own, so an attachment always has somewhere to go
@@ -351,11 +357,12 @@ public class PreferencesFormBuilder {
         controlRow.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(control, Priority.ALWAYS);
         GridPane.setHgrow(controlRow, Priority.ALWAYS);
-        {
+
+        if (label != null) {
             searchable(label, control);
-            grid.add(new Label(label), 0, row);
-            grid.add(controlRow, 1, row);
         }
+        grid.add(new Label(label), 0, row);
+        grid.add(controlRow, 1, row);
     }
 
     private GridPane ensureGrid() {
@@ -514,7 +521,7 @@ public class PreferencesFormBuilder {
         }
         control.sceneProperty().addListener(new ChangeListener<>() {
             @Override
-            public void changed(ObservableValue<? extends Scene> scene, Scene oldScene, Scene newScene) {
+            public void changed(ObservableValue<? extends Scene> scene, Scene oldScene, @Nullable Scene newScene) {
                 if (newScene != null) {
                     control.sceneProperty().removeListener(this);
                     visualizer.initVisualization(status, control);
@@ -541,7 +548,7 @@ public class PreferencesFormBuilder {
                 first, second);
     }
 
-    private Pane container() {
+    private @Nullable Pane container() {
         return containers.peek();
     }
 
@@ -556,6 +563,11 @@ public class PreferencesFormBuilder {
     /// column widths therefore do not depend on how long the captions inside them happen to be.
     private void addToContainer(Node node) {
         Pane container = container();
+        if (container == null) {
+            LOGGER.error("No container present to add node to.");
+            return;
+        }
+
         container.getChildren().add(node);
         if (container instanceof HBox) {
             HBox.setHgrow(node, Priority.ALWAYS);
@@ -600,6 +612,7 @@ public class PreferencesFormBuilder {
 
         /// Every disable condition installed on this region so far, ANDed together; see
         /// {@link ElementBase#combinedDisable} for the same rule on element handles.
+        @Nullable
         private ObservableValue<? extends Boolean> combinedDisable;
 
         RegionBase(T region) {
@@ -721,6 +734,7 @@ public class PreferencesFormBuilder {
         /// attachField}, following its toggle) or from a caller's {@link #disableWhen}. There is no
         /// distinction between "the builder's" and "the caller's" binding: each call just adds
         /// another condition to the combination, so nothing is ever silently replaced.
+        @Nullable
         private ObservableValue<? extends Boolean> combinedDisable;
 
         ElementBase(PreferencesFormBuilder form, N node) {
