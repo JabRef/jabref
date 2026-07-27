@@ -90,7 +90,7 @@ public class OpenOfficePreferences {
                 OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
                            : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
                                      : DEFAULT_LINUX_EXEC_PATH,
-                true,                             // useAllDatabases
+                true,                                           // useAllDatabases
                 false,                                          // syncWhenCiting
                 List.of(),                                      // externalJStyles
                 JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
@@ -102,7 +102,7 @@ public class OpenOfficePreferences {
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceBefore
                 true,                                           // addSpaceAfter
-                true,                                            // zoteroCompatibilityMode
+                true,                                           // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
                 BstCitationFormat.NUMERIC                       // bstCitationFormat
