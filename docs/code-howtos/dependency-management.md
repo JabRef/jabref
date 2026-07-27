@@ -29,6 +29,10 @@ Then execute `./gradlew checkAllModuleInfo` which runs a _dependency scope check
 which Java types are visible (and should be visible) to which modules. If the check fails, it will advise you how to
 change the scope.
 
+When a JabKit dependency changes, include the native image build in the check. If the native image needs additional 
+reachability metadata, add it as described in
+[Building JabKit as a GraalVM native image](jabkit-native-image.md).
+
 ## Adding or changing test-only dependencies (without module-info.java)
 
 In addition to the production code of a module (located in `src/main/java`)
@@ -58,10 +62,6 @@ modules used. If you want to upgrade the version of a module, do this here. If y
 in a `src/main/java/module-info.java` file, you need to add the version here.
 (If the new module is not completely JPMS compatible, you may also need to add or modify
 [patching rules](#patching-3rd-party-modules)).
-
-When a JabKit dependency changes, include the native image build in the check. If the native image
-needs additional reachability metadata, add it as described in
-[Building JabKit as a GraalVM native image](jabkit-native-image.md).
 
 ### Patching 3rd party modules
 
