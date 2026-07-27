@@ -63,7 +63,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         EnhancedPasswordField apiKey = PasswordFieldEditor.create(viewModel.apiKeyProperty())
                                                           .withRevealButton()
                                                           .withClearButton()
-                                                          .build();
+                                                          .field();
 
         getChildren().add(form()
 

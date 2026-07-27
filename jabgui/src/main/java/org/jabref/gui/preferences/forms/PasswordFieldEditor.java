@@ -13,14 +13,15 @@ import org.jabref.gui.util.ControlHelper;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 
 /// Custom editor: a bound {@link EnhancedPasswordField} with an optional row of icon buttons in its
-/// right slot. {@link EnhancedPasswordField} is third-party, so the fluent subject is this wrapper
-/// and {@link #build()} hands back the field:
+/// right slot. {@link EnhancedPasswordField} is third-party, so the fluent subject is this wrapper;
+/// {@link #field()} hands back the field once configuration is done — it does no work of its own,
+/// it just stops `field` from being reachable before the withers have run:
 ///
 /// ```java
 /// PasswordFieldEditor.create(viewModel.apiKeyProperty())
 ///                    .withRevealButton()
 ///                    .withClearButton()
-///                    .build();
+///                    .field();
 /// ```
 ///
 /// Every button follows the field's own disabled state, so disabling the field disables the row.
@@ -60,7 +61,7 @@ public final class PasswordFieldEditor {
         return this;
     }
 
-    public EnhancedPasswordField build() {
+    public EnhancedPasswordField field() {
         return field;
     }
 }

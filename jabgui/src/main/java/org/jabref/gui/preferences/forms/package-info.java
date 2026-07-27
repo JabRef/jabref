@@ -29,8 +29,9 @@
 ///
 /// - **An editor binds its own value property**; builder methods and tabs only place the node.
 /// - **Shape follows option count**: an editor without options is a static `create(...)` factory;
-///   one with optional parts (the password field's buttons) is a small fluent builder ending in
-///   `build()`.
+///   one with optional parts (the password field's buttons) is a small fluent builder. Its terminal
+///   call is named for what it actually does — `PasswordFieldEditor.field()` just hands back the
+///   field, so it is not called `build()`.
 /// - Editors return their control, so a tab can pass them to the builder's `field`/`custom`
 ///   methods or dedicated hooks such as `tagsField`. The password editor deliberately has no
 ///   builder method: its variants differ per call site, and `field(label, editor)` places it just
