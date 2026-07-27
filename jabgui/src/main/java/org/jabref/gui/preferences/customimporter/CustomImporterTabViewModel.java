@@ -57,8 +57,8 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         importerPreferences.setCustomImporters(importers.stream()
-                                                                         .map(ImporterViewModel::getLogic)
-                                                                         .collect(Collectors.toSet()));
+                                                        .map(ImporterViewModel::getLogic)
+                                                        .collect(Collectors.toSet()));
     }
 
     /// Converts a path relative to a base-path into a class name.

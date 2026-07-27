@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.autocompletion;
 
-
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.logic.l10n.Localization;
@@ -29,20 +28,20 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
                 .checkbox(Localization.lang("Use autocompletion"), viewModel.enableAutoCompleteProperty())
 
                 .group(autoComplete -> autoComplete
-                        .tagsField(Localization.lang("Affected fields"), autoCompleteFields)
+                                .tagsField(Localization.lang("Affected fields"), autoCompleteFields)
 
-                        .label(Localization.lang("Name format"))
-                        .radioGroup(nameFormat -> nameFormat
-                                .radio(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"), viewModel.autoCompleteFirstLastProperty())
-                                .radio(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"), viewModel.autoCompleteLastFirstProperty())
-                                .radio(Localization.lang("Autocomplete names in both formats"), viewModel.autoCompleteBothProperty()))
+                                .label(Localization.lang("Name format"))
+                                .radioGroup(nameFormat -> nameFormat
+                                        .radio(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"), viewModel.autoCompleteFirstLastProperty())
+                                        .radio(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"), viewModel.autoCompleteLastFirstProperty())
+                                        .radio(Localization.lang("Autocomplete names in both formats"), viewModel.autoCompleteBothProperty()))
 
-                        .label(Localization.lang("First names"))
-                        .radioGroup(firstNames -> firstNames
-                                .radio(Localization.lang("Use abbreviated firstname whenever possible"), viewModel.firstNameModeAbbreviatedProperty())
-                                .radio(Localization.lang("Use full firstname whenever possible"), viewModel.firstNameModeFullProperty())
-                                .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty())),
-                    settings -> settings.disableWhen(viewModel.enableAutoCompleteProperty().not()))
+                                .label(Localization.lang("First names"))
+                                .radioGroup(firstNames -> firstNames
+                                        .radio(Localization.lang("Use abbreviated firstname whenever possible"), viewModel.firstNameModeAbbreviatedProperty())
+                                        .radio(Localization.lang("Use full firstname whenever possible"), viewModel.firstNameModeFullProperty())
+                                        .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty())),
+                        settings -> settings.disableWhen(viewModel.enableAutoCompleteProperty().not()))
 
                 .build());
     }

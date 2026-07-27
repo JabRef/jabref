@@ -47,7 +47,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
     /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab
-    ///                             observes its master switch to offer or hide the LLM citation parser
+    ///                                                         observes its master switch to offer or hide the LLM citation parser
     public WebSearchTab(AiPreferences workingAiPreferences) {
         this.viewModel = new WebSearchTabViewModel(
                 preferences.getImporterPreferences(),

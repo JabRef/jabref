@@ -49,11 +49,11 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
 
                         .label(Localization.lang("Letters after duplicate generated keys"))
                         .group(letters -> letters
-                                .radioGroup(suffix -> suffix
-                                        .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
-                                        .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
-                                        .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())),
-                            indent -> indent.styleClass("prefIndent"))
+                                        .radioGroup(suffix -> suffix
+                                                .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
+                                                .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
+                                                .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())),
+                                indent -> indent.styleClass("prefIndent"))
 
                         // `[regex] by [replacement]` — one labelled field, so the two stay adjacent.
                         .stringField(Localization.lang("Replace (regular expression)"), viewModel.keyPatternRegexProperty(),
@@ -64,9 +64,9 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                         .checkbox(Localization.lang("Transliterate fields that are used for generating the citation key"), viewModel.transliterateFieldsForCitationKeyProperty()))
 
                 .section(Localization.lang("Key patterns"), patterns -> patterns
-                        .label(Localization.lang("( Note: Press return to commit changes in the table! )"))
-                        .custom(buildKeyPatternsRegion()),
-                    patternsSection -> patternsSection.help(KEY_PATTERNS_HELP_URL))
+                                .label(Localization.lang("( Note: Press return to commit changes in the table! )"))
+                                .custom(buildKeyPatternsRegion()),
+                        patternsSection -> patternsSection.help(KEY_PATTERNS_HELP_URL))
 
                 .build());
     }

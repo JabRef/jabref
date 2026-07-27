@@ -54,5 +54,4 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
-
 }

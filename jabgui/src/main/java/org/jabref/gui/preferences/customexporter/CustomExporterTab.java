@@ -57,5 +57,4 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
         exporterTable.getColumns().add(extensionColumn);
         return exporterTable;
     }
-
 }
