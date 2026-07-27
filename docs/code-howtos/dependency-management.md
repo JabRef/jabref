@@ -59,8 +59,8 @@ in a `src/main/java/module-info.java` file, you need to add the version here.
 (If the new module is not completely JPMS compatible, you may also need to add or modify
 [patching rules](#patching-3rd-party-modules)).
 
-After changing dependencies used by JabKit, check the JabKit native image build, too. Dependencies that use dynamic
-features such as reflection, resources, or JNI may require reachability metadata; see
+When a JabKit dependency changes, include the native image build in the check. If the native image
+needs additional reachability metadata, add it as described in
 [Building JabKit as a GraalVM native image](jabkit-native-image.md).
 
 ### Patching 3rd party modules
