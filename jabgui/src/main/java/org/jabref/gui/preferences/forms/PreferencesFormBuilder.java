@@ -199,7 +199,8 @@ public class PreferencesFormBuilder {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
-        return configured(placeField(label, field), config);
+        addField(label, field);
+        return configured(new InputElement<>(this, field), config);
     }
 
     public PreferencesFormBuilder button(String text, Runnable action) {
@@ -280,7 +281,8 @@ public class PreferencesFormBuilder {
         new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.setMaxWidth(Double.MAX_VALUE);
         combo.valueProperty().bindBidirectional(value);
-        return configured(placeField(label, combo), config);
+        addField(label, combo);
+        return configured(new InputElement<>(this, combo), config);
     }
 
     /// A pre-built, pre-bound {@link TagsField} (see {@link TagsFieldEditor}).
@@ -292,7 +294,8 @@ public class PreferencesFormBuilder {
                                                 TagsField<X> tagsField,
                                                 Consumer<InputElement<TagsField<X>>> config) {
         HBox.setHgrow(tagsField, Priority.ALWAYS);
-        return configured(placeField(label, tagsField), config);
+        addField(label, tagsField);
+        return configured(new InputElement<>(this, tagsField), config);
     }
 
     // endregion
@@ -335,15 +338,8 @@ public class PreferencesFormBuilder {
     }
 
     public <T extends Control> PreferencesFormBuilder field(String label, T control, Consumer<InputElement<T>> config) {
-        return configured(placeField(label, control), config);
-    }
-
-    /// Places `control` in the aligned field grid and hands back its (not yet configured) handle —
-    /// the shared tail every field-shaped builder method (`field`, `stringField`, the combos,
-    /// `tagsField`) ends with.
-    private <T extends Control> InputElement<T> placeField(String label, T control) {
         addField(label, control);
-        return new InputElement<>(this, control);
+        return configured(new InputElement<>(this, control), config);
     }
 
     private void addField(String label, Node control) {
