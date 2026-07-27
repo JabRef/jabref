@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
 /// it is not a {@link Control}. Asking for the wrong one does not compile.
 ///
 /// Consecutive labelled fields share an aligned two-column {@link GridPane}. Validation decoration is
-/// collected and applied once on the FX thread in {@link #build()}.
+/// applied per control once that control reaches a scene, which is when ControlsFX can position it.
 @NullMarked
 public class PreferencesFormBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesFormBuilder.class);
@@ -578,14 +578,25 @@ public class PreferencesFormBuilder {
         }
     }
 
-    /// Places `attachment` directly after `primary` in its row. Every element the builder places
-    /// sits in an {@link HBox} row of its own — field(), checkbox(), radio() and stackedField()
-    /// all wrap eagerly for exactly this reason — so attaching is the same append addToContainer
-    /// already does for top-level nodes, just targeting the primary's row instead of the current
-    /// container.
+    /// Places `attachment` directly after `primary` in its row: the same append
+    /// {@link #addToContainer} does for top-level nodes, only targeting the primary's row rather
+    /// than the open container.
+    ///
+    /// This works because the placements that can take attachments wrap eagerly in an {@link HBox}
+    /// row of their own — {@link #field}/{@link #stringField}/the combos/{@link #tagsField} (via
+    /// {@link #addField}), {@link #checkbox}, {@link #radio}, {@link #stackedField} and a
+    /// {@link #section} header. {@link #label}, {@link #info}, {@link #button} and
+    /// {@link #hyperlink} do *not*: they go straight into the surrounding container, so attaching
+    /// to one is unsupported and reports itself here rather than failing as a cast.
     private void attachTo(Node primary, Node attachment) {
-        HBox row = (HBox) primary.getParent();
-        row.getChildren().add(attachment);
+        if (primary.getParent() instanceof HBox row) {
+            row.getChildren().add(attachment);
+            return;
+        }
+        throw new IllegalStateException(primary.getParent() == null
+                ? "the control has not been placed yet; attach from within its config lambda"
+                : "cannot attach to a control sitting in a " + primary.getParent().getClass().getSimpleName()
+                        + "; only elements the builder wraps in a row of their own take attachments");
     }
 
     private Button helpButton(StandardActions action, HelpFile helpFile) {
@@ -829,7 +840,7 @@ public class PreferencesFormBuilder {
             return this;
         }
 
-        /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
+        /// Decorates the control with `status`, applied once the control reaches a scene.
         public InputElement<N> validate(ValidationStatus status) {
             form.decorate(status, node);
             return this;

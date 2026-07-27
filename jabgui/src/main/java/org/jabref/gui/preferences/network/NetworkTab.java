@@ -215,7 +215,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
     }
 
     private SplitPane credentialTooltipWrapper(Node content) {
-        // The disabled persist checkbox does not show tooltips, so it is wrapped in a SplitPane.
+        // A disabled node swallows mouse events and so never shows its tooltip; the wrapper carries it instead.
+        // It is a SplitPane because setTooltip needs a Control, which Pane and StackPane are not.
         SplitPane wrapper = new SplitPane(content);
         EasyBind.subscribe(viewModel.passwordPersistAvailable(), available ->
                 wrapper.setTooltip(available ? null : new Tooltip(Localization.lang("Credential store not available."))));
