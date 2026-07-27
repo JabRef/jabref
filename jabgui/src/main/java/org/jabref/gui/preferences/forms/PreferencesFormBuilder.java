@@ -598,10 +598,9 @@ public class PreferencesFormBuilder {
 
         final T region;
 
-        /// A disable binding the builder installed on this region itself. {@link #disableWhen}
-        /// combines with it instead of silently replacing it — the same rule {@link ElementBase}
-        /// applies via its own {@code ownedDisable}.
-        private ObservableValue<? extends Boolean> ownedDisable;
+        /// Every disable condition installed on this region so far, ANDed together; see
+        /// {@link ElementBase#combinedDisable} for the same rule on element handles.
+        private ObservableValue<? extends Boolean> combinedDisable;
 
         RegionBase(T region) {
             this.region = region;
@@ -610,12 +609,6 @@ public class PreferencesFormBuilder {
         @SuppressWarnings("unchecked")
         final S self() {
             return (S) this;
-        }
-
-        /// Installs `condition` as the builder's own disable binding; see {@link #ownedDisable}.
-        final void ownDisable(ObservableValue<? extends Boolean> condition) {
-            region.disableProperty().bind(condition);
-            ownedDisable = condition;
         }
 
         public T node() {
@@ -627,16 +620,13 @@ public class PreferencesFormBuilder {
             return self();
         }
 
-        /// Disables the whole region while `condition` holds; disable propagates to every descendant,
-        /// so its contents need no binding of their own. Where the builder installed a disable
-        /// binding of its own, the two are combined rather than one replacing the other.
+        /// Disables the whole region while `condition` holds, combined with whatever already
+        /// disables it; disable propagates to every descendant, so its contents need no binding
+        /// of their own.
         public S disableWhen(ObservableValue<? extends Boolean> condition) {
+            combinedDisable = combinedDisable == null ? condition : either(combinedDisable, condition);
             region.disableProperty().unbind();
-            if (ownedDisable == null) {
-                region.disableProperty().bind(condition);
-            } else {
-                ownDisable(either(ownedDisable, condition));
-            }
+            region.disableProperty().bind(combinedDisable);
             return self();
         }
 
@@ -726,27 +716,30 @@ public class PreferencesFormBuilder {
         final PreferencesFormBuilder form;
         final N node;
 
-        /// A disable binding the builder installed on this element itself (the value field of an
-        /// {@link InputElement#attachField attachField}, which follows its toggle). {@link #disableWhen}
-        /// combines with it instead of silently replacing it.
-        private ObservableValue<? extends Boolean> ownedDisable;
+        /// Every disable condition installed on this element so far, ANDed together — whether it
+        /// came from the builder itself (the value field of an {@link InputElement#attachField
+        /// attachField}, following its toggle) or from a caller's {@link #disableWhen}. There is no
+        /// distinction between "the builder's" and "the caller's" binding: each call just adds
+        /// another condition to the combination, so nothing is ever silently replaced.
+        private ObservableValue<? extends Boolean> combinedDisable;
 
         ElementBase(PreferencesFormBuilder form, N node) {
             this.form = form;
             this.node = node;
         }
 
-        /// Installs `condition` as the builder's own disable binding; see {@link #ownedDisable}.
-        final void ownDisable(ObservableValue<? extends Boolean> condition) {
-            node.disableProperty().bind(condition);
-            ownedDisable = condition;
+        /// Adds `condition` to the combination of things that disable this element; see
+        /// {@link #combinedDisable}.
+        final void addDisableCondition(ObservableValue<? extends Boolean> condition) {
+            combinedDisable = combinedDisable == null ? condition : either(combinedDisable, condition);
+            node.disableProperty().unbind();
+            node.disableProperty().bind(combinedDisable);
         }
 
-        /// Couples this element's disable state to `primary`'s, combinably: a later
-        /// `disableWhen` on this element still combines instead of replacing (see {@link #ownedDisable}).
-        /// Every attachment that should track its primary's disabled state goes through this.
+        /// Couples this element's disable state to `primary`'s. Every attachment that should track
+        /// its primary's disabled state goes through this.
         final void followDisable(Node primary) {
-            ownDisable(primary.disableProperty());
+            addDisableCondition(primary.disableProperty());
         }
 
         /// The single unchecked cast of the handle hierarchy: `S` is always the concrete class of
@@ -766,16 +759,10 @@ public class PreferencesFormBuilder {
             return self();
         }
 
-        /// Disables the node while `condition` holds. Where the builder installed a disable binding
-        /// of its own — an {@link InputElement#attachField attached field} following its toggle —
-        /// the two are combined, so the built-in coupling survives.
+        /// Disables the node while `condition` holds, combined with whatever already disables it —
+        /// e.g. an {@link InputElement#attachField attached field} following its toggle.
         public S disableWhen(ObservableValue<? extends Boolean> condition) {
-            node.disableProperty().unbind();
-            if (ownedDisable == null) {
-                node.disableProperty().bind(condition);
-            } else {
-                ownDisable(either(ownedDisable, condition));
-            }
+            addDisableCondition(condition);
             return self();
         }
 
@@ -875,9 +862,9 @@ public class PreferencesFormBuilder {
             InputElement<TextField> element = new InputElement<>(form, field);
             switch (node) {
                 case CheckBox box ->
-                        element.ownDisable(box.selectedProperty().not());
+                        element.addDisableCondition(box.selectedProperty().not());
                 case ToggleButton toggle ->
-                        element.ownDisable(toggle.selectedProperty().not());
+                        element.addDisableCondition(toggle.selectedProperty().not());
                 default ->
                         element.followDisable(node);
             }
