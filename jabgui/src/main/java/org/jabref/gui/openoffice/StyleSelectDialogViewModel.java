@@ -387,8 +387,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
 
             BstStyle bstStyleToAdd = new BstStyle(stylePath);
-
-            // Check if citation style is duplicate in the list
+            
             if (isDuplicate(bstStyleToAdd)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Style already available"),
