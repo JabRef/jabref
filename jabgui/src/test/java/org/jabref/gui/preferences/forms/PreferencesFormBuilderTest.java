@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.Scene;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
