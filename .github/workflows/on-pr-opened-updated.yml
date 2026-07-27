@@ -53,8 +53,9 @@ jobs:
             if [ "$EVENT" = "workflow_dispatch" ]; then
               # Fail closed: a failing "gh api" must abort the step (via set -e), not be
               # swallowed into "no comment found" - which would post a duplicate comment.
-              COMMENT_BODIES=$(
-                gh api graphql -f query="
+              # Redirected to a file rather than captured in a variable, because xtrace
+              # would echo the expanded assignment - all 20 comment bodies - into the log.
+              gh api graphql -f query="
                   query {
                     repository(owner: \"JabRef\", name: \"JabRef\") {
                       pullRequest(number: $PR_NUMBER) {
@@ -64,10 +65,9 @@ jobs:
                       }
                     }
                   }
-                " --jq '.data.repository.pullRequest.comments.nodes[].body'
-              )
+                " --jq '.data.repository.pullRequest.comments.nodes[].body' > comments.txt
 
-              if grep -q "Conflicts with target branch" <<< "$COMMENT_BODIES"; then
+              if grep -q "Conflicts with target branch" comments.txt; then
                 echo "Already commented about conflicts."
                 # When triggered by another workflow, success is also if there is a merge conflict
                 exit 0;
