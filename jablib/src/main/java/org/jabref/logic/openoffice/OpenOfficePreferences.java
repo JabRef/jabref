@@ -42,6 +42,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyHeaderFormat;
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
+    private final BooleanProperty addSpaceBefore;
     private final BooleanProperty addSpaceAfter;
     private final BooleanProperty zoteroCompatibilityMode;
     private final ObservableList<String> externalBstStyles;
@@ -59,6 +60,7 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
+                                 boolean addSpaceBefore,
                                  boolean addSpaceAfter,
                                  boolean zoteroCompatibilityMode,
                                  List<String> externalBstStyles,
@@ -75,6 +77,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
+        this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
@@ -87,7 +90,7 @@ public class OpenOfficePreferences {
                 OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
                            : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
                                      : DEFAULT_LINUX_EXEC_PATH,
-                true,                             // useAllDatabases
+                true,                                           // useAllDatabases
                 false,                                          // syncWhenCiting
                 List.of(),                                      // externalJStyles
                 JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
@@ -97,8 +100,9 @@ public class OpenOfficePreferences {
                 "Heading 2",                                    // cslBibliographyHeaderFormat
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
+                true,                                           // addSpaceBefore
                 true,                                           // addSpaceAfter
-                true,                                            // zoteroCompatibilityMode
+                true,                                           // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
                 BstCitationFormat.NUMERIC                       // bstCitationFormat
@@ -247,6 +251,18 @@ public class OpenOfficePreferences {
 
     public void setExternalCslStyles(List<String> paths) {
         externalCslStyles.setAll(paths);
+    }
+
+    public boolean getAddSpaceBefore() {
+        return addSpaceBefore.get();
+    }
+
+    public BooleanProperty addSpaceBeforeProperty() {
+        return addSpaceBefore;
+    }
+
+    public void setAddSpaceBefore(boolean addSpaceBefore) {
+        this.addSpaceBefore.setValue(addSpaceBefore);
     }
 
     public boolean getAddSpaceAfter() {
