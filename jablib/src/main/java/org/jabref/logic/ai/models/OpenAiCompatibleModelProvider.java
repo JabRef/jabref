@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.models;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
     @Override
     public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
@@ -37,6 +40,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         try {
             URLDownload urlDownload = new URLDownload(modelsEndpoint);
+            urlDownload.setConnectTimeout(CONNECT_TIMEOUT);
             urlDownload.addHeader("Authorization", "Bearer " + apiKey);
             urlDownload.addHeader("accept", "application/json");
 

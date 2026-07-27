@@ -16,17 +16,6 @@ class OpenAiCompatibleModelProviderTest {
 
     private OpenAiCompatibleModelProvider provider;
 
-    @BeforeAll
-    static void ensureUnirestInitialized() {
-        // Ensure URLDownload's static initializer runs before any tests
-        // This configures Unirest and prevents UnirestConfigException
-        try {
-            Class.forName(URLDownload.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to initialize URLDownload", e);
-        }
-    }
-
     @BeforeEach
     void setUp() {
         provider = new OpenAiCompatibleModelProvider();

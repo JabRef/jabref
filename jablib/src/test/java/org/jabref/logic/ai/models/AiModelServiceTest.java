@@ -17,17 +17,6 @@ class AiModelServiceTest {
 
     private AiModelService aiModelService;
 
-    @BeforeAll
-    static void ensureUnirestInitialized() {
-        // Ensure URLDownload's static initializer runs before any tests
-        // This configures Unirest and prevents UnirestConfigException
-        try {
-            Class.forName(URLDownload.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to initialize URLDownload", e);
-        }
-    }
-
     @BeforeEach
     void setUp() {
         aiModelService = new AiModelService();
@@ -65,8 +54,6 @@ class AiModelServiceTest {
 
     @Test
     void fetchModelsSynchronouslyHandlesTimeout() {
-        // This test uses a URL that will likely timeout (non-routable IP)
-        // Unirest has a default timeout, so should fail and return empty list
         long startTime = System.currentTimeMillis();
 
         List<String> models = aiModelService.fetchModelsSynchronously(
@@ -78,7 +65,6 @@ class AiModelServiceTest {
         long duration = System.currentTimeMillis() - startTime;
 
         assertEquals(List.of(), models);
-        // Unirest default timeout is around 10 seconds, allow margin for test execution
         assertTrue(duration < 15000, "Should timeout within reasonable time, but took " + duration + "ms");
     }
 
