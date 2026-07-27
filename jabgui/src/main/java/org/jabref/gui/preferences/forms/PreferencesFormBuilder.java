@@ -6,16 +6,17 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -55,6 +56,7 @@ import com.dlsc.gemsfx.TagsField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
+import org.jspecify.annotations.NullMarked;
 
 /// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings. It
 /// replaces the FXML + controller pair: each call creates a control, binds it to a view-model
@@ -82,6 +84,7 @@ import org.controlsfx.control.SearchableComboBox;
 ///
 /// Consecutive labelled fields share an aligned two-column {@link GridPane}. Validation decoration is
 /// collected and applied once on the FX thread in {@link #build()}.
+@NullMarked
 public class PreferencesFormBuilder {
 
     private static final double SHORT_FIELD_WIDTH = 100.0;
@@ -98,7 +101,6 @@ public class PreferencesFormBuilder {
     private final Deque<Pane> containers = new ArrayDeque<>();
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-    private final List<Runnable> validationInits = new ArrayList<>();
 
     /// Every visible text handed to the builder, paired with the node it captions. The
     /// preferences search matches against these and highlights the node without reflection.
@@ -110,7 +112,11 @@ public class PreferencesFormBuilder {
 
     private boolean built;
 
-    /// The toggle group radios join inside {@link #radioGroup}.
+    /// The toggle group radios join inside {@link #radioGroup}. Deliberately *not* scoped to the
+    /// container stack: {@link #group}/{@link #section}/{@link #columns} opened inside the lambda
+    /// keep enrolling their radios in it too, which is what lets a {@code radioGroup} be wrapped in
+    /// a {@code group} purely for styling without breaking the mutual exclusion. It is restored only
+    /// when the owning {@link #radioGroup} call returns.
     private ToggleGroup currentToggleGroup;
 
     public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences) {
@@ -339,15 +345,17 @@ public class PreferencesFormBuilder {
     private void addField(String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();
-        if (label == null) {
-            // No caption: span both columns rather than leaving an empty label column.
-            grid.add(control, 0, row, 2, 1);
-        } else {
+        // Every field sits in a row of its own, so an attachment always has somewhere to go
+        // (see attachTo) — the same shape checkbox(), radio() and stackedField() use.
+        HBox controlRow = new HBox(DEFAULT_GAP, control);
+        controlRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(control, Priority.ALWAYS);
+        GridPane.setHgrow(controlRow, Priority.ALWAYS);
+        {
             searchable(label, control);
             grid.add(new Label(label), 0, row);
-            grid.add(control, 1, row);
+            grid.add(controlRow, 1, row);
         }
-        GridPane.setHgrow(control, Priority.ALWAYS);
     }
 
     private GridPane ensureGrid() {
@@ -483,7 +491,6 @@ public class PreferencesFormBuilder {
         }
         built = true;
         flushGrid();
-        Platform.runLater(() -> validationInits.forEach(Runnable::run));
         return root;
     }
 
@@ -498,10 +505,22 @@ public class PreferencesFormBuilder {
         searchableElements.add(new SearchableElement(text, node));
     }
 
-    /// Collects a validation decoration; it is applied on the FX thread in {@link #build()}, once
-    /// the controls sit in a scene.
+    /// Applies a validation decoration once `control` actually sits in a scene — ControlsFX
+    /// positions the decoration against the parent, so doing this earlier is a no-op at best.
     private void decorate(ValidationStatus status, Control control) {
-        validationInits.add(() -> visualizer.initVisualization(status, control));
+        if (control.getScene() != null) {
+            visualizer.initVisualization(status, control);
+            return;
+        }
+        control.sceneProperty().addListener(new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends Scene> scene, Scene oldScene, Scene newScene) {
+                if (newScene != null) {
+                    control.sceneProperty().removeListener(this);
+                    visualizer.initVisualization(status, control);
+                }
+            }
+        });
     }
 
     private <E> PreferencesFormBuilder configured(E element, Consumer<E> config) {
@@ -547,34 +566,14 @@ public class PreferencesFormBuilder {
         }
     }
 
-    /// Places `attachment` directly after `primary`: appended to the primary's row if it sits in
-    /// an {@link HBox}, otherwise by wrapping the primary's grid cell into a row. Wrapping keeps
-    /// the cell's position and span, and the primary keeps growing while the attachment does not.
+    /// Places `attachment` directly after `primary` in its row. Every element the builder places
+    /// sits in an {@link HBox} row of its own — field(), checkbox(), radio() and stackedField()
+    /// all wrap eagerly for exactly this reason — so attaching is the same append addToContainer
+    /// already does for top-level nodes, just targeting the primary's row instead of the current
+    /// container.
     private void attachTo(Node primary, Node attachment) {
-        switch (primary.getParent()) {
-            case HBox row ->
-                    row.getChildren().add(attachment);
-            case GridPane grid -> {
-                Integer columnIndex = GridPane.getColumnIndex(primary);
-                Integer rowIndex = GridPane.getRowIndex(primary);
-                Integer columnSpan = GridPane.getColumnSpan(primary);
-                grid.getChildren().remove(primary);
-                HBox wrapper = new HBox(DEFAULT_GAP, primary, attachment);
-                wrapper.setAlignment(Pos.CENTER_LEFT);
-                HBox.setHgrow(primary, Priority.ALWAYS);
-                GridPane.setHgrow(wrapper, Priority.ALWAYS);
-                grid.add(wrapper,
-                        columnIndex == null ? 0 : columnIndex,
-                        rowIndex == null ? 0 : rowIndex,
-                        columnSpan == null ? 1 : columnSpan,
-                        1);
-            }
-            case null ->
-                    throw new IllegalStateException("the control has not been placed yet; attach from within its config lambda");
-            default ->
-                    throw new IllegalStateException("cannot attach to a control sitting in a "
-                            + primary.getParent().getClass().getSimpleName());
-        }
+        HBox row = (HBox) primary.getParent();
+        row.getChildren().add(attachment);
     }
 
     private Button helpButton(StandardActions action, HelpFile helpFile) {
@@ -599,6 +598,11 @@ public class PreferencesFormBuilder {
 
         final T region;
 
+        /// A disable binding the builder installed on this region itself. {@link #disableWhen}
+        /// combines with it instead of silently replacing it — the same rule {@link ElementBase}
+        /// applies via its own {@code ownedDisable}.
+        private ObservableValue<? extends Boolean> ownedDisable;
+
         RegionBase(T region) {
             this.region = region;
         }
@@ -606,6 +610,12 @@ public class PreferencesFormBuilder {
         @SuppressWarnings("unchecked")
         final S self() {
             return (S) this;
+        }
+
+        /// Installs `condition` as the builder's own disable binding; see {@link #ownedDisable}.
+        final void ownDisable(ObservableValue<? extends Boolean> condition) {
+            region.disableProperty().bind(condition);
+            ownedDisable = condition;
         }
 
         public T node() {
@@ -618,9 +628,15 @@ public class PreferencesFormBuilder {
         }
 
         /// Disables the whole region while `condition` holds; disable propagates to every descendant,
-        /// so its contents need no binding of their own.
+        /// so its contents need no binding of their own. Where the builder installed a disable
+        /// binding of its own, the two are combined rather than one replacing the other.
         public S disableWhen(ObservableValue<? extends Boolean> condition) {
-            region.disableProperty().bind(condition);
+            region.disableProperty().unbind();
+            if (ownedDisable == null) {
+                region.disableProperty().bind(condition);
+            } else {
+                ownDisable(either(ownedDisable, condition));
+            }
             return self();
         }
 
@@ -726,6 +742,13 @@ public class PreferencesFormBuilder {
             ownedDisable = condition;
         }
 
+        /// Couples this element's disable state to `primary`'s, combinably: a later
+        /// `disableWhen` on this element still combines instead of replacing (see {@link #ownedDisable}).
+        /// Every attachment that should track its primary's disabled state goes through this.
+        final void followDisable(Node primary) {
+            ownDisable(primary.disableProperty());
+        }
+
         /// The single unchecked cast of the handle hierarchy: `S` is always the concrete class of
         /// `this`, so base methods can return the subclass and chain order does not matter.
         @SuppressWarnings("unchecked")
@@ -829,9 +852,10 @@ public class PreferencesFormBuilder {
         }
 
         public <A extends Node> InputElement<N> attach(A attachment, Consumer<NodeElement<A>> config) {
-            attachment.disableProperty().bind(node.disableProperty());
+            NodeElement<A> element = new NodeElement<>(form, attachment);
+            element.followDisable(node);
             form.attachTo(node, attachment);
-            config.accept(new NodeElement<>(form, attachment));
+            config.accept(element);
             return this;
         }
 
@@ -845,8 +869,8 @@ public class PreferencesFormBuilder {
 
         public InputElement<N> attachField(StringProperty value, Consumer<InputElement<TextField>> config) {
             TextField field = new TextField();
-            field.textProperty().bindBidirectional(value);
             field.setMaxWidth(Double.MAX_VALUE);
+            field.textProperty().bindBidirectional(value);
             HBox.setHgrow(field, Priority.ALWAYS);
             InputElement<TextField> element = new InputElement<>(form, field);
             switch (node) {
@@ -855,7 +879,7 @@ public class PreferencesFormBuilder {
                 case ToggleButton toggle ->
                         element.ownDisable(toggle.selectedProperty().not());
                 default ->
-                        field.disableProperty().bind(node.disableProperty());
+                        element.followDisable(node);
             }
             form.attachTo(node, field);
             config.accept(element);
@@ -869,10 +893,8 @@ public class PreferencesFormBuilder {
             browseButton.getStyleClass().addAll("icon-button", "narrow");
             browseButton.setPrefSize(ICON_BUTTON_SIZE, ICON_BUTTON_SIZE);
             browseButton.setTooltip(new Tooltip(Localization.lang("Browse")));
-            browseButton.disableProperty().bind(node.disableProperty());
             browseButton.setOnAction(_ -> onBrowse.run());
-            form.attachTo(node, browseButton);
-            return this;
+            return attach(browseButton);
         }
 
         /// Attaches a help icon button. Help stays clickable even while the control is disabled.
