@@ -24,6 +24,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -373,6 +374,37 @@ public class PreferencesFormBuilder {
 
         addNode(new VBox(GAP, caption, controlRow));
         return configured(new InputElement<>(this, control), config);
+    }
+
+    // endregion
+
+    // region lists
+
+    /// An editable list, taking the form's remaining height. Usually followed by a {@link #buttonRow}
+    /// holding the actions that operate on the selection.
+    public <X> PreferencesFormBuilder table(TableView<X> table) {
+        return table(table, noConfig());
+    }
+
+    public <X> PreferencesFormBuilder table(TableView<X> table, Consumer<InputElement<TableView<X>>> config) {
+        table.setMaxWidth(Double.MAX_VALUE);
+        HBox tableRow = row(table);
+        HBox.setHgrow(table, Priority.ALWAYS);
+        // A table is the one element that should soak up leftover height rather than stay at its
+        // preferred size, so that the form does not leave a gap under a short list.
+        VBox.setVgrow(tableRow, Priority.ALWAYS);
+        addNode(tableRow);
+        return configured(new InputElement<>(this, table), config);
+    }
+
+    /// The row of actions under a {@link #table}, right-aligned as the table's actions always are.
+    /// The buttons come ready-made, since what they do is the tab's business; see
+    /// {@link org.jabref.gui.util.ControlHelper#labelledIconButton}.
+    public PreferencesFormBuilder buttonRow(Button... buttons) {
+        HBox buttonRow = new HBox(GAP, buttons);
+        buttonRow.setAlignment(Pos.BASELINE_RIGHT);
+        addNode(buttonRow);
+        return this;
     }
 
     // endregion

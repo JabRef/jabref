@@ -1,15 +1,10 @@
 package org.jabref.gui.preferences.protectedterms;
 
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -25,8 +20,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 
 import com.airhacks.afterburner.injection.Injector;
-
-import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 /// Tab for managing term list files.
 public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> {
@@ -49,8 +42,12 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
     private void buildView() {
         setContent(form()
-                .custom(buildFilesTable(), table -> table.configure(t -> VBox.setVgrow(t, Priority.ALWAYS)))
-                .custom(buildButtonRow())
+                .table(buildFilesTable())
+                // These captions are full sentences, so unlike the other button rows these two are
+                // left to size themselves rather than being forced to a uniform width.
+                .buttonRow(
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.OPEN_LIST, Localization.lang("Add protected terms file"), viewModel::addFile),
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("New protected terms file"), viewModel::createNewFile))
                 .build());
     }
 
@@ -113,16 +110,6 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
         filesTable.itemsProperty().set(viewModel.termsFilesProperty());
         return filesTable;
-    }
-
-    private Node buildButtonRow() {
-        // These two captions are full sentences, so unlike the other button rows they are left to
-        // size themselves rather than being forced to a uniform width.
-        HBox row = new HBox(GAP,
-                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.OPEN_LIST, Localization.lang("Add protected terms file"), viewModel::addFile),
-                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("New protected terms file"), viewModel::createNewFile));
-        row.setAlignment(Pos.BASELINE_RIGHT);
-        return row;
     }
 
     private ContextMenu createContextMenu(ProtectedTermsListItemModel file) {

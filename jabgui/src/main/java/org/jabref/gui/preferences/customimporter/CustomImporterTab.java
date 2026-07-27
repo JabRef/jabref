@@ -1,13 +1,10 @@
 package org.jabref.gui.preferences.customimporter;
 
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImporterViewModel;
@@ -19,7 +16,6 @@ import org.jabref.logic.l10n.Localization;
 import com.tobiasdiez.easybind.EasyBind;
 
 import static org.jabref.gui.preferences.forms.FormMetrics.BUTTON_WIDTH;
-import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterTabViewModel> {
 
@@ -38,8 +34,10 @@ public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterT
 
     private void buildView() {
         setContent(form()
-                .custom(buildImporterTable())
-                .custom(buildButtonRow())
+                .table(buildImporterTable())
+                .buttonRow(
+                        buildAddButton(),
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REMOVE_NOBOX, Localization.lang("Remove"), BUTTON_WIDTH, viewModel::removeSelectedImporter))
                 .build());
     }
 
@@ -70,17 +68,14 @@ public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterT
         return importerTable;
     }
 
-    private Node buildButtonRow() {
+    /// Unlike the other button-row buttons this one explains itself, since what counts as an
+    /// importer class and where it may live is not obvious from the caption.
+    private Button buildAddButton() {
         Button addButton = ControlHelper.labelledIconButton(
                 IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("Add"), BUTTON_WIDTH, viewModel::addImporter);
         addButton.setTooltip(new Tooltip(
                 Localization.lang("Add a (compiled) custom Importer class from a class path.")
                         + "\n" + Localization.lang("The path need not be on the classpath of JabRef.")));
-
-        HBox row = new HBox(GAP,
-                addButton,
-                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REMOVE_NOBOX, Localization.lang("Remove"), BUTTON_WIDTH, viewModel::removeSelectedImporter));
-        row.setAlignment(Pos.BASELINE_RIGHT);
-        return row;
+        return addButton;
     }
 }

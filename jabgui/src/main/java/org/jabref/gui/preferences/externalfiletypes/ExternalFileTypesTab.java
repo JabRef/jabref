@@ -1,22 +1,15 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-
-import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 /// Editor for external file types.
 public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFileTypesTabViewModel> {
@@ -35,8 +28,10 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
 
     private void buildView() {
         setContent(form()
-                .custom(buildFileTypesTable(), table -> table.configure(t -> VBox.setVgrow(t, Priority.ALWAYS)))
-                .custom(buildButtonRow())
+                .table(buildFileTypesTable())
+                .buttonRow(
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("Add new file type"), this::addNewType),
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Reset to default"), viewModel::resetToDefaults))
                 .build());
     }
 
@@ -107,20 +102,6 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
         fileTypesTable.getColumns().add(deleteColumn);
 
         return fileTypesTable;
-    }
-
-    private Node buildButtonRow() {
-        Button addNewType = new Button(Localization.lang("Add new file type"));
-        addNewType.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
-        addNewType.setOnAction(_ -> addNewType());
-
-        Button resetToDefault = new Button(Localization.lang("Reset to default"));
-        resetToDefault.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
-        resetToDefault.setOnAction(_ -> viewModel.resetToDefaults());
-
-        HBox row = new HBox(GAP, addNewType, resetToDefault);
-        row.setAlignment(Pos.BASELINE_RIGHT);
-        return row;
     }
 
     private void editType(ExternalFileTypeItemViewModel type) {
