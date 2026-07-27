@@ -57,14 +57,12 @@ public class MedlineImporter extends Importer implements Parser {
 
     public MedlineImporter() {
         this.xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // Not supported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         // required for reading Unicode characters such as &#xf6;
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
     }
 
     @Override
