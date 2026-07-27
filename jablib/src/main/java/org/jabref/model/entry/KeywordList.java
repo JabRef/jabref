@@ -106,6 +106,14 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
+        return serialize(keywords, delimiter, delimiter.toString());
+    }
+
+    public static String serializeWithSpaces(List<Keyword> keywords, Character delimiter) {
+        return serialize(keywords, delimiter, delimiter + " ");
+    }
+
+    private static String serialize(List<Keyword> keywords, Character delimiter, String keywordSeparator) {
         String delimiterStr = delimiter.toString();
         String escapeSequenceStr = Keyword.DEFAULT_ESCAPE_SYMBOL.toString();
         String escapedDelimiter = escapeSequenceStr + delimiterStr;
@@ -120,7 +128,7 @@ public class KeywordList implements Iterable<Keyword> {
                                               .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
                                               .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
                                               .collect(Collectors.joining(hierarchicalSeparator)))
-                       .collect(Collectors.joining(delimiterStr));
+                       .collect(Collectors.joining(keywordSeparator));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {

@@ -128,7 +128,8 @@ public class BibtexImporter extends Importer {
         return result;
     }
 
-    /// Postprocessing for imported entries that replaces the delimiters in KEYWORDS with the default delimiters.
+    /// [impl->req~import.bibtex.keywords.normalize-delimiters~1]
+    /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
     private void normalizeKeywordDelimiters(ParserResult result) {
         Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
 
@@ -138,9 +139,8 @@ public class BibtexImporter extends Importer {
                 continue;
             }
 
-            entry.clearField(StandardField.KEYWORDS);
             KeywordList importedKeywords = KeywordList.parseImport(rawKeywords.get(), IMPORT_KEYWORD_DELIMITERS);
-            entry.addKeywords(importedKeywords, separator);
+            entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
         }
     }
 

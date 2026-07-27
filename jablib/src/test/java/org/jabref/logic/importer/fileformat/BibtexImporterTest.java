@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /// This class tests the BibtexImporter.
 ///
@@ -41,7 +45,13 @@ class BibtexImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        importer = createImporter(',');
+    }
+
+    private BibtexImporter createImporter(char keywordSeparator) {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(keywordSeparator);
+        return new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -116,6 +126,36 @@ class BibtexImporterTest {
                 assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
             }
         }
+    }
+
+    @Test
+    void importSemicolonSeparatedKeywordsUsesConfiguredSeparator() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(new StringReader("""
+                @Article{,
+                  keywords = {keywordOne; keywordTwo; keywordThree},
+                }
+                """))).getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        BibEntry importedEntry = importedEntries.getFirst();
+        assertEquals(Optional.of("keywordOne, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
+    }
+
+    @Test
+    void importSemicolonSeparatedKeywordsContainingConfiguredSeparatorEscapesEmbeddedSeparator() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(new StringReader("""
+                @Article{,
+                  keywords = {keywordOne, keywordTwo; keywordThree},
+                }
+                """))).getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        BibEntry importedEntry = importedEntries.getFirst();
+        assertEquals(Optional.of("keywordOne\\, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(new KeywordList("keywordOne, keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
     }
 
     @Test

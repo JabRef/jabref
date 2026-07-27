@@ -206,4 +206,10 @@ class KeywordListTest {
         String secondSerialize = KeywordList.serialize(parsed.stream().toList(), delimiter);
         assertEquals(expected, secondSerialize);
     }
+
+    @Test
+    void serializeWithSpacesEscapesEmbeddedDelimiterAndKeepsReadableSeparatorSpacing() {
+        assertEquals("keyword\\,one, keywordTwo",
+                KeywordList.serializeWithSpaces(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), ','));
+    }
 }
