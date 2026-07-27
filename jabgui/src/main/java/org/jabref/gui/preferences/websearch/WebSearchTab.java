@@ -21,6 +21,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -82,19 +83,19 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
                 .section(Localization.lang("General"), general -> general
                         .flow(toggles -> toggles
-                                .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
-                                .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
-                                .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
-                                .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
-                            toggleRow -> toggleRow.styleClass("checkbox-flowpane"))
+                                        .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
+                                        .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
+                                        .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
+                                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
+                                toggleRow -> toggleRow.styleClass("checkbox-flowpane"))
                         .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName(),
-                                groupName -> groupName.grow())
+                                PreferencesFormBuilder.InputElement::grow)
                         .combo(Localization.lang("Default plain citation parser"), viewModel.plainCitationParsers(), viewModel.defaultPlainCitationParserProperty(), PlainCitationParserChoice::getLocalizedName)
                         .field(Localization.lang("Citations relations local storage time-to-live (in days)"), buildStoreTtlField()))
 
                 .section(Localization.lang("Custom DOI URI"), doi -> doi
                         .checkWithField(Localization.lang("Use custom DOI base URI for article access"), viewModel.useCustomDOIProperty(), viewModel.useCustomDOINameProperty(),
-                                baseUri -> baseUri.grow()))
+                                PreferencesFormBuilder.InputElement::grow))
 
                 .section(Localization.lang("Remote services"), remote -> remote
                         .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
@@ -148,7 +149,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private Node buildSearchEngineTable() {
         TableView<SearchEngineItem> table = new TableView<>();
         table.setEditable(true);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         table.setItems(viewModel.getSearchEngines());
 
         TableColumn<SearchEngineItem, String> name = new TableColumn<>(Localization.lang("Search Engine"));

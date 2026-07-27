@@ -31,9 +31,7 @@ import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
@@ -60,21 +58,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
-        EnhancedPasswordField apiKey = PasswordFieldEditor.create(viewModel.apiKeyProperty())
-                                                          .withRevealButton()
-                                                          .withClearButton()
-                                                          .field();
-
         getChildren().add(form()
 
                 .section(Localization.lang("General"), general -> general
-                        // [impl->feat~ai.llms.providers~1]
-                        .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
-                        .info(Localization.lang("AI functionality in Jabref includes:"))
-                        .info(Localization.lang("• Chatting with entries."))
-                        .info(Localization.lang("• Summarizing entries."))
-                        .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
-                    generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
+                                // [impl->feat~ai.llms.providers~1]
+                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
+                                .info(Localization.lang("AI functionality in Jabref includes:"))
+                                .info(Localization.lang("• Chatting with entries."))
+                                .info(Localization.lang("• Summarizing entries."))
+                                .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
+                        generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
 
                 .section(Localization.lang("Connection"), connection -> connection
                         .combo(Localization.lang("AI provider"),
@@ -85,54 +78,57 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                         .field(Localization.lang("Chat model"), buildChatModelCombo(),
                                 chatModel -> chatModel.disableWhen(viewModel.disableBasicSettingsProperty())
                                                       .validate(viewModel.getChatModelValidationStatus()))
-                        .field(Localization.lang("API key"), apiKey,
+                        .field(Localization.lang("API key"), PasswordFieldEditor.create(viewModel.apiKeyProperty())
+                                                                                .withRevealButton()
+                                                                                .withClearButton()
+                                                                                .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
                                           .validate(viewModel.getApiTokenValidationStatus())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
-                        .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
-                                customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
-                        .group(expert -> expert
-                                        .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
-                                                baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
-                                                                  .validate(viewModel.getApiBaseUrlValidationStatus()))
-                                        .searchableCombo(Localization.lang("Embedding model"),
-                                                viewModel.embeddingModelsProperty(),
-                                                viewModel.selectedEmbeddingModelProperty(),
-                                                PredefinedEmbeddingModel::fullInfo,
-                                                embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
-                                        .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
-                                        // The six numeric expert settings, as two columns of caption-above-field cells.
-                                        // [impl->req~ai.expert-settings.chat-inference-global~1]
-                                        // [impl->req~ai.expert-settings.rag-global~1]
-                                        .columns(expertColumns -> expertColumns
-                                                .group(leftColumn -> leftColumn
-                                                        .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
-                                                                windowSize -> windowSize.validate(viewModel.getMessageWindowSizeValidationStatus()))
-                                                        .stackedField(Localization.lang("RAG - maximum results count"), integerField(viewModel.ragMaxResultsCountProperty()),
-                                                                resultsCount -> resultsCount.validate(viewModel.getRagMaxResultsCountValidationStatus()))
-                                                        .stackedField(Localization.lang("Document splitter - chunk size"), integerField(viewModel.documentSplitterChunkSizeProperty()),
-                                                                chunkSize -> chunkSize.validate(viewModel.getDocumentSplitterChunkSizeValidationStatus())))
-                                                .group(rightColumn -> rightColumn
-                                                        .stackedField(Localization.lang("Temperature"), textField(viewModel.temperatureProperty()),
-                                                                temperature -> temperature.validate(viewModel.getTemperatureTypeValidationStatus())
-                                                                                          .validate(viewModel.getTemperatureRangeValidationStatus()))
-                                                        .stackedField(Localization.lang("RAG - minimum score"), textField(viewModel.ragMinScoreProperty()),
-                                                                minScore -> minScore.validate(viewModel.getRagMinScoreTypeValidationStatus())
-                                                                                    .validate(viewModel.getRagMinScoreRangeValidationStatus()))
-                                                        .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
-                                                                overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
-                                        .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
-                                // Disabling the group covers every expert control above; individual controls
-                                // only add their own extra conditions on top.
-                                expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
-                                                          .disableWhen(viewModel.disableExpertSettingsProperty())),
-                    expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
+                                .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
+                                        customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
+                                .group(expert -> expert
+                                                .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
+                                                        baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
+                                                                          .validate(viewModel.getApiBaseUrlValidationStatus()))
+                                                .searchableCombo(Localization.lang("Embedding model"),
+                                                        viewModel.embeddingModelsProperty(),
+                                                        viewModel.selectedEmbeddingModelProperty(),
+                                                        PredefinedEmbeddingModel::fullInfo,
+                                                        embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
+                                                .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                                                // The six numeric expert settings, as two columns of caption-above-field cells.
+                                                // [impl->req~ai.expert-settings.chat-inference-global~1]
+                                                // [impl->req~ai.expert-settings.rag-global~1]
+                                                .columns(expertColumns -> expertColumns
+                                                        .group(leftColumn -> leftColumn
+                                                                .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
+                                                                        windowSize -> windowSize.validate(viewModel.getMessageWindowSizeValidationStatus()))
+                                                                .stackedField(Localization.lang("RAG - maximum results count"), integerField(viewModel.ragMaxResultsCountProperty()),
+                                                                        resultsCount -> resultsCount.validate(viewModel.getRagMaxResultsCountValidationStatus()))
+                                                                .stackedField(Localization.lang("Document splitter - chunk size"), integerField(viewModel.documentSplitterChunkSizeProperty()),
+                                                                        chunkSize -> chunkSize.validate(viewModel.getDocumentSplitterChunkSizeValidationStatus())))
+                                                        .group(rightColumn -> rightColumn
+                                                                .stackedField(Localization.lang("Temperature"), textField(viewModel.temperatureProperty()),
+                                                                        temperature -> temperature.validate(viewModel.getTemperatureTypeValidationStatus())
+                                                                                                  .validate(viewModel.getTemperatureRangeValidationStatus()))
+                                                                .stackedField(Localization.lang("RAG - minimum score"), textField(viewModel.ragMinScoreProperty()),
+                                                                        minScore -> minScore.validate(viewModel.getRagMinScoreTypeValidationStatus())
+                                                                                            .validate(viewModel.getRagMinScoreRangeValidationStatus()))
+                                                                .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
+                                                                        overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
+                                                .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
+                                        // Disabling the group covers every expert control above; individual controls
+                                        // only add their own extra conditions on top.
+                                        expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
+                                                                  .disableWhen(viewModel.disableExpertSettingsProperty())),
+                        expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
 
                 // [impl->req~ai.expert-settings.templates~1]
                 .section(Localization.lang("Templates"), templates -> templates
-                        .custom(buildTemplatesRegion()),
-                    templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
+                                .custom(buildTemplatesRegion()),
+                        templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
 
                 .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
                         // [impl->req~ai.ingestion.automatic-trigger~1]

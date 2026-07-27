@@ -21,7 +21,6 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-
 public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
     private final TableView<MainTableColumnModel> columnsList = new TableView<>();
@@ -57,19 +56,19 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                                 .group(order -> order
                                         .label(Localization.lang("Order"))
                                         .group(choices -> choices
-                                                .radioGroup(choice -> choice
-                                                        .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
-                                                        .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
-                                                        .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
-                                                        .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
+                                                        .radioGroup(choice -> choice
+                                                                .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
+                                                                .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
+                                                                .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
+                                                                .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
                                                 indent -> indent.styleClass("prefIndent").spacing(4.0)))
                                 .group(abbreviation -> abbreviation
                                         .label(Localization.lang("Abbreviations"))
                                         .group(choices -> choices
-                                                .radioGroup(choice -> choice
-                                                        .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
-                                                        .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
-                                                        .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
+                                                        .radioGroup(choice -> choice
+                                                                .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
+                                                                .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
+                                                                .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
                                                 indent -> indent.styleClass("prefIndent")
                                                                 .spacing(4.0)
                                                                 // Natbib and "unchanged" render names verbatim,
