@@ -112,8 +112,10 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public String getImportDelimiterParsingStrategyDisplayName(BibEntryPreferences.ImportDelimiterParsingStrategy parsingStrategy) {
         return switch (parsingStrategy) {
-            case SPLIT_ON_ALL_DELIMITERS -> Localization.lang("Split on all accepted delimiters");
-            case INFER_DELIMITER_BY_PRIORITY -> Localization.lang("Infer one delimiter by priority order");
+            case SPLIT_ON_ALL_DELIMITERS ->
+                    Localization.lang("Split on all accepted delimiters");
+            case INFER_DELIMITER_BY_PRIORITY ->
+                    Localization.lang("Infer one delimiter by priority order");
         };
     }
 

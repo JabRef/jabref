@@ -33,12 +33,14 @@ public final class KeywordImportNormalizer {
                                       .orElse(BibEntryPreferences.getDefault().getKeywordSeparator());
         List<Character> importKeywordDelimiters = parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
         BibEntryPreferences.ImportDelimiterParsingStrategy parsingStrategy = Optional.ofNullable(preferences.getImportDelimiterParsingStrategy())
-                                                                                    .orElse(BibEntryPreferences.ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
+                                                                                     .orElse(BibEntryPreferences.ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
 
         entry.getField(StandardField.KEYWORDS).ifPresent(rawKeywords -> {
             KeywordList importedKeywords = switch (parsingStrategy) {
-                case SPLIT_ON_ALL_DELIMITERS -> KeywordList.parseWithMultipleDelimiters(rawKeywords, importKeywordDelimiters);
-                case INFER_DELIMITER_BY_PRIORITY -> KeywordList.parseWithPrioritizedDelimiters(rawKeywords, importKeywordDelimiters);
+                case SPLIT_ON_ALL_DELIMITERS ->
+                        KeywordList.parseWithMultipleDelimiters(rawKeywords, importKeywordDelimiters);
+                case INFER_DELIMITER_BY_PRIORITY ->
+                        KeywordList.parseWithPrioritizedDelimiters(rawKeywords, importKeywordDelimiters);
             };
             entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
         });
