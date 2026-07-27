@@ -25,7 +25,7 @@ public class ExportTab extends AbstractPreferenceTabView<ExportTabViewModel> {
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
 
-        getChildren().add(form()
+        setContent(form()
                 .section(Localization.lang("Export sort order"), order -> order
                         .custom(exportOrderPanel))
                 .build());

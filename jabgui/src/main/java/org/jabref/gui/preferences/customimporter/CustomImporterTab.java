@@ -37,7 +37,7 @@ public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterT
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
                 .custom(buildImporterTable())
                 .custom(buildButtonRow())
                 .build());

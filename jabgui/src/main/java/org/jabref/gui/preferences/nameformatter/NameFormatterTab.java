@@ -40,7 +40,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
                 .custom(buildFormatterEditor())
                 .build());
     }

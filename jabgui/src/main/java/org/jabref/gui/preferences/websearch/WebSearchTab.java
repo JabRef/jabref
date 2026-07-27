@@ -79,7 +79,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
 
                 .section(Localization.lang("General"), general -> general
                         .flow(toggles -> toggles

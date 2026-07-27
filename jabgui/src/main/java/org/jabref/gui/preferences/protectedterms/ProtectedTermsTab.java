@@ -48,7 +48,7 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
                 .custom(buildFilesTable(), table -> table.configure(t -> VBox.setVgrow(t, Priority.ALWAYS)))
                 .custom(buildButtonRow())
                 .build());

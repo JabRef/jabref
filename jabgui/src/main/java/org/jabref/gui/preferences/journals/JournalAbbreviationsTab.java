@@ -70,7 +70,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
                 .custom(buildFileChooserRow())
                 .custom(buildAbbreviationsEditor())
                 .custom(buildAddAbbreviationRow())

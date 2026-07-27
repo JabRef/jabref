@@ -60,7 +60,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
 
                 .section(Localization.lang("General"), general -> general
                                 // [impl->feat~ai.llms.providers~1]

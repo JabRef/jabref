@@ -50,7 +50,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
                 .custom(buildBindingsEditor())
                 .custom(buildButtonRow())
                 .build());

@@ -3,7 +3,6 @@ package org.jabref.gui.preferences;
 import java.util.List;
 
 import javafx.scene.Node;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
@@ -12,12 +11,14 @@ import org.jabref.logic.util.TaskExecutor;
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
-import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
-
 /// Base class for preference tabs. A tab describes its UI with a {@link PreferencesFormBuilder}
 /// obtained from {@link #form()} and delegates the {@link PreferencesTab} lifecycle to its
 /// view model.
-public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel> extends VBox implements PreferencesTab {
+///
+/// A tab is not itself a node: the form the builder assembles is the tab's content, handed over with
+/// {@link #setContent}. Were the tab a container of its own, every tab would nest that form in a
+/// second pane with the same spacing, and it would be ambiguous which of the two owns the layout.
+public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel> implements PreferencesTab {
 
     protected final TaskExecutor taskExecutor;
     protected final DialogService dialogService;
@@ -28,11 +29,12 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
     /// The builder created via [#form()], kept to serve its texts to the preferences search.
     private @Nullable PreferencesFormBuilder form;
 
+    private @Nullable Node content;
+
     protected AbstractPreferenceTabView() {
         this.preferences = Injector.instantiateModelOrService(GuiPreferences.class);
         this.dialogService = Injector.instantiateModelOrService(DialogService.class);
         this.taskExecutor = Injector.instantiateModelOrService(TaskExecutor.class);
-        setSpacing(GAP);
     }
 
     /// Creates the tab's builder, pre-wired with the services needed for section help buttons. A tab
@@ -51,9 +53,17 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
         return form == null ? List.of() : form.getSearchableElements();
     }
 
+    /// Hands the assembled form over as the tab's content; called once, from the tab's constructor.
+    protected void setContent(Node content) {
+        this.content = content;
+    }
+
     @Override
     public Node getContent() {
-        return this;
+        if (content == null) {
+            throw new IllegalStateException("the tab built no content; call setContent() from its constructor");
+        }
+        return content;
     }
 
     @Override

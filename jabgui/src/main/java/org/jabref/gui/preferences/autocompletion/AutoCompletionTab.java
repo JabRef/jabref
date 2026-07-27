@@ -25,7 +25,7 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
         TagsField<Field> autoCompleteFields = TagsFieldEditor.create(
                 FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.autoCompleteFieldsProperty());
 
-        getChildren().add(form()
+        setContent(form()
                 .checkbox(Localization.lang("Use autocompletion"), viewModel.enableAutoCompleteProperty())
 
                 .group(autoComplete -> autoComplete

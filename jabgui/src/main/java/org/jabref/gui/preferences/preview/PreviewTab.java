@@ -88,7 +88,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         Node dualListRegion = buildDualListRegion();
         Node editorRegion = buildEditorRegion();
 
-        getChildren().add(form()
+        setContent(form()
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())

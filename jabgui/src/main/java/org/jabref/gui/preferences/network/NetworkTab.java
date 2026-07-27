@@ -60,7 +60,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         Label hint = new Label(Localization.lang("If you encounter an issue or a bug, please check the latest version, whether the issue is still present."));
         hint.setWrapText(true);
 
-        getChildren().add(form()
+        setContent(form()
                 .checkbox(Localization.lang("Check for updates on startup"), viewModel.versionCheckProperty())
                 .custom(hint)
 

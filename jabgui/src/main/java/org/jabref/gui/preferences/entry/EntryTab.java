@@ -48,7 +48,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
         TagsField<Field> nonWrappableTags = TagsFieldEditor.create(
                 FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.nonWrappableTagsFieldProperty());
 
-        getChildren().add(form()
+        setContent(form()
 
                 .section(Localization.lang("Field"), field -> field
                         .custom(buildKeywordSeparatorRow())

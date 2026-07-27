@@ -37,7 +37,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     private void buildView() {
-        getChildren().add(form()
+        setContent(form()
 
                 .section(Localization.lang("General"), general -> general
                         .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())
