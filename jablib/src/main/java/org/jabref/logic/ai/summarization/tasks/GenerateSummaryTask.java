@@ -15,7 +15,10 @@ public class GenerateSummaryTask extends TrackedBackgroundTask<AiSummary> {
     private final String citationKey; // Useful for logging.
     private final BibEntrySummarizator bibEntrySummarizator;
 
-    public GenerateSummaryTask(GenerateSummaryTaskRequest request) {
+    public GenerateSummaryTask(
+            GenerateSummaryTaskRequest request,
+            boolean showToUser
+    ) {
         this.request = request;
         this.citationKey = request.fullEntry().entry().getCitationKey().orElse("<no citation key>");
 
@@ -24,11 +27,11 @@ public class GenerateSummaryTask extends TrackedBackgroundTask<AiSummary> {
                 request.summarizator()
         );
 
-        configure();
+        configure(showToUser);
     }
 
-    private void configure() {
-        showToUser(true);
+    private void configure(boolean showToUser) {
+        showToUser(showToUser);
         titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
     }
 

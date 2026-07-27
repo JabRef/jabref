@@ -44,22 +44,26 @@ public class SummarizationTaskAggregator {
     /// {@link org.jabref.logic.ai.util.TrackedBackgroundTask#getStatus()} immediately after
     /// attaching, in case the task already finished before the listener was registered.
     public synchronized GenerateSummaryTask start(GenerateSummaryTaskRequest request) {
+        return start(request, true);
+    }
+
+    public synchronized GenerateSummaryTask start(GenerateSummaryTaskRequest request, boolean showToUser) {
         Optional<GenerateSummaryTask> task = getTask(request.fullEntry().entry());
 
         if (task.isEmpty()) {
-            return startNewTask(request);
+            return startNewTask(request, showToUser);
         }
 
         if (task.get().getStatus() == TrackedBackgroundTask.Status.CANCELLED && request.regenerate()) {
             tasks.remove(request.fullEntry().entry());
-            return startNewTask(request);
+            return startNewTask(request, showToUser);
         }
 
         return task.get();
     }
 
-    private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request) {
-        GenerateSummaryTask task = new GenerateSummaryTask(request);
+    private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request, boolean showToUser) {
+        GenerateSummaryTask task = new GenerateSummaryTask(request, showToUser);
 
         task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
 

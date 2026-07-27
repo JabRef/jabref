@@ -87,7 +87,7 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
                         summarizator.get(),
                         new FullBibEntry(context, entry),
                         false
-                ));
+                ), false);
             });
         }
 
@@ -104,7 +104,7 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
                     summarizator.get(),
                     new FullBibEntry(context, event.getBibEntry()),
                     false
-            ));
+            ), false);
         }
     }
 }
