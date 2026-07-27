@@ -30,7 +30,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
-import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -48,12 +47,13 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
 
+    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
+
     private final Map<PageKey, String> cursorCacheMap = new ConcurrentHashMap<>();
 
     private final ImporterPreferences importerPreferences;
-
-    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
     public ScholarFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
