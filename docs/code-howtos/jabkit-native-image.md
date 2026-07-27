@@ -13,7 +13,7 @@ It is currently shipped through `jpackage` (installer and portable build, both b
 
 ### The big picture
 
-Native Image compilation has two inputs: the **code** to compile (JabKit plus everything it pulls in) and the **reachability metadata**. Metadata covers dynamic behavior that static analysis cannot fully detect, such as reflective library calls, JNI access, and resource lookups. Both meet in the `nativeCompile` task:
+Native Image compilation has two inputs: the **code** to compile (JabKit plus everything it pulls in) and the **[reachability metadata](https://www.graalvm.org/latest/reference-manual/native-image/metadata/)**. Metadata covers dynamic behavior that static analysis cannot fully detect, such as reflective library calls, JNI access, and resource lookups. Both meet in the `nativeCompile` task:
 
 ![JabKit native image: code and metadata feeding nativeCompile](../images/jabkit-native-image-overview.png)
 
@@ -43,8 +43,7 @@ jablib/src/main/resources/META-INF/native-image/org.jabref/jablib/
 
 Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) schema, one file with `reflection`, `resources`, and `bundles` sections (JNI is expressed as a `jniAccessible` flag on reflection entries).
 
-{: .note }
-Ownership rule: metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
+Metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
 
 ### Smoke tests in CI
 
@@ -100,9 +99,6 @@ JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experime
   ./jabkit/build/install/jabkit/bin/jabkit --help
 ```
 
-{: .note }
-**Minimal wins.** Add the narrowest entry that fixes the failure: the constructor named by the error, the single missing resource glob, or the specific JNI access required. Small entries are reviewable and make it clear why each line exists. Use the existing entries in `reachability-metadata.json` as templates for the JSON shape.
-
 See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) documentation for the agent options.
 
 ### Smoke testing
@@ -122,15 +118,12 @@ clitest src/test/nativeimage/jabkit-offline.md
 
 - Pass `--porcelain` where supported to keep command output script-friendly.
 - Assert exit codes, generated files, or stable machine-readable output.
-- Avoid assertions on logs, progress messages, or warnings written by dependencies.
 
 ## Known limitations
 
 ### Liberica NIK
 
-[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches `java.desktop`/AWT.
-
-GraalVM CE, Oracle GraalVM, and Red Hat Mandrel do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)). This matters because [PDFBox initializes AWT eagerly in `PDDocument`'s static initializer](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj): even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it.
+[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches [`java.desktop`/AWT from `PDDocument`](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), while stock GraalVM/Mandrel toolchains do not support AWT in native images ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)).
 
 ### What the build produces on Linux
 
