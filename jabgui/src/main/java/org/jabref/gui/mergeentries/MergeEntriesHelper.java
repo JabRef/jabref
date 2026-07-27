@@ -7,8 +7,10 @@ import java.util.Set;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -42,8 +44,28 @@ public final class MergeEntriesHelper {
         boolean typeChanged = mergeEntryType(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
         boolean fieldsChanged = mergeFields(entryFromFetcher, entryFromLibrary, namedCompoundEdit, keywordSeparator);
         boolean fieldsRemoved = removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
+        boolean citationKeyChanged = mergeCitationKey(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
 
-        return typeChanged || fieldsChanged || fieldsRemoved;
+        return typeChanged || fieldsChanged || fieldsRemoved || citationKeyChanged;
+    }
+
+    /// Adopts the fetcher-provided citation key (e.g. an INSPIRE texkey) onto the library entry,
+    /// but only if the library entry doesn't already have one — an existing, possibly user-chosen
+    /// key is never overwritten by this merge.
+    private static boolean mergeCitationKey(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
+        if (entryFromLibrary.getCitationKey().isPresent()) {
+            return false;
+        }
+
+        return entryFromFetcher.getCitationKey()
+                               .filter(key -> !key.isBlank())
+                               .map(key -> {
+                                   LOGGER.debug("Adopting citation key from fetcher: {}", key);
+                                   Optional<FieldChange> change = entryFromLibrary.setCitationKey(key);
+                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new UndoableKeyChange(fieldChange)));
+                                   return true;
+                               })
+                               .orElse(false);
     }
 
     private static boolean mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {

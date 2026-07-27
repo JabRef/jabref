@@ -58,23 +58,61 @@ class StudyFetcher {
 
     private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
-            List<BibEntry> fetchResult = new ArrayList<>();
+            List<BibEntry> fetchResult;
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
-                int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
-                for (int page = 0; page < pages; page++) {
-                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
-                }
-                if (fetchResult.size() > limit) {
-                    fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
-                }
+                fetchResult = performPagedSearch(basedFetcher, searchQuery);
             } else {
-                fetchResult = fetcher.performSearch(searchQuery.getQuery());
+                fetchResult = performNonPagedSearch(fetcher, searchQuery);
             }
             return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return Optional.empty();
+        }
+    }
+
+    private Optional<String> getCatalogOverride(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
+        return searchQuery.getCatalogSpecific().entrySet().stream()
+                          .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
+                          .map(Map.Entry::getValue)
+                          .filter(v -> v != null && !v.isBlank())
+                          .findFirst();
+    }
+
+    private List<BibEntry> performPagedSearch(PagedSearchBasedFetcher basedFetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, basedFetcher);
+        int limit = resultLimits.getOrDefault(basedFetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
+        int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
+        List<BibEntry> fetchResult = new ArrayList<>();
+        if (catalogOverride.isPresent()) {
+            try {
+                for (int page = 0; page < pages; page++) {
+                    fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride.get(), page).getContent());
+                }
+            } catch (UnsupportedOperationException e) {
+                throw new FetcherException(basedFetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
+            }
+        } else {
+            for (int page = 0; page < pages; page++) {
+                fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
+            }
+        }
+        if (fetchResult.size() > limit) {
+            fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
+        }
+        return fetchResult;
+    }
+
+    private List<BibEntry> performNonPagedSearch(SearchBasedFetcher fetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, fetcher);
+        if (catalogOverride.isPresent()) {
+            try {
+                return fetcher.performRawSearchQuery(catalogOverride.get());
+            } catch (UnsupportedOperationException e) {
+                throw new FetcherException(fetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
+            }
+        } else {
+            return fetcher.performSearch(searchQuery.getQuery());
         }
     }
 }

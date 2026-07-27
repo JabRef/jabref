@@ -111,7 +111,7 @@ public class Study {
         return maxResultsPerCatalog;
     }
 
-    public void setMaxResultsPerCatalog(Integer maxResultsPerCatalog) {
+    public void setMaxResultsPerCatalog(@Nullable Integer maxResultsPerCatalog) {
         this.maxResultsPerCatalog = maxResultsPerCatalog;
     }
 

@@ -32,4 +32,47 @@ Since some data fetchers take time, we need to open the dialog and wait until al
 
 Needs: impl
 
+## Critical startup failures show an error dialog
+`req~ux.startup.critical-error-dialog~1`
+
+If a critical error occurs before the main window is fully constructed, it must not fail silently.
+The user needs a visible error dialog, in addition to the log entry, since [digging through log files is not accessible to most users](https://github.com/JabRef/jabref/issues/14967).
+
+Needs: impl
+
+## GitHub personal access token verification
+`req~ux.git-share.personal-access-token-verification~1`
+
+The GitHub sharing dialog must allow users to verify that their personal access token has push access to the configured GitHub repository before sharing a library.
+
+Needs: impl
+
+## Git pull with unrelated histories
+`req~ux.git-pull.unrelated-histories~1`
+
+Git pull must support a local library and its configured remote when their commit histories have no common ancestor.
+
+Needs: impl
+
+## Git push to an empty remote
+`req~ux.git-push.empty-remote~1`
+
+Git push must publish the current branch and configure its upstream when the configured remote has no branches.
+
+Needs: impl
+
+## Git push rejection reporting
+`req~ux.git-push.rejected-update-reporting~1`
+
+Git push must report a rejected remote update to the user.
+
+Needs: impl
+
+### Activating large libraries keeps entry previews responsive
+`req~ux.active-library.preview-responsiveness~1`
+
+When a user activates a large library, automatic group construction and group-count evaluation must not delay rendering the selected entry preview.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
