@@ -25,6 +25,7 @@ import org.jabref.model.entry.field.FieldTextMapper;
 public class EntryTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
+    private final StringProperty importKeywordDelimitersProperty = new SimpleStringProperty("");
 
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
 
@@ -52,6 +53,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         keywordSeparatorProperty.setValue(bibEntryPreferences.getKeywordSeparator().toString());
+        importKeywordDelimitersProperty.setValue(bibEntryPreferences.getImportKeywordDelimiters());
 
         resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
         resolvableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getResolvableFields()));
@@ -68,6 +70,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         bibEntryPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
+        bibEntryPreferences.importKeywordDelimitersProperty().setValue(importKeywordDelimitersProperty.getValue());
 
         fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
         fieldPreferences.setResolvableFields(resolvableTagsFieldProperty.getValue());
@@ -83,6 +86,10 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return keywordSeparatorProperty;
+    }
+
+    public StringProperty importKeywordDelimitersProperty() {
+        return importKeywordDelimitersProperty;
     }
 
     public BooleanProperty resolveStringsProperty() {

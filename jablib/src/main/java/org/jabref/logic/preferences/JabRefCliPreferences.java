@@ -174,6 +174,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
+    public static final String IMPORT_KEYWORD_DELIMITERS = "importKeywordDelimiters";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
 
@@ -1640,10 +1641,12 @@ public class JabRefCliPreferences implements CliPreferences {
         BibEntryPreferences defaultValues = BibEntryPreferences.getDefault();
 
         bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0));
+                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0),
+                get(IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters()));
 
         bindObject(bibEntryPreferences.keywordSeparatorProperty(), KEYWORD_SEPARATOR, defaultValues.getKeywordSeparator(),
                 String::valueOf, separator -> separator.charAt(0));
+        bindString(bibEntryPreferences.importKeywordDelimitersProperty(), IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters());
 
         return bibEntryPreferences;
     }

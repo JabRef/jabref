@@ -21,6 +21,11 @@
         <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0" alignment="CENTER"/>
     </HBox>
 
+    <HBox spacing="10.0" alignment="BASELINE_LEFT">
+        <Label text="%Accepted keyword delimiters on import"/>
+        <TextField fx:id="importKeywordDelimiters" prefWidth="80.0"/>
+    </HBox>
+
     <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Affected fields" wrapText="true"/>

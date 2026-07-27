@@ -32,6 +32,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
     @FXML private TextField keywordSeparator;
+    @FXML private TextField importKeywordDelimiters;
 
     @FXML private CheckBox resolveStrings;
 
@@ -56,6 +57,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         this.viewModel = new EntryTabViewModel(preferences);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+        importKeywordDelimiters.textProperty().bindBidirectional(viewModel.importKeywordDelimitersProperty());
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
         UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {

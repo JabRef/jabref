@@ -10,19 +10,17 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
@@ -36,7 +34,6 @@ public class BibtexImporter extends Importer {
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
-    private static final List<Character> IMPORT_KEYWORD_DELIMITERS = List.of(';', ',');
 
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -130,18 +127,9 @@ public class BibtexImporter extends Importer {
         return result;
     }
 
-    /// [impl->req~import.bibtex.keywords.normalize-delimiters~1]
     /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
     private void normalizeKeywordDelimiters(ParserResult result) {
-        Character separator = Optional.ofNullable(importFormatPreferences.bibEntryPreferences().getKeywordSeparator())
-                                      .orElse(',');
-
-        for (BibEntry entry : result.getDatabase().getEntries()) {
-            entry.getField(StandardField.KEYWORDS).ifPresent(rawKeywords -> {
-                KeywordList importedKeywords = KeywordList.parseImport(rawKeywords, IMPORT_KEYWORD_DELIMITERS);
-                entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
-            });
-        }
+        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences());
     }
 
     @Override
