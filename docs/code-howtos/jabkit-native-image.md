@@ -5,7 +5,7 @@ parent: Code Howtos
 
 JabKit is JabRef's command-line toolkit.
 
-It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit) (which downloads a JRE plus `jablib`). For a command-line tool, JVM start-up is the bottleneck.
+It is currently available as a `jpackage` installer or portable build, each bundling a Java runtime, and through [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit).
 
 [GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) builds JabKit ahead of time into a native executable with reduced startup time.
 
@@ -23,15 +23,13 @@ The metadata comes from three places:
 | --- | --- | --- |
 | [GraalVM Reachability Metadata Repository](https://github.com/oracle/graalvm-reachability-metadata) | Upstream/community | Common third-party libraries |
 | [picocli-generated native-image config](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) | picocli annotation processor | JabKit's command model |
-| `reachability-metadata.json` | JabRef | Gaps not covered by the first two sources |
+| `reachability-metadata.json` | JabRef | Gaps not covered by the first two sources; one file per module |
 
-### Toolchain
-
-The build uses [Liberica NIK Full](#liberica-nik). "Full", because JabKit reaches `java.desktop`/AWT through [PDFBox](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), which requires AWT.
+The build uses [Liberica NIK Full](#liberica-nik).
 
 ### Where the metadata lives
 
-GraalVM auto-discovers metadata on the classpath under a per-artifact path: `META-INF/native-image/<group>/<artifact>/`. We keep each module's metadata under its own module, so JabLib's stays with JabLib:
+GraalVM auto-discovers metadata on the classpath under a per-artifact path: `META-INF/native-image/<group>/<artifact>/`. Each module ships its own file:
 
 ```text
 jabkit/src/main/resources/META-INF/native-image/org.jabref/jabkit/
