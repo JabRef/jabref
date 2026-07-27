@@ -234,7 +234,13 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
-    /// Handles importing a custom CSL style file
+    /// Handles
+    /// importing
+    /// a
+    /// custom
+    /// CSL
+    /// style
+    /// file
     public void addCslStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("%0 file", StandardFileType.CITATION_STYLE.getName()), StandardFileType.CITATION_STYLE)
@@ -377,13 +383,25 @@ public class StyleSelectDialogViewModel {
                 .build();
 
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
+
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
+
+            BstStyle bstStyleToAdd = new BstStyle(stylePath);
+
+            // Check if citation style is duplicate in the list
+            if (isDuplicate(bstStyleToAdd)) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Style already available"),
+                        Localization.lang("The selected BST style is already available in the list.")
+                );
+                return;
+            }
+
             if (bstStyleLoader.addStyleIfValid(stylePath)) {
-                BstStyle added = new BstStyle(stylePath);
-                BstStyleSelectViewModel vm = new BstStyleSelectViewModel(added);
+                BstStyleSelectViewModel vm = new BstStyleSelectViewModel(bstStyleToAdd);
                 bstStyles.add(vm);
                 selectedBstStyle.setValue(vm);
-                openOfficePreferences.setCurrentStyle(added);
+                openOfficePreferences.setCurrentStyle(bstStyleToAdd);
             } else {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid style selected"),
@@ -398,6 +416,15 @@ public class StyleSelectDialogViewModel {
         if (selectedBstStyle.get() != null && selectedBstStyle.get().getBstStyle().equals(style)) {
             selectedBstStyle.setValue(bstStyles.isEmpty() ? null : bstStyles.getFirst());
         }
+    }
+
+    private boolean isDuplicate(BstStyle fileToAdd) {
+        return bstStyleLoader.getStyles().stream()
+                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, fileToAdd));
+    }
+
+    private boolean hasSameStyleName(BstStyle existingStyle, BstStyle styleToAdd) {
+        return existingStyle.getName().equals(styleToAdd.getName());
     }
 
     // endregion
