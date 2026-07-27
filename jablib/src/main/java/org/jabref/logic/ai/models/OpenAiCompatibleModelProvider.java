@@ -3,12 +3,10 @@ package org.jabref.logic.ai.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
-import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.jspecify.annotations.NullMarked;
@@ -35,18 +33,16 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         try {
             String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
-            HttpResponse<JsonNode> response = Unirest.get(modelsEndpoint)
-                                                     .header("Authorization", "Bearer " + apiKey)
-                                                     .header("accept", "application/json")
-                                                     .asJson();
 
-            if (response.getStatus() == 200) {
-                models = parseModelsFromResponse(response.getBody());
-                LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
-            } else {
-                LOGGER.error("Failed to fetch models from {} (status: {})", aiProvider.name(), response.getStatus());
-            }
-        } catch (UnirestException e) {
+            URLDownload urlDownload = new URLDownload(modelsEndpoint);
+            urlDownload.addHeader("Authorization", "Bearer " + apiKey);
+            urlDownload.addHeader("accept", "application/json");
+
+            String response = urlDownload.asString();
+            models = parseModelsFromResponse(new JsonNode(response));
+
+            LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
+        } catch (Exception e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
 
