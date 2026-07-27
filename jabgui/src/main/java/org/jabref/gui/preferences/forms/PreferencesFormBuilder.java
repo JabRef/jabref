@@ -58,8 +58,6 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings. It
 /// replaces the FXML + controller pair: each call creates a control, binds it to a view-model
@@ -89,7 +87,6 @@ import org.slf4j.LoggerFactory;
 /// applied per control once that control reaches a scene, which is when ControlsFX can position it.
 @NullMarked
 public class PreferencesFormBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesFormBuilder.class);
 
     private static final double SHORT_FIELD_WIDTH = 100.0;
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
@@ -174,9 +171,7 @@ public class PreferencesFormBuilder {
         // Consent and explanation labels run long; wrapping is never wrong for a short one.
         checkBox.setWrapText(true);
         checkBox.selectedProperty().bindBidirectional(value);
-        HBox row = new HBox(DEFAULT_GAP, checkBox);
-        row.setAlignment(Pos.CENTER_LEFT);
-        addNode(row);
+        addNode(row(checkBox));
         return configured(new InputElement<>(this, checkBox), config);
     }
 
@@ -329,15 +324,13 @@ public class PreferencesFormBuilder {
         searchable(text, radio);
         radio.setToggleGroup(currentToggleGroup);
         radio.selectedProperty().bindBidirectional(selected);
-        HBox row = new HBox(DEFAULT_GAP, radio);
-        row.setAlignment(Pos.CENTER_LEFT);
-        addNode(row);
+        addNode(row(radio));
         return configured(new InputElement<>(this, radio), config);
     }
 
     // endregion
 
-    // region text fields
+    // region grid fields
 
     public <T extends Control> PreferencesFormBuilder field(String label, T control) {
         return field(label, control, noConfig());
@@ -351,10 +344,7 @@ public class PreferencesFormBuilder {
     private void addField(@Nullable String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();
-        // Every field sits in a row of its own, so an attachment always has somewhere to go
-        // (see attachTo) — the same shape checkbox(), radio() and stackedField() use.
-        HBox controlRow = new HBox(DEFAULT_GAP, control);
-        controlRow.setAlignment(Pos.CENTER_LEFT);
+        HBox controlRow = row(control);
         HBox.setHgrow(control, Priority.ALWAYS);
         GridPane.setHgrow(controlRow, Priority.ALWAYS);
 
@@ -363,26 +353,6 @@ public class PreferencesFormBuilder {
         }
         grid.add(new Label(label), 0, row);
         grid.add(controlRow, 1, row);
-    }
-
-    private GridPane ensureGrid() {
-        if (currentGrid == null) {
-            currentGrid = new GridPane();
-            currentGrid.setHgap(DEFAULT_GAP);
-            currentGrid.setVgap(DEFAULT_GAP);
-            ColumnConstraints labelColumn = new ColumnConstraints();
-            labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
-            labelColumn.setHalignment(HPos.LEFT);
-            ColumnConstraints controlColumn = new ColumnConstraints();
-            controlColumn.setHgrow(Priority.ALWAYS);
-            currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
-            addToContainer(currentGrid);
-        }
-        return currentGrid;
-    }
-
-    private void flushGrid() {
-        currentGrid = null;
     }
 
     /// A field with the label **above**. No grid alignment allowed.
@@ -396,9 +366,7 @@ public class PreferencesFormBuilder {
         searchable(label, caption);
 
         control.setMaxWidth(Double.MAX_VALUE);
-        // The control gets a row of its own so that attachments have somewhere to go.
-        HBox controlRow = new HBox(DEFAULT_GAP, control);
-        controlRow.setAlignment(Pos.CENTER_LEFT);
+        HBox controlRow = row(control);
         HBox.setHgrow(control, Priority.ALWAYS);
 
         addNode(new VBox(DEFAULT_GAP, caption, controlRow));
@@ -438,7 +406,8 @@ public class PreferencesFormBuilder {
         header.getStyleClass().add("sectionHeader");
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
-        HBox headerRow = new HBox(DEFAULT_GAP, header);
+        HBox headerRow = row(header);
+        // Unlike an element row, a heading and the help button beside it align on their baseline.
         headerRow.setAlignment(Pos.BASELINE_CENTER);
         addNode(headerRow);
 
@@ -541,6 +510,12 @@ public class PreferencesFormBuilder {
         };
     }
 
+    /// Logical OR of two conditions, used to combine disable conditions: an element is disabled
+    /// while *any* of the conditions installed on it holds (see {@link ElementBase#disableWhen}).
+    ///
+    /// Written out rather than using `Bindings.or`, which needs two `ObservableBooleanValue`s;
+    /// these are `ObservableValue<? extends Boolean>`, the type view-model properties and
+    /// `disableProperty()` actually present, and whose value can be `null`.
     private static ObservableValue<Boolean> either(ObservableValue<? extends Boolean> first,
                                                    ObservableValue<? extends Boolean> second) {
         return Bindings.createBooleanBinding(
@@ -548,8 +523,42 @@ public class PreferencesFormBuilder {
                 first, second);
     }
 
-    private @Nullable Pane container() {
-        return containers.peek();
+    /// The two-column grid consecutive labeled fields share, created on first use. Cleared by
+    /// {@link #flushGrid} whenever something that is not a field interrupts the run, so the next
+    /// field starts a fresh grid rather than aligning across the interruption.
+    private GridPane ensureGrid() {
+        if (currentGrid == null) {
+            currentGrid = new GridPane();
+            currentGrid.setHgap(DEFAULT_GAP);
+            currentGrid.setVgap(DEFAULT_GAP);
+            ColumnConstraints labelColumn = new ColumnConstraints();
+            labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
+            labelColumn.setHalignment(HPos.LEFT);
+            ColumnConstraints controlColumn = new ColumnConstraints();
+            controlColumn.setHgrow(Priority.ALWAYS);
+            currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
+            addToContainer(currentGrid);
+        }
+        return currentGrid;
+    }
+
+    private void flushGrid() {
+        currentGrid = null;
+    }
+
+    /// The row an element lives in, and the guarantee {@link #attachTo} reads back out: an element
+    /// placed through one of these can always take attachments, because there is an {@link HBox}
+    /// to append them to. Placements that skip this (see {@link #attachTo}) cannot.
+    private static HBox row(Node content) {
+        HBox row = new HBox(DEFAULT_GAP, content);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    /// The open container: `root` until a {@link #region} pushes one, and never empty, since the
+    /// stack is seeded in the constructor and every push is popped in a `finally`.
+    private Pane container() {
+        return containers.element();
     }
 
     private void addNode(Node node) {
@@ -562,12 +571,10 @@ public class PreferencesFormBuilder {
     /// its own, a column claims nothing up front and the row's whole width is shared out evenly —
     /// column widths therefore do not depend on how long the captions inside them happen to be.
     private void addToContainer(Node node) {
-        Pane container = container();
-        if (container == null) {
-            LOGGER.error("No container present to add node to.");
-            return;
+        if (built) {
+            throw new IllegalStateException("build() was already called; the form is finished and cannot take more elements");
         }
-
+        Pane container = container();
         container.getChildren().add(node);
         if (container instanceof HBox) {
             HBox.setHgrow(node, Priority.ALWAYS);
@@ -594,9 +601,9 @@ public class PreferencesFormBuilder {
             return;
         }
         throw new IllegalStateException(primary.getParent() == null
-                ? "the control has not been placed yet; attach from within its config lambda"
-                : "cannot attach to a control sitting in a " + primary.getParent().getClass().getSimpleName()
-                        + "; only elements the builder wraps in a row of their own take attachments");
+                                        ? "the control has not been placed yet; attach from within its config lambda"
+                                        : "cannot attach to a control sitting in a " + primary.getParent().getClass().getSimpleName()
+                                                + "; only elements the builder wraps in a row of their own take attachments");
     }
 
     private Button helpButton(StandardActions action, HelpFile helpFile) {
