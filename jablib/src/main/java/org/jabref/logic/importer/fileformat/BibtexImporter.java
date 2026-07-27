@@ -122,7 +122,7 @@ public class BibtexImporter extends Importer {
     }
 
     /// This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
-    /// reader manually to the metadata.
+    /// reader manually to the metadata
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
