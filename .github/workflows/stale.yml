@@ -17,6 +17,9 @@ jobs:
   stale:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-slim
+    env:
+      DAYS_BEFORE_PR_STALE: 3
+      DAYS_BEFORE_PR_CLOSE: 7
     steps:
       - uses: actions/stale@v10
         id: stale
@@ -31,13 +34,13 @@ jobs:
           stale-pr-label: "status: stale"
           remove-pr-stale-when-updated: false
 
-          days-before-pr-stale: 10
+          days-before-pr-stale: ${{ env.DAYS_BEFORE_PR_STALE }}
           stale-pr-message: >
-            The requested changes were not addressed for 10 days.
-            Please follow-up in the next 10 days or your PR will be automatically closed.
+            The requested changes were not addressed for ${{ env.DAYS_BEFORE_PR_STALE }} days.
+            Please follow-up in the next ${{ env.DAYS_BEFORE_PR_CLOSE }} days or your PR will be automatically closed.
             You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
 
-          days-before-pr-close: 10
+          days-before-pr-close: ${{ env.DAYS_BEFORE_PR_CLOSE }}
           close-pr-message: >
             This PR is being closed due to continued inactivity.
       - uses: actions/checkout@v7
