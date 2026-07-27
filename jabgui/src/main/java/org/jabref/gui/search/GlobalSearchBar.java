@@ -2,17 +2,21 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
@@ -60,7 +64,10 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.search.inmemory.MatchInformation;
+import org.jabref.logic.search.inmemory.MatchInformation.PartialResult;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
@@ -244,6 +251,10 @@ public class GlobalSearchBar extends HBox {
                 this.stateManager.addSearchHistory(searchField.textProperty().get());
             }
         });
+
+        stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
+            setSearchBarHint();
+        });
     }
 
     private void initSearchModifierButtons() {
@@ -417,14 +428,35 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void setSearchBarHint() {
+        StringBuilder tooltipText = new StringBuilder();
         if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith AND title=electrical</tt>");
-            List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
+            tooltipText.append(Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith AND title=electrical</tt>"));
+        }
+        Set<PartialResult> prs = getPartialResultsForSelectedBibEntry();
+        if (!prs.isEmpty()) {
+            tooltipText.append(Localization.lang("\n\nDetails of match:\n"));
+            for (PartialResult pr : prs) {
+                tooltipText.append(pr.subquery()).append("->").append(Localization.lang(Boolean.toString(pr.isTrue()))).append("\n");
+            }
+        }
+        if (!tooltipText.isEmpty()) {
+            List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(tooltipText.toString());
 
             TextFlow emptyHintTooltip = new TextFlow();
             emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
             searchFieldTooltip.setGraphic(emptyHintTooltip);
         }
+    }
+
+    private Set<PartialResult> getPartialResultsForSelectedBibEntry() {
+        Optional<SearchQuery> sq = stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get();
+        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+        if (sq.isEmpty() || selectedEntries == null || selectedEntries.size() != 1) {
+            return Collections.emptySet();
+        }
+        BibEntry selectedEntry = selectedEntries.getFirst();
+        MatchInformation matchInformation = sq.get().getMatchInformation().get(selectedEntry.getId());
+        return matchInformation != null ? matchInformation.getPartialResults() : Collections.emptySet();
     }
 
     public void setSearchTerm(SearchQuery searchQuery) {

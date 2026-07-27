@@ -1,8 +1,11 @@
 package org.jabref.model.search.query;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
@@ -25,6 +28,7 @@ public class SearchQuery {
     private SearchParser.StartContext context;
     private boolean isValidExpression;
     private SearchResults searchResults;
+    private final Map<String, MatchInformation> matchInformation = new HashMap<>();
 
     public SearchQuery(String searchExpression) {
         this(searchExpression, EnumSet.noneOf(SearchFlags.class));
@@ -66,6 +70,10 @@ public class SearchQuery {
 
     public SearchParser.StartContext getContext() {
         return context;
+    }
+
+    public Map<String, MatchInformation> getMatchInformation() {
+        return matchInformation;
     }
 
     @Override

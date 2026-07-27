@@ -2,6 +2,8 @@ package org.jabref.logic.search.inmemory;
 
 import java.util.List;
 
+import javafx.util.Pair;
+
 import org.jabref.logic.search.LibrarySearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -33,15 +35,21 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
 
     @Override
     public List<BibEntry> getMatches(SearchQuery query) {
-        if (!query.isValid()) {
-            LOGGER.warn("Search failed: invalid search expression '{}'", query.getSearchExpression());
+        if (!validate(query)) {
             return List.of();
-        }
-        if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
-            LOGGER.warn("In-memory searcher does not support FULLTEXT search; matching against metadata only");
         }
         return databaseContext.getDatabase().getEntries().stream()
                               .filter(entry -> matchesParsedQuery(entry, query))
+                              .toList();
+    }
+
+    public List<Pair<BibEntry, MatchInformation>> getDetailedMatches(SearchQuery query) {
+        if (!validate(query)) {
+            return List.of();
+        }
+        return databaseContext.getDatabase().getEntries().stream()
+                              .map(entry -> new Pair<>(entry, getMatchInformation(entry, query)))
+                              .filter(pair -> pair.getValue().getResult())
                               .toList();
     }
 
@@ -57,5 +65,20 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
     private boolean matchesParsedQuery(BibEntry entry, SearchQuery query) {
         return Boolean.TRUE.equals(
                 new BibEntryMatchVisitor(entry, query.getSearchFlags(), keywordSeparator).visit(query.getContext()));
+    }
+
+    private MatchInformation getMatchInformation(BibEntry entry, SearchQuery query) {
+        return new BibEntryDetailedMatchVisitor(entry, query.getSearchFlags(), keywordSeparator).visit(query.getContext());
+    }
+
+    private boolean validate(SearchQuery query) {
+        if (!query.isValid()) {
+            LOGGER.warn("Search failed: invalid search expression '{}'", query.getSearchExpression());
+            return false;
+        }
+        if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
+            LOGGER.warn("In-memory searcher does not support FULLTEXT search; matching against metadata only");
+        }
+        return true;
     }
 }
