@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.Node;
@@ -11,6 +10,7 @@ import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.Nullable;
 
 import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
@@ -25,8 +25,8 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     protected T viewModel;
 
-    /// The builders created via [#form()], kept to serve their texts to the preferences search.
-    private final List<PreferencesFormBuilder> forms = new ArrayList<>();
+    /// The builder created via [#form()], kept to serve its texts to the preferences search.
+    private @Nullable PreferencesFormBuilder form;
 
     protected AbstractPreferenceTabView() {
         this.preferences = Injector.instantiateModelOrService(GuiPreferences.class);
@@ -35,18 +35,20 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
         setSpacing(GAP);
     }
 
-    /// Creates a fresh builder pre-wired with the services needed for section help buttons.
+    /// Creates the tab's builder, pre-wired with the services needed for section help buttons. A tab
+    /// describes itself with one form, so calling this twice would leave the first form's texts
+    /// unreachable to the preferences search.
     protected PreferencesFormBuilder form() {
-        PreferencesFormBuilder form = new PreferencesFormBuilder(dialogService, preferences);
-        forms.add(form);
+        if (form != null) {
+            throw new IllegalStateException("form() was already called; a tab describes itself with one form");
+        }
+        form = new PreferencesFormBuilder(dialogService, preferences);
         return form;
     }
 
     @Override
     public List<SearchableElement> getSearchableElements() {
-        return forms.stream()
-                    .flatMap(form -> form.getSearchableElements().stream())
-                    .toList();
+        return form == null ? List.of() : form.getSearchableElements();
     }
 
     @Override
