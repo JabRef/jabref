@@ -1,0 +1,9 @@
+{
+  "name": "jabext_bridge",
+  "description": "JabRef Browser Extension - fulltext bridge",
+  "path": "@BRIDGE_PATH@",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/"
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "org.tinylog.writers.ConsoleWriter",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "methods": [{ "name": "<init>", "parameterTypes": ["java.util.Map"] }]
+  },
+  {
+    "name": "org.tinylog.writers.FileWriter",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "methods": [{ "name": "<init>", "parameterTypes": ["java.util.Map"] }]
+  }
+]
