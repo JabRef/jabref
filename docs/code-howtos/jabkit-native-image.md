@@ -5,15 +5,13 @@ parent: Code Howtos
 
 JabKit is JabRef's command-line toolkit.
 
-It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit) (which downloads a JRE plus `jablib`). For a command-line tool, **JVM start-up is the bottleneck**.
+It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit) (which downloads a JRE plus `jablib`). For a command-line tool, JVM start-up is the bottleneck.
 
-[GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) turns JabKit into a self-contained executable with a reduced startup time.
-
-The catch is the closed-world assumption: Native Image must know every class, method, and resource the program can use. Anything reached only through **reflection, resources, serialization, dynamic proxies, or JNI** must be declared as **reachability metadata**. Producing that metadata correctly, minimally, and with clear ownership is what most of this page is about.
+[GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) builds JabKit ahead of time into a native executable with reduced startup time.
 
 ## The big picture
 
-Native Image compilation has two inputs: the **code** to compile (JabKit plus everything it pulls in) and the **reachability metadata**. Both meet in the `nativeCompile` task:
+Native Image compilation has two inputs: the **code** to compile (JabKit plus everything it pulls in) and the **reachability metadata**. Metadata covers dynamic behavior that static analysis cannot fully detect, such as reflective library calls, JNI access, and resource lookups. Both meet in the `nativeCompile` task:
 
 ![JabKit native image: code and metadata feeding nativeCompile](../images/jabkit-native-image-overview.png)
 
@@ -35,11 +33,7 @@ The executable is written to `jabkit/build/native/nativeCompile/jabkit`.
 
 ### Toolchain
 
-The build uses [Liberica NIK Full](#liberica-nik). "Full", because JabKit reaches `java.desktop`/AWT through PDFBox, which requires AWT.
-
-### Platform support
-
-CI builds on Linux (`ubuntu-22.04`) and macOS (`macos-15`). The PDF attachment command currently works only on Linux because it uses an AWT path. See [Liberica NIK](#liberica-nik).
+The build uses [Liberica NIK Full](#liberica-nik). "Full", because JabKit reaches `java.desktop`/AWT through [PDFBox](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), which requires AWT.
 
 ## Where the metadata lives
 
@@ -60,23 +54,18 @@ Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.or
 
 ## Adding metadata for a new command
 
-Adding or upgrading a dependency is covered in [Dependency management](dependency-management.md). If that makes the native build fail with a missing reachability entry, this page is where you fix it.
+Adding or upgrading a dependency is covered in [Dependency management](dependency-management.md).
 
-picocli already generates metadata for `@Command` and `@Option` fields. Add only what the command reaches at runtime and static analysis cannot see: reflective library calls, JNI, and resource lookups.
+[picocli](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) already generates metadata for `@Command` and `@Option` fields, so start with the command's runtime path instead of duplicating picocli-generated entries. GraalVM documents automatic metadata collection in [Collect Metadata with the Tracing Agent](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/).
 
-The loop:
+Use this loop for JabKit commands:
 
-1. **Build** the binary: `./gradlew :jabkit:nativeCompile`.
-2. **Run the command's real code path.** `--help` covers startup and is enough for baseline metadata; a new command's data path needs the real invocation with real arguments. Reachability gaps only show up on the code path that uses them.
-3. **Read the failure.** Missing entries surface as `ClassNotFoundException`, `NoSuchMethodException`, a missing-resource error, or `UnsatisfiedLinkError`.
-4. **Add the minimal entry** to the owning module's `reachability-metadata.json`.
-5. Try steps 1 and 2 again. If green continue, else go to 3.
-6. **Lock it in** with a clitest case.
-
-### Two ways to find what is missing
-
-- **Error-driven:** run the binary, read the exception, add one entry, repeat. This is precise and minimal, but slower.
-- **Tracing agent:** run the command under the native-image agent and trim the generated metadata.
+1. Run the command's real code path on the JVM with the tracing agent enabled. `--help` covers startup; a new command's data path needs the real invocation with real arguments.
+2. Copy the relevant generated entries into the owning module's `reachability-metadata.json`; see [Where the metadata lives](#where-the-metadata-lives).
+3. Trim entries that do not belong to the command's runtime path.
+4. **Build** the binary: `./gradlew :jabkit:nativeCompile`.
+5. Run the same command path with the native binary. If it still fails, use GraalVM's [runtime error troubleshooting guide](https://www.graalvm.org/dev/reference-manual/native-image/guides/troubleshoot-run-time-errors/) or rerun the tracing agent on the missing path, then add the next minimal entry.
+6. **Lock it in** with a clitest case; see [Smoke testing](#smoke-testing).
 
 Native Build Tools can run the app under the agent for you:
 
@@ -100,28 +89,13 @@ See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/ref
 
 ## Liberica NIK
 
-### Why not stock GraalVM
+[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches `java.desktop`/AWT.
 
-GraalVM CE and Oracle GraalVM do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)); Red Hat's Mandrel excludes it too. This matters because PDFBox initializes AWT eagerly in `PDDocument`'s static initializer: even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it, and the CE binary dies with `UnsatisfiedLinkError: Can't load library: awt`.
-
-[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support, so it compiles that path. It is FOSS and tracks GraalVM; the cost is an extra vendor dependency.
-
-### Setting it up
-
-Use the **Full** variant, which bundles the AWT native libraries. The Standard package does not. To verify the installation, check that `<nik-home>/lib/libawt.so` exists.
-
-The build has no toolchain pinning: the Native Build Tools plugin uses whichever `native-image` it finds through `GRAALVM_HOME`/`JAVA_HOME`.
-
-- **Locally:** install the Liberica NIK Full package that matches the project's JDK version, and point `GRAALVM_HOME` and `JAVA_HOME` at it.
-- **In CI** (`jabkit-native-smoke-test.yml`): use [`graalvm/setup-graalvm`](https://github.com/graalvm/setup-graalvm#supported-distributions) with `distribution: liberica` (NIK) and `java-package: jdk+fx` (the Full package).
+GraalVM CE, Oracle GraalVM, and Red Hat Mandrel do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)). This matters because [PDFBox initializes AWT eagerly in `PDDocument`'s static initializer](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj): even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it.
 
 ### What the build produces on Linux
 
-The build emits the `jabkit` binary plus companion `.so` files; native-image externalizes the JDK's AWT libraries. Check for `libfreetype.so` as part of that output: GraalVM CE emits `libawt.so` and `libfontmanager.so` too, but its AWT chain is incomplete, so it crashes at runtime. NIK Full completes the chain. Ship the whole `nativeCompile/` directory.
-
-### macOS is a known limitation
-
-Liberica NIK Full fixes the AWT path on **Linux**, verified end-to-end. On **macOS** it does not: the PDF-attachment command crashes loading `libawt_lwawt.dylib`, blocked by [oracle/graal#13272](https://github.com/oracle/graal/issues/13272) (runtime symptom: [oracle/graal#4124](https://github.com/oracle/graal/issues/4124)). The upstream fix landed in GraalVM `master` in May 2026 but is not in any released GraalVM/NIK yet; it should arrive in a future release. Until then, native PDF support on macOS is unavailable, which is why the [PDF smoke test](#smoke-testing) runs on Linux only.
+On Linux, the native build produces the `jabkit` executable and companion `.so` libraries in `jabkit/build/native/nativeCompile/`.
 
 ## Smoke testing
 
@@ -148,9 +122,9 @@ clitest src/test/nativeimage/jabkit-offline.md
 
 ### How to write assertions
 
-- Assert data or exit code, not fragile status text. Check `$?`, or use `grep -c` on a known stable string in the output.
-- Silence expected noise. Add `--porcelain` at the leaf command.
-- If a command has no `--porcelain`, assert the exit code. Commands without `SharedOptions`, such as `preferences export`, cannot take the flag, so check `; echo $?`.
+- Pass `--porcelain` where supported to keep command output script-friendly.
+- Assert exit codes, generated files, or stable machine-readable output.
+- Avoid assertions on logs, progress messages, or warnings written by dependencies.
 
 ### Test files
 
@@ -158,6 +132,6 @@ clitest src/test/nativeimage/jabkit-offline.md
 | --- | --- | --- |
 | `jabkit-offline.md` | Commands needing no network | Linux and macOS |
 | `jabkit-offline-pdf.md` | The PDF/AWT path | Linux only; see [Liberica NIK](#liberica-nik) |
-| `jabkit-online.md` | Commands hitting external APIs | Opt-in with `run-online-tests` |
+| `jabkit-online.md` | Commands hitting external APIs | Opt-in with the `run-jabkit-online-tests` workflow input |
 
-All three files live in `jabkit/src/test/nativeimage/` and run from `jabkit-native-smoke-test.yml`.
+All three files live in `jabkit/src/test/nativeimage/` and run from `.github/workflows/binaries.yml`.
