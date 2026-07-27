@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class ScholarApiFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     ScholarFetcher fetcher = new ScholarFetcher(importerPreferences);
@@ -67,7 +67,7 @@ public class ScholarApiFetcherTest implements SearchBasedFetcherCapabilityTest, 
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = ScholarFetcher.jsonItemToBibEntry(jsonObject);
 
-        assertEquals(Optional.of("846a45f"), bibEntry.getField(new UnknownField("scholarapi-id")));
+        assertEquals(Optional.of("846a45f"), bibEntry.getField(new UnknownField("scholarapi")));
         assertEquals(Optional.of("2023-09-14"), bibEntry.getField(StandardField.DATE));
         assertEquals(Optional.of("2023"), bibEntry.getField(StandardField.YEAR));
         assertEquals(Optional.of("Paraneoplastic pemphigus case study"), bibEntry.getField(StandardField.TITLE));

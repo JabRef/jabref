@@ -2,9 +2,11 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ScholarApiQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScholarApiQueryTransformer.class);
 
@@ -37,7 +39,7 @@ public class ScholarApiQueryTransformer extends YearAndYearRangeByFilteringQuery
 
     @Override
     protected String handleJournal(String journalTitle) {
-        LOGGER.warn("ScholarAPI has no journal scoped search");
-        return "";
+        LOGGER.debug("ScholarAPI has no journal scoped search");
+        return StringUtil.quoteStringIfSpaceIsContained(journalTitle);
     }
 }

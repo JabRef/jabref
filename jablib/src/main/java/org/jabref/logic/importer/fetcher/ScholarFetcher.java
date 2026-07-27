@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -27,6 +30,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -36,15 +40,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyFetcher {
-    public static final String FETCHER_NAME = "Scholar";
+    public static final String FETCHER_NAME = "ScholarAPI";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScholarFetcher.class);
 
     private static final String LIST_URL = "https://scholarapi.net/api/v1/list";
 
+    private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
+
     private final Map<PageKey, String> cursorCacheMap = new ConcurrentHashMap<>();
 
     private final ImporterPreferences importerPreferences;
+
+    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
     public ScholarFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
@@ -65,7 +74,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                     authorsList.add(authors.getString(i));
                 }
                 if (!authorsList.isEmpty()) {
-                    entry.setField(StandardField.AUTHOR, String.join(" and ", authorsList));
+                    entry.withField(StandardField.AUTHOR, String.join(" and ", authorsList));
                 } else {
                     LOGGER.debug("Empty authors array.");
                 }
@@ -73,43 +82,62 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                 LOGGER.debug("No authors found.");
             }
 
-            // direct accessible fields
             entry.withField(StandardField.TITLE, scholarJsonEntry.getString("title"));
             String publishedDate = scholarJsonEntry.getString("published_date");
             String publishedDateOnly = publishedDate.split("T")[0];
             entry.withField(StandardField.DATE, publishedDateOnly);
             entry.withField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
+            entry.withField(new UnknownField("scholarApiHasText"), String.valueOf(scholarJsonEntry.getBoolean("has_text")));
+            entry.withField(new UnknownField("scholarApiHasPdf"), String.valueOf(scholarJsonEntry.getBoolean("has_pdf")));
 
             if (scholarJsonEntry.has("id")) {
-                entry.setField(new UnknownField("scholarapi-id"), scholarJsonEntry.getString("id"));
+                entry.withField(new UnknownField("scholarapi"), scholarJsonEntry.getString("id"));
             }
-            // doi
+
             if (scholarJsonEntry.has("doi")) {
                 entry.withField(StandardField.DOI, scholarJsonEntry.getString("doi"));
             }
-            // Journal issue
+
             if (scholarJsonEntry.has("journal_issue")) {
                 entry.withField(StandardField.NUMBER, scholarJsonEntry.getString("journal_issue"));
             }
-            // Journal pages
+
             if (scholarJsonEntry.has("journal_pages")) {
                 entry.withField(StandardField.PAGES, scholarJsonEntry.getString("journal_pages"));
             }
-            // ISSN
+
             Optional.ofNullable(scholarJsonEntry.optJSONArray("journal_issn")).filter(arr -> !arr.isEmpty()).ifPresent(arr -> entry.withField(StandardField.ISSN, arr.getString(0)));
             // Journal
             if (scholarJsonEntry.has("journal")) {
                 entry.withField(StandardField.JOURNAL, scholarJsonEntry.getString("journal"));
             }
-            // Url
+
+            if (scholarJsonEntry.has("journal_issue")) {
+                String journalIssue = scholarJsonEntry.getString("journal_issue");
+                Matcher volume = JOURNAL_VOLUME.matcher(journalIssue);
+                Matcher issue = JOURNAL_ISSUE_NUMBER.matcher(journalIssue);
+                boolean matchedVolume = volume.find();
+                boolean matchedIssue = issue.find();
+
+                if (matchedVolume) {
+                    entry.withField(StandardField.VOLUME, volume.group(1).trim());
+                }
+                if (matchedIssue) {
+                    entry.withField(StandardField.NUMBER, issue.group(1).trim());
+                }
+                if (!matchedVolume && !matchedIssue) {
+                    entry.withField(StandardField.NUMBER, journalIssue);
+                }
+            }
+
             if (scholarJsonEntry.has("url")) {
                 entry.withField(StandardField.URL, scholarJsonEntry.getString("url"));
             }
-            // Abstract
+
             if (scholarJsonEntry.has("abstract")) {
                 entry.withField(StandardField.ABSTRACT, scholarJsonEntry.getString("abstract"));
             }
-            // Journal publisher
+
             if (scholarJsonEntry.has("journal_publisher")) {
                 entry.withField(StandardField.PUBLISHER, scholarJsonEntry.getString("journal_publisher"));
             }
@@ -135,6 +163,15 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
     }
 
     private Page<BibEntry> fetchPage(String query, int pageNumber, Optional<Integer> startYear, Optional<Integer> endYear) throws FetcherException {
+        if (query.isBlank() && startYear.isEmpty() && endYear.isEmpty()) {
+            return new Page<>(query, pageNumber, List.of());
+        }
+        if (pageNumber == 0) {
+            int keyStartYear = startYear.orElse(NO_YEAR_BOUND);
+            int keyEndYear = endYear.orElse(NO_YEAR_BOUND);
+            cursorCacheMap.keySet().removeIf(key ->
+                    key.query().equals(query) && key.startYear() == keyStartYear && key.endYear() == keyEndYear);
+        }
         URL url;
         try {
             url = buildSearchUrl(query, pageNumber, startYear, endYear);
@@ -145,15 +182,17 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         JSONObject response = callListApi(url);
 
         try {
-            int count = response.optInt("count", 0);
-            boolean isLastPage = count < getPageSize();
+            JSONArray results = response.optJSONArray("results");
+            int resultCount = results == null ? 0 : results.length();
+            boolean isLastPage = resultCount < getPageSize();
 
             if (!isLastPage) {
-                String nextIndexedAfter = response.getString("next_indexed_after");
-                cursorCacheMap.put(new PageKey(query, startYear, endYear, pageNumber + 1), nextIndexedAfter);
+                Optional.ofNullable(response.optString("next_indexed_after", null))
+                        .ifPresent(cursor -> cursorCacheMap.put(
+                                new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
+                                cursor));
             }
 
-            JSONArray results = response.optJSONArray("results");
             List<BibEntry> entries = new ArrayList<>();
             if (results != null) {
                 for (int i = 0; i < results.length(); i++) {
@@ -170,7 +209,9 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private JSONObject callListApi(URL url) throws FetcherException {
         URLDownload urlDownload = new URLDownload(url);
-        importerPreferences.getApiKey(getName()).ifPresent(key -> urlDownload.addHeader("X-API-Key", key));
+        importerPreferences.getApiKey(getName())
+                           .filter(key -> !key.isBlank())
+                           .ifPresent(key -> urlDownload.addHeader("X-API-Key", key));
 
         try (InputStream stream = urlDownload.asInputStream()) {
             return JsonReader.toJsonObject(stream);
@@ -184,8 +225,8 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         try {
             URLDownload urlDownload = new URLDownload(getTestUrl());
             urlDownload.addHeader("X-API-Key", apiKey);
-            urlDownload.asInputStream().close();
-            return true;
+            int statusCode = ((HttpURLConnection) urlDownload.openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
         } catch (IOException | FetcherException e) {
             return false;
         }
@@ -201,7 +242,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
     }
 
     private URL buildSearchUrl(String query, int pageNumber, Optional<Integer> startYear, Optional<Integer> endYear)
-            throws URISyntaxException, MalformedURLException {
+            throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(LIST_URL);
         if (StringUtil.isNotBlank(query)) {
             uriBuilder.setParameter("q", query);
@@ -211,9 +252,9 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         endYear.ifPresent(year -> uriBuilder.addParameter("published_before", (year + 1) + "-01-01"));
 
         if (pageNumber > 0) {
-            String cursor = cursorCacheMap.get(new PageKey(query, startYear, endYear, pageNumber));
+            String cursor = cursorCacheMap.get(new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber));
             if (cursor == null) {
-                throw new URISyntaxException(LIST_URL,
+                throw new FetcherException(
                         "Page " + pageNumber + " was requested before its cursor was available; pages must be fetched sequentially");
             }
             uriBuilder.addParameter("indexed_after", cursor);
@@ -221,6 +262,6 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         return uriBuilder.build().toURL();
     }
 
-    private record PageKey(String query, Optional<Integer> startYear, Optional<Integer> endYear, int pageNumber) {
+    private record PageKey(String query, int startYear, int endYear, int pageNumber) {
     }
 }
