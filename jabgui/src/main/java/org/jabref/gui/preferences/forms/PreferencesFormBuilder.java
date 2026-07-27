@@ -72,11 +72,11 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 ///
 /// ```java
 /// form().section(Localization.lang("HTTP Server"), httpServer -> httpServer
-///               .checkWithField(Localization.lang("Enable HTTP Server on port"),
+///               .checkWithField("Enable HTTP Server on port"), // Note: Localization tests cannot parse comments
 ///                       viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
 ///                       port -> port.validate(viewModel.httpPortValidationStatus()))
 ///               .group(expert -> expert
-///                       .stringField(Localization.lang("API base URL"), viewModel.apiBaseUrlProperty()),
+///                       .stringField("API base URL", viewModel.apiBaseUrlProperty()),
 ///                   expertGroup -> expertGroup.disableWhen(viewModel.disableExpertSettingsProperty())))
 ///       .build();
 /// ```
