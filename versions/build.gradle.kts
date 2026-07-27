@@ -57,7 +57,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
-    api("com.googlecode.plist:dd-plist:1.29")
+    api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.1")
