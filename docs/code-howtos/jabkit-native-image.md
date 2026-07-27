@@ -5,7 +5,7 @@ parent: Code Howtos
 
 JabKit is JabRef's command-line toolkit.
 
-It is currently available as a `jpackage` installer or portable build, each bundling a Java runtime, and through [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit).
+It currently ships as a `jpackage` installer or portable build, both bundling a Java runtime, and can also be run through [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit).
 
 [GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) builds JabKit ahead of time into a native executable with reduced startup time.
 
@@ -43,7 +43,7 @@ Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.or
 
 Metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
 
-### Smoke tests in CI
+### Native smoke test files
 
 | File | Scope | Runs |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ Metadata for a class belongs in that class's module. A reflection entry for a Ja
 | `jabkit-offline-pdf.md` | The PDF/AWT path | Linux only; see [Liberica NIK](#liberica-nik) |
 | `jabkit-online.md` | Commands hitting external APIs | Opt-in with the `run-jabkit-online-tests` workflow input |
 
-All three files live in `jabkit/src/test/nativeimage/` and run from `.github/workflows/binaries.yml`.
+All three files live in `jabkit/src/test/nativeimage/` and are invoked by `.github/workflows/binaries.yml`.
 
 ## How to build and extend it
 
@@ -65,43 +65,22 @@ The executable is written to `jabkit/build/native/nativeCompile/jabkit`.
 
 ### Adding metadata for a new command
 
-Adding or upgrading a dependency is covered in [Dependency management](dependency-management.md).
+This section is about adding a command. For adding or upgrading a dependency, see [Dependency management](dependency-management.md) instead.
 
-[picocli](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) already generates metadata for `@Command` and `@Option` fields, so start with the command's runtime path instead of duplicating picocli-generated entries. GraalVM documents automatic metadata collection in [Collect Metadata with the Tracing Agent](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/).
+[picocli](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) already generates metadata for `@Command` and `@Option` fields, so start with the command's runtime path instead of duplicating picocli-generated entries.
 
 Use this loop for JabKit commands:
 
-1. Run the command's real code path on the JVM with the tracing agent enabled. `--help` covers startup; a new command's data path needs the real invocation with real arguments.
+1. Run the command's real code path on the JVM with the [tracing agent](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) enabled. `--help` covers startup; a new command's data path needs the real invocation with real arguments.
 2. Copy the relevant generated entries into the owning module's `reachability-metadata.json`; see [Where the metadata lives](#where-the-metadata-lives).
 3. Trim entries that do not belong to the command's runtime path.
-4. **Build** the binary: `./gradlew :jabkit:nativeCompile`.
+4. Build the binary: `./gradlew :jabkit:nativeCompile`.
 5. Run the same command path with the native binary. If it still fails, use GraalVM's [runtime error troubleshooting guide](https://www.graalvm.org/dev/reference-manual/native-image/guides/troubleshoot-run-time-errors/) or rerun the tracing agent on the missing path, then add the next minimal entry.
-6. **Lock it in** with a clitest case; see [Smoke testing](#smoke-testing).
+6. Add a clitest case; see [Adding a smoke test](#adding-a-smoke-test).
 
-Native Build Tools can run the app under the agent for you:
+### Adding a smoke test
 
-```shell
-./gradlew :jabkit:run -Pagent --args="check consistency path/to/library.bib"
-```
-
-The agent over-collects: it records everything touched during the run, which is more than your command usually needs. Trim the output to what the command actually requires.
-
-To see why an entry was collected, create the JVM installed distribution and run it with origin tracking enabled:
-
-```shell
-./gradlew :jabkit:installDist
-```
-
-```shell
-JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experimental-configuration-with-origins" \
-  ./jabkit/build/install/jabkit/bin/jabkit --help
-```
-
-See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) documentation for the agent options.
-
-### Smoke testing
-
-A native binary can build and still crash on a code path with missing metadata, so every ported command gets a [clitest](https://github.com/aureliojargas/clitest) case. These tests protect metadata cleanup: after trimming entries, rerun them to catch broken commands.
+A native binary can build and still crash on a code path with missing metadata, so every ported command gets a [clitest](https://github.com/aureliojargas/clitest) case. These tests make metadata cleanup safe: after trimming entries, rerun them to catch broken commands.
 
 clitest reads a Markdown file where `$` lines are run and the lines beneath them are the expected output. Use the files in `jabkit/src/test/nativeimage/` as examples.
 
@@ -121,8 +100,8 @@ clitest src/test/nativeimage/jabkit-offline.md
 
 ### Liberica NIK
 
-[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches [`java.desktop`/AWT from `PDDocument`](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), while stock GraalVM/Mandrel toolchains do not support AWT in native images ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)).
+[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches `java.desktop`/AWT from its `PDDocument` [static initializer](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), while stock GraalVM/Mandrel toolchains do not support AWT in native images ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)).
 
 ### What the build produces on Linux
 
-On Linux, the native build produces the `jabkit` executable and companion `.so` libraries in `jabkit/build/native/nativeCompile/`.
+The build is not a single self-contained file: on Linux the `jabkit` executable ships alongside companion `.so` libraries in `jabkit/build/native/nativeCompile/`.
