@@ -37,6 +37,17 @@ class KeywordImportNormalizerTest {
     }
 
     @Test
+    void normalizeKeywordsCanInferOneDelimiterByPriority() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.KEYWORDS, "keywordOne, keywordTwo; keywordThree");
+
+        KeywordImportNormalizer.normalizeKeywords(entry,
+                new BibEntryPreferences(',', ";,", BibEntryPreferences.ImportDelimiterParsingStrategy.INFER_DELIMITER_BY_PRIORITY));
+
+        assertEquals(List.of("keywordOne, keywordTwo", "keywordThree"), entry.getKeywords(',').stream().map(Keyword::toString).toList());
+    }
+
+    @Test
     void normalizeKeywordsDoesNotSplitConfiguredDelimitersInsideBraces() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.KEYWORDS, "test1; {2,1}; test3");

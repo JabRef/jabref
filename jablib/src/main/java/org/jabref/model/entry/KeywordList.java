@@ -113,6 +113,22 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
+    /// Parses the keyword list by inferring a single delimiter using the given priority order.
+    public static KeywordList parseWithPrioritizedDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(DEFAULT_KEYWORD_DELIMITER) : delimiters;
+        for (Character delimiter : effectiveDelimiters) {
+            KeywordList keywordList = parseWithMultipleDelimiters(keywordString, List.of(delimiter));
+            if (keywordList.size() > 1) {
+                return keywordList;
+            }
+        }
+        return parseWithMultipleDelimiters(keywordString, List.of(DEFAULT_KEYWORD_DELIMITER));
+    }
+
     private static List<String> splitByDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
         List<String> keywordTokens = new ArrayList<>();
         StringBuilder currentToken = new StringBuilder();

@@ -190,6 +190,21 @@ class BibtexImporterTest {
     }
 
     @Test
+    void importCanInferOneDelimiterByPriority() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        BibtexImporter importerWithPriorityInference = createImporter(
+                new BibEntryPreferences(',', ";,", BibEntryPreferences.ImportDelimiterParsingStrategy.INFER_DELIMITER_BY_PRIORITY));
+        List<BibEntry> importedEntries = importerWithPriorityInference.importDatabase(new BufferedReader(Reader.of("""
+                @Article{,
+                  keywords = {keywordOne, keywordTwo; keywordThree},
+                }
+                """))).getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        assertEquals(Optional.of("keywordOne\\, keywordTwo, keywordThree"), importedEntries.getFirst().getField(StandardField.KEYWORDS));
+    }
+
+    @Test
     void importSemicolonSeparatedKeywordsFallsBackToDefaultSeparatorWhenPreferenceIsMissing() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);

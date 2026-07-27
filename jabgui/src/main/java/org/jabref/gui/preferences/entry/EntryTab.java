@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -22,6 +23,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 
@@ -33,6 +35,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     @FXML private TextField keywordSeparator;
     @FXML private TextField importKeywordDelimiters;
+    @FXML private ComboBox<BibEntryPreferences.ImportDelimiterParsingStrategy> importDelimiterParsingStrategy;
 
     @FXML private CheckBox resolveStrings;
 
@@ -58,6 +61,11 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
         importKeywordDelimiters.textProperty().bindBidirectional(viewModel.importKeywordDelimitersProperty());
+        new ViewModelListCellFactory<BibEntryPreferences.ImportDelimiterParsingStrategy>()
+                .withText(viewModel::getImportDelimiterParsingStrategyDisplayName)
+                .install(importDelimiterParsingStrategy);
+        importDelimiterParsingStrategy.setItems(viewModel.importDelimiterParsingStrategies());
+        importDelimiterParsingStrategy.valueProperty().bindBidirectional(viewModel.importDelimiterParsingStrategyProperty());
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
         UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
