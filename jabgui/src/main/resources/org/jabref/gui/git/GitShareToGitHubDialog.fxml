@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DialogPane?>
@@ -64,10 +65,17 @@
                         </tooltip>
                     </Label>
 
+                    <Button
+                            fx:id="checkGitHubAccessButton"
+                            mnemonicParsing="false"
+                            onAction="#checkGitHubAccess"
+                            GridPane.rowIndex="3"
+                            GridPane.columnIndex="1"/>
+
                     <CheckBox
                             fx:id="rememberSettingsCheck"
                             text="%Remember Git settings"
-                            GridPane.rowIndex="3"
+                            GridPane.rowIndex="4"
                             GridPane.columnIndex="1"/>
 
                 </GridPane>
