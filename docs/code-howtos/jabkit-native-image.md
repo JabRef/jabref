@@ -9,7 +9,9 @@ It is currently shipped through `jpackage` (installer and portable build, both b
 
 [GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) builds JabKit ahead of time into a native executable with reduced startup time.
 
-## The big picture
+## Current setup
+
+### The big picture
 
 Native Image compilation has two inputs: the **code** to compile (JabKit plus everything it pulls in) and the **reachability metadata**. Metadata covers dynamic behavior that static analysis cannot fully detect, such as reflective library calls, JNI access, and resource lookups. Both meet in the `nativeCompile` task:
 
@@ -23,19 +25,11 @@ The metadata comes from three places:
 | [picocli-generated native-image config](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) | picocli annotation processor | JabKit's command model |
 | `reachability-metadata.json` | JabRef | Gaps not covered by the first two sources |
 
-## Building the binary
-
-```shell
-./gradlew :jabkit:nativeCompile
-```
-
-The executable is written to `jabkit/build/native/nativeCompile/jabkit`.
-
 ### Toolchain
 
 The build uses [Liberica NIK Full](#liberica-nik). "Full", because JabKit reaches `java.desktop`/AWT through [PDFBox](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj), which requires AWT.
 
-## Where the metadata lives
+### Where the metadata lives
 
 GraalVM auto-discovers metadata on the classpath under a per-artifact path: `META-INF/native-image/<group>/<artifact>/`. We keep each module's metadata under its own module, so JabLib's stays with JabLib:
 
@@ -52,7 +46,27 @@ Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.or
 > [!NOTE]
 > Ownership rule: metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
 
-## Adding metadata for a new command
+### Smoke tests in CI
+
+| File | Scope | Runs |
+| --- | --- | --- |
+| `jabkit-offline.md` | Commands needing no network | Linux and macOS |
+| `jabkit-offline-pdf.md` | The PDF/AWT path | Linux only; see [Liberica NIK](#liberica-nik) |
+| `jabkit-online.md` | Commands hitting external APIs | Opt-in with the `run-jabkit-online-tests` workflow input |
+
+All three files live in `jabkit/src/test/nativeimage/` and run from `.github/workflows/binaries.yml`.
+
+## How to build and extend it
+
+### Building the binary
+
+```shell
+./gradlew :jabkit:nativeCompile
+```
+
+The executable is written to `jabkit/build/native/nativeCompile/jabkit`.
+
+### Adding metadata for a new command
 
 Adding or upgrading a dependency is covered in [Dependency management](dependency-management.md).
 
@@ -87,17 +101,7 @@ JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experime
 
 See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) documentation for the agent options.
 
-## Liberica NIK
-
-[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches `java.desktop`/AWT.
-
-GraalVM CE, Oracle GraalVM, and Red Hat Mandrel do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)). This matters because [PDFBox initializes AWT eagerly in `PDDocument`'s static initializer](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj): even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it.
-
-### What the build produces on Linux
-
-On Linux, the native build produces the `jabkit` executable and companion `.so` libraries in `jabkit/build/native/nativeCompile/`.
-
-## Smoke testing
+### Smoke testing
 
 A native binary can build and still crash on a code path with missing metadata, so every ported command gets a [clitest](https://github.com/aureliojargas/clitest) case. These tests protect metadata cleanup: after trimming entries, rerun them to catch broken commands.
 
@@ -120,18 +124,20 @@ cd jabkit
 clitest src/test/nativeimage/jabkit-offline.md
 ```
 
-### How to write assertions
+#### How to write assertions
 
 - Pass `--porcelain` where supported to keep command output script-friendly.
 - Assert exit codes, generated files, or stable machine-readable output.
 - Avoid assertions on logs, progress messages, or warnings written by dependencies.
 
-### Test files
+## Known limitations
 
-| File | Scope | Runs |
-| --- | --- | --- |
-| `jabkit-offline.md` | Commands needing no network | Linux and macOS |
-| `jabkit-offline-pdf.md` | The PDF/AWT path | Linux only; see [Liberica NIK](#liberica-nik) |
-| `jabkit-online.md` | Commands hitting external APIs | Opt-in with the `run-jabkit-online-tests` workflow input |
+### Liberica NIK
 
-All three files live in `jabkit/src/test/nativeimage/` and run from `.github/workflows/binaries.yml`.
+[BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support. JabKit uses the Full package because PDFBox reaches `java.desktop`/AWT.
+
+GraalVM CE, Oracle GraalVM, and Red Hat Mandrel do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)). This matters because [PDFBox initializes AWT eagerly in `PDDocument`'s static initializer](https://lists.apache.org/thread/dkvct72z2ltjy1cm73z7x23jyfjrnkxj): even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it.
+
+### What the build produces on Linux
+
+On Linux, the native build produces the `jabkit` executable and companion `.so` libraries in `jabkit/build/native/nativeCompile/`.
