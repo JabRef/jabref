@@ -12,6 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
+
 import com.dlsc.unitfx.IntegerInputField;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +23,14 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(ApplicationExtension.class)
 class PreferencesFormBuilderTest {
 
     /// The builder only needs its services for help buttons, which these forms do not use.
     private PreferencesFormBuilder form() {
-        return new PreferencesFormBuilder(null, null);
+        return new PreferencesFormBuilder(mock(DialogService.class), mock(GuiPreferences.class));
     }
 
     private static List<Node> childrenOf(Node node) {
