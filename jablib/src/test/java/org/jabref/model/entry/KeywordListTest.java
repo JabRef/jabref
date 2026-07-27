@@ -104,9 +104,21 @@ class KeywordListTest {
     }
 
     @Test
-    void parseImportPrefersSemicolonOverComma() {
-        assertEquals(new KeywordList("keywordOne, keywordTwo", "keywordThree"),
+    void parseImportSplitsOnAllConfiguredDelimiters() {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"),
                 KeywordList.parseImport("keywordOne, keywordTwo; keywordThree", List.of(';', ',')));
+    }
+
+    @Test
+    void parseImportDoesNotSplitConfiguredDelimitersInsideBraces() {
+        assertEquals(new KeywordList("test1", "{2,1}", "test3"),
+                KeywordList.parseImport("test1; {2,1}; test3", List.of(';', ',')));
+    }
+
+    @Test
+    void parseImportDoesNotSplitEscapedConfiguredDelimiters() {
+        assertEquals(new KeywordList("keyword#one", "keywordTwo"),
+                KeywordList.parseImport("keyword\\#one; keywordTwo", List.of(';', '#')));
     }
 
     @Test

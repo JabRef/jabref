@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -26,12 +27,22 @@ class KeywordImportNormalizerTest {
     }
 
     @Test
-    void normalizeKeywordsUsesConfiguredInputSeparators() {
+    void normalizeKeywordsUsesConfiguredInputDelimiters() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.KEYWORDS, "keywordOne| keywordTwo| keywordThree");
+                .withField(StandardField.KEYWORDS, "keywordOne; keywordTwo# keywordThree");
 
-        KeywordImportNormalizer.normalizeKeywords(entry, new BibEntryPreferences(',', "|#"));
+        KeywordImportNormalizer.normalizeKeywords(entry, new BibEntryPreferences(',', ";#"));
 
         assertEquals("keywordOne, keywordTwo, keywordThree", entry.getField(StandardField.KEYWORDS).orElseThrow());
+    }
+
+    @Test
+    void normalizeKeywordsDoesNotSplitConfiguredDelimitersInsideBraces() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.KEYWORDS, "test1; {2,1}; test3");
+
+        KeywordImportNormalizer.normalizeKeywords(entry, new BibEntryPreferences(',', ";,"));
+
+        assertEquals(List.of("test1", "{2,1}", "test3"), entry.getKeywords(',').stream().map(Keyword::toString).toList());
     }
 }

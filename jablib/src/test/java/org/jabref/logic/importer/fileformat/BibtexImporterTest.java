@@ -145,9 +145,25 @@ class BibtexImporterTest {
     }
 
     @Test
-    void importSemicolonSeparatedKeywordsContainingConfiguredSeparatorEscapesEmbeddedSeparator() throws IOException {
+    void importSplitsOnAllConfiguredInputDelimiters() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
         List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(Reader.of("""
+                @Article{,
+                  keywords = {keywordOne, keywordTwo; keywordThree},
+                }
+                """))).getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        BibEntry importedEntry = importedEntries.getFirst();
+        assertEquals(Optional.of("keywordOne, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
+    }
+
+    @Test
+    void importConfiguredInputDelimitersStillEscapeEmbeddedConfiguredSeparatorWhenItIsNotAcceptedOnImport() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        BibtexImporter importerWithSemicolonOnly = createImporter(new BibEntryPreferences(',', ";#"));
+        List<BibEntry> importedEntries = importerWithSemicolonOnly.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
                   keywords = {keywordOne, keywordTwo; keywordThree},
                 }
@@ -160,12 +176,12 @@ class BibtexImporterTest {
     }
 
     @Test
-    void importConfiguredInputKeywordSeparators() throws IOException {
+    void importConfiguredInputKeywordDelimiters() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
-        BibtexImporter importerWithCustomInputSeparators = createImporter(new BibEntryPreferences(',', "|#"));
+        BibtexImporter importerWithCustomInputSeparators = createImporter(new BibEntryPreferences(',', ";#"));
         List<BibEntry> importedEntries = importerWithCustomInputSeparators.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
-                  keywords = {keywordOne| keywordTwo| keywordThree},
+                  keywords = {keywordOne; keywordTwo# keywordThree},
                 }
                 """))).getDatabase().getEntries();
 

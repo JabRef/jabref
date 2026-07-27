@@ -88,21 +88,64 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
-    /// Parses the keyword list using heuristic delimiter detection for the importing process.
-    /// Tries each delimiter in the provided list in priority order; if none found, falls back to comma.
+    /// Parses the keyword list for the importing process using all configured delimiters.
+    /// Delimiters are recognized only at top level, not when escaped or inside braces.
     ///
     /// @param keywordString a String of keywordChains
     /// @param delimiters    a List of delimiters used for separating the keywords in the importing process
     /// @return a parsed list containing the keywordChains
     public static KeywordList parseImport(@NonNull String keywordString, @NonNull List<Character> delimiters) {
-        for (Character delimiter : delimiters) {
-            KeywordList keywordList = parse(keywordString, delimiter);
-            if (keywordList.size() > 1) {
-                return keywordList;
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(',') : delimiters;
+        List<String> keywordTokens = splitImportKeywords(keywordString, effectiveDelimiters);
+        KeywordList keywordList = new KeywordList();
+        for (String keywordToken : keywordTokens) {
+            parse(keywordToken, '\0').forEach(keywordList::add);
+        }
+        return keywordList;
+    }
+
+    private static List<String> splitImportKeywords(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+        List<String> keywordTokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        AtomicBoolean isEscaping = new AtomicBoolean(false);
+        int braceDepth = 0;
+
+        for (char currentChar : keywordString.toCharArray()) {
+            if (isEscaping.get()) {
+                currentToken.append(currentChar);
+                isEscaping.set(false);
+            } else if (currentChar == Keyword.DEFAULT_ESCAPE_SYMBOL) {
+                currentToken.append(currentChar);
+                isEscaping.set(true);
+            } else if (currentChar == '{') {
+                currentToken.append(currentChar);
+                braceDepth++;
+            } else if (currentChar == '}') {
+                currentToken.append(currentChar);
+                if (braceDepth > 0) {
+                    braceDepth--;
+                }
+            } else if ((braceDepth == 0) && delimiters.contains(currentChar)) {
+                addImportToken(keywordTokens, currentToken);
+            } else {
+                currentToken.append(currentChar);
             }
         }
-        // Falls back to comma if none of the delimiters are found.
-        return parse(keywordString, ',');
+
+        addImportToken(keywordTokens, currentToken);
+        return keywordTokens;
+    }
+
+    private static void addImportToken(List<String> keywordTokens, StringBuilder currentToken) {
+        String keywordToken = currentToken.toString().trim();
+        if (!keywordToken.isEmpty()) {
+            keywordTokens.add(keywordToken);
+        }
+        currentToken.setLength(0);
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
