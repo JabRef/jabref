@@ -21,6 +21,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,7 +49,7 @@ class BibtexImporterTest {
         importer = createImporter(',');
     }
 
-    private BibtexImporter createImporter(char keywordSeparator) {
+    private BibtexImporter createImporter(@Nullable Character keywordSeparator) {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(keywordSeparator);
         return new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
@@ -156,6 +157,20 @@ class BibtexImporterTest {
         BibEntry importedEntry = importedEntries.getFirst();
         assertEquals(Optional.of("keywordOne\\, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
         assertEquals(new KeywordList("keywordOne, keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
+    }
+
+    @Test
+    void importSemicolonSeparatedKeywordsFallsBackToDefaultSeparatorWhenPreferenceIsMissing() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        BibtexImporter importerWithoutKeywordSeparator = createImporter(null);
+        List<BibEntry> importedEntries = importerWithoutKeywordSeparator.importDatabase(new BufferedReader(Reader.of("""
+                @Article{,
+                  keywords = {keywordOne; keywordTwo},
+                }
+                """))).getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        assertEquals(Optional.of("keywordOne, keywordTwo"), importedEntries.getFirst().getField(StandardField.KEYWORDS));
     }
 
     @Test

@@ -131,16 +131,14 @@ public class BibtexImporter extends Importer {
     /// [impl->req~import.bibtex.keywords.normalize-delimiters~1]
     /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
     private void normalizeKeywordDelimiters(ParserResult result) {
-        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
+        Character separator = Optional.ofNullable(importFormatPreferences.bibEntryPreferences().getKeywordSeparator())
+                                      .orElse(',');
 
         for (BibEntry entry : result.getDatabase().getEntries()) {
-            Optional<String> rawKeywords = entry.getField(StandardField.KEYWORDS);
-            if (rawKeywords.isEmpty()) {
-                continue;
-            }
-
-            KeywordList importedKeywords = KeywordList.parseImport(rawKeywords.get(), IMPORT_KEYWORD_DELIMITERS);
-            entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
+            entry.getField(StandardField.KEYWORDS).ifPresent(rawKeywords -> {
+                KeywordList importedKeywords = KeywordList.parseImport(rawKeywords, IMPORT_KEYWORD_DELIMITERS);
+                entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
+            });
         }
     }
 
