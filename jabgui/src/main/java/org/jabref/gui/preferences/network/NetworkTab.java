@@ -21,7 +21,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -31,6 +30,7 @@ import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
 
 import static javafx.beans.binding.Bindings.not;
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
 
@@ -194,7 +194,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         table.itemsProperty().set(viewModel.customCertificateListProperty());
 
         Button addCertificate = new Button(Localization.lang("Browse for certificate..."));
-        addCertificate.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.ADD_NOBOX));
+        addCertificate.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
         addCertificate.getStyleClass().add("add-certificate");
         addCertificate.setOnAction(_ -> viewModel.addCertificateFile());
         GridPane.setHalignment(addCertificate, HPos.RIGHT);
@@ -235,8 +235,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
 
     private static GridPane threeColumnGrid() {
         GridPane grid = new GridPane();
-        grid.setHgap(10.0);
-        grid.setVgap(10.0);
+        grid.setHgap(GAP);
+        grid.setVgap(GAP);
         for (int i = 0; i < 3; i++) {
             ColumnConstraints constraints = new ColumnConstraints();
             constraints.setHgrow(Priority.SOMETIMES);

@@ -31,7 +31,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BindingsHelper;
@@ -159,7 +158,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
         readOnlyLabel = new Label(Localization.lang("Read only"));
         resetDefaultButton = new Button();
-        resetDefaultButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+        resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetDefaultButton.getStyleClass().addAll("icon-button", "narrow");
         resetDefaultButton.setPrefSize(20.0, 20.0);
         resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
@@ -181,7 +180,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     private Button moveButton(IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button();
-        button.setGraphic(new JabRefIconView(icon, 24));
+        button.setGraphic(icon.withSize(24).getGraphicNode());
         button.getStyleClass().add("icon-button");
         button.setPrefSize(40.0, 40.0);
         button.setOnAction(_ -> action.run());

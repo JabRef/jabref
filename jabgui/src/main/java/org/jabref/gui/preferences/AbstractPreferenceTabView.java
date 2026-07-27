@@ -12,6 +12,8 @@ import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 /// Base class for preference tabs. A tab describes its UI with a {@link PreferencesFormBuilder}
 /// obtained from {@link #form()} and delegates the {@link PreferencesTab} lifecycle to its
 /// view model.
@@ -30,7 +32,7 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
         this.preferences = Injector.instantiateModelOrService(GuiPreferences.class);
         this.dialogService = Injector.instantiateModelOrService(DialogService.class);
         this.taskExecutor = Injector.instantiateModelOrService(TaskExecutor.class);
-        setSpacing(10.0);
+        setSpacing(GAP);
     }
 
     /// Creates a fresh builder pre-wired with the services needed for section help buttons.

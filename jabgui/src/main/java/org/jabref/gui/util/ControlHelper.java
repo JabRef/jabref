@@ -34,6 +34,23 @@ public class ControlHelper {
         return button;
     }
 
+    /// An icon button that also carries its label, as used in the button rows under the editable
+    /// tables ("Add", "Modify", "Remove", ...).
+    public static Button labelledIconButton(JabRefIcon icon, String text, Runnable action) {
+        Button button = new Button(text);
+        button.setGraphic(icon.getGraphicNode());
+        button.setOnAction(_ -> action.run());
+        return button;
+    }
+
+    /// A {@link #labelledIconButton} forced to `prefWidth`, so that the buttons of one row come out
+    /// uniformly wide however long their individual captions are.
+    public static Button labelledIconButton(JabRefIcon icon, String text, double prefWidth, Runnable action) {
+        Button button = labelledIconButton(icon, text, action);
+        button.setPrefWidth(prefWidth);
+        return button;
+    }
+
     /// The compact 20x20 icon button used next to fields and lists (browse, reset, reorder, ...).
     public static Button narrowIconButton(JabRefIcon icon, String tooltip, Runnable action) {
         Button button = new Button();

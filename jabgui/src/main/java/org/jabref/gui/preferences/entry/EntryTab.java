@@ -24,6 +24,8 @@ import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.dlsc.gemsfx.TagsField;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
 
     public EntryTab() {
@@ -102,7 +104,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
                 new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()),
                 markOwnerHelp);
 
-        HBox row = new HBox(10.0, markOwner, markOwnerName, markOwnerOverwrite, markOwnerHelp);
+        HBox row = new HBox(GAP, markOwner, markOwnerName, markOwnerOverwrite, markOwnerHelp);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }

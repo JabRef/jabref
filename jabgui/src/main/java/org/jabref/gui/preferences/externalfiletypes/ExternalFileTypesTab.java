@@ -16,6 +16,8 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 /// Editor for external file types.
 public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFileTypesTabViewModel> {
 
@@ -116,7 +118,7 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
         resetToDefault.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetToDefault.setOnAction(_ -> viewModel.resetToDefaults());
 
-        HBox row = new HBox(10.0, addNewType, resetToDefault);
+        HBox row = new HBox(GAP, addNewType, resetToDefault);
         row.setAlignment(Pos.BASELINE_RIGHT);
         return row;
     }

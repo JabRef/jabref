@@ -12,10 +12,14 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
+
+import static org.jabref.gui.preferences.forms.FormMetrics.BUTTON_WIDTH;
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterTabViewModel> {
 
@@ -67,23 +71,16 @@ public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterT
     }
 
     private Node buildButtonRow() {
-        Button addButton = iconButton(Localization.lang("Add"), IconTheme.JabRefIcons.ADD_NOBOX, viewModel::addImporter);
+        Button addButton = ControlHelper.labelledIconButton(
+                IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("Add"), BUTTON_WIDTH, viewModel::addImporter);
         addButton.setTooltip(new Tooltip(
                 Localization.lang("Add a (compiled) custom Importer class from a class path.")
                         + "\n" + Localization.lang("The path need not be on the classpath of JabRef.")));
 
-        HBox row = new HBox(10.0,
+        HBox row = new HBox(GAP,
                 addButton,
-                iconButton(Localization.lang("Remove"), IconTheme.JabRefIcons.REMOVE_NOBOX, viewModel::removeSelectedImporter));
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REMOVE_NOBOX, Localization.lang("Remove"), BUTTON_WIDTH, viewModel::removeSelectedImporter));
         row.setAlignment(Pos.BASELINE_RIGHT);
         return row;
-    }
-
-    private Button iconButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
-        Button button = new Button(text);
-        button.setPrefWidth(100.0);
-        button.setGraphic(icon.getGraphicNode());
-        button.setOnAction(_ -> action.run());
-        return button;
     }
 }

@@ -33,6 +33,8 @@ import org.jabref.model.ai.llm.AiProvider;
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.unitfx.IntegerInputField;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
@@ -224,10 +226,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         Button resetAll = resetButton(Localization.lang("Reset templates to default"), viewModel::resetTemplates);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox buttons = new HBox(10.0, resetCurrent, spacer, resetAll);
+        HBox buttons = new HBox(GAP, resetCurrent, spacer, resetAll);
         buttons.setAlignment(Pos.CENTER_LEFT);
 
-        return new VBox(10.0, templatesTabPane, buttons);
+        return new VBox(GAP, templatesTabPane, buttons);
     }
 
     /// A template tab; its reset action is carried on the tab itself so that "reset current

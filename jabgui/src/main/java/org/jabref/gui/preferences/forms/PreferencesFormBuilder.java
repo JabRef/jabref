@@ -59,6 +59,8 @@ import org.controlsfx.control.SearchableComboBox;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 /// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings. It
 /// replaces the FXML + controller pair: each call creates a control, binds it to a view-model
 /// property and appends it to the current container.
@@ -90,7 +92,7 @@ public class PreferencesFormBuilder {
 
     private static final double SHORT_FIELD_WIDTH = 100.0;
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
-    private static final double DEFAULT_GAP = 10.0;
+
     private static final double INFO_LABEL_INDENT = 20.0;
 
     private static final double ICON_BUTTON_SIZE = 20.0;
@@ -98,7 +100,7 @@ public class PreferencesFormBuilder {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
 
-    private final VBox root = new VBox(DEFAULT_GAP);
+    private final VBox root = new VBox(GAP);
     private final Deque<Pane> containers = new ArrayDeque<>();
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -369,7 +371,7 @@ public class PreferencesFormBuilder {
         HBox controlRow = row(control);
         HBox.setHgrow(control, Priority.ALWAYS);
 
-        addNode(new VBox(DEFAULT_GAP, caption, controlRow));
+        addNode(new VBox(GAP, caption, controlRow));
         return configured(new InputElement<>(this, control), config);
     }
 
@@ -411,7 +413,7 @@ public class PreferencesFormBuilder {
         headerRow.setAlignment(Pos.BASELINE_CENTER);
         addNode(headerRow);
 
-        return configured(new SectionRegion(this, region(new VBox(DEFAULT_GAP), content), header), config);
+        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
@@ -419,7 +421,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return configured(new FormRegion<>(region(new VBox(DEFAULT_GAP), content)), config);
+        return configured(new FormRegion<>(region(new VBox(GAP), content)), config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -429,7 +431,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
-        return configured(new FormRegion<>(region(new HBox(DEFAULT_GAP), content)), config);
+        return configured(new FormRegion<>(region(new HBox(GAP), content)), config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
@@ -529,8 +531,8 @@ public class PreferencesFormBuilder {
     private GridPane ensureGrid() {
         if (currentGrid == null) {
             currentGrid = new GridPane();
-            currentGrid.setHgap(DEFAULT_GAP);
-            currentGrid.setVgap(DEFAULT_GAP);
+            currentGrid.setHgap(GAP);
+            currentGrid.setVgap(GAP);
             ColumnConstraints labelColumn = new ColumnConstraints();
             labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
             labelColumn.setHalignment(HPos.LEFT);
@@ -550,7 +552,7 @@ public class PreferencesFormBuilder {
     /// placed through one of these can always take attachments, because there is an {@link HBox}
     /// to append them to. Placements that skip this (see {@link #attachTo}) cannot.
     private static HBox row(Node content) {
-        HBox row = new HBox(DEFAULT_GAP, content);
+        HBox row = new HBox(GAP, content);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
@@ -673,7 +675,7 @@ public class PreferencesFormBuilder {
             return self();
         }
 
-        /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#DEFAULT_GAP}).
+        /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#GAP}).
         /// The three cases are the three panes a region is ever made of; see {@link #region}.
         public S spacing(double value) {
             switch (region) {

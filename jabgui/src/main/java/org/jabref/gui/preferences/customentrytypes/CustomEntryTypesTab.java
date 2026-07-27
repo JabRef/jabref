@@ -53,6 +53,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.textfield.TextFields;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
 
     private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
@@ -104,7 +106,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private void buildView() {
         getChildren().add(form()
-                .custom(new HBox(10.0, buildEntryTypesColumn(), buildFieldsColumn()), columns -> columns
+                .custom(new HBox(GAP, buildEntryTypesColumn(), buildFieldsColumn()), columns -> columns
                         .validate(viewModel.entryTypeValidationStatus(), addNewEntryType)
                         .validate(viewModel.fieldValidationStatus(), addNewField))
                 .build());
@@ -125,7 +127,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewEntryTypeButton.setTooltip(new Tooltip(Localization.lang("Add new entry type")));
         addNewEntryTypeButton.setOnAction(_ -> addEntryType());
 
-        VBox column = new VBox(10.0, header, entryTypesTable, new HBox(10.0, addNewEntryType, addNewEntryTypeButton));
+        VBox column = new VBox(GAP, header, entryTypesTable, new HBox(GAP, addNewEntryType, addNewEntryTypeButton));
         column.setPrefWidth(100.0);
         return column;
     }
@@ -145,7 +147,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewFieldButton.setPrefWidth(100.0);
         addNewFieldButton.setOnAction(_ -> addNewField());
 
-        HBox addFieldRow = new HBox(10.0, addNewField, fieldPropertyCheckComboBox, addNewFieldButton);
+        HBox addFieldRow = new HBox(GAP, addNewField, fieldPropertyCheckComboBox, addNewFieldButton);
         addFieldRow.setAlignment(Pos.BASELINE_CENTER);
 
         Button resetButton = new Button(Localization.lang("Reset to default"));
@@ -155,10 +157,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox bottomRow = new HBox(10.0, new VBox(5.0, addFieldRow), spacer, resetButton);
+        HBox bottomRow = new HBox(GAP, new VBox(5.0, addFieldRow), spacer, resetButton);
         bottomRow.setAlignment(Pos.BASELINE_LEFT);
 
-        VBox column = new VBox(10.0, header, fields, bottomRow);
+        VBox column = new VBox(GAP, header, fields, bottomRow);
         HBox.setHgrow(column, Priority.ALWAYS);
         return column;
     }

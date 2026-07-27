@@ -33,6 +33,8 @@ import org.jabref.logic.l10n.Localization;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> {
 
     private final TreeTableView<KeyBindingViewModel> keyBindingsTable = new TreeTableView<>();
@@ -72,7 +74,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
         setUpTable();
 
-        return new VBox(10.0, searchBox, keyBindingsTable);
+        return new VBox(GAP, searchBox, keyBindingsTable);
     }
 
     private void setUpTable() {
@@ -138,7 +140,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         expandAll.setOnAction(_ -> setCategoriesExpanded(true));
         Button collapseAll = new Button(Localization.lang("Collapse all"));
         collapseAll.setOnAction(_ -> setCategoriesExpanded(false));
-        HBox left = new HBox(10.0, expandAll, collapseAll);
+        HBox left = new HBox(GAP, expandAll, collapseAll);
         left.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(left, Priority.ALWAYS);
 
@@ -150,7 +152,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         resetAll.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetAll.setOnAction(_ -> viewModel.resetToDefault());
 
-        HBox right = new HBox(10.0, presetsButton, resetAll);
+        HBox right = new HBox(GAP, presetsButton, resetAll);
         right.setAlignment(Pos.CENTER_RIGHT);
         HBox.setHgrow(right, Priority.ALWAYS);
 

@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.customexporter;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -11,9 +10,13 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
+
+import static org.jabref.gui.preferences.forms.FormMetrics.BUTTON_WIDTH;
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> {
 
@@ -57,19 +60,11 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
     }
 
     private Node buildButtonRow() {
-        HBox row = new HBox(10.0,
-                iconButton(Localization.lang("Add"), IconTheme.JabRefIcons.ADD_NOBOX, viewModel::addExporter),
-                iconButton(Localization.lang("Modify"), IconTheme.JabRefIcons.EDIT, viewModel::modifyExporter),
-                iconButton(Localization.lang("Remove"), IconTheme.JabRefIcons.REMOVE_NOBOX, viewModel::removeExporters));
+        HBox row = new HBox(GAP,
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("Add"), BUTTON_WIDTH, viewModel::addExporter),
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.EDIT, Localization.lang("Modify"), BUTTON_WIDTH, viewModel::modifyExporter),
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REMOVE_NOBOX, Localization.lang("Remove"), BUTTON_WIDTH, viewModel::removeExporters));
         row.setAlignment(Pos.BASELINE_RIGHT);
         return row;
-    }
-
-    private Button iconButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
-        Button button = new Button(text);
-        button.setPrefWidth(100.0);
-        button.setGraphic(icon.getGraphicNode());
-        button.setOnAction(_ -> action.run());
-        return button;
     }
 }

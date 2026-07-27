@@ -21,6 +21,8 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
     private final TableView<MainTableColumnModel> columnsList = new TableView<>();
@@ -91,7 +93,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
         VBox listWithAddRow = new VBox(4.0, columnsList, addRow);
         HBox.setHgrow(listWithAddRow, Priority.ALWAYS);
 
-        VBox reorderButtons = new VBox(10.0,
+        VBox reorderButtons = new VBox(GAP,
                 ControlHelper.narrowIconButton(IconTheme.JabRefIcons.LIST_MOVE_UP, Localization.lang("Sort column one step upwards"), viewModel::moveColumnUp),
                 ControlHelper.narrowIconButton(IconTheme.JabRefIcons.LIST_MOVE_DOWN, Localization.lang("Sort column one step downwards"), viewModel::moveColumnDown),
                 ControlHelper.narrowIconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Update to current column order"), viewModel::fillColumnList));

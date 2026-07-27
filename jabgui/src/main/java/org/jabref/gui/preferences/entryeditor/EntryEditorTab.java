@@ -14,7 +14,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
@@ -67,7 +66,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Button resetTabsButton = new Button();
-        resetTabsButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+        resetTabsButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetTabsButton.getStyleClass().add("icon-button");
         resetTabsButton.setTooltip(new Tooltip(Localization.lang("Reset to default tabs")));
         resetTabsButton.setOnAction(_ -> viewModel.resetToDefaults());

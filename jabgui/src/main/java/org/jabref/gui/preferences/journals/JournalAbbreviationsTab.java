@@ -39,6 +39,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
 /// Tab for managing journal abbreviation lists.
 public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> {
 
@@ -116,7 +118,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         setUpTable();
         setBindings();
 
-        return new VBox(10.0, searchBox, journalAbbreviationsTable);
+        return new VBox(GAP, searchBox, journalAbbreviationsTable);
     }
 
     private void setUpTable() {
@@ -188,7 +190,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         addAbbreviationButton.disableProperty().bind(viewModel.isEditableAndRemovableProperty().not());
         addAbbreviationButton.setOnAction(_ -> addAbbreviation());
 
-        HBox row = new HBox(10.0, addAbbreviationButton);
+        HBox row = new HBox(GAP, addAbbreviationButton);
         row.setAlignment(Pos.BASELINE_RIGHT);
         return row;
     }

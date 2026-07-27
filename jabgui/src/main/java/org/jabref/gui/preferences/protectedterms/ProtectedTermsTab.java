@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.protectedterms;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -18,6 +17,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
@@ -25,6 +25,8 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 
 import com.airhacks.afterburner.injection.Injector;
+
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 /// Tab for managing term list files.
 public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> {
@@ -114,19 +116,13 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     }
 
     private Node buildButtonRow() {
-        HBox row = new HBox(10.0);
+        // These two captions are full sentences, so unlike the other button rows they are left to
+        // size themselves rather than being forced to a uniform width.
+        HBox row = new HBox(GAP,
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.OPEN_LIST, Localization.lang("Add protected terms file"), viewModel::addFile),
+                ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("New protected terms file"), viewModel::createNewFile));
         row.setAlignment(Pos.BASELINE_RIGHT);
-        row.getChildren().addAll(
-                iconButton(Localization.lang("Add protected terms file"), IconTheme.JabRefIcons.OPEN_LIST, viewModel::addFile),
-                iconButton(Localization.lang("New protected terms file"), IconTheme.JabRefIcons.ADD_NOBOX, viewModel::createNewFile));
         return row;
-    }
-
-    private Button iconButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
-        Button button = new Button(text);
-        button.setGraphic(icon.getGraphicNode());
-        button.setOnAction(_ -> action.run());
-        return button;
     }
 
     private ContextMenu createContextMenu(ProtectedTermsListItemModel file) {
