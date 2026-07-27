@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TextBasedPreviewLayoutTest {
-    
+class TextBasedPreviewLayoutTest {
+
     private final LayoutFormatterPreferences layoutFormatterPreferences = LayoutFormatterPreferences.getDefault();
     private final JournalAbbreviationRepository abbreviationRepository = new JournalAbbreviationRepository();
 
@@ -44,7 +44,7 @@ public class TextBasedPreviewLayoutTest {
         TextBasedPreviewLayout first = new TextBasedPreviewLayout("First", "some text", layoutFormatterPreferences, abbreviationRepository);
         TextBasedPreviewLayout second = new TextBasedPreviewLayout("Second", "some text", layoutFormatterPreferences, abbreviationRepository);
         assertEquals("First", first.getName());
-        assertEquals("second", second.getName());
+        assertEquals("Second", second.getName());
     }
 
     @Test

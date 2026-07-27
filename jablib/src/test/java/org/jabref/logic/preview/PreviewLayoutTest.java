@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class PreviewLayoutTest {
+class PreviewLayoutTest {
     
     private final LayoutFormatterPreferences layoutFormatterPreferences = LayoutFormatterPreferences.getDefault();
     private final JournalAbbreviationRepository abbreviationRepository = new JournalAbbreviationRepository();
@@ -19,11 +19,12 @@ public class PreviewLayoutTest {
 
     @Test
     void ofFindsCustomLayoutByName() {
-       TextBasedPreviewLayout myStyle = new TextBasedPreviewLayout("My Style", "some text", layoutFormatterPreferences, abbreviationRepository);
-       List<TextBasedPreviewLayout> customLayouts = List.of(myStyle);
-       PreviewLayout result = PreviewLayout.of("My Style", customLayouts, List.of(), layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
-       
-       assertSame(myStyle, result);
+
+        TextBasedPreviewLayout myStyle = new TextBasedPreviewLayout("My Style", "some text", layoutFormatterPreferences, abbreviationRepository);
+        List<TextBasedPreviewLayout> customLayouts = List.of(myStyle);
+        PreviewLayout result = PreviewLayout.of("My Style", customLayouts, List.of(), layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
+
+        assertSame(myStyle, result);
     }
 
     @Test
@@ -37,7 +38,7 @@ public class PreviewLayoutTest {
     }
 
     @Test
-    void ofReturnsNullForUknownStyle() {
+    void ofReturnsNullForUnknownStyle() {
         TextBasedPreviewLayout myStyle = new TextBasedPreviewLayout("My Style", "some text", layoutFormatterPreferences, abbreviationRepository);
         List<TextBasedPreviewLayout> customLayouts = List.of(myStyle);
         PreviewLayout result = PreviewLayout.of("Nonexistent Style", customLayouts, List.of(), layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
