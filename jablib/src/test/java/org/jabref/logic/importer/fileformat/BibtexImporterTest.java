@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -131,7 +131,7 @@ class BibtexImporterTest {
     @Test
     void importSemicolonSeparatedKeywordsUsesConfiguredSeparator() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
-        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(new StringReader("""
+        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
                   keywords = {keywordOne; keywordTwo; keywordThree},
                 }
@@ -146,7 +146,7 @@ class BibtexImporterTest {
     @Test
     void importSemicolonSeparatedKeywordsContainingConfiguredSeparatorEscapesEmbeddedSeparator() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
-        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(new StringReader("""
+        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
                   keywords = {keywordOne, keywordTwo; keywordThree},
                 }
