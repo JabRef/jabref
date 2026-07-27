@@ -1,8 +1,10 @@
 package org.jabref.logic.ai.models;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
@@ -31,9 +33,9 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         List<String> models = List.of();
 
-        try {
-            String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
+        String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
 
+        try {
             URLDownload urlDownload = new URLDownload(modelsEndpoint);
             urlDownload.addHeader("Authorization", "Bearer " + apiKey);
             urlDownload.addHeader("accept", "application/json");
@@ -42,7 +44,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
             models = parseModelsFromResponse(new JsonNode(response));
 
             LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
-        } catch (Exception e) {
+        } catch (FetcherException | MalformedURLException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
 
