@@ -43,8 +43,8 @@ jablib/src/main/resources/META-INF/native-image/org.jabref/jablib/
 
 Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) schema, one file with `reflection`, `resources`, and `bundles` sections (JNI is expressed as a `jniAccessible` flag on reflection entries).
 
-> [!NOTE]
-> Ownership rule: metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
+{: .note }
+Ownership rule: metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
 
 ### Smoke tests in CI
 
@@ -89,15 +89,19 @@ Native Build Tools can run the app under the agent for you:
 
 The agent over-collects: it records everything touched during the run, which is more than your command usually needs. Trim the output to what the command actually requires.
 
-To see why an entry was collected, run the installed binary with origin tracking enabled:
+To see why an entry was collected, create the JVM installed distribution and run it with origin tracking enabled:
+
+```shell
+./gradlew :jabkit:installDist
+```
 
 ```shell
 JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experimental-configuration-with-origins" \
   ./jabkit/build/install/jabkit/bin/jabkit --help
 ```
 
-> [!NOTE]
-> **Minimal wins.** Add the narrowest entry that fixes the failure: the constructor named by the error, the single missing resource glob, or the specific JNI access required. Small entries are reviewable and make it clear why each line exists. Use the existing entries in `reachability-metadata.json` as templates for the JSON shape.
+{: .note }
+**Minimal wins.** Add the narrowest entry that fixes the failure: the constructor named by the error, the single missing resource glob, or the specific JNI access required. Small entries are reviewable and make it clear why each line exists. Use the existing entries in `reachability-metadata.json` as templates for the JSON shape.
 
 See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) documentation for the agent options.
 
@@ -105,17 +109,7 @@ See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/ref
 
 A native binary can build and still crash on a code path with missing metadata, so every ported command gets a [clitest](https://github.com/aureliojargas/clitest) case. These tests protect metadata cleanup: after trimming entries, rerun them to catch broken commands.
 
-clitest reads a Markdown file where `$` lines are run and the lines beneath them are the expected output:
-
-```console
-$ JABKIT=build/native/nativeCompile/jabkit
-$ "$JABKIT" check consistency --porcelain --input=src/test/resources/testbib/origin.bib 2>/dev/null; echo $?
-0
-$ "$JABKIT" convert --porcelain --input=src/test/resources/testbib/origin.bib --output=build/tmp/convert.bib 2>/dev/null; echo $?
-0
-$ grep -c "@Book{" build/tmp/convert.bib
-3
-```
+clitest reads a Markdown file where `$` lines are run and the lines beneath them are the expected output. Use the files in `jabkit/src/test/nativeimage/` as examples.
 
 Run a file with:
 
