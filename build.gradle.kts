@@ -1,16 +1,16 @@
 plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
-    id("org.openrewrite.rewrite") version "7.31.0"
-    id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.cyclonedx.bom") version "3.2.4"
+    id("org.openrewrite.rewrite") version "7.37.0"
+    id("org.itsallcode.openfasttrace") version "3.1.2"
+    id("org.cyclonedx.bom") version "3.3.0"
 }
 
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.29.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.35.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -51,6 +51,18 @@ requirementTracing {
             "jabsrv/src/test/java"
         )
     )
+
+    filteredArtifactTypes =
+        listOf(
+            "impl",
+            "utest",
+            "model",
+            "guard",
+            "pp",
+            "feat",
+            "req"
+        )
+
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 

@@ -75,7 +75,7 @@
         <TextField fx:id="unwantedCharacters"
                 GridPane.columnIndex="1" GridPane.rowIndex="8"/>
 
-        <CheckBox fx:id="transliterateFieldsForCitationKey" text="%Transliterate fields for citation key"
+        <CheckBox fx:id="transliterateFieldsForCitationKey" text="%Transliterate fields that are used for generating the citation key"
                 GridPane.columnIndex="0" GridPane.rowIndex="9"/>
     </GridPane>
 

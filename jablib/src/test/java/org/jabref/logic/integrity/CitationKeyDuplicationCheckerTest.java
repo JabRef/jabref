@@ -40,7 +40,7 @@ class CitationKeyDuplicationCheckerTest {
         CitationKeyDuplicationChecker checker = new CitationKeyDuplicationChecker(bibDatabase);
 
         List<IntegrityMessage> expected = List.of(
-                new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));
+                new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, InternalField.KEY_FIELD));
         assertEquals(expected, checker.check(entry));
     }
 }

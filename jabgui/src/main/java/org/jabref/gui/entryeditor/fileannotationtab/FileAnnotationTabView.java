@@ -94,7 +94,8 @@ public class FileAnnotationTabView {
         Label date = new Label(annotation.getDate());
         Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
-        marking.setStyle("-fx-font-size: 0.75em; -fx-font-weight: bold");
+        marking.setStyle("-fx-font-size: 0.75em;");
+        marking.getStyleClass().add("bold");
         marking.setMaxHeight(30);
 
         Tooltip markingTooltip = new Tooltip(annotation.getMarking());

@@ -33,11 +33,6 @@ public class NameDisplayPreferences {
         return new NameDisplayPreferences();
     }
 
-    public void setAll(NameDisplayPreferences preferences) {
-        this.displayStyle.set(preferences.displayStyle.get());
-        this.abbreviationStyle.set(preferences.abbreviationStyle.get());
-    }
-
     public DisplayStyle getDisplayStyle() {
         return displayStyle.get();
     }

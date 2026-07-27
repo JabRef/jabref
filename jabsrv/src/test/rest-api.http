@@ -13,7 +13,28 @@ GET http://localhost:23119
 GET http://localhost:23119/libraries
 Accept: application/json
 
-## demo cases
+### Query entries across all open libraries (single query)
+
+// Each query is a Search.g4 expression. The DOI below is present in the bundled demo (Chocolate.bib),
+// so this returns a match when the server is started without a library file.
+
+POST http://localhost:23119/libraries:query
+Content-Type: application/json
+
+{
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\""]
+}
+
+### Query entries across all open libraries (multiple queries, results returned in input order)
+
+POST http://localhost:23119/libraries:query
+Content-Type: application/json
+
+{
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\"", "title = \"chocolate\""]
+}
+
+### demo cases
 
 // JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
 
@@ -61,69 +82,33 @@ Accept: text/html
 GET http://localhost:23119/libraries/demo/entries/Corti_2009
 Accept: text/plain
 
-## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
+### Get BibTeX of Chocolate.bib
 
-### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
-
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex
 
-### Get JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+### Get JSON of Chocolate.bib
 
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/json
 
-### Get CSL JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+### Get CSL JSON of Chocolate.bib
 
-// if you have checked out the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of your first opened library using CSL JSON
-
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex-library-csl+json
 
-## Error cases
+###
+
+# Error Cases
 
 ### GET not available library
 
 GET http://localhost:23119/libraries/notfound
 
-## Creation
+### GET HTML entry preview for unknown citation key (404; key is HTML-escaped in the message)
 
-JabRef offers `current` for the currently selected tab
+// The citation key below is `<script>alert(1)</script>` URL-encoded. The 404 body is served
+// as text/html, so the key is HTML-escaped (`&lt;script&gt;...`) and not reflected as raw markup.
 
-### Add BibTeX to current library
-
-// Works in UI mode only
-
-POST http://localhost:23119/libraries/current/entries
-Content-Type: application/x-bibtex
-
-@article{demo,
-  title = {Added by REST}
-}
-
-### Import RIS to current library
-
-// Works in UI mode only
-
-POST http://localhost:23119/libraries/current/entries
-Content-Type: application/x-research-info-systems
-
-TY  - CHAP
-PY  - 2015
-Y1  - 2015/09/10
-Y2  - 2015/11/06
-M1  - 0
-DO  - doi:10.1201/b19107-2
-UR  - http://dx.doi.org/10.1201/b19107-2
-N1  - doi:10.1201/b19107-2
-AU  - Catarina Barata
-AU  - MEmre Celebi
-AU  - JorgeS Marques
-SP  - 1-22
-TI  - Toward a Robust Analysis of Dermoscopy Images Acquired under Different Conditions
-T2  - Dermoscopy Image Analysis
-T3  - Digital Imaging and Computer Vision
-SN  - 978-1-4822-5326-9
-PB  - CRC Press
-ER  -
+GET http://localhost:23119/libraries/demo/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E
+Accept: text/html

@@ -19,6 +19,7 @@ concurrency:
 
 permissions:
   actions: write
+  contents: read
 
 jobs:
   build:
@@ -57,7 +58,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: 'true'

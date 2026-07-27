@@ -38,7 +38,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
 
         if (!Objects.equals(key, generatedKey)) {
             return List.of(new IntegrityMessage(
-                    Localization.lang("Citation key deviates from generated key"), entry, InternalField.KEY_FIELD));
+                    Localization.lang("Citation key deviates from generated key %0", generatedKey), entry, InternalField.KEY_FIELD));
         }
 
         return List.of();

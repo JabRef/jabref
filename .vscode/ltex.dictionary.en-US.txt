@@ -9,3 +9,11 @@ OpenFastTrace
 OpenRewrite
 Temurin
 jpackage
+impl
+utest
+dsn
+summarizator
+HuggingFace
+vLLM
+Ollama
+de-facto

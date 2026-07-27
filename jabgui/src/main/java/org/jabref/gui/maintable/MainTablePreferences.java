@@ -29,13 +29,6 @@ public class MainTablePreferences {
         return new MainTablePreferences();
     }
 
-    public void setAll(MainTablePreferences preferences) {
-        this.columnPreferences.setColumns(preferences.getColumnPreferences().getColumns());
-        this.columnPreferences.setColumnSortOrder(preferences.getColumnPreferences().getColumnSortOrder());
-        this.setResizeColumnsToFit(preferences.getResizeColumnsToFit());
-        this.setExtraFileColumnsEnabled(preferences.getExtraFileColumnsEnabled());
-    }
-
     public ColumnPreferences getColumnPreferences() {
         return columnPreferences;
     }

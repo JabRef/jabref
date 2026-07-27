@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 /// Tab displaying article recommendations based on the currently selected BibEntry
 public class RelatedArticlesTab extends EntryEditorTab {
 
-    public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
 
     private final DialogService dialogService;
@@ -62,7 +61,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
         this.preferences = preferences;
 
-        setText(Localization.lang("Related articles"));
+        setText(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES.displayName());
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
@@ -226,7 +225,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.getChildren().addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
         vb.setSpacing(10);
 
-        button.setOnAction(event -> {
+        button.setOnAction(_ -> {
             MrDlibPreferences mrDlibPreferences = preferences.getMrDlibPreferences();
             mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
@@ -236,8 +235,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        hideTab.setOnAction(event -> {
-            preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
+        hideTab.setOnAction(_ -> {
+            preferences.getEntryEditorPreferences().setTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES, false);
         });
 
         hbox.getChildren().addAll(button, hideTab);
@@ -245,12 +244,6 @@ public class RelatedArticlesTab extends EntryEditorTab {
         root.setContent(vbox);
 
         return root;
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        return entryEditorPreferences.shouldShowRecommendationsTab();
     }
 
     @Override

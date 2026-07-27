@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @FetcherTest
 class PicaXmlParserTest {
@@ -64,5 +67,17 @@ class PicaXmlParserTest {
             assertEquals(Optional.of("Word1 word2"), entries.get(3).getField(StandardField.SUBTITLE));
             assertEquals(Optional.of("Word1 word2"), entries.get(4).getField(StandardField.SUBTITLE));
         }
+    }
+
+    @Test
+    void rejectsDocumentTypeDeclarations() {
+        String xmlWithDoctype = """
+                <!DOCTYPE response [<!ENTITY entity SYSTEM "file:///not-accessed">]>
+                <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/"/>
+                """;
+
+        PicaXmlParser parser = new PicaXmlParser();
+
+        assertThrows(ParseException.class, () -> parser.parseEntries(new ByteArrayInputStream(xmlWithDoctype.getBytes(StandardCharsets.UTF_8))));
     }
 }

@@ -50,6 +50,7 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("ISO 690", "iso690txt", "iso690", "iso690txt", StandardFileType.TXT, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("Endnote", "endnote", "EndNote", "endnote", StandardFileType.TXT, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("OpenOffice/LibreOffice CSV", "oocsv", "openoffice-csv", "openoffice", StandardFileType.CSV, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter("CSV", "csv", "csv", "csv", StandardFileType.CSV, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("RIS", "ris", "ris", "ris", StandardFileType.RIS, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
         exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));

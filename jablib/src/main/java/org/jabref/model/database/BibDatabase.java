@@ -331,8 +331,8 @@ public class BibDatabase {
     }
 
     /// Returns the string with the given id.
-    public BibtexString getString(String id) {
-        return bibtexStrings.get(id);
+    public Optional<BibtexString> getString(String id) {
+        return Optional.ofNullable(bibtexStrings.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -544,8 +544,50 @@ public class BibDatabase {
         }
     }
 
+    private void updateCitationIndexForFieldChange(FieldChangedEvent event) {
+        Field field = event.getField();
+        // check if field changed was single entry or multiple entry link
+        boolean isLinkedField = field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
+                field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK);
+
+        if (isLinkedField) {
+            BibEntry entry = event.getBibEntry();
+            String oldValue = event.getOldValue();
+            String newValue = event.getNewValue();
+
+            // split the old multiple key string into individual keys and remove the entry from all old keys
+            if (!StringUtil.isBlank(oldValue)) {
+                for (String rawKey : oldValue.split(",")) {
+                    if (!StringUtil.isBlank(rawKey)) {
+                        String oldKey = rawKey.trim();
+                        Set<BibEntry> referenceEntries = citationIndex.get(oldKey);
+                        if (referenceEntries != null) {
+                            // remove entry using unique id to prevent duplicate child entries
+                            // due to changed hashcodes when field in child is changed
+                            referenceEntries.removeIf(referenceEntry -> referenceEntry.getId().equals(entry.getId()));
+                            if (referenceEntries.isEmpty()) {
+                                citationIndex.remove(oldKey);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // split the new multiple key string into individual keys and add the entry to all new keys
+            if (!StringUtil.isBlank(newValue)) {
+                for (String rawKey : newValue.split(",")) {
+                    if (!StringUtil.isBlank(rawKey)) {
+                        String newKey = rawKey.trim();
+                        citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
+                    }
+                }
+            }
+        }
+    }
+
     @Subscribe
     private void relayEntryChangeEvent(FieldChangedEvent event) {
+        updateCitationIndexForFieldChange(event);
         eventBus.post(event);
     }
 
@@ -607,7 +649,7 @@ public class BibDatabase {
     /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
-    public int indexOf(BibEntry bibEntry) {
+    public int indexOf(@NonNull BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
         if (index >= 0) {
             return index;
@@ -616,8 +658,8 @@ public class BibDatabase {
         return -1;
     }
 
-    public BibEntry getEntryById(String id) {
-        return entriesId.get(id);
+    public Optional<BibEntry> getEntryById(String id) {
+        return Optional.ofNullable(entriesId.get(id));
     }
 
     @Override

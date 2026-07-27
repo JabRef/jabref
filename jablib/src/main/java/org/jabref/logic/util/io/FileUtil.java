@@ -79,11 +79,16 @@ public class FileUtil {
     ///
     /// @return the extension (without leading dot), trimmed and in lowercase.
     public static Optional<String> getFileExtension(@NonNull String fileName) {
-        Path realFileName = Path.of(fileName.trim()).getFileName();
-        if (realFileName == null) {
-            return Optional.empty();
+        String realFileNameString;
+        try {
+            Path realFileName = Path.of(fileName.trim()).getFileName();
+            if (realFileName == null) {
+                return Optional.empty();
+            }
+            realFileNameString = realFileName.toString();
+        } catch (InvalidPathException e) {
+            realFileNameString = FilenameUtils.getName(fileName.trim());
         }
-        String realFileNameString = realFileName.toString();
         String extension = FilenameUtils.getExtension(realFileNameString);
         if (StringUtil.isNullOrEmpty(extension)) {
             return Optional.empty();
@@ -114,7 +119,7 @@ public class FileUtil {
         try {
             path = Path.of(fileName.trim());
         } catch (InvalidPathException e) {
-            return fileName;
+            return FilenameUtils.getBaseName(FilenameUtils.getName(fileName.trim()));
         }
         String realFileName = path.getFileName().toString();
         String baseName = FilenameUtils.getBaseName(realFileName);
@@ -173,15 +178,22 @@ public class FileUtil {
         String nameWithoutExtension = getBaseName(fileName);
 
         nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);
+        final String cleanedName = nameWithoutExtension;
 
-        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
-            Optional<String> extension = getFileExtension(fileName);
-            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info("Truncated the too long filename '{}' ({}} characters) to '{}'.", fileName, fileName.length(), shortName);
+        Optional<String> extension = getFileExtension(fileName);
+        String fullCleanedName = extension.map(s -> cleanedName + "." + s).orElse(cleanedName);
+        // Fix: check FULL filename length (name + extension), not just name alone
+        if (fullCleanedName.length() > MAXIMUM_FILE_NAME_LENGTH) {
+            int maxBaseLen = MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0);
+            if (maxBaseLen <= 0) {
+                return fullCleanedName.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            }
+            String shortName = nameWithoutExtension.substring(0, maxBaseLen);
+            LOGGER.info("Truncated the too long filename '{}' ({} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
-        return fileName;
+        return fullCleanedName;
     }
 
     /// Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"

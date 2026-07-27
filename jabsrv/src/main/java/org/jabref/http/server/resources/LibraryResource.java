@@ -9,7 +9,6 @@ import java.util.Objects;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.BibEntryDTO;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
@@ -17,7 +16,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -43,10 +41,10 @@ public class LibraryResource {
     SrvStateManager srvStateManager;
 
     @Inject
-    FilesToServe filesToServe;
+    Gson gson;
 
     @Inject
-    Gson gson;
+    BibEntryTypesManager entryTypesManager;
 
     /// At http://localhost:23119/libraries/{id}
     ///
@@ -57,7 +55,6 @@ public class LibraryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
                                                 .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
                                                 .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
@@ -70,7 +67,7 @@ public class LibraryResource {
     public String getClsItemJson(@PathParam("id") String id) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());
+        jabRefItemDataProvider.setData(databaseContext, entryTypesManager);
         return jabRefItemDataProvider.toJson();
     }
 
@@ -90,7 +87,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, srvStateManager);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -111,6 +108,6 @@ public class LibraryResource {
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
     }
 }

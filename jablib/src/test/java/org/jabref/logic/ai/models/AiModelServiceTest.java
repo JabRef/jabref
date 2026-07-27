@@ -3,14 +3,13 @@ package org.jabref.logic.ai.models;
 import java.util.List;
 
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,31 +31,6 @@ class AiModelServiceTest {
     @BeforeEach
     void setUp() {
         aiModelService = new AiModelService();
-    }
-
-    @Test
-    void getStaticModelsReturnsNonEmptyListForOpenAi() {
-        List<String> models = aiModelService.getStaticModels(AiProvider.OPEN_AI);
-        assertNotNull(models);
-        assertFalse(models.isEmpty());
-        assertTrue(models.contains("gpt-4o-mini"));
-        assertTrue(models.contains("gpt-4o"));
-    }
-
-    @Test
-    void getStaticModelsReturnsNonEmptyListForMistralAi() {
-        List<String> models = aiModelService.getStaticModels(AiProvider.MISTRAL_AI);
-        assertNotNull(models);
-        assertFalse(models.isEmpty());
-        assertTrue(models.contains("open-mistral-nemo"));
-    }
-
-    @Test
-    void getStaticModelsReturnsNonEmptyListForGemini() {
-        List<String> models = aiModelService.getStaticModels(AiProvider.GEMINI);
-        assertNotNull(models);
-        assertFalse(models.isEmpty());
-        assertTrue(models.contains("gemini-3-flash-preview"));
     }
 
     @Test

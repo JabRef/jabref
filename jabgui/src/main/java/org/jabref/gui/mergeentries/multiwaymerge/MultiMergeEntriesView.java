@@ -40,6 +40,7 @@ import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.FetcherException;
@@ -310,7 +311,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 }
 
                 if (field.equals(StandardField.DOI)) {
-                    Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
+                    Button doiButton = ControlHelper.iconButton(IconTheme.JabRefIcons.LOOKUP_IDENTIFIER);
                     HBox.setHgrow(doiButton, Priority.NEVER);
                     doiButton.prefHeightProperty().bind(cellButton.heightProperty());
                     doiButton.setMinHeight(Control.USE_PREF_SIZE);

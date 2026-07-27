@@ -2,11 +2,11 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.preferences.JabRefCliPreferences;
-import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.NotificationService;
 
 /// Wrapper around the different options to extract citations from a PDF
@@ -24,15 +24,14 @@ public class CitationsFromPdf {
         return importer.importDatabase(path);
     }
 
-    /// As [NotificationService], one can pass `LOGGER::info`
     public static ParserResult extractCitationsUsingLLM(JabRefCliPreferences preferences, NotificationService notificationService, Path path) {
-        try (AiService aiService = new AiService(
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                notificationService,
-                new CurrentThreadTaskExecutor())) {
-            LlmPlainCitationParser importer = new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
+        try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
+            LlmPlainCitationParser importer = new LlmPlainCitationParser(
+                    preferences.getImportFormatPreferences(),
+                    preferences.getAiPreferences().getCitationParsingSystemMessageTemplate(),
+                    chatModel
+            );
+
             return importer.importDatabase(path);
         }
     }

@@ -69,7 +69,7 @@ public class FileSelectionPage extends WizardPane {
         BorderPane mainLayout = new BorderPane();
 
         progressPane = new VBox(10);
-        progressPane.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        progressPane.getStyleClass().add("file-selection-progress-pane");
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.progressProperty().bind(viewModel.progressValueProperty());
@@ -82,7 +82,7 @@ public class FileSelectionPage extends WizardPane {
         contentPane = new VBox(10);
 
         fileCountLabel = new Label();
-        fileCountLabel.setStyle("-fx-font-weight: bold;");
+        fileCountLabel.getStyleClass().add("bold");
 
         unlinkedFilesList = new CheckTreeView<>();
         unlinkedFilesList.setCellFactory(_ -> new UnlinkedFilesCellFactory(stateManager, viewModel));

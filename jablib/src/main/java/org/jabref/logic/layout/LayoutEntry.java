@@ -309,7 +309,7 @@ class LayoutEntry {
 
                 if (fieldText == null) {
                     if ((i + 1) < layoutEntries.size()) {
-                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
+                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).isBlank()) {
                             i++;
                             previousSkipped = true;
                             continue;

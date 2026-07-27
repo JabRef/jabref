@@ -32,6 +32,12 @@ public class FieldFactory {
     /// (e.g. "author/editor" to use editor where author is not set):
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
+    // Used to separate field and its property
+    // (e.g. "[Googlescholar|EXTERNAL]", "Googlescholar" is field name and "EXTERNAL" is its property)
+    private static final String FIELD_NAME_PROPERTY_SEPARATOR = "|";
+    // Used to separate different field properties of a field
+    // (e.g. "[custom1|EXTERNAL,MULTILINE_TEXT]", "custom1" is field name, "EXTERNAL" and ","MULTILINE_TEXT" are its properties)
+    private static final String FIELD_PROPERTY_SEPARATOR = ",";
 
     private static final Pattern UNKNOWNFIELD_PATTERN = Pattern.compile("UnknownField\\{name='(?<fieldName>[^']+)'");
 
@@ -56,6 +62,26 @@ public class FieldFactory {
         Matcher matcher = UNKNOWNFIELD_PATTERN.matcher(fieldName);
         if (matcher.find()) {
             fieldName = matcher.group("fieldName");
+        }
+
+        if (fieldName.contains(FIELD_NAME_PROPERTY_SEPARATOR)) {
+            // Unknown field can be parsed into "Field name" and "Properties" by FIELD_NAME_PROPERTY_SEPARATOR
+            String[] fieldAndProperties = fieldName.split(Pattern.quote(FIELD_NAME_PROPERTY_SEPARATOR));
+            // Only accept unknown fields
+            if (fieldAndProperties.length == 2) {
+                String unknownFieldName = fieldAndProperties[0];
+                String[] fieldProperties = fieldAndProperties[1].split(FIELD_PROPERTY_SEPARATOR);
+
+                if (fieldProperties.length == 0) {
+                    return new UnknownField(unknownFieldName);
+                } else {
+                    List<FieldProperty> properties = Arrays.stream(fieldProperties)
+                                                           .map(FieldProperty::valueOf)
+                                                           .toList();
+
+                    return new UnknownField(unknownFieldName, properties);
+                }
+            }
         }
 
         return OptionalUtil.<Field>orElse(
@@ -109,6 +135,18 @@ public class FieldFactory {
                      .collect(Collectors.joining(DELIMITER));
     }
 
+    public static String serializeFieldsListV2(Collection<Field> fields) {
+        return fields.stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
+                         } else {
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(DELIMITER));
+    }
+
     public static String serializeOrFields(Field... fields) {
         return serializeOrFields(new OrFields(fields));
     }
@@ -119,8 +157,37 @@ public class FieldFactory {
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
+    public static String serializeOrFieldsV2(OrFields fields) {
+        return fields.getFields().stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
+                         } else {
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+    }
+
+    private static String serializeUnknownField(UnknownField unknownField) {
+        String fieldName = unknownField.getName();
+        String fieldProperties = unknownField.getProperties().stream()
+                                             .map(Enum::name)
+                                             .collect(Collectors.joining(FIELD_PROPERTY_SEPARATOR));
+
+        if (fieldProperties.isEmpty()) {
+            return fieldName;
+        }
+
+        return fieldName + FIELD_NAME_PROPERTY_SEPARATOR + fieldProperties;
+    }
+
     public static String serializeOrFieldsList(Set<OrFields> fields) {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
+    }
+
+    public static String serializeOrFieldsListV2(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFieldsV2).collect(Collectors.joining(DELIMITER));
     }
 
     // endregion

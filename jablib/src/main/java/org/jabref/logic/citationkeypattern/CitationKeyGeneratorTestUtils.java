@@ -2,7 +2,7 @@ package org.jabref.logic.citationkeypattern;
 
 import javafx.beans.property.SimpleObjectProperty;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 
 public class CitationKeyGeneratorTestUtils {
 

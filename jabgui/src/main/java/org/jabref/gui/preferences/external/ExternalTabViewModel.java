@@ -64,7 +64,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         this.initialExternalApplicationPreferences = preferences.getExternalApplicationsPreferences();
         this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
         this.workingPushToApplicationPreferences = PushToApplicationPreferences.getDefault();
-        this.workingPushToApplicationPreferences.setAll(initialPushToApplicationPreferences);
+        copyPushPreferences(workingPushToApplicationPreferences, initialPushToApplicationPreferences);
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -94,7 +94,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        workingPushToApplicationPreferences.setAll(preferences.getPushToApplicationPreferences());
+        copyPushPreferences(workingPushToApplicationPreferences, preferences.getPushToApplicationPreferences());
 
         eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
@@ -131,6 +131,15 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
         pushPreferences.setVimServer(workingPushToApplicationPreferences.getVimServer());
         pushPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
+    }
+
+    /// Copies all push-to-application settings from {@code source} into the existing {@code target} instance.
+    private static void copyPushPreferences(PushToApplicationPreferences target, PushToApplicationPreferences source) {
+        target.setActiveApplicationName(source.getActiveApplicationName());
+        target.setCommandPaths(source.getCommandPaths());
+        target.setEmacsArguments(source.getEmacsArguments());
+        target.setVimServer(source.getVimServer());
+        target.setCiteCommand(source.getCiteCommand());
     }
 
     public ValidationStatus terminalCommandValidationStatus() {

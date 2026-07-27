@@ -1,6 +1,36 @@
 # AI tooling
 
-.claude/
+.agents
+
+.code-review-graph/
+
+CLAUDE.md
+.mcp.json
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+memory/*
+
+.cursorrules
+
+.gemini
+GEMINI.md
+
+.github/code-review-graph.instruction.md
+
+.kiro
+
+.opencode.json
+
+.qoder
+QODER.md
+
+skills-lock.json
+
+.windsurfrules
+
+.zenflow
+
 
 # no generated files in version control
 src/main/gen/

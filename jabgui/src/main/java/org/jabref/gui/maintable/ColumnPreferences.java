@@ -45,11 +45,6 @@ public class ColumnPreferences {
         return new ColumnPreferences();
     }
 
-    public void setAll(ColumnPreferences columnPreferences) {
-        this.columns.addAll(columnPreferences.getColumns());
-        this.columnSortOrder.addAll(columnPreferences.getColumnSortOrder());
-    }
-
     public ObservableList<MainTableColumnModel> getColumns() {
         return columns;
     }

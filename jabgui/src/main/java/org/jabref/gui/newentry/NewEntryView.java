@@ -91,8 +91,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private AiService aiService;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private AiService aiService;
 
     private final ControlsFxVisualizer visualizer;
 
@@ -216,7 +216,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
 

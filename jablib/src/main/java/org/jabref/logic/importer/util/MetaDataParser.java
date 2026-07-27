@@ -62,6 +62,9 @@ public class MetaDataParser {
 
     public static Optional<BibEntryType> parseCustomEntryType(String comment) {
         String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());
+        if (comment.contains(MetaData.ENTRYTYPE_FLAG_V2)) {
+            rest = comment.substring(MetaData.ENTRYTYPE_FLAG_V2.length());
+        }
         int indexEndOfName = rest.indexOf(':');
         if (indexEndOfName < 0) {
             return Optional.empty();
@@ -147,6 +150,8 @@ public class MetaDataParser {
                 metaData.setGroupSearchSyntaxVersion(version);
             } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {
                 metaData.setVersionDBStructure(getSingleItem(values));
+            } else if (MetaData.AI_LIBRARY_ID.equals(entry.getKey())) {
+                metaData.setAiLibraryId(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), values);

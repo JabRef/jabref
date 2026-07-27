@@ -129,7 +129,7 @@ class URLUtilTest {
 
     @Test
     void emptyUrl() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
                 URLUtil.create("   "));
         assertTrue(exception.getMessage().contains("URL must not be empty."));
     }

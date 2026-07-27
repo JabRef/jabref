@@ -15,9 +15,9 @@ class LibrariesResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
-        addFilesToServeToResourceConfig(resourceConfig);
         addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
+        addPreferencesToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }
@@ -33,7 +33,7 @@ class LibrariesResourceTest extends ServerTest {
     }
 
     @Test
-    void twoTestLibraries() {
+    void twoExplicitTestLibraries() {
         EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.CHOCOLATE_BIB);
         setAvailableLibraries(availableLibraries);
 

@@ -98,7 +98,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         EasyBind.subscribe(textProperty(), label::replaceText);
         label.setAutoHeight(true);
         label.setWrapText(true);
-        label.setStyle("-fx-cursor: hand");
+        label.setCursor(Cursor.HAND);
 
         // Workarounds
         preventTextSelectionViaMouseEvents();

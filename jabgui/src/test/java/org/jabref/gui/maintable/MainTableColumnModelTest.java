@@ -64,4 +64,20 @@ class MainTableColumnModelTest {
 
         assertEquals("", testColumnModel.getQualifier());
     }
+
+    @Test
+    void emptyStringShouldReturnNormalFieldWithEmptyQualifier() {
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse("");
+
+        assertEquals(MainTableColumnModel.Type.NORMALFIELD, testColumnModel.getType());
+        assertEquals("", testColumnModel.getQualifier());
+    }
+
+    @Test
+    void blankStringShouldReturnNormalFieldWithEmptyQualifier() {
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse("   ");
+
+        assertEquals(MainTableColumnModel.Type.NORMALFIELD, testColumnModel.getType());
+        assertEquals("", testColumnModel.getQualifier());
+    }
 }

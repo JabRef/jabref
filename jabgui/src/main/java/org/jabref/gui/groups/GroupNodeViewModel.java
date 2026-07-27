@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
@@ -28,6 +29,7 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -61,8 +63,12 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupNodeViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupNodeViewModel.class);
 
     private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
@@ -83,6 +89,9 @@ public class GroupNodeViewModel {
     private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
+    private boolean matchedEntriesInitialized;
+    private boolean matchedEntriesUpdateInProgress;
+    private boolean matchedEntriesUpdatePending;
 
     public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext,
                               @NonNull StateManager stateManager,
@@ -111,16 +120,14 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-            stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                refreshGroup();
-                databaseContext.getMetaData().groupsBinding().invalidate();
-            });
+            SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+            searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
+            refreshGroup();
+            databaseContext.getMetaData().groupsBinding().invalidate();
         }
 
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), _ -> updateMatchedEntries());
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((_, _, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -204,6 +211,14 @@ public class GroupNodeViewModel {
         return Bindings.size(matchedEntries);
     }
 
+    void ensureMatchedEntriesLoaded() {
+        // Also guard on "in progress": this method only needs the initial load, and cells re-render
+        // frequently — queueing a pending re-run here would rescan the whole database once per burst.
+        if (!matchedEntriesInitialized && !matchedEntriesUpdateInProgress) {
+            updateMatchedEntries();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -243,12 +258,13 @@ public class GroupNodeViewModel {
     }
 
     private JabRefIcon createDefaultIcon() {
-        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
+        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR);
         return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color);
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return IconTheme.findIcon(iconCode, getColor());
+        return IconTheme.findJabRefIcon(iconCode)
+                        .map(icon -> icon.withColor(getColor()));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -305,21 +321,47 @@ public class GroupNodeViewModel {
         });
     }
 
-    private void updateMatchedEntries() {
-        // We calculate the new hit value
-        // We could be more intelligent and try to figure out the new number of hits based on the entry change
-        // for example, a previously matched entry gets removed -> hits = hits - 1
-        if (preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
-            BackgroundTask
-                    .wrap(() -> databaseContext.getDatabase().getEntries().stream()
-                                               .filter(e -> isMatchEffective(this, e))
-                                               .toList())
-                    .onSuccess(entries -> {
-                        matchedEntries.clear();
-                        // ADR-0038
-                        entries.forEach(entry -> matchedEntries.add(entry.getId()));
-                    })
-                    .executeWith(taskExecutor);
+    void updateMatchedEntries() {
+        // [impl->req~ux.active-library.preview-responsiveness~1]
+        if (!preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
+            // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
+            // and clear now so rebinding never briefly shows the outdated number
+            matchedEntriesInitialized = false;
+            matchedEntries.clear();
+            return;
+        }
+
+        if (matchedEntriesUpdateInProgress) {
+            matchedEntriesUpdatePending = true;
+            return;
+        }
+
+        matchedEntriesUpdateInProgress = true;
+        BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
+                .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                                           .filter(e -> isMatchEffective(this, e))
+                                           .toList())
+                .onSuccess(entries -> {
+                    matchedEntries.clear();
+                    // ADR-0038
+                    entries.forEach(entry -> matchedEntries.add(entry.getId()));
+                    matchedEntriesInitialized = true;
+                    completeMatchedEntriesUpdate();
+                })
+                .onFailure(e -> {
+                    LOGGER.warn("Could not update matched entries for group {}", groupNode.getName(), e);
+                    completeMatchedEntriesUpdate();
+                });
+        // schedule() routes to the executor's separate scheduled pool, keeping the main worker pool
+        // free for preview rendering — do not "simplify" to executeWith()
+        taskExecutor.schedule(updateTask, 0, TimeUnit.MILLISECONDS);
+    }
+
+    private void completeMatchedEntriesUpdate() {
+        matchedEntriesUpdateInProgress = false;
+        if (matchedEntriesUpdatePending) {
+            matchedEntriesUpdatePending = false;
+            updateMatchedEntries();
         }
     }
 
@@ -336,7 +378,7 @@ public class GroupNodeViewModel {
     }
 
     public Color getColor() {
-        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
+        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR);
     }
 
     public String getPath() {
@@ -632,32 +674,31 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexStartedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                    refreshGroup();
-                    databaseContext.getMetaData().groupsBinding().invalidate();
-                });
+                SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+                searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
+                refreshGroup();
+                databaseContext.getMetaData().groupsBinding().invalidate();
             }
         }
 
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager ->
-                        BackgroundTask.wrap(() -> {
-                            for (BibEntry entry : event.entries()) {
-                                searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
-                            }
-                        }).onFinished(() -> {
-                            for (BibEntry entry : event.entries()) {
-                                if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
-                                    matchedEntries.add(entry.getId());
-                                } else {
-                                    matchedEntries.remove(entry.getId());
-                                }
-                            }
-                            databaseContext.getMetaData().groupsBinding().invalidate();
-                        }).executeWith(taskExecutor));
+                SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+                BackgroundTask.wrap(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        searchGroup.updateMatches(entry, searchContext.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                    }
+                }).onFinished(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
+                            matchedEntries.add(entry.getId());
+                        } else {
+                            matchedEntries.remove(entry.getId());
+                        }
+                    }
+                    databaseContext.getMetaData().groupsBinding().invalidate();
+                }).executeWith(taskExecutor);
             }
         }
 

@@ -226,7 +226,7 @@ public class RepecNepImporter extends Importer {
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
         readLine(in);
-        while ((this.lastLine != null) && !this.lastLine.trim().isEmpty() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !this.lastLine.isBlank() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
             result.append(this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim());
             readLine(in);
         }
@@ -309,7 +309,7 @@ public class RepecNepImporter extends Importer {
             throws IOException {
 
         // one empty line is possible before fields start
-        if ((this.lastLine != null) && this.lastLine.trim().isEmpty()) {
+        if ((this.lastLine != null) && this.lastLine.isBlank()) {
             readLine(in);
         }
 
@@ -355,7 +355,7 @@ public class RepecNepImporter extends Importer {
     /// if line starts with a string of the form 'x. ' and we are not in the overview
     /// section, we have a working paper entry we are interested in
     private boolean isStartOfWorkingPaper() {
-        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().isEmpty();
+        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.isBlank();
     }
 
     @Override

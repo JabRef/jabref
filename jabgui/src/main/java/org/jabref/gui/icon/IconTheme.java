@@ -1,32 +1,24 @@
 package org.jabref.gui.icon;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.Properties;
 
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -51,59 +43,55 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.EnumSet.allOf;
-
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
+@NullMarked
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
+    public static final Color DEFAULT_GROUP_COLOR = Color.web("#8a8a8a");
     public static final Color SELECTED_COLOR = Color.web("#50618F");
-    private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
+    private static final List<String> LOGO_SET = List.of(
+            "jabrefIcon16",
+            "jabrefIcon20",
+            "jabrefIcon32",
+            "jabrefIcon40",
+            "jabrefIcon48",
+            "jabrefIcon64",
+            "jabrefIcon128");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
-    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-    private static final Set<Ikon> ICON_NAMES = new HashSet<>();
 
-    public static Color getDefaultGroupColor() {
-        return Color.web("#8a8a8a");
+    private static final String ICON_PATH_PREFIX = "/images/external/";
+    private static final String DEFAULT_ICON_PATH = ICON_PATH_PREFIX + "red.png";
+    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"));
+
+    private IconTheme() {
     }
 
-    public static Optional<JabRefIcon> findIcon(String code, Color color) {
-        if (ICON_NAMES.isEmpty()) {
-            loadAllIkons();
+    public static Image getJabRefIcon() {
+        return new Image(getIconUrl("jabrefIcon48").toString());
+    }
+
+    public static List<Image> getLogoSet() {
+        return LOGO_SET.stream()
+                       .map(name -> new Image(getIconUrl(name).toString()))
+                       .toList();
+    }
+
+    public static Optional<JabRefIcon> findJabRefIcon(String iconCode) {
+        String normalizedIconCode = iconCode.toUpperCase(Locale.ENGLISH);
+
+        try {
+            return Optional.of(JabRefIcons.valueOf(normalizedIconCode));
+        } catch (IllegalArgumentException ignored) {
+            return java.util.Arrays.stream(JabRefIcons.values())
+                                   .filter(icon -> icon.matchesPersistedName(normalizedIconCode))
+                                   .findFirst()
+                                   .map(JabRefIcon.class::cast);
         }
-        return ICON_NAMES.stream().filter(icon -> icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
-                         .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
     }
 
-    public static Image getJabRefImage() {
-        return getImageFX("jabrefIcon48");
-    }
-
-    private static void loadAllIkons() {
-        ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
-
-        for (IkonProvider provider : providers) {
-            ICON_NAMES.addAll(allOf(provider.getIkon()));
-        }
-    }
-
-    /*
-     * Constructs an {@link Image} for the image representing the given function, in the resource
-     * file listing images.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The {@link Image} for the function.
-     */
-    private static Image getImageFX(String name) {
-        return new Image(getIconUrl(name).toString());
-    }
-
-    /// Looks up the URL for the image representing the given function, in the resource
-    /// file listing images.
-    ///
-    /// @param name The name of the icon, such as "open", "save", "saveAs" etc.
-    /// @return The URL to the actual image to use.
-    public static URL getIconUrl(@NonNull String name) {
+    private static URL getIconUrl(String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
@@ -111,47 +99,23 @@ public class IconTheme {
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
     }
 
-    /// Read a typical java property url into a Map. Currently, doesn't support escaping
-    /// of the '=' character - it simply looks for the first '=' to determine where the key ends.
-    /// Both the key and the value is trimmed for whitespace at the ends.
+    /// Reads file mapping icon keys to image file names, prefixing each value with {@link #ICON_PATH_PREFIX}.
     ///
-    /// @param url    The URL to read information from.
-    /// @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be found.
+    /// @param url The URL to read information from.
     /// @return A Map containing all key-value pairs found.
-    // FIXME: prefix can be removed?!
-    private static Map<String, String> readIconThemeFile(@NonNull URL url, @NonNull String prefix) {
-        Map<String, String> result = new HashMap<>();
-
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (!line.contains("=")) {
-                    continue;
-                }
-
-                int index = line.indexOf('=');
-                String key = line.substring(0, index).trim();
-                String value = prefix + line.substring(index + 1).trim();
-                result.put(key, value);
-            }
+    private static Map<String, String> readIconThemeFile(URL url) {
+        Properties properties = new Properties();
+        try (InputStream in = url.openStream()) {
+            properties.load(in);
         } catch (IOException e) {
             LOGGER.warn("Unable to read default icon theme.", e);
         }
+
+        Map<String, String> result = new HashMap<>();
+        for (String key : properties.stringPropertyNames()) {
+            result.put(key, ICON_PATH_PREFIX + properties.getProperty(key));
+        }
         return result;
-    }
-
-    public static List<Image> getLogoSetFX() {
-        List<Image> jabrefLogos = new ArrayList<>();
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon16").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon20").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon32").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon40").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon48").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon64").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon128").toString()));
-
-        return jabrefLogos;
     }
 
     public enum JabRefIcons implements JabRefIcon {
@@ -229,6 +193,7 @@ public class IconTheme {
         COPY_TO_FOLDER(MaterialDesignC.CONTENT_COPY),
         RENAME(MaterialDesignR.RENAME_BOX),
         DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
+        OCR(MaterialDesignT.TEXT_RECOGNITION),
         REMOVE_LINK(MaterialDesignL.LINK_OFF),
         AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
@@ -274,7 +239,7 @@ public class IconTheme {
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
         APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
         APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
-        APPLICATION_TEXWORS(JabRefMaterialDesignIcon.TEXWORKS),
+        APPLICATION_TEXWORKS(JabRefMaterialDesignIcon.TEXWORKS),
         APPLICATION_VSCODE(JabRefMaterialDesignIcon.VSCODE),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
@@ -364,21 +329,28 @@ public class IconTheme {
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
         GIT_SYNC(MaterialDesignG.GIT),
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
-        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
+        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
+
+        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
+        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
 
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {
-            icon = new InternalMaterialDesignIcon(icons);
+            icon = new IkonliIcon(icons);
         }
 
         JabRefIcons(Color color, Ikon... icons) {
-            icon = new InternalMaterialDesignIcon(color, icons);
+            icon = new IkonliIcon(color, icons);
+        }
+
+        JabRefIcons(String svgPath) {
+            icon = new SvgIcon(name(), svgPath);
         }
 
         @Override
-        public Ikon getIkon() {
-            return icon.getIkon();
+        public boolean matches(Node graphicNode) {
+            return icon.matches(graphicNode);
         }
 
         @Override
@@ -386,18 +358,9 @@ public class IconTheme {
             return icon.getGraphicNode();
         }
 
-        public Button asButton() {
-            Button button = new Button();
-            button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("icon-button");
-            return button;
-        }
-
-        public ToggleButton asToggleButton() {
-            ToggleButton button = new ToggleButton();
-            button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("icon-button");
-            return button;
+        @Override
+        public JabRefIcon withSize(int size) {
+            return icon.withSize(size);
         }
 
         @Override
@@ -408,6 +371,10 @@ public class IconTheme {
         @Override
         public JabRefIcon disabled() {
             return icon.disabled();
+        }
+
+        private boolean matchesPersistedName(String persistedIconName) {
+            return name().equals(persistedIconName) || icon.name().equalsIgnoreCase(persistedIconName);
         }
     }
 }

@@ -1,0 +1,10 @@
+authors:
+  - Oscar Wilde
+title: TestStudyName
+research-questions:
+  - Question1
+queries:
+  - query: Quantum
+databases:
+  - name: Springer
+    enabled: true

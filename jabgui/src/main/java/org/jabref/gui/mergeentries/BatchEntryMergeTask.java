@@ -29,6 +29,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
     private final MergingIdBasedFetcher fetcher;
     private final UndoManager undoManager;
     private final NotificationService notificationService;
+    private final char keywordSeparator;
 
     private int processedEntries;
     private int successfulUpdates;
@@ -36,11 +37,13 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
     public BatchEntryMergeTask(List<BibEntry> entries,
                                MergingIdBasedFetcher fetcher,
                                UndoManager undoManager,
-                               NotificationService notificationService) {
+                               NotificationService notificationService,
+                               char keywordSeparator) {
         this.entries = entries;
         this.fetcher = fetcher;
         this.undoManager = undoManager;
         this.notificationService = notificationService;
+        this.keywordSeparator = keywordSeparator;
 
         this.compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
         this.processedEntries = 0;
@@ -107,7 +110,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         return fetcher.fetchEntry(entry)
                       .filter(MergingIdBasedFetcher.FetcherResult::hasChanges)
                       .flatMap(result -> {
-                          boolean changesApplied = MergeEntriesHelper.mergeEntries(result.mergedEntry(), entry, compoundEdit);
+                          boolean changesApplied = MergeEntriesHelper.mergeEntries(result.mergedEntry(), entry, compoundEdit, keywordSeparator);
                           if (changesApplied) {
                               successfulUpdates++;
                               return entry.getCitationKey();

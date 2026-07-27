@@ -2,6 +2,7 @@ package org.jabref.logic.net.ssl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
@@ -130,6 +131,9 @@ public class TrustStoreManager {
 
     /// This method checks to see if the truststore is present in `storePath`,
     /// and if it isn't, it copies the default JDK truststore to the specified location.
+    /// If it already exists (e.g. carried over from a previous JabRef installation),
+    /// any certificates newly bundled with this version but missing from the existing
+    /// file are merged in, so upgrading users pick up new roots like HARICA TLS ECC Root CA 2021.
     ///
     /// @param storePath path of the truststore
     public static void createTruststoreFileIfNotExist(Path storePath) {
@@ -140,6 +144,8 @@ public class TrustStoreManager {
                 try (InputStream inputStream = TrustStoreManager.class.getResourceAsStream("/ssl/truststore.jks")) {
                     Files.copy(inputStream, storePath);
                 }
+            } else {
+                mergeMissingBundledCertificates(storePath);
             }
 
             try {
@@ -149,6 +155,39 @@ public class TrustStoreManager {
             }
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
+        }
+    }
+
+    /// Adds any certificate present in the bundled `/ssl/truststore.jks` resource but missing
+    /// from the truststore at `storePath` (e.g. a root added in a newer JabRef release),
+    /// so upgrading an existing installation still picks up new roots.
+    private static void mergeMissingBundledCertificates(Path storePath) {
+        try {
+            KeyStore bundledStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            try (InputStream bundledStream = TrustStoreManager.class.getResourceAsStream("/ssl/truststore.jks")) {
+                bundledStore.load(bundledStream, STORE_PASSWORD.toCharArray());
+            }
+
+            KeyStore userStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            try (InputStream userStream = Files.newInputStream(storePath)) {
+                userStore.load(userStream, STORE_PASSWORD.toCharArray());
+            }
+
+            boolean changed = false;
+            for (String alias : Collections.list(bundledStore.aliases())) {
+                if (!userStore.containsAlias(alias)) {
+                    userStore.setCertificateEntry(alias, bundledStore.getCertificate(alias));
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                try (OutputStream outputStream = Files.newOutputStream(storePath)) {
+                    userStore.store(outputStream, STORE_PASSWORD.toCharArray());
+                }
+            }
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
+            LOGGER.warn("Error while merging bundled certificates into existing truststore: {}", storePath, e);
         }
     }
 

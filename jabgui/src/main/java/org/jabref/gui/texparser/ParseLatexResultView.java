@@ -55,7 +55,7 @@ public class ParseLatexResultView extends BaseDialog<Void> {
                 .withGraphic(reference -> {
                     Text referenceText = new Text(reference.getDisplayText());
                     if (reference.isHighlighted()) {
-                        referenceText.setStyle("-fx-fill: -fx-accent");
+                        referenceText.getStyleClass().add("parse-latex-reference-text");
                     }
                     return referenceText;
                 })

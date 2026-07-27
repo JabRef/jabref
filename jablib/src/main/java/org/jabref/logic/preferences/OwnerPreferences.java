@@ -32,13 +32,6 @@ public class OwnerPreferences {
         return new OwnerPreferences();
     }
 
-    public OwnerPreferences setAll(OwnerPreferences preferences) {
-        setUseOwner(preferences.shouldUseOwner());
-        setDefaultOwner(preferences.getDefaultOwner());
-        setOverwriteOwner(preferences.shouldOverwriteOwner());
-        return this;
-    }
-
     public boolean shouldUseOwner() {
         return useOwner.getValue();
     }

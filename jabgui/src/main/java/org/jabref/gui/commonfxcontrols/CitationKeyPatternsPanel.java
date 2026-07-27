@@ -121,17 +121,19 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
     }
 
     private static class HighlightTableRow extends TableRow<CitationKeyPatternsPanelItemModel> {
+        private static final String DEFAULT_ROW_STYLE_CLASS = "citation-key-pattern-default-row";
+
         @Override
         public void updateItem(CitationKeyPatternsPanelItemModel item, boolean empty) {
+            // Style used to highlight the default entry type row
             super.updateItem(item, empty);
-            if (item == null || item.getEntryType() == null) {
-                setStyle("");
-            } else if (isSelected()) {
-                setStyle("-fx-background-color: -fx-selection-bar");
-            } else if (CitationKeyPatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME.equals(item.getEntryType().getName())) {
-                setStyle("-fx-background-color: -fx-default-button");
-            } else {
-                setStyle("");
+
+            getStyleClass().remove(DEFAULT_ROW_STYLE_CLASS);
+            // Reapply the style only for the default entry type row
+            if (item != null
+                    && item.getEntryType() != null
+                    && CitationKeyPatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME.equals(item.getEntryType().getName())) {
+                getStyleClass().add(DEFAULT_ROW_STYLE_CLASS);
             }
         }
     }

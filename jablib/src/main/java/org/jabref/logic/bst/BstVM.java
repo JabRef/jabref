@@ -2,14 +2,13 @@ package org.jabref.logic.bst;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -19,17 +18,19 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class BstVM {
 
     protected static final Integer FALSE = 0;
     protected static final Integer TRUE = 1;
 
     protected final ParseTree tree;
-    protected BstVMContext latestContext; // for testing
+    @Nullable private BstVMContext latestContext; // for testing
 
-    private Path path = null;
+    @Nullable private Path path;
 
     public BstVM(Path path) throws RecognitionException, IOException {
         this(CharStreams.fromPath(path));
@@ -62,9 +63,9 @@ public class BstVM {
     /// Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
     ///
     /// @param bibEntries  list of entries to convert
-    /// @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+    /// @param bibDatabase the bibDatabase used for resolving strings / crossref
     /// @return list of references in plain text form
-    public String render(@NonNull Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
+    public String render(List<BibEntry> bibEntries, BibDatabase bibDatabase) {
         // needs to be modifiable due to sort operations later
         List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());
 
@@ -83,15 +84,16 @@ public class BstVM {
         return resultBuffer.toString();
     }
 
-    public String render(Collection<BibEntry> bibEntries) {
-        return render(bibEntries, null);
+    public String render(List<BibEntry> bibEntries) {
+        return render(bibEntries, new BibDatabase(bibEntries));
     }
 
-    protected Deque<Object> getStack() {
+    @VisibleForTesting
+    BstVMContext getContext() {
         if (latestContext != null) {
-            return latestContext.stack();
+            return latestContext;
         } else {
-            throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
+            throw new BstVMException("BstVM must have rendered at least once to provide the latest context");
         }
     }
 

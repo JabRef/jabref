@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<fx:root
+        type="VBox"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.ai.summary.AiSummaryParametersView"
+        spacing="10.0">
+    <HBox spacing="8.0"
+          alignment="BASELINE_CENTER">
+        <Label text="%Summarization algorithm:"/>
+        <ComboBox
+                fx:id="summarizatorCombo"
+                HBox.hgrow="ALWAYS"/>
+    </HBox>
+</fx:root>

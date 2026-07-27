@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -20,6 +21,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.jabref.model.openoffice.util.OOListUtil;
+import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -48,22 +50,14 @@ public class EditInsert {
 
     /// @param cursor   Where to insert.
     /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
-    public static void insertCitationGroup(XTextDocument doc,
-                                           OOFrontend frontend,
-                                           XTextCursor cursor,
-                                           List<BibEntry> entries,
-                                           BibDatabase database,
-                                           JStyle style,
-                                           CitationType citationType,
-                                           String pageInfo)
-            throws
-            NoDocumentException,
-            NotRemoveableException,
-            WrappedTargetException,
-            PropertyVetoException,
-            CreationException,
-            IllegalTypeException {
-
+    public static OOVoidResult<JabRefException> insertCitationGroup(XTextDocument doc,
+                                                                    OOFrontend frontend,
+                                                                    XTextCursor cursor,
+                                                                    List<BibEntry> entries,
+                                                                    BibDatabase database,
+                                                                    JStyle style,
+                                                                    CitationType citationType,
+                                                                    String pageInfo) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -102,6 +96,9 @@ public class EditInsert {
                     cursor,
                     style,
                     true /* insertSpaceAfter */);
+            return OOVoidResult.ok();
+        } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {
+            return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         } finally {
             UnoScreenRefresh.unlockControllers(doc);
         }

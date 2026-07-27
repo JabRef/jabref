@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -36,6 +37,12 @@ public class EndnoteImporter extends Importer {
 
     private static final Pattern A_PATTERN = Pattern.compile("%A .*");
     private static final Pattern E_PATTERN = Pattern.compile("%E .*");
+
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+
+    public EndnoteImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+    }
 
     @Override
     public String getName() {
@@ -236,7 +243,7 @@ public class EndnoteImporter extends Importer {
                         }
                     }
                     case "F" ->
-                            hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(val, CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+                            hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(val, citationKeyPatternPreferences.getUnwantedCharacters()));
                 }
             }
 

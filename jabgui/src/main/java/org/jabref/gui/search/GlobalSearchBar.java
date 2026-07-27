@@ -53,6 +53,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
@@ -171,12 +172,12 @@ public class GlobalSearchBar extends HBox {
             searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
         });
 
-        regexButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
-        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
-        fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
-        openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
-        keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
-        filterModeButton = IconTheme.JabRefIcons.FILTER.asToggleButton();
+        regexButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.REG_EX);
+        caseSensitiveButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.CASE_SENSITIVE);
+        fulltextButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.FULLTEXT);
+        openGlobalSearchButton = ControlHelper.iconButton(IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH);
+        keepSearchString = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.KEEP_SEARCH_STRING);
+        filterModeButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.FILTER);
 
         initSearchModifierButtons();
 

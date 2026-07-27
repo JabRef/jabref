@@ -2,6 +2,7 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
 
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SaveOrderPanelViewModelTest {
 
-    SortCriterionViewModel sortCriterionKey = new SortCriterionViewModel(new SaveOrder.SortCriterion(StandardField.KEY, false));
+    SortCriterionViewModel sortCriterionKey = new SortCriterionViewModel(new SaveOrder.SortCriterion(InternalField.KEY_FIELD, false));
     SortCriterionViewModel sortCriterionAuthor = new SortCriterionViewModel(new SaveOrder.SortCriterion(StandardField.AUTHOR, false));
     SortCriterionViewModel sortCriterionTitle = new SortCriterionViewModel(new SaveOrder.SortCriterion(StandardField.TITLE, true));
 

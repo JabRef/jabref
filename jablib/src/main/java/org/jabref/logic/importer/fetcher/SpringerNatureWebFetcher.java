@@ -191,8 +191,24 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new SpringerQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    /// Builds the Springer search URL for a raw, catalog-native query, sent verbatim as the `q` parameter.
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the Springer Nature search API URL for the given raw query string and page number.
+    /// The raw query is sent verbatim as the `q` parameter, bypassing [SpringerQueryTransformer].
+    ///
+    /// @param rawQuery   the query string to pass directly as the `q` parameter
+    /// @param pageNumber zero based page number; converted to a one based `s` start value.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new SpringerQueryTransformer().transformSearchQuery(queryNode).orElse("")); // Search query
+        uriBuilder.addParameter("q", rawQuery); // Search query
         importerPreferences.getApiKey(getName()).ifPresent(key -> uriBuilder.addParameter("api_key", key)); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size

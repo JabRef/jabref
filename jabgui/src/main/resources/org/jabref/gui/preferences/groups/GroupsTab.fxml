@@ -20,4 +20,5 @@
                  toggleGroup="$groupViewMode"/>
     <CheckBox fx:id="autoAssignGroup" text="%Automatically assign new entry to selected groups"/>
     <CheckBox fx:id="displayGroupCount" text="%Display count of items in group"/>
+    <CheckBox fx:id="showAiChatButton" text="%Show 'AI chat' in the context menu"/>
 </fx:root>

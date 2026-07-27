@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.util.MarkdownTextFlow;
+import org.jabref.gui.util.component.MarkdownTextFlow;
 import org.jabref.gui.walkthrough.declarative.richtext.ArbitraryJFXBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;

@@ -1,0 +1,61 @@
+% !TeX program = pdflatex
+
+\documentclass[final]{ltugboat}
+
+\usepackage{mwe}
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xspace}
+
+\def\JR{Jab\-Ref\xspace}
+\def\SLR{\acro{SLR}}
+
+\title{JabRef: \BibTeX-based literature management~software}
+
+\author{Oliver Kopp}
+\address{Sindelfingen, Germany}
+\EDITORnonetaddress
+\personalURL{https://github.com/koppor}
+\ORCID{0000-0001-6962-4290}
+
+\author{Carl Christian Snethlage}
+\address{Zwiesel, Germany}
+\EDITORnonetaddress
+\personalURL{https://github.com/calixtus}
+
+\author{Christoph Schwentker}
+\address{Paderborn, Germany}
+\EDITORnonetaddress
+\personalURL{https://github.com/Siedlerchr}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\JR\ is a comprehensive literature management tool built entirely around the \BibTeX\ data format.
+This excerpt focuses on \JR's support for systematic literature reviews and serves as a
+manual test fixture for extracting related-work text from \PDF{}s.
+\end{abstract}
+
+\section{Introduction}
+
+\blindtext
+
+\section{Related Work}
+
+Systematic literature reviews (\SLR{}s) are comprehensive examinations of existing research on a particular topic, conducted according to a well-defined and transparent methodology~\cite{Kitchenham2007}.
+The most difficult challenge researchers face when conducting an \SLR\ is during the search step~\cite{AlZubidy2018,Voigt2021}.
+Commonly used e-libraries in the domain of computer science research, such as \acro{IEEE}, arXiv, and \acro{ACM}, do not support easy bulk access, which is key to the \SLR\ method~\cite{AlZubidy2018}.
+\JR fills this gap with its special \SLR\ feature~\cite{Voigt2021}.
+The main concept of the implementation is to a)~build on git and \BibTeX{} to track the state of papers (excluded, included, \dots); and b)~transform a generic query syntax to the different query formats of each publisher.
+
+\section{Conclusion}
+
+\blindtext
+
+\bibliographystyle{tugboat}
+\bibliography{references}
+
+\makesignature
+
+\end{document}

@@ -63,6 +63,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchCitationCountButton.setTooltip(

@@ -56,6 +56,7 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
                 conferenceRepository
         );
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         lookupICORERankButton.setTooltip(

@@ -1,10 +1,8 @@
 package org.jabref.gui.groups;
 
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -35,7 +33,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabrefIconProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -60,9 +57,6 @@ import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.jspecify.annotations.Nullable;
-import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.IkonProvider;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
@@ -262,7 +256,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 return;
             }
             if (parentNode == null) {
-                viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+                viewModel.colorFieldProperty().setValue(IconTheme.DEFAULT_GROUP_COLOR);
                 return;
             }
             List<Color> colorsOfSiblings = parentNode.getChildren().stream()
@@ -284,23 +278,16 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
-        ObservableList<Ikon> ikonList = FXCollections.observableArrayList();
-        FilteredList<Ikon> filteredList = new FilteredList<>(ikonList);
-
-        for (IkonProvider provider : ServiceLoader.load(IkonProvider.class.getModule().getLayer(), IkonProvider.class)) {
-            if (provider.getClass() != JabrefIconProvider.class) {
-                ikonList.addAll(EnumSet.allOf(provider.getIkon()));
-            }
-        }
+        ObservableList<IconTheme.JabRefIcons> ikonList = FXCollections.observableArrayList(IconTheme.JabRefIcons.values());
+        FilteredList<IconTheme.JabRefIcons> filteredList = new FilteredList<>(ikonList);
 
         CustomTextField searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-        searchBox.textProperty().addListener((obs, oldValue, newValue) ->
-                filteredList.setPredicate(ikon -> newValue.isEmpty() || ikon.getDescription().toLowerCase()
-                                                                            .contains(newValue.toLowerCase())));
+        searchBox.textProperty().addListener((_, _, newValue) ->
+                filteredList.setPredicate(icon -> newValue.isEmpty() || icon.name().toLowerCase().contains(newValue.toLowerCase())));
 
-        GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
+        GridView<IconTheme.JabRefIcons> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
         ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
@@ -323,24 +310,21 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         popOver.show(iconPickerButton);
     }
 
-    public class IkonliCell extends GridCell<Ikon> {
+    public class IkonliCell extends GridCell<IconTheme.JabRefIcons> {
         @Override
-        protected void updateItem(Ikon ikon, boolean empty) {
+        protected void updateItem(IconTheme.JabRefIcons ikon, boolean empty) {
             super.updateItem(ikon, empty);
             if (empty || (ikon == null)) {
                 setText(null);
                 setGraphic(null);
             } else {
-                FontIcon fontIcon = FontIcon.of(ikon);
-                fontIcon.getStyleClass().setAll("font-icon");
-                fontIcon.setIconSize(22);
-                setGraphic(fontIcon);
+                setGraphic(ikon.withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
                 setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(event -> {
-                    iconField.textProperty().setValue(String.valueOf(fontIcon.getIconCode()));
+                    iconField.textProperty().setValue(ikon.name());
                     PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
                     stage.hide();
                 });

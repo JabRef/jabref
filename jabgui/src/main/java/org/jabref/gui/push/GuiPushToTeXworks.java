@@ -3,6 +3,7 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.push.PushToTeXworks;
 
@@ -17,11 +18,11 @@ public class GuiPushToTeXworks extends PushToTeXworks implements GuiPushToApplic
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXWORS;
+        return IconTheme.JabRefIcons.APPLICATION_TEXWORKS;
     }
 
     @Override
     public void sendErrorNotification(String title, String message) {
-        dialogService.showErrorDialogAndWait(title, message);
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
     }
 }

@@ -160,6 +160,18 @@ class GroupsParserTest {
     }
 
     @Test
+    void importGroupsMarksSearchGroupPresenceInMetaData() throws ParseException {
+        List<String> groupData = List.of(
+                "0 AllEntriesGroup:;",
+                "1 SearchGroup:Data;2;project=data|number|quant*;0;1;1;;;;;"
+        );
+
+        GroupsParser.importGroups(groupData, ',', fileMonitor, metaData, "userAndHost");
+
+        assertTrue(metaData.containsSearchGroups());
+    }
+
+    @Test
     void fromStringParsesAutomaticDateGroupWithYearGranularity() throws ParseException {
         AutomaticDateGroup expected = new AutomaticDateGroup("By Year", GroupHierarchyType.INDEPENDENT, StandardField.DATE, DateGranularity.YEAR);
         AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:By Year;0;date;YEAR;1;;;;", ',', fileMonitor, metaData, "userAndHost");

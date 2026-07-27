@@ -72,8 +72,26 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseJavaFXWeb(JavaClasses classes) {
+        // javafx.web (WebView/WebEngine) is intentionally not used: it bundles a full WebKit, bloating the
+        // distribution and blocking native-image. HTML is rendered via the html-to-node library instead.
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("javafx.scene.web..")
+                          .because("html-to-node (plain JavaFX nodes) should be used instead of javafx.web")
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseAssertJ(JavaClasses classes) {
         ArchRuleDefinition.noClasses().should().accessClassesThat().resideInAPackage("org.assertj..")
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void doNotUseGuavaCache(JavaClasses classes) {
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("com.google.common.cache..")
+                          .because("Caffeine (com.github.benmanes.caffeine.cache) should be used for caching")
                           .check(classes);
     }
 
@@ -99,6 +117,10 @@ public class CommonArchitectureTest {
         ArchRuleDefinition.noClasses().that().haveNameNotMatching(".*Test")
                           .and().areNotAnnotatedWith(AllowedToUseClassGetResource.class)
                           .and().areNotAssignableFrom("org.jabref.logic.importer.fileformat.ImporterTestEngine")
+                          // html-to-node is an external dependency sharing the org.jabref namespace; it needs a
+                          // stylesheet URL for JavaFX (Parent#getStylesheets()), which getResourceAsStream cannot
+                          // provide. It cannot use @AllowedToUseClassGetResource without depending back on JabRef.
+                          .and().resideOutsideOfPackages("org.jabref.htmltonode..")
                           .should()
                           .callMethod(Class.class, "getResource", String.class)
                           .because("getResourceAsStream(...) should be used instead")
@@ -136,7 +158,7 @@ public class CommonArchitectureTest {
     public void restrictUsagesInLogic(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                           .and().areNotAnnotatedWith(AllowedToUseSwing.class)
-                          .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
+                          .and().areNotAssignableFrom("org.jabref.logic.search.sqlbased.SqlBasedLibrarySearcherWithBibFilesTest")
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                           .check(classes);
     }
@@ -194,7 +216,7 @@ public class CommonArchitectureTest {
                                   "javax.annotation..",
                                   "org.eclipse.jgit.annotations",
                                   "org.jetbrains.annotations..")
-                          .because("JSpecify annotations should be used")
+                          .because("JSpecify or Guava's @VisisbleForTesting annotations should be used")
                           .check(classes);
     }
 }

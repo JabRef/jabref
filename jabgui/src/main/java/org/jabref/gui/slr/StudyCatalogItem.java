@@ -7,16 +7,23 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
-/// View representation of {@link org.jabref.model.study.StudyDatabase}
+/// View representation of {@link org.jabref.model.study.StudyCatalog}
+@NullMarked
 public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
+    private final StringProperty reason;
 
-    public StudyCatalogItem(@NonNull String name, boolean enabled) {
+    public StudyCatalogItem(String name, boolean enabled) {
+        this(name, enabled, "");
+    }
+
+    public StudyCatalogItem(String name, boolean enabled, String reason) {
         this.name = new SimpleStringProperty(name);
         this.enabled = new SimpleBooleanProperty(enabled);
+        this.reason = new SimpleStringProperty(reason);
     }
 
     public String getName() {
@@ -43,11 +50,24 @@ public class StudyCatalogItem {
         return enabled;
     }
 
+    public String getReason() {
+        return reason.getValue();
+    }
+
+    public void setReason(String reason) {
+        this.reason.setValue(reason);
+    }
+
+    public StringProperty reasonProperty() {
+        return reason;
+    }
+
     @Override
     public String toString() {
         return "StudyCatalogItem{" +
                 "name=" + name.get() +
                 ", enabled=" + enabled.get() +
+                ", reason=" + reason.get() +
                 '}';
     }
 
@@ -60,11 +80,13 @@ public class StudyCatalogItem {
             return false;
         }
         StudyCatalogItem that = (StudyCatalogItem) o;
-        return Objects.equals(getName(), that.getName()) && Objects.equals(isEnabled(), that.isEnabled());
+        return Objects.equals(getName(), that.getName()) &&
+                Objects.equals(isEnabled(), that.isEnabled()) &&
+                Objects.equals(getReason(), that.getReason());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), isEnabled());
+        return Objects.hash(getName(), isEnabled(), getReason());
     }
 }

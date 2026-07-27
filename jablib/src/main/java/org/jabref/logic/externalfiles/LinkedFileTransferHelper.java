@@ -47,13 +47,13 @@ public class LinkedFileTransferHelper {
             return;
         }
 
-        LOGGER.debug("Handling {}", targetEntry.getKeyAuthorTitleYear());
+        LOGGER.trace("Handling {}", targetEntry.getKeyAuthorTitleYear());
 
         boolean fileLinksChanged = false;
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
         for (LinkedFile linkedFile : targetEntry.getFiles()) {
-            LOGGER.debug("Handling file {}", linkedFile);
+            LOGGER.trace("Handling file {}", linkedFile);
             if (linkedFile.getLink().isEmpty() || linkedFile.isOnlineLink()) {
                 linkedFiles.add(linkedFile);
                 continue;
@@ -150,7 +150,6 @@ public class LinkedFileTransferHelper {
                 } catch (IOException e) {
                     LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFileAsPath, e);
                     linkedFiles.add(linkedFile);
-                    continue;
                 }
             }
         }

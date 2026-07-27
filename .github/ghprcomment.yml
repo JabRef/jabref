@@ -76,7 +76,7 @@
 
 
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, reformat the code, commit, and push.
 - jobName: Modernizer
   workflowName: 'Source Code Tests'
   message: >
@@ -96,7 +96,7 @@
     You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
 
 
-    If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
+    If you made changes that are visible to the user, please add a brief description to the `CHANGELOG.md` file, along with the issue number when one exists; otherwise link the pull request.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
 - jobName: 'CHANGELOG.md - only unreleased touched'

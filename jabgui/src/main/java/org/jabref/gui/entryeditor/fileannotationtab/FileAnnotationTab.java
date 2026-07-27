@@ -4,8 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -13,37 +13,23 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
-    public static final String NAME = "File annotations";
-
     private final StateManager stateManager;
-    private final EntryEditorPreferences entryEditorPreferences;
 
     public FileAnnotationTab(StateManager stateManager,
                              GuiPreferences preferences) {
         this.stateManager = stateManager;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
-        setText(Localization.lang("File annotations"));
+        // Visible only when the current entry has a linked file to annotate.
+        setContentDrivenVisibility(EasyBind.map(
+                currentEntryProperty(),
+                entry -> (entry != null) && entry.getField(StandardField.FILE).isPresent()));
+
+        setText(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        if (!entryEditorPreferences.shouldShowFileAnnotationsTab()) {
-            return entry.getField(StandardField.FILE).isPresent();
-        }
-
-        return entry.getField(StandardField.FILE).isPresent()
-                && stateManager.activeTabProperty().get()
-                               .map(tab -> tab.getAnnotationCache()
-                                              .getFromCache(entry)
-                                              .values()
-                                              .stream()
-                                              .anyMatch(list -> !list.isEmpty()))
-                               .orElse(false);
     }
 
     @Override

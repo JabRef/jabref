@@ -16,6 +16,8 @@ import java.util.Set;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,24 +26,23 @@ import org.slf4j.LoggerFactory;
 ///
 ///
 /// In detail, the strategy is to:
-/// <ol>
-/// - Write to a temporary file (with .tmp suffix) in the same directory as the destination file.
-/// - Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.
-/// - Move the temporary file to the correct place, overwriting any file that already exists at that location.
-/// - Delete the backup file (if configured to do so).
-/// </ol>
+///
+/// 1. Write to a temporary file (with .tmp suffix) in the same directory as the destination file.
+/// 2. Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.
+/// 3. Move the temporary file to the correct place, overwriting any file that already exists at that location.
+/// 4. Delete the backup file (if configured to do so).
+///
 /// If all goes well, no temporary or backup files will remain on disk after closing the stream.
 ///
 /// Errors are handled as follows:
-/// <ol>
-/// - If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
-/// original file untouched).
-/// - If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
-/// kept.
-/// </ol>
 ///
-/// Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
-/// Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
+/// 1. If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
+/// original file untouched).
+/// 2. If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
+/// kept.
+///
+/// Implementation inspired by code from [Marty Lamb](https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java) and [Apache](https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java).
+@NullMarked
 public class AtomicFileOutputStream extends FilterOutputStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
@@ -55,7 +56,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// The file to which writes are redirected to.
     private final Path temporaryFile;
 
-    private FileLock temporaryFileLock;
+    /// Can be null in case of failure to acquire a lock (for example, a network drive).
+    /// If null, then ignore.
+    @Nullable private FileLock temporaryFileLock;
 
     /// A backup of the target file (if it exists), created when the stream is closed
     private final Path backupFile;
@@ -122,7 +125,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Overridden because of cleanup actions in case of an error
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         try {
             out.write(b, off, len);
         } catch (IOException exception) {

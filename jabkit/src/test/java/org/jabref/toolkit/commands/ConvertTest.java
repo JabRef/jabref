@@ -1,51 +1,27 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.collections.FXCollections;
-
 import org.jabref.logic.exporter.BibDatabaseWriter;
-import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class ConvertTest extends AbstractJabKitTest {
-    @ParameterizedTest
-    @CsvSource({"bibtex", "html",
-            "simplehtml", "tablerefs",
-            "oocsv", "hayagrivayaml",
-            "iso690rtf"
-    })
-    void differentOutputFormatTest(String format, @TempDir Path tempDir) throws IOException {
-        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
-        Path newPath = tempDir.resolve("origin.bib");
-        Files.copy(origin, newPath);
-        Path outputPath = tempDir.resolve("output");
-
-        // assertEquals(commandLine.execute("convert", "--input=" + newPath, "--input-format=bibtex", "--output-format=" + format, "--output=" + outputPath), 0);
-        commandLine.execute("convert",
-                "--input=" + newPath, "--input-format=bibtex",
-                "--output-format=" + format,
-                "--output=" + outputPath);
-
-        assertFileExists(outputPath);
-    }
+class ConvertTest extends AbstractJabKitTest {
 
     @Test
     void simpleOutputTest(@TempDir Path tempDir) throws IOException {
@@ -65,22 +41,6 @@ public class ConvertTest extends AbstractJabKitTest {
     }
 
     @Test
-    void wrongOutputFormatFails(@TempDir Path tempDir) throws IOException {
-        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
-        Path newPath = tempDir.resolve("origin.bib");
-        Files.copy(origin, newPath);
-        Path outputPath = tempDir.resolve("output");
-
-        // assertEquals(commandLine.execute("convert", "--input=" + newPath, "--input-format=bibtex", "--output-format=" + format, "--output=" + outputPath), 0);
-        commandLine.execute("convert",
-                "--input=" + newPath, "--input-format=bibtex",
-                "--output-format=ffasdfasd",
-                "--output=" + outputPath);
-
-        assertFileDoesntExist(outputPath);
-    }
-
-    @Test
     void noOutputGeneratesNothing(@TempDir Path tempDir) throws IOException {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path newPath = tempDir.resolve("origin.bib");
@@ -95,28 +55,59 @@ public class ConvertTest extends AbstractJabKitTest {
     }
 
     @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws IOException, URISyntaxException {
-        Path originBib = getClassResourceAsPath("origin.bib");
-        String originBibFile = originBib.toAbsolutePath().toString();
+    void noOutputPrintsBibtexToStdout(@TempDir Path tempDir) throws IOException {
+        SelfContainedSaveOrder saveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
+        when(preferences.getSelfContainedExportConfiguration())
+                .thenReturn(new SelfContainedSaveConfiguration(saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false));
 
-        Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
-        String outputHtmlFile = outputHtml.toAbsolutePath().toString();
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
 
-        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        commandLine.executeToLog("convert",
+                "--input=" + newPath, "--input-format=bibtex");
 
-        SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
-        ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
-        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
+        assertTrue(commandLine.getStandardOutput().contains("@Book{Darwin1888,"));
+    }
 
-        SelfContainedSaveOrder selfContainedSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
-        SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
+    @Test
+    void noOutputExportsRequestedOutputFormat(@TempDir Path tempDir) throws IOException {
+        SelfContainedSaveOrder saveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
+        when(preferences.getSelfContainedExportConfiguration())
+                .thenReturn(new SelfContainedSaveConfiguration(saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false));
 
-        List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
 
-        commandLine.execute(args.toArray(String[]::new));
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + newPath,
+                "--input-format=bibtex",
+                "--output-format=html");
 
-        assertFileExists(outputHtml);
+        assertEquals(0, exitCode);
+        assertTrue(commandLine.getStandardOutput().contains("<html"));
+        assertFalse(commandLine.getStandardOutput().contains("@Book"));
+        assertTrue(commandLine.getErrorOutput().contains("Converting"));
+    }
+
+    @Test
+    void noOutputWithUnknownOutputFormatFailsWithUsageError(@TempDir Path tempDir) throws IOException {
+        commandLine.setExecutionExceptionHandler(
+                new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
+
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
+
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + newPath,
+                "--input-format=bibtex",
+                "--output-format=unknownformat");
+
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Unknown export format 'unknownformat'."));
+        assertFalse(commandLine.getStandardOutput().contains("@Book"));
     }
 
     @Test

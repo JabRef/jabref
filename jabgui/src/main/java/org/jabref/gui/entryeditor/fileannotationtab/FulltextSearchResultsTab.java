@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -22,8 +23,8 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.maintable.OpenSingleExternalFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -43,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
-    public static final String NAME = "Search results";
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
@@ -51,45 +51,45 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
-    private final EntryEditor entryEditor;
     private final TextFlow content;
 
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
+    /// Content available only while an active, valid fulltext search query exists.
+    private final ObservableValue<Boolean> contentVisibility;
+
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor,
-                                    EntryEditor entryEditor) {
+                                    TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
-        this.entryEditor = entryEditor;
+
+        this.contentVisibility = Bindings.createBooleanBinding(
+                () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
+                                  .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
+                                  .orElse(false),
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
+        setContentDrivenVisibility(contentVisibility);
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
         content.setPadding(new Insets(10));
         setContent(scrollPane);
-        setText(Localization.lang("Search results"));
+        setText(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS.displayName());
 
         // Rebinding is necessary because of re-rendering of highlighting of matched text
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
-                           .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
-                           .orElse(false);
-    }
-
-    @Override
     protected void bindToEntry(BibEntry entry) {
-        if (entry == null || !shouldShow(entry)) {
+        if (entry == null || !contentVisibility.getValue()) {
             return;
         }
         this.entry = entry;
@@ -117,7 +117,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                 }
                                 if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
                                     Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
-                                    annotationsText.setStyle("-fx-font-style: italic;");
+                                    annotationsText.getStyleClass().add("italic");
                                     content.getChildren().add(annotationsText);
 
                                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
@@ -131,12 +131,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
-        Platform.runLater(entryEditor::adaptVisibleTabs);
     }
 
     private Text createFileLink(LinkedFile linkedFile) {
         Text fileLinkText = new Text(Localization.lang("Found match in %0", linkedFile.getLink()) + System.lineSeparator() + System.lineSeparator());
-        fileLinkText.setStyle("-fx-font-weight: bold;");
+        fileLinkText.getStyleClass().add("bold");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
@@ -159,7 +158,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createPageLink(LinkedFile linkedFile, int pageNumber, String searchExpression) {
         Text pageLink = new Text(Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
-        pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
+        pageLink.getStyleClass().addAll("italic", "bold");
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {

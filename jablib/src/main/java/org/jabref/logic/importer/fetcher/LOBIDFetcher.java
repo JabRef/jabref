@@ -30,6 +30,8 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Fetches data from the LOBID API
 ///
 /// @see <a href="https://lobid.org/resources/api">API documentation</a> for more details
@@ -48,9 +50,23 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
     /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new LOBIDQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string.
+    ///
+    /// The query is sent verbatim as the `q` parameter, so raw queries
+    /// bypass [LOBIDQueryTransformer] and are passed unchanged to the catalog.
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformSearchQuery(queryNode).orElse("")); // search query
-        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
+        uriBuilder.addParameter("q", query);
+        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber));
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
         uriBuilder.addParameter("format", "json");
         return uriBuilder.build().toURL();
@@ -97,7 +113,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (typeArray != null) {
             List<String> typeList = IntStream.range(0, typeArray.length())
                                              .mapToObj(typeArray::optString)
-                                             .filter(type -> !type.isEmpty())
+                                             .filter(not(String::isEmpty))
                                              .toList();
             types = String.join(", ", typeList);
             entry.setField(StandardField.TYPE, types);
@@ -172,7 +188,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (keywordArray != null) {
             List<String> keywordList = IntStream.range(0, keywordArray.length())
                                                 .mapToObj(keywordArray::optString)
-                                                .filter(keyword -> !keyword.isEmpty())
+                                                .filter(not(String::isEmpty))
                                                 .toList();
             entry.setField(StandardField.KEYWORDS, String.join(", ", keywordList));
         }

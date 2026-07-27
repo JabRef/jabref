@@ -1,5 +1,6 @@
 package org.jabref.logic.bst.util;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /// consider braces to be text characters; furthermore, this function appends any
 /// needed matching |right_brace|s. If any of the types is incorrect, it
 /// complains and pushes the null string.
-///
+@NullMarked
 public class BstTextPrefixer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstTextPrefixer.class);
 
