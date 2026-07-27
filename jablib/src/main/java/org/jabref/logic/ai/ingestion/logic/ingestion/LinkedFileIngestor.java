@@ -43,6 +43,11 @@ public class LinkedFileIngestor {
     public void ingest(BibDatabaseContext bibDatabaseContext, LinkedFile linkedFile) throws InterruptedException {
         LOGGER.debug("Generating embeddings for file \"{}\"", linkedFile.getLink());
 
+        if (linkedFile.isOnlineLink()) {
+            LOGGER.debug("Skipping embeddings generation for online link \"{}\"", linkedFile.getLink());
+            return;
+        }
+
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
