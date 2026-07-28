@@ -38,6 +38,7 @@ jobs:
           echo "✅ Title format OK"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   no-html-comments:
     if: >
@@ -70,6 +71,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   mandatory-checks-section-exists:
     if: >
@@ -101,6 +103,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   checklist-checked:
     if: >
@@ -146,6 +149,7 @@ jobs:
           echo "✅ All checkboxes are present and in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   upload-pr-number:
     runs-on: ubuntu-slim
