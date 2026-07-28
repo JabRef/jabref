@@ -122,7 +122,7 @@ env:
 
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.action == 'labeled' && github.event.label.name != 'automerge' && github.event.label.name != 'dev: binaries' && github.run_id || 'shared' }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
   cancel-in-progress: true
 
 jobs:
