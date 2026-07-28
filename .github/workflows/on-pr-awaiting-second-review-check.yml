@@ -18,6 +18,10 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: "${{ github.workflow }}-${{ github.repository }}-${{ github.event.pull_request.number || github.run_id }}"
+  cancel-in-progress: true
+
 jobs:
   require-second-approval:
     name: Require second approval
