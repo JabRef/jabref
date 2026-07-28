@@ -57,7 +57,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
-    api("com.googlecode.plist:dd-plist:1.29")
+    api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.1")
@@ -119,7 +119,7 @@ dependencies.constraints {
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.85")
     api("org.controlsfx:controlsfx:11.2.3")
-    api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
+    api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.hk2:hk2-api:4.0.1")

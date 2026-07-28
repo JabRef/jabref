@@ -423,7 +423,7 @@ public class CSLCitationOOAdapter {
                 document,
                 cursor,
                 ooText,
-                !preceedingSpaceExists,
+                !preceedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
                 openOfficePreferences.getAddSpaceAfter(),
                 citationType,
                 bibDatabaseContext,
