@@ -24,6 +24,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -47,9 +48,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     private static final String API_URL = "https://api.crossref.org/works";
 
-    // Conservative rate limit for the CrossRef REST API public pool (no polite-pool mailto configured).
-    // CrossRef's polite pool supports up to 50 req/s; without a mailto header the public pool is stricter.
-    // 5 req/s keeps CI runs well within the undocumented public-pool threshold.
+    /// Conservative rate limit for the CrossRef REST API public pool (no polite-pool mailto configured).
+    /// CrossRef's polite pool supports up to 50 req/s; without a mailto header the public pool is stricter.
+    /// 5 req/s keeps CI runs well within the undocumented public-pool threshold.
     private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 5.0);
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
@@ -77,13 +78,16 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BaseQueryNode queryNode) throws FetcherException {
         RATE_LIMITER.acquire(queryNode.toString());
         return SearchBasedParserFetcher.super.performSearch(queryNode);
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(@NonNull String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
         RATE_LIMITER.acquire(identifier);
         return IdBasedParserFetcher.super.performSearchById(identifier);
     }
