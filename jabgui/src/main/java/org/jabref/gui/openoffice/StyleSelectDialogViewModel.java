@@ -234,13 +234,7 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
-    /// Handles
-    /// importing
-    /// a
-    /// custom
-    /// CSL
-    /// style
-    /// file
+    /// Handles importing a custom CSL style file
     public void addCslStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("%0 file", StandardFileType.CITATION_STYLE.getName()), StandardFileType.CITATION_STYLE)
@@ -387,7 +381,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
 
             BstStyle bstStyleToAdd = new BstStyle(stylePath);
-            
+
             if (isDuplicate(bstStyleToAdd)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Style already available"),

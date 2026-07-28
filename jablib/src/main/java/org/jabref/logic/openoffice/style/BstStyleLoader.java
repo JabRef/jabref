@@ -11,36 +11,10 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Manages
-/// the
-/// list
-/// of
-/// available
-/// BST
-/// styles,
-/// mirroring
-/// [JStyleLoader].
+/// Manages the list of available BST styles, mirroring [JStyleLoader].
 ///
-/// Internal
-/// styles
-/// (IEEEtran,
-/// abbrv,
-/// APA)
-/// are
-/// bundled
-/// with
-/// JabRef
-/// and
-/// always
-/// available.
-/// External
-/// styles
-/// are
-/// user-supplied
-/// `.bst`
-/// files
-/// stored
-/// in
+/// Internal styles (IEEEtran, abbrv, APA) are bundled with JabRef and always
+/// available. External styles are user-supplied `.bst` files stored in
 /// preferences.
 @NullMarked
 public class BstStyleLoader {
@@ -63,44 +37,16 @@ public class BstStyleLoader {
         loadExternalStyles();
     }
 
-    /// Returns
-    /// all
-    /// styles
-    /// -
-    /// internal
-    /// first,
-    /// then
-    /// external.
+    /// Returns all styles - internal first, then external.
     public List<BstStyle> getStyles() {
         List<BstStyle> all = new ArrayList<>(internalStyles);
         all.addAll(externalStyles);
         return List.copyOf(all);
     }
 
-    /// Adds
-    /// a
-    /// user-supplied
-    /// `.bst`
-    /// file
-    /// if
-    /// it
-    /// exists,
-    /// is
-    /// not
-    /// already
-    /// present,
-    /// and
-    /// has
-    /// the
-    /// right
-    /// extension.
+    /// Adds a user-supplied `.bst` file if it exists and has the right extension.
     ///
-    /// @return `true`
-    /// if
-    /// the
-    /// style
-    /// was
-    /// added
+    /// @return `true` if the style was added
     public boolean addStyleIfValid(Path path) {
         if (!path.getFileName().toString().toLowerCase().endsWith(".bst")) {
             LOGGER.warn("Not a .bst file: {}", path);
