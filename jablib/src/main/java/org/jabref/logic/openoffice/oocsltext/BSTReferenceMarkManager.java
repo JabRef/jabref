@@ -277,14 +277,12 @@ public class BSTReferenceMarkManager {
 
             // Store the start position before writing
             XTextRange startRange = cursor.getStart();
-            XTextCursor writeCursor = text.createTextCursorByRange(startRange);
-            OOTextIntoOO.removeEscapementFormatting(writeCursor);
 
             // Update the text using OOTextIntoOO
-            OOTextIntoOO.write(document, writeCursor, ooText);
+            OOTextIntoOO.write(document, cursor, ooText);
 
             // Store the end position after writing
-            XTextRange endRange = writeCursor.getEnd();
+            XTextRange endRange = cursor.getEnd();
 
             // Move cursor to wrap the entire inserted content
             cursor.gotoRange(startRange, false);
