@@ -153,7 +153,7 @@ jobs:
               core.setFailed([
                 'Some active Qodo review threads still need acknowledgment from the PR author.',
                 '',
-                'Each Qodo-started review thread must either be outdated, or have have been responded to by the PR author.',
+                'Each Qodo-started review thread must either be outdated or have have been responded to by the PR author.',
                 '',
                 ...failingThreads,
               ].join('\n'));
