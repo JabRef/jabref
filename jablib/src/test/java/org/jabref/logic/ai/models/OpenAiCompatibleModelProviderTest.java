@@ -3,29 +3,19 @@ package org.jabref.logic.ai.models;
 import java.util.List;
 
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.ai.llm.AiProvider;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpenAiCompatibleModelProviderTest {
 
     private OpenAiCompatibleModelProvider provider;
-
-    @BeforeAll
-    static void ensureUnirestInitialized() {
-        // Ensure URLDownload's static initializer runs before any tests
-        // This configures Unirest and prevents UnirestConfigException
-        try {
-            Class.forName(URLDownload.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to initialize URLDownload", e);
-        }
-    }
 
     @BeforeEach
     void setUp() {
@@ -147,5 +137,12 @@ class OpenAiCompatibleModelProviderTest {
             assertTrue(models.isEmpty(),
                     "Provider " + provider + " should return empty list for blank API key");
         }
+    }
+
+    @Test
+    void urlDownloadCanBeInitializedAfterModelFetchingUsesUnirest() {
+        provider.fetchModels(AiProvider.OPEN_AI, "http://127.0.0.1:1", "test-key");
+
+        assertDoesNotThrow(() -> new URLDownload(URLUtil.create("https://example.org")));
     }
 }

@@ -84,13 +84,6 @@ public class URLDownload {
     // Can be null if SSL is not supported. If null, then ignore.
     private @Nullable SSLContext sslContext;
 
-    static {
-        Unirest.config()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
-    }
-
     /// @param source the URL to download from
     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
     public URLDownload(String source) throws MalformedURLException {
@@ -181,8 +174,7 @@ public class URLDownload {
     ///
     /// @return the status code of the response
     public boolean canBeReached() throws UnirestException {
-
-        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        int statusCode = Unirest.head(source.toString()).headers(parameters).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
     }
 
