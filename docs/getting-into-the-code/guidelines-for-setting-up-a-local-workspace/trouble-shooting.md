@@ -84,6 +84,35 @@ Another indication is following output
 java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 ```
 
+## `UnsatisfiedLinkError: no glass in java.library.path` on NixOS
+
+Following error message appears when running `./gradlew :jabgui:run` on NixOS:
+
+```text
+java.lang.UnsatisfiedLinkError: no glass in java.library.path: /usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+        at javafx.graphics/com.sun.glass.utils.NativeLibLoader.loadLibraryInternal(NativeLibLoader.java:162)
+        at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.<clinit>(GtkApplication.java:85)
+```
+
+JabRef consumes JavaFX as plain Maven artifacts, so the JavaFX native libraries ship as prebuilt `.so` files inside the jars.
+JavaFX extracts them to `~/.openjfx/cache/<version>/amd64/` and `dlopen`s them from there.
+They carry no RPATH and are not patchelf'ed, so the GTK/X11 stack they link against has to be reachable through `LD_LIBRARY_PATH` — which NixOS deliberately does not provide globally.
+Enabling `programs.nix-ld` is not enough: it supplies an ELF interpreter, not the libraries these natives load at runtime.
+
+The repository ships a [`shell.nix`](https://github.com/JabRef/jabref/blob/main/shell.nix) that provides them.
+Run the build from inside it:
+
+```shell
+nix-shell
+./gradlew :jabgui:run
+```
+
+The GUI tests additionally need an X server:
+
+```shell
+nix-shell --run 'xvfb-run --auto-servernum ./gradlew :jabgui:check'
+```
+
 ## Attempts to open preferences panel freezes application
 
 This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program.
