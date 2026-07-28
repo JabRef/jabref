@@ -122,7 +122,7 @@ env:
 
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.action == 'labeled' && github.event.label.name != 'automerge' && github.event.label.name != 'dev: binaries' && github.run_id || 'shared' }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
   cancel-in-progress: true
 
 jobs:
@@ -149,7 +149,7 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
@@ -157,7 +157,7 @@ jobs:
           set -x
           PS4='+ ${LINENO}: '
 
-          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
+          if [[ "$EVENT_ACTION" != "labeled" || "$LABEL_NAME" == "automerge" || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
             echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
             echo "should-build=true" >> "$GITHUB_OUTPUT"
