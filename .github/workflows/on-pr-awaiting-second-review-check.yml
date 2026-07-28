@@ -1,6 +1,7 @@
 name: Await second review
 
 on:
+  merge_group:
   pull_request_target:
     types:
       - opened
