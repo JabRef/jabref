@@ -7,10 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +51,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
-    private final Map<PageKey, String> cursorCacheMap = new ConcurrentHashMap<>();
+    private final Map<PageKey, String> cursorCacheMap = new Hashtable<>();
 
     private final ImporterPreferences importerPreferences;
 
@@ -91,15 +91,11 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             entry.withField(new UnknownField("scholarApiHasPdf"), String.valueOf(scholarJsonEntry.getBoolean("has_pdf")));
 
             if (scholarJsonEntry.has("id")) {
-                entry.withField(new UnknownField("scholarapi"), scholarJsonEntry.getString("id"));
+                entry.withField(new UnknownField("scholarAPiId"), scholarJsonEntry.getString("id"));
             }
 
             if (scholarJsonEntry.has("doi")) {
                 entry.withField(StandardField.DOI, scholarJsonEntry.getString("doi"));
-            }
-
-            if (scholarJsonEntry.has("journal_issue")) {
-                entry.withField(StandardField.NUMBER, scholarJsonEntry.getString("journal_issue"));
             }
 
             if (scholarJsonEntry.has("journal_pages")) {
