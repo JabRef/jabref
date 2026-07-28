@@ -19,7 +19,6 @@ class PreviewLayoutTest {
 
     @Test
     void ofFindsCustomLayoutByName() {
-
         TextBasedPreviewLayout myStyle = new TextBasedPreviewLayout("My Style", "some text", layoutFormatterPreferences, abbreviationRepository);
         List<TextBasedPreviewLayout> customLayouts = List.of(myStyle);
         PreviewLayout result = PreviewLayout.of("My Style", customLayouts, List.of(), layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
