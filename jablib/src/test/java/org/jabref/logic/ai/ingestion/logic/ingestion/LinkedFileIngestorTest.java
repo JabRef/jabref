@@ -8,14 +8,16 @@ import org.jabref.model.entry.LinkedFile;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+@NullMarked
 class LinkedFileIngestorTest {
 
     @Test
@@ -27,9 +29,7 @@ class LinkedFileIngestorTest {
                 mock(EmbeddingModel.class),
                 mock(DocumentSplitter.class));
 
-        LinkedFile onlineLink = mock(LinkedFile.class);
-        when(onlineLink.isOnlineLink()).thenReturn(true);
-        when(onlineLink.getLink()).thenReturn("https://arxiv.org/pdf/2301.00001v1");
+        LinkedFile onlineLink = spy(new LinkedFile("", "https://arxiv.org/pdf/2301.00001v1", "PDF"));
 
         ingestor.ingest(mock(BibDatabaseContext.class), onlineLink);
 
