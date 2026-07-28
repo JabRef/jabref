@@ -111,7 +111,7 @@ class PreferencesFormBuilderTest {
             root.layout();
 
             HBox columnsRow = (HBox) root.getChildren().getFirst();
-            columns[0] = (VBox) columnsRow.getChildren().get(0);
+            columns[0] = (VBox) columnsRow.getChildren().getFirst();
             columns[1] = (VBox) columnsRow.getChildren().get(1);
             laidOut.countDown();
         });
