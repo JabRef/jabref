@@ -26,8 +26,14 @@ public final class CSLStyleUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
-    /// Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
-    public record StyleInfo(String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent) {
+    /// Style information record (style id, style class, title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
+    public record StyleInfo(String styleId,
+                            String styleClass,
+                            String title,
+                            String shortTitle,
+                            boolean isNumericStyle,
+                            boolean hasBibliography,
+                            boolean usesHangingIndent) {
     }
 
     static {
@@ -94,6 +100,8 @@ public final class CSLStyleUtils {
             Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
             return styleInfo.map(info -> new CitationStyle(
                     filename,
+                    info.styleId(),
+                    info.styleClass(),
                     info.title(),
                     info.shortTitle(),
                     info.isNumericStyle(),
@@ -120,6 +128,8 @@ public final class CSLStyleUtils {
             boolean hasBibliography = false;
             boolean hasCitation = false;
             boolean usesHangingIndent = false;
+            String styleId = "";
+            String styleClass = "";
             String title = "";
             boolean isNumericStyle = false;
             String shortTitle = "";
@@ -131,6 +141,9 @@ public final class CSLStyleUtils {
                     String elementName = reader.getLocalName();
 
                     switch (elementName) {
+                        case "style" -> {
+                            styleClass = Optional.ofNullable(reader.getAttributeValue(null, "class")).orElse("");
+                        }
                         case "bibliography" -> {
                             hasBibliography = true;
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
@@ -140,6 +153,11 @@ public final class CSLStyleUtils {
                                 hasCitation = true;
                         case "info" ->
                                 inInfo = true;
+                        case "id" -> {
+                            if (inInfo) {
+                                styleId = reader.getElementText();
+                            }
+                        }
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();
@@ -165,7 +183,14 @@ public final class CSLStyleUtils {
             }
 
             if (hasCitation && title != null) {
-                return Optional.of(new StyleInfo(title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent));
+                return Optional.of(new StyleInfo(
+                        styleId,
+                        styleClass,
+                        title,
+                        shortTitle,
+                        isNumericStyle,
+                        hasBibliography,
+                        usesHangingIndent));
             } else {
                 LOGGER.debug("No valid title or citation found for file {}", filename);
                 return Optional.empty();

@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -519,22 +518,16 @@ public class StringUtil {
         return out.toString();
     }
 
-    /*
-     * @param  buf       String to be tokenized
-     * @param  delimstr  Delimiter string
-     * @return list      {@link java.util.List} of <tt>String</tt>
-     */
-    public static List<String> tokenizeToList(String buf, String delimstr) {
-        List<String> list = new ArrayList<>();
-        String buffer = buf + '\n';
-
-        StringTokenizer st = new StringTokenizer(buffer, delimstr);
-
-        while (st.hasMoreTokens()) {
-            list.add(st.nextToken());
-        }
-
-        return list;
+    /// @param buffer    String to be tokenized
+    /// @param delimiter Delimiter string
+    /// @return list      {@link java.util.List} of <tt>String</tt>
+    public static List<String> tokenizeToList(String buffer, String delimiter) {
+        // delimiter is a set of characters, so it is turned into a character class.
+        // \Q...\E keeps any regex metacharacter inside the class literal.
+        return Pattern.compile("[\\Q" + delimiter + "\\E]")
+                      .splitAsStream(buffer + '\n')
+                      .filter(token -> !token.isEmpty())
+                      .toList();
     }
 
     /// Limits the length of a string to a maximum length.
