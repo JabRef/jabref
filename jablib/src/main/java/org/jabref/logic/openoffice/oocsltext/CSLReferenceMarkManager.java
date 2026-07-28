@@ -2,9 +2,11 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
 
+import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -302,6 +305,7 @@ public class CSLReferenceMarkManager {
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
+        Set<String> existingReferenceMarkUniqueIds = new HashSet<>();
 
         for (String name : marks.getElementNames()) {
             if (ReferenceMark.isReferenceMarkName(name)) {
@@ -318,6 +322,7 @@ public class CSLReferenceMarkManager {
 
                 if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
+                    existingReferenceMarkUniqueIds.add(referenceMark.getUniqueId());
                     String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + referenceMark.getUniqueId();
                     UnoUserDefinedProperty.getStringValue(document, storageKey)
                                           .map(OOText::fromString)
@@ -334,6 +339,7 @@ public class CSLReferenceMarkManager {
             }
         }
 
+        removeUnusedFormattedCitationTextProperties(existingReferenceMarkUniqueIds);
         rebuildCitationNumberState();
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
@@ -344,6 +350,21 @@ public class CSLReferenceMarkManager {
             } catch (Exception
                      | CreationException e) {
                 LOGGER.warn("Error updating citation numbers", e);
+            }
+        }
+    }
+
+    private void removeUnusedFormattedCitationTextProperties(Set<String> existingReferenceMarkUniqueIds) {
+        for (String propertyName : UnoUserDefinedProperty.getListOfNames(document)
+                                                         .stream()
+                                                         .filter(name -> name.startsWith(FORMATTED_CITATION_TEXT_PROPERTY_PREFIX))
+                                                         .filter(name -> !existingReferenceMarkUniqueIds.contains(
+                                                                 name.substring(FORMATTED_CITATION_TEXT_PROPERTY_PREFIX.length())))
+                                                         .toList()) {
+            try {
+                UnoUserDefinedProperty.removeIfExists(document, propertyName);
+            } catch (NotRemoveableException ex) {
+                LOGGER.warn("Could not remove unused formatted CSL citation text property: {}", propertyName, ex);
             }
         }
     }
