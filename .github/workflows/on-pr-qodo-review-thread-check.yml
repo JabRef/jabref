@@ -9,6 +9,18 @@ on:
     types: [created, edited, deleted]
 
 jobs:
+  # Enables "Comment on PR" (pr-comment.yml) to pick up the PR number and adapt labels
+  upload-pr-number:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-slim
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pr_number
+          path: pr_number.txt
+
   check-qodo-review-threads:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-slim
