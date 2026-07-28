@@ -99,8 +99,24 @@ JavaFX extracts them to `~/.openjfx/cache/<version>/amd64/` and `dlopen`s them f
 They carry no RPATH and are not patchelf'ed, so the GTK/X11 stack they link against has to be reachable through `LD_LIBRARY_PATH` — which NixOS deliberately does not provide globally.
 Enabling `programs.nix-ld` is not enough: it supplies an ELF interpreter, not the libraries these natives load at runtime.
 
-The repository ships a [`shell.nix`](https://github.com/JabRef/jabref/blob/main/shell.nix) that provides them.
-Run the build from inside it:
+The repository ships a [`shell.nix`](https://github.com/JabRef/jabref/blob/main/shell.nix) that provides them, along with a bootstrap JDK for the Gradle wrapper and `xvfb-run` for the GUI tests.
+
+### Prerequisite: `programs.nix-ld`
+
+The build pins the Gradle toolchain to vendor Amazon, so Gradle downloads a Corretto JDK into `~/.gradle/jdks` regardless of which JDK is on `PATH`.
+That JDK is an ordinary dynamically linked binary and asks for `/lib64/ld-linux-x86-64.so.2`, a path NixOS does not have by default.
+`shell.nix` cannot supply it, because it is system configuration rather than something a shell can set.
+Enable it once in your NixOS configuration:
+
+```nix
+programs.nix-ld.enable = true;
+```
+
+Then run `nixos-rebuild switch`.
+Without this the build fails with `No such file or directory` when Gradle tries to start the downloaded JDK.
+Entering `nix-shell` prints a warning pointing here if the interpreter is missing.
+
+### Running the build
 
 ```shell
 nix-shell

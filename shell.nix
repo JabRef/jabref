@@ -12,12 +12,24 @@
 # `./gradlew :jabgui:run` dies with
 # `UnsatisfiedLinkError: no glass in java.library.path`.
 #
-# `programs.nix-ld` does not fix this: it supplies an ELF interpreter (which is
-# what lets the Gradle-provisioned Corretto toolchain in `~/.gradle/jdks` run at
-# all) plus a small default library set, but that set has no X11 or GTK in it.
+# `programs.nix-ld` does not fix this: it supplies an ELF interpreter plus a
+# small default library set, but that set has no X11 or GTK in it.
 #
-# The JDK is deliberately *not* provided here — the build pins toolchain vendor
-# AMAZON, so Gradle auto-provisions Corretto regardless of what is on PATH.
+# On NixOS `programs.nix-ld.enable = true` is nevertheless a prerequisite, and
+# this shell cannot provide it — it is system configuration. The build pins
+# toolchain vendor AMAZON, so Gradle auto-provisions a Corretto JDK into
+# `~/.gradle/jdks` no matter what is on PATH, and that JDK is an ordinary
+# dynamically linked binary asking for `/lib64/ld-linux-x86-64.so.2`. NixOS only
+# has that path when nix-ld creates it. The shellHook below checks for it and
+# points at the fix rather than letting the build fail with a bare
+# "No such file or directory". See the troubleshooting guide:
+# docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/trouble-shooting.md
+#
+# The JDK here is only a *bootstrap* for the Gradle wrapper: `./gradlew` is a
+# shell script that needs an existing `java` to start Gradle at all, and
+# toolchain auto-provisioning happens only afterwards, from inside that JVM.
+# Gradle still resolves the Amazon toolchain for compiling and running JabRef,
+# so this does not change which JDK the project is built against.
 #
 # `xvfb-run` is for the GUI tests, which CI runs as `xvfb-run --auto-servernum`
 # (see `.github/workflows/tests-code.yml`); NixOS ships the `Xvfb` binary in
@@ -65,11 +77,35 @@ let
   ];
 
   runtimeLibs = javafxRuntimeLibs ++ embeddedPostgresLibs;
+
+  # Bootstrap JDK for the Gradle wrapper only; see the header. Keep the major
+  # version in sync with the toolchain in
+  # build-logic/src/main/kotlin/org/jabref/gradle/Toolchains.kt (currently 25).
+  bootstrapJdk = pkgs.jdk25;
 in
 pkgs.mkShell {
   packages = [
+    bootstrapJdk
     pkgs.xvfb-run # `xvfb-run --auto-servernum ./gradlew :jabgui:check` — the GUI tests
   ] ++ runtimeLibs;
 
+  # The Gradle wrapper prefers JAVA_HOME over a `java` found on PATH.
+  JAVA_HOME = "${bootstrapJdk}";
+
   LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath runtimeLibs;
+
+  # Fail loudly and early instead of letting Gradle die on the auto-provisioned
+  # Corretto with a bare "No such file or directory". Only meaningful on NixOS:
+  # every other distribution ships the interpreter at that path anyway.
+  shellHook = ''
+    if [ -e /etc/NIXOS ] && [ ! -e /lib64/ld-linux-x86-64.so.2 ]; then
+      echo "warning: /lib64/ld-linux-x86-64.so.2 is missing." >&2
+      echo "  Gradle auto-provisions an Amazon Corretto JDK into ~/.gradle/jdks and cannot" >&2
+      echo "  run it without that ELF interpreter. Enable nix-ld in your system config:" >&2
+      echo "" >&2
+      echo "    programs.nix-ld.enable = true;" >&2
+      echo "" >&2
+      echo "  then 'nixos-rebuild switch' and re-enter this shell." >&2
+    fi
+  '';
 }
