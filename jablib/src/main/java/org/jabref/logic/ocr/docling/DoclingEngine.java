@@ -147,7 +147,7 @@ public class DoclingEngine implements OcrEngine {
                             contentStream.beginText();
                             contentStream.setRenderingMode(RenderingMode.NEITHER);
                             contentStream.setFont(font, fontSize);
-                            contentStream.newLineAtOffset((float) bbox.left(), (float) bbox.bottom());
+                            contentStream.newLineAtOffset((float) bbox.l(), (float) bbox.b());
                             contentStream.showText(text);
                             contentStream.endText();
                         } catch (IllegalArgumentException e) {
