@@ -64,7 +64,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                 .section(Localization.lang("Attached files"), attached -> attached
                         .checkbox(Localization.lang("Show confirmation dialog when deleting attached files"), viewModel.confirmLinkedFileDeleteProperty())
                         .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty(),
-                                trash -> trash.disabled(!NativeDesktop.get().moveToTrashSupported()))
+                                trash -> {
+                                    if (!NativeDesktop.get().moveToTrashSupported()) {
+                                        trash.disable();
+                                    }
+                                })
                         .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty())
                         .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty(),
                                 copy -> copy.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not()))

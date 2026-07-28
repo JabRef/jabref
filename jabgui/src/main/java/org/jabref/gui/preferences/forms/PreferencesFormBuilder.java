@@ -832,9 +832,10 @@ public class PreferencesFormBuilder {
             return self();
         }
 
-        /// Statically disables the node (for platform-capability checks, not reactive state).
-        public S disabled(boolean value) {
-            node.setDisable(value);
+        /// Statically disables the node (for platform-capability checks, not reactive state). Use
+        /// [#disableWhen] for anything that can change while the dialog is open.
+        public S disable() {
+            node.setDisable(true);
             return self();
         }
 
