@@ -316,10 +316,13 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - name: Run ${{ matrix.module }} tests
+      - name: Run ${{ matrix.module }} unit tests
         run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+      - name: Run JabKit portable smoke test
+        if: matrix.module == 'jabkit'
+        run: gradle :jabkit:runJabKitPortableSmokeTest
       - name: Prepare format failed test results
         if: failure()
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
@@ -381,19 +384,6 @@ jobs:
         run: gradle :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
-
-  tests-jabkit-smoke:
-    name: "JabKit Smoke Test"
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - run: gradle :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
     if: (github.repository_owner == 'JabRef')
