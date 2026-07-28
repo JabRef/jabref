@@ -72,6 +72,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where italic and bold citation styles are not properly generated. [#16379](https://github.com/JabRef/jabref/issues/16379)
+- We fixed an issue where generating bibliography or inserting citations make superscript citations smaller and smaller. [#16351](https://github.com/JabRef/jabref/issues/16351)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
