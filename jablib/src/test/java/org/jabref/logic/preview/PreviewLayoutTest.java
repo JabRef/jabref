@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 class PreviewLayoutTest {
-    
+
     private final LayoutFormatterPreferences layoutFormatterPreferences = LayoutFormatterPreferences.getDefault();
     private final JournalAbbreviationRepository abbreviationRepository = new JournalAbbreviationRepository();
     private final BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();

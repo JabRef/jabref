@@ -46,7 +46,7 @@ class PreviewPreferencesTest {
     void getDefaultWithStylesCustomLayoutIsSameInstanceInBothLists() {
         PreviewPreferences defaults = PreviewPreferences.getDefaultWithStyles(layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
         TextBasedPreviewLayout customLayout = defaults.getCustomPreviewLayouts().getFirst();
-    
+
         assertTrue(defaults.getLayoutCycle().contains(customLayout));
     }
 
