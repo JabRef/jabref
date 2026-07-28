@@ -138,11 +138,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Set up Gradle and JBang for ghprcomment
+      # Setup JBang (included at setup-gralde)
       - uses: ./.github/actions/setup-gradle
         if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.name != 'Qodo review threads acknowledged' && steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        with:
-          setupJbang: 'true'
 
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.name != 'Qodo review threads acknowledged' && steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}

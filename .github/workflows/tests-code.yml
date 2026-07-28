@@ -181,7 +181,7 @@ jobs:
       - name: Cache JBang
         # Combined cache action: restores at start and saves ~/.jbang on a
         # cache miss in the post-job step. A madrlint-specific key keeps this
-        # cache separate from the shared "jbang-" cache used when setup-gradle enables JBang.
+        # cache separate from the shared "jbang-" cache used by setup-gradle.
         uses: actions/cache@v6
         with:
           path: ~/.jbang
@@ -437,8 +437,6 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-        with:
-          setupJbang: 'true'
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
@@ -453,8 +451,6 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-        with:
-          setupJbang: 'true'
       # Publish jablib to the local Maven repository so the JBang scripts pick up
       # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
       # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).

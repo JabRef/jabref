@@ -1,5 +1,5 @@
-name: Setup JDK and Gradle
-description: Setup JDK and Gradle, optionally JBang
+name: Setup JDK, JBang, and gradle
+description: Setup JDK, JBang and gradle
 
 inputs:
   distribution:
@@ -10,10 +10,6 @@ inputs:
     description: Java version
     required: false
     default: '25'
-  setupJbang:
-    description: Whether to set up JBang
-    required: false
-    default: 'false'
 
 runs:
   using: composite
@@ -32,12 +28,10 @@ runs:
         GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: false
     - name: Generate JBang cache key
       id: cache-key
-      if: inputs.setupJbang == 'true'
       shell: bash
       run: |
         echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
     - name: Cache JBang
-      if: inputs.setupJbang == 'true'
       uses: actions/cache@v6
       with:
         path: ~/.jbang
@@ -45,5 +39,4 @@ runs:
         restore-keys:
           jbang-
     - name: Setup JBang
-      if: inputs.setupJbang == 'true'
       uses: jbangdev/setup-jbang@main
