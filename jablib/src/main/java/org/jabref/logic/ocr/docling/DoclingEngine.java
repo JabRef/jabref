@@ -151,8 +151,9 @@ public class DoclingEngine implements OcrEngine {
                             contentStream.showText(text);
                             contentStream.endText();
                         } catch (IllegalArgumentException e) {
+                            text = filterEncodableCharacters(font, text);
+                            contentStream.showText(text);
                             contentStream.endText();
-                            LOGGER.debug("Skipping unsupported text span: {}", text, e);
                         }
                     }
                 }
@@ -162,5 +163,19 @@ public class DoclingEngine implements OcrEngine {
         }
 
         return OcrResult.success(outputPdf);
+    }
+
+    private String filterEncodableCharacters(PDFont font, String text) {
+        StringBuilder filtered = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            String ch = String.valueOf(text.charAt(i));
+            try {
+                font.encode(ch);
+                filtered.append(ch);
+            } catch (IllegalArgumentException | IOException e) {
+                LOGGER.debug("Skipping unsupported character: {}", ch, e);
+            }
+        }
+        return filtered.toString();
     }
 }
