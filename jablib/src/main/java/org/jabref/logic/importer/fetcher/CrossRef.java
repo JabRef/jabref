@@ -48,10 +48,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     private static final String API_URL = "https://api.crossref.org/works";
 
-    /// Conservative rate limit for the CrossRef REST API public pool (no polite-pool mailto configured).
-    /// CrossRef's polite pool supports up to 50 req/s; without a mailto header the public pool is stricter.
-    /// 5 req/s keeps CI runs well within the undocumented public-pool threshold.
-    private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 5.0);
+    /// Rate limit for the CrossRef REST API public pool.
+    /// CrossRef's public pool defaults to 50 req/s, as measured via X-Rate-Limit-Interval/X-Rate-Limit-Limit
+    /// response headers - consistent with [DoiFetcher]'s existing CROSSREF_DCN_RATE_LIMITER.
+    private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 50.0);
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
