@@ -11,6 +11,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.ControlHelper;
 
 import com.dlsc.gemsfx.EnhancedPasswordField;
+import org.jspecify.annotations.NullMarked;
 
 /// Custom editor: a bound {@link EnhancedPasswordField} with an optional row of icon buttons in its
 /// right slot. {@link EnhancedPasswordField} is third-party, so the fluent subject is this wrapper;
@@ -25,6 +26,7 @@ import com.dlsc.gemsfx.EnhancedPasswordField;
 /// ```
 ///
 /// Every button follows the field's own disabled state, so disabling the field disables the row.
+@NullMarked
 public final class PasswordFieldEditor {
 
     private final EnhancedPasswordField field = new EnhancedPasswordField();

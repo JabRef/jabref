@@ -9,6 +9,7 @@ import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Base class for preference tabs. A tab describes its UI with a {@link PreferencesFormBuilder}
@@ -54,7 +55,7 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
     }
 
     /// Hands the assembled form over as the tab's content; called once, from the tab's constructor.
-    protected void setContent(Node content) {
+    protected void setContent(@NonNull Node content) {
         this.content = content;
     }
 

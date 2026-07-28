@@ -253,7 +253,7 @@ public class AiPreferences {
     }
 
     /// Creates an independent copy of `other`, e.g. as a dialog-scoped working copy that is
-    /// edited freely and flushed back via {@link #copyFrom(AiPreferences)} on save.
+    /// edited freely and flushed back via [#copyFrom(AiPreferences)] on save.
     public static AiPreferences copyOf(AiPreferences other) {
         AiPreferences copy = new AiPreferences();
         copy.copyFrom(other);

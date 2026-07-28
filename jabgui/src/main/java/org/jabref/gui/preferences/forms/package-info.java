@@ -3,7 +3,7 @@
 ///
 /// ## The builder
 ///
-/// {@link org.jabref.gui.preferences.forms.PreferencesFormBuilder} assembles a tab's node tree.
+/// [org.jabref.gui.preferences.forms.PreferencesFormBuilder] assembles a tab's node tree.
 /// Its contract:
 ///
 /// - **The chain only adds elements.** Anything that configures an element happens inside that
