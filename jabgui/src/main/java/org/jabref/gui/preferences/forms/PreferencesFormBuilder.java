@@ -907,9 +907,9 @@ public class PreferencesFormBuilder {
             return this;
         }
 
-        /// Attaches a text field bound to `value`. On a checkbox or radio the field is enabled
-        /// only while the toggle is selected (the recurring "option with inline value" pattern);
-        /// on any other control it follows the control's disabled state. The config lambda
+        /// Attaches a text field bound to `value`. Like every attachment it follows the control's
+        /// disabled state; on a checkbox or radio it is additionally disabled while the toggle is
+        /// unselected (the recurring "option with inline value" pattern). The config lambda
         /// addresses the new field.
         public InputElement<N> attachField(StringProperty value) {
             return attachField(value, noConfig());
@@ -921,13 +921,11 @@ public class PreferencesFormBuilder {
             field.textProperty().bindBidirectional(value);
             HBox.setHgrow(field, Priority.ALWAYS);
             InputElement<TextField> element = new InputElement<>(form, field);
-            switch (node) {
-                case CheckBox box ->
-                        element.addDisableCondition(box.selectedProperty().not());
-                case ToggleButton toggle ->
-                        element.addDisableCondition(toggle.selectedProperty().not());
-                default ->
-                        element.followDisable(node);
+            element.followDisable(node);
+            if (node instanceof CheckBox box) {
+                element.addDisableCondition(box.selectedProperty().not());
+            } else if (node instanceof ToggleButton toggle) {
+                element.addDisableCondition(toggle.selectedProperty().not());
             }
             form.attachTo(node, field);
             config.accept(element);
