@@ -375,7 +375,13 @@ public class OOTextIntoOO {
 
     /// Reset only direct superscript/subscript formatting before rewriting marked-up citation text.
     public static void removeEscapementFormatting(@NonNull XTextCursor cursor) {
-        XMultiPropertyStates propertyStates = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
+        Optional<XMultiPropertyStates> optionalPropertyStates = UnoCast.cast(XMultiPropertyStates.class, cursor);
+        if (optionalPropertyStates.isEmpty()) {
+            LOGGER.debug("Could not reset escapement format.");
+            return;
+        }
+
+        XMultiPropertyStates propertyStates = optionalPropertyStates.get();
 
         try {
             propertyStates.setPropertiesToDefault(new String[] {
