@@ -13,9 +13,8 @@ import org.slf4j.LoggerFactory;
 
 /// Manages the list of available BST styles, mirroring [JStyleLoader].
 ///
-/// Internal styles (IEEEtran, abbrv, APA) are bundled with JabRef and always
-/// available. External styles are user-supplied `.bst` files stored in
-/// preferences.
+/// Internal styles (IEEEtran, abbrv, APA) are bundled with JabRef and always available.
+/// External styles are user-supplied `.bst` files stored in preferences.
 @NullMarked
 public class BstStyleLoader {
 
