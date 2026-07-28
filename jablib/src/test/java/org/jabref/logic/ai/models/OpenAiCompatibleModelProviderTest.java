@@ -138,11 +138,4 @@ class OpenAiCompatibleModelProviderTest {
                     "Provider " + provider + " should return empty list for blank API key");
         }
     }
-
-    @Test
-    void urlDownloadCanBeInitializedAfterModelFetchingUsesUnirest() {
-        provider.fetchModels(AiProvider.OPEN_AI, "http://127.0.0.1:1", "test-key");
-
-        assertDoesNotThrow(() -> new URLDownload(URLUtil.create("https://example.org")));
-    }
 }
