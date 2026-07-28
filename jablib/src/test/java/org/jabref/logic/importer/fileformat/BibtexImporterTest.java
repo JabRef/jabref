@@ -174,6 +174,26 @@ class BibtexImporterTest {
                 parserResult.getDatabase().getEntries());
     }
 
+    private static Stream<Arguments> parsingUtf16FilesWithAndWithoutBom() {
+        return Stream.of(
+                Arguments.of("tiny-BE-withBOM.bib", StandardCharsets.UTF_16BE),
+                Arguments.of("tiny-BE-noBOM.bib", StandardCharsets.UTF_16BE),
+                Arguments.of("tiny-LE-withBOM.bib", StandardCharsets.UTF_16LE),
+                Arguments.of("tiny-LE-noBOM.bib", StandardCharsets.UTF_16LE)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parsingUtf16FilesWithAndWithoutBom(String filename, Charset expectedEncoding) throws URISyntaxException, IOException {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        assertEquals(expectedEncoding, parserResult.getMetaData().getEncoding().orElseThrow());
+        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+        assertEquals("Verwilghen+vanGalen+Wilke2011", parserResult.getDatabase().getEntries().getFirst().getCitationKey().orElseThrow());
+    }
+
     private static Stream<Arguments> encodingExplicitlySuppliedCorrectlyDetermined() {
         return Stream.of(
                 Arguments.of("encoding-utf-8-with-header.bib", true),

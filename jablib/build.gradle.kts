@@ -5,7 +5,8 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.*
+import org.jabref.gradle.EmbeddedPostgresBinaries
+import java.util.Calendar
 
 plugins {
     id("org.jabref.gradle.module")
@@ -23,9 +24,15 @@ plugins {
     id("net.ltgt.nullaway") version "3.1.0"
 }
 
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
+
 testModuleInfo {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     runtimeOnly("org.jabref")
+    embeddedPostgresHostBinary?.let { runtimeOnly(it.moduleName) }
 
     requires("org.jabref.testsupport")
 
@@ -63,6 +70,8 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
+
+    embeddedPostgresHostBinary?.let { testRuntimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
 var version = providers.gradleProperty("projVersion")

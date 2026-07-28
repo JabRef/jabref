@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 
-public class ModifyCSLBibliographyPropertiesDialogViewModel {
+public class ModifyBibliographyPropertiesDialogViewModel {
 
     private final StringProperty cslBibliographyTitle = new SimpleStringProperty();
     private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();
@@ -21,7 +21,7 @@ public class ModifyCSLBibliographyPropertiesDialogViewModel {
 
     private final OpenOfficePreferences openOfficePreferences;
 
-    public ModifyCSLBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
+    public ModifyBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = openOfficePreferences;
 
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());

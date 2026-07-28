@@ -317,15 +317,12 @@
       "glob": "protectedterms/months_weekdays.terms"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "build.properties"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "journals/journal-list.mv"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "journals/ltwa-list.mv"
     },
     {
