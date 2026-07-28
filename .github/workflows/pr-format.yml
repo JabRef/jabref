@@ -25,11 +25,6 @@ jobs:
       )
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Check PR title
         run: |
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
@@ -59,12 +54,6 @@ jobs:
     name: No HTML comments
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-
       - name: Check for existence of section "Checklist"
         id: check_mandatory_section
         run: |
@@ -97,12 +86,6 @@ jobs:
     name: Mandatory Checklist present
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-
       - name: Check for existence of section "Checklist"
         id: check_mandatory_section
         run: |
@@ -135,11 +118,6 @@ jobs:
     runs-on: ubuntu-slim
     needs: [ mandatory-checks-section-exists ]
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Check for PR checklist
         id: check_changelog_modification
         run: |
