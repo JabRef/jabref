@@ -1,7 +1,6 @@
 name: Await second review
 
 on:
-  merge_group:
   pull_request_target:
     types:
       - opened
@@ -26,20 +25,9 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check whether a second approval is required
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
-            if (context.eventName === 'merge_group') {
-              // A merge group may batch several PRs and its payload carries no PR number,
-              // so the label check cannot run here. It already gated queue entry via the
-              // pull_request_target run, which must be green before a PR can be queued.
-              await core.summary
-                .addHeading('Await second review')
-                .addRaw('Merge group event: requirement was already enforced before the PR entered the merge queue.\n')
-                .write();
-              return;
-            }
-
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const pullNumber = context.payload.pull_request?.number;
