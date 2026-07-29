@@ -11,6 +11,7 @@ on:
       - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
+      - '.github/workflows/tests-code-fetchers.yml'
       - '.github/actions/setup-gradle/action.yml'
       - 'jablib/build.gradle.kts'
   pull_request:
@@ -22,6 +23,7 @@ on:
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/actions/setup-gradle/action.yml'
+      - '.github/workflows/tests-code-fetchers.yml'
       - 'jablib/build.gradle.kts'
   schedule:
     # run on each Monday
