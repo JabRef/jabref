@@ -52,19 +52,25 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: 'false'
-      - id: changed-files
+      - id: changed-non-workflow-files
         if: github.event_name != 'workflow_dispatch'
         uses: tj-actions/changed-files@v47
         with:
           files_ignore: |
             .github/workflows/**
+      - id: changed-tests-code-workflow
+        if: github.event_name != 'workflow_dispatch'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .github/workflows/tests-code.yml
       - name: Determine whether Gradle jobs should run
         id: determine
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "run-gradle-ci=true" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ steps.changed-files.outputs.any_changed }}" == "true" ]]; then
+          elif [[ "${{ steps.changed-non-workflow-files.outputs.any_changed }}" == "true" || "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" ]]; then
             echo "run-gradle-ci=true" >> "$GITHUB_OUTPUT"
           else
             echo "run-gradle-ci=false" >> "$GITHUB_OUTPUT"
