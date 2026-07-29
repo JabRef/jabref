@@ -11,6 +11,7 @@ import org.jabref.model.ai.llm.AiProvider;
 
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -48,7 +49,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
             models = parseModelsFromResponse(new JsonNode(response));
 
             LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
-        } catch (FetcherException | MalformedURLException e) {
+        } catch (FetcherException | MalformedURLException | JSONException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
 

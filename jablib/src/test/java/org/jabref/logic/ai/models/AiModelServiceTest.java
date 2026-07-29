@@ -2,10 +2,8 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +52,8 @@ class AiModelServiceTest {
 
     @Test
     void fetchModelsSynchronouslyHandlesTimeout() {
+        // This test uses a URL that will likely timeout (non-routable IP)
+        // Unirest has a default timeout, so should fail and return empty list
         long startTime = System.currentTimeMillis();
 
         List<String> models = aiModelService.fetchModelsSynchronously(
@@ -65,6 +65,7 @@ class AiModelServiceTest {
         long duration = System.currentTimeMillis() - startTime;
 
         assertEquals(List.of(), models);
+        // Unirest default timeout is around 10 seconds, allow margin for test execution
         assertTrue(duration < 15000, "Should timeout within reasonable time, but took " + duration + "ms");
     }
 
