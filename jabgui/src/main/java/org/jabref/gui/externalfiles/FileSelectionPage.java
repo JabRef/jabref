@@ -61,6 +61,14 @@ public class FileSelectionPage extends WizardPane {
         setupBindings();
     }
 
+    public void setHeaderVisible(boolean visible) {
+        if (visible) {
+            setHeaderText(Localization.lang("Select files to import"));
+        } else {
+            setHeaderText(null);
+        }
+    }
+
     public BooleanProperty invalidProperty() {
         return invalidProperty;
     }
@@ -127,6 +135,9 @@ public class FileSelectionPage extends WizardPane {
 
                 updateFileCount(root);
 
+                // Restore header after search completes (issue #16158)
+                setHeaderVisible(true);
+
                 ((BorderPane) getContent()).setCenter(contentPane);
             } else {
                 EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());
@@ -172,6 +183,9 @@ public class FileSelectionPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
+        // Hide header while search is in progress (issue #16158)
+        setHeaderVisible(false);
+
         // Start search if not already done
         if (viewModel.treeRootProperty().get().isEmpty()) {
             ((BorderPane) getContent()).setCenter(progressPane);

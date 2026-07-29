@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,6 +27,7 @@ public class UnlinkedFilesWizard {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private UnlinkedFilesDialogViewModel viewModel;
     private BibDatabaseContext bibDatabaseContext;
@@ -92,6 +94,16 @@ public class UnlinkedFilesWizard {
         wizard = new Wizard();
         wizard.setTitle(Localization.lang("Search for unlinked local files"));
         wizard.setFlow(new Wizard.LinearFlow(page1, page2, page3));
+
+        // Issue #16158: Remove the help button since it doesn't link to a help page
+        wizard.setShowHelpButton(false);
+
+        // Issue #16158: Apply JabRef CSS to the wizard dialog
+        wizard.setOnShown(event -> {
+            if (wizard.getDialogPane() != null && wizard.getDialogPane().getScene() != null) {
+                themeManager.installCssOnScene(wizard.getDialogPane().getScene());
+            }
+        });
 
         return true;
     }
