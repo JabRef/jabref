@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class LinkedFile implements Serializable {
 
-    private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
+    private static final String REGEX_URL = "^((?:https?\\:\\/\\/|ftps?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
