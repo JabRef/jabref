@@ -92,8 +92,7 @@ jobs:
       - name: Run checkAllModuleInfo using gradle
         run: gradle checkAllModuleInfo
 
-  static-checks:
-    name: Static Checks
+  check-formatting:
     needs: changes
     if: needs.changes.outputs.run-gradle-ci == 'true'
     # ubuntu-slim doesn't offer docker and is too slow for the gradle-based checks
@@ -115,6 +114,21 @@ jobs:
 
       - uses: ./.github/actions/setup-gradle
 
+      # cloned outside the workspace, because an additional checkout would show up as uncommitted change
+      - name: Checkout Convert2MarkdownJavadoc
+        run: git clone --depth 1 https://github.com/rmuller/Convert2MarkdownJavadoc.git "${RUNNER_TEMP}/Convert2MarkdownJavadoc"
+
+      - name: Convert JavaDoc to Markdown
+        run: java Convert2MarkdownJavadoc.java "${GITHUB_WORKSPACE}"
+        working-directory: ${{ runner.temp }}/Convert2MarkdownJavadoc
+
+      - name: Fail if working directory is unclean after JavaDoc conversion
+        uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: javadoc-fix-patch
+          annotation-title: JavaDoc
+          annotation-message-prefix: "Non-Markdown JavaDoc found; use Markdown JavaDoc (`///`) for"
+
       - name: Run checkstyle using gradle
         run: gradle checkstyleMain checkstyleTest checkstyleJmh
 
@@ -131,33 +145,6 @@ jobs:
           artifact-name: openrewrite-fix-patch
           annotation-title: OpenRewrite
           annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
-
-  format-javadoc:
-    needs: changes
-    if: needs.changes.outputs.run-gradle-ci == 'true'
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          path: 'jabref'
-      - uses: actions/checkout@v7
-        with:
-          repository: 'rmuller/Convert2MarkdownJavadoc'
-          path: 'Convert2MarkdownJavadoc'
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '24'
-          distribution: 'corretto'
-          check-latest: true
-      - run: |
-          cd Convert2MarkdownJavadoc
-          java Convert2MarkdownJavadoc.java ../jabref
-      - uses: ./jabref/.github/actions/check-formatting
-        with:
-          working-directory: jabref
-          artifact-name: javadoc-fix-patch
 
   modernizer:
     name: Modernizer
