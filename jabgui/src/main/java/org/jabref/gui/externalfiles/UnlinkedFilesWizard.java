@@ -95,9 +95,6 @@ public class UnlinkedFilesWizard {
         wizard.setTitle(Localization.lang("Search for unlinked local files"));
         wizard.setFlow(new Wizard.LinearFlow(page1, page2, page3));
 
-        // Issue #16158: Remove the help button since it doesn't link to a help page
-        wizard.setShowHelpButton(false);
-
         // Issue #16158: Apply JabRef CSS to the wizard dialog
         wizard.setOnShown(event -> {
             if (wizard.getDialogPane() != null && wizard.getDialogPane().getScene() != null) {
