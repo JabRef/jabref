@@ -8,12 +8,16 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.SearchableElement;
 
 import com.dlsc.unitfx.IntegerInputField;
 import org.junit.jupiter.api.Test;
@@ -140,5 +144,55 @@ class PreferencesFormBuilderTest {
                                         .orElseThrow(() -> new AssertionError("the columns block is missing from the group"));
         assertEquals(2, childrenOf(columns).size(), "both column groups are present");
         assertEquals(1, childrenOf(childrenOf(columns).getFirst()).size());
+    }
+
+    /// The escape hatch is the one place the builder did not place the text itself, so it reads the
+    /// text back off the node. Otherwise every custom node would be a hole in the preferences search.
+    @Test
+    void customRegistersTheTextsOfItsSubtree() {
+        HBox row = new HBox(new Label("Keyword separator"), new TextField(), new CheckBox("Overwrite"));
+
+        PreferencesFormBuilder form = form();
+        form.custom(row);
+
+        assertEquals(List.of("Keyword separator", "Overwrite"), textsOf(form));
+    }
+
+    @Test
+    void customHighlightsTheLabeledItselfRatherThanTheCustomNode() {
+        Label caption = new Label("Cite command");
+
+        PreferencesFormBuilder form = form();
+        form.custom(new HBox(caption));
+
+        assertSame(caption, form.getSearchableElements().getFirst().node());
+    }
+
+    /// A control captions itself; what is inside it belongs to its skin and is none of the search's
+    /// business. A labeled without text captions nothing.
+    @Test
+    void customIgnoresControlInsidesAndBlankTexts() {
+        ComboBox<String> combo = new ComboBox<>();
+        combo.getItems().addAll("English", "Deutsch");
+
+        PreferencesFormBuilder form = form();
+        form.custom(new HBox(combo, new Label(""), new Label("Language")));
+
+        assertEquals(List.of("Language"), textsOf(form));
+    }
+
+    @Test
+    void searchableRegistersTextsThatAreInNoLabeled() {
+        TextField field = new TextField();
+
+        PreferencesFormBuilder form = form();
+        form.custom(field, element -> element.searchable("Cite command", "LaTeX"));
+
+        assertEquals(List.of("Cite command", "LaTeX"), textsOf(form));
+        assertSame(field, form.getSearchableElements().getFirst().node());
+    }
+
+    private static List<String> textsOf(PreferencesFormBuilder form) {
+        return form.getSearchableElements().stream().map(SearchableElement::text).toList();
     }
 }

@@ -16,6 +16,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -23,6 +24,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -52,6 +54,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.dlsc.gemsfx.TagsField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -418,6 +421,11 @@ public class PreferencesFormBuilder {
 
     public <T extends Node> PreferencesFormBuilder custom(T node, Consumer<NodeElement<T>> config) {
         addNode(node);
+        // The escape hatch is the one place where the builder did not place the text itself, so it
+        // reads it back off the node instead. Without this, every custom node would be a hole in
+        // the preferences search. A node filled only after this call registers nothing and has to
+        // use [ElementBase#searchable].
+        collectSearchable(node);
         return configured(new NodeElement<>(this, node), config);
     }
 
@@ -512,6 +520,17 @@ public class PreferencesFormBuilder {
 
     private void searchable(String text, Node node) {
         searchableElements.add(new SearchableElement(text, node));
+    }
+
+    /// Registers the text of every [Labeled] inside `current`, each highlighting the labeled itself.
+    /// The descent stops at a [Control], whose own text is its caption and whose insides belong to
+    /// its skin.
+    private void collectSearchable(Node current) {
+        if (current instanceof Labeled labeled && StringUtil.isNotBlank(labeled.getText())) {
+            searchable(labeled.getText(), labeled);
+        } else if (current instanceof Parent parent && !(current instanceof Control)) {
+            parent.getChildrenUnmodifiable().forEach(this::collectSearchable);
+        }
     }
 
     /// Applies a validation decoration once `control` actually sits in a scene — ControlsFX
@@ -631,6 +650,9 @@ public class PreferencesFormBuilder {
     private void attachTo(Node primary, Node attachment) {
         if (primary.getParent() instanceof HBox row) {
             row.getChildren().add(attachment);
+            // An attachment the caller brought is as opaque to the builder as a custom node, so its
+            // text is read back the same way. The builder's own attachments carry none.
+            collectSearchable(attachment);
             return;
         }
         throw new IllegalStateException(primary.getParent() == null
@@ -849,6 +871,17 @@ public class PreferencesFormBuilder {
 
         public S styleClass(String... styleClasses) {
             node.getStyleClass().addAll(styleClasses);
+            return self();
+        }
+
+        /// Makes the preferences search find this element under `texts`, highlighting the node.
+        /// Only needed where the text is in no [Labeled] the builder can see: a synonym, a text
+        /// painted by a control itself, or a [#custom] node filled after it was added — everything
+        /// the builder placed, and every labeled inside a custom node, is registered already.
+        public S searchable(String... texts) {
+            for (String text : texts) {
+                form.searchable(text, node);
+            }
             return self();
         }
     }
