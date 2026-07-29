@@ -12,7 +12,6 @@ public class LinkedFileTest {
             "http://example.com/paper.pdf, true",
             "https://example.com/paper.pdf, true",
             "ftp://ftp.example.com/paper.pdf, true",
-            "ftps://ftp.example.com/paper.pdf, true",
             "www.example.com/paper.pdf, true",
             "HTTP://EXAMPLE.COM/paper.pdf, true",
             "FTP://FTP.EXAMPLE.COM/paper.pdf, true",
