@@ -24,7 +24,7 @@
 ///
 /// ## The editors
 ///
-/// `PasswordFieldEditor` and `TagsFieldEditor` encapsulate control patterns that recur across
+/// [PasswordFieldEditor] and [TagsFieldEditor] encapsulate control patterns that recur across
 /// tabs. Their conventions:
 ///
 /// - **An editor binds its own value property**; builder methods and tabs only place the node.

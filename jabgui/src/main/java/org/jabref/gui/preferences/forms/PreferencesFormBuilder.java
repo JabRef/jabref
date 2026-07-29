@@ -74,20 +74,45 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 /// anything, so no call can land on the wrong node — there is no "current element" to get wrong:
 ///
 /// ```java
-/// form().section(Localization.lang("HTTP Server"), httpServer -> httpServer
-///               .checkWithField("Enable HTTP Server on port"), // Note: Localization tests cannot parse comments
-///                       viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
-///                       port -> port.validate(viewModel.httpPortValidationStatus()))
-///               .group(expert -> expert
-///                       .stringField("API base URL", viewModel.apiBaseUrlProperty()),
-///                   expertGroup -> expertGroup.disableWhen(viewModel.disableExpertSettingsProperty())))
-///       .build();
+/// form()
+///         // A titled section. Its contents are the chain inside the lambda, so the grouping
+///         // is visible in the source; the trailing lambda addresses the section as a whole.
+///         .section("HTTP Server", httpServer -> httpServer
+///
+///                 // A checkbox with a value field beside it, enabled while the box is ticked.
+///                 // Convenience sugar for checkbox(text, enabled, box -> box.attachField(...).
+///                 // The lambda addresses that field, not the checkbox.
+///                 .checkWithField("Enable HTTP Server on port",
+///                         viewModel.enableHttpServerProperty(),
+///                         viewModel.httpPortProperty(),
+///                         port -> port.validate(viewModel.httpPortValidationStatus())
+///                                     .help(HelpFile.REMOTE))
+///
+///                 // A group of related elements, can be disabled as one.
+///                 .group(expert -> expert
+///                         .stringField("API base URL", viewModel.apiBaseUrlProperty()),
+///                         expertGroup -> expertGroup.disableWhen(viewModel.disableExpertSettingsProperty())),
+///
+///                 // Documentation for the section as a whole: a help button beside its heading.
+///                 httpServerSection -> httpServerSection.help("https://docs.jabref.org/advanced/remote"))
+///         .section("Another section", section -> section
+///                 ...)
+///         .build();
 /// ```
+///
+/// The texts are written out above for readability; in a tab they are `Localization.lang(...)`
+/// calls.
 ///
 /// The handle a lambda receives states what it is: an [InputElement] is a [Control],
 /// so it can carry a tooltip, validation and attachments — a help button, a browse button, an
 /// inline value field appended right after it; a [NodeElement] offers none of that because
 /// it is not a [Control]. Asking for the wrong one does not compile.
+///
+/// Documentation is linked with `help(...)`, which appends a help icon button that stays clickable
+/// while the element it belongs to is disabled. It sits on the two handles that own a row of their
+/// own: [SectionRegion#help] puts it beside the section heading, [InputElement#help] beside a single
+/// control. Both take either a [HelpFile] — a page of the JabRef user documentation — or a URL for
+/// anything outside it.
 ///
 /// Consecutive labelled fields share an aligned two-column [GridPane]. Validation decoration is
 /// applied per control once that control reaches a scene, which is when ControlsFX can position it.
