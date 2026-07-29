@@ -1140,6 +1140,10 @@
       "type": "org.eclipse.lsp4j.services.LanguageServer",
       "methods": [
         {
+          "name": "exit",
+          "parameterTypes": []
+        },
+        {
           "name": "getNotebookDocumentService",
           "parameterTypes": []
         },
@@ -1162,6 +1166,10 @@
           "parameterTypes": [
             "org.eclipse.lsp4j.InitializedParams"
           ]
+        },
+        {
+          "name": "shutdown",
+          "parameterTypes": []
         }
       ]
     },
