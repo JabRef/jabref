@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -19,6 +20,16 @@
     <HBox spacing="4.0" alignment="BASELINE_LEFT">
         <Label text="%Keyword separator"/>
         <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0" alignment="CENTER"/>
+    </HBox>
+
+    <HBox spacing="10.0" alignment="BASELINE_LEFT">
+        <Label text="%Accepted keyword delimiters on import"/>
+        <TextField fx:id="importKeywordDelimiters" prefWidth="80.0"/>
+    </HBox>
+
+    <HBox spacing="10.0" alignment="BASELINE_LEFT">
+        <Label text="%Delimiter parsing strategy"/>
+        <ComboBox fx:id="importDelimiterParsingStrategy" prefWidth="260.0"/>
     </HBox>
 
     <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
