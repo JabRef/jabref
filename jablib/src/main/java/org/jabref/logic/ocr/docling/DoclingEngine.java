@@ -80,6 +80,9 @@ public class DoclingEngine implements OcrEngine {
         command.add("docling");
         command.add("--to");
         command.add("json");
+        command.add("--no-tables");
+        command.add("--image-export-mode");
+        command.add("placeholder");
         command.add("--output");
         command.add(outputDir.toString());
         command.add(pdfPath.toString());
