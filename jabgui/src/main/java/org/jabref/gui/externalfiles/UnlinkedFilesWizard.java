@@ -96,7 +96,7 @@ public class UnlinkedFilesWizard {
         wizard.setFlow(new Wizard.LinearFlow(page1, page2, page3));
 
         // Issue #16158: Apply JabRef CSS to the wizard dialog
-        wizard.setOnShown(event -> {
+        wizard.getDialog().setOnShown(event -> {
             if (wizard.getDialogPane() != null && wizard.getDialogPane().getScene() != null) {
                 themeManager.installCssOnScene(wizard.getDialogPane().getScene());
             }
