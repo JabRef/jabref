@@ -66,6 +66,9 @@ import org.slf4j.LoggerFactory;
 /// which uses an already opened connection).
 ///
 /// Nothing is cached.
+///
+/// Implentation note: This relies on <https://kong.github.io/unirest-java/configuration/> setting `followRedirects` to `true`
+/// and enabling cookie management.
 public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0";
