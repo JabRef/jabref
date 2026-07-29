@@ -73,6 +73,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where importing a `.bst` file with the same filename as an existing internal or external style was allowed, resulting in ambiguous duplicate entries. [#16360](https://github.com/JabRef/jabref/issues/16360)
+- We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
