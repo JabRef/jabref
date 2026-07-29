@@ -8,7 +8,7 @@ In case there is no issue present, the pull request implementing the feature is 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-
+- We fixed alignment of journal info icon in entry editor [#16425](https://github.com/JabRef/jabref/issues/16425)
 ### Added
 
 - We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
