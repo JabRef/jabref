@@ -9,16 +9,31 @@ import javafx.scene.Node;
 /// It needs to extend from Component.
 public interface PreferencesTab {
 
+    /// Extra, invisible search terms for the tab (synonyms, abbreviations). The visible texts are
+    /// covered by {@link #getSearchableElements()} already.
     default List<String> getSearchKeywords() {
-        return List.of(getTabName());
+        return List.of(getTabName(), getTitle());
     }
 
-    Node getBuilder();
+    /// The visible texts of the tab with the nodes they caption; the preferences search matches
+    /// these and highlights the node.
+    default List<SearchableElement> getSearchableElements() {
+        return List.of();
+    }
+
+    /// @return the root node of the tab's content, shown in the preferences dialog
+    Node getContent();
 
     /// Should return the localized identifier to use for the tab.
     ///
     /// @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
     String getTabName();
+
+    /// The heading the dialog shows above the tab's content. Defaults to the tab's name; override
+    /// where the heading is more specific (e.g. tab "Entry types", heading "Custom entry types").
+    default String getTitle() {
+        return getTabName();
+    }
 
     /// This method is called when the dialog is opened, or if it is made
     /// visible after being hidden. This calls the appropriate method in the
