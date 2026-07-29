@@ -42,9 +42,6 @@
       ]
     },
     {
-      "type": "groovy.lang.Closure"
-    },
-    {
       "type": "java.lang.Boolean",
       "jniAccessible": true,
       "methods": [
@@ -308,7 +305,7 @@
     },
     {
       "module": "java.base",
-      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
+      "glob": "jdk/internal/icu/impl/data/*/nfc.nrm"
     },
     {
       "module": "org.jabref.jablib",
