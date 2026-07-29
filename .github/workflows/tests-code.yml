@@ -127,7 +127,7 @@ jobs:
         with:
           artifact-name: javadoc-fix-patch
           annotation-title: JavaDoc
-          annotation-message-prefix: "Non-Markdown JavaDoc. Use Markdown JavaDoc (`///`) to fix"
+          annotation-message-prefix: "Non-Markdown JavaDoc. Use Markdown JavaDoc (`///`)."
 
       - name: Run checkstyle using gradle
         run: gradle checkstyleMain checkstyleTest checkstyleJmh
@@ -144,7 +144,7 @@ jobs:
         with:
           artifact-name: openrewrite-fix-patch
           annotation-title: OpenRewrite
-          annotation-message-prefix: "Uncommitted changes after OpenRewrite. Run `gradle :rewriteRun`, reformat, and commit the result to fix"
+          annotation-message-prefix: "Uncommitted changes after OpenRewrite. Run `gradle :rewriteRun`, reformat, and commit the result."
 
   modernizer:
     name: Modernizer
