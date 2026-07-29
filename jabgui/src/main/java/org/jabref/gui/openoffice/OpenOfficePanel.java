@@ -66,6 +66,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -197,26 +198,29 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (currentStyle == null) {
+        if (ooBase != null && ooBase.testDialog(title, ooBase.readStyleInPreference())) {
+            return FAIL;
+        }
+
+        currentStyle = openOfficePreferences.getCurrentStyle();
+        currentStyleProperty.set(currentStyle);
+        updateButtonAvailability();
+
+        if (!(currentStyle instanceof JStyle jStyle)) {
+            return PASS;
+        }
+
+        try {
+            jStyle = jStyleLoader.getUsedJstyle();
+            jStyle.ensureUpToDate();
             currentStyle = openOfficePreferences.getCurrentStyle();
             currentStyleProperty.set(currentStyle);
-        } else {
-            if (currentStyle instanceof JStyle jStyle) {
-                try {
-                    jStyle = jStyleLoader.getUsedJstyle();
-                    jStyle.ensureUpToDate();
-                } catch (IOException ex) {
-                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                    String msg = Localization.lang("Unable to reload style file")
-                            + "'" + jStyle.getPath() + "'"
-                            + "\n" + ex.getMessage();
-                    new OOError(title, msg, ex).showErrorDialog(dialogService);
-                    return FAIL;
-                }
-            } else {
-                // CSL and BST styles don't need to be reloaded from disk
-                return PASS;
-            }
+            updateButtonAvailability();
+        } catch (IOException ex) {
+            LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+            String msg = Localization.lang("Unable to reload style file '%0'. %1", jStyle.getPath(), String.valueOf(ex.getMessage()));
+            new OOError(title, msg, ex).showErrorDialog(dialogService);
+            return FAIL;
         }
         return PASS;
     }
@@ -229,6 +233,9 @@ public class OpenOfficePanel {
         selectDocument.setOnAction(_ -> {
             try {
                 ooBase.guiActionSelectDocument(false);
+                currentStyle = openOfficePreferences.getCurrentStyle();
+                currentStyleProperty.set(currentStyle);
+                updateButtonAvailability();
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
                 LOGGER.warn("Unable to select document to work on", ex);
@@ -252,6 +259,10 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
+                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
+                                 if (ooBase.testDialog(Localization.lang("Problem modifying citation"), result)) {
+                                     return;
+                                 }
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              } else if (currentStyle instanceof BstStyle bstStyle) {
                                  dialogService.notify(Localization.lang("Currently selected BST style: '%0'", bstStyle.getName()));
@@ -442,6 +453,7 @@ public class OpenOfficePanel {
                 || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
+        setStyleFile.setDisable(!isConnectedToDocument);
 
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
@@ -484,7 +496,8 @@ public class OpenOfficePanel {
                 return;
             }
 
-            // Enable actions that depend on a connection
+            currentStyle = openOfficePreferences.getCurrentStyle();
+            currentStyleProperty.set(currentStyle);
             updateButtonAvailability();
         });
 

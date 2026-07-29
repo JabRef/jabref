@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
 - We added an "add space before citation" option in the LibreOffice integration. [#16349](https://github.com/JabRef/jabref/issues/16349)
 - CSL Citations emitted by JabRef in LibreOffice can now be read by Zotero (under a new preference "Zotero Compatibility Mode") and vice versa. [#15878](https://github.com/JabRef/jabref/issues/15878)
 - We added support for bibliography generation using `.bst` files in the OpenOffice/LibreOffice integration. [#624](https://github.com/JabRef/jabref/issues/624)
@@ -74,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue in the LibreOffice integration where citations generated via CSL styles were not properly formatted. [#16379](https://github.com/JabRef/jabref/issues/16379)
 - We fixed an issue in the LibreOffice integration where generating bibliography or inserting citations made superscript citations smaller and smaller. [#16351](https://github.com/JabRef/jabref/issues/16351)
+- We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
