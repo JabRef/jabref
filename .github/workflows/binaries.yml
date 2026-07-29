@@ -161,6 +161,12 @@ jobs:
         with:
           files: |
             .github/workflows/binaries.yml
+      - id: changed-binaries-resource-markdown
+        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jabgui/buildres/**/*.md
       - name: Determine conditions
         id: binary
         shell: bash
@@ -171,6 +177,7 @@ jobs:
           LABEL_NAME: ${{ github.event.label.name }}
           NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
           BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
+          BINARIES_RESOURCE_MARKDOWN_CHANGED: ${{ steps.changed-binaries-resource-markdown.outputs.any_changed }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
@@ -184,7 +191,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" ]]; then
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
