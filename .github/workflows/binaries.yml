@@ -154,6 +154,7 @@ jobs:
         with:
           files_ignore: |
             .github/workflows/**
+            **/*.md
       - id: changed-binaries-workflow
         if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
         uses: tj-actions/changed-files@v47
@@ -184,8 +185,8 @@ jobs:
           fi
 
           if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" ]]; then
-            echo "⊘ only workflow files changed – skipping build"
-            echo "⊘ only workflow files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
+            echo "⊘ no build-relevant files changed – skipping build"
+            echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
