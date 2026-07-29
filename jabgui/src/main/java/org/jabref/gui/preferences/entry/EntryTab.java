@@ -52,6 +52,11 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
 
                 .section(Localization.lang("Field"), field -> field
                         .custom(buildKeywordSeparatorRow())
+                        .stringField(Localization.lang("Accepted keyword delimiters on import"), viewModel.importKeywordDelimitersProperty())
+                        .combo(Localization.lang("Delimiter parsing strategy"),
+                                viewModel.importDelimiterParsingStrategies(),
+                                viewModel.importDelimiterParsingStrategyProperty(),
+                                viewModel::getImportDelimiterParsingStrategyDisplayName)
                         .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
                         .tagsField(Localization.lang("Affected fields"), resolvableTags,
                                 affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))

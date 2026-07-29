@@ -28,11 +28,12 @@ import org.xmlunit.diff.ElementSelectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
-public class MSBibExportFormatFilesTest {
+public class MSBibImportExportRoundTripFilesTest {
 
     private static Path resourceDir;
     public BibDatabaseContext databaseContext;
@@ -43,11 +44,11 @@ public class MSBibExportFormatFilesTest {
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         // we have to point it to one existing file, otherwise it will return the default class path
-        resourceDir = Path.of(MSBibExportFormatFilesTest.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+        resourceDir = Path.of(MSBibImportExportRoundTripFilesTest.class.getResource("MsBibImportExportRoundTripTest1.bib").toURI()).getParent();
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString())
                          .filter(n -> n.endsWith(".bib"))
-                         .filter(n -> n.startsWith("MsBib"))
+                         .filter(n -> n.startsWith("MsBibImportExportRoundTripTest"))
                          // mapping required, because we get "source already consumed or closed" otherwise
                          .toList().stream();
         }
@@ -60,12 +61,15 @@ public class MSBibExportFormatFilesTest {
         exporter = new MSBibExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         exportedFile = Files.createFile(path);
-        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+
+        ImportFormatPreferences importPrefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importPrefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        testImporter = new BibtexImporter(importPrefs, new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest(name = "{index} file={0}")
     @MethodSource("fileNames")
-    void performExport(String filename) throws IOException, SaveException {
+    void importThenExportProducesExpectedMsBibXml(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path expectedFile = resourceDir.resolve(xmlFileName);
         Path importFile = resourceDir.resolve(filename);
