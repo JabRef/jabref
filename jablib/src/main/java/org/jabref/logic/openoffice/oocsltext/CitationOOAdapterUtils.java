@@ -5,6 +5,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class CitationOOAdapterUtils {
+    private static final String LINE_BREAK = "\\R";
 
     private CitationOOAdapterUtils() {
     }
@@ -22,7 +23,7 @@ class CitationOOAdapterUtils {
             proceedingSpaceExists = " ".equals(checkCursor.getString());
             // If not a space, check if it's a paragraph break
             if (!proceedingSpaceExists) {
-                proceedingSpaceExists = checkCursor.getString().matches("\\R");
+                proceedingSpaceExists = checkCursor.getString().matches(LINE_BREAK);
             }
         }
 
@@ -38,7 +39,7 @@ class CitationOOAdapterUtils {
         } else {
             succeedingSpaceExists = " ".equals(checkCursor.getString());
             if (!succeedingSpaceExists) {
-                succeedingSpaceExists = checkCursor.getString().matches("\\R");
+                succeedingSpaceExists = checkCursor.getString().matches(LINE_BREAK);
             }
         }
 
