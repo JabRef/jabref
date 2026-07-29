@@ -92,18 +92,45 @@ jobs:
       - name: Run checkAllModuleInfo using gradle
         run: gradle checkAllModuleInfo
 
-  format:
+  static-checks:
+    name: Static Checks
     needs: changes
     if: needs.changes.outputs.run-gradle-ci == 'true'
-    # ubuntu-slim doesn't offer docker
+    # ubuntu-slim doesn't offer docker and is too slow for the gradle-based checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/format-java
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+
+      - name: Run formatter
+        uses: ./.github/actions/format-java
       # job should fail in case there are changes
-      - uses: ./.github/actions/check-formatting
+      - name: Fail if working directory is unclean after formatting
+        uses: ./.github/actions/check-formatting
         with:
           artifact-name: formatting-fix-patch
+
+      - uses: ./.github/actions/setup-gradle
+
+      - name: Run checkstyle using gradle
+        run: gradle checkstyleMain checkstyleTest checkstyleJmh
+
+      - name: Run OpenRewrite
+        run: gradle --no-configuration-cache :rewriteRun
+
+      # Reformat code (because OpenRewrite does different indents)
+      - name: Run formatter after OpenRewrite
+        uses: ./.github/actions/format-java
+
+      - name: Fail if working directory is unclean after OpenRewrite
+        uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: openrewrite-fix-patch
+          annotation-title: OpenRewrite
+          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   format-javadoc:
     needs: changes
@@ -131,49 +158,6 @@ jobs:
         with:
           working-directory: jabref
           artifact-name: javadoc-fix-patch
-
-  checkstyle:
-    name: Checkstyle
-    needs: changes
-    if: needs.changes.outputs.run-gradle-ci == 'true'
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run checkstyle using gradle
-        run: gradle checkstyleMain checkstyleTest checkstyleJmh
-
-  openrewrite:
-    name: OpenRewrite
-    needs: changes
-    if: needs.changes.outputs.run-gradle-ci == 'true'
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run OpenRewrite
-        run: |
-          gradle --no-configuration-cache :rewriteRun
-
-      # Reformat code (because OpenRewrite does different indents)
-      - uses: ./.github/actions/format-java
-
-      - name: Fail if working directory is unclean
-        uses: ./.github/actions/check-formatting
-        with:
-          artifact-name: openrewrite-fix-patch
-          annotation-title: OpenRewrite
-          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer
