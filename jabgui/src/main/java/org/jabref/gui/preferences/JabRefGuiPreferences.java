@@ -42,6 +42,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
+import org.jabref.gui.welcome.DonationPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -396,7 +397,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
-    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.BuiltIn} order.
+    /// followed by every static (built-in) tab's visibility flag, in [EntryEditorTabModel.BuiltIn] order.
     private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
