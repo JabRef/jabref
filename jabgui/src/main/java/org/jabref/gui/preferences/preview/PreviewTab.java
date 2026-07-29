@@ -54,7 +54,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 
 public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
-private ListView<PreviewLayout> availableListViewCsl;
+    private ListView<PreviewLayout> availableListViewCsl;
     private ListView<PreviewLayout> availableListViewCustom;
     private ListView<PreviewLayout> chosenListView;
     private Button toRightButton;
