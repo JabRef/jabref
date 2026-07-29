@@ -656,3 +656,65 @@ jobs:
             exit 1
           fi
           echo "✅ gradlew.bat blob is LF"
+
+  pr-gate:
+    name: PR gate
+    needs:
+      - changes
+      - dependencyscopes
+      - format
+      - format-javadoc
+      - checkstyle
+      - openrewrite
+      - modernizer
+      - markdown
+      - madr
+      - changelog
+      - changelog-unreleased-only
+      - javadoc
+      - tests
+      - tests-windows
+      - tests-windows-file-based
+      - tests-jabkit-smoke
+      - databasetests
+      - jbang-pr
+      - requirements_coverage
+      - gradlevalidation
+      - line_endings
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - name: Verify required checks
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const needs = ${{ toJSON(needs) }};
+            const runGradleCI = '${{ needs.changes.outputs.run-gradle-ci }}' === 'true';
+            const pullRequestOnly = new Set([
+              'changelog-unreleased-only',
+              'tests-windows',
+            ]);
+            const alwaysRequired = new Set([
+              'changes',
+              'markdown',
+              'madr',
+              'changelog',
+              'gradlevalidation',
+              'line_endings',
+            ]);
+
+            const failedJobs = Object.entries(needs)
+              .filter(([job, result]) => {
+                if (result.result === 'success') {
+                  return false;
+                }
+                if (result.result === 'skipped' && context.eventName !== 'pull_request' && pullRequestOnly.has(job)) {
+                  return false;
+                }
+                return runGradleCI || alwaysRequired.has(job);
+              })
+              .map(([job, result]) => `${job} (${result.result})`);
+
+            if (failedJobs.length > 0) {
+              core.setFailed(`Required checks did not succeed: ${failedJobs.join(', ')}`);
+            }
