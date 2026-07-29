@@ -1,6 +1,7 @@
 package org.jabref.logic.ocr.docling;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,6 +163,7 @@ public class DoclingEngine implements OcrEngine {
             pdfWithText.save(outputPdf.toFile());
         }
 
+        Files.delete(jsonOutputPath);
         return OcrResult.success(outputPdf);
     }
 
