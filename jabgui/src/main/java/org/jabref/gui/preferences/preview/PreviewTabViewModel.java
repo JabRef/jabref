@@ -204,12 +204,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         if (chosenListProperty.isEmpty()) {
             PreviewLayout anyCustomLayout = availableListProperty.getValue().stream()
-                                                                  .filter(TextBasedPreviewLayout.class::isInstance)
-                                                                  .findFirst()
-                                                                  .orElseGet(() -> TextBasedPreviewLayout.of(
-                                                                          TextBasedPreviewLayout.DEFAULT,
-                                                                          layoutFormatterPreferences,
-                                                                          abbreviationRepository));
+                                                                 .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                 .findFirst()
+                                                                 .orElseGet(() -> TextBasedPreviewLayout.of(
+                                                                         TextBasedPreviewLayout.DEFAULT,
+                                                                         layoutFormatterPreferences,
+                                                                         abbreviationRepository));
             chosenListProperty.add(anyCustomLayout);
         }
 
