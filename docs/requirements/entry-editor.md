@@ -52,14 +52,14 @@ Needs: impl
 
 Comment fields have a separate "Comments" tab. The general comment field is always shown with an editable input — even when the entry has no comment yet. All set comment fields are shown below it, sorted by name; user-specific comment fields of other users are read-only. When user-specific comment fields are enabled and the current user's own comment field is unset, it is offered as a one-click "+" chip that shows an empty, focused editor which stays visible — even while still empty — until another entry is opened.
 
-Needs: impl
+Needs: impl, utest
 
 ## The comments tab refreshes on external field changes without disturbing typing
 `req~entry-editor.comments-tab.live-refresh~1`
 
 When comment fields of the shown entry are set or unset outside the Comments tab (source tab, undo), the tab updates to reflect the new field set. Typing inside a visible editor never rebuilds the tab or steals focus; the current user's own comment editor and an empty editor added via the "+" chip stay visible until another entry is opened.
 
-Needs: impl
+Needs: impl, utest
 
 ## Arbitrary fields can be added via a field-name box
 `req~entry-editor.main-tab.free-form-add~1`
