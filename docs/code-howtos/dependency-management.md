@@ -30,8 +30,7 @@ which Java types are visible (and should be visible) to which modules. If the ch
 change the scope.
 
 When a JabKit dependency changes, include the native image build in the check. If the native image needs additional
-reachability metadata, add it as described in
-[Building JabKit as a GraalVM native image](jabkit-native-image.md).
+reachability metadata, add it as described in [Building JabKit as a GraalVM native image](jabkit-native-image.md).
 
 ## Adding or changing test-only dependencies (without module-info.java)
 
