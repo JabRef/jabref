@@ -97,8 +97,8 @@ public class UnlinkedFilesWizard {
 
         // Issue #16158: Apply JabRef CSS to the wizard dialog
         wizard.getDialog().setOnShown(event -> {
-            if (wizard.getDialogPane() != null && wizard.getDialogPane().getScene() != null) {
-                themeManager.installCssOnScene(wizard.getDialogPane().getScene());
+            if (wizard.getDialog().getDialogPane() != null && wizard.getDialog().getDialogPane().getScene() != null) {
+                themeManager.installCssOnScene(wizard.getDialog().getDialogPane().getScene());
             }
         });
 
