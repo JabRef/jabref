@@ -466,8 +466,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         private static final FetcherRateLimiter ARXIV_API_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("arXiv", 1, Duration.ofSeconds(3));
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
-
-        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
 
         private final ImportFormatPreferences importFormatPreferences;
 
@@ -618,7 +617,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
             try {
                 ARXIV_API_RATE_LIMITER.acquire(url.toString());
-                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                DocumentBuilder builder = createDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {
@@ -630,6 +629,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             } catch (SAXException | ParserConfigurationException | IOException exception) {
                 throw new FetcherException(url, "arXiv API request failed", exception);
             }
+        }
+
+        private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setFeature(DISALLOW_DOCTYPE_DECLARATION, true);
+            return documentBuilderFactory.newDocumentBuilder();
         }
 
         private FetcherException getException(Document error) {

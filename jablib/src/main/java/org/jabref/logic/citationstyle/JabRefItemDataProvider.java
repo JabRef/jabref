@@ -200,13 +200,16 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                    .toList();
     }
 
+    public String toJson(BibEntry entry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        CSLItemData itemData = bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager);
+        return (String) itemData.toJson(stringJsonBuilderFactory.createJsonBuilder());
+    }
+
     public String toJson() {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         this.setData(entries, bibDatabaseContext, entryTypesManager);
         return entries.stream()
-                      .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
-                      .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                      .map(String.class::cast)
+                      .map(entry -> toJson(entry, bibDatabaseContext, entryTypesManager))
                       .collect(Collectors.joining(",", "[", "]"));
     }
 }
