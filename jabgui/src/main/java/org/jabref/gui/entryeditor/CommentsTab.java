@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -27,12 +28,15 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -55,6 +59,10 @@ public class CommentsTab extends FieldsEditorTab {
     /// [BibEntry#getFields()] yet, but must stay visible while this entry is edited.
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
+
+    /// The entry whose event bus this tab is currently subscribed to (for live refresh
+    /// when comment fields are set/unset from outside, e.g. Source tab, undo).
+    private Optional<BibEntry> subscribedEntry = Optional.empty();
 
     public CommentsTab(UndoManager undoManager,
                        UndoAction undoAction,
@@ -100,6 +108,46 @@ public class CommentsTab extends FieldsEditorTab {
              .forEach(comments::add);
         comments.addAll(userAddedFields);
         return comments;
+    }
+
+    @Override
+    protected void bindToEntry(BibEntry entry) {
+        if (subscribedEntry.filter(current -> current == entry).isEmpty()) {
+            subscribedEntry.ifPresent(previous -> previous.unregisterListener(this));
+            entry.registerListener(this);
+            subscribedEntry = Optional.of(entry);
+        }
+        super.bindToEntry(entry);
+    }
+
+    /// Refreshes the tab when a comment field is set or unset from outside this tab
+    /// (Source tab, undo, …). Rebuilds only when the set of shown comment fields actually
+    /// changes, so typing inside a visible editor never rebuilds or steals focus.
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
+        if (subscribedEntry.filter(current -> current == event.getBibEntry()).isEmpty()) {
+            return;
+        }
+        Platform.runLater(() -> refreshShownFieldsIfNeeded(event));
+    }
+
+    // [impl->req~entry-editor.comments-tab.live-refresh~1]
+    private void refreshShownFieldsIfNeeded(FieldChangedEvent event) {
+        BibEntry entry = event.getBibEntry();
+        if (getCurrentEntry() != entry) {
+            return;
+        }
+        // The user's own comment editor stays visible while this entry is edited, even when its
+        // content was just cleared (otherwise deleting the last character would remove the editor
+        // mid-edit). Other users' fields are read-only here, so they can only vanish from outside.
+        if (userSpecificCommentField.equals(event.getField())
+                && editors.containsKey(event.getField())
+                && StringUtil.isBlank(event.getNewValue())) {
+            userAddedFields.add(userSpecificCommentField);
+        }
+        if (!determineFieldsToShow(entry).equals(editors.keySet())) {
+            setupPanel(activeDatabaseContext(), entry, false);
+        }
     }
 
     @Override

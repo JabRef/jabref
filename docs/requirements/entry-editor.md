@@ -54,6 +54,13 @@ Comment fields have a separate "Comments" tab. The general comment field is alwa
 
 Needs: impl
 
+## The comments tab refreshes on external field changes without disturbing typing
+`req~entry-editor.comments-tab.live-refresh~1`
+
+When comment fields of the shown entry are set or unset outside the Comments tab (source tab, undo), the tab updates to reflect the new field set. Typing inside a visible editor never rebuilds the tab or steals focus; the current user's own comment editor and an empty editor added via the "+" chip stay visible until another entry is opened.
+
+Needs: impl
+
 ## Arbitrary fields can be added via a field-name box
 `req~entry-editor.main-tab.free-form-add~1`
 

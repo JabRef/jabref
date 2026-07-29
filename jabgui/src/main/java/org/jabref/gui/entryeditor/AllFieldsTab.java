@@ -535,10 +535,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                            .orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    private BibDatabaseContext activeDatabaseContext() {
-        return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
-    }
-
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
         if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {

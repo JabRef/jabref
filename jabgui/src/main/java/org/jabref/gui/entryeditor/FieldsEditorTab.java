@@ -219,9 +219,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     @Override
     protected void bindToEntry(BibEntry entry) {
         initPanel();
-        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
-        setupPanel(bibDatabaseContext, entry, isCompressed);
+        setupPanel(activeDatabaseContext(), entry, isCompressed);
         super.bindToEntry(entry);
+    }
+
+    protected BibDatabaseContext activeDatabaseContext() {
+        return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
