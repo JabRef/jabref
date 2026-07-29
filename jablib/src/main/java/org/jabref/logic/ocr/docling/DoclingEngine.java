@@ -136,7 +136,7 @@ public class DoclingEngine implements OcrEngine {
 
         try (PDDocument pdfWithText = Loader.loadPDF(originalPdf.toFile())) {
             PDFont font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-            float fontSize = 12f;
+            float fontSize = 12F;
             for (Map.Entry<Integer, ArrayList<DoclingText>> entry : pageTextMap.entrySet()) {
                 int pageNo = entry.getKey();
                 PDPage pdPage = pdfWithText.getPage(pageNo);
