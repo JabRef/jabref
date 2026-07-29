@@ -842,8 +842,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // Mutable lists required
         List<TextBasedPreviewLayout> customPreviewLayouts = getCustomPreviewLayoutsFromStore(defaultValues.getCustomPreviewLayouts());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayouts);
-        LOGGER.info("PREVIEW_CYCLE raw: {}", getStringList(PREVIEW_CYCLE));
-        LOGGER.info("Resolved layout names: {}", layouts.stream().map(PreviewLayout::getName).toList());
         if (layouts.isEmpty()) {
             layouts = new ArrayList<>(defaultValues.getLayoutCycle());
         }
