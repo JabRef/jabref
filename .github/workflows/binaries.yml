@@ -148,12 +148,18 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: 'false'
-      - id: changed-files
+      - id: changed-non-workflow-files
         if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
         uses: tj-actions/changed-files@v47
         with:
           files_ignore: |
             .github/workflows/**
+      - id: changed-binaries-workflow
+        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .github/workflows/binaries.yml
       - name: Determine conditions
         id: binary
         shell: bash
@@ -162,7 +168,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
-          NON_WORKFLOW_CHANGES: ${{ steps.changed-files.outputs.any_changed }}
+          NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
+          BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
@@ -176,7 +183,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" ]]; then
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" ]]; then
             echo "⊘ only workflow files changed – skipping build"
             echo "⊘ only workflow files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
