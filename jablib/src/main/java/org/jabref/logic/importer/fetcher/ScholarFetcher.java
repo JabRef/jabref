@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
-    private final Map<PageKey, String> cursorCacheMap = new Hashtable<>();
+    private final Map<PageKey, String> cursorCacheMap = new ConcurrentHashMap<>();
 
     private final ImporterPreferences importerPreferences;
 
