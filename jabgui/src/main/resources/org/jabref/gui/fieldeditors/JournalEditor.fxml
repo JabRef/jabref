@@ -8,16 +8,7 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.JournalEditor">
     <EditorTextField fx:id="textField"/>
-    <HBox alignment="CENTER_LEFT">
-        <Button onAction="#toggleAbbreviation"
-                styleClass="icon-button">
-            <graphic>
-                <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
-            </tooltip>
-        </Button>
+    <HBox>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
                 styleClass="icon-button">
@@ -26,6 +17,15 @@
             </graphic>
             <tooltip>
                 <Tooltip text="%View journal info"/>
+            </tooltip>
+        </Button>
+        <Button onAction="#toggleAbbreviation"
+                styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
             </tooltip>
         </Button>
     </HBox>
