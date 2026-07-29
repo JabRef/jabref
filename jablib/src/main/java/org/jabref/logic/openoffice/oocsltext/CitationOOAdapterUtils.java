@@ -1,0 +1,47 @@
+package org.jabref.logic.openoffice.oocsltext;
+
+import com.sun.star.text.XTextCursor;
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
+class CitationOOAdapterUtils {
+
+    private CitationOOAdapterUtils() {
+    }
+
+    static boolean hasPrecedingSpace(XTextCursor cursor) {
+        boolean proceedingSpaceExists;
+        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
+
+        // Check if we're at the start of the document - if yes we set the flag and don't insert a space
+        if (!checkCursor.goLeft((short) 1, true)) {
+            // We're at the start of the document
+            return true;
+        } else {
+            // If not at the start of document, check if there is a space before
+            proceedingSpaceExists = " ".equals(checkCursor.getString());
+            // If not a space, check if it's a paragraph break
+            if (!proceedingSpaceExists) {
+                proceedingSpaceExists = checkCursor.getString().matches("\\R");
+            }
+        }
+
+        return proceedingSpaceExists;
+    }
+
+    static boolean hasSucceedingSpace(XTextCursor cursor) {
+        boolean succeedingSpaceExists;
+        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
+
+        if (!checkCursor.goRight((short) 1, true)) {
+            return true;
+        } else {
+            succeedingSpaceExists = " ".equals(checkCursor.getString());
+            if (!succeedingSpaceExists) {
+                succeedingSpaceExists = checkCursor.getString().matches("\\R");
+            }
+        }
+
+        return succeedingSpaceExists;
+    }
+}
