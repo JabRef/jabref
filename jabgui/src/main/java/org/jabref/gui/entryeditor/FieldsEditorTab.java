@@ -41,6 +41,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
@@ -50,13 +51,24 @@ import org.slf4j.LoggerFactory;
 /// A single tab displayed in the EntryEditor holding several FieldEditors.
 abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
+    /// Number of entries the caret cache keeps; the least recently visited entry is dropped beyond it.
+    @VisibleForTesting
+    static final int CARET_POSITIONS_MAX_ENTRIES = 100;
 
-    /// Caret positions per entry (keyed by [BibEntry#getId()]) and field, shared by all
-    /// fields tabs so a caret survives switching entries and back. Session-only by design;
-    /// the default position (0, beginning of the field) is never stored to keep the map small.
-    // ponytail: grows with the number of entries edited in a session (a few ints each); no eviction
-    private static final Map<String, Map<Field, Integer>> CARET_POSITIONS = new HashMap<>();
+    /// Caret positions per entry and field, shared by all fields tabs so a caret survives switching
+    /// entries and back. Keyed by [BibEntry#getId()], which is unique within a session across all
+    /// open libraries. Session-only by design; the default position (0, beginning of the field) is
+    /// never stored to keep the map small, and only the [#CARET_POSITIONS_MAX_ENTRIES] most recently
+    /// visited entries are kept, so closing a library or the entry editor needs no cleanup.
+    @VisibleForTesting
+    static final Map<String, Map<Field, Integer>> CARET_POSITIONS = new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Map<Field, Integer>> eldest) {
+            return size() > CARET_POSITIONS_MAX_ENTRIES;
+        }
+    };
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
 
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;

@@ -71,7 +71,7 @@ Needs: impl
 ## Caret positions are restored when returning to an entry
 `req~entry-editor.caret-restore~1`
 
-When the user returns to a previously edited entry, the caret of each field is placed where it was when the user left that entry; positions also survive rebuilds of the field list while an entry stays open. Positions are kept in memory only — they are not persisted across sessions — and the default position (the beginning of the field) is never stored.
+When the user returns to a previously edited entry, the caret of each field is placed where it was when the user left that entry; positions also survive rebuilds of the field list while an entry stays open. Positions are kept in memory only — they are not persisted across sessions — and the default position (the beginning of the field) is never stored. Only the 100 most recently visited entries are remembered; going back to an entry left longer ago than that places the caret at the beginning again.
 
 Needs: impl
 
