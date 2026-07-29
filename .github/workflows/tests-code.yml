@@ -694,6 +694,10 @@ jobs:
               'changelog-unreleased-only',
               'tests-windows',
             ]);
+            const ownerGated = new Set([
+              'tests-windows',
+              'databasetests',
+            ]);
             const alwaysRequired = new Set([
               'changes',
               'markdown',
@@ -706,6 +710,9 @@ jobs:
             const failedJobs = Object.entries(needs)
               .filter(([job, result]) => {
                 if (result.result === 'success') {
+                  return false;
+                }
+                if (result.result === 'skipped' && ownerGated.has(job) && context.repo.owner !== 'JabRef') {
                   return false;
                 }
                 if (result.result === 'skipped' && context.eventName !== 'pull_request' && pullRequestOnly.has(job)) {
