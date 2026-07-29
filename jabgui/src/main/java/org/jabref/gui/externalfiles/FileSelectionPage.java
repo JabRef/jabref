@@ -61,12 +61,12 @@ public class FileSelectionPage extends WizardPane {
         setupBindings();
     }
 
-    public void setHeaderVisible(boolean visible) {
-        if (visible) {
-            setHeaderText(Localization.lang("Select files to import"));
-        } else {
-            setHeaderText(null);
-        }
+    public void showHeader() {
+        setHeaderText(Localization.lang("Select files to import"));
+    }
+
+    public void hideHeader() {
+        setHeaderText(null);
     }
 
     public BooleanProperty invalidProperty() {
@@ -135,13 +135,19 @@ public class FileSelectionPage extends WizardPane {
 
                 updateFileCount(root);
 
-                // Restore header after search completes (issue #16158)
-                setHeaderVisible(true);
+                showHeader();
 
                 ((BorderPane) getContent()).setCenter(contentPane);
             } else {
                 EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());
                 ((BorderPane) getContent()).setCenter(progressPane);
+            }
+        });
+
+        // Restore header when task completes (even on failure)
+        viewModel.taskActiveProperty().addListener((obs, wasActive, isActive) -> {
+            if (wasActive && !isActive) {
+                showHeader();
             }
         });
 
@@ -183,16 +189,13 @@ public class FileSelectionPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
-        // Hide header while search is in progress (issue #16158)
-        setHeaderVisible(false);
+        hideHeader();
 
-        // Start search if not already done
         if (viewModel.treeRootProperty().get().isEmpty()) {
             ((BorderPane) getContent()).setCenter(progressPane);
             viewModel.startSearch();
         }
 
-        // Bind Next button only once
         if (!nextButtonBound) {
             Platform.runLater(() -> {
                 Node nextButton = this.lookupButton(ButtonType.NEXT);
