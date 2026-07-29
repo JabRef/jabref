@@ -12,25 +12,25 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.exporter.CreateModifyExporterDialogView;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final CliPreferences preferences;
+    private final ExportPreferences exportPreferences;
     private final DialogService dialogService;
 
-    public CustomExporterTabViewModel(CliPreferences preferences, DialogService dialogService) {
-        this.preferences = preferences;
+    public CustomExporterTabViewModel(ExportPreferences exportPreferences, DialogService dialogService) {
+        this.exportPreferences = exportPreferences;
         this.dialogService = dialogService;
     }
 
     @Override
     public void setValues() {
-        List<TemplateExporter> exportersLogic = preferences.getExportPreferences().getCustomExporters();
+        List<TemplateExporter> exportersLogic = exportPreferences.getCustomExporters();
         exporters.clear();
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
@@ -42,7 +42,7 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
         List<TemplateExporter> exportersLogic = exporters.stream()
                                                          .map(ExporterViewModel::getLogic)
                                                          .collect(Collectors.toList());
-        preferences.getExportPreferences().setCustomExporters(exportersLogic);
+        exportPreferences.setCustomExporters(exportersLogic);
     }
 
     public void addExporter() {
