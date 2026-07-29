@@ -143,6 +143,17 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
+      - uses: actions/checkout@v7
+        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        with:
+          fetch-depth: 0
+          show-progress: 'false'
+      - id: changed-files
+        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        uses: tj-actions/changed-files@v47
+        with:
+          files_ignore: |
+            .github/workflows/**
       - name: Determine conditions
         id: binary
         shell: bash
@@ -151,22 +162,30 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
+          NON_WORKFLOW_CHANGES: ${{ steps.changed-files.outputs.any_changed }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
           set -x
           PS4='+ ${LINENO}: '
 
-          if [[ "$EVENT_ACTION" != "labeled" || "$LABEL_NAME" == "automerge" || "$LABEL_NAME" == "dev: binaries" ]]; then
-            echo "📦 build enabled"
-            echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
-            echo "should-build=true" >> "$GITHUB_OUTPUT"
-          else
+          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" ]]; then
+            echo "⊘ only workflow files changed – skipping build"
+            echo "⊘ only workflow files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "📦 build enabled"
+          echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          echo "should-build=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
@@ -279,6 +298,7 @@ jobs:
 
   disk-space-check:
     needs: conditions
+    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
@@ -338,6 +358,7 @@ jobs:
 
   compute-matrix:
     needs: conditions
+    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
