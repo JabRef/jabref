@@ -15,6 +15,7 @@ import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -45,28 +46,27 @@ public class DoclingEngine implements OcrEngine {
 
     @Override
     public boolean isAvailable() {
-        return true;
-        //        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        //        command.add("--version");
-        //        try {
-        //            ProcessBuilder processBuilder = new ProcessBuilder(command);
-        //            processBuilder.redirectErrorStream(true);
-        //            Process process = processBuilder.start();
-        //            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
-        //            if (!finished) {
-        //                process.destroyForcibly();
-        //                LOGGER.debug("Checking Docling availability timed out");
-        //                return false;
-        //            }
-        //            return process.exitValue() == 0;
-        //        } catch (IOException e) {
-        //            LOGGER.error("Docling is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
-        //            return false;
-        //        } catch (InterruptedException e) {
-        //            Thread.currentThread().interrupt();
-        //            LOGGER.error("Checking Docling availability was interrupted", e);
-        //            return false;
-        //        }
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        command.add("--version");
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroyForcibly();
+                LOGGER.debug("Checking Docling availability timed out");
+                return false;
+            }
+            return process.exitValue() == 0;
+        } catch (IOException e) {
+            LOGGER.error("Docling is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("Checking Docling availability was interrupted", e);
+            return false;
+        }
     }
 
     @Override
