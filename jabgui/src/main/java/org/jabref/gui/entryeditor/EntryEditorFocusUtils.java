@@ -30,6 +30,10 @@ class EntryEditorFocusUtils {
 
     private @Nullable Field lastFocusedField;
 
+    /// Incremented per restore request so a queued restore can tell whether it is still the
+    /// most recent one. Only touched on the JavaFX thread.
+    private long focusRestoreRequest;
+
     EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
@@ -47,13 +51,21 @@ class EntryEditorFocusUtils {
     /// Restores focus to the last captured field (if any); the caret position is restored by
     /// [FieldsEditorTab]'s caret memory when the tab rebinds, so it is not touched here.
     /// Clears the captured field afterwards so a subsequent entry change starts clean.
+    /// When entries are switched faster than the queued restores run, only the last request
+    /// applies - an earlier one would move focus (and the selected tab) to a field captured
+    /// for an entry that is no longer shown.
     void restoreLastFocusedField() {
         if (lastFocusedField == null) {
             return;
         }
         Field fieldToRestore = lastFocusedField;
         lastFocusedField = null;
-        Platform.runLater(() -> setFocusToField(fieldToRestore));
+        long request = ++focusRestoreRequest;
+        Platform.runLater(() -> {
+            if (request == focusRestoreRequest) {
+                setFocusToField(fieldToRestore);
+            }
+        });
     }
 
     // endregion
