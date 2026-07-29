@@ -193,6 +193,7 @@ public class LinkedFile implements Serializable {
 
     /// Checks if the given String is an online link
     /// Recognizes http://, https://, ftp://, and www. prefixes.
+    ///
     /// @param toCheck The String to check
     /// @return `true`, if it starts with "http://", "https://", "ftp://" or contains "www."; `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
