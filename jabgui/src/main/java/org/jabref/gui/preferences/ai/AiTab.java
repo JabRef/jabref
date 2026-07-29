@@ -187,7 +187,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         return spinner;
     }
 
-    /// {@link IntegerInputField} holds a nullable `Integer`; mirror it onto the view model's
+    /// [IntegerInputField] holds a nullable `Integer`; mirror it onto the view model's
     /// primitive property in both directions, mapping `null` to zero.
     private IntegerInputField integerField(IntegerProperty value) {
         IntegerInputField field = new IntegerInputField();
@@ -235,9 +235,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     /// A template tab; its reset action is carried on the tab itself so that "reset current
     /// template" needs no chain of identity comparisons.
     ///
-    /// The text area sits in a wrapper rather than being the content directly: {@link Tab} writes
-    /// through to its content's `disable` property (on {@link Tab#setContent}, on being added to a
-    /// {@link TabPane}, and whenever the tab itself is disabled), which throws against a bound
+    /// The text area sits in a wrapper rather than being the content directly: [Tab] writes
+    /// through to its content's `disable` property (on [Tab#setContent], on being added to a
+    /// [TabPane], and whenever the tab itself is disabled), which throws against a bound
     /// value. The wrapper absorbs those writes; the text area keeps its own binding and the
     /// effective state is the union of both.
     private Tab templateTab(String title, StringProperty template, Runnable reset) {

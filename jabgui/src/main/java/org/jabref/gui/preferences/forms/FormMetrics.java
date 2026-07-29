@@ -2,7 +2,7 @@ package org.jabref.gui.preferences.forms;
 
 import org.jspecify.annotations.NullMarked;
 
-/// The layout measurements a preference tab shares with {@link PreferencesFormBuilder}, so that a
+/// The layout measurements a preference tab shares with [PreferencesFormBuilder], so that a
 /// tab building part of its view by hand (the `.custom(Node)` hatch) lines up with the parts the
 /// builder laid out, rather than re-typing the numbers.
 @NullMarked

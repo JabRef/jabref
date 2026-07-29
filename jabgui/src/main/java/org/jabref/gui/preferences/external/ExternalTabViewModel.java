@@ -134,7 +134,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         initialPushToApplicationPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
     }
 
-    /// Copies all push-to-application settings from {@code source} into the existing {@code target} instance.
+    /// Copies all push-to-application settings from `source` into the existing `target` instance.
     private static void copyPushPreferences(PushToApplicationPreferences target, PushToApplicationPreferences source) {
         target.setActiveApplicationName(source.getActiveApplicationName());
         target.setCommandPaths(source.getCommandPaths());

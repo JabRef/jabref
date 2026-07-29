@@ -12,12 +12,12 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/// Base class for preference tabs. A tab describes its UI with a {@link PreferencesFormBuilder}
-/// obtained from {@link #form()} and delegates the {@link PreferencesTab} lifecycle to its
+/// Base class for preference tabs. A tab describes its UI with a [PreferencesFormBuilder]
+/// obtained from [#form()] and delegates the [PreferencesTab] lifecycle to its
 /// view model.
 ///
 /// A tab is not itself a node: the form the builder assembles is the tab's content, handed over with
-/// {@link #setContent}. Were the tab a container of its own, every tab would nest that form in a
+/// [#setContent]. Were the tab a container of its own, every tab would nest that form in a
 /// second pane with the same spacing, and it would be ambiguous which of the two owns the layout.
 public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel> implements PreferencesTab {
 

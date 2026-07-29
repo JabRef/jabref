@@ -47,7 +47,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList(CitationCountFetcherType.values()));
 
     /// Working copy of tab configurations — not the live preferences list.
-    /// Written to preferences only in {@link #storeSettings()}.
+    /// Written to preferences only in [#storeSettings()].
     private final ObservableList<EntryEditorTabModel> tabModels = FXCollections.observableArrayList();
 
     private final DialogService dialogService;

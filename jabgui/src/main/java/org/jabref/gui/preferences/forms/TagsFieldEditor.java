@@ -18,7 +18,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import com.dlsc.gemsfx.TagsField;
 import org.jspecify.annotations.NullMarked;
 
-/// Custom editor: a fully-styled gemsfx {@link TagsField} bound to its value, with suggestion,
+/// Custom editor: a fully-styled gemsfx [TagsField] bound to its value, with suggestion,
 /// converter and a removable tag view. Encapsulates the repeated setup (search icon off, focus
 /// pseudo-class, enter-to-commit, remove-icon tag cells) so a tab only supplies the value-typed
 /// callbacks.

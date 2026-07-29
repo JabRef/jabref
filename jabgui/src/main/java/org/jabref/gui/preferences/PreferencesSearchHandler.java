@@ -14,8 +14,8 @@ import javafx.css.PseudoClass;
 /// Filters the preference tabs by a search query and highlights the matching elements.
 ///
 /// Tabs declare what is searchable themselves: the visible texts (with the node they caption)
-/// come from {@link PreferencesTab#getSearchableElements()}, extra invisible synonyms from
-/// {@link PreferencesTab#getSearchKeywords()}. There is no scene-graph scanning.
+/// come from [PreferencesTab#getSearchableElements()], extra invisible synonyms from
+/// [PreferencesTab#getSearchKeywords()]. There is no scene-graph scanning.
 class PreferencesSearchHandler {
 
     private static final PseudoClass SEARCH_HIGHLIGHT = PseudoClass.getPseudoClass("search-highlight");

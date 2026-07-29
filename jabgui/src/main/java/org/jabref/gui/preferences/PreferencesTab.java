@@ -10,7 +10,7 @@ import javafx.scene.Node;
 public interface PreferencesTab {
 
     /// Extra, invisible search terms for the tab (synonyms, abbreviations). The visible texts are
-    /// covered by {@link #getSearchableElements()} already.
+    /// covered by [#getSearchableElements()] already.
     default List<String> getSearchKeywords() {
         return List.of(getTabName(), getTitle());
     }
@@ -44,7 +44,7 @@ public interface PreferencesTab {
     /// dialog. This calls the appropriate method in the ViewModel.
     void storeSettings();
 
-    /// This method is called before the {@link #storeSettings()} method,
+    /// This method is called before the [#storeSettings()] method,
     /// to check if there are illegal settings in the tab, or if is ready
     /// to be closed. This calls the appropriate method in the ViewModel.
     boolean validateSettings();
