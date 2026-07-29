@@ -144,25 +144,25 @@ jobs:
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
       - uses: actions/checkout@v7
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'pull_request'
         with:
           fetch-depth: 0
           show-progress: 'false'
       - id: changed-non-workflow-files
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-binaries-workflow
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
             .github/workflows/binaries.yml
       - id: changed-binaries-resource-markdown
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
@@ -191,7 +191,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" != "workflow_dispatch" && "$GITHUB_REF" != refs/tags/* && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
