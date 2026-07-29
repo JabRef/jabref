@@ -6,10 +6,14 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
@@ -98,6 +102,29 @@ class CommentsTabTest {
         assertTrue(isEditable(StandardField.COMMENT));
         assertTrue(isEditable(OWN_COMMENT));
         assertFalse(isEditable(ANNAS_COMMENT));
+    }
+
+    /// Read-only is not only about typing: dropping an image onto another user's comment would copy
+    /// the file into the library and insert a Markdown link into that user's field.
+    // [utest->req~entry-editor.comments-tab~1]
+    @Test
+    void otherUsersCommentsRejectDroppedFiles(FxRobot robot) {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(ANNAS_COMMENT, "anna's comment");
+        show(robot, entry);
+        TextInputControl readOnlyInput = textInputOf(commentsTab.editors.get(ANNAS_COMMENT).getNode()).orElseThrow();
+
+        // The dragboard is never read: the editor must reject the drag before looking at its content.
+        DragEvent dragOver = dragEvent(DragEvent.DRAG_OVER, readOnlyInput);
+        DragEvent dragDropped = dragEvent(DragEvent.DRAG_DROPPED, readOnlyInput);
+        robot.interact(() -> {
+            Event.fireEvent(readOnlyInput, dragOver);
+            Event.fireEvent(readOnlyInput, dragDropped);
+        });
+
+        assertFalse(dragOver.isAccepted());
+        assertFalse(dragDropped.isDropCompleted());
+        assertEquals("anna's comment", readOnlyInput.getText());
+        assertEquals(Optional.of("anna's comment"), entry.getField(ANNAS_COMMENT));
     }
 
     /// While the own comment is unset, it is offered as a chip instead of an empty editor.
@@ -266,6 +293,13 @@ class CommentsTabTest {
         robot.interact(() -> ownCommentChip().orElseThrow().fire());
         // The chip focuses its new editor in a deferred block
         WaitForAsyncUtils.waitForFxEvents();
+    }
+
+    /// A drag event without a dragboard: a handler that inspects the dragboard before checking
+    /// whether the editor may be changed at all fails with a [NullPointerException].
+    private static DragEvent dragEvent(EventType<DragEvent> eventType, Node target) {
+        return new DragEvent(null, target, eventType, null, 0, 0, 0, 0,
+                TransferMode.COPY, null, null, null);
     }
 
     private List<Field> shownFields() {

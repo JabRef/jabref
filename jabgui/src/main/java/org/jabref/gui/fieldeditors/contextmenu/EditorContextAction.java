@@ -39,19 +39,22 @@ public class EditorContextAction extends SimpleCommand {
         BooleanBinding redoableBinding = Bindings.createBooleanBinding(textInputControl::isRedoable, textInputControl.redoableProperty());
 
         this.executable.bind(
+                // Everything that changes the text is offered only for an editable input: the text
+                // control itself refuses none of these (it enforces `editable` for typing only), so a
+                // read-only editor (e.g. another user's comment in the Comments tab) would be changed.
                 switch (command) {
                     case COPY ->
-                            editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                    case CUT ->
                             maskTextBinding.not().and(hasSelectionBinding);
+                    case CUT ->
+                            editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
                     case PASTE ->
                             editableBinding.and(hasStringInClipboardBinding);
                     case DELETE ->
                             editableBinding.and(hasSelectionBinding);
                     case UNDO ->
-                            undoableBinding;
+                            editableBinding.and(undoableBinding);
                     case REDO ->
-                            redoableBinding;
+                            editableBinding.and(redoableBinding);
                     case SELECT_ALL -> {
                         if (SHOW_HANDLES) {
                             yield hasTextBinding.and(allSelectedBinding.not());

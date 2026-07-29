@@ -73,7 +73,9 @@ public class MarkdownEditor extends SimpleEditor {
 
     private void enableDragOver(EditorTextArea textArea) {
         textArea.setOnDragOver(event -> {
-            if (event.getGestureSource() != textArea && (event.getDragboard().hasImage() || event.getDragboard().hasFiles())) {
+            if (textArea.isEditable()
+                    && (event.getGestureSource() != textArea)
+                    && (event.getDragboard().hasImage() || event.getDragboard().hasFiles())) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
@@ -82,6 +84,14 @@ public class MarkdownEditor extends SimpleEditor {
 
     private void enableDragDrop(EditorTextArea textArea) {
         textArea.setOnDragDropped(event -> {
+            // A read-only editor (e.g. another user's comment in the Comments tab) must not be changed
+            // by a drop either: the drop would copy the file into the library and insert the Markdown
+            // link, which the editor's binding would write into the entry's field.
+            if (!textArea.isEditable()) {
+                event.setDropCompleted(false);
+                event.consume();
+                return;
+            }
             Dragboard dragboard = event.getDragboard();
             boolean success = false;
             if (dragboard.hasFiles()) {
