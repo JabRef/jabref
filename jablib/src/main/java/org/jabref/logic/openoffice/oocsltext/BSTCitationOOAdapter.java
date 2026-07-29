@@ -78,7 +78,7 @@ public class BSTCitationOOAdapter {
         boolean preceedingSpaceExists = checkPreceedingSpace(cursor);
         markManager.insertReferenceIntoOO(
                 entries, document, cursor, ooText,
-                !preceedingSpaceExists,
+                !preceedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
                 openOfficePreferences.getAddSpaceAfter(),
                 CSLCitationType.NORMAL);
         markManager.setRealTimeNumberUpdateRequired(
