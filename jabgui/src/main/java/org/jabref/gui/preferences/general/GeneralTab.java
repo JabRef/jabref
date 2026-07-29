@@ -70,6 +70,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                 path -> path
                                         .browse(viewModel::importCSSFile)
                                         .disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
+                                        .disableWhen(viewModel.themeSyncOsProperty())
                                         .validate(viewModel.customPathToThemeValidationStatus()))
                         .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
                         .field(Localization.lang("Size"), buildFontSizeSpinner(),

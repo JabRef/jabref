@@ -306,8 +306,11 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder radioGroup(Consumer<PreferencesFormBuilder> content) {
         ToggleGroup enclosing = currentToggleGroup;
         currentToggleGroup = new ToggleGroup();
-        content.accept(this);
-        currentToggleGroup = enclosing;
+        try {
+            content.accept(this);
+        } finally {
+            currentToggleGroup = enclosing;
+        }
         return this;
     }
 
@@ -316,6 +319,9 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<InputElement<RadioButton>> config) {
+        if (currentToggleGroup == null) {
+            throw new IllegalStateException("radio() outside of a radioGroup(...); without one the radios would not be mutually exclusive");
+        }
         RadioButton radio = new RadioButton(text);
         searchable(text, radio);
         radio.setToggleGroup(currentToggleGroup);
@@ -655,8 +661,9 @@ public class PreferencesFormBuilder {
 
         final T region;
 
-        /// Every disable condition installed on this region so far, ANDed together; see
-        /// [ElementBase#combinedDisable] for the same rule on element handles.
+        /// Every disable condition installed on this region so far, OR-combined: the region is
+        /// disabled while *any* of them holds; see [ElementBase#combinedDisable] for the same
+        /// rule on element handles.
         @Nullable
         private ObservableValue<? extends Boolean> combinedDisable;
 
@@ -774,7 +781,8 @@ public class PreferencesFormBuilder {
         final PreferencesFormBuilder form;
         final N node;
 
-        /// Every disable condition installed on this element so far, ANDed together — whether it
+        /// Every disable condition installed on this element so far, OR-combined — the element is
+        /// disabled while *any* of them holds — whether it
         /// came from the builder itself (the value field of an
         /// [attachField][InputElement#attachField], following its toggle) or from a caller's
         /// [#disableWhen]. There is no distinction between "the builder's" and "the caller's"
