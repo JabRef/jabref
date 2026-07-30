@@ -15,12 +15,22 @@ import org.jspecify.annotations.Nullable;
 
 public class InsertUtil {
 
+    /// Renders a user feedback message for a given number of entries.
+    ///
+    /// Implementations have to call [Localization#lang(String, Object...)] with a **literal** key,
+    /// because the localization consistency tests can only detect literal keys.
+    @FunctionalInterface
+    public interface FeedbackMessage {
+        /// @param params Replacement strings for the parameters %0, %1, etc. of the message
+        String format(Object... params);
+    }
+
     /// @param jabRefClipboardTransferData - can be null if called via clipboard and clipboard content was NOT created by JabRef
     public static void addEntriesWithFeedback(@Nullable TransferInformation jabRefClipboardTransferData,
                                               List<BibEntry> entriesToAdd,
                                               BibDatabaseContext targetDatabaseContext,
-                                              String successMessage,
-                                              String partialMessage,
+                                              FeedbackMessage successMessage,
+                                              FeedbackMessage partialMessage,
                                               DialogService dialogService,
                                               ImportHandler importHandler,
                                               StateManager stateManager
@@ -35,11 +45,11 @@ public class InsertUtil {
                                                      .orElse(Localization.lang("target library"));
 
             if (importedCount == entriesToAdd.size()) {
-                dialogService.notify(Localization.lang(successMessage, String.valueOf(importedCount), targetName));
+                dialogService.notify(successMessage.format(importedCount, targetName));
             } else if (importedCount == 0) {
                 dialogService.notify(Localization.lang("No entry was copied to %0", targetName));
             } else {
-                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
+                dialogService.notify(partialMessage.format(importedCount, targetName, skippedCount));
             }
         });
 

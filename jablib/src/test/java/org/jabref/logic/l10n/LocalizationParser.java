@@ -34,6 +34,9 @@ import org.mockito.Mockito;
 @ResourceLock("Localization.lang")
 public class LocalizationParser {
 
+    /// All modules containing Java sources and FXML files which may use localization keys.
+    private static final List<String> MODULES = List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls");
+
     public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
         Set<String> keysInJavaFiles = entries.stream()
@@ -80,11 +83,13 @@ public class LocalizationParser {
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
-            return pathStream
-                    .filter(LocalizationParser::isJavaFile)
-                    .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
-                    .collect(Collectors.toSet());
+        try {
+            return MODULES.stream()
+                          .map(path -> Path.of("..", path, "src", "main", "java").normalize())
+                          .flatMap(Unchecked.function(path -> Files.walk(path)))
+                          .filter(LocalizationParser::isJavaFile)
+                          .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
+                          .collect(Collectors.toSet());
         } catch (UncheckedIOException ioe) {
             throw new IOException(ioe);
         }
@@ -92,8 +97,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type) throws IOException {
         try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
-                       .stream()
+            return MODULES.stream()
                        .map(path -> Path.of("..", path, "src", "main", "java").normalize())
                        .flatMap(Unchecked.function(path -> Files.walk(path)))
                        .filter(LocalizationParser::isJavaFile)
@@ -106,8 +110,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type) throws IOException {
         try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
-                       .stream()
+            return MODULES.stream()
                        .map(path -> Path.of("..", path, "src", "main", "resources").normalize())
                        .filter(Files::isDirectory)
                        .flatMap(Unchecked.function(path -> Files.walk(path)))
