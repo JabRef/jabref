@@ -97,6 +97,18 @@ class URLUtilTest {
     @ParameterizedTest
     @CsvSource(
             textBlock = """
+                    ' http://www.google.com'
+                    'http://www.google.com '
+                    ' http://www.google.com '
+                    """
+    )
+    void isURLshouldAcceptValidURLWithSurroundingWhitespace(String url) {
+        assertTrue(URLUtil.isURL(url));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
                     www.google.com
                     google.com
                     """
