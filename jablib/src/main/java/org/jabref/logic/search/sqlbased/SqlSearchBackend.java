@@ -1,8 +1,11 @@
 package org.jabref.logic.search.sqlbased;
 
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.jabref.logic.search.SearchBackend;
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
@@ -20,7 +23,14 @@ public class SqlSearchBackend implements SearchBackend {
 
     @Override
     public SearchResults search(SearchQuery query) {
-        return indexManager.search(query);
+        query.getMatchInformation().clear();
+        SearchResults results = indexManager.search(query);
+        for (Entry<String, Optional<MatchInformation>> mi : results.getDetailedMatchedEntries().entrySet()) {
+            if (mi.getValue().isPresent()) {
+                query.getMatchInformation().put(mi.getKey(), mi.getValue().get());
+            }
+        }
+        return results;
     }
 
     @Override

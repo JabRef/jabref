@@ -308,7 +308,7 @@ public class IndexManager {
 
     public SearchResults search(SearchQuery query) {
         List<Callable<SearchResults>> tasks = new ArrayList<>();
-        tasks.add(() -> bibFieldsSearcher.search(query));
+        tasks.add(() -> bibFieldsSearcher.searchDetailedMatches(query));
 
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             tasks.add(() -> linkedFilesSearcher.search(query));

@@ -1,6 +1,8 @@
 package org.jabref.logic.search.inmemory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
@@ -43,23 +45,20 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
                               .toList();
     }
 
-    public List<Pair<BibEntry, MatchInformation>> getDetailedMatches(SearchQuery query) {
+    public Map<BibEntry, MatchInformation> getDetailedMatches(SearchQuery query) {
         if (!validate(query)) {
-            return List.of();
+            return Map.of();
         }
         return databaseContext.getDatabase().getEntries().stream()
                               .map(entry -> new Pair<>(entry, getMatchInformation(entry, query)))
                               .filter(pair -> pair.getValue().getResult())
-                              .toList();
+                              .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
     /// Test a single entry against a query without iterating the library.
     /// Returns `false` for invalid queries.
     public boolean matches(BibEntry entry, SearchQuery query) {
-        if (!query.isValid()) {
-            return false;
-        }
-        return matchesParsedQuery(entry, query);
+        return query.isValid() && matchesParsedQuery(entry, query);
     }
 
     private boolean matchesParsedQuery(BibEntry entry, SearchQuery query) {

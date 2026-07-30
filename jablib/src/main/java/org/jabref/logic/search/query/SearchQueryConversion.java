@@ -18,6 +18,11 @@ public class SearchQueryConversion {
         return new SearchToSqlVisitor(table, searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
+    public static SqlQueryNode searchToSqlWithMatchDetails(String table, SearchQuery searchQuery) {
+        LOGGER.debug("Converting search expression to SQL: {}", searchQuery.getSearchExpression());
+        return new SearchToSqlDetailedMatchVisitor(table, searchQuery.getSearchFlags()).visit(searchQuery.getContext());
+    }
+
     public static String flagsToSearchExpression(SearchQuery searchQuery) {
         LOGGER.debug("Converting search flags to search expression: {}, flags {}", searchQuery.getSearchExpression(), searchQuery.getSearchFlags());
         return new SearchFlagsToExpressionVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());

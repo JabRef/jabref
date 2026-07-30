@@ -5,7 +5,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,6 +18,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -78,11 +82,12 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
     private static final BibEntry MINIMAL_NOTE_MIXED_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note-mixed-case")
             .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
+    private static final String FULLTEXT_QUERY = "\"This is a short sentence, comma included.\"";
+    private static final String PARSED_FULLTEXT_QUERY = "\"? ? ? short sentenc comma includ\"";
 
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-
     private PostgresServer postgresServer;
 
     @TempDir
@@ -144,12 +149,54 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
 
                 // test-library-with-attached-files
                 Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting.", true),
-                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "\"This is a short sentence, comma included.\"", true),
+                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", FULLTEXT_QUERY, true),
                 Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "comma", true),
 
                 Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting", true),
                 Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "world", true),
                 Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "\"Hello World\"", true)
+        );
+    }
+
+    private static Stream<Arguments> detailedLibrarySearch() {
+        BiFunction<List<String>, List<Boolean>, Optional<MatchInformation>> createMI = (List<String> clauses, List<Boolean> partialResults) -> {
+            var result = new MatchInformation(true);
+            for (int i = 0; i < clauses.size(); i++) {
+                result.getPartialResults().add(new MatchInformation.PartialResult(partialResults.get(i), clauses.get(i)));
+            }
+            return Optional.of(result);
+        };
+        return Stream.of(
+                //                                 test-library-with-attached-files
+                Arguments.of(Map.of(), "test-library-with-attached-files.bib", "NotExisting.", true),
+                Arguments.of(Map.of(
+                                MINIMAL_SENTENCE_CASE, createMI.apply(List.of(PARSED_FULLTEXT_QUERY), List.of(true)),
+                                MINIMAL_ALL_UPPER_CASE, createMI.apply(List.of(PARSED_FULLTEXT_QUERY), List.of(true)),
+                                MINIMAL_MIXED_CASE, createMI.apply(List.of(PARSED_FULLTEXT_QUERY), List.of(true))),
+                        "test-library-with-attached-files.bib", FULLTEXT_QUERY, true),
+                Arguments.of(Map.of(
+                                MINIMAL_SENTENCE_CASE, createMI.apply(List.of("comma"), List.of(true)),
+                                MINIMAL_ALL_UPPER_CASE, createMI.apply(List.of("comma"), List.of(true)),
+                                MINIMAL_MIXED_CASE, createMI.apply(List.of("comma"), List.of(true))),
+                        "test-library-with-attached-files.bib", "comma", true),
+
+                Arguments.of(Map.of(), "test-library-with-attached-files.bib", "NotExisting", true),
+                Arguments.of(Map.of(
+                        MINIMAL_NOTE_SENTENCE_CASE, createMI.apply(List.of("world"), List.of(true)),
+                        MINIMAL_NOTE_ALL_UPPER_CASE, createMI.apply(List.of("world"), List.of(true)),
+                        MINIMAL_NOTE_MIXED_CASE, createMI.apply(List.of("world"), List.of(true))), "test-library-with-attached-files.bib", "world", true),
+                Arguments.of(Map.of(
+                        MINIMAL_NOTE_SENTENCE_CASE, createMI.apply(List.of("\"hello world\""), List.of(true)),
+                        MINIMAL_NOTE_ALL_UPPER_CASE, createMI.apply(List.of("\"hello world\""), List.of(true)),
+                        MINIMAL_NOTE_MIXED_CASE, createMI.apply(List.of("\"hello world\""), List.of(true))), "test-library-with-attached-files.bib", "\"Hello World\"", true),
+                Arguments.of(Map.of(
+                                MINIMAL_NOTE_SENTENCE_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(true, false)),
+                                MINIMAL_NOTE_ALL_UPPER_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(true, false)),
+                                MINIMAL_NOTE_MIXED_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(true, false)),
+                                MINIMAL_SENTENCE_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(false, true)),
+                                MINIMAL_ALL_UPPER_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(false, true)),
+                                MINIMAL_MIXED_CASE, createMI.apply(List.of("world", PARSED_FULLTEXT_QUERY), List.of(false, true))),
+                        "test-library-with-attached-files.bib", "world or \"This is a short sentence, comma included.\"", true)
         );
     }
 
@@ -160,5 +207,14 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
         List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer).getMatches(new SearchQuery(query, flags));
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void detailedLibrarySearch(Map<BibEntry, Optional<MatchInformation>> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
+        BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
+        EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
+        Map<BibEntry, Optional<MatchInformation>> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer).getDetailedMatches(new SearchQuery(query, flags));
+        assertThat(expected.entrySet(), Matchers.everyItem(Matchers.in(matches.entrySet())));
     }
 }

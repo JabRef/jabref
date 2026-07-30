@@ -3,12 +3,15 @@ package org.jabref.logic.search.sqlbased;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,6 +29,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -69,8 +74,24 @@ public class SqlBasedLibrarySearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
+        System.out.println("query: " + query);
         List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer).getMatches(query);
         // Order-insensitive comparison: SQL-backed searcher does not guarantee result ordering.
         assertEquals(Set.copyOf(expectedMatches), Set.copyOf(matches));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.search.LibrarySearcherTestCases#detailedSearchCases")
+    void detailedSearchCases(Map<BibEntry, MatchInformation> expectedMatches, SearchQuery query, List<BibEntry> entries) throws IOException {
+        for (BibEntry entry : entries) {
+            databaseContext.getDatabase().insertEntry(entry);
+        }
+        Map<BibEntry, MatchInformation> matches =
+                new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer)
+                        .getDetailedMatches(query).entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get())); // SqlBasedLibraryTest should not return empty optionals for MatchInformation
+        // Order-insensitive comparison: SQL-backed searcher does not guarantee result ordering.
+        assertThat(expectedMatches.entrySet(), Matchers.everyItem(Matchers.in(matches.entrySet())));
     }
 }

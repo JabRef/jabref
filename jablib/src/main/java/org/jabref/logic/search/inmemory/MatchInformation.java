@@ -10,6 +10,9 @@ public class MatchInformation {
     private Boolean result;
     private Set<PartialResult> partialResults = new HashSet<>();
 
+    public MatchInformation() {
+    }
+
     public MatchInformation(Boolean result) {
         this.result = result;
     }
@@ -33,8 +36,9 @@ public class MatchInformation {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         MatchInformation that = (MatchInformation) o;
         return Objects.equals(result, that.result) && Objects.equals(partialResults, that.partialResults);
     }
@@ -55,8 +59,9 @@ public class MatchInformation {
     public record PartialResult(boolean isTrue, String subquery) {
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass())
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             PartialResult that = (PartialResult) o;
             return isTrue == that.isTrue && Objects.equals(subquery, that.subquery);
         }

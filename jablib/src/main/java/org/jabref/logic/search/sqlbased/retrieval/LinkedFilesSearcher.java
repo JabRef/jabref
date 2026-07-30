@@ -2,13 +2,16 @@ package org.jabref.logic.search.sqlbased.retrieval;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,6 +38,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.logic.search.sqlbased.retrieval.LinkedFilesClausesSearcher.getClausesResults;
 
 public final class LinkedFilesSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesSearcher.class);
@@ -93,12 +98,13 @@ public final class LinkedFilesSearcher {
 
     private SearchResults search(IndexSearcher indexSearcher, Query searchQuery) throws IOException {
         TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);
+        Map<String, TopDocs> clauseResult = getClausesResults(indexSearcher, searchQuery);
         StoredFields storedFields = indexSearcher.storedFields();
         LOGGER.debug("Found {} matching documents", topDocs.totalHits.value());
-        return getSearchResults(topDocs, storedFields, searchQuery);
+        return getSearchResults(topDocs, storedFields, searchQuery, clauseResult);
     }
 
-    private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery) throws IOException {
+    private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery, Map<String, TopDocs> clauseResults) throws IOException {
         SearchResults searchResults = new SearchResults();
         long startTime = System.currentTimeMillis();
 
@@ -118,6 +124,14 @@ public final class LinkedFilesSearcher {
                             getFieldContents(document, LinkedFilesConstants.ANNOTATIONS),
                             Integer.parseInt(getFieldContents(document, LinkedFilesConstants.PAGE_NUMBER)),
                             highlighter);
+                    if (!clauseResults.isEmpty()) {
+                        MatchInformation matchInformation = new MatchInformation(true);
+                        for (Entry<String, TopDocs> clauseResult : clauseResults.entrySet()) {
+                            List<Integer> resultDocs = Arrays.stream(clauseResult.getValue().scoreDocs).map(scoredoc -> scoredoc.doc).toList();
+                            matchInformation.getPartialResults().add(new MatchInformation.PartialResult(resultDocs.contains(scoreDoc.doc), clauseResult.getKey()));
+                        }
+                        searchResult.setMatchInformation(matchInformation);
+                    }
                     searchResults.addSearchResult(entriesWithFile, searchResult);
                 }
             }

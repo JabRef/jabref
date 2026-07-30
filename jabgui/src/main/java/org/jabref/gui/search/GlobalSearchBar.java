@@ -434,7 +434,7 @@ public class GlobalSearchBar extends HBox {
         }
         Set<PartialResult> prs = getPartialResultsForSelectedBibEntry();
         if (!prs.isEmpty()) {
-            tooltipText.append(Localization.lang("\n\nDetails of match:\n"));
+            tooltipText.append(Localization.lang("\n\nDetails of the currently selected match:\n"));
             for (PartialResult pr : prs) {
                 tooltipText.append(pr.subquery()).append("->").append(Localization.lang(Boolean.toString(pr.isTrue()))).append("\n");
             }

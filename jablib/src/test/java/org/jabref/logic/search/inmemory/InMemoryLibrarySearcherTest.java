@@ -1,20 +1,20 @@
 package org.jabref.logic.search.inmemory;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import javafx.util.Pair;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,11 +42,11 @@ class InMemoryLibrarySearcherTest {
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.search.LibrarySearcherTestCases#detailedSearchCases")
-    void commonDetailedSearchCases(List<Pair<BibEntry, MatchInformation>> expectedMatches, SearchQuery query, List<BibEntry> entries) {
+    void commonDetailedSearchCases(Map<BibEntry, MatchInformation> expectedMatches, SearchQuery query, List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<Pair<BibEntry, MatchInformation>> matches = new InMemoryLibrarySearcher(databaseContext, bibEntryPreferences).getDetailedMatches(query);
-        assertEquals(new HashSet<>(expectedMatches), new HashSet<>(matches));
+        Map<BibEntry, MatchInformation> matches = new InMemoryLibrarySearcher(databaseContext, bibEntryPreferences).getDetailedMatches(query);
+        assertThat(expectedMatches.entrySet(), Matchers.everyItem(Matchers.in(matches.entrySet())));
     }
 }

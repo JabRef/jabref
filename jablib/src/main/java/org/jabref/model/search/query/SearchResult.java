@@ -3,7 +3,9 @@ package org.jabref.model.search.query;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.model.search.LinkedFilesConstants;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -21,6 +23,7 @@ public final class SearchResult {
     private final Highlighter highlighter;
     private List<String> contentResultStringsHtml;
     private List<String> annotationsResultStringsHtml;
+    private MatchInformation matchInformation;
 
     private SearchResult(boolean hasFulltextResults,
                          String path,
@@ -68,6 +71,14 @@ public final class SearchResult {
 
     public int getPageNumber() {
         return pageNumber;
+    }
+
+    public Optional<MatchInformation> getMatchInformation() {
+        return matchInformation != null ? Optional.of(matchInformation) : Optional.empty();
+    }
+
+    public void setMatchInformation(MatchInformation matchInformation) {
+        this.matchInformation = matchInformation;
     }
 
     private static List<String> getHighlighterFragments(Highlighter highlighter, LinkedFilesConstants field, String content) {

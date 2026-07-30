@@ -5,9 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jabref.logic.search.inmemory.MatchInformation;
 import org.jabref.model.entry.BibEntry;
 
 public class SearchResults {
@@ -53,5 +56,19 @@ public class SearchResults {
 
     public Set<String> getMatchedEntries() {
         return searchResults.keySet();
+    }
+
+    public Map<String, Optional<MatchInformation>> getDetailedMatchedEntries() {
+        Map<String, Optional<MatchInformation>> matchedEntries = new HashMap<>();
+        for (Entry<String, List<SearchResult>> entry : searchResults.entrySet()) {
+            matchedEntries.put(entry.getKey(), Optional.empty());
+            for (SearchResult result : entry.getValue()) {
+                if (result.getMatchInformation().isPresent()) {
+                    matchedEntries.put(entry.getKey(), result.getMatchInformation());
+                    break;
+                }
+            }
+        }
+        return matchedEntries;
     }
 }
