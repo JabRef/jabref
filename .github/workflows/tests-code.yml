@@ -49,25 +49,25 @@ jobs:
       run-gradle-ci-full: ${{ steps.determine.outputs.run-gradle-ci-full }}
     steps:
       - uses: actions/checkout@v7
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         with:
           fetch-depth: 0
           show-progress: 'false'
       - id: changed-non-workflow-non-markdown-files
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-requirements-docs
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
             docs/requirements/**/*.md
       - id: changed-tests-code-workflow
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
@@ -76,7 +76,7 @@ jobs:
         id: determine
         shell: bash
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "merge_group" ]]; then
             echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
             echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
           elif [[ "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" || "${{ steps.changed-non-workflow-non-markdown-files.outputs.any_changed }}" == "true" ]]; then
