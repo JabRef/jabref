@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -35,6 +36,8 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     private TaskExecutor taskExecutor;
     @Inject
     private GitHandlerRegistry gitHandlerRegistry;
+    @Inject
+    private GuiPreferences guiPreferences;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -47,7 +50,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         setTitle(Localization.lang("Git Commit"));
-        this.viewModel = new GitCommitDialogViewModel(stateManager, dialogService, taskExecutor, gitHandlerRegistry);
+        this.viewModel = new GitCommitDialogViewModel(stateManager, dialogService, taskExecutor, gitHandlerRegistry, guiPreferences);
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));

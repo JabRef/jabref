@@ -12,8 +12,11 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitSyncService;
+import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -34,6 +37,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final GuiPreferences guiPreferences;
 
     private final StringProperty commitMessage = new SimpleStringProperty("");
     private final BooleanProperty amend = new SimpleBooleanProperty(false);
@@ -44,11 +48,13 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             StateManager stateManager,
             DialogService dialogService,
             TaskExecutor taskExecutor,
-            GitHandlerRegistry gitHandlerRegistry) {
+            GitHandlerRegistry gitHandlerRegistry,
+            GuiPreferences guiPreferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.guiPreferences = guiPreferences;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
                 commitMessage,
@@ -58,22 +64,24 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     public void commit(Runnable onSuccess) {
-        commitAction(onSuccess);
+        commitAction(onSuccess, commitTask());
     }
 
     public void commitAndPush(Runnable onSuccess) {
-        commitAction(onSuccess);
+        commitAction(onSuccess, commitAndPushTask());
     }
 
-    private void commitAction(Runnable onSuccess) {
-        commitTask()
-                .onSuccess(_ -> {
-                    dialogService.notify(Localization.lang("Committed successfully"));
+    private void commitAction(Runnable onSuccess, BackgroundTask<CommitOutcome> task) {
+        task
+                .onSuccess(outcome -> {
+                    dialogService.notify(messageFor(outcome));
                     onSuccess.run();
                 })
                 .onFailure(ex ->
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("Git Commit Failed"),
+                                ex instanceof PushFailedException
+                                ? Localization.lang("Git Push Failed")
+                                : Localization.lang("Git Commit Failed"),
                                 ex.getMessage(),
                                 ex
                         )
@@ -81,14 +89,39 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                 .executeWith(taskExecutor);
     }
 
-    public BackgroundTask<Void> commitTask() {
+    private BackgroundTask<CommitOutcome> commitTask() {
         return BackgroundTask.wrap(() -> {
             doCommit();
-            return null;
+            return CommitOutcome.COMMITTED;
         });
     }
 
+    private BackgroundTask<CommitOutcome> commitAndPushTask() {
+        return BackgroundTask.wrap(this::doCommitAndPush);
+    }
+
+    private String messageFor(CommitOutcome outcome) {
+        return switch (outcome) {
+            case COMMITTED ->
+                    Localization.lang("Committed successfully");
+            case COMMITTED_AND_PUSHED ->
+                    Localization.lang("Committed and pushed successfully");
+            case COMMITTED_WITHOUT_PUSH ->
+                    Localization.lang("Nothing to push. Local branch is up to date.");
+        };
+    }
+
+    private CommitOutcome doCommitAndPush() throws JabRefException, GitAPIException, IOException {
+        ResolvedRepository repository = resolveRepository();
+        commitOn(repository);
+        return pushTo(repository);
+    }
+
     private void doCommit() throws JabRefException, GitAPIException, IOException {
+        commitOn(resolveRepository());
+    }
+
+    private ResolvedRepository resolveRepository() throws JabRefException {
         Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
         if (activeDatabaseOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("No library open"));
@@ -116,15 +149,29 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
         }
 
+        return new ResolvedRepository(dbContext, bibFilePath, gitHandler);
+    }
+
+    private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
         String message = commitMessage.get();
         if (message == null || message.isBlank()) {
             message = Localization.lang("Update references");
         }
 
-        boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());
+        boolean committed = repository.gitHandler().createCommitOnCurrentBranch(message, amend.get());
         // TODO: Replace control-flow-by-exception with a proper control structure
         if (!committed) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
+        }
+    }
+
+    private CommitOutcome pushTo(ResolvedRepository repository) throws PushFailedException {
+        try {
+            PushResult result = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry)
+                                              .push(repository.database(), repository.bibFilePath());
+            return result.noop() ? CommitOutcome.COMMITTED_WITHOUT_PUSH : CommitOutcome.COMMITTED_AND_PUSHED;
+        } catch (JabRefException | GitAPIException | IOException e) {
+            throw new PushFailedException(e);
         }
     }
 
@@ -138,5 +185,22 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus commitMessageValidation() {
         return commitMessageValidator.getValidationStatus();
+    }
+
+    private record ResolvedRepository(BibDatabaseContext database, Path bibFilePath, GitHandler gitHandler) {
+    }
+
+    /// What a finished dialog action actually achieved, so the user can be told the truth about it.
+    private enum CommitOutcome {
+        COMMITTED,
+        COMMITTED_AND_PUSHED,
+        COMMITTED_WITHOUT_PUSH
+    }
+
+    /// Marks a failure that happened once the commit already existed, so the user is not told the commit itself failed.
+    private static class PushFailedException extends JabRefException {
+        PushFailedException(Throwable cause) {
+            super(cause.getLocalizedMessage(), cause);
+        }
     }
 }
