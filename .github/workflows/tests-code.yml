@@ -254,6 +254,10 @@ jobs:
         uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
       - name: Trust madrlint source
         run: jbang trust add https://github.com/adr/
+      - uses: actions/setup-java@v6
+        with:
+          distribution: 'corretto'
+          java-version: '25'
       - name: Lint ADRs
         # madrlint is pinned to a commit (not the moving `madrlint@adr/madrlint` alias) so
         # upstream changes cannot alter lint results without a deliberate bump here.
