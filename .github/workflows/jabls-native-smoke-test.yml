@@ -1,0 +1,61 @@
+name: JabLS Native Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths:
+      - 'jabls-cli/**'
+      - 'jablib/**'
+      - 'versions/**'
+      - '.github/workflows/jabls-native-smoke-test.yml'
+  pull_request:
+    paths:
+      - 'jabls-cli/**'
+      - 'jablib/**'
+      - 'versions/**'
+      - '.github/workflows/jabls-native-smoke-test.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  native-smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} JabLS native smoke test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabLS native binary
+        run: gradle :jabls-cli:nativeCompile
+
+      - name: Run JabLS native smoke test
+        run: python3 jabls-cli/src/test/nativeimage/jabls-smoke-test.py
+
+      - name: Upload JabLS native image (binary + libraries)
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabls-native-${{ matrix.os }}
+          path: jabls-cli/build/native/nativeCompile/
+          if-no-files-found: error
