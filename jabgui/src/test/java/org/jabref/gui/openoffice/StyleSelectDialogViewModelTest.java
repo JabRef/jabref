@@ -80,8 +80,6 @@ class StyleSelectDialogViewModelTest {
 
     @Test
     void addingDuplicateBstFilenameShowsInfoDialogAndDoesNotAdd() throws IOException {
-        // Create two files of the same name
-        // Check for validity when adding test
         Path firstFile = createBstFile(styleFolder.resolve("first"), "mystyle.bst");
         Path secondFile = createBstFile(styleFolder.resolve("second"), "mystyle.bst");
 
@@ -89,7 +87,6 @@ class StyleSelectDialogViewModelTest {
                 .thenReturn(Optional.of(firstFile))
                 .thenReturn(Optional.of(secondFile));
 
-        when(bstStyleLoader.addStyleIfValid(any())).thenReturn(true);
         when(bstStyleLoader.getStyles())
                 .thenReturn(List.of())
                 .thenReturn(List.of(new BstStyle(firstFile)));
@@ -97,13 +94,12 @@ class StyleSelectDialogViewModelTest {
         viewModel.addBstStyleFile();
         viewModel.addBstStyleFile();
 
-        // Assert
-        verify(dialogService).showInformationDialogAndWait(
+        verify(dialogService).showErrorDialogAndWait(
                 Localization.lang("Style already available"),
-                Localization.lang("The selected BST style is already available in the list.")
+                Localization.lang("A style with the same filename already exists. If it is a different style, please rename and import.")
         );
 
-        verify(bstStyleLoader, times(1)).addStyleIfValid(any());
+        verify(bstStyleLoader, times(1)).addExternalStyle(any());
     }
 
     @Test
@@ -118,11 +114,11 @@ class StyleSelectDialogViewModelTest {
 
         viewModel.addBstStyleFile();
 
-        verify(dialogService).showInformationDialogAndWait(
+        verify(dialogService).showErrorDialogAndWait(
                 Localization.lang("Style already available"),
-                Localization.lang("The selected BST style is already available in the list.")
+                Localization.lang("The selected BST style is already contained in the list.")
         );
 
-        verify(bstStyleLoader, times(0)).addStyleIfValid(any());
+        verify(bstStyleLoader, times(0)).addExternalStyle(any());
     }
 }

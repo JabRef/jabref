@@ -1,0 +1,109 @@
+name: Await second review
+
+on:
+  merge_group:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - labeled
+      - unlabeled
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  require-second-approval:
+    name: Require second approval
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check whether a second approval is required
+        uses: actions/github-script@v8
+        with:
+          script: |
+            if (context.eventName === 'merge_group') {
+              // A merge group may batch several PRs and its payload carries no PR number,
+              // so the label check cannot run here. It already gated queue entry via the
+              // pull_request_target run, which must be green before a PR can be queued.
+              await core.summary
+                .addHeading('Await second review')
+                .addRaw('Merge group event: requirement was already enforced before the PR entered the merge queue.\n')
+                .write();
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pullNumber = context.payload.pull_request?.number;
+            const requiredLabel = 'status: awaiting-second-review';
+
+            if (!pullNumber) {
+              core.setFailed('This workflow requires a pull request context.');
+              return;
+            }
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pullNumber,
+            });
+
+            const labelNames = pullRequest.labels.map((label) => label.name);
+            const hasAwaitingSecondReviewLabel = labelNames.includes(requiredLabel);
+
+            if (!hasAwaitingSecondReviewLabel) {
+              await core.summary
+                .addHeading('Await second review')
+                .addRaw(`Label \`${requiredLabel}\` is not present.\n`)
+                .write();
+              return;
+            }
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number: pullNumber,
+              per_page: 100,
+            });
+
+            const latestOpinionatedReviewStateByUser = new Map();
+            for (const review of reviews) {
+              const login = review.user?.login;
+              if (!login || login === pullRequest.user.login) {
+                continue;
+              }
+
+              if (review.state === 'APPROVED' || review.state === 'CHANGES_REQUESTED' || review.state === 'DISMISSED') {
+                latestOpinionatedReviewStateByUser.set(login, review.state);
+              }
+            }
+
+            const approvers = [...latestOpinionatedReviewStateByUser.entries()]
+              .filter(([, state]) => state === 'APPROVED')
+              .map(([login]) => login);
+
+            core.summary
+              .addHeading('Await second review')
+              .addRaw(`Label present: \`${requiredLabel}\`\n\n`)
+              .addRaw(`Current approvers: ${approvers.length > 0 ? approvers.map((login) => `\`${login}\``).join(', ') : 'none'}\n`);
+
+            if (approvers.length >= 2) {
+              await core.summary
+                .addRaw('\nSecond approval requirement satisfied.\n')
+                .write();
+              return;
+            }
+
+            await core.summary
+              .addRaw('\nSecond approval requirement not satisfied.\n')
+              .write();
+
+            core.setFailed(`PR has label "${requiredLabel}" and needs approval from a second reviewer before it can enter the merge queue.`);

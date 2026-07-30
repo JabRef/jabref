@@ -1,6 +1,7 @@
 package org.jabref.gui.openoffice;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -380,26 +381,29 @@ public class StyleSelectDialogViewModel {
 
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
 
-            BstStyle bstStyleToAdd = new BstStyle(stylePath);
-
-            if (isDuplicate(bstStyleToAdd)) {
-                dialogService.showInformationDialogAndWait(
-                        Localization.lang("Style already available"),
-                        Localization.lang("The selected BST style is already available in the list.")
+            if (!stylePath.getFileName().toString().toLowerCase().endsWith(".bst") || !Files.exists(stylePath)) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Invalid style selected"),
+                        Localization.lang("You must select a valid .bst style file.")
                 );
                 return;
             }
 
-            if (bstStyleLoader.addStyleIfValid(stylePath)) {
-                BstStyleSelectViewModel vm = new BstStyleSelectViewModel(bstStyleToAdd);
-                bstStyles.add(vm);
-                selectedBstStyle.setValue(vm);
-                openOfficePreferences.setCurrentStyle(bstStyleToAdd);
-            } else {
+            BstStyle bstStyleToAdd = new BstStyle(stylePath);
+
+            if (isDuplicate(bstStyleToAdd)) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Invalid style selected"),
-                        Localization.lang("You must select a valid .bst style file."));
+                        Localization.lang("Style already available"),
+                        Localization.lang("A style with the same filename already exists. If it is a different style, please rename and import.")
+                );
+                return;
             }
+
+            bstStyleLoader.addExternalStyle(bstStyleToAdd);
+            BstStyleSelectViewModel vm = new BstStyleSelectViewModel(bstStyleToAdd);
+            bstStyles.add(vm);
+            selectedBstStyle.setValue(vm);
+            openOfficePreferences.setCurrentStyle(bstStyleToAdd);
         });
     }
 
