@@ -32,7 +32,9 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.UrlBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -40,6 +42,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
@@ -81,6 +84,11 @@ public class NewEntryViewModel {
     private final ObjectProperty<IdBasedFetcher> idFetcher;
     private final Validator idFetcherValidator;
     private Task<Optional<BibEntry>> idLookupWorker;
+
+    private final UrlBasedFetcher urlFetcher;
+    private final StringProperty urlText;
+    private final Validator urlTextValidator;
+    private Task<Optional<List<BibEntry>>> urlWorker;
 
     private final StringProperty interpretText;
     private final Validator interpretTextValidator;
@@ -133,6 +141,14 @@ public class NewEntryViewModel {
                 Objects::nonNull,
                 ValidationMessage.error(Localization.lang("You must select an identifier type.")));
         idLookupWorker = null;
+
+        urlFetcher = new GenericUrlBasedFetcher();
+        urlText = new SimpleStringProperty();
+        urlTextValidator = new FunctionBasedValidator<>(
+                urlText,
+                URLUtil::isURL,
+                ValidationMessage.error(Localization.lang("You must specify a valid URL.")));
+        urlWorker = null;
 
         interpretText = new SimpleStringProperty();
         interpretTextValidator = new FunctionBasedValidator<>(
@@ -215,6 +231,14 @@ public class NewEntryViewModel {
 
     public ReadOnlyBooleanProperty idFetcherValidatorProperty() {
         return idFetcherValidator.getValidationStatus().validProperty();
+    }
+
+    public StringProperty urlTextProperty() {
+        return urlText;
+    }
+
+    public ReadOnlyBooleanProperty urlTextValidatorProperty() {
+        return urlTextValidator.getValidationStatus().validProperty();
     }
 
     public StringProperty interpretTextProperty() {
@@ -364,6 +388,78 @@ public class NewEntryViewModel {
         });
 
         taskExecutor.execute(idLookupWorker);
+    }
+
+    private class WorkerEnterUrl extends Task<Optional<List<BibEntry>>> {
+        @Override
+        protected Optional<List<BibEntry>> call() throws FetcherException {
+            final String url = urlText.getValue();
+            final boolean urlValid = urlTextValidator.getValidationStatus().isValid();
+
+            if (StringUtil.isBlank(url) || !urlValid) {
+                return Optional.empty();
+            }
+
+            final List<BibEntry> entries = urlFetcher.performSearch(url);
+
+            if (entries.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(entries);
+        }
+    }
+
+    public void executeEnterUrl() {
+        executing.setValue(true);
+
+        cancel();
+        urlWorker = new WorkerEnterUrl();
+
+        urlWorker.setOnFailed(_ -> {
+            final Throwable exception = urlWorker.getException();
+            final String exceptionMessage = exception.getMessage();
+            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", urlText.getValue(), exception);
+
+            final String dialogTitle = Localization.lang("Failed to create entry from URL");
+            dialogService.showInformationDialogAndWait(
+                    dialogTitle,
+                    Localization.lang(
+                            "Failed to fetch the URL.\n" +
+                                    "The following error was encountered:\n" +
+                                    "%0",
+                            exceptionMessage));
+
+            executing.set(false);
+        });
+
+        urlWorker.setOnSucceeded(_ -> {
+            final Optional<List<BibEntry>> result = urlWorker.getValue();
+
+            if (result.isEmpty()) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Invalid result"),
+                        Localization.lang(
+                                "An unknown error has occurred.\n" +
+                                        "Entries may need to be added manually."));
+                executing.set(false);
+                return;
+            }
+
+            final ImportHandler handler = new ImportHandler(
+                    libraryTab.getBibDatabaseContext(),
+                    preferences,
+                    fileUpdateMonitor,
+                    libraryTab.getUndoManager(),
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+            handler.importEntriesWithDuplicateCheck(null, result.get());
+
+            executedSuccessfully.set(true);
+            executing.set(false);
+        });
+
+        taskExecutor.execute(urlWorker);
     }
 
     private class WorkerInterpretCitations extends Task<Optional<List<BibEntry>>> {
@@ -552,6 +648,9 @@ public class NewEntryViewModel {
     public void cancel() {
         if (idLookupWorker != null) {
             idLookupWorker.cancel();
+        }
+        if (urlWorker != null) {
+            urlWorker.cancel();
         }
         if (interpretWorker != null) {
             interpretWorker.cancel();
