@@ -194,6 +194,10 @@ public class LinkedFile implements Serializable {
     /// Checks if the given String is an online link
     /// Recognizes http://, https://, ftp://, ftps://, and www. prefixes.
     ///
+    /// @implNote We use an explicit regex instead of delegating to URLUtil because
+    ///           isOnlineLink() specifically filters for *remote* links. URLUtil.isURL()
+    ///           accepts any valid URL scheme (including file://), which would misclassify
+    ///           local file URLs as online links.
     /// @param toCheck The String to check
     /// @return `true`, if it starts with "http://", "https://", "ftp://", "ftps://" or contains "www."; `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
