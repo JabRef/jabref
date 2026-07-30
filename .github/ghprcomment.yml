@@ -39,31 +39,44 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
-- jobName: check-formatting
+- jobName: format
+  workflowName: 'Source Code Tests'
+  message: >
+    Your code currently does not meet JabRef's code guidelines.
+    IntelliJ auto format covers some cases.
+    There seem to be issues with your code style and autoformat configuration.
+    Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
+- jobName: format-javadoc
+  workflowName: 'Source Code Tests'
+  message: >
+    You introduced non-Markdown JavaDoc.
+    Please use Markdown JavaDoc (`///`).
+- jobName: Checkstyle
   workflowName: 'Source Code Tests'
   message: >
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    The job "check-formatting" runs code formatting, the JavaDoc check, [Checkstyle](https://checkstyle.sourceforge.io/), and [OpenRewrite](https://docs.openrewrite.org/) one after another and stops at the first failing check.
-    To see which check failed, locate the box "Some checks were not successful" on the pull request page, then open "Source Code Tests / check-formatting (pull_request)".
+    We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Source Code Tests / Checkstyle (pull_request)" and click on it.
 
 
-    Depending on the failing step:
-
-
-    - **Formatting**: reformat your code in IntelliJ (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>), commit, and push.
-    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html) to get the same result locally.
-
-    - **JavaDoc**: you introduced non-Markdown JavaDoc. Please use Markdown JavaDoc (`///`).
-
-    - **Checkstyle**: [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the reported issues.
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
     You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
 
-    - **OpenRewrite**: the issues found can be **automatically fixed**.
-    Execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, reformat the code, commit, and push.
+
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
+- jobName: OpenRewrite
+  workflowName: 'Source Code Tests'
+  message: >
+    Your code currently does not meet JabRef's code guidelines.
+    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Source Code Tests / OpenRewrite (pull_request)" and click on it.
 
 
-    Each failing step also uploads a patch artifact (`formatting-fix-patch`, `javadoc-fix-patch`, or `openrewrite-fix-patch`), which you can apply locally with `git apply format.patch`.
+    The issues found can be **automatically fixed**.
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, reformat the code, commit, and push.
 - jobName: Modernizer
   workflowName: 'Source Code Tests'
   message: >
