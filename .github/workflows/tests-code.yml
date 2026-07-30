@@ -49,25 +49,25 @@ jobs:
       run-gradle-ci-full: ${{ steps.determine.outputs.run-gradle-ci-full }}
     steps:
       - uses: actions/checkout@v7
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         with:
           fetch-depth: 0
           show-progress: 'false'
       - id: changed-non-workflow-non-markdown-files
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-requirements-docs
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
             docs/requirements/**/*.md
       - id: changed-tests-code-workflow
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request'
         uses: tj-actions/changed-files@v47
         with:
           files: |
@@ -76,7 +76,7 @@ jobs:
         id: determine
         shell: bash
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "merge_group" ]]; then
             echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
             echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
           elif [[ "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" || "${{ steps.changed-non-workflow-non-markdown-files.outputs.any_changed }}" == "true" ]]; then
@@ -368,20 +368,25 @@ jobs:
 
   tests:
     needs: changes
-    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
+      - name: Skip tests because no source-relevant files changed
+        if: needs.changes.outputs.run-gradle-ci-full != 'true'
+        run: echo "Skipping tests because no source-relevant files changed."
       - name: Checkout source
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
       - name: Run ${{ matrix.module }} tests
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
@@ -389,20 +394,19 @@ jobs:
         if: matrix.module == 'jabkit'
         run: gradle :jabkit:runJabKitPortableSmokeTest
       - name: Prepare format failed test results
-        if: failure()
+        if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: xml-twig-tools xsltproc
           version: 1.0
       - name: Format failed test results
-        if: failure()
+        if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()
         run: scripts/after-failure.sh
 
   tests-windows:
     needs: changes
     name: "Unit tests (Windows)"
     if: >
-      needs.changes.outputs.run-gradle-ci-full == 'true' &&
       github.repository_owner == 'JabRef' &&
       (
         github.event_name == 'push' ||
@@ -415,13 +419,19 @@ jobs:
       matrix:
         module: [ jablib ]
     steps:
+      - name: Skip Windows tests because no source-relevant files changed
+        if: needs.changes.outputs.run-gradle-ci-full != 'true'
+        run: echo "Skipping Windows tests because no source-relevant files changed."
       - name: Checkout source
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
       - name: Run ${{ matrix.module }} tests
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         run: gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
