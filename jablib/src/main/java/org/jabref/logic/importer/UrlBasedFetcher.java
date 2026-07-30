@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Searches web resources for bibliographic information based on a URL pointing to the resource.
+@NullMarked
 public interface UrlBasedFetcher extends WebFetcher {
 
     /// Looks for bibliographic information for the resource located at the given URL.

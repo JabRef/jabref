@@ -60,6 +60,21 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
+    void performSearchWithNonHttpUrlSkipsTitleFetchAndStillCreatesEntry() throws FetcherException {
+        // URLUtil.isURL accepts ftp:// (its regex allows https?|ftp), but Jsoup.connect only supports http/https
+        // and throws IllegalArgumentException for other schemes. fetchTitle must skip the fetch entirely for such
+        // URLs rather than let that exception escape and abort entry creation.
+        String url = "ftp://example.com/some-file";
+
+        List<BibEntry> result = fetcher.performSearch(url);
+
+        assertEquals(1, result.size());
+        BibEntry entry = result.getFirst();
+        assertEquals(url, entry.getField(StandardField.URL).orElse(null));
+        assertEquals(url, entry.getField(StandardField.TITLE).orElse(null));
+    }
+
+    @Test
     void performSearchWithInvalidUrlThrowsFetcherException() {
         assertThrows(FetcherException.class, () -> fetcher.performSearch("not a url"));
     }

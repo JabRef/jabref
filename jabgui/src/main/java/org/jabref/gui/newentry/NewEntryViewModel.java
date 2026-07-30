@@ -423,11 +423,7 @@ public class NewEntryViewModel {
             final String dialogTitle = Localization.lang("Failed to create entry from URL");
             dialogService.showInformationDialogAndWait(
                     dialogTitle,
-                    Localization.lang(
-                            "Failed to fetch the URL.\n" +
-                                    "The following error was encountered:\n" +
-                                    "%0",
-                            exceptionMessage));
+                    Localization.lang("Failed to fetch the URL.\nThe following error was encountered:\n%0", exceptionMessage));
 
             executing.set(false);
         });
