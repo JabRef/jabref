@@ -267,6 +267,12 @@
       "serializable": true
     },
     {
+      "type": "org.jabref.model.database.BibDatabase"
+    },
+    {
+      "type": "org.jabref.model.database.KeyChangeListener"
+    },
+    {
       "type": "sun.text.resources.cldr.FormatData"
     },
     {

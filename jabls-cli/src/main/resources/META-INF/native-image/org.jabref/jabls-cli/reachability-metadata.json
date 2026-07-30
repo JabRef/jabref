@@ -1,47 +1,6 @@
 {
   "reflection": [
     {
-      "type": "com.github.benmanes.caffeine.cache.BBHeader$ReadAndWriteCounterRef",
-      "fields": [
-        {
-          "name": "writeCounter"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.BBHeader$ReadCounterRef",
-      "fields": [
-        {
-          "name": "readCounter"
-        }
-      ]
-    },
-    {
-      "type": "com.google.common.util.concurrent.AbstractFutureState",
-      "fields": [
-        {
-          "name": "listenersField"
-        },
-        {
-          "name": "valueField"
-        },
-        {
-          "name": "waitersField"
-        }
-      ]
-    },
-    {
-      "type": "com.google.common.util.concurrent.AbstractFutureState$Waiter",
-      "fields": [
-        {
-          "name": "next"
-        },
-        {
-          "name": "thread"
-        }
-      ]
-    },
-    {
       "type": "java.lang.Boolean",
       "jniAccessible": true,
       "methods": [
@@ -162,20 +121,6 @@
       "type": "java.util.List"
     },
     {
-      "type": "org.jabref.languageserver.cli.ServerCli",
-      "fields": [
-        {
-          "name": "port"
-        }
-      ]
-    },
-    {
-      "type": "org.jabref.model.database.BibDatabase"
-    },
-    {
-      "type": "org.jabref.model.database.KeyChangeListener"
-    },
-    {
       "type": "org.tinylog.configuration.PropertiesConfigurationLoader",
       "methods": [
         {
@@ -215,17 +160,6 @@
           "parameterTypes": [
             "java.util.Map"
           ]
-        }
-      ]
-    },
-    {
-      "type": "picocli.CommandLine$AutoHelpMixin",
-      "fields": [
-        {
-          "name": "helpRequested"
-        },
-        {
-          "name": "versionRequested"
         }
       ]
     },
