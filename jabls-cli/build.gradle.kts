@@ -2,7 +2,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("org.jabref.gradle.module")
-
     id("application")
     id("org.jabref.gradle.feature.nativecompile")
     id("org.jabref.gradle.feature.shadowjar")
