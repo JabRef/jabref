@@ -373,7 +373,6 @@ jobs:
 
   compute-matrix:
     needs: conditions
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
@@ -815,6 +814,19 @@ jobs:
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
 
+  build-skipped:
+    needs: [ compute-matrix, conditions ]
+    if: ${{ needs.conditions.outputs.should-build != 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ${{ fromJSON(needs.compute-matrix.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} installer and portable version
+    steps:
+      - name: Skip binary build because no build-relevant files changed
+        run: echo "Skipping binary build because no build-relevant files changed."
+
   jabkit-native:
     needs: [ conditions, disk-space-check, pre-build ]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
@@ -938,10 +950,29 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
 
+  jabkit-native-skipped:
+    needs: conditions
+    if: ${{ needs.conditions.outputs.should-build != 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            displayName: linux-amd64
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+          - os: macos-15
+            displayName: macOS-silicon
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabkit native binary
+    steps:
+      - name: Skip native binary build because no build-relevant files changed
+        run: echo "Skipping native binary build because no build-relevant files changed."
+
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
     needs: [ conditions, disk-space-check, build, jabkit-native ]
-    if: ${{ (github.event_name == 'pull_request') }}
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     permissions:
       issues: write
       pull-requests: write

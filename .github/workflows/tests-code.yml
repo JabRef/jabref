@@ -395,6 +395,18 @@ jobs:
         if: failure()
         run: scripts/after-failure.sh
 
+  tests-skipped:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full != 'true'
+    name: "Unit tests – ${{ matrix.module }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [ jablib, jabkit, jabsrv, jabgui ]
+    steps:
+      - name: Skip tests because no source-relevant files changed
+        run: echo "Skipping tests because no source-relevant files changed."
+
   tests-windows:
     needs: changes
     name: "Unit tests (Windows)"
@@ -422,6 +434,26 @@ jobs:
         run: gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+
+  tests-windows-skipped:
+    needs: changes
+    name: "Unit tests (Windows)"
+    if: >
+      needs.changes.outputs.run-gradle-ci-full != 'true' &&
+      github.repository_owner == 'JabRef' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'pull_request' ||
+        github.event_name == 'merge_group'
+      )
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        module: [ jablib ]
+    steps:
+      - name: Skip Windows tests because no source-relevant files changed
+        run: echo "Skipping Windows tests because no source-relevant files changed."
 
   tests-windows-file-based:
     needs: changes
