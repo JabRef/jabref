@@ -1,10 +1,7 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.undo.UndoManager;
 
@@ -13,9 +10,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -28,10 +22,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,59 +112,8 @@ public class FetchAndMergeEntry {
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
         dialog.autoSelectBetterFields();
         Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
-
-        if (mergedEntry.isPresent()) {
-            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entry with %0 information", fetcher.getName()));
-
-            // Updated the original entry with the new fields
-            Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            jointFields.addAll(mergedEntry.get().getFields());
-            Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            originalFields.addAll(originalEntry.getFields());
-            boolean edited = false;
-
-            // entry type
-            EntryType oldType = originalEntry.getType();
-            EntryType newType = mergedEntry.get().getType();
-
-            if (!oldType.equals(newType)) {
-                originalEntry.setType(newType);
-                compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
-                edited = true;
-            }
-
-            // fields
-            for (Field field : jointFields) {
-                Optional<String> originalString = originalEntry.getField(field);
-                Optional<String> mergedString = mergedEntry.get().getField(field);
-                if (originalString.isEmpty() || !originalString.equals(mergedString)) {
-                    originalEntry.setField(field, mergedString.get()); // mergedString always present
-                    compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
-                            mergedString.get()));
-                    edited = true;
-                }
-            }
-
-            // Remove fields which are not in the merged entry, unless they are internal fields
-            for (Field field : originalFields) {
-                if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
-                    Optional<String> originalString = originalEntry.getField(field);
-                    originalEntry.clearField(field);
-                    compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
-                    edited = true;
-                }
-            }
-
-            if (edited) {
-                compoundEdit.end();
-                undoManager.addEdit(compoundEdit);
-                dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
-            } else {
-                dialogService.notify(Localization.lang("No information added"));
-            }
-        } else {
-            dialogService.notify(Localization.lang("Canceled merging entries"));
-        }
+        UpdateOriginalEntry updateOriginalEntry = new UpdateOriginalEntry(originalEntry, mergedEntry, Optional.of(fetcher), dialogService, undoManager);
+        updateOriginalEntry.update();
     }
 
     public void fetchAndMerge(BibEntry entry, EntryBasedFetcher fetcher) {
