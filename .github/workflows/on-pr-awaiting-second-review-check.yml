@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check whether a second approval is required
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const owner = context.repo.owner;
