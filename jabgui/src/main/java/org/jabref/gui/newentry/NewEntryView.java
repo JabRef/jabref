@@ -470,7 +470,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_URL);
 
         if (urlText != null) {
-            Platform.runLater(() -> urlText.requestFocus());
+            Platform.runLater(() -> {
+                if (tabEnterUrl.isSelected()) {
+                    urlText.requestFocus();
+                }
+            });
         }
 
         if (generateButton != null) {
