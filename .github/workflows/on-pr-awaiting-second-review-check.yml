@@ -32,15 +32,14 @@ jobs:
               return;
             }
 
-            // refs/heads/gh-readonly-queue/<base>/pr-<N>-<sha>
-            const headRef = context.payload.merge_group.head_ref ?? '';
-            let match = headRef.match(/\/pr-(\d+)-[0-9a-f]+$/);
+            // gh-readonly-queue/<base>/pr-<N>-<sha>, same parsing as on-pr-merge-queued.yml.
+            // The commit message is deliberately not used as a fallback: it can carry
+            // unrelated "#123" references and would then enforce against the wrong PR.
+            const refName = process.env.GITHUB_REF_NAME ?? '';
+            const headRef = context.payload.merge_group?.head_ref ?? '';
+            const match = refName.match(/(?:^|\/)pr-(\d+)-/) ?? headRef.match(/(?:^|\/)pr-(\d+)-/);
             if (!match) {
-              // Fallback: "Merge pull request #N from ..."
-              match = (context.payload.merge_group.head_commit?.message ?? '').match(/#(\d+)/);
-            }
-            if (!match) {
-              core.setFailed(`Could not determine PR number from merge group (head_ref: "${headRef}").`);
+              core.setFailed(`Could not determine PR number from merge group (GITHUB_REF_NAME: "${refName}", head_ref: "${headRef}").`);
               return;
             }
             const pullNumber = Number(match[1]);
