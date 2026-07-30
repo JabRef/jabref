@@ -454,20 +454,27 @@ jobs:
       branch: ${{ steps.normalize.outputs.branch }}
       url: ${{ steps.url.outputs.url }}
     steps:
+      - name: Skip pre-build because no build-relevant files changed
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping pre-build because no build-relevant files changed."
       - name: Fetch all history for all tags and branches
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
           show-progress: 'false'
       - name: Install GitVersion
+        if: needs.conditions.outputs.should-build == 'true'
         id: pre-gitversion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Normalize branch name
+        if: needs.conditions.outputs.should-build == 'true'
         id: normalize
         shell: bash
         run: |
@@ -481,7 +488,7 @@ jobs:
 
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
       - name: Output URL
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         shell: bash
         id: url
         run: |
@@ -489,12 +496,12 @@ jobs:
           echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
           echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
       - name: Setup SSH key
-        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Create backlink to PR at builds.jabref.org
-        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
         run: |
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
@@ -517,6 +524,7 @@ jobs:
         if: needs.conditions.outputs.should-build != 'true'
         run: echo "Skipping binary build because no build-relevant files changed."
       - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
@@ -526,13 +534,13 @@ jobs:
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
       - name: Free disk space
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         background: true
         run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
 
       - name: Install pigz and cache (Linux)
         id: pigz
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         background: true
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
@@ -540,15 +548,15 @@ jobs:
           version: 1.0
 
       - name: Setup SSH key
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
@@ -557,7 +565,7 @@ jobs:
         run: choco install rsync --version=6.4.4
 
       - name: Patch used JDK
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
         shell: bash
         run: |
           set -ex
@@ -567,14 +575,14 @@ jobs:
 
       # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
         with:
           website: jdk.java.net
           release: EA
           version: ${{ needs.conditions.outputs.jdkVersionFlavour }}
       - name: Tell gradle to use JDK EA and JavaFX EA
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
         run: |
           set -ex
@@ -588,9 +596,11 @@ jobs:
           cat gradle.properties
 
       - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true'
         with:
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
       - name: Output current Java environment
+        if: needs.conditions.outputs.should-build == 'true'
         shell: bash
         run: |
           set -x
@@ -603,14 +613,14 @@ jobs:
           jlink --version
 
       - name: Setup macOS key chain
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
+        if: needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: tEmPoRaRY-PaeSWD
       - name: Setup macOS key chain for app id cert
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
+        if: needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -619,6 +629,7 @@ jobs:
           keychain-password: tEmPoRaRY-PaeSWD
 
       - name: Workaround for jpackage issue
+        if: needs.conditions.outputs.should-build == 'true'
         run: |
           cd jabgui
           cp buildres/linux/JabRef.png .   # Linux
@@ -626,7 +637,7 @@ jobs:
 
       - name: Check WiX Version
         run: candle -?
-        if: startsWith(matrix.os, 'windows')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'windows')
 
       # All Gradle work happens in this single invocation: one daemon, one task graph.
       # Shared upstream projects (e.g., jablib) are built exactly once; parallelism across
@@ -845,6 +856,7 @@ jobs:
         if: needs.conditions.outputs.should-build != 'true'
         run: echo "Skipping native binary build because no build-relevant files changed."
       - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
@@ -852,9 +864,10 @@ jobs:
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true'
 
       - name: Setup macOS key chain for app id cert
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -864,6 +877,7 @@ jobs:
       # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
+        if: needs.conditions.outputs.should-build == 'true'
         uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'liberica'
@@ -936,12 +950,12 @@ jobs:
           compression-level: 0 # no compression
 
       - name: Setup SSH key
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Upload jabkit native to builds.jabref.org
         if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
