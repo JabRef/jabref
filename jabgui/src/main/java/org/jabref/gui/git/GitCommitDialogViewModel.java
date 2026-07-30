@@ -23,6 +23,7 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -154,7 +155,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
         String message = commitMessage.get();
-        if (message == null || message.isBlank()) {
+        if (StringUtil.isBlank(message)) {
             message = Localization.lang("Update references");
         }
 
