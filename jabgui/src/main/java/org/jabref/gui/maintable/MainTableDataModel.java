@@ -48,7 +48,6 @@ import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
 
 public class MainTableDataModel {
     private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
-
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -172,7 +171,6 @@ public class MainTableDataModel {
     }
 
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
-
         BackgroundTask.wrap(() -> {
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
             boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
@@ -184,9 +182,6 @@ public class MainTableDataModel {
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
         boolean isMatched = groupsMatcher.map(matcher -> matcher.isMatch(entry.getEntry()) ^ isInvertMode)
                                          .orElse(true);
-        LOGGER.info(">>> updateEntryGroupMatch: entry={}, isMatched={}, isFloatingMode={}, groupsMatcherPresent={}",
-                entry.getEntry().getCitationKey().orElse("?"), isMatched, isFloatingMode, groupsMatcher.isPresent());
-
         entry.isMatchedByGroup().set(isMatched);
         entry.updateMatchCategory();
         if (isMatched) {
@@ -286,8 +281,6 @@ public class MainTableDataModel {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // When entries are removed, we need to refresh the search matches
             // to ensure the filtered list is properly updated and doesn't show stale entries
-
-
             BackgroundTask.wrap(() -> {
                 // Re-run the current search to update the filtered results
                 if (searchQueryProperty.get().isPresent()) {
@@ -300,11 +293,8 @@ public class MainTableDataModel {
                 // instead of falling back to "All entries".
                 boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
                 boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
-
                 entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
-            }).onSuccess(result ->{FilteredListProxy.refilterListReflection(entriesFiltered);
-            }).executeWith(taskExecutor);
-
+            }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
 }
