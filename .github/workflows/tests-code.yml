@@ -391,7 +391,7 @@ jobs:
         env:
           CI: "true"
       - name: Run JabKit portable smoke test
-        if: matrix.module == 'jabkit'
+        if: (needs.changes.outputs.run-gradle-ci-full == 'true') && (matrix.module == 'jabkit')
         run: gradle :jabkit:runJabKitPortableSmokeTest
       - name: Prepare format failed test results
         if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()
