@@ -74,8 +74,11 @@ class JavaLocalizationEntryParser {
         return languageKey;
     }
 
-    public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
+    public static List<String> getLocalizationParameter(String rawContent, LocalizationBundleForTest type) {
         List<String> result = new ArrayList<>();
+
+        // Comments may contain `Localization.lang(...)` snippets, which are no real usages.
+        String content = blankOutComments(rawContent);
 
         Matcher matcher;
         if (type == LocalizationBundleForTest.LANG) {
@@ -106,5 +109,69 @@ class JavaLocalizationEntryParser {
         }
 
         return result;
+    }
+
+    /// Replaces the content of all Java comments (`//`, `///`, `/* */`, javadoc) by spaces.
+    /// Newlines are kept, so that the result has the same length as the input and the same line structure.
+    /// String literals, text blocks, and character literals are left untouched -
+    /// a `//` inside a string (e.g., a URL) does not start a comment.
+    static String blankOutComments(String source) {
+        char[] chars = source.toCharArray();
+        int length = chars.length;
+        int i = 0;
+        while (i < length) {
+            char current = chars[i];
+            char next = (i + 1) < length ? chars[i + 1] : '\0';
+            if ((current == '/') && (next == '/')) {
+                while ((i < length) && (chars[i] != '\n')) {
+                    chars[i] = ' ';
+                    i++;
+                }
+            } else if ((current == '/') && (next == '*')) {
+                chars[i] = ' ';
+                chars[i + 1] = ' ';
+                i += 2;
+                while (i < length) {
+                    if ((chars[i] == '*') && ((i + 1) < length) && (chars[i + 1] == '/')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
+                        i += 2;
+                        break;
+                    }
+                    if (chars[i] != '\n') {
+                        chars[i] = ' ';
+                    }
+                    i++;
+                }
+            } else if ((current == '"') && (next == '"') && ((i + 2) < length) && (chars[i + 2] == '"')) {
+                // text block
+                i += 3;
+                while (i < length) {
+                    if (chars[i] == '\\') {
+                        i += 2;
+                    } else if ((chars[i] == '"') && ((i + 2) < length) && (chars[i + 1] == '"') && (chars[i + 2] == '"')) {
+                        i += 3;
+                        break;
+                    } else {
+                        i++;
+                    }
+                }
+            } else if ((current == '"') || (current == '\'')) {
+                i++;
+                while (i < length) {
+                    if (chars[i] == '\\') {
+                        i += 2;
+                    } else if (chars[i] == current) {
+                        i++;
+                        break;
+                    } else {
+                        i++;
+                    }
+                }
+            } else {
+                i++;
+            }
+        }
+        return new String(chars);
     }
 }

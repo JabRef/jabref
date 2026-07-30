@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -65,6 +66,66 @@ public class JavaLocalizationEntryParserTest {
                 // "\\n" in the *.java source file
                 "Localization.lang(\"Escaped newline\\\\nthere\")"
         );
+    }
+
+    /// Code snippets in which `Localization.lang` only occurs inside a comment, hence no key must be found.
+    public static Stream<String> commentedOutLocalizations() {
+        return Stream.of(
+                "// Localization.lang(\"key in line comment\")",
+                "/// Localization.lang(\"key in markdown comment\")",
+                "int i = 0; // Localization.lang(\"key in trailing line comment\")",
+                "/* Localization.lang(\"key in block comment\") */",
+                "/*\n * Localization.lang(\"key in multi line block comment\")\n */",
+                "/**\n * Localization.lang(\"key in javadoc\")\n */",
+                // unterminated block comment at the end of a file
+                "/* Localization.lang(\"key in unterminated block comment\")"
+        );
+    }
+
+    public static Stream<Arguments> commentsMixedWithCode() {
+        return Stream.of(
+                // the comment must not swallow the real key
+                Arguments.of("// Localization.lang(\"commented\")\nLocalization.lang(\"real\")", List.of("real")),
+                Arguments.of("Localization.lang(\"real\") // Localization.lang(\"commented\")", List.of("real")),
+                Arguments.of("/* Localization.lang(\"commented\") */ Localization.lang(\"real\")", List.of("real")),
+                // a comment inside the argument list is ignored, the key is still found
+                Arguments.of("Localization.lang(\"real\" /* comment */)", List.of("real")),
+                Arguments.of("Localization.lang(\"real\" // comment\n)", List.of("real")),
+                // "//" inside a string literal does not start a comment
+                Arguments.of("String url = \"https://example.org\"; Localization.lang(\"real\")", List.of("real")),
+                // a quote inside a comment must not be treated as the start of a string literal
+                Arguments.of("// it's commented\nLocalization.lang(\"real\")", List.of("real")),
+                Arguments.of("/* \" */ Localization.lang(\"real\")", List.of("real")),
+                // character literals containing quotes do not confuse the parser
+                Arguments.of("char c = '\"'; Localization.lang(\"real\")", List.of("real")),
+                // comment markers inside a text block do not start a comment
+                Arguments.of("String s = \"\"\"\n// no comment /* here\n\"\"\"; Localization.lang(\"real\")", List.of("real"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("commentedOutLocalizations")
+    void localizationInCommentIsIgnored(String code) {
+        assertEquals(List.of(), JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
+    }
+
+    @ParameterizedTest
+    @MethodSource("commentsMixedWithCode")
+    void localizationKeysAreFoundNextToComments(String code, List<String> expectedLanguageKeys) {
+        assertEquals(expectedLanguageKeys, JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
+    }
+
+    @Test
+    void menuTitleInCommentIsIgnored() {
+        assertEquals(List.of(), JavaLocalizationEntryParser.getLanguageKeysInString("// Localization.menuTitle(\"File\")", LocalizationBundleForTest.MENU));
+    }
+
+    @Test
+    void blankOutCommentsKeepsLengthAndLineStructure() {
+        String source = "int i = 0; // comment\n/* block\ncomment */ int j = 1;";
+        String blanked = JavaLocalizationEntryParser.blankOutComments(source);
+        assertEquals(source.length(), blanked.length());
+        assertEquals("int i = 0;" + " ".repeat(11) + "\n" + " ".repeat(8) + "\n" + " ".repeat(10) + " int j = 1;", blanked);
     }
 
     @ParameterizedTest
