@@ -313,7 +313,6 @@ jobs:
 
   disk-space-check:
     needs: conditions
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
@@ -446,7 +445,6 @@ jobs:
 
   pre-build:
     needs: [ conditions, disk-space-check ]
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
@@ -503,7 +501,6 @@ jobs:
 
   build:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -516,6 +513,9 @@ jobs:
       url: ${{ needs.pre-build.outputs.url }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
+      - name: Skip binary build because no build-relevant files changed
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping binary build because no build-relevant files changed."
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -635,6 +635,7 @@ jobs:
       # on shared task outputs (stale output cleanup deletes e.g. jablib/build while a
       # sibling build reads it).
       - name: Build all packages
+        if: needs.conditions.outputs.should-build == 'true'
         run: >
           gradle --parallel
           :jabgui:jpackage :jabkit:jpackage :jabls-cli:jpackage :jabsrv-cli:jpackage
@@ -645,7 +646,7 @@ jobs:
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
       - name: Verify Linux Postgres binary packaging
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         shell: bash
         run: |
           set -euo pipefail
@@ -725,6 +726,7 @@ jobs:
       # package all components, JabKit should be available the fastest - JabGui as last, because build requires the most time
 
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabKit
         with:
           component: jabkit
@@ -744,6 +746,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabRef Language Server
         id: jabls-cli
         with:
@@ -764,6 +767,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabRef HTTP Server
         with:
           component: jabsrv-cli
@@ -783,6 +787,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabGUI
         id: jabgui
         with:
@@ -804,7 +809,7 @@ jobs:
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
@@ -814,22 +819,8 @@ jobs:
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
 
-  build-skipped:
-    needs: [ compute-matrix, conditions ]
-    if: ${{ needs.conditions.outputs.should-build != 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        ${{ fromJSON(needs.compute-matrix.outputs.matrix) }}
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.displayName }} installer and portable version
-    steps:
-      - name: Skip binary build because no build-relevant files changed
-        run: echo "Skipping binary build because no build-relevant files changed."
-
   jabkit-native:
     needs: [ conditions, disk-space-check, pre-build ]
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -850,6 +841,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} jabkit native binary
     steps:
+      - name: Skip native binary build because no build-relevant files changed
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping native binary build because no build-relevant files changed."
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -878,12 +872,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabKit native binary
+        if: needs.conditions.outputs.should-build == 'true'
         run: gradle :jabkit:nativeCompile
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       - name: Install clitest
+        if: needs.conditions.outputs.should-build == 'true'
         uses: ethanjli/cached-download-action@v0.1.4
         with:
           # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
@@ -891,20 +887,23 @@ jobs:
           destination: /tmp/clitest
 
       - name: Make clitest executable
+        if: needs.conditions.outputs.should-build == 'true'
         run: chmod +x /tmp/clitest
 
       - name: Run JabKit offline smoke tests
+        if: needs.conditions.outputs.should-build == 'true'
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
       - name: Run JabKit PDF native smoke test (Linux only)
-        if: ${{ runner.os == 'Linux' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Linux' }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
 
       - name: Run JabKit online smoke tests
-        if: ${{ inputs.run-jabkit-online-tests }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && inputs.run-jabkit-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
       - name: Package JabKit native binary
+        if: needs.conditions.outputs.should-build == 'true'
         shell: bash
         run: |
           set -eo pipefail
@@ -920,7 +919,7 @@ jobs:
           ${{ matrix.archiveNative }}
 
       - name: Upload jabkit native to GitHub artifacts store
-        if: ${{ (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         uses: actions/upload-artifact@v7
         with:
           name: jabkit-native (${{ matrix.displayName }})
@@ -928,7 +927,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
@@ -945,29 +944,10 @@ jobs:
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Upload jabkit native to builds.jabref.org
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
-
-  jabkit-native-skipped:
-    needs: conditions
-    if: ${{ needs.conditions.outputs.should-build != 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-22.04
-            displayName: linux-amd64
-          - os: ubuntu-22.04-arm
-            displayName: linux-arm
-          - os: macos-15
-            displayName: macOS-silicon
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.displayName }} jabkit native binary
-    steps:
-      - name: Skip native binary build because no build-relevant files changed
-        run: echo "Skipping native binary build because no build-relevant files changed."
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
