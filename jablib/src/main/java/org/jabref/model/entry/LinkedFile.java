@@ -28,6 +28,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.jabref.logic.util.URLUtil;
 
 /// Represents the link to an external file (e.g. associated PDF file).
 /// This class is {@link Serializable} which is needed for drag and drop in gui
@@ -194,10 +195,9 @@ public class LinkedFile implements Serializable {
     /// Checks if the given String is an online link
     ///
     /// @param toCheck The String to check
-    /// @return `true`, if it starts with "http://", "https://" or contains "www."; `false` otherwise
+    /// @return `true`, if it is a URL (http, https, ftp, ...); `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
-        String normalizedFilePath = toCheck.trim().toLowerCase();
-        return URL_PATTERN.matcher(normalizedFilePath).matches();
+        return URLUtil.isURL(toCheck);
     }
 
     @Override
