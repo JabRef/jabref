@@ -66,6 +66,12 @@ jobs:
               per_page: 100,
             });
 
+            // The loop below is last-write-wins, so the order has to be oldest-first.
+            // Review ids increase with submission time and are always set, unlike
+            // submitted_at. The API happens to return this order already; relying on
+            // that would make the approval count depend on undocumented behaviour.
+            reviews.sort((a, b) => a.id - b.id);
+
             const latestOpinionatedReviewStateByUser = new Map();
             for (const review of reviews) {
               const login = review.user?.login;
