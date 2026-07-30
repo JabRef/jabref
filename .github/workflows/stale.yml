@@ -21,7 +21,7 @@ jobs:
       DAYS_BEFORE_PR_STALE: 3
       DAYS_BEFORE_PR_CLOSE: 7
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@v11
         id: stale
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

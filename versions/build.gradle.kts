@@ -83,7 +83,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.185")
+    api("io.github.classgraph:classgraph:4.8.186")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
@@ -158,5 +158,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.12.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
-    api("tools.maran:svgnode:1.0.0")
+    api("tools.maran:svgnode:2.0.0")
 }
