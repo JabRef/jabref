@@ -666,7 +666,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         if (tabbedPane.getTabs().isEmpty()) {
-            // Clear the active database so the group pane doesn't keep displaying groups from a library that's no longer open
+            // Force group update in the GroupTreeViewModel by clearing the active database so the group pane doesn't keep displaying groups from a library that's no longer open
             stateManager.setActiveDatabase(null);
             // No library remains open, so show the welcome screen instead of an empty tab pane
             showWelcomeTab();
