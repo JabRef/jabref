@@ -3,7 +3,6 @@ package org.jabref.logic.l10n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -19,13 +18,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.jooq.lambda.Unchecked;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
@@ -83,43 +83,39 @@ public class LocalizationParser {
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        try {
-            return MODULES.stream()
-                          .map(path -> Path.of("..", path, "src", "main", "java").normalize())
-                          .flatMap(Unchecked.function(path -> Files.walk(path)))
-                          .filter(LocalizationParser::isJavaFile)
-                          .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
-                          .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
-        }
+        return findInModules("src/main/java", LocalizationParser::isJavaFile, path -> getLocalizationParametersInJavaFile(path, type));
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type) throws IOException {
-        try {
-            return MODULES.stream()
-                       .map(path -> Path.of("..", path, "src", "main", "java").normalize())
-                       .flatMap(Unchecked.function(path -> Files.walk(path)))
-                       .filter(LocalizationParser::isJavaFile)
-                       .flatMap(javaPath -> getLanguageKeysInJavaFile(javaPath, type).stream())
-                       .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
-        }
+        return findInModules("src/main/java", LocalizationParser::isJavaFile, path -> getLanguageKeysInJavaFile(path, type));
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type) throws IOException {
-        try {
-            return MODULES.stream()
-                       .map(path -> Path.of("..", path, "src", "main", "resources").normalize())
-                       .filter(Files::isDirectory)
-                       .flatMap(Unchecked.function(path -> Files.walk(path)))
-                       .filter(LocalizationParser::isFxmlFile)
-                       .flatMap(fxmlPath -> getLanguageKeysInFxmlFile(fxmlPath, type).stream())
-                       .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
+        return findInModules("src/main/resources", LocalizationParser::isFxmlFile, path -> getLanguageKeysInFxmlFile(path, type));
+    }
+
+    /// Collects the localization entries of all matching files below the given source directory of each module.
+    ///
+    /// @param sourceDirectory the module relative directory to walk, e.g. `src/main/java`
+    /// @param fileFilter      determines which of the found files are parsed
+    /// @param extractor       extracts the localization entries of a single file
+    private static Set<LocalizationEntry> findInModules(String sourceDirectory,
+                                                        Predicate<Path> fileFilter,
+                                                        Function<Path, Collection<LocalizationEntry>> extractor) throws IOException {
+        Set<LocalizationEntry> result = new HashSet<>();
+        for (String module : MODULES) {
+            Path root = Path.of("..", module).resolve(sourceDirectory).normalize();
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            // Files.walk holds a directory handle, thus the stream needs to be closed
+            try (Stream<Path> paths = Files.walk(root)) {
+                paths.filter(fileFilter)
+                     .map(extractor)
+                     .forEach(result::addAll);
+            }
         }
+        return result;
     }
 
     /// Returns the trimmed key set of the given property file. Each key is already unescaped.
