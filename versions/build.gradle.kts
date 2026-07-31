@@ -138,7 +138,7 @@ dependencies.constraints {
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.23.1")
-    api("org.jspecify:jspecify:1.0.0")
+    api("org.jspecify:jspecify:1.0.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
