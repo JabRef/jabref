@@ -134,19 +134,17 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path) {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
-        String content = String.join("\n", lines);
-        return JavaLocalizationEntryParser.getLanguageKeysInString(content).stream()
-                                          .map(key -> new LocalizationEntry(path, key))
-                                          .collect(Collectors.toList());
+        return parseJavaFile(path, JavaLocalizationEntryParser::getLanguageKeysInString);
     }
 
     private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path) {
+        return parseJavaFile(path, JavaLocalizationEntryParser::getLocalizationParameter);
+    }
+
+    /// Reads the given Java file and turns everything the parser finds in it into localization entries.
+    ///
+    /// The line endings are normalized to `\n`, because the parser treats `\n` as the end of a line comment.
+    private static List<LocalizationEntry> parseJavaFile(Path path, Function<String, List<String>> parser) {
         List<String> lines;
         try {
             lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -154,9 +152,9 @@ public class LocalizationParser {
             throw new RuntimeException(exception);
         }
         String content = String.join("\n", lines);
-        return JavaLocalizationEntryParser.getLocalizationParameter(content).stream()
-                                          .map(key -> new LocalizationEntry(path, key))
-                                          .collect(Collectors.toList());
+        return parser.apply(content).stream()
+                     .map(key -> new LocalizationEntry(path, key))
+                     .collect(Collectors.toList());
     }
 
     /// Loads the fxml file and returns all used language resources.
