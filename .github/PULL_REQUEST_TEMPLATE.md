@@ -10,18 +10,7 @@ AI-assisted code contributions are allowed only, if reviewed, understood, and ow
 Unreviewed, misleading, or misrepresented AI-generated submissions may be closed immediately and publicly labeled as such.
 -->
 
-### Related issues and pull requests
-
-Closes _____
-
-   <!--
-   LINK the issue with the PR by using the "Closes" keyword.
-   Examples:
-     Closes https://github.com/JabRef/jabref/issues/13109
-     Closes #13109
-   -->
-
-### PR Description
+### Summary
 
 > Tip: re-read your description before opening the pull request, then delete this line.
 
@@ -49,6 +38,17 @@ Closes _____
       Ideally, think of how you would guide a beginner user of JabRef to try out your change.
    2. Add screenshots (preferred) or videos.
       (E.g. using Loom - https://www.loom.com or by just adding .mp4 files).
+   -->
+
+### Related issues and pull requests
+
+Closes _____
+
+   <!--
+   LINK the issue with the PR by using the "Closes" keyword.
+   Examples:
+     Closes https://github.com/JabRef/jabref/issues/13109
+     Closes #13109
    -->
 
 ### AI usage
