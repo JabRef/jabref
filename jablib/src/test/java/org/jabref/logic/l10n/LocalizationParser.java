@@ -39,19 +39,12 @@ public class LocalizationParser {
 
     private static final String ENGLISH_PROPERTIES_FILE = "/l10n/JabRef_en.properties";
 
+    /// Returns all keys used in the sources which are not declared in the English properties file.
     public static SortedSet<LocalizationEntry> findMissingKeys() throws IOException {
-        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles();
-        Set<String> keysInJavaFiles = entries.stream()
-                                             .map(LocalizationEntry::getKey)
-                                             .collect(Collectors.toSet());
-
         Set<String> englishKeys = getKeysInPropertiesFile(ENGLISH_PROPERTIES_FILE);
-        List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
-        missingKeys.removeAll(englishKeys);
-
-        return entries.stream()
-                      .filter(e -> missingKeys.contains(e.getKey()))
-                      .collect(Collectors.toCollection(TreeSet::new));
+        return findLocalizationEntriesInFiles().stream()
+                                               .filter(entry -> !englishKeys.contains(entry.getKey()))
+                                               .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static SortedSet<String> findObsolete() throws IOException {
