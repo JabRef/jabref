@@ -31,7 +31,9 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private final StateManager stateManager;
@@ -201,7 +203,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     /// Marks a failure that happened once the commit already existed, so the user is not told the commit itself failed.
     private static class PushFailedException extends JabRefException {
         PushFailedException(Throwable cause) {
-            super(cause.getLocalizedMessage(), cause);
+            super(messageOrFallback(cause), cause);
+        }
+
+        private static String messageOrFallback(Throwable cause) {
+            String message = cause.getLocalizedMessage();
+            return message != null ? message : Localization.lang("Git Push Failed");
         }
     }
 }
