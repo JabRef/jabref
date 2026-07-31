@@ -120,7 +120,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         externalFiles.forEach(name -> openFile(Path.of(name)));
     }
 
-    /// This will set the `currentFile` property to the {@link AbbreviationsFileViewModel} object that was added to
+    /// This will set the `currentFile` property to the [AbbreviationsFileViewModel] object that was added to
     /// the `journalFiles` list property lastly. If there are no files in the list property this method will do
     /// nothing as the `currentFile` property is already `null`.
     public void selectLastJournalFile() {
@@ -147,7 +147,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     /// This method shall be used to add a new journal abbreviation file to the set of journal abbreviation files. It
-    /// basically just calls the {@link #openFile(Path)}} method.
+    /// basically just calls the [#openFile(Path)] method.
     public void addNewFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSV)
@@ -284,7 +284,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         shouldWriteLists = true;
     }
 
-    /// Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file in the journalFiles property
+    /// Calls the [AbbreviationsFileViewModel#writeOrCreate()] method for each file in the journalFiles property
     /// which will overwrite the existing files with the content of the abbreviations property of the AbbreviationsFile.
     /// Non-existing files will be created.
     public void saveJournalAbbreviationFiles() {

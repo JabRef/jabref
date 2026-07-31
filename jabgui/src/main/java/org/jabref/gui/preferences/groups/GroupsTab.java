@@ -1,27 +1,13 @@
 package org.jabref.gui.preferences.groups;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
-
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
-
-public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> implements PreferencesTab {
-
-    @FXML private RadioButton groupViewModeIntersection;
-    @FXML private RadioButton groupViewModeUnion;
-    @FXML private CheckBox autoAssignGroup;
-    @FXML private CheckBox displayGroupCount;
-    @FXML private CheckBox showAiChatButton;
+public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> {
 
     public GroupsTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new GroupsTabViewModel(preferences.getGroupsPreferences());
+        buildView();
     }
 
     @Override
@@ -29,13 +15,17 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
         return Localization.lang("Groups");
     }
 
-    public void initialize() {
-        this.viewModel = new GroupsTabViewModel(preferences.getGroupsPreferences());
+    private void buildView() {
+        setContent(form()
 
-        groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
-        groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
-        autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
-        displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
-        showAiChatButton.selectedProperty().bindBidirectional(viewModel.showAiChatButtonProperty());
+                .section(Localization.lang("View"), view -> view
+                        .radioGroup(viewMode -> viewMode
+                                .radio(Localization.lang("Display only entries belonging to all selected groups"), viewModel.groupViewModeIntersectionProperty())
+                                .radio(Localization.lang("Display all entries belonging to one or more of the selected groups"), viewModel.groupViewModeUnionProperty()))
+                        .checkbox(Localization.lang("Automatically assign new entry to selected groups"), viewModel.autoAssignGroupProperty())
+                        .checkbox(Localization.lang("Display count of items in group"), viewModel.displayGroupCount())
+                        .checkbox(Localization.lang("Show 'AI chat' in the context menu"), viewModel.showAiChatButtonProperty()))
+
+                .build());
     }
 }

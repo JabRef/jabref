@@ -63,6 +63,7 @@ public class OOTextIntoOO {
      */
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
+    private static final String CHAR_AUTO_ESCAPEMENT = "CharAutoEscapement";
     private static final String CHAR_STYLE_NAME = "CharStyleName";
     private static final String CHAR_UNDERLINE = "CharUnderline";
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
@@ -369,6 +370,27 @@ public class OOTextIntoOO {
                 continue;
             }
             LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '{}'", p.Name);
+        }
+    }
+
+    /// Reset only direct superscript/subscript formatting before rewriting marked-up citation text.
+    public static void removeEscapementFormatting(@NonNull XTextCursor cursor) {
+        Optional<XMultiPropertyStates> optionalPropertyStates = UnoCast.cast(XMultiPropertyStates.class, cursor);
+        if (optionalPropertyStates.isEmpty()) {
+            LOGGER.debug("Could not reset escapement format.");
+            return;
+        }
+
+        XMultiPropertyStates propertyStates = optionalPropertyStates.get();
+
+        try {
+            propertyStates.setPropertiesToDefault(new String[] {
+                    CHAR_AUTO_ESCAPEMENT,
+                    CHAR_ESCAPEMENT,
+                    CHAR_ESCAPEMENT_HEIGHT
+            });
+        } catch (UnknownPropertyException ex) {
+            LOGGER.warn("Could not reset escapement format", ex);
         }
     }
 

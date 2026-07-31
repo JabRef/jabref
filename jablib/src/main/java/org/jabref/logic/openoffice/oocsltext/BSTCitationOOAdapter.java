@@ -75,11 +75,12 @@ public class BSTCitationOOAdapter {
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
-        boolean preceedingSpaceExists = checkPreceedingSpace(cursor);
+        boolean precedingSpaceExists = CitationOOAdapterUtils.hasPrecedingSpace(cursor);
+        boolean succeedingSpaceExists = CitationOOAdapterUtils.hasSucceedingSpace(cursor);
         markManager.insertReferenceIntoOO(
                 entries, document, cursor, ooText,
-                !preceedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                openOfficePreferences.getAddSpaceAfter(),
+                !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 CSLCitationType.NORMAL);
         markManager.setRealTimeNumberUpdateRequired(
                 openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);
@@ -242,14 +243,5 @@ public class BSTCitationOOAdapter {
         Map<String, Integer> identifierToNumber = new LinkedHashMap<>();
         emittedKeyOrder.forEach((key, index) -> identifierToNumber.put(keyToIdentifier.getOrDefault(key, key), index));
         return identifierToNumber;
-    }
-
-    private boolean checkPreceedingSpace(XTextCursor cursor) {
-        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
-        if (!checkCursor.goLeft((short) 1, true)) {
-            return true;
-        }
-        String cursorString = checkCursor.getString();
-        return " ".equals(cursorString) || cursorString.matches("\\R");
     }
 }
