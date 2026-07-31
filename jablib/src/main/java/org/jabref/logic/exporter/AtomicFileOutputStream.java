@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
+/// A file output stream that is similar to the standard [java.io.FileOutputStream], except that all writes are first
 /// redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
 ///
 ///
