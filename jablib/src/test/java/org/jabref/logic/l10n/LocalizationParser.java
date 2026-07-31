@@ -41,7 +41,7 @@ public class LocalizationParser {
 
     /// Returns all keys used in the sources which are not declared in the English properties file.
     public static SortedSet<LocalizationEntry> findMissingKeys() throws IOException {
-        Set<String> englishKeys = getKeysInPropertiesFile(ENGLISH_PROPERTIES_FILE);
+        Set<String> englishKeys = getEnglishKeys();
         return findLocalizationEntriesInFiles().stream()
                                                .filter(entry -> !englishKeys.contains(entry.getKey()))
                                                .collect(Collectors.toCollection(TreeSet::new));
@@ -52,9 +52,9 @@ public class LocalizationParser {
         Set<String> keysInSourceFiles = findLocalizationEntriesInFiles().stream()
                                                                         .map(LocalizationEntry::getKey)
                                                                         .collect(Collectors.toSet());
-        return getKeysInPropertiesFile(ENGLISH_PROPERTIES_FILE).stream()
-                                                               .filter(key -> !keysInSourceFiles.contains(key))
-                                                               .collect(Collectors.toCollection(TreeSet::new));
+        return getEnglishKeys().stream()
+                               .filter(key -> !keysInSourceFiles.contains(key))
+                               .collect(Collectors.toCollection(TreeSet::new));
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFiles() throws IOException {
@@ -100,9 +100,9 @@ public class LocalizationParser {
         return result;
     }
 
-    /// Returns the trimmed key set of the given property file. Each key is already unescaped.
-    public static SortedSet<String> getKeysInPropertiesFile(String path) {
-        Properties properties = getProperties(path);
+    /// Returns the trimmed key set of the English properties file. Each key is already unescaped.
+    private static SortedSet<String> getEnglishKeys() {
+        Properties properties = getProperties(ENGLISH_PROPERTIES_FILE);
         return properties.keySet().stream()
                          .map(Object::toString)
                          .map(String::trim)
