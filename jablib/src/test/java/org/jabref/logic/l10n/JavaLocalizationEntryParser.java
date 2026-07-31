@@ -10,6 +10,15 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 @ResourceLock("Localization.lang")
 class JavaLocalizationEntryParser {
 
+    private enum CommentState {
+        NORMAL,
+        LINE_COMMENT,
+        BLOCK_COMMENT,
+        STRING,
+        CHARACTER,
+        TEXT_BLOCK
+    }
+
     private static final String INFINITE_WHITESPACE = "\\s*";
     private static final String DOT = "\\.";
     private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
@@ -112,66 +121,92 @@ class JavaLocalizationEntryParser {
     }
 
     /// Replaces the content of all Java comments (`//`, `///`, `/* */`, javadoc) by spaces.
-    /// Newlines are kept, so that the result has the same length as the input and the same line structure.
-    /// String literals, text blocks, and character literals are left untouched -
-    /// a `//` inside a string (e.g., a URL) does not start a comment.
+    /// Newlines are kept, so that the result has the same length as the input and the same
+    /// line structure. String literals, text blocks, and character literals are left untouched,
+    /// so a `//` inside a string (e.g. a URL) does not start a comment.
     static String blankOutComments(String source) {
         char[] chars = source.toCharArray();
-        int length = chars.length;
-        int i = 0;
-        while (i < length) {
-            char current = chars[i];
-            char next = (i + 1) < length ? chars[i + 1] : '\0';
-            if ((current == '/') && (next == '/')) {
-                while ((i < length) && (chars[i] != '\n')) {
-                    chars[i] = ' ';
-                    i++;
-                }
-            } else if ((current == '/') && (next == '*')) {
-                chars[i] = ' ';
-                chars[i + 1] = ' ';
-                i += 2;
-                while (i < length) {
-                    if ((chars[i] == '*') && ((i + 1) < length) && (chars[i + 1] == '/')) {
+
+        CommentState state = CommentState.NORMAL;
+        char quote = '\0';
+
+        for (int i = 0; i < chars.length; i++) {
+            switch (state) {
+                case NORMAL -> {
+                    if (startsWith(chars, i, '/', '/')) {
                         chars[i] = ' ';
                         chars[i + 1] = ' ';
+                        i++;
+                        state = CommentState.LINE_COMMENT;
+                    } else if (startsWith(chars, i, '/', '*')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
+                        i++;
+                        state = CommentState.BLOCK_COMMENT;
+                    } else if (startsTextBlock(chars, i)) {
                         i += 2;
-                        break;
+                        state = CommentState.TEXT_BLOCK;
+                    } else if (chars[i] == '"') {
+                        quote = '"';
+                        state = CommentState.STRING;
+                    } else if (chars[i] == '\'') {
+                        quote = '\'';
+                        state = CommentState.CHARACTER;
                     }
-                    if (chars[i] != '\n') {
+                }
+
+                case LINE_COMMENT -> {
+                    if (chars[i] == '\n') {
+                        state = CommentState.NORMAL;
+                    } else {
                         chars[i] = ' ';
                     }
-                    i++;
                 }
-            } else if ((current == '"') && (next == '"') && ((i + 2) < length) && (chars[i + 2] == '"')) {
-                // text block
-                i += 3;
-                while (i < length) {
-                    if (chars[i] == '\\') {
-                        i += 2;
-                    } else if ((chars[i] == '"') && ((i + 2) < length) && (chars[i + 1] == '"') && (chars[i + 2] == '"')) {
-                        i += 3;
-                        break;
-                    } else {
+
+                case BLOCK_COMMENT -> {
+                    if (startsWith(chars, i, '*', '/')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
                         i++;
+                        state = CommentState.NORMAL;
+                    } else if (chars[i] != '\n') {
+                        chars[i] = ' ';
                     }
                 }
-            } else if ((current == '"') || (current == '\'')) {
-                i++;
-                while (i < length) {
+
+                case STRING,
+                     CHARACTER -> {
                     if (chars[i] == '\\') {
-                        i += 2;
-                    } else if (chars[i] == current) {
-                        i++;
-                        break;
-                    } else {
-                        i++;
+                        i++; // skip escaped character
+                    } else if (chars[i] == quote) {
+                        state = CommentState.NORMAL;
                     }
                 }
-            } else {
-                i++;
+
+                case TEXT_BLOCK -> {
+                    if (chars[i] == '\\') {
+                        i++; // skip escaped character
+                    } else if (startsTextBlock(chars, i)) {
+                        i += 2;
+                        state = CommentState.NORMAL;
+                    }
+                }
             }
         }
+
         return new String(chars);
+    }
+
+    private static boolean startsWith(char[] chars, int index, char first, char second) {
+        return index + 1 < chars.length
+                && chars[index] == first
+                && chars[index + 1] == second;
+    }
+
+    private static boolean startsTextBlock(char[] chars, int index) {
+        return index + 2 < chars.length
+                && chars[index] == '"'
+                && chars[index + 1] == '"'
+                && chars[index + 2] == '"';
     }
 }
