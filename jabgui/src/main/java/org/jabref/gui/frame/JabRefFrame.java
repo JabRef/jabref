@@ -668,6 +668,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Force group update in the GroupTreeViewModel when all the libraries are closed
         if (tabbedPane.getTabs().isEmpty()) {
             stateManager.setActiveDatabase(null);
+            showWelcomeTab();
         }
         return true;
     }
