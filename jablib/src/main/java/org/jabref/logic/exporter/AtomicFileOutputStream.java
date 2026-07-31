@@ -1,14 +1,17 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
@@ -21,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
+/// A file output stream that is similar to the standard {@link java.io.FileOutputStream}, except that all writes are first
 /// redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
 ///
 ///
@@ -50,11 +53,21 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final String TEMPORARY_EXTENSION = ".tmp";
     private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
+    /// Number of attempts to move the temporary file onto the target file. See [#moveTemporaryFileToTargetFile()].
+    private static final int MOVE_ATTEMPTS = 5;
+
+    /// Delay before the second move attempt; doubled after each further failed attempt.
+    private static final long MOVE_RETRY_INITIAL_DELAY_MILLIS = 20;
+
     /// The file we want to create/replace.
     private final Path targetFile;
 
     /// The file to which writes are redirected to.
     private final Path temporaryFile;
+
+    /// Null if the stream was constructed from an injected [OutputStream] (tests), because neither locking
+    /// nor syncing is possible then.
+    @Nullable private final FileChannel temporaryFileChannel;
 
     /// Can be null in case of failure to acquire a lock (for example, a network drive).
     /// If null, then ignore.
@@ -72,8 +85,24 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// @param path       the path of the file to write to or replace
     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
-        this(path, getPathOfTemporaryFile(path), Files.newOutputStream(getPathOfTemporaryFile(path)), keepBackup);
+        this(path,
+                getPathOfTemporaryFile(path),
+                FileChannel.open(getPathOfTemporaryFile(path),
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.WRITE,
+                        StandardOpenOption.TRUNCATE_EXISTING),
+                keepBackup);
+    }
+
+    /// The temporary file is opened as a [FileChannel], because the channel is needed both for [FileChannel#tryLock()]
+    /// and for [FileChannel#force(boolean)]. `Files.newOutputStream(...)` returns a `sun.nio.ch.ChannelOutputStream`,
+    /// which offers neither.
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup) throws IOException {
+        this(path,
+                pathOfTemporaryFile,
+                Channels.newOutputStream(temporaryFileChannel),
+                temporaryFileChannel,
+                keepBackup);
     }
 
     /// Creates a new output stream to write to or replace the file at the specified path.
@@ -86,25 +115,32 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Required for proper testing
     AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup);
+    }
+
+    private AtomicFileOutputStream(Path path,
+                                   Path pathOfTemporaryFile,
+                                   OutputStream temporaryFileOutputStream,
+                                   @Nullable FileChannel temporaryFileChannel,
+                                   boolean keepBackup) throws IOException {
         super(temporaryFileOutputStream);
         this.targetFile = path;
         this.temporaryFile = pathOfTemporaryFile;
         this.backupFile = getPathOfSaveBackupFile(path);
         this.keepBackup = keepBackup;
+        this.temporaryFileChannel = temporaryFileChannel;
+
+        if (temporaryFileChannel == null) {
+            return;
+        }
 
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            if (out instanceof FileOutputStream stream) {
-                try {
-                    temporaryFileLock = stream.getChannel().tryLock();
-                } catch (IOException ex) {
-                    // workaround for https://bugs.openjdk.org/browse/JDK-8167023
-                    LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
-                    temporaryFileLock = null;
-                }
-            } else {
-                temporaryFileLock = null;
-            }
+            temporaryFileLock = temporaryFileChannel.tryLock();
+        } catch (IOException ex) {
+            // workaround for https://bugs.openjdk.org/browse/JDK-8167023
+            LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
+            temporaryFileLock = null;
         } catch (OverlappingFileLockException exception) {
             throw new IOException("Could not obtain write access to " + temporaryFile + ". Maybe another instance of JabRef is currently writing to the same file?", exception);
         }
@@ -170,8 +206,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             try {
                 // Make sure we have written everything to the temporary file
                 flush();
-                if (out instanceof FileOutputStream stream) {
-                    stream.getFD().sync();
+                if (temporaryFileChannel != null) {
+                    temporaryFileChannel.force(true);
                 }
             } catch (IOException exception) {
                 // Try to close nonetheless
@@ -207,13 +243,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
-            try {
-                // Move temporary file (replace original if it exists)
-                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                LOGGER.warn("Could not move temporary file", e);
-                throw e;
-            }
+            // Move temporary file (replace original if it exists)
+            moveTemporaryFileToTargetFile();
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
@@ -231,6 +262,37 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         } finally {
             // Remove temporary file (but not the backup!)
             cleanup();
+        }
+    }
+
+    /// Moves the temporary file onto the target file, replacing it.
+    ///
+    /// On Windows, replacing a file requires `DELETE` access to it. That fails with a sharing violation
+    /// (`ERROR_SHARING_VIOLATION`) while any other process holds a handle that was opened without
+    /// `FILE_SHARE_DELETE`. Qt-based editors (for example TeXstudio, which re-reads `.bib` files while the user
+    /// types), anti-virus scanners and the search indexer all open files that way, typically only for a few
+    /// milliseconds. Retrying briefly therefore clears virtually all of these collisions.
+    ///
+    /// See <[#11916](https://github.com/JabRef/jabref/issues/11916)>.
+    private void moveTemporaryFileToTargetFile() throws IOException {
+        for (int attempt = 1; attempt <= MOVE_ATTEMPTS; attempt++) {
+            try {
+                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                return;
+            } catch (FileSystemException exception) {
+                if (attempt == MOVE_ATTEMPTS) {
+                    LOGGER.warn("Could not move temporary file", exception);
+                    throw exception;
+                }
+                LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, MOVE_ATTEMPTS, temporaryFile, targetFile, exception);
+                try {
+                    Thread.sleep(MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.warn("Could not move temporary file", exception);
+                    throw exception;
+                }
+            }
         }
     }
 
