@@ -24,6 +24,9 @@ class GenericUrlBasedFetcherTest {
     @Test
     void performSearchWithValidUrlReturnsMiscEntryWithTitleAndUrldate() throws FetcherException {
         String url = "https://gi-radar.de/397-coding-unterstuetzung-im-lauf-der-zeit/";
+        // Captured before performSearch, which internally calls LocalDate.now() itself during its (real, network-
+        // dependent) title fetch -- capturing after the call risks the two calls straddling a midnight rollover.
+        String expectedUrlDate = new Date(LocalDate.now()).getNormalized();
 
         List<BibEntry> result = fetcher.performSearch(url);
 
@@ -31,13 +34,14 @@ class GenericUrlBasedFetcherTest {
         BibEntry entry = result.getFirst();
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertEquals(url, entry.getField(StandardField.URL).orElse(null));
-        assertEquals(new Date(LocalDate.now()).getNormalized(), entry.getField(StandardField.URLDATE).orElse(null));
+        assertEquals(expectedUrlDate, entry.getField(StandardField.URLDATE).orElse(null));
         assertTrue(entry.getField(StandardField.TITLE).map(title -> !title.isBlank()).orElse(false));
     }
 
     @Test
     void performSearchWithUnreachableUrlStillCreatesEntryWithUrlAsTitleFallback() throws FetcherException {
         String url = "https://this-host-should-not-resolve.jabref-test.invalid/some-page";
+        String expectedUrlDate = new Date(LocalDate.now()).getNormalized();
 
         List<BibEntry> result = fetcher.performSearch(url);
 
@@ -45,7 +49,7 @@ class GenericUrlBasedFetcherTest {
         BibEntry entry = result.getFirst();
         assertEquals(url, entry.getField(StandardField.URL).orElse(null));
         assertEquals(url, entry.getField(StandardField.TITLE).orElse(null));
-        assertEquals(new Date(LocalDate.now()).getNormalized(), entry.getField(StandardField.URLDATE).orElse(null));
+        assertEquals(expectedUrlDate, entry.getField(StandardField.URLDATE).orElse(null));
     }
 
     @Test

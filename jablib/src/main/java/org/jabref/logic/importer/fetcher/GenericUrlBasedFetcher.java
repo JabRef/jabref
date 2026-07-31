@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 /// interpret the URL's shape (e.g. a DOI or Semantic Scholar link), it only records the link itself, when it was
 /// added, and (best-effort) the target page's title.
 @NullMarked
+// [impl->req~fetchers.generic-url~1]
 public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 
     public static final String NAME = "URL";
