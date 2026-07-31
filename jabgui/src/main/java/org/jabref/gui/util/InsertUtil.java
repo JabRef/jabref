@@ -11,8 +11,10 @@ import org.jabref.model.TransferInformation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class InsertUtil {
 
     /// Renders a user feedback message for a given number of entries.
