@@ -95,7 +95,7 @@ The `StudyFetcher` sends every query to every enabled fetcher (`searchQueries ×
 ### File and class reference
 
 | What you're looking for | Where it lives |
-|---|---|
+| --- | --- |
 | Top-level study model | `jablib/.../model/study/Study.java` |
 | Catalog model | `jablib/.../model/study/StudyCatalog.java` |
 | Query model | `jablib/.../model/study/StudyQuery.java` |
@@ -140,7 +140,7 @@ A canonical fixture with every field populated lives at `jablib/src/test/resourc
 ### What changed from v1
 
 | Field | v1 | v2 |
-|---|---|---|
+| --- | --- | --- |
 | Schema version | (absent) | `version: "2.0.0"` at top |
 | Catalog list key | `databases:` | `catalogs:` |
 | Per-catalog inclusion reason | (no field) | `reason:` on each catalog entry |
@@ -233,7 +233,7 @@ Why this hook exists on the fetcher and not on `StudyFetcher` directly is explai
 ### Migration status
 
 | Catalog | Status |
-|---|---|
+| --- | --- |
 | IEEEXplore | Migrated |
 | ACM Portal | Migrated |
 | Scopus | Migrated |
