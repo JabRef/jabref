@@ -47,12 +47,14 @@ public class LocalizationParser {
                                                .collect(Collectors.toCollection(TreeSet::new));
     }
 
+    /// Returns all keys declared in the English properties file which are not used in the sources.
     public static SortedSet<String> findObsolete() throws IOException {
-        Set<String> englishKeys = getKeysInPropertiesFile(ENGLISH_PROPERTIES_FILE);
-        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles()
-                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
-        englishKeys.removeAll(keysInSourceFiles);
-        return new TreeSet<>(englishKeys);
+        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles().stream()
+                                                                        .map(LocalizationEntry::getKey)
+                                                                        .collect(Collectors.toSet());
+        return getKeysInPropertiesFile(ENGLISH_PROPERTIES_FILE).stream()
+                                                               .filter(key -> !keysInSourceFiles.contains(key))
+                                                               .collect(Collectors.toCollection(TreeSet::new));
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFiles() throws IOException {
