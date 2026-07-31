@@ -22,6 +22,7 @@ public class InsertUtil {
     /// Implementations have to call [Localization#lang(String, Object...)] with a **literal** key,
     /// because the localization consistency tests can only detect literal keys.
     @FunctionalInterface
+    @NullMarked
     public interface FeedbackMessage {
         /// @param params Replacement strings for the parameters %0, %1, etc. of the message
         String format(Object... params);
