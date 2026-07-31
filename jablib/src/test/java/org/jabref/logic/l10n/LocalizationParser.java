@@ -114,9 +114,12 @@ public class LocalizationParser {
     }
 
     public static Properties getProperties(String path) {
+        InputStream inputStream = LocalizationParser.class.getResourceAsStream(path);
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Could not find the properties file " + path);
+        }
         Properties properties = new Properties();
-        try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path);
-             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+        try (inputStream; InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             properties.load(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
