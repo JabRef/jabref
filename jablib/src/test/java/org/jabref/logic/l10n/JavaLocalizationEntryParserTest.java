@@ -106,18 +106,13 @@ public class JavaLocalizationEntryParserTest {
     @ParameterizedTest
     @MethodSource("commentedOutLocalizations")
     void localizationInCommentIsIgnored(String code) {
-        assertEquals(List.of(), JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
+        assertEquals(List.of(), JavaLocalizationEntryParser.getLanguageKeysInString(code));
     }
 
     @ParameterizedTest
     @MethodSource("commentsMixedWithCode")
     void localizationKeysAreFoundNextToComments(String code, List<String> expectedLanguageKeys) {
-        assertEquals(expectedLanguageKeys, JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
-    }
-
-    @Test
-    void menuTitleInCommentIsIgnored() {
-        assertEquals(List.of(), JavaLocalizationEntryParser.getLanguageKeysInString("// Localization.menuTitle(\"File\")", LocalizationBundleForTest.MENU));
+        assertEquals(expectedLanguageKeys, JavaLocalizationEntryParser.getLanguageKeysInString(code));
     }
 
     @Test
@@ -137,20 +132,20 @@ public class JavaLocalizationEntryParserTest {
     @ParameterizedTest
     @MethodSource("multiLineChecks")
     void localizationKeyParsing(String code, List<String> expectedLanguageKeys) {
-        List<String> languageKeysInString = JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLanguageKeysInString(code);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("singleLineParameterChecks")
     void localizationParameterParsing(String code, String expectedParameter) {
-        List<String> languageKeysInString = JavaLocalizationEntryParser.getLocalizationParameter(code, LocalizationBundleForTest.LANG);
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLocalizationParameter(code);
         assertEquals(List.of(expectedParameter), languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("causesRuntimeExceptions")
     void throwsRuntimeException(String code) {
-        assertThrows(RuntimeException.class, () -> JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
+        assertThrows(RuntimeException.class, () -> JavaLocalizationEntryParser.getLanguageKeysInString(code));
     }
 }

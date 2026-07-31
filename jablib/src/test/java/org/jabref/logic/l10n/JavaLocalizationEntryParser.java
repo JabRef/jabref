@@ -23,14 +23,13 @@ class JavaLocalizationEntryParser {
     private static final String DOT = "\\.";
     private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
 
-    private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "menuTitle" + INFINITE_WHITESPACE + "\\(");
     private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
 
     private static final String QUOTATION_PLACEHOLDER = "QUOTATIONPLACEHOLDER";
     private static final Pattern QUOTATION_SYMBOL_PATTERN = Pattern.compile(QUOTATION_PLACEHOLDER);
 
-    public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
-        List<String> parameters = getLocalizationParameter(content, type);
+    public static List<String> getLanguageKeysInString(String content) {
+        List<String> parameters = getLocalizationParameter(content);
 
         List<String> result = new ArrayList<>();
 
@@ -83,18 +82,13 @@ class JavaLocalizationEntryParser {
         return languageKey;
     }
 
-    public static List<String> getLocalizationParameter(String rawContent, LocalizationBundleForTest type) {
+    public static List<String> getLocalizationParameter(String rawContent) {
         List<String> result = new ArrayList<>();
 
         // Comments may contain `Localization.lang(...)` snippets, which are no real usages.
         String content = blankOutComments(rawContent);
 
-        Matcher matcher;
-        if (type == LocalizationBundleForTest.LANG) {
-            matcher = LOCALIZATION_START_PATTERN.matcher(content);
-        } else {
-            matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
-        }
+        Matcher matcher = LOCALIZATION_START_PATTERN.matcher(content);
         while (matcher.find()) {
             // find contents between the brackets, covering multi-line strings as well
             int index = matcher.end();
