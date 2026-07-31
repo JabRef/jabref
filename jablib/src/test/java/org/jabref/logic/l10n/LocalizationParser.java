@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,24 +64,24 @@ public class LocalizationParser {
     }
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles() throws IOException {
-        return findInModules("src/main/java", LocalizationParser::isJavaFile, LocalizationParser::getLocalizationParametersInJavaFile);
+        return findInModules("src/main/java", ".java", LocalizationParser::getLocalizationParametersInJavaFile);
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles() throws IOException {
-        return findInModules("src/main/java", LocalizationParser::isJavaFile, LocalizationParser::getLanguageKeysInJavaFile);
+        return findInModules("src/main/java", ".java", LocalizationParser::getLanguageKeysInJavaFile);
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles() throws IOException {
-        return findInModules("src/main/resources", LocalizationParser::isFxmlFile, LocalizationParser::getLanguageKeysInFxmlFile);
+        return findInModules("src/main/resources", ".fxml", LocalizationParser::getLanguageKeysInFxmlFile);
     }
 
     /// Collects the localization entries of all matching files below the given source directory of each module.
     ///
     /// @param sourceDirectory the module relative directory to walk, e.g. `src/main/java`
-    /// @param fileFilter      determines which of the found files are parsed
+    /// @param extension       only files having this file name extension are parsed
     /// @param extractor       extracts the localization entries of a single file
     private static Set<LocalizationEntry> findInModules(String sourceDirectory,
-                                                        Predicate<Path> fileFilter,
+                                                        String extension,
                                                         Function<Path, Collection<LocalizationEntry>> extractor) throws IOException {
         Set<LocalizationEntry> result = new HashSet<>();
         for (String module : MODULES) {
@@ -92,7 +91,7 @@ public class LocalizationParser {
             }
             // Files.walk holds a directory handle, thus the stream needs to be closed
             try (Stream<Path> paths = Files.walk(root)) {
-                paths.filter(fileFilter)
+                paths.filter(path -> path.toString().endsWith(extension))
                      .map(extractor)
                      .forEach(result::addAll);
             }
@@ -123,14 +122,6 @@ public class LocalizationParser {
             throw new RuntimeException(e);
         }
         return properties;
-    }
-
-    private static boolean isJavaFile(Path path) {
-        return path.toString().endsWith(".java");
-    }
-
-    private static boolean isFxmlFile(Path path) {
-        return path.toString().endsWith(".fxml");
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path) {
