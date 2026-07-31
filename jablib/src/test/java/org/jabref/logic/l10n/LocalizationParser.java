@@ -148,7 +148,7 @@ public class LocalizationParser {
         String content = String.join("\n", lines);
         return parser.apply(content).stream()
                      .map(key -> new LocalizationEntry(path, key))
-                     .collect(Collectors.toList());
+                     .toList();
     }
 
     /// Loads the fxml file and returns all used language resources.

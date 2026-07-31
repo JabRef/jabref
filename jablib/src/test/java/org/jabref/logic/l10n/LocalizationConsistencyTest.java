@@ -99,7 +99,7 @@ class LocalizationConsistencyTest {
                 .findLocalizationParametersStringsInJavaFiles()
                 .stream()
                 .filter(key -> key.getKey().contains("\\_"))
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(List.of(), quotedEntries,
                 "Language keys must not use underscores for spaces! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
@@ -115,7 +115,7 @@ class LocalizationConsistencyTest {
                 .findLocalizationParametersStringsInJavaFiles()
                 .stream()
                 .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(List.of(), entriesWithHtml,
                 "Language keys must not contain HTML <br> or <p>. Use \\n for a line break.\n" +
                         "Please correct the following entries:\n" +
