@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -289,8 +290,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     Thread.sleep(MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
                 } catch (InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();
-                    LOGGER.warn("Could not move temporary file", exception);
-                    throw exception;
+                    InterruptedIOException interruptedIOException = new InterruptedIOException("Interrupted while moving temporary file " + temporaryFile + " onto " + targetFile);
+                    interruptedIOException.initCause(interruptedException);
+                    interruptedIOException.addSuppressed(exception);
+                    LOGGER.warn("Interrupted while moving temporary file {} onto {}", temporaryFile, targetFile, interruptedIOException);
+                    throw interruptedIOException;
                 }
             }
         }
