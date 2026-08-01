@@ -39,7 +39,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final OcrEngine ocrEngine;
     private final List<BibEntry> linkedEntries;
     private final ImportHandler importHandler;
 
@@ -58,11 +57,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        if (preferences.getOcrPreferences().getEngineSelection() == EngineSelection.OCRMYPDF) {
-            this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
-        } else {
-            this.ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
-        }
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -81,6 +75,12 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
+        OcrEngine ocrEngine;
+        if (preferences.getOcrPreferences().getEngineSelection() == EngineSelection.OCRMYPDF) {
+            ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
+        } else {
+            ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
+        }
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
         ocrTask.titleProperty().set(Localization.lang("Performing OCR"));
@@ -95,7 +95,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = getFailureResult(failure);
+                    String failureReason = getFailureResult(failure, ocrEngine);
                     dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
                 }
             }
@@ -107,7 +107,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(ocrTask);
     }
 
-    String getFailureResult(OcrResult.Failure failure) {
+    String getFailureResult(OcrResult.Failure failure, OcrEngine ocrEngine) {
         return switch (failure.reason()) {
             case NOT_AVAILABLE ->
                     Localization.lang("%0 is not available at: %1", ocrEngine.getName(), preferences.getOcrPreferences().getOcrEnginePath());

@@ -67,7 +67,12 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         this.ocrPreferences = ocrPreferences;
         this.taskExecutor = taskExecutor;
 
-        selectedEngine.addListener((_, _, _) -> autoDetectEnginePath());
+        selectedEngine.addListener((_, oldValue, newValue) -> {
+            if (oldValue == newValue) {
+                return;
+            }
+            autoDetectEnginePath();
+        });
     }
 
     @Override
