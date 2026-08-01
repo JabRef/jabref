@@ -641,14 +641,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public boolean closeTabs(@NonNull List<LibraryTab> tabs) {
-        return closeTabs(tabs, true);
-    }
-
-    public boolean closeAllTabs() {
-        return closeTabs(getLibraryTabs(), false);
-    }
-
-    private boolean closeTabs(@NonNull List<LibraryTab> tabs, boolean showWelcomeTabIfEmpty) {
         // Only accept library tabs that are shown in the tab container
         List<LibraryTab> toClose = tabs.stream()
                                        .distinct()
@@ -677,9 +669,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Force group update in the GroupTreeViewModel by clearing the active database so the group pane doesn't keep displaying groups from a library that's no longer open
             stateManager.setActiveDatabase(null);
             // No library remains open, so show the welcome screen instead of an empty tab pane
-            if (showWelcomeTabIfEmpty) {
-                showWelcomeTab();
-            }
+            showWelcomeTab();
         }
         return true;
     }
