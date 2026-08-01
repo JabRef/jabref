@@ -16,7 +16,6 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrMyPdfEngine;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -56,7 +55,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
+        this.ocrEngine = preferences.getOcrPreferences().getOcrEngine();
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -104,7 +103,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     String getFailureResult(OcrResult.Failure failure) {
         return switch (failure.reason()) {
             case NOT_AVAILABLE ->
-                    Localization.lang("OCRmyPDF is not available at: %0", preferences.getOcrPreferences().getOcrEnginePath());
+                    Localization.lang("%0 is not available at: %1", ocrEngine.getName(), preferences.getOcrPreferences().getOcrEnginePath());
             case TIMEOUT ->
                     Localization.lang("OCR timed out");
             case NON_ZERO_EXIT ->
