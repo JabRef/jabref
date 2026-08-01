@@ -22,6 +22,7 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
 import org.junit.jupiter.api.Test;
@@ -135,6 +136,24 @@ class JStyleTest {
                 isFirstAppearanceOfSource,
                 pageInfo);
     }
+
+    static String getCitationMarkerForType(JStyle style,
+                                           List<BibEntry> entries,
+                                           Map<BibEntry, BibDatabase> entryDBMap,
+                                           CitationType citationType,
+                                           String[] uniquefiers,
+                                           Boolean[] isFirstAppearanceOfSource,
+                                           String[] pageInfo) {
+        return OOBibStyleTestHelper.getCitationMarkerForType(style,
+                entries,
+                entryDBMap,
+                citationType,
+                uniquefiers,
+                isFirstAppearanceOfSource,
+                pageInfo,
+                NonUniqueCitationMarker.THROWS);
+    }
+
 
     // endregion
 
@@ -925,5 +944,66 @@ class JStyleTest {
                             true,
                             NonUniqueCitationMarker.THROWS).toString());
         }
+    }
+
+    @Test
+    void createCitationMarkerSupportsCitationTypesFromCiteSpecial() throws IOException {
+        JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
+
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Jane Doe")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.TITLE, "Title 1");
+        entry1.setCitationKey("a1");
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Jane Doe")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.TITLE, "Title 2");
+        entry2.setCitationKey("a2");
+
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        Map<BibEntry, BibDatabase> entryDBMap = Map.of(
+                entry1, database,
+                entry2, database);
+
+        assertEquals("Doe 2003; p1",
+                getCitationMarkerForType(style,
+                        List.of(entry1),
+                        entryDBMap,
+                        CitationType.AUTHORYEAR_NOPAR,
+                        new String[] {null},
+                        new Boolean[] {false},
+                        new String[] {"p1"}));
+
+        assertEquals("Doe",
+                getCitationMarkerForType(style,
+                        List.of(entry1),
+                        entryDBMap,
+                        CitationType.AUTHOR_ONLY,
+                        new String[] {"a"},
+                        new Boolean[] {false},
+                        new String[] {"p1"}));
+
+        assertEquals("Doe; Doe",
+                getCitationMarkerForType(style,
+                        List.of(entry1, entry2),
+                        entryDBMap,
+                        CitationType.AUTHOR_ONLY,
+                        new String[] {"a", "b"},
+                        new Boolean[] {false, false},
+                        new String[] {null, null}));
+
+        assertEquals("2003a; p1",
+                getCitationMarkerForType(style,
+                        List.of(entry1),
+                        entryDBMap,
+                        CitationType.YEAR_ONLY,
+                        new String[] {"a"},
+                        new Boolean[] {false},
+                        new String[] {"p1"}));
     }
 }

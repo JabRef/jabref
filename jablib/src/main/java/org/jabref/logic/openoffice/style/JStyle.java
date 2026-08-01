@@ -35,6 +35,7 @@ import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
 import org.jspecify.annotations.NonNull;
@@ -724,6 +725,19 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
                 inParenthesis,
                 nonUniqueCitationMarkerHandling);
     }
+
+    /// As [#createCitationMarker(List, boolean, NonUniqueCitationMarker)], but takes the
+    /// presentation from the citation type of the group, so that the partial and bracket-less
+    /// citation types of <https://github.com/JabRef/jabref/issues/7861> are handled as well.
+    public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
+                                       CitationType citationType,
+                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+        return JStyleGetCitationMarker.createCitationMarker(this,
+                citationMarkerEntries,
+                citationType,
+                nonUniqueCitationMarkerHandling);
+    }
+
 
     /// Add setLocaleNone and optionally setCharStyle(CitationCharacterFormat) around
     /// citationText.  Called in fillCitationMarkInCursor, so these are

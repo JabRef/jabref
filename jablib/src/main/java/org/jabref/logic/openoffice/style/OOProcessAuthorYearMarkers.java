@@ -133,13 +133,12 @@ class OOProcessAuthorYearMarkers {
         setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-            final boolean inParenthesis = group.citationType == CitationType.AUTHORYEAR_PAR;
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
             List<Citation> cits = group.getCitationsInLocalOrder();
             List<CitationMarkerEntry> citationMarkerEntries = OOListUtil.map(cits, e -> e);
             OOText citMarker = style.createCitationMarker(citationMarkerEntries,
-                    inParenthesis,
+                    group.citationType,
                     strictlyUnique);
             group.setCitationMarker(Optional.of(citMarker));
         }

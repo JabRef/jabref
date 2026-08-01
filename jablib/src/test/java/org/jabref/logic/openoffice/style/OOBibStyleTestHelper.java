@@ -16,6 +16,7 @@ import org.jabref.model.openoffice.style.CitationLookupResult;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.PageInfo;
 
@@ -200,6 +201,42 @@ class OOBibStyleTestHelper {
                 pageInfo,
                 NonUniqueCitationMarker.THROWS);
     }
+
+    static String getCitationMarkerForType(JStyle style,
+                                           List<BibEntry> entries,
+                                           Map<BibEntry, BibDatabase> entryDBMap,
+                                           CitationType citationType,
+                                           String[] uniquefiers,
+                                           Boolean[] isFirstAppearanceOfSource,
+                                           String[] pageInfo,
+                                           NonUniqueCitationMarker nonunique) {
+        if (uniquefiers == null) {
+            uniquefiers = new String[entries.size()];
+            Arrays.fill(uniquefiers, null);
+        }
+        if (pageInfo == null) {
+            pageInfo = new String[entries.size()];
+            Arrays.fill(pageInfo, null);
+        }
+        if (isFirstAppearanceOfSource == null) {
+            isFirstAppearanceOfSource = new Boolean[entries.size()];
+            Arrays.fill(isFirstAppearanceOfSource, false);
+        }
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>(entries.size());
+        for (int i = 0; i < entries.size(); i++) {
+            BibEntry entry = entries.get(i);
+            CitationMarkerEntry citationMarkerEntry = makeCitationMarkerEntry(entry,
+                    entryDBMap.get(entry),
+                    uniquefiers[i],
+                    pageInfo[i],
+                    isFirstAppearanceOfSource[i]);
+            citationMarkerEntries.add(citationMarkerEntry);
+        }
+        return style.createCitationMarker(citationMarkerEntries,
+                citationType,
+                nonunique).toString();
+    }
+
 
     static String getCitationMarker2b(JStyle style,
                                       List<BibEntry> entries,
