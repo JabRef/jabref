@@ -917,8 +917,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager.getJabRefClipboardTransferData(),
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Pasted %0 entry(s) to %1"),
-                Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+                params -> Localization.lang("Pasted %0 entry(s) to %1", params),
+                params -> Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -948,8 +948,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Moved %0 entry(s) to %1"),
-                Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+                params -> Localization.lang("Moved %0 entry(s) to %1", params),
+                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
