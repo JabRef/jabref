@@ -35,6 +35,9 @@ import tools.jackson.databind.json.JsonMapper;
 public class DoclingEngine implements OcrEngine {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(DoclingEngine.class);
+    private final static JsonMapper JSON_MAPPER = new JsonMapper();
+    private final static PDFont FONT = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    private final static float FONTSIZE = 12F;
     private final OcrPreferences ocrPreferences;
 
     public DoclingEngine(OcrPreferences ocrPreferences) {
@@ -99,8 +102,7 @@ public class DoclingEngine implements OcrEngine {
     }
 
     private OcrResult embedText(Path jsonOutputPath, Path originalPdf) throws IOException {
-        JsonMapper jsonMapper = new JsonMapper();
-        DoclingDocument doclingDocument = jsonMapper.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
+        DoclingDocument doclingDocument = JSON_MAPPER.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
 
         Map<Integer, ArrayList<DoclingText>> pageTextMap = new HashMap<>();
         for (DoclingText doclingText : doclingDocument.texts()) {
@@ -112,8 +114,6 @@ public class DoclingEngine implements OcrEngine {
         Path outputPdf = OcrUtils.makeOutputFilePath(originalPdf);
 
         try (PDDocument pdfWithText = Loader.loadPDF(originalPdf.toFile())) {
-            PDFont font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-            float fontSize = 12F;
             for (Map.Entry<Integer, ArrayList<DoclingText>> entry : pageTextMap.entrySet()) {
                 int pageNo = entry.getKey();
                 PDPage pdPage = pdfWithText.getPage(pageNo);
@@ -127,12 +127,12 @@ public class DoclingEngine implements OcrEngine {
                         try {
                             contentStream.beginText();
                             contentStream.setRenderingMode(RenderingMode.NEITHER);
-                            contentStream.setFont(font, fontSize);
+                            contentStream.setFont(FONT, FONTSIZE);
                             contentStream.newLineAtOffset((float) bbox.l(), (float) bbox.b());
                             contentStream.showText(text);
                             contentStream.endText();
                         } catch (IllegalArgumentException e) {
-                            text = filterEncodableCharacters(font, text);
+                            text = filterEncodableCharacters(text);
                             contentStream.showText(text);
                             contentStream.endText();
                         }
@@ -147,12 +147,12 @@ public class DoclingEngine implements OcrEngine {
         return OcrResult.success(outputPdf);
     }
 
-    private String filterEncodableCharacters(PDFont font, String text) {
+    private String filterEncodableCharacters(String text) {
         StringBuilder filtered = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
             String ch = String.valueOf(text.charAt(i));
             try {
-                font.encode(ch);
+                FONT.encode(ch);
                 filtered.append(ch);
             } catch (IllegalArgumentException | IOException e) {
                 LOGGER.debug("Skipping unsupported character: {}", ch, e);
