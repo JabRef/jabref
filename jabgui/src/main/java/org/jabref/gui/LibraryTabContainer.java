@@ -28,7 +28,12 @@ public interface LibraryTabContainer {
     /// @return true if closing the tab was successful
     boolean closeTab(@Nullable LibraryTab tab);
 
-    boolean closeTabs(List<LibraryTab> tabs);
+    /// Closes the designated libraryTabs
+    ///
+    /// @param tabs to be closed.
+    /// @param showWelcomeTab whether to show the welcome tab if no library tab remains open afterwards (should be false when quitting the application)
+    /// @return true if closing the tabs was successful
+    boolean closeTabs(List<LibraryTab> tabs, boolean showWelcomeTab);
 
     /// Refreshes the ui after changes to the preferences
     void refresh();
