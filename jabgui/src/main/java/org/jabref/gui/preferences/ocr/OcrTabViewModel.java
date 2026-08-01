@@ -58,6 +58,8 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final OcrPreferences ocrPreferences;
     private final TaskExecutor taskExecutor;
 
+    private boolean isInitializing = true;
+
     public OcrTabViewModel(DialogService dialogService,
                            FilePreferences filePreferences,
                            OcrPreferences ocrPreferences,
@@ -68,7 +70,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         this.taskExecutor = taskExecutor;
 
         selectedEngine.addListener((_, oldValue, newValue) -> {
-            if (oldValue == newValue) {
+            if (isInitializing || oldValue == newValue) {
                 return;
             }
             autoDetectEnginePath();
@@ -77,9 +79,11 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        isInitializing = true;
         selectedEngine.setValue(ocrPreferences.getEngineSelection());
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
         selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
+        isInitializing = false;
     }
 
     @Override
