@@ -315,9 +315,9 @@ public class OOBibBase {
             }
 
             List<XTextRange> citationRanges = frontend.getCitationRanges(doc, style)
-                                                     .stream()
-                                                     .map(RangeForOverlapCheck::getRange)
-                                                     .toList();
+                                                      .stream()
+                                                      .map(RangeForOverlapCheck::getRange)
+                                                      .toList();
             if (UnoRedlines.countDeletedRangesTouching(doc, citationRanges) == 0) {
                 return OOVoidResult.ok();
             }
@@ -571,8 +571,8 @@ public class OOBibBase {
 
         if (style instanceof JStyle jStyle) {
             OOVoidResult<OOError> pendingDeletionOverlap = syncOptions.isPresent()
-                    ? checkCitationMarkersOutsidePendingDeletions(doc, style, frontend.get())
-                    : OOVoidResult.ok();
+                                                           ? checkCitationMarkersOutsidePendingDeletions(doc, style, frontend.get())
+                                                           : OOVoidResult.ok();
             if (testDialog(errorTitle,
                     checkStylesExistInTheDocument(jStyle, doc),
                     pendingDeletionOverlap)) {
