@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.json.JsonMapper;
 
-/// Implementation of the {@link OcrEngine} interface using Docling.
+/// Implementation of the [OcrEngine] interface using Docling.
 public class DoclingEngine implements OcrEngine {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(DoclingEngine.class);
