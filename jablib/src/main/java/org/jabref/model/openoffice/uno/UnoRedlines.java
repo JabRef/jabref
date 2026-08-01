@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jspecify.annotations.Nullable;
-
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
@@ -16,6 +14,7 @@ import com.sun.star.document.XRedlinesSupplier;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import org.jspecify.annotations.Nullable;
 
 /// Change tracking and Redlines
 public class UnoRedlines {
