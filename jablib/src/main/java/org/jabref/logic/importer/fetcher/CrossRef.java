@@ -15,6 +15,7 @@ import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.IdParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -37,6 +39,7 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 
 /// A class for fetching DOIs from CrossRef
 ///
@@ -44,6 +47,11 @@ import org.apache.hc.core5.net.URIBuilder;
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
     private static final String API_URL = "https://api.crossref.org/works";
+
+    /// Rate limit for the CrossRef REST API public pool.
+    /// CrossRef's public pool defaults to 50 req/s, as measured via X-Rate-Limit-Interval/X-Rate-Limit-Limit
+    /// response headers - consistent with [DoiFetcher]'s existing CROSSREF_DCN_RATE_LIMITER.
+    private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 50.0);
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
@@ -55,6 +63,33 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_CROSSREF);
+    }
+
+    @Override
+    public Optional<DOI> findIdentifier(@NonNull BibEntry entry) throws FetcherException {
+        RATE_LIMITER.acquire(entry.getCitationKey().orElse(""));
+        return IdParserFetcher.super.findIdentifier(entry);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+        RATE_LIMITER.acquire(entry.getCitationKey().orElse(""));
+        return EntryBasedParserFetcher.super.performSearch(entry);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(@NonNull BaseQueryNode queryNode) throws FetcherException {
+        RATE_LIMITER.acquire(queryNode.toString());
+        return SearchBasedParserFetcher.super.performSearch(queryNode);
+    }
+
+    @Override
+    public Optional<BibEntry> performSearchById(@NonNull String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+        RATE_LIMITER.acquire(identifier);
+        return IdBasedParserFetcher.super.performSearchById(identifier);
     }
 
     @Override
