@@ -668,19 +668,29 @@ public class OOBibBase {
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
 
-            if (convertReferenceMarks) {
-                cslCitationOOAdapter.convertReferenceMarksToPreference();
-            }
+            OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
+                try {
+                    if (convertReferenceMarks) {
+                        cslCitationOOAdapter.convertReferenceMarksToPreference();
+                    }
 
-            if (citationType == CitationType.AUTHORYEAR_PAR) {
-                // "Cite" button
-                cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-            } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                // "Cite in-text" button
-                cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-            } else if (citationType == CitationType.INVISIBLE_CIT) {
-                // "Insert empty citation"
-                cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    if (citationType == CitationType.AUTHORYEAR_PAR) {
+                        // "Cite" button
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                        // "Cite in-text" button
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    } else if (citationType == CitationType.INVISIBLE_CIT) {
+                        // "Insert empty citation"
+                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    }
+                    return OOVoidResult.ok();
+                } catch (CreationException | com.sun.star.uno.Exception e) {
+                    return OOVoidResult.error(OOError.fromMisc(e));
+                }
+            });
+            if (insertResult.isError()) {
+                return insertResult;
             }
 
             // If "Automatically sync bibliography when inserting citations" is enabled
@@ -688,8 +698,6 @@ public class OOBibBase {
                 syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             }
             return OOVoidResult.ok();
-        } catch (CreationException | com.sun.star.uno.Exception e) {
-            return OOVoidResult.error(OOError.fromMisc(e));
         } finally {
             // Release controller lock
             doc.unlockControllers();
@@ -745,10 +753,14 @@ public class OOBibBase {
                                                     OOResult<XTextCursor, OOError> cursor) {
         try {
             doc.lockControllers();
-            bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
-            return OOVoidResult.ok();
-        } catch (CreationException | com.sun.star.uno.Exception e) {
-            return OOVoidResult.error(OOError.fromMisc(e));
+            return supplyWithTrackChangesSuspended(doc, () -> {
+                try {
+                    bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
+                    return OOVoidResult.ok();
+                } catch (CreationException | com.sun.star.uno.Exception e) {
+                    return OOVoidResult.error(OOError.fromMisc(e));
+                }
+            });
         } finally {
             doc.unlockControllers();
         }
