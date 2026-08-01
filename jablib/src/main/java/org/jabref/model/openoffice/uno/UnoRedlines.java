@@ -31,7 +31,7 @@ public class UnoRedlines {
         try {
             return (boolean) propertySet.getPropertyValue("RecordChanges");
         } catch (UnknownPropertyException ex) {
-            throw new java.lang.IllegalStateException("Caught UnknownPropertyException on 'RecordChanges'");
+            throw new IllegalStateException("Caught UnknownPropertyException on 'RecordChanges'");
         }
     }
 
