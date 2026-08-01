@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
@@ -142,40 +144,30 @@ public class UnoRedlines {
             setRecordChanges(doc, false);
         }
 
-        WrappedTargetException actionException = null;
-        RuntimeException actionRuntimeException = null;
-        TrackChangesRestoreException restoreException = null;
-
         try {
             action.run();
-        } catch (WrappedTargetException ex) {
-            actionException = ex;
-        } catch (RuntimeException ex) {
-            actionRuntimeException = ex;
-        } finally {
-            if (wasRecording) {
-                try {
-                    setRecordChanges(doc, true);
-                } catch (WrappedTargetException | RuntimeException restoreFailure) {
-                    if (actionException != null) {
-                        actionException.addSuppressed(restoreFailure);
-                    } else if (actionRuntimeException != null) {
-                        actionRuntimeException.addSuppressed(restoreFailure);
-                    } else {
-                        restoreException = new TrackChangesRestoreException(restoreFailure);
-                    }
-                }
-            }
+        } catch (WrappedTargetException | RuntimeException actionFailure) {
+            restoreTrackChanges(doc, wasRecording, actionFailure);
+            throw actionFailure;
         }
 
-        if (actionException != null) {
-            throw actionException;
+        restoreTrackChanges(doc, wasRecording, null);
+    }
+
+    private static void restoreTrackChanges(XTextDocument doc, boolean wasRecording, @Nullable Throwable actionFailure)
+            throws WrappedTargetException, TrackChangesRestoreException {
+        if (!wasRecording) {
+            return;
         }
-        if (actionRuntimeException != null) {
-            throw actionRuntimeException;
-        }
-        if (restoreException != null) {
-            throw restoreException;
+
+        try {
+            setRecordChanges(doc, true);
+        } catch (WrappedTargetException | RuntimeException restoreFailure) {
+            if (actionFailure != null) {
+                actionFailure.addSuppressed(restoreFailure);
+                return;
+            }
+            throw new TrackChangesRestoreException(restoreFailure);
         }
     }
 
