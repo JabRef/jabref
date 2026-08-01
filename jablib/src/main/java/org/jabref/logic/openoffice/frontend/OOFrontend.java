@@ -265,9 +265,13 @@ public class OOFrontend {
                 new ArrayList<>(citationGroups.numberOfCitationGroups());
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
-            XTextRange range = this.getMarkRange(doc, group).orElseThrow(IllegalStateException::new);
-            String description = range.getString();
-            result.add(new RangeForOverlapCheck<>(range,
+            Optional<XTextRange> range = this.getMarkRange(doc, group);
+            if (range.isEmpty()) {
+                continue;
+            }
+            XTextRange textRange = range.get();
+            String description = textRange.getString();
+            result.add(new RangeForOverlapCheck<>(textRange,
                     group.groupId,
                     RangeForOverlapCheck.REFERENCE_MARK_KIND,
                     description));

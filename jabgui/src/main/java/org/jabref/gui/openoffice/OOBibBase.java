@@ -341,8 +341,18 @@ public class OOBibBase {
         List<T> holder = new ArrayList<>(1);
         try {
             UnoRedlines.withRecordChangesSuspended(doc, () -> holder.add(action.get()));
+        } catch (UnoRedlines.TrackChangesRestoreException ex) {
+            LOGGER.warn("Could not restore change recording", ex);
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Track changes"),
+                    Localization.lang("JabRef updated the document, but could not restore Track Changes."
+                            + " Please verify [Edit]/[Track Changes]/[Record]."));
+            return holder.getFirst();
         } catch (WrappedTargetException ex) {
             LOGGER.warn("Could not suspend change recording", ex);
+            if (!holder.isEmpty()) {
+                return holder.getFirst();
+            }
             return action.get();
         }
         return holder.getFirst();

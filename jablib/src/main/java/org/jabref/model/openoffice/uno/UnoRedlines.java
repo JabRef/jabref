@@ -135,18 +135,53 @@ public class UnoRedlines {
     /// JabRef's own rewrite operations are not recorded as tracked changes.
     /// TODO: Add this warning to user documentation
     public static void withRecordChangesSuspended(XTextDocument doc, RedlineAction action)
-            throws WrappedTargetException {
+            throws WrappedTargetException, TrackChangesRestoreException {
 
         boolean wasRecording = getRecordChanges(doc);
         if (wasRecording) {
             setRecordChanges(doc, false);
         }
+
+        WrappedTargetException actionException = null;
+        RuntimeException actionRuntimeException = null;
+        TrackChangesRestoreException restoreException = null;
+
         try {
             action.run();
+        } catch (WrappedTargetException ex) {
+            actionException = ex;
+        } catch (RuntimeException ex) {
+            actionRuntimeException = ex;
         } finally {
             if (wasRecording) {
-                setRecordChanges(doc, true);
+                try {
+                    setRecordChanges(doc, true);
+                } catch (WrappedTargetException | RuntimeException restoreFailure) {
+                    if (actionException != null) {
+                        actionException.addSuppressed(restoreFailure);
+                    } else if (actionRuntimeException != null) {
+                        actionRuntimeException.addSuppressed(restoreFailure);
+                    } else {
+                        restoreException = new TrackChangesRestoreException(restoreFailure);
+                    }
+                }
             }
+        }
+
+        if (actionException != null) {
+            throw actionException;
+        }
+        if (actionRuntimeException != null) {
+            throw actionRuntimeException;
+        }
+        if (restoreException != null) {
+            throw restoreException;
+        }
+    }
+
+    public static final class TrackChangesRestoreException extends Exception {
+        public TrackChangesRestoreException(Throwable cause) {
+            super("Could not restore Track Changes", cause);
         }
     }
 
