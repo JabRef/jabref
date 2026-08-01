@@ -1,7 +1,7 @@
 package org.jabref.logic.ocr;
 
 public enum EngineSelection {
-    OCRMYPDF("OcrmyPDF"),
+    OCRMYPDF("OCRmyPDF"),
     DOCLING("Docling");
 
     private final String displayName;
