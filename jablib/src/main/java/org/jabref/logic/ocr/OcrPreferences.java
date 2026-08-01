@@ -5,8 +5,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.ocr.docling.DoclingEngine;
-
 public class OcrPreferences {
     private final ObjectProperty<EngineSelection> engineSelection;
     private final StringProperty ocrEnginePath;
@@ -60,13 +58,5 @@ public class OcrPreferences {
 
     public static OcrPreferences getDefault() {
         return new OcrPreferences();
-    }
-
-    public OcrEngine getOcrEngine() {
-        if (engineSelection.get() == EngineSelection.OCRMYPDF) {
-            return new OcrMyPdfEngine(this);
-        } else {
-            return new DoclingEngine(this);
-        }
     }
 }

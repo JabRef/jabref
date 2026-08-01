@@ -15,8 +15,11 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrEngine;
+import org.jabref.logic.ocr.OcrMyPdfEngine;
 import org.jabref.logic.ocr.OcrResult;
+import org.jabref.logic.ocr.docling.DoclingEngine;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -55,7 +58,11 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.ocrEngine = preferences.getOcrPreferences().getOcrEngine();
+        if (preferences.getOcrPreferences().getEngineSelection() == EngineSelection.OCRMYPDF) {
+            this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
+        } else {
+            this.ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
+        }
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
