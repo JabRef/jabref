@@ -27,31 +27,6 @@ public class OcrMyPdfEngine implements OcrEngine {
         return "OCRmyPDF";
     }
 
-    @Override
-    public boolean isAvailable() {
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--version");
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                LOGGER.debug("Checking OCRmyPDF availability timed out");
-                return false;
-            }
-            return process.exitValue() == 0;
-        } catch (IOException e) {
-            LOGGER.error("OCRmyPDF is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
-            return false;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.error("Checking OCRmyPDF availability was interrupted", e);
-            return false;
-        }
-    }
-
     /// OCRmyPDF writes the searchable PDF to a new file alongside the original file.
     ///
     /// Example: document.pdf -> document_ocr.pdf.
@@ -61,7 +36,7 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// or {@link OcrResult.Failure} with an error message if OCR failed.
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) {
-        if (!isAvailable()) {
+        if (!OcrUtils.isAvailable(ocrPreferences)) {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
         Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
