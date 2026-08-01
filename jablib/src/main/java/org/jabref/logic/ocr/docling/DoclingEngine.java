@@ -16,6 +16,9 @@ import org.jabref.logic.ocr.OcrUtils;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.ocr.docling.DoclingBBox;
+import org.jabref.model.ocr.docling.DoclingDocument;
+import org.jabref.model.ocr.docling.DoclingText;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;

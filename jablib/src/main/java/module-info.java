@@ -158,6 +158,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.msc;
     exports org.jabref.logic.ai.models;
     exports org.jabref.logic.ocr.docling;
+    exports org.jabref.model.ocr.docling;
     // endregion
 
     requires java.base;

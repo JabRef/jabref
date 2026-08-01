@@ -1,4 +1,4 @@
-package org.jabref.logic.ocr.docling;
+package org.jabref.model.ocr.docling;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
