@@ -12,6 +12,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 
 public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
@@ -29,11 +30,15 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     private void buildView() {
         setContent(form()
 
+                .section(Localization.lang("OCR engine selection"), engine -> engine
+                        .combo(Localization.lang("OCR engine"),
+                                viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName))
+
                 .section(Localization.lang("Partially scanned PDFs"), scanned -> scanned
                         .combo(Localization.lang("OCR for partially scanned PDFs"),
                                 viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName))
 
-                .section(Localization.lang("OCR engine path"), engine -> engine
+                .section(Localization.lang("OCR engine path"), path -> path
                         .custom(buildEnginePathRow()))
 
                 .build());
