@@ -35,7 +35,7 @@ class CitationOOAdapterUtils {
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
         if (!checkCursor.goRight((short) 1, true)) {
-            return true;
+            return false;
         } else {
             succeedingSpaceExists = " ".equals(checkCursor.getString());
             if (!succeedingSpaceExists) {
