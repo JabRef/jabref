@@ -30,6 +30,9 @@ public interface LibraryTabContainer {
 
     boolean closeTabs(List<LibraryTab> tabs);
 
+    /// Closes all tabs without showing the welcome tab afterwards (used when quitting)
+    boolean closeAllTabs();
+
     /// Refreshes the ui after changes to the preferences
     void refresh();
 }
