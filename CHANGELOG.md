@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
 - We added an "add space before citation" option in the LibreOffice integration. [#16349](https://github.com/JabRef/jabref/issues/16349)
 - CSL Citations emitted by JabRef in LibreOffice can now be read by Zotero (under a new preference "Zotero Compatibility Mode") and vice versa. [#15878](https://github.com/JabRef/jabref/issues/15878)
 - We added support for bibliography generation using `.bst` files in the OpenOffice/LibreOffice integration. [#624](https://github.com/JabRef/jabref/issues/624)
@@ -72,6 +73,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing a `.bst` file with the same filename as an existing internal or external style was allowed, resulting in ambiguous duplicate entries. [#16360](https://github.com/JabRef/jabref/issues/16360)
+- We fixed alignment of Journal/JournalTitle info icon in entry editor. [#16425](https://github.com/JabRef/jabref/issues/16425)
+- We fixed an issue in the LibreOffice integration where citations generated via CSL styles were not properly formatted. [#16379](https://github.com/JabRef/jabref/issues/16379)
+- We fixed an issue in the LibreOffice integration where generating bibliography or inserting citations made superscript citations smaller and smaller. [#16351](https://github.com/JabRef/jabref/issues/16351)
+- We fixed an issue where opening preferences could break arXiv web search later. [#16059](https://github.com/JabRef/jabref/issues/16059)
 - We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
@@ -113,6 +119,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
+- We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
 
 ### Removed
 
