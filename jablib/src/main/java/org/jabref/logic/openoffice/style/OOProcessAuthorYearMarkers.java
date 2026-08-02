@@ -13,7 +13,6 @@ import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroups;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
-import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.CitedKey;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
