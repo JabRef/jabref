@@ -150,8 +150,8 @@ class JStyleTest {
                 citationType,
                 uniquefiers,
                 isFirstAppearanceOfSource,
-                pageInfo,
-                NonUniqueCitationMarker.THROWS);
+                pageInfo
+        );
     }
 
     // endregion

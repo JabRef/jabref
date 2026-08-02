@@ -157,7 +157,7 @@ class OOBibStyleTestHelper {
                                        String[] uniquefiers,
                                        Boolean[] isFirstAppearanceOfSource,
                                        String[] pageInfo,
-                                       NonUniqueCitationMarker nonunique) {
+                                       NonUniqueCitationMarker nonUniqueCitationMarker) {
         if (uniquefiers == null) {
             uniquefiers = new String[entries.size()];
             Arrays.fill(uniquefiers, null);
@@ -182,7 +182,7 @@ class OOBibStyleTestHelper {
         }
         return style.createCitationMarker(citationMarkerEntries,
                 inParenthesis,
-                nonunique).toString();
+                nonUniqueCitationMarker).toString();
     }
 
     static String getCitationMarker2(JStyle style,
@@ -208,8 +208,7 @@ class OOBibStyleTestHelper {
                                            CitationType citationType,
                                            String[] uniquefiers,
                                            Boolean[] isFirstAppearanceOfSource,
-                                           String[] pageInfo,
-                                           NonUniqueCitationMarker nonunique) {
+                                           String[] pageInfo) {
         if (uniquefiers == null) {
             uniquefiers = new String[entries.size()];
             Arrays.fill(uniquefiers, null);
@@ -234,7 +233,7 @@ class OOBibStyleTestHelper {
         }
         return style.createCitationMarker(citationMarkerEntries,
                 citationType,
-                nonunique).toString();
+                NonUniqueCitationMarker.THROWS).toString();
     }
 
     static String getCitationMarker2b(JStyle style,
