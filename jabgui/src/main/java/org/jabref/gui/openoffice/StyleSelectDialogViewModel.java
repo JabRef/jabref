@@ -378,9 +378,7 @@ public class StyleSelectDialogViewModel {
                 .build();
 
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
-
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
-
             if (!stylePath.getFileName().toString().toLowerCase().endsWith(".bst") || !Files.exists(stylePath)) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid style selected"),
