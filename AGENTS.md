@@ -152,6 +152,8 @@ Both comments must not be added.
 
 ### Favor Optionals over nulls
 
+- Use `Optional` only as a return type. Do not use it for fields, parameters, or local variables.
+
 - Use the methods of java.util.Optional. `ifPresent`.
 
    NOT
