@@ -3,7 +3,6 @@ package org.jabref.logic.l10n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -19,13 +18,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.jooq.lambda.Unchecked;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
@@ -34,94 +33,75 @@ import org.mockito.Mockito;
 @ResourceLock("Localization.lang")
 public class LocalizationParser {
 
-    public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
-        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
-        Set<String> keysInJavaFiles = entries.stream()
-                                             .map(LocalizationEntry::getKey)
-                                             .collect(Collectors.toSet());
+    /// All modules containing Java sources and FXML files which may use localization keys.
+    private static final List<String> MODULES = List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls");
 
-        Set<String> englishKeys;
-        if (type == LocalizationBundleForTest.LANG) {
-            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
-        } else {
-            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
-        }
-        List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
-        missingKeys.removeAll(englishKeys);
+    private static final String ENGLISH_PROPERTIES_FILE = "/l10n/JabRef_en.properties";
 
-        return entries.stream()
-                      .filter(e -> missingKeys.contains(e.getKey()))
-                      .collect(Collectors.toCollection(TreeSet::new));
+    /// Returns all keys used in the sources which are not declared in the English properties file.
+    public static SortedSet<LocalizationEntry> findMissingKeys() throws IOException {
+        Set<String> englishKeys = getEnglishKeys();
+        return findLocalizationEntriesInFiles().stream()
+                                               .filter(entry -> !englishKeys.contains(entry.getKey()))
+                                               .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    public static SortedSet<String> findObsolete(LocalizationBundleForTest type) throws IOException {
-        Set<String> englishKeys;
-        if (type == LocalizationBundleForTest.LANG) {
-            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
-        } else {
-            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
-        }
-        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles(type)
-                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
-        englishKeys.removeAll(keysInSourceFiles);
-        return new TreeSet<>(englishKeys);
+    /// Returns all keys declared in the English properties file which are not used in the sources.
+    public static SortedSet<String> findObsolete() throws IOException {
+        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles().stream()
+                                                                        .map(LocalizationEntry::getKey)
+                                                                        .collect(Collectors.toSet());
+        return getEnglishKeys().stream()
+                               .filter(key -> !keysInSourceFiles.contains(key))
+                               .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundleForTest type) throws IOException {
-        if (type == LocalizationBundleForTest.MENU) {
-            return findLocalizationEntriesInJavaFiles(type);
-        } else {
-            Set<LocalizationEntry> entriesInFiles = new HashSet<>();
-            entriesInFiles.addAll(findLocalizationEntriesInJavaFiles(type));
-            entriesInFiles.addAll(findLocalizationEntriesInFxmlFiles(type));
-            return entriesInFiles;
-        }
+    private static Set<LocalizationEntry> findLocalizationEntriesInFiles() throws IOException {
+        Set<LocalizationEntry> entriesInFiles = new HashSet<>();
+        entriesInFiles.addAll(findLocalizationEntriesInJavaFiles());
+        entriesInFiles.addAll(findLocalizationEntriesInFxmlFiles());
+        return entriesInFiles;
     }
 
-    public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
-            throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
-            return pathStream
-                    .filter(LocalizationParser::isJavaFile)
-                    .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
-                    .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
-        }
+    public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles() throws IOException {
+        return findInModules("src/main/java", ".java", LocalizationParser::getLocalizationParametersInJavaFile);
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type) throws IOException {
-        try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
-                       .stream()
-                       .map(path -> Path.of("..", path, "src", "main", "java").normalize())
-                       .flatMap(Unchecked.function(path -> Files.walk(path)))
-                       .filter(LocalizationParser::isJavaFile)
-                       .flatMap(javaPath -> getLanguageKeysInJavaFile(javaPath, type).stream())
-                       .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
-        }
+    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles() throws IOException {
+        return findInModules("src/main/java", ".java", LocalizationParser::getLanguageKeysInJavaFile);
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type) throws IOException {
-        try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
-                       .stream()
-                       .map(path -> Path.of("..", path, "src", "main", "resources").normalize())
-                       .filter(Files::isDirectory)
-                       .flatMap(Unchecked.function(path -> Files.walk(path)))
-                       .filter(LocalizationParser::isFxmlFile)
-                       .flatMap(fxmlPath -> getLanguageKeysInFxmlFile(fxmlPath, type).stream())
-                       .collect(Collectors.toSet());
-        } catch (UncheckedIOException ioe) {
-            throw new IOException(ioe);
-        }
+    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles() throws IOException {
+        return findInModules("src/main/resources", ".fxml", LocalizationParser::getLanguageKeysInFxmlFile);
     }
 
-    /// Returns the trimmed key set of the given property file. Each key is already unescaped.
-    public static SortedSet<String> getKeysInPropertiesFile(String path) {
-        Properties properties = getProperties(path);
+    /// Collects the localization entries of all matching files below the given source directory of each module.
+    ///
+    /// @param sourceDirectory the module relative directory to walk, e.g. `src/main/java`
+    /// @param extension       only files having this file name extension are parsed
+    /// @param extractor       extracts the localization entries of a single file
+    private static Set<LocalizationEntry> findInModules(String sourceDirectory,
+                                                        String extension,
+                                                        Function<Path, Collection<LocalizationEntry>> extractor) throws IOException {
+        Set<LocalizationEntry> result = new HashSet<>();
+        for (String module : MODULES) {
+            Path root = Path.of("..", module).resolve(sourceDirectory).normalize();
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            // Files.walk holds a directory handle, thus the stream needs to be closed
+            try (Stream<Path> paths = Files.walk(root)) {
+                paths.filter(path -> path.toString().endsWith(extension))
+                     .map(extractor)
+                     .forEach(result::addAll);
+            }
+        }
+        return result;
+    }
+
+    /// Returns the trimmed key set of the English properties file. Each key is already unescaped.
+    private static SortedSet<String> getEnglishKeys() {
+        Properties properties = getProperties(ENGLISH_PROPERTIES_FILE);
         return properties.keySet().stream()
                          .map(Object::toString)
                          .map(String::trim)
@@ -134,9 +114,12 @@ public class LocalizationParser {
     }
 
     public static Properties getProperties(String path) {
+        InputStream inputStream = LocalizationParser.class.getResourceAsStream(path);
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Could not find the properties file " + path);
+        }
         Properties properties = new Properties();
-        try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path);
-             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+        try (inputStream; InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             properties.load(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -144,15 +127,18 @@ public class LocalizationParser {
         return properties;
     }
 
-    private static boolean isJavaFile(Path path) {
-        return path.toString().endsWith(".java");
+    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path) {
+        return parseJavaFile(path, JavaLocalizationEntryParser::getLanguageKeysInString);
     }
 
-    private static boolean isFxmlFile(Path path) {
-        return path.toString().endsWith(".fxml");
+    private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path) {
+        return parseJavaFile(path, JavaLocalizationEntryParser::getLocalizationParameter);
     }
 
-    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTest type) {
+    /// Reads the given Java file and turns everything the parser finds in it into localization entries.
+    ///
+    /// The line endings are normalized to `\n`, because the parser treats `\n` as the end of a line comment.
+    private static List<LocalizationEntry> parseJavaFile(Path path, Function<String, List<String>> parser) {
         List<String> lines;
         try {
             lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -160,28 +146,15 @@ public class LocalizationParser {
             throw new RuntimeException(exception);
         }
         String content = String.join("\n", lines);
-        return JavaLocalizationEntryParser.getLanguageKeysInString(content, type).stream()
-                                          .map(key -> new LocalizationEntry(path, key, type))
-                                          .collect(Collectors.toList());
-    }
-
-    private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
-        String content = String.join("\n", lines);
-        return JavaLocalizationEntryParser.getLocalizationParameter(content, type).stream()
-                                          .map(key -> new LocalizationEntry(path, key, type))
-                                          .collect(Collectors.toList());
+        return parser.apply(content).stream()
+                     .map(key -> new LocalizationEntry(path, key))
+                     .toList();
     }
 
     /// Loads the fxml file and returns all used language resources.
     ///
     /// Note: FXML prefixes localization keys with `%`.
-    private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
+    private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path) {
         Collection<String> result = new ArrayList<>();
 
         // Afterburner ViewLoader forces a controller factory, but we do not need any controller
@@ -223,7 +196,7 @@ public class LocalizationParser {
         }
 
         return result.stream()
-                     .map(key -> new LocalizationEntry(path, key, type))
+                     .map(key -> new LocalizationEntry(path, key))
                      .toList();
     }
 

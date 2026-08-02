@@ -89,6 +89,11 @@ on:
         type: boolean
         required: false
         default: false
+      run-jabkit-online-tests:
+        description: "Run online JabKit smoke tests (native binary)"
+        type: boolean
+        required: false
+        default: false
       upload:
         description: "Upload to builds.jabref.org"
         type: boolean
@@ -117,7 +122,7 @@ env:
 
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.action == 'labeled' && github.event.label.name != 'automerge' && github.event.label.name != 'dev: binaries' && github.run_id || 'shared' }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
   cancel-in-progress: true
 
 jobs:
@@ -138,30 +143,64 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'pull_request'
+        with:
+          fetch-depth: 0
+          show-progress: 'false'
+      - id: changed-non-workflow-files
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files_ignore: |
+            .github/workflows/**
+            **/*.md
+      - id: changed-binaries-workflow
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .github/workflows/binaries.yml
+      - id: changed-binaries-resource-markdown
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jabgui/buildres/**/*.md
       - name: Determine conditions
         id: binary
         shell: bash
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
+          NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
+          BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
+          BINARIES_RESOURCE_MARKDOWN_CHANGED: ${{ steps.changed-binaries-resource-markdown.outputs.any_changed }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
           set -x
           PS4='+ ${LINENO}: '
 
-          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
-            echo "📦 build enabled"
-            echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
-            echo "should-build=true" >> "$GITHUB_OUTPUT"
-          else
+          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
+            echo "⊘ no build-relevant files changed – skipping build"
+            echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "📦 build enabled"
+          echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          echo "should-build=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
@@ -406,7 +445,6 @@ jobs:
 
   pre-build:
     needs: [ conditions, disk-space-check ]
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-22.04
     outputs:
       AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
@@ -416,20 +454,27 @@ jobs:
       branch: ${{ steps.normalize.outputs.branch }}
       url: ${{ steps.url.outputs.url }}
     steps:
+      - name: Skip pre-build because no build-relevant files changed
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping pre-build because no build-relevant files changed."
       - name: Fetch all history for all tags and branches
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
           show-progress: 'false'
       - name: Install GitVersion
+        if: needs.conditions.outputs.should-build == 'true'
         id: pre-gitversion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Normalize branch name
+        if: needs.conditions.outputs.should-build == 'true'
         id: normalize
         shell: bash
         run: |
@@ -443,7 +488,7 @@ jobs:
 
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
       - name: Output URL
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         shell: bash
         id: url
         run: |
@@ -451,19 +496,18 @@ jobs:
           echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
           echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
       - name: Setup SSH key
-        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Create backlink to PR at builds.jabref.org
-        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
         run: |
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
 
   build:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
-    if: ${{ needs.conditions.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -476,7 +520,11 @@ jobs:
       url: ${{ needs.pre-build.outputs.url }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
+      - name: Skip binary build because no build-relevant files changed
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping binary build because no build-relevant files changed."
       - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
@@ -486,13 +534,13 @@ jobs:
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
       - name: Free disk space
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         background: true
         run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
 
       - name: Install pigz and cache (Linux)
         id: pigz
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         background: true
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
@@ -500,15 +548,15 @@ jobs:
           version: 1.0
 
       - name: Setup SSH key
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
@@ -517,7 +565,7 @@ jobs:
         run: choco install rsync --version=6.4.4
 
       - name: Patch used JDK
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
         shell: bash
         run: |
           set -ex
@@ -527,14 +575,14 @@ jobs:
 
       # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
         with:
           website: jdk.java.net
           release: EA
           version: ${{ needs.conditions.outputs.jdkVersionFlavour }}
       - name: Tell gradle to use JDK EA and JavaFX EA
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
         run: |
           set -ex
@@ -548,9 +596,11 @@ jobs:
           cat gradle.properties
 
       - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true'
         with:
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
       - name: Output current Java environment
+        if: needs.conditions.outputs.should-build == 'true'
         shell: bash
         run: |
           set -x
@@ -563,14 +613,14 @@ jobs:
           jlink --version
 
       - name: Setup macOS key chain
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
+        if: needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: tEmPoRaRY-PaeSWD
       - name: Setup macOS key chain for app id cert
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
+        if: needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -579,6 +629,7 @@ jobs:
           keychain-password: tEmPoRaRY-PaeSWD
 
       - name: Workaround for jpackage issue
+        if: needs.conditions.outputs.should-build == 'true'
         run: |
           cd jabgui
           cp buildres/linux/JabRef.png .   # Linux
@@ -586,7 +637,7 @@ jobs:
 
       - name: Check WiX Version
         run: candle -?
-        if: startsWith(matrix.os, 'windows')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'windows')
 
       # All Gradle work happens in this single invocation: one daemon, one task graph.
       # Shared upstream projects (e.g., jablib) are built exactly once; parallelism across
@@ -595,6 +646,7 @@ jobs:
       # on shared task outputs (stale output cleanup deletes e.g. jablib/build while a
       # sibling build reads it).
       - name: Build all packages
+        if: needs.conditions.outputs.should-build == 'true'
         run: >
           gradle --parallel
           :jabgui:jpackage :jabkit:jpackage :jabls-cli:jpackage :jabsrv-cli:jpackage
@@ -605,7 +657,7 @@ jobs:
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
       - name: Verify Linux Postgres binary packaging
-        if: startsWith(matrix.os, 'ubuntu')
+        if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         shell: bash
         run: |
           set -euo pipefail
@@ -648,6 +700,13 @@ jobs:
             echo "Expected Postgres binary module is missing for ${{ matrix.os }}: $expected"
             exit 1
           fi
+
+          launcher_config="jabgui/build/packages/${{ matrix.os }}/JabRef/lib/app/JabRef.cfg"
+          if ! grep -Fqx "java-options=--add-modules=$expected" "$launcher_config"; then
+            echo "Expected Postgres binary module is not enabled by the JabRef launcher for ${{ matrix.os }}: $expected"
+            exit 1
+          fi
+
           for module in "${forbidden[@]}"; do
             if awk -F@ -v module="$module" '$1 == module { found = 1 } END { exit !found }' <<<"$modules"; then
               echo "Unexpected Postgres binary module packaged for ${{ matrix.os }}: $module"
@@ -678,6 +737,7 @@ jobs:
       # package all components, JabKit should be available the fastest - JabGui as last, because build requires the most time
 
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabKit
         with:
           component: jabkit
@@ -697,6 +757,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabRef Language Server
         id: jabls-cli
         with:
@@ -717,6 +778,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabRef HTTP Server
         with:
           component: jabsrv-cli
@@ -736,6 +798,7 @@ jobs:
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
       - uses: ./.github/actions/package
+        if: needs.conditions.outputs.should-build == 'true'
         name: Package JabGUI
         id: jabgui
         with:
@@ -757,7 +820,7 @@ jobs:
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
@@ -767,10 +830,146 @@ jobs:
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
 
+  jabkit-native:
+    needs: [ conditions, disk-space-check, pre-build ]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            displayName: linux-amd64
+            runOnPullRequest: true
+            javaPackage: jdk+fx
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            runOnPullRequest: true
+            # BellSoft does not publish the Full NIK (jdk+fx) for linux-aarch64; the standard JDK bundle still contains java.desktop/AWT
+            javaPackage: jdk
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
+          - os: macos-15
+            displayName: macOS-silicon
+            runOnPullRequest: false
+            javaPackage: jdk+fx
+            archiveNative: "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabkit native binary
+    steps:
+      - name: Skip native binary build because it is not needed for this event
+        if: needs.conditions.outputs.should-build != 'true' || (github.event_name == 'pull_request' && matrix.runOnPullRequest != true)
+        run: echo "Skipping native binary build because it is not needed for this event."
+      - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+
+      - name: Setup macOS key chain for app id cert
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
+        with:
+          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
+          p12-password: ${{ secrets.OSX_CERT_PWD }}
+          keychain-password: tEmPoRaRY-PaeSWD
+
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
+      # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
+      - name: Set up Liberica NIK (native-image with AWT support)
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'liberica'
+          java-package: ${{ matrix.javaPackage }}
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabKit native binary
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        run: gradle :jabkit:nativeCompile
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+
+      - name: Install clitest
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        uses: ethanjli/cached-download-action@v0.1.4
+        with:
+          # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
+          url: https://raw.githubusercontent.com/aureliojargas/clitest/8bdaae2f56e524f8824307d5c443e6353fe0dbd9/clitest
+          destination: /tmp/clitest
+
+      - name: Make clitest executable
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        run: chmod +x /tmp/clitest
+
+      - name: Run JabKit offline smoke tests
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
+
+      - name: Run JabKit PDF native smoke test (Linux only)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && runner.os == 'Linux' }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
+
+      - name: Run JabKit online smoke tests
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && inputs.run-jabkit-online-tests }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
+
+      - name: Package JabKit native binary
+        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        shell: bash
+        run: |
+          set -eo pipefail
+          mv jabkit/build/native/nativeCompile jabkit/build/native/jabkit
+
+          if [[ "${{ matrix.os }}" == macos-* && "${{ needs.conditions.outputs.secretspresent }}" == "true" ]]; then
+            codesign --force --options runtime --timestamp --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" jabkit/build/native/jabkit
+            codesign --verify --strict --verbose=2 jabkit/build/native/jabkit
+            codesign --display --verbose=2 jabkit/build/native/jabkit 2>&1 | grep "Authority=Developer ID Application"
+          fi
+
+          mkdir -p jabkit/build/native-dist
+          ${{ matrix.archiveNative }}
+
+      - name: Upload jabkit native to GitHub artifacts store
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native (${{ matrix.displayName }})
+          path: jabkit/build/native-dist/*.*
+          if-no-files-found: error
+
+      - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        uses: actions/upload-artifact@v7
+        with:
+          # tbn = to-be-notarized
+          name: jabkit-native-${{ matrix.os }}-tbn
+          path: jabkit/build/native-dist/jabkit-native_macos-silicon.zip
+          compression-level: 0 # no compression
+
+      - name: Setup SSH key
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && needs.disk-space-check.outputs.available == 'true' }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Upload jabkit native to builds.jabref.org
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
+
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, disk-space-check, build ]
-    if: ${{ (github.event_name == 'pull_request') }}
+    needs: [ conditions, disk-space-check, build, jabkit-native ]
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     permissions:
       issues: write
       pull-requests: write
@@ -887,6 +1086,37 @@ jobs:
           name: ${{ matrix.displayName }}
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
+
+  notarize-jabkit-native:
+    name: macOS notarization - JabKit native binary
+    needs: [ conditions, disk-space-check, jabkit-native, pre-build ]
+    if: ${{ needs.conditions.outputs.should-notarize == 'true' }}
+    runs-on: macos-15
+    steps:
+      - name: Download from GitHub workflow artifacts store (macOS)
+        uses: actions/download-artifact@v8
+        with:
+          name: jabkit-native-macos-15-tbn
+          path: jabkit/build/native-dist
+      - name: Notarize JabKit native binary
+        shell: bash
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
+          xcrun notarytool submit jabkit/build/native-dist/jabkit-native_macos-silicon.zip --keychain-profile "notarytool-profile" --wait
+      - name: Upload to builds.jabref.org
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        shell: bash
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools/
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native (macOS-silicon)
+          path: jabkit/build/native-dist/jabkit-native_macos-silicon.zip
+          if-no-files-found: error
 
   upload-pr-nnumber:
     runs-on: ubuntu-slim

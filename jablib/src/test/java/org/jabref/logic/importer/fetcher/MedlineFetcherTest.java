@@ -207,6 +207,17 @@ class MedlineFetcherTest {
     }
 
     @Test
+    void performRawSearchQueryWithBlankQueryReturnsEmptyList() throws FetcherException {
+        assertEquals(List.of(), fetcher.performRawSearchQuery(""));
+    }
+
+    @Test
+    void performRawSearchQueryFindsEntries() throws FetcherException {
+        List<BibEntry> entryList = fetcher.performRawSearchQuery("vigmond[au] AND 2021[dp]");
+        assertEquals(18, entryList.size());
+    }
+
+    @Test
     void invalidSearchTerm() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
