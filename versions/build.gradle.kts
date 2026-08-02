@@ -22,7 +22,7 @@ val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -64,7 +64,7 @@ dependencies.constraints {
     api("com.konghq:unirest-modules-gson:4.10.1")
     api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
-    api("com.squareup.okio:okio-jvm:3.18.0")
+    api("com.squareup.okio:okio-jvm:3.18.1")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
@@ -137,8 +137,8 @@ dependencies.constraints {
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
-    api("org.jsoup:jsoup:1.22.2")
-    api("org.jspecify:jspecify:1.0.0")
+    api("org.jsoup:jsoup:1.23.1")
+    api("org.jspecify:jspecify:1.0.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
