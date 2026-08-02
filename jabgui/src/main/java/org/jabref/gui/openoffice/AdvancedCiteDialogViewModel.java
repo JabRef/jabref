@@ -10,8 +10,11 @@ import org.jabref.model.openoffice.style.CitationType;
 public class AdvancedCiteDialogViewModel {
 
     private final StringProperty pageInfo = new SimpleStringProperty("");
-    private final ObjectProperty<CitationType> citationType =
-            new SimpleObjectProperty<>(CitationType.AUTHORYEAR_INTEXT);
+    private final ObjectProperty<CitationType> citationType;
+
+    public AdvancedCiteDialogViewModel(CitationType citationType) {
+        this.citationType = new SimpleObjectProperty<>(citationType);
+    }
 
     public StringProperty pageInfoProperty() {
         return pageInfo;

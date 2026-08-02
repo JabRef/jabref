@@ -15,6 +15,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewModel> {
 
+    private final CitationType initialCitationType;
+
     @FXML private TextField pageInfo;
     @FXML private RadioButton inPar;
     @FXML private RadioButton inText;
@@ -24,7 +26,9 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
     @FXML private ToggleGroup citeToggleGroup;
     private AdvancedCiteDialogViewModel viewModel;
 
-    public AdvancedCiteDialogView() {
+    public AdvancedCiteDialogView(CitationType initialCitationType) {
+        this.initialCitationType = initialCitationType;
+
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -41,7 +45,7 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
 
     @FXML
     private void initialize() {
-        viewModel = new AdvancedCiteDialogViewModel();
+        viewModel = new AdvancedCiteDialogViewModel(initialCitationType);
 
         inPar.setUserData(CitationType.AUTHORYEAR_PAR);
         inText.setUserData(CitationType.AUTHORYEAR_INTEXT);
@@ -49,6 +53,8 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
         authorOnly.setUserData(CitationType.AUTHOR_ONLY);
         yearOnly.setUserData(CitationType.YEAR_ONLY);
 
+        // Page information belongs next to the year. Therefore it stays available for
+        // YEAR_ONLY, but not for AUTHOR_ONLY where there is no visible year part.
         pageInfo.disableProperty().bind(authorOnly.selectedProperty());
 
         citeToggleGroup.selectedToggleProperty().addListener((_, _, selected) -> {
