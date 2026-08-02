@@ -21,6 +21,7 @@ The recording supports eager field-editor construction followed by JavaFX CSS an
 - No `jdk.JavaMonitorEnter` events were recorded, so the capture does not indicate contended Java-monitor blocking.
 - A supplemental run with a library containing linked PDF files reproduced the same JavaFX CSS, control-construction, and layout profile. It recorded no file or socket reads on the JavaFX application thread during the relevant window, so linked-file I/O is not supported as the cause of this occurrence.
 - The supplemental run also recorded a burst of JavaFX CSS conversion exceptions. The looked-up-color failures are consistent with [OpenJFX pull request #2225](https://github.com/openjdk/jfx/pull/2225), and the entry-editor construction path initializes ControlsFX validation decoration for many field controls.
+- A restored-editor startup run after preinstalling ControlsFX's `DecorationPane` constructs the editor during startup without the prior looked-up-color `ClassCastException` burst. It still performs substantial JavaFX CSS and layout work, so it is evidence that the root replacement moved off the later open-editor path, not a comparable click-to-render improvement measurement.
 
 These spans are evidence windows between statistical samples, not exact method durations. The recording did not include a custom event marking the menu action or JavaFX pulse-duration events, so it cannot provide an exact click-to-first-render latency.
 
@@ -246,6 +247,16 @@ During that interval, the JavaFX application thread recorded:
 The allocation samples were dominated by JavaFX CSS state and matching structures, including `PseudoClassState` arrays and objects, byte and long arrays, and immutable-set iterators. Execution samples were dominated by `SelectorPartitioning.match(...)`, `StyleManager.findMatchingStyles(...)`, `CssStyleHelper.createStyleHelper(...)`, CSS state transitions, `Node.reapplyCss()`, and subsequent `VirtualFlow` and `TableView` layout.
 
 The absence of recorded UI-thread file reads does not prove that no filesystem metadata check occurred, but the profile contains no evidence that resolving or reading an attached PDF caused this stall. The dominant sampled work remains field-control creation, CSS, and layout.
+
+### ControlsFX-decoration startup experiment
+
+ControlsFX silently installs its internal `DecorationPane` as the scene root when the first validation decoration is added. `JabRefGUI` now performs this installation with a temporary `GraphicDecoration` immediately after creating the scene, while the `PowerPane` is the root. The temporary decoration is then removed; the `DecorationPane` remains around the `PowerPane` and later validations do not need to replace the scene root.
+
+A JFR run then launched the linked-file fixture after the entry editor had been open in the preceding session. The editor was constructed during startup without an input command: `EntryEditor.<init>` was sampled at 20:51:04.050 and `EntryEditorViewModel.rebuildTabs()` at 20:51:04.670 (Europe/Berlin). The JavaFX application thread subsequently sampled CSS selector matching, style-map creation, CSS transitions, and layout until approximately 20:51:11.140.
+
+No `ClassCastException` events were recorded on the JavaFX application thread between 20:51:03 and 20:51:12, unlike the 90 looked-up-color conversion exceptions in the comparable-sized linked-file interaction window above. This supports the hypothesis that eager `DecorationPane` installation avoids that exception path.
+
+This is deliberately not reported as a speedup: the recording overlaps application and library startup, uses editor restoration rather than a verified table interaction, and has no click-to-render marker. The remaining startup CSS and layout activity also shows that eager field-editor construction remains material work. A controlled post-change capture with the original library, entry selection, and an input marker is still required for a direct before/after latency comparison.
 
 ## Relevant code path
 
