@@ -136,7 +136,7 @@ public class MainTableDataModel {
     private void setSearchMatches(SearchResults results) {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+            entry.setHasFullTextResults(results.hasFulltextResults(entry.getEntry()));
             updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isFloatingMode);
         });
     }
@@ -144,30 +144,30 @@ public class MainTableDataModel {
     private void clearSearchMatches() {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.isMatchedBySearch().set(true);
-            entry.hasFullTextResultsProperty().set(false);
+            entry.setMatchedBySearch(true);
+            entry.setHasFullTextResults(false);
             updateEntrySearchMatch(entry, true, isFloatingMode);
         });
     }
 
     private static void updateEntrySearchMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
-        entry.isMatchedBySearch().set(isMatched);
+        entry.setMatchedBySearch(isMatched);
         entry.updateMatchCategory();
         setEntrySearchVisibility(entry, isMatched, isFloatingMode);
     }
 
     private static void setEntrySearchVisibility(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
         if (isMatched) {
-            entry.isVisibleBySearch().set(true);
+            entry.setVisibleBySearch(true);
         } else {
-            entry.isVisibleBySearch().set(isFloatingMode);
+            entry.setVisibleBySearch(isFloatingMode);
         }
     }
 
     private void updateSearchDisplayMode(SearchDisplayMode mode) {
         BackgroundTask.wrap(() -> {
             boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
-            entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));
+            entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.getMatchedBySearch(), isFloatingMode));
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
@@ -183,12 +183,12 @@ public class MainTableDataModel {
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
         boolean isMatched = groupsMatcher.map(matcher -> matcher.isMatch(entry.getEntry()) ^ isInvertMode)
                                          .orElse(true);
-        entry.isMatchedByGroup().set(isMatched);
+        entry.setMatchedByGroup(isMatched);
         entry.updateMatchCategory();
         if (isMatched) {
-            entry.isVisibleByGroup().set(true);
+            entry.setVisibleByGroup(true);
         } else {
-            entry.isVisibleByGroup().set(isFloatingMode);
+            entry.setVisibleByGroup(isFloatingMode);
         }
     }
 
@@ -256,10 +256,10 @@ public class MainTableDataModel {
                         SearchResults results = searchContext.search(entryQuery);
 
                         isMatched = results.isMatched(entry);
-                        viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
+                        viewModel.setHasFullTextResults(results.hasFulltextResults(entry));
                     } else {
                         isMatched = true;
-                        viewModel.hasFullTextResultsProperty().set(false);
+                        viewModel.setHasFullTextResults(false);
                     }
 
                     updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);

@@ -69,13 +69,13 @@ public class SearchResultsTableDataModel {
                     searchResults.mergeSearchResults(stateManager.getSearchContext(context).search(query.get()));
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));
-                    entry.isVisibleBySearch().set(searchResults.isMatched(entry.getEntry()));
+                    entry.setHasFullTextResults(searchResults.hasFulltextResults(entry.getEntry()));
+                    entry.setVisibleBySearch(searchResults.isMatched(entry.getEntry()));
                 }
             } else {
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.hasFullTextResultsProperty().set(false);
-                    entry.isVisibleBySearch().set(true);
+                    entry.setHasFullTextResults(false);
+                    entry.setVisibleBySearch(true);
                 }
             }
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);

@@ -37,18 +37,24 @@ import org.jabref.model.groups.GroupTreeNode;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.Nullable;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
-    private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
-    private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
+    @Nullable private Map<OrFields, ObservableValue<String>> fieldValues;
+    @Nullable private Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues;
     private final BibDatabaseContext bibDatabaseContext;
-    private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
-    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);
-    private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
-    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
-    private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
+    private boolean hasFullTextResultsValue;
+    private boolean isMatchedBySearchValue = true;
+    private boolean isVisibleBySearchValue = true;
+    private boolean isMatchedByGroupValue = true;
+    private boolean isVisibleByGroupValue = true;
+    @Nullable private BooleanProperty hasFullTextResults;
+    @Nullable private BooleanProperty isMatchedBySearch;
+    @Nullable private BooleanProperty isVisibleBySearch;
+    @Nullable private BooleanProperty isMatchedByGroup;
+    @Nullable private BooleanProperty isVisibleByGroup;
     private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
     private EasyBinding<List<LinkedFile>> linkedFiles;
     private EasyBinding<Map<Field, String>> linkedIdentifiers;
@@ -120,29 +126,29 @@ public class BibEntryTableViewModel {
     }
 
     public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
-        OptionalBinding<SpecialFieldValueViewModel> value = specialFieldValues.get(field);
+        OptionalBinding<SpecialFieldValueViewModel> value = getSpecialFieldValues().get(field);
         // Fetch possibly updated value from BibEntry entry
         Optional<String> currentValue = this.entry.getField(field);
         if (value != null) {
             if (currentValue.isEmpty() && value.getValue().isEmpty()) {
                 OptionalBinding<SpecialFieldValueViewModel> zeroValue = getField(field).flatMapOpt(_ -> field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new));
-                specialFieldValues.put(field, zeroValue);
+                getSpecialFieldValues().put(field, zeroValue);
                 return zeroValue;
             } else if (value.getValue().isEmpty() || !value.getValue().get().getValue().getFieldValue().equals(currentValue)) {
                 // specialFieldValues value and BibEntry value differ => Set specialFieldValues value to BibEntry value
                 value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
-                specialFieldValues.put(field, value);
+                getSpecialFieldValues().put(field, value);
                 return value;
             }
         } else {
             value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
-            specialFieldValues.put(field, value);
+            getSpecialFieldValues().put(field, value);
         }
         return value;
     }
 
     public ObservableValue<String> getFields(OrFields fields) {
-        ObservableValue<String> value = fieldValues.get(fields);
+        ObservableValue<String> value = getFieldValues().get(fields);
         if (value != null) {
             return value;
         }
@@ -150,8 +156,22 @@ public class BibEntryTableViewModel {
         value = Bindings.createStringBinding(() ->
                         fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
                 getFieldValueDependencies());
-        fieldValues.put(fields, value);
+        getFieldValues().put(fields, value);
         return value;
+    }
+
+    private Map<OrFields, ObservableValue<String>> getFieldValues() {
+        if (fieldValues == null) {
+            fieldValues = new HashMap<>();
+        }
+        return fieldValues;
+    }
+
+    private Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> getSpecialFieldValues() {
+        if (specialFieldValues == null) {
+            specialFieldValues = new HashMap<>();
+        }
+        return specialFieldValues;
     }
 
     /// Cache the dependency array so each field binding can reuse it instead of rebuilding the same observable list.
@@ -173,23 +193,78 @@ public class BibEntryTableViewModel {
     }
 
     public BooleanProperty hasFullTextResultsProperty() {
+        if (hasFullTextResults == null) {
+            hasFullTextResults = new SimpleBooleanProperty(hasFullTextResultsValue);
+        }
         return hasFullTextResults;
     }
 
     public BooleanProperty isMatchedBySearch() {
+        if (isMatchedBySearch == null) {
+            isMatchedBySearch = new SimpleBooleanProperty(isMatchedBySearchValue);
+        }
         return isMatchedBySearch;
     }
 
     public BooleanProperty isVisibleBySearch() {
+        if (isVisibleBySearch == null) {
+            isVisibleBySearch = new SimpleBooleanProperty(isVisibleBySearchValue);
+        }
         return isVisibleBySearch;
     }
 
     public BooleanProperty isMatchedByGroup() {
+        if (isMatchedByGroup == null) {
+            isMatchedByGroup = new SimpleBooleanProperty(isMatchedByGroupValue);
+        }
         return isMatchedByGroup;
     }
 
     public BooleanProperty isVisibleByGroup() {
+        if (isVisibleByGroup == null) {
+            isVisibleByGroup = new SimpleBooleanProperty(isVisibleByGroupValue);
+        }
         return isVisibleByGroup;
+    }
+
+    public void setHasFullTextResults(boolean hasFullTextResults) {
+        if (this.hasFullTextResults == null) {
+            hasFullTextResultsValue = hasFullTextResults;
+        } else {
+            this.hasFullTextResults.set(hasFullTextResults);
+        }
+    }
+
+    public void setMatchedBySearch(boolean isMatchedBySearch) {
+        if (this.isMatchedBySearch == null) {
+            isMatchedBySearchValue = isMatchedBySearch;
+        } else {
+            this.isMatchedBySearch.set(isMatchedBySearch);
+        }
+    }
+
+    public void setVisibleBySearch(boolean isVisibleBySearch) {
+        if (this.isVisibleBySearch == null) {
+            isVisibleBySearchValue = isVisibleBySearch;
+        } else {
+            this.isVisibleBySearch.set(isVisibleBySearch);
+        }
+    }
+
+    public void setMatchedByGroup(boolean isMatchedByGroup) {
+        if (this.isMatchedByGroup == null) {
+            isMatchedByGroupValue = isMatchedByGroup;
+        } else {
+            this.isMatchedByGroup.set(isMatchedByGroup);
+        }
+    }
+
+    public void setVisibleByGroup(boolean isVisibleByGroup) {
+        if (this.isVisibleByGroup == null) {
+            isVisibleByGroupValue = isVisibleByGroup;
+        } else {
+            this.isVisibleByGroup.set(isVisibleByGroup);
+        }
     }
 
     public ObjectProperty<MatchCategory> matchCategory() {
@@ -197,20 +272,36 @@ public class BibEntryTableViewModel {
     }
 
     public boolean isVisible() {
-        return isVisibleBySearch.get() && isVisibleByGroup.get();
+        return getVisibleBySearch() && getVisibleByGroup();
     }
 
     public void updateMatchCategory() {
         MatchCategory category = MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS;
 
-        if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
+        if (getMatchedBySearch() && getMatchedByGroup()) {
             category = MatchCategory.MATCHING_SEARCH_AND_GROUPS;
-        } else if (isMatchedBySearch.get()) {
+        } else if (getMatchedBySearch()) {
             category = MatchCategory.MATCHING_SEARCH_NOT_GROUPS;
-        } else if (isMatchedByGroup.get()) {
+        } else if (getMatchedByGroup()) {
             category = MatchCategory.MATCHING_GROUPS_NOT_SEARCH;
         }
 
         matchCategory.set(category);
+    }
+
+    boolean getMatchedBySearch() {
+        return isMatchedBySearch == null ? isMatchedBySearchValue : isMatchedBySearch.get();
+    }
+
+    private boolean getVisibleBySearch() {
+        return isVisibleBySearch == null ? isVisibleBySearchValue : isVisibleBySearch.get();
+    }
+
+    private boolean getMatchedByGroup() {
+        return isMatchedByGroup == null ? isMatchedByGroupValue : isMatchedByGroup.get();
+    }
+
+    private boolean getVisibleByGroup() {
+        return isVisibleByGroup == null ? isVisibleByGroupValue : isVisibleByGroup.get();
     }
 }
