@@ -31,6 +31,7 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
@@ -84,6 +85,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TableColumn<BstStyleSelectViewModel, String> bstNameColumn;
     @FXML private TableColumn<BstStyleSelectViewModel, String> bstFileColumn;
     @FXML private TableColumn<BstStyleSelectViewModel, Boolean> bstDeleteColumn;
+    @FXML private Label bstPandocWarning;
 
     @FXML private Button addCslButton;
     @FXML private Button addJStyleButton;
@@ -320,6 +322,21 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private void setupBstStylesTab() {
+        OpenOfficePreferences openOfficePreferences =
+                preferences.getOpenOfficePreferences(journalAbbreviationRepository);
+                
+        String pandocPath = openOfficePreferences.getPandocPath();
+
+        if (pandocPath == null || pandocPath.isBlank()) {
+            bstPandocWarning.setText(
+                    Localization.lang("Pandoc path is required to use BST styles"));
+            bstPandocWarning.setStyle("-fx-text-fill: #c9a227;");
+        } else {
+            bstPandocWarning.setText(
+                    Localization.lang("Pandoc path: %0", pandocPath));
+            bstPandocWarning.setStyle("");
+        }
+
         bstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         bstFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         bstDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
