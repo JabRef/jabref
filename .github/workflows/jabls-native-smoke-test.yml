@@ -6,12 +6,14 @@ on:
       - main
       - main-release
     paths:
+      - 'jabls/**'
       - 'jabls-cli/**'
       - 'jablib/**'
       - 'versions/**'
       - '.github/workflows/jabls-native-smoke-test.yml'
   pull_request:
     paths:
+      - 'jabls/**'
       - 'jabls-cli/**'
       - 'jablib/**'
       - 'versions/**'
