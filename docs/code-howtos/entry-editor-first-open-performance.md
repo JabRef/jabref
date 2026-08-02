@@ -1,10 +1,3 @@
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
-
 # Entry editor first-open performance
 
 This report records the baseline Java Flight Recorder (JFR) evidence for the reported UI freeze when the entry editor is opened for the first time. It accompanies the raw recording so the evidence can be inspected again and compared with later implementations. The investigation is tracked in [JabRef pull request #16464](https://github.com/JabRef/jabref/pull/16464).
