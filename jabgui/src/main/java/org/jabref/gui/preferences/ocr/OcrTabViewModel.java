@@ -121,8 +121,8 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         selectedPath.ifPresent(path -> ocrEnginePathProperty().set(path.toString()));
     }
 
-    public Optional<String> autoDetectDefaultEnginePath() {
-        if (selectedEngine.get() == EngineSelection.OCRMYPDF) {
+    public Optional<String> autoDetectDefaultEnginePath(EngineSelection engineToDetect) {
+        if (engineToDetect == EngineSelection.OCRMYPDF) {
             return DEFAULT_OCRMYPDF_PATHS.stream()
                                          .filter(this::enginePathExists)
                                          .findFirst();
@@ -133,21 +133,31 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     public void autoDetectEnginePath() {
-        BackgroundTask<Optional<String>> autoDetectTask = BackgroundTask.wrap(this::autoDetectDefaultEnginePath);
-        String engineSelection = selectedEngine.get().getDisplayName();
+        EngineSelection selectionAtStart = selectedEngine.get();
+        BackgroundTask<Optional<String>> autoDetectTask =
+                BackgroundTask.wrap(() -> autoDetectDefaultEnginePath(selectionAtStart));
+        String engineSelectionName = selectionAtStart.getDisplayName();
 
-        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of %0 path", engineSelection));
+        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of %0 path", engineSelectionName));
         autoDetectTask.showToUser(true);
         autoDetectTask.onSuccess(result -> {
+            if (selectedEngine.get() != selectionAtStart) {
+                return;
+            }
             if (result.isPresent()) {
                 String path = result.get();
                 ocrEnginePathProperty().set(path);
-                dialogService.notify(Localization.lang("%0 detected at: %1", engineSelection, path));
+                dialogService.notify(Localization.lang("%0 detected at: %1", engineSelectionName, path));
             } else {
-                dialogService.notify(Localization.lang("%0 could not be detected automatically", engineSelection));
+                dialogService.notify(Localization.lang("%0 could not be detected automatically", engineSelectionName));
             }
         });
-        autoDetectTask.onFailure(_ -> dialogService.notify(Localization.lang("Auto detection of %0 path failed", engineSelection)));
+        autoDetectTask.onFailure(_ -> {
+            if (selectedEngine.get() != selectionAtStart) {
+                return;
+            }
+            dialogService.notify(Localization.lang("Auto detection of %0 path failed", engineSelectionName));
+        });
         taskExecutor.execute(autoDetectTask);
     }
 
