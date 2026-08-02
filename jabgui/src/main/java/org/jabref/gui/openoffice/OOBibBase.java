@@ -878,7 +878,7 @@ public class OOBibBase {
 
         if (!result.newDatabase.hasEntries()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                             + " no citation keys"
                             + " which could also be found in your current library."));
@@ -888,7 +888,7 @@ public class OOBibBase {
         List<String> unresolvedKeys = result.unresolvedKeys;
         if (!unresolvedKeys.isEmpty()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                                     + " at least %0 citation keys"
                                     + " which could not be found in your current library."

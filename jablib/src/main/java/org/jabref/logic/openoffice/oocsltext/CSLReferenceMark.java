@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.openoffice.JabRefReferenceMark;
 import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
@@ -10,6 +11,7 @@ import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.openoffice.ootext.OOText;
 
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
@@ -24,6 +26,7 @@ public class CSLReferenceMark {
     private final List<String> citationKeys;
     private List<Integer> citationNumbers;
     private final CSLCitationType citationType;
+    private Optional<OOText> formattedCitationText = Optional.empty();
 
     public CSLReferenceMark(XNamed named, ReferenceMark referenceMark) {
         this.referenceMark = referenceMark;
@@ -100,6 +103,14 @@ public class CSLReferenceMark {
 
     public void setCitationNumbers(List<Integer> numbers) {
         this.citationNumbers = numbers;
+    }
+
+    public Optional<OOText> getFormattedCitationText() {
+        return formattedCitationText;
+    }
+
+    public void setFormattedCitationText(OOText formattedCitationText) {
+        this.formattedCitationText = Optional.of(formattedCitationText);
     }
 
     public XTextContent getTextContent() {
