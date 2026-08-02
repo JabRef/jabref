@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import javax.swing.undo.UndoManager;
 
@@ -865,7 +866,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
 
-        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache, database)
+        // Snapshot taken here, on the JavaFX Application Thread: the background task must not iterate the live
+        // entry list, which the user can modify while the matching runs.
+        List<BibEntry> libraryEntries = List.copyOf(database.getEntries());
+        BibDatabaseMode databaseMode = BibDatabaseModeDetection.inferMode(database);
+
+        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache, libraryEntries, databaseMode)
             .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
             .onSuccess(citationRelationItems -> onSearchForRelationsSucceed(
                     citationComponents,
@@ -892,18 +898,23 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     /// TODO: Make the method return a callable and let the calling method create the background task.
     private BackgroundTask<List<CitationRelationItem>> createBackgroundTask(
-            BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache, BibDatabase database
+            BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache,
+            List<BibEntry> libraryEntries, BibDatabaseMode databaseMode
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                        () -> matchAgainstLibrary(this.searchCitationsRelationsService.searchCites(entry, bypassCache, citingTask::isCancelled), database)
+                        () -> matchAgainstLibrary(
+                                this.searchCitationsRelationsService.searchCites(entry, bypassCache, citingTask::isCancelled),
+                                libraryEntries, databaseMode, citingTask::isCancelled)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                        () -> matchAgainstLibrary(this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, citedByTask::isCancelled), database)
+                        () -> matchAgainstLibrary(
+                                this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, citedByTask::isCancelled),
+                                libraryEntries, databaseMode, citedByTask::isCancelled)
                 );
                 yield citedByTask;
             }
@@ -913,14 +924,23 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Marks the fetched entries which are already present in the library.
     ///
     /// Called from within the background task: [DuplicateCheck#containsDuplicate] scans the whole library for
-    /// each fetched entry, which blocks the UI for seconds on entries with many citations.
-    private List<CitationRelationItem> matchAgainstLibrary(List<BibEntry> fetchedList, BibDatabase database) {
-        BibDatabaseMode databaseMode = BibDatabaseModeDetection.inferMode(database);
-        return fetchedList.stream()
-                          .map(entry -> duplicateCheck.containsDuplicate(database, entry, databaseMode)
-                                                      .map(localEntry -> new CitationRelationItem(entry, localEntry, true))
-                                                      .orElseGet(() -> new CitationRelationItem(entry, false)))
-                          .toList();
+    /// each fetched entry, which blocks the UI for seconds on entries with many citations. The scan is
+    /// cancellable, because it can outlast the fetch it belongs to.
+    private List<CitationRelationItem> matchAgainstLibrary(List<BibEntry> fetchedList,
+                                                           List<BibEntry> libraryEntries,
+                                                           BibDatabaseMode databaseMode,
+                                                           BooleanSupplier isCancelled) {
+        List<CitationRelationItem> citationRelationItems = new ArrayList<>(fetchedList.size());
+        for (BibEntry fetchedEntry : fetchedList) {
+            if (isCancelled.getAsBoolean()) {
+                return List.of();
+            }
+            citationRelationItems.add(
+                    duplicateCheck.containsDuplicate(libraryEntries, fetchedEntry, databaseMode)
+                                  .map(localEntry -> new CitationRelationItem(fetchedEntry, localEntry, true))
+                                  .orElseGet(() -> new CitationRelationItem(fetchedEntry, false)));
+        }
+        return citationRelationItems;
     }
 
     private void onSearchForRelationsSucceed(CitationComponents citationComponents,
