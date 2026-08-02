@@ -7,7 +7,7 @@
 
 # Entry editor first-open performance
 
-This report records the baseline Java Flight Recorder (JFR) evidence for the reported UI freeze when the entry editor is opened for the first time. It accompanies the raw recording so the evidence can be inspected again and compared with later implementations.
+This report records the baseline Java Flight Recorder (JFR) evidence for the reported UI freeze when the entry editor is opened for the first time. It accompanies the raw recording so the evidence can be inspected again and compared with later implementations. The investigation is tracked in [JabRef pull request #16464](https://github.com/JabRef/jabref/pull/16464).
 
 ## Result
 
@@ -19,6 +19,8 @@ The recording supports eager field-editor construction followed by JavaFX CSS an
 - A broader window of JavaFX scene, CSS, and layout samples around the interaction spans 3.436 seconds.
 - Garbage collection does not explain a multi-second freeze. The longest stop-the-world pause during the relevant window was 8.41 milliseconds.
 - No `jdk.JavaMonitorEnter` events were recorded, so the capture does not indicate contended Java-monitor blocking.
+- A supplemental run with a library containing linked PDF files reproduced the same JavaFX CSS, control-construction, and layout profile. It recorded no file or socket reads on the JavaFX application thread during the relevant window, so linked-file I/O is not supported as the cause of this occurrence.
+- The supplemental run also recorded a burst of JavaFX CSS conversion exceptions. The looked-up-color failures are consistent with [OpenJFX pull request #2225](https://github.com/openjdk/jfx/pull/2225), and the entry-editor construction path initializes ControlsFX validation decoration for many field controls.
 
 These spans are evidence windows between statistical samples, not exact method durations. The recording did not include a custom event marking the menu action or JavaFX pulse-duration events, so it cannot provide an exact click-to-first-render latency.
 
@@ -88,6 +90,81 @@ The recording was dumped after the entry editor had opened:
 jcmd <pid> JFR.dump name=1 filename=entry-editor-first-open-before-lazy-loading.jfr
 ```
 
+### Supplemental linked-file run
+
+A second cold-start run used a repository fixture whose six entries each link a local PDF. The first entry, `minimal-sentence-case`, was opened by double-clicking its row in the main table.
+
+| Property | Value |
+| --- | --- |
+| Library | `jablib/src/test/resources/org/jabref/logic/search/test-library-with-attached-files.bib` |
+| Source revision | `72a34bfaa1` |
+| JavaFX | 26.0.2, macOS AArch64 |
+| JFR settings | `profile`, stack depth 256, maximum size 250 MB |
+| Recording duration | 59 seconds |
+| Recording size | approximately 2.8 MB |
+
+The application was launched with:
+
+```bash
+JDK_JAVA_OPTIONS='-XX:StartFlightRecording=name=entry,settings=profile,disk=true,maxsize=250m -XX:FlightRecorderOptions=stackdepth=256' \
+  ./gradlew :jabgui:run \
+  --args="/absolute/path/to/jabref/jablib/src/test/resources/org/jabref/logic/search/test-library-with-attached-files.bib"
+```
+
+The recording was dumped while JabRef was still running:
+
+```bash
+jcmd <pid> JFR.dump name=entry filename=/tmp/jabref-entry-editor-linked-cold.jfr
+```
+
+The supplemental recording was analyzed locally and is not part of the committed snapshots. The original recording above remains the reproducible artifact attached to this report.
+
+### AppleScript interaction probe
+
+The following accessibility script was used while attempting to automate the double-click and detect the editor toolbar:
+
+```applescript
+tell application "System Events"
+    tell process "java"
+        set frontmost to true
+        click at {600, 300}
+        delay 0.05
+        click at {600, 300}
+        repeat 400 times
+            if (count of (UI elements of front window whose role is "AXToolbar")) > 1 then
+                return "editor-visible"
+            end if
+            delay 0.025
+        end repeat
+        return "timeout"
+    end tell
+end tell
+```
+
+It was invoked as follows:
+
+```bash
+osascript <<'APPLESCRIPT'
+tell application "System Events"
+    tell process "java"
+        set frontmost to true
+        click at {600, 300}
+        delay 0.05
+        click at {600, 300}
+        repeat 400 times
+            if (count of (UI elements of front window whose role is "AXToolbar")) > 1 then
+                return "editor-visible"
+            end if
+            delay 0.025
+        end repeat
+        return "timeout"
+    end tell
+end tell
+APPLESCRIPT
+```
+
+This script did **not** produce a reliable JavaFX double-click. It selected the entry cell in the main table, and the entry editor was subsequently opened by a manual double-click while JFR continued recording. The script's approximately 10.8-second wall-clock result therefore includes the wait for that manual action and is invalid as click-to-render latency. A future automation must emit a verified double-click on the main-table row and record a custom input marker before its timing can be used.
+
 ## Environment
 
 | Property | Value |
@@ -147,6 +224,29 @@ The timestamps below are shown in Europe/Berlin local time. Thread ID 48 is name
 
 The 2.033-second confirmed evidence window is the difference between the first direct `FieldsEditorTab` sample at 17:13:04.127 and the final CSS-pass sample at 17:13:06.160. The 3.436-second broader window begins with scene-size work at 17:13:02.724. Sampling gaps mean neither number should be interpreted as continuous CPU time.
 
+### Supplemental interaction evidence
+
+The manual double-click in the linked-file run was followed by JavaFX application-thread work from approximately 18:02:08.515 until layout settled around 18:02:10.280. This approximately 1.765-second interval is another statistical evidence window, not exact input-to-render latency, because the recording has no custom input marker.
+
+During that interval, the JavaFX application thread recorded:
+
+| Evidence | Result |
+| --- | ---: |
+| Java exceptions | 160 |
+| `ClassCastException`, predominantly CSS `String` to `Paint`, `Color`, or `ParsedValue` conversions | 90 |
+| `MalformedURLException`, predominantly JavaFX CSS parsing of `HAND`, `TEXT`, and `DEFAULT` | 58 |
+| `NoSuchMethodError` from method-handle linkage | 6 |
+| `IllegalArgumentException` for invalid color specifications | 5 |
+| `FileNotFoundException` for a JAR entry | 1 |
+| Weighted sampled allocation | approximately 130 MB |
+| Garbage-collection pause | 10.593 ms |
+| `jdk.FileRead` on the JavaFX application thread | 0 |
+| `jdk.SocketRead` on the JavaFX application thread | 0 |
+
+The allocation samples were dominated by JavaFX CSS state and matching structures, including `PseudoClassState` arrays and objects, byte and long arrays, and immutable-set iterators. Execution samples were dominated by `SelectorPartitioning.match(...)`, `StyleManager.findMatchingStyles(...)`, `CssStyleHelper.createStyleHelper(...)`, CSS state transitions, `Node.reapplyCss()`, and subsequent `VirtualFlow` and `TableView` layout.
+
+The absence of recorded UI-thread file reads does not prove that no filesystem metadata check occurred, but the profile contains no evidence that resolving or reading an attached PDF caused this stall. The dominant sampled work remains field-control creation, CSS, and layout.
+
 ## Relevant code path
 
 The direct application frame in the execution sample is:
@@ -160,6 +260,30 @@ FieldsEditorTab.bindToEntry(...)
 `FieldsEditorTab.setupPanel(...)` determines every field, then maps every field through `createLabelAndEditor(...)` before layout. Each call creates a `FieldEditorFX`, binds it to the entry, stores it, and creates a `FieldNameLabel`. Adding the resulting control tree triggers the CSS, bounds, and rendering work visible in subsequent samples.
 
 The entry editor also constructs all configured tabs in `EntryEditorViewModel.rebuildTabs()`. That can contribute to initial work, but the strongest direct evidence in this recording is the selected fields tab creating and laying out its editors.
+
+The current main tab also eagerly creates controls that are not immediately used:
+
+- `AllFieldsTab.createSectionPane(...)` builds add-field chip buttons even for sections that start collapsed.
+- `AllFieldsTab.createFreeFormAddRow(...)` fills the editable field-name combo box with every known non-internal field during panel construction.
+
+The release tag `v6.0-alpha.5` predates both the June 2026 MVVM entry-editor refactor and the July 2026 new entry editor. Commit `6c67e6f99b` (`New entry editor (#16166)`) is therefore a useful regression boundary to test, particularly because it introduced the current all-fields main tab. This source-history observation narrows the A/B candidates; it does not by itself identify the cause.
+
+## CSS looked-up-color failures
+
+The supplemental profile and terminal output show repeated JavaFX CSS conversion failures during entry-editor construction. [OpenJFX pull request #2225](https://github.com/openjdk/jfx/pull/2225) fixes looked-up colors that fail when used for `-fx-background-color` in a deeply nested, optionally unstyled scene graph. That description and its affected CSS code match the observed `CssStyleHelper`, selector-matching, and invalid-color activity.
+
+There is also a direct entry-editor path to ControlsFX decoration:
+
+```text
+field editor construction
+EditorValidator.configureValidation(...)
+MVVMFX ControlsFxVisualizer
+JabRef IconValidationDecorator
+ControlsFX GraphicValidationDecoration
+JavaFX CSS processing
+```
+
+This makes ControlsFX validation decoration a plausible trigger for the looked-up-color issue when many editors are created together. OpenJFX #2225 is the likely JavaFX-side fix, but an A/B run with that patch, or with validation decoration disabled, is still needed to prove how much of the first-open latency and exception burst it removes.
 
 ## Garbage collection
 
@@ -189,8 +313,12 @@ A safe implementation should:
 4. Immediately materialize a requested field for jump-to-field and focus restoration.
 5. Avoid repeatedly recreating controls that were already bound.
 6. Keep all JavaFX node construction on the JavaFX application thread.
+7. Build the contents and add-field chips of initially collapsed sections only when they are first expanded.
+8. Populate the free-form field-name combo box when it is first opened instead of during panel construction.
 
 Lazy tab creation is a secondary opportunity, especially for tabs that are configured but not selected. It does not replace incremental creation in the initially selected fields tab.
+
+Separately, test a JavaFX build containing OpenJFX #2225 and compare the CSS exception count and JavaFX application-thread work window. Prewarming the editor may hide the cold-path delay, but reducing the initial scene graph and removing the CSS failure path address the recorded work directly.
 
 ## Validation plan
 
@@ -202,6 +330,8 @@ The target outcomes are:
 - a shorter field-creation-to-final-CSS sample window;
 - no regression in focus restoration, jump-to-field behavior, or field visibility;
 - GC pauses remaining insignificant relative to UI work.
+- no burst of looked-up-color conversion exceptions after the JavaFX fix;
+- unchanged results when the linked-file fixture is compared with an equivalent entry without attachments.
 
 A JMH benchmark can measure isolated field-editor creation and binding, including cold and warm cases. It cannot fully measure JavaFX pulse, CSS, and rendering latency by itself. An automated JavaFX integration measurement should therefore complement JMH for the end-to-end open-editor latency.
 
