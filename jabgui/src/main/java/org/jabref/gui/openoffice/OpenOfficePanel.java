@@ -684,9 +684,9 @@ public class OpenOfficePanel {
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
-        updateJstylePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
+        updatePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            updateJstylePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
+            updatePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
 
             switch (newValue) {
                 case JStyle _ -> {
@@ -750,7 +750,7 @@ public class OpenOfficePanel {
         return contextMenu;
     }
 
-    private void updateJstylePreferences(OOStyle currentStyle,
+    private void updatePreferences(OOStyle currentStyle,
                                          CheckMenuItem addSpaceBefore,
                                          CheckMenuItem addSpaceAfter,
                                          CheckMenuItem zoteroCompatibilityMode) {
