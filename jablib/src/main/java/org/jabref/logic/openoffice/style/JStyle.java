@@ -738,7 +738,6 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
                 nonUniqueCitationMarkerHandling);
     }
 
-
     /// Add setLocaleNone and optionally setCharStyle(CitationCharacterFormat) around
     /// citationText.  Called in fillCitationMarkInCursor, so these are
     /// also applied to "Unresolved()" entries and numeric styles.

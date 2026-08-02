@@ -154,7 +154,6 @@ class JStyleTest {
                 NonUniqueCitationMarker.THROWS);
     }
 
-
     // endregion
 
     @Test

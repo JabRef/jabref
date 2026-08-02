@@ -237,7 +237,6 @@ class OOBibStyleTestHelper {
                 nonunique).toString();
     }
 
-
     static String getCitationMarker2b(JStyle style,
                                       List<BibEntry> entries,
                                       Map<BibEntry, BibDatabase> entryDBMap,

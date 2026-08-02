@@ -542,8 +542,6 @@ public class OpenOfficePanel {
         return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
-
-
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
