@@ -74,8 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where the entry editor would freeze for some time on first load. [#16343](https://github.com/JabRef/jabref/issues/16343)
-- We fixed an issue where JabRef was unable to save the changed `.bib` file if it was open in TeXstudio on Windows. [#11916](https://github.com/JabRef/jabref/issues/11916)
+- We fixed an issue where opening the entry editor for the first time froze the UI for several seconds. [#16343](https://github.com/JabRef/jabref/issues/16343)
 - We fixed alignment of Journal/JournalTitle info icon in entry editor. [#16425](https://github.com/JabRef/jabref/issues/16425)
 - We fixed an issue in the LibreOffice integration where citations generated via CSL styles were not properly formatted. [#16379](https://github.com/JabRef/jabref/issues/16379)
 - We fixed an issue in the LibreOffice integration where generating bibliography or inserting citations made superscript citations smaller and smaller. [#16351](https://github.com/JabRef/jabref/issues/16351)
