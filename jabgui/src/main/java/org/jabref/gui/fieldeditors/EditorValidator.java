@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.preferences.GuiPreferences;
@@ -21,7 +20,7 @@ public class EditorValidator {
         if (preferences.getEntryEditorPreferences().shouldEnableValidation()) {
             ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
             validationVisualizer.setDecoration(new IconValidationDecorator());
-            Platform.runLater(() -> validationVisualizer.initVisualization(status, textInput));
+            validationVisualizer.initVisualization(status, textInput);
         }
     }
 }
