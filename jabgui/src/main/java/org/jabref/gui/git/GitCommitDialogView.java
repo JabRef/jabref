@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -61,6 +62,13 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         Platform.runLater(() -> {
             visualizer.setDecoration(new IconValidationDecorator());
             visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
+            commitMessage.requestFocus();
+
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            if (clipboard.hasString() && !clipboard.getString().isEmpty()) {
+                commitMessage.setText(clipboard.getString());
+                commitMessage.selectAll();
+            }
         });
     }
 }
