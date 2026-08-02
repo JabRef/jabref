@@ -34,12 +34,12 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                         .combo(Localization.lang("OCR engine"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName))
 
-                .section(Localization.lang("Partially scanned PDFs"), scanned -> scanned
-                        .combo(Localization.lang("OCR for partially scanned PDFs"),
-                                viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName))
-
                 .section(Localization.lang("OCR engine path"), path -> path
                         .custom(buildEnginePathRow()))
+
+                .section(Localization.lang("Handling of pre-existing text"), scanned -> scanned
+                        .combo(Localization.lang("OCR for pre-existing text"),
+                                viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName))
 
                 .build());
     }
