@@ -114,8 +114,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
