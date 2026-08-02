@@ -525,9 +525,9 @@ public class AllFieldsTab extends FieldsEditorTab {
             if (fieldNameBox.getItems().isEmpty()) {
                 fieldNameBox.getItems().setAll(
                         FieldFactory.getAllFieldsWithOutInternal().stream()
-                                   .map(Field::getName)
-                                   .sorted()
-                                   .toList());
+                                    .map(Field::getName)
+                                    .sorted()
+                                    .toList());
             }
         });
         fieldNameBox.setPromptText(Localization.lang("Field name"));

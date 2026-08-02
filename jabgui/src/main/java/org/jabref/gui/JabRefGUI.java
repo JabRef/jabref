@@ -381,6 +381,7 @@ public class JabRefGUI extends Application {
     }
 
     // [impl->req~entry-editor.validation-decoration.startup~1]
+
     /// Installs ControlsFX's decoration root before validation is first used.
     ///
     /// ControlsFX injects its internal `DecorationPane` as the scene root on the first
