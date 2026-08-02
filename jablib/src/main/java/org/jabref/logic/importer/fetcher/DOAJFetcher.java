@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -32,12 +34,16 @@ import org.slf4j.LoggerFactory;
 
 /// Fetches data from the Directory of Open Access Journals (DOAJ)
 ///
-/// @see <a href="https://doaj.org/api/v1/docs">API documentation</a>
+/// @see <a href="https://doaj.org/api/docs">API documentation</a>
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
 
-    private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
+    private static final String SEARCH_URL = "https://doaj.org/api/search/articles/";
+
+    // DOAJ allows two requests per second on all API routes
+    private static final FetcherRateLimiter DOAJ_API_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("DOAJ", 2, Duration.ofSeconds(1));
+
     private final ImportFormatPreferences preferences;
 
     public DOAJFetcher(@NonNull ImportFormatPreferences preferences) {
@@ -188,6 +194,12 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         // Page (not needed so far)
         // uriBuilder.addParameter("page", "1");
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URLDownload getUrlDownload(URL url) {
+        DOAJ_API_RATE_LIMITER.acquire(url.toString());
+        return new URLDownload(url);
     }
 
     @Override
