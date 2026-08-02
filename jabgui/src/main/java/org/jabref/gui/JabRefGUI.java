@@ -13,8 +13,10 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -65,6 +67,9 @@ import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
+import org.controlsfx.control.decoration.Decoration;
+import org.controlsfx.control.decoration.Decorator;
+import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -348,6 +353,17 @@ public class JabRefGUI extends Application {
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
 
         Scene scene = new Scene(powerpane);
+
+        // ControlsFX lazily installs its internal DecorationPane as the scene root the
+        // first time any control is decorated (e.g. by a field validator), silently
+        // reparenting the entire scene graph under it. Doing this during normal usage
+        // freezes the UI for several seconds - see #16343. Trigger that one-time
+        // installation now, during startup, by decorating and immediately
+        // un-decorating a throwaway node that is already attached to the scene.
+        Node decorationWarmupTarget = JabRefGUI.mainFrame;
+        Decoration decorationWarmup = new GraphicDecoration(new Region());
+        Decorator.addDecoration(decorationWarmupTarget, decorationWarmup);
+        Decorator.removeDecoration(decorationWarmupTarget, decorationWarmup);
 
         LOGGER.debug("installing CSS");
         themeManager.installCssOnScene(scene);
