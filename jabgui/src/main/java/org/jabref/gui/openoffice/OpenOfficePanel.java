@@ -682,11 +682,12 @@ public class OpenOfficePanel {
 
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
-        zoteroCompatibilityMode.setDisable(currentStyle instanceof JStyle);
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
+        updateJstylePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            zoteroCompatibilityMode.setDisable(newValue instanceof JStyle);
+            updateJstylePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
+
             switch (newValue) {
                 case JStyle _ -> {
                     if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
@@ -747,6 +748,31 @@ public class OpenOfficePanel {
         }
 
         return contextMenu;
+    }
+
+    private void updateJstylePreferences(OOStyle currentStyle,
+                                         CheckMenuItem addSpaceBefore,
+                                         CheckMenuItem addSpaceAfter,
+                                         CheckMenuItem zoteroCompatibilityMode) {
+        boolean isJStyle = currentStyle instanceof JStyle;
+
+        if (isJStyle) {
+            addSpaceBefore.setSelected(false);
+            addSpaceAfter.setSelected(false);
+            zoteroCompatibilityMode.setSelected(false);
+            openOfficePreferences.setAddSpaceBefore(false);
+            openOfficePreferences.setAddSpaceAfter(false);
+            openOfficePreferences.setZoteroCompatibilityMode(false);
+        } else {
+            addSpaceBefore.setSelected(true);
+            addSpaceAfter.setSelected(true);
+            openOfficePreferences.setAddSpaceBefore(true);
+            openOfficePreferences.setAddSpaceAfter(true);
+        }
+
+        zoteroCompatibilityMode.setDisable(isJStyle);
+        addSpaceBefore.setDisable(isJStyle);
+        addSpaceAfter.setDisable(isJStyle);
     }
 
     private void browsePandocPath() {

@@ -102,7 +102,7 @@ public class OpenOfficePreferences {
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceBefore
                 true,                                           // addSpaceAfter
-                true,                                           // zoteroCompatibilityMode
+                false,                                          // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
                 BstCitationFormat.NUMERIC                       // bstCitationFormat
