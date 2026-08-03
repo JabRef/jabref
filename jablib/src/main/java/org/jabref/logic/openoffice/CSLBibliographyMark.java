@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.DocumentAnnotation;
@@ -39,7 +39,7 @@ public final class CSLBibliographyMark {
     public static void rebuildCSLBibliography(XTextDocument doc,
                                               CSLCitationOOAdapter cslCitationOOAdapter,
                                               List<BibEntry> entries,
-                                              List<BibDatabaseContext> lookupContexts,
+                                              List<BibDatabase> lookupDatabases,
                                               CitationStyle citationStyle,
                                               BibEntryTypesManager bibEntryTypesManager,
                                               OpenOfficeReferenceMarkFormat referenceMarkFormat)
@@ -53,7 +53,7 @@ public final class CSLBibliographyMark {
             createCSLBibTextSection(doc, referenceMarkFormat);
         }
 
-        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupContexts, citationStyle, bibEntryTypesManager, referenceMarkFormat);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupDatabases, citationStyle, bibEntryTypesManager, referenceMarkFormat);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -127,7 +127,7 @@ public final class CSLBibliographyMark {
     private static void populateCSLBibTextSection(XTextDocument doc,
                                                   CSLCitationOOAdapter cslCitationOOAdapter,
                                                   List<BibEntry> entries,
-                                                  List<BibDatabaseContext> lookupContexts,
+                                                  List<BibDatabase> lookupDatabases,
                                                   CitationStyle citationStyle,
                                                   BibEntryTypesManager bibEntryTypesManager,
                                                   OpenOfficeReferenceMarkFormat referenceMarkFormat)
@@ -142,9 +142,9 @@ public final class CSLBibliographyMark {
 
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
-                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupContexts, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupDatabases, bibEntryTypesManager);
             case ZOTERO_COMPATIBLE ->
-                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupContexts, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupDatabases, bibEntryTypesManager);
         }
 
         LOGGER.debug("CSL bibliography section population completed");

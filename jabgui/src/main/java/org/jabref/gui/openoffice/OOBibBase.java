@@ -114,12 +114,16 @@ public class OOBibBase {
         }
     }
 
-    private static List<BibDatabaseContext> getLookupContexts(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
+    private static List<BibDatabase> getLookupDatabases(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
         if (openOfficePreferences.getUseAllDatabases()) {
-            return List.copyOf(stateManager.getOpenDatabases());
+            return stateManager.getOpenDatabases().stream()
+                               .map(BibDatabaseContext::getDatabase)
+                               .toList();
         }
 
-        return stateManager.getActiveDatabase().stream().toList();
+        return stateManager.getActiveDatabase().stream()
+                           .map(BibDatabaseContext::getDatabase)
+                           .toList();
     }
 
     /// A simple test for document availability.
@@ -663,7 +667,7 @@ public class OOBibBase {
                                                    BibEntryTypesManager bibEntryTypesManager,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
-        List<BibDatabaseContext> lookupContexts = getLookupContexts(
+        List<BibDatabase> lookupDatabases = getLookupDatabases(
                 Injector.instantiateModelOrService(StateManager.class),
                 openOfficePreferences);
 
@@ -692,22 +696,22 @@ public class OOBibBase {
             OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
                 try {
                     if (convertReferenceMarks) {
-                        cslCitationOOAdapter.convertReferenceMarksToPreference(lookupContexts);
+                        cslCitationOOAdapter.convertReferenceMarksToPreference(lookupDatabases);
                     }
 
                     if (citationType == CitationType.AUTHORYEAR_PAR) {
                         // If current citation style is not the same as passed-in citation type, then change it to the new citation style.
                         // If current citation type is not "NORMAL", then change it to "NORMAL".
                         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case).
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, lookupContexts);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, lookupDatabases);
                         // "Cite" button
                         cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, lookupContexts);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, lookupDatabases);
                         // "Cite in-text" button
                         cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, lookupContexts);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, lookupDatabases);
                         // "Insert empty citation"
                         cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     }
@@ -1147,10 +1151,6 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-            List<BibDatabaseContext> lookupContexts = databases.stream()
-                                                               .map(BibDatabaseContext::new)
-                                                               .toList();
-
             // Collect entries from the databases selected by the OpenOffice lookup preference
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
@@ -1175,7 +1175,7 @@ public class OOBibBase {
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
             try {
-                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, lookupContexts, citationStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, databases, citationStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
