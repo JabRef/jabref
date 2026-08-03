@@ -77,7 +77,7 @@ public class EditInsert {
             citeText = OOText.fromString("[-]"); // A dash only. Only refresh later.
         } else {
             citeText = style.createCitationMarker(citations,
-                    citationType.inParenthesis(),
+                    citationType,
                     NonUniqueCitationMarker.FORGIVEN);
         }
 
