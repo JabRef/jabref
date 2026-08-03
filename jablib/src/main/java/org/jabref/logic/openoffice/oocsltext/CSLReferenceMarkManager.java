@@ -638,6 +638,10 @@ public class CSLReferenceMarkManager {
 
         for (CSLReferenceMark mark : marksInOrder) {
             XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling reference mark without anchor: {}", mark.getName());
+                continue;
+            }
             sortEntries.add(new RangeSortEntry<>(range, 0, mark));
         }
 
