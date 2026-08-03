@@ -122,17 +122,16 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public void prepareCitationInsertion(CitationStyle newStyle,
-                                         CSLCitationType newCitationType,
-                                         BibDatabaseContext currentEntryContext,
-                                         List<BibDatabase> lookupDatabases) throws CreationException, Exception {
+    public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> lookupDatabases)
+            throws CreationException, Exception {
         linkZoteroCitations(currentEntryContext);
         setCitationStyleParameters(newStyle, newCitationType, lookupDatabases);
     }
 
     /// This method is used to determine whether citation style and citation type should be updated.
     /// Citation type and citation style are extracted into one method for more readability and uniformity.
-    private void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType, List<BibDatabase> lookupDatabases) throws CreationException, Exception {
+    private void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType, List<BibDatabase> lookupDatabases)
+            throws CreationException, Exception {
         boolean styleChanged;
         boolean citationTypeIsChanged;
 
@@ -206,10 +205,7 @@ public class CSLCitationOOAdapter {
 
     /// Inserts "empty" citations for a list of entries at the cursor to the document.
     /// Adds the entries to the list for which bibliography is to be generated.
-    public void insertEmptyCitation(XTextCursor cursor,
-                                    CitationStyle selectedStyle,
-                                    List<BibEntry> entries,
-                                    BibDatabaseContext currentEntryContext)
+    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
