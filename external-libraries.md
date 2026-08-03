@@ -33,6 +33,14 @@ License: SIL Open Font License, Version 1.1
 Note:    It is important to include v1.5.54 or later as v1.5.54 is the first version offering fixed code points. Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 ```
 
+```yaml
+Id:      jetbrains-mono.font
+Project: JetBrains Mono
+Path:    jabgui/src/main/resources/fonts/JetBrainsMono-Regular.ttf
+URL:     https://github.com/JetBrains/JetBrainsMono
+License: SIL Open Font License, Version 1.1
+```
+
 ## Libraries
 
 One can generate a file with all library dependencies by using Gradle task `cyclonedxBom`.

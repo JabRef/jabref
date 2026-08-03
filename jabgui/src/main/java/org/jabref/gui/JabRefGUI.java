@@ -1,5 +1,7 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +17,7 @@ import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -64,6 +67,7 @@ import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
@@ -88,10 +92,13 @@ public class JabRefGUI extends Application {
     private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
+
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
     private static JournalAbbreviationRepository journalAbbreviationRepository;
+    private static BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -271,6 +278,28 @@ public class JabRefGUI extends Application {
                 dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
+
+        loadBundledFonts();
+
+        JabRefGUI.bibTeXSyntaxHighlighter = new BibTeXSyntaxHighlighter();
+        Injector.setModelOrService(BibTeXSyntaxHighlighter.class, bibTeXSyntaxHighlighter);
+    }
+
+    /// Registers bundled fonts so they can be referenced by family name in CSS.
+    private void loadBundledFonts() {
+        try (InputStream stream = JabRefGUI.class.getClassLoader().getResourceAsStream(BIBTEX_EDITOR_FONT_RESOURCE)) {
+            if (stream == null) {
+                LOGGER.warn("Could not find bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE);
+                return;
+            }
+
+            Font font = Font.loadFont(stream, -1);
+            if (font == null) {
+                LOGGER.warn("Could not load bundled font {}, falling back to the platform default", BIBTEX_EDITOR_FONT_RESOURCE);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not load bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE, e);
+        }
     }
 
     private void setupProxy() {
