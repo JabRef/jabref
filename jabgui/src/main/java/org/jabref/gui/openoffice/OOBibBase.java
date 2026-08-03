@@ -113,7 +113,7 @@ public class OOBibBase {
         }
     }
 
-    private static List<BibDatabaseContext> getDatabasesForCitationLookup(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
+    private static List<BibDatabaseContext> getLookupContexts(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
         if (openOfficePreferences.getUseAllDatabases()) {
             return List.copyOf(stateManager.getOpenDatabases());
         }
@@ -649,20 +649,20 @@ public class OOBibBase {
     /// Throws CreationException, com.sun.star.uno.Exception
     /// Caught by guiActionInsertEntry
     ///
-    /// @param entries            The entries to cite.
-    /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
-    /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
-    /// @param citationStyle      Indicates style, name and path of citation
-    /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
+    /// @param entries             The entries to cite.
+    /// @param currentEntryContext The database the entries belong to. Used when creating the citation mark.
+    /// @param citationType        Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
+    /// @param citationStyle       Indicates style, name and path of citation
+    /// @param syncOptions         Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     public OOVoidResult<OOError> insertCSLCitation(List<BibEntry> entries,
                                                    XTextDocument doc,
                                                    CitationType citationType,
                                                    CitationStyle citationStyle,
-                                                   BibDatabaseContext bibDatabaseContext,
+                                                   BibDatabaseContext currentEntryContext,
                                                    BibEntryTypesManager bibEntryTypesManager,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
-        List<BibDatabaseContext> citationLookupDatabases = getDatabasesForCitationLookup(
+        List<BibDatabaseContext> lookupContexts = getLookupContexts(
                 Injector.instantiateModelOrService(StateManager.class),
                 openOfficePreferences);
 
@@ -691,18 +691,18 @@ public class OOBibBase {
             OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
                 try {
                     if (convertReferenceMarks) {
-                        cslCitationOOAdapter.convertReferenceMarksToPreference(citationLookupDatabases);
+                        cslCitationOOAdapter.convertReferenceMarksToPreference(lookupContexts);
                     }
 
                     if (citationType == CitationType.AUTHORYEAR_PAR) {
                         // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts, bibEntryTypesManager);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                         // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts, bibEntryTypesManager);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
                         // "Insert empty citation"
-                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases);
+                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts);
                     }
                     return OOVoidResult.ok();
                 } catch (CreationException | com.sun.star.uno.Exception e) {
@@ -1140,9 +1140,9 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-            List<BibDatabaseContext> citationLookupDatabases = databases.stream()
-                                                                        .map(BibDatabaseContext::new)
-                                                                        .toList();
+            List<BibDatabaseContext> lookupContexts = databases.stream()
+                                                               .map(BibDatabaseContext::new)
+                                                               .toList();
 
             // Collect entries from the databases selected by the OpenOffice lookup preference
             List<BibEntry> entries = databases.stream()
@@ -1166,13 +1166,13 @@ public class OOBibBase {
 
             // A separate database and database context
             BibDatabase bibDatabase = new BibDatabase(citedEntries);
-            BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+            BibDatabaseContext currentEntryContext = new BibDatabaseContext(bibDatabase);
 
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
             try {
-                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationLookupDatabases, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, lookupContexts, citationStyle, currentEntryContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));

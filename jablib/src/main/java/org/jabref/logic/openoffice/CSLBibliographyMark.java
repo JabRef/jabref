@@ -39,9 +39,9 @@ public final class CSLBibliographyMark {
     public static void rebuildCSLBibliography(XTextDocument doc,
                                               CSLCitationOOAdapter cslCitationOOAdapter,
                                               List<BibEntry> entries,
-                                              List<BibDatabaseContext> citationLookupDatabases,
+                                              List<BibDatabaseContext> lookupContexts,
                                               CitationStyle citationStyle,
-                                              BibDatabaseContext bibDatabaseContext,
+                                              BibDatabaseContext currentEntryContext,
                                               BibEntryTypesManager bibEntryTypesManager,
                                               OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
@@ -54,7 +54,7 @@ public final class CSLBibliographyMark {
             createCSLBibTextSection(doc, referenceMarkFormat);
         }
 
-        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationLookupDatabases, citationStyle, bibDatabaseContext, bibEntryTypesManager, referenceMarkFormat);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupContexts, citationStyle, currentEntryContext, bibEntryTypesManager, referenceMarkFormat);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -128,9 +128,9 @@ public final class CSLBibliographyMark {
     private static void populateCSLBibTextSection(XTextDocument doc,
                                                   CSLCitationOOAdapter cslCitationOOAdapter,
                                                   List<BibEntry> entries,
-                                                  List<BibDatabaseContext> citationLookupDatabases,
+                                                  List<BibDatabaseContext> lookupContexts,
                                                   CitationStyle citationStyle,
-                                                  BibDatabaseContext bibDatabaseContext,
+                                                  BibDatabaseContext currentEntryContext,
                                                   BibEntryTypesManager bibEntryTypesManager,
                                                   OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
@@ -144,9 +144,9 @@ public final class CSLBibliographyMark {
 
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
-                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, citationLookupDatabases, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupContexts, currentEntryContext, bibEntryTypesManager);
             case ZOTERO_COMPATIBLE ->
-                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, citationLookupDatabases, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupContexts, currentEntryContext, bibEntryTypesManager);
         }
 
         LOGGER.debug("CSL bibliography section population completed");
