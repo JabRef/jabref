@@ -44,7 +44,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput), keyBindingRepository);
         this.getChildren().add(textInput);
         AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
+        new EditorValidator(preferences).configureValidation(viewModel.textProperty(), textInput);
     }
 
     @Override

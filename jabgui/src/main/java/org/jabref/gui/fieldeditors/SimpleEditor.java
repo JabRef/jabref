@@ -51,7 +51,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
             }
         }
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
+        new EditorValidator(preferences).configureValidation(viewModel.textProperty(), textInput);
     }
 
     protected TextInputControl createTextInputControl(Field field) {

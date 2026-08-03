@@ -66,10 +66,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
 
                 .section(Localization.lang("Proxy configuration"), proxy -> proxy
                         .custom(buildProxyGrid(), grid -> grid
-                                .validate(viewModel.proxyHostnameValidationStatus(), proxyHostname)
-                                .validate(viewModel.proxyPortValidationStatus(), proxyPort)
-                                .validate(viewModel.proxyUsernameValidationStatus(), proxyUsername)
-                                .validate(viewModel.proxyPasswordValidationStatus(), proxyPassword)))
+                                .validate(viewModel.proxyHostnameProperty(), proxyHostname)
+                                .validate(viewModel.proxyPortProperty(), proxyPort)
+                                .validate(viewModel.proxyUsernameProperty(), proxyUsername)
+                                .validate(viewModel.proxyPasswordProperty(), proxyPassword)))
 
                 .section(Localization.lang("Git configuration"), git -> git
                         .custom(buildGitGrid()))

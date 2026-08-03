@@ -38,6 +38,8 @@ import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
@@ -50,10 +52,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private ObjectBinding<Node> linkedFileIconBinding;
 
-    private final Validator fileExistsValidator;
+    private final ConstrainedStringProperty<ValidationMessage> link;
 
     public LinkedFileViewModel(LinkedFile linkedFile,
                                BibEntry entry,
@@ -91,17 +91,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        fileExistsValidator = new FunctionBasedValidator<>(
-                linkedFile.linkProperty(),
-                link -> {
+        link = new SimpleConstrainedStringProperty<>(linkedFile.getLink(), ValidationConstraints.predicate(
+                linkValue -> {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
+                        Optional<Path> path = FileUtil.find(databaseContext, linkValue, preferences.getFilePreferences());
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
-                ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
+                ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink()))));
+        link.bindBidirectional(linkedFile.linkProperty());
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
@@ -143,8 +143,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return downloadProgress;
     }
 
-    public StringProperty linkProperty() {
-        return linkedFile.linkProperty();
+    public ConstrainedStringProperty<ValidationMessage> linkProperty() {
+        return link;
     }
 
     public StringProperty descriptionProperty() {
@@ -529,10 +529,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
         }
         return entries;
-    }
-
-    public ValidationStatus fileExistsValidationStatus() {
-        return fileExistsValidator.getValidationStatus();
     }
 
     public void parsePdfMetadataAndShowMergeDialog() {

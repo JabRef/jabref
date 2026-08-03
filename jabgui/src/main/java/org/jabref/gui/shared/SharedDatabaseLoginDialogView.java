@@ -2,7 +2,6 @@ package org.jabref.gui.shared;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,7 +18,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
@@ -29,7 +28,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 /// This offers the user to connect to a remove SQL database.
@@ -66,7 +64,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public SharedDatabaseLoginDialogView(LibraryTabContainer tabContainer) {
         this.tabContainer = tabContainer;
@@ -79,7 +76,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initialize the button is still null
-        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        btnConnect.disableProperty().bind(viewModel.formValidProperty().not());
         btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> loading ? Localization.lang("Connecting...") : Localization.lang("Connect")));
     }
 
@@ -94,8 +91,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        visualizer.setDecoration(new IconValidationDecorator());
-
         viewModel = new SharedDatabaseLoginDialogViewModel(
                 tabContainer,
                 dialogService,
@@ -137,19 +132,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
         rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
 
-        // Must be executed after the initialization of the view, otherwise it doesn't work
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.dbValidation(), database, true);
-            visualizer.initVisualization(viewModel.hostValidation(), host, true);
-            visualizer.initVisualization(viewModel.portValidation(), port, true);
-            visualizer.initVisualization(viewModel.userValidation(), user, true);
-
-            EasyBind.subscribe(autosave.selectedProperty(), selected ->
-                    visualizer.initVisualization(viewModel.folderValidation(), folder, true));
-
-            EasyBind.subscribe(useSSL.selectedProperty(), selected ->
-                    visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true));
-        });
+        new ValidationVisualizer().initVisualization(viewModel.databaseproperty(), database);
+        new ValidationVisualizer().initVisualization(viewModel.hostProperty(), host);
+        new ValidationVisualizer().initVisualization(viewModel.portProperty(), port);
+        new ValidationVisualizer().initVisualization(viewModel.userProperty(), user);
+        new ValidationVisualizer().initVisualization(viewModel.folderProperty(), folder);
+        new ValidationVisualizer().initVisualization(viewModel.keyStoreProperty(), fileKeystore);
     }
 
     @FXML

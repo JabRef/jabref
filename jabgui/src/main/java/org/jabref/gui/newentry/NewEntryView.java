@@ -35,7 +35,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
@@ -68,7 +67,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -93,8 +91,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private AiService aiService;
-
-    private final ControlsFxVisualizer visualizer;
 
     @FXML private ButtonType generateButtonType;
     private Button generateButton;
@@ -144,7 +140,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
 
-        visualizer = new ControlsFxVisualizer();
         this.setTitle(Localization.lang("New Entry"));
         ViewLoader.view(this).load().setAsDialogPane(this);
 
@@ -219,8 +214,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
-
-        visualizer.setDecoration(new IconValidationDecorator());
 
         EasyBind.subscribe(
                 viewModel.executedSuccessfullyProperty(),
@@ -305,7 +298,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         viewModel.populateDOICache();
-        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+        viewModel.duplicateDoiProperty().validProperty().addListener((_, _, isValid) -> {
             if (isValid) {
                 Tooltip.install(idText, idTextTooltip);
             } else {
@@ -357,7 +350,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             }
         });
 
-        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
+        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiProperty().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
@@ -366,7 +359,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         TextInputControl textInput = idText;
         EditorValidator validator = new EditorValidator(this.preferences);
-        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
+        validator.configureValidation(viewModel.duplicateDoiProperty(), textInput);
     }
 
     private void initializeInterpretCitations() {

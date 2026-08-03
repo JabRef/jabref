@@ -12,8 +12,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -55,8 +53,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -69,8 +65,6 @@ public class SourceTab extends EntryEditorTab {
     private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
-    private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
-    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
@@ -217,8 +211,6 @@ public class SourceTab extends EntryEditorTab {
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
 
-        sourceValidator.addRule(validationMessage);
-
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (getCurrentEntry() != null)) {
                 storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
@@ -274,7 +266,6 @@ public class SourceTab extends EntryEditorTab {
         try {
             parserResult = bibtexParser.parse(Reader.of(text));
         } catch (IOException ex) {
-            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getMessage())));
             LOGGER.debug("Incorrect source", ex);
             return;
         }
@@ -295,13 +286,11 @@ public class SourceTab extends EntryEditorTab {
                 LOGGER.warn("Could not store entry: {}", parserResult.warnings());
                 String errors = parserResult.getErrorMessage();
                 dialogService.showErrorDialogAndWait(errors);
-                validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                 return;
             } else {
                 LOGGER.warn("No entries found.");
                 String errors = Localization.lang("No entries available");
                 dialogService.showErrorDialogAndWait(errors);
-                validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                 return;
             }
         }
@@ -310,7 +299,6 @@ public class SourceTab extends EntryEditorTab {
             LOGGER.warn("Failed to parse Bib(La)TeX: {}", parserResult.warnings());
             String errors = parserResult.getErrorMessage();
             dialogService.showErrorDialogAndWait(errors);
-            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
         NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
@@ -340,8 +328,6 @@ public class SourceTab extends EntryEditorTab {
                 // Test if the field is legally set.
                 List<String> errors = FieldWriter.checkBalancedBraces(newValue);
                 if (!errors.isEmpty()) {
-                    validationMessage.setValue(ValidationMessage.error(
-                            Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
                     return;
                 }
 
@@ -364,8 +350,6 @@ public class SourceTab extends EntryEditorTab {
                     libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
             );
         }
-
-        validationMessage.setValue(null);
     }
 
     private void listenForSaveKeybinding(KeyEvent event) {

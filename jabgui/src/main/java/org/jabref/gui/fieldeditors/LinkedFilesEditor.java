@@ -163,7 +163,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
-                .withValidation(LinkedFileViewModel::fileExistsValidationStatus)
+                .withValidation(LinkedFileViewModel::linkProperty)
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 

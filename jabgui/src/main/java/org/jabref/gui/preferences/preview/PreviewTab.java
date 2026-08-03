@@ -3,7 +3,8 @@ package org.jabref.gui.preferences.preview;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.property.ListProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -94,7 +95,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
                 .button(Localization.lang("Add BST file"), this::selectBstFile)
                 .custom(dualListRegion, lists -> lists
-                        .validate(viewModel.chosenListValidationStatus(), chosenListView))
+                        .validate(viewModel.chosenListProperty(), chosenListView))
                 .custom(editorRegion)
                 .build());
 
@@ -372,7 +373,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         event.consume();
     }
 
-    private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
+    private void dragDropped(ObservableValue<ObservableList<PreviewLayout>> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();

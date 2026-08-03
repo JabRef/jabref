@@ -9,11 +9,9 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class ReplaceStringView extends BaseDialog<Void> {
 
@@ -25,8 +23,6 @@ public class ReplaceStringView extends BaseDialog<Void> {
     @FXML private TextField replaceField;
 
     private ReplaceStringViewModel viewModel;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public ReplaceStringView(LibraryTab libraryTab) {
         this.setTitle(Localization.lang("Replace String"));
@@ -42,8 +38,6 @@ public class ReplaceStringView extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        visualizer.setDecoration(new IconValidationDecorator());
-
         viewModel.findStringProperty().bind(findField.textProperty());
         viewModel.replaceStringProperty().bind(replaceField.textProperty());
         viewModel.fieldStringProperty().bind(limitFieldInput.textProperty());

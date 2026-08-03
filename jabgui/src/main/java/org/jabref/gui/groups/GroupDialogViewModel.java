@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -29,6 +31,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.validation.Severity;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
@@ -61,16 +66,15 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.Constraints;
+import org.jfxcore.validation.ValidationResult;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.jspecify.annotations.Nullable;
 
 public class GroupDialogViewModel {
     // Basic Settings
-    private final StringProperty nameProperty = new SimpleStringProperty("");
+    private ConstrainedStringProperty<ValidationMessage> nameProperty;
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final StringProperty iconProperty = new SimpleStringProperty("");
     private final BooleanProperty colorUseProperty = new SimpleBooleanProperty();
@@ -87,12 +91,12 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeEntryTypeProperty = new SimpleBooleanProperty();
 
     // Option Groups
-    private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
-    private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
+    private ConstrainedStringProperty<ValidationMessage> keywordGroupSearchTermProperty;
+    private ConstrainedStringProperty<ValidationMessage> keywordGroupSearchFieldProperty;
     private final BooleanProperty keywordGroupCaseSensitiveProperty = new SimpleBooleanProperty();
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
 
-    private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
+    private ConstrainedStringProperty<ValidationMessage> searchGroupSearchTermProperty;
     private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>(EnumSet.noneOf(SearchFlags.class));
 
     private final BooleanProperty autoGroupKeywordsOptionProperty = new SimpleBooleanProperty();
@@ -102,23 +106,13 @@ public class GroupDialogViewModel {
     private final BooleanProperty autoGroupPersonsOptionProperty = new SimpleBooleanProperty();
     private final StringProperty autoGroupPersonsFieldProperty = new SimpleStringProperty("");
 
-    private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
+    private ConstrainedStringProperty<ValidationMessage> texGroupFilePathProperty;
 
     // Date Group Properties
     private final BooleanProperty dateRadioButtonSelectedProperty = new SimpleBooleanProperty();
     private final ObjectProperty<Field> dateGroupFieldProperty = new SimpleObjectProperty<>();
     private final ObjectProperty<DateGranularity> dateGroupOptionProperty = new SimpleObjectProperty<>();
     private final BooleanProperty dateGroupIncludeEmptyProperty = new SimpleBooleanProperty();
-
-    private Validator nameValidator;
-    private Validator nameContainsDelimiterValidator;
-    private Validator sameNameValidator;
-    private Validator keywordRegexValidator;
-    private Validator keywordFieldEmptyValidator;
-    private Validator keywordSearchTermEmptyValidator;
-    private Validator searchSearchTermEmptyValidator;
-    private Validator texGroupFilePathValidator;
-    private CompositeValidator validator;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -147,135 +141,124 @@ public class GroupDialogViewModel {
         setValues();
     }
 
+    /// Sets up validation for the group-editing fields.
+    ///
+    /// Each field's own constraint is always active, independent of which group type is currently selected —
+    /// matching the old per-field validators, which were likewise always evaluated regardless of type (only the
+    /// overall submit-gating validator had type-dependent membership). Type-relevance is applied only in
+    /// [#validProperty()] and [#highestValidationMessage()], mirroring the old dynamic composite-validator
+    /// membership without the risk of imperative add/remove getting out of sync.
     private void setupValidation() {
-        validator = new CompositeValidator();
+        nameProperty = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(
+                        StringUtil::isNotBlank,
+                        ValidationMessage.error(Localization.lang("Please enter a name for the group."))),
+                ValidationConstraints.predicate(
+                        name -> !name.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())),
+                        ValidationMessage.warning(
+                                Localization.lang(
+                                        "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
+                                        Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
+                                ))),
+                ValidationConstraints.predicate(
+                        name -> currentDatabase.getMetaData().getGroups()
+                                               .map(rootGroup -> {
+                                                   boolean groupsExistWithSameName = !rootGroup.findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
+                                                   if ((editedGroup == null) && groupsExistWithSameName) {
+                                                       // New group but there is already one group with the same name
+                                                       return false;
+                                                   }
 
-        nameValidator = new FunctionBasedValidator<>(
-                nameProperty,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a name for the group.")));
-
-        nameContainsDelimiterValidator = new FunctionBasedValidator<>(
-                nameProperty,
-                name -> !name.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())),
-                ValidationMessage.warning(
-                        Localization.lang(
-                                "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
+                                                   // Edit group, changed name to something that is already present
+                                                   return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
+                                               })
+                                               .orElse(true),
+                        ValidationMessage.warning(
+                                Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
                         )));
 
-        sameNameValidator = new FunctionBasedValidator<>(
-                nameProperty,
-                name -> {
-                    Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
-                    if (rootGroup.isPresent()) {
-                        boolean groupsExistWithSameName = !rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
-                        if ((editedGroup == null) && groupsExistWithSameName) {
-                            // New group but there is already one group with the same name
-                            return false;
+        keywordGroupSearchFieldProperty = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(
+                        StringUtil::isNotBlank,
+                        ValidationMessage.error(Localization.lang("Please enter a field name to search for a keyword."))));
+
+        keywordGroupSearchTermProperty = new SimpleConstrainedStringProperty<>("",
+                Constraints.validate((String input, Boolean isRegex) -> {
+                    if (!isRegex) {
+                        return ValidationResult.valid();
+                    }
+                    if (!StringUtil.isNullOrEmpty(input)) {
+                        try {
+                            Pattern.compile(input);
+                            return ValidationResult.valid();
+                        } catch (PatternSyntaxException _) {
+                            // fall through to invalid
                         }
-
-                        // Edit group, changed name to something that is already present
-                        return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
                     }
-                    return true;
-                },
-                ValidationMessage.warning(
-                        Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
-                )
-        );
+                    return ValidationResult.invalid(ValidationMessage.error("%s > %n %s %n %n %s".formatted(
+                            Localization.lang("Searching for a keyword"),
+                            Localization.lang("Keywords"),
+                            Localization.lang("Invalid regular expression."))));
+                }, keywordGroupRegexProperty),
+                ValidationConstraints.predicate(
+                        input -> !StringUtil.isNullOrEmpty(input),
+                        ValidationMessage.error("%s > %n %s %n %n %s".formatted(
+                                Localization.lang("Searching for a keyword"),
+                                Localization.lang("Keywords"),
+                                Localization.lang("Search term is empty.")))));
 
-        keywordRegexValidator = new FunctionBasedValidator<>(
-                keywordGroupSearchTermProperty,
-                input -> {
-                    if (!keywordGroupRegexProperty.get()) {
-                        return true;
-                    }
+        searchGroupSearchTermProperty = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(
+                        input -> !StringUtil.isNullOrEmpty(input) && new SearchQuery(input).isValid(),
+                        ValidationMessage.error(Localization.lang("Illegal search expression"))));
 
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    }
+        texGroupFilePathProperty = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(
+                        input -> {
+                            if (StringUtil.isBlank(input)) {
+                                return false;
+                            }
+                            Path inputPath = getAbsoluteTexGroupPath(input);
+                            return inputPath.isAbsolute() && Files.isRegularFile(inputPath)
+                                    && FileUtil.getFileExtension(input).map("aux"::equalsIgnoreCase).orElse(false);
+                        },
+                        ValidationMessage.error(Localization.lang("Please provide a valid aux file."))));
+    }
 
-                    try {
-                        Pattern.compile(input);
-                        return true;
-                    } catch (PatternSyntaxException _) {
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s > %n %s %n %n %s".formatted(
-                        Localization.lang("Searching for a keyword"),
-                        Localization.lang("Keywords"),
-                        Localization.lang("Invalid regular expression."))));
+    /// Aggregate validity gating the confirm button: name is always relevant; the search/keyword/tex fields
+    /// only count while their group type is currently selected — mirroring the old dynamic composite-validator
+    /// membership (add/remove based on the type radio buttons), without the risk of the two getting out of sync.
+    public BooleanBinding validProperty() {
+        return Bindings.createBooleanBinding(() ->
+                        nameProperty.isValid()
+                                && (!typeSearchProperty.get() || searchGroupSearchTermProperty.isValid())
+                                && (!typeKeywordsProperty.get() || (keywordGroupSearchFieldProperty.isValid() && keywordGroupSearchTermProperty.isValid()))
+                                && (!typeTexProperty.get() || texGroupFilePathProperty.isValid()),
+                nameProperty.validProperty(), typeSearchProperty, searchGroupSearchTermProperty.validProperty(),
+                typeKeywordsProperty, keywordGroupSearchFieldProperty.validProperty(), keywordGroupSearchTermProperty.validProperty(),
+                typeTexProperty, texGroupFilePathProperty.validProperty());
+    }
 
-        keywordFieldEmptyValidator = new FunctionBasedValidator<>(
-                keywordGroupSearchFieldProperty,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a field name to search for a keyword.")));
+    /// Same type-relevance rule as [#validProperty()] — only messages from the currently-relevant fields are
+    /// surfaced in the submit-time error dialog.
+    private Optional<ValidationMessage> highestValidationMessage() {
+        List<ConstrainedStringProperty<ValidationMessage>> relevantProperties = new ArrayList<>(List.of(nameProperty));
+        if (typeSearchProperty.get()) {
+            relevantProperties.add(searchGroupSearchTermProperty);
+        }
+        if (typeKeywordsProperty.get()) {
+            relevantProperties.add(keywordGroupSearchFieldProperty);
+            relevantProperties.add(keywordGroupSearchTermProperty);
+        }
+        if (typeTexProperty.get()) {
+            relevantProperties.add(texGroupFilePathProperty);
+        }
 
-        keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
-                keywordGroupSearchTermProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %n %s %n %n %s".formatted(
-                        Localization.lang("Searching for a keyword"),
-                        Localization.lang("Keywords"),
-                        Localization.lang("Search term is empty.")
-                )));
-
-        searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
-                searchGroupSearchTermProperty,
-                input -> {
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    }
-                    return new SearchQuery(input).isValid();
-                },
-                ValidationMessage.error(Localization.lang("Illegal search expression")));
-
-        texGroupFilePathValidator = new FunctionBasedValidator<>(
-                texGroupFilePathProperty,
-                input -> {
-                    if (StringUtil.isBlank(input)) {
-                        return false;
-                    } else {
-                        Path inputPath = getAbsoluteTexGroupPath(input);
-                        if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
-                            return false;
-                        }
-                        return FileUtil.getFileExtension(input)
-                                       .map("aux"::equalsIgnoreCase)
-                                       .orElse(false);
-                    }
-                },
-                ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
-
-        typeSearchProperty.addListener((_, _, isSelected) -> {
-            if (Boolean.TRUE.equals(isSelected)) {
-                validator.addValidators(searchSearchTermEmptyValidator);
-            } else {
-                validator.removeValidators(searchSearchTermEmptyValidator);
-            }
-        });
-
-        typeKeywordsProperty.addListener((_, _, isSelected) -> {
-            if (Boolean.TRUE.equals(isSelected)) {
-                validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
-            } else {
-                validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
-            }
-        });
-
-        typeTexProperty.addListener((_, _, isSelected) -> {
-            if (Boolean.TRUE.equals(isSelected)) {
-                validator.addValidators(texGroupFilePathValidator);
-            } else {
-                validator.removeValidators(texGroupFilePathValidator);
-            }
-        });
-
-        validator.addValidators(nameValidator,
-                nameContainsDelimiterValidator,
-                sameNameValidator);
+        List<ValidationMessage> invalidMessages = relevantProperties.stream()
+                                                                    .flatMap(property -> property.getDiagnostics().invalidSubList().stream())
+                                                                    .toList();
+        return invalidMessages.stream().filter(message -> message.severity() == Severity.ERROR).findFirst()
+                              .or(() -> invalidMessages.stream().findFirst());
     }
 
     /// Gets the absolute path relative to the LatexFileDirectory, if given a relative path
@@ -288,10 +271,9 @@ public class GroupDialogViewModel {
     }
 
     public void validationHandler(Event event) {
-        ValidationStatus validationStatus = validator.getValidationStatus();
-        Optional<ValidationMessage> highestMessage = validationStatus.getHighestMessage();
+        Optional<ValidationMessage> highestMessage = highestValidationMessage();
         if (highestMessage.isPresent()) {
-            dialogService.showErrorDialogAndWait(highestMessage.get().getMessage());
+            dialogService.showErrorDialogAndWait(highestMessage.get().message());
             // consume the event to prevent the dialog to close
             event.consume();
         }
@@ -537,43 +519,7 @@ public class GroupDialogViewModel {
         return fileDirs;
     }
 
-    public ValidationStatus validationStatus() {
-        return validator.getValidationStatus();
-    }
-
-    public ValidationStatus nameValidationStatus() {
-        return nameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus nameContainsDelimiterValidationStatus() {
-        return nameContainsDelimiterValidator.getValidationStatus();
-    }
-
-    public ValidationStatus sameNameValidationStatus() {
-        return sameNameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus searchSearchTermEmptyValidationStatus() {
-        return searchSearchTermEmptyValidator.getValidationStatus();
-    }
-
-    public ValidationStatus keywordRegexValidationStatus() {
-        return keywordRegexValidator.getValidationStatus();
-    }
-
-    public ValidationStatus keywordFieldEmptyValidationStatus() {
-        return keywordFieldEmptyValidator.getValidationStatus();
-    }
-
-    public ValidationStatus keywordSearchTermEmptyValidationStatus() {
-        return keywordSearchTermEmptyValidator.getValidationStatus();
-    }
-
-    public ValidationStatus texGroupFilePathValidatonStatus() {
-        return texGroupFilePathValidator.getValidationStatus();
-    }
-
-    public StringProperty nameProperty() {
+    public ConstrainedStringProperty<ValidationMessage> nameProperty() {
         return nameProperty;
     }
 
@@ -625,11 +571,11 @@ public class GroupDialogViewModel {
         return typeEntryTypeProperty;
     }
 
-    public StringProperty keywordGroupSearchTermProperty() {
+    public ConstrainedStringProperty<ValidationMessage> keywordGroupSearchTermProperty() {
         return keywordGroupSearchTermProperty;
     }
 
-    public StringProperty keywordGroupSearchFieldProperty() {
+    public ConstrainedStringProperty<ValidationMessage> keywordGroupSearchFieldProperty() {
         return keywordGroupSearchFieldProperty;
     }
 
@@ -641,7 +587,7 @@ public class GroupDialogViewModel {
         return keywordGroupRegexProperty;
     }
 
-    public StringProperty searchGroupSearchTermProperty() {
+    public ConstrainedStringProperty<ValidationMessage> searchGroupSearchTermProperty() {
         return searchGroupSearchTermProperty;
     }
 
@@ -681,7 +627,7 @@ public class GroupDialogViewModel {
         return autoGroupPersonsFieldProperty;
     }
 
-    public StringProperty texGroupFilePathProperty() {
+    public ConstrainedStringProperty<ValidationMessage> texGroupFilePathProperty() {
         return texGroupFilePathProperty;
     }
 

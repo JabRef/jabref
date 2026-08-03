@@ -64,17 +64,17 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                 ThemeTypes::getDisplayName,
                                 theme -> theme
                                         .disableWhen(viewModel.themeSyncOsProperty())
-                                        .validate(viewModel.themeValidationStatus()))
+                                        .validate(viewModel.selectedThemeProperty()))
                         .checkbox(Localization.lang("Use System Preference"), viewModel.themeSyncOsProperty())
                         .stringField(null, viewModel.customPathToThemeProperty(),
                                 path -> path
                                         .browse(viewModel::importCSSFile)
                                         .disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
                                         .disableWhen(viewModel.themeSyncOsProperty())
-                                        .validate(viewModel.customPathToThemeValidationStatus()))
+                                        .validate(viewModel.customPathToThemeProperty()))
                         .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
                         .field(Localization.lang("Size"), buildFontSizeSpinner(),
-                                size -> size.validate(viewModel.fontSizeValidationStatus()))
+                                size -> size.validate(viewModel.fontSizeProperty()))
                         .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser))
 
                 .section(Localization.lang("User interface"), userInterface -> userInterface
@@ -89,19 +89,19 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 .section(Localization.lang("Single instance"), singleInstance -> singleInstance
                         .checkWithField(Localization.lang("Enforce single JabRef instance (and allow remote operations) using port"),
                                 viewModel.remoteServerProperty(), viewModel.remotePortProperty(),
-                                port -> port.validate(viewModel.remotePortValidationStatus())
+                                port -> port.validate(viewModel.remotePortProperty())
                                             .help(HelpFile.REMOTE)))
 
                 .section(Localization.lang("HTTP Server"), httpServer -> httpServer
                         .checkWithField(Localization.lang("Enable HTTP Server (e.g., for JabMap) on port"),
                                 viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
-                                port -> port.validate(viewModel.httpPortValidationStatus()))
+                                port -> port.validate(viewModel.httpPortProperty()))
                         .checkbox(Localization.lang("Skip import dialog for entries received from browser extensions"), viewModel.directHttpImportProperty()))
 
                 .section(Localization.lang("LSP Server"), lspServer -> lspServer
                         .checkWithField(Localization.lang("Enable LSP Server on port"),
                                 viewModel.enableLanguageServerProperty(), viewModel.languageServerPortProperty(),
-                                port -> port.validate(viewModel.languageServerPortValidationStatus())))
+                                port -> port.validate(viewModel.languageServerPortProperty())))
 
                 .section(Localization.lang("Libraries"), libraries -> libraries
                         .combo(Localization.lang("Default library mode"),
