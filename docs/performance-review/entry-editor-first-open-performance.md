@@ -59,7 +59,7 @@ The final capture used a known repository test library and selected a known cita
 
 | Input | Value |
 | --- | --- |
-| Library | `jablib/src/test/resources/org/jabref/bibtexFiles/test.bib` |
+| Library | `../../jablib/src/test/resources/org/jabref/bibtexFiles/test.bib` |
 | Selected citation key | `1102917` |
 | Editor command | **View → Open entry editor** (`Ansicht → Eintragseditor öffnen`) |
 | Preference state | Reset to defaults before the final capture |
@@ -90,7 +90,7 @@ A second cold-start run used a repository fixture whose six entries each link a 
 
 | Property | Value |
 | --- | --- |
-| Library | `jablib/src/test/resources/org/jabref/logic/search/test-library-with-attached-files.bib` |
+| Library | `../../jablib/src/test/resources/org/jabref/logic/search/test-library-with-attached-files.bib` |
 | Source revision | `72a34bfaa1` |
 | JavaFX | 26.0.2, macOS AArch64 |
 | JFR settings | `profile`, stack depth 256, maximum size 250 MB |
