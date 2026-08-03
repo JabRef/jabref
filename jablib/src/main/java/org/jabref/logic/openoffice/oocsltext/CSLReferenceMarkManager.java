@@ -227,9 +227,9 @@ public class CSLReferenceMarkManager {
     private Optional<BibEntry> findEntryByCitationKey(String citationKey,
                                                       List<BibDatabase> lookupDatabases) {
         return lookupDatabases.stream()
-                                  .map(database -> database.getEntryByCitationKey(citationKey))
-                                  .flatMap(Optional::stream)
-                                  .findFirst();
+                              .map(database -> database.getEntryByCitationKey(citationKey))
+                              .flatMap(Optional::stream)
+                              .findFirst();
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
