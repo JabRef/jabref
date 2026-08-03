@@ -35,7 +35,6 @@ public class CSLUpdateBibliography {
                                        List<BibEntry> entries,
                                        List<BibDatabaseContext> lookupContexts,
                                        CitationStyle citationStyle,
-                                       BibDatabaseContext currentEntryContext,
                                        BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
@@ -46,7 +45,6 @@ public class CSLUpdateBibliography {
                 entries,
                 lookupContexts,
                 citationStyle,
-                currentEntryContext,
                 bibEntryTypesManager,
                 openOfficePreferences.getReferenceMarkFormat());
 

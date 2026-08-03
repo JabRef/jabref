@@ -41,7 +41,6 @@ public final class CSLBibliographyMark {
                                               List<BibEntry> entries,
                                               List<BibDatabaseContext> lookupContexts,
                                               CitationStyle citationStyle,
-                                              BibDatabaseContext currentEntryContext,
                                               BibEntryTypesManager bibEntryTypesManager,
                                               OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
@@ -54,7 +53,7 @@ public final class CSLBibliographyMark {
             createCSLBibTextSection(doc, referenceMarkFormat);
         }
 
-        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupContexts, citationStyle, currentEntryContext, bibEntryTypesManager, referenceMarkFormat);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupContexts, citationStyle, bibEntryTypesManager, referenceMarkFormat);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -130,7 +129,6 @@ public final class CSLBibliographyMark {
                                                   List<BibEntry> entries,
                                                   List<BibDatabaseContext> lookupContexts,
                                                   CitationStyle citationStyle,
-                                                  BibDatabaseContext currentEntryContext,
                                                   BibEntryTypesManager bibEntryTypesManager,
                                                   OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
@@ -144,9 +142,9 @@ public final class CSLBibliographyMark {
 
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
-                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupContexts, currentEntryContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupContexts, bibEntryTypesManager);
             case ZOTERO_COMPATIBLE ->
-                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupContexts, currentEntryContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupContexts, bibEntryTypesManager);
         }
 
         LOGGER.debug("CSL bibliography section population completed");

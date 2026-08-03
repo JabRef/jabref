@@ -29,6 +29,7 @@ import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.BSTCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -695,14 +696,20 @@ public class OOBibBase {
                     }
 
                     if (citationType == CitationType.AUTHORYEAR_PAR) {
+                        // If current citation style is not the same as passed-in citation type, then change it to the new citation style.
+                        // If current citation type is not "NORMAL", then change it to "NORMAL".
+                        // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case).
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, lookupContexts);
                         // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, lookupContexts);
                         // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, lookupContexts);
                         // "Insert empty citation"
-                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, currentEntryContext, lookupContexts);
+                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     }
                     return OOVoidResult.ok();
                 } catch (CreationException | com.sun.star.uno.Exception e) {
@@ -1164,15 +1171,11 @@ public class OOBibBase {
                 return OOVoidResult.ok();
             }
 
-            // A separate database and database context
-            BibDatabase bibDatabase = new BibDatabase(citedEntries);
-            BibDatabaseContext currentEntryContext = new BibDatabaseContext(bibDatabase);
-
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
             try {
-                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, lookupContexts, citationStyle, currentEntryContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, lookupContexts, citationStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
