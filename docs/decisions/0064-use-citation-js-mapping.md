@@ -6,7 +6,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-We are implementing compatibility with Zotero. Zotero uses its item types, while JabRef uses BibTeX/BibLaTeX entry types. We need a suitable mapping strategy that preserves as much information as possible in both directions, from JabRef to Zotero and from Zotero to JabRef.
+We are implementing compatibility with Zotero. Zotero uses its [item types](https://www.zotero.org/support/kb/item_types_and_fields), while JabRef uses BibTeX/BibLaTeX entry types. We need a suitable mapping strategy that preserves as much information as possible in both directions, from JabRef to Zotero and from Zotero to JabRef.
 
 Which mapping should JabRef use to convert between entry types and Zotero's item types?
 
@@ -93,7 +93,7 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js also supports other mappings, such as BibLaTeX to RIS.
 * Bad, because JabRef needs to track citation-js's updates, or import it as a submodule.
 
-### More information
+## More information
 
 * Implementation PR: [#15946](https://github.com/JabRef/jabref/pull/15946)
 * Implemented mapping can be found via [CSLItemTypeDefinitions.java](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java)

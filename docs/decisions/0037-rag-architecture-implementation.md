@@ -56,7 +56,7 @@ required to install some separate software (or even Python runtime).
 
 ## Decision Outcome
 
-Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java library".
+Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java library", because third-party libraries provide the machinery for connecting to an LLM and extracting text, while some parts still need to be hand-crafted (see below).
 
 Third-party libraries provide excellent resources for connecting to an LLM or extracting text from PDF files. For RAG,
 we mostly used all the machinery provided by `langchain4j`, but there were moments that should be hand-crafted:

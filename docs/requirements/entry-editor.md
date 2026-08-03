@@ -61,4 +61,18 @@ When fields of the shown entry are set or unset outside the Main tab (source tab
 
 Needs: impl
 
+## A focused, empty, non-required field can be removed from the list
+`req~entry-editor.main-tab.remove-field~1`
+
+A field's row shows a small gray "remove field" icon button pinned to its top-right corner while the field's editor is focused and the field is currently blank. Clicking it hides the row again. The citation key and the entry type's required fields never show this button, so they cannot be removed this way.
+
+Needs: impl
+
+## Special fields are edited with the same icon controls as the main table
+`req~entry-editor.special-field-editors~1`
+
+Special fields (ranking, priority, read status, printed, quality, relevance) are edited with the same icon-based controls the main table's special field columns use: a five-star rating for the ranking, one icon toggle per value for priority and read status (deselecting the active toggle clears the field), and a single icon toggle for the one-value fields printed, quality, and relevance. Field labels and add-chips show the localized special field name instead of the raw field name. Values changed elsewhere (main table, source tab, undo) are reflected live.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

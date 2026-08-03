@@ -17,6 +17,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -131,6 +133,19 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
         URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()), 0);
         assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
+    }
+
+    @Test
+    void getURLForRawQuery() throws MalformedURLException, URISyntaxException, FetcherException {
+        String expected = "https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors";
+        String actual = fetcher.getURLForRawQuery("Software engineering", 0).toString();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
     }
 
     @Test

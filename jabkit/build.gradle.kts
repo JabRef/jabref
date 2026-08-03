@@ -16,12 +16,13 @@ mainModuleInfo {
 }
 
 testModuleInfo {
+    requires("mockwebserver3")
+    requires("okhttp3")
+    requires("org.apache.pdfbox")
     requires("org.jabref.testsupport")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("mockwebserver3")
-    requires("okhttp3")
 }
 
 tasks.withType<Test>().configureEach {
@@ -36,7 +37,7 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
+        "--enable-native-access=com.sun.jna,javafx.graphics,jkeychain,org.apache.lucene.core",
 
         // "-XX:+UseZGC", "-XX:+ZUncommit",
         // "-XX:+UseG1GC",
@@ -84,6 +85,9 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
 graalvmNative {
     binaries {
         named("main") {
+            resources {
+                includedPatterns.add("build\\.properties")
+            }
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
         }

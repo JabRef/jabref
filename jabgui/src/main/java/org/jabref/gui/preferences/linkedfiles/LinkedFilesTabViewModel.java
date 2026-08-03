@@ -20,7 +20,6 @@ import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 
 import org.jfxcore.validation.property.ConstrainedStringProperty;
@@ -71,10 +70,12 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
 
-    public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
+    public LinkedFilesTabViewModel(DialogService dialogService,
+                                   FilePreferences filePreferences,
+                                   AutoLinkPreferences autoLinkPreferences) {
         this.dialogService = dialogService;
-        this.filePreferences = preferences.getFilePreferences();
-        this.autoLinkPreferences = preferences.getAutoLinkPreferences();
+        this.filePreferences = filePreferences;
+        this.autoLinkPreferences = autoLinkPreferences;
     }
 
     @Override

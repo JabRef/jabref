@@ -8,7 +8,7 @@ parent: Requirements
 
 - [General](./ai/general.md)
 - [Chatting](./ai/chatting.md)
-- [Answer engines](./ai/answer-engines.md)
+- [Response engines](./ai/response-engines.md)
 - [Summarization](./ai/summarization.md)
 - [Citation parsing](./ai/citation-parsing.md)
 - [Ingestion](./ai/ingestion.md)

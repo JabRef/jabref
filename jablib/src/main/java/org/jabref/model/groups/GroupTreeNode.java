@@ -401,11 +401,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
     }
 
-    /// Returns true if the underlying groups of both {@link GroupTreeNode}s is the same.
-    public boolean isSameGroupAs(GroupTreeNode other) {
-        return Objects.equals(getGroup(), other.getGroup());
-    }
-
     public boolean containsGroup(AbstractGroup other) {
         if (this.getGroup() == other) {
             return true;

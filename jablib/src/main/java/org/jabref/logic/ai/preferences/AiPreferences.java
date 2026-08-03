@@ -23,8 +23,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.llm.PredefinedChatModel;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -87,7 +87,7 @@ public class AiPreferences {
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
 
-    private final ObjectProperty<AnswerEngineKind> answerEngineKind;
+    private final ObjectProperty<ResponseEngineKind> responseEngineKind;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
@@ -132,7 +132,7 @@ public class AiPreferences {
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND,                              // Document splitter kind
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE,                        // Document splitter chunk size
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE,                      // Document splitter overlap size
-                AiDefaultExpertSettings.ANSWER_ENGINE_KIND,                                  // Answer engine kind
+                AiDefaultExpertSettings.RESPONSE_ENGINE_KIND,                                // Response engine kind
                 AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT,                               // RAG max results count
                 AiDefaultExpertSettings.RAG_MIN_SCORE,                                       // RAG min score
 
@@ -172,7 +172,7 @@ public class AiPreferences {
             DocumentSplitterKind documentSplitterKind,
             int documentSplitterChunkSize,
             int documentSplitterOverlapSize,
-            AnswerEngineKind answerEngineKind,
+            ResponseEngineKind responseEngineKind,
             int ragMaxResultsCount,
             double ragMinScore,
             String chattingSystemMessageTemplate,
@@ -215,7 +215,7 @@ public class AiPreferences {
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
 
-        this.answerEngineKind = new SimpleObjectProperty<>(answerEngineKind);
+        this.responseEngineKind = new SimpleObjectProperty<>(responseEngineKind);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
@@ -250,6 +250,64 @@ public class AiPreferences {
 
     public static AiPreferences getDefault() {
         return new AiPreferences();
+    }
+
+    /// Creates an independent copy of `other`, e.g. as a dialog-scoped working copy that is
+    /// edited freely and flushed back via [#copyFrom(AiPreferences)] on save.
+    public static AiPreferences copyOf(AiPreferences other) {
+        AiPreferences copy = new AiPreferences();
+        copy.copyFrom(other);
+        return copy;
+    }
+
+    /// Copies all persisted, user-editable values from `other` into this instance.
+    ///
+    /// [#aiFeaturesEnabledInitially] is deliberately not copied: it captures the state at JabRef
+    /// startup and belongs to the instance's own session, not to the copied values.
+    public void copyFrom(AiPreferences other) {
+        setAiFeaturesEnabledCurrently(other.getAiFeaturesEnabledCurrently());
+        setAutoGenerateEmbeddings(other.getAutoGenerateEmbeddings());
+        setAutoGenerateSummaries(other.getAutoGenerateSummaries());
+
+        setAiProvider(other.getAiProvider());
+
+        setOpenAiChatModel(other.getOpenAiChatModel());
+        setMistralAiChatModel(other.getMistralAiChatModel());
+        setGeminiChatModel(other.getGeminiChatModel());
+        setHuggingFaceChatModel(other.getHuggingFaceChatModel());
+
+        setCustomizeExpertSettings(other.getCustomizeExpertSettings());
+
+        setOpenAiApiBaseUrl(other.getOpenAiApiBaseUrl());
+        setMistralAiApiBaseUrl(other.getMistralAiApiBaseUrl());
+        setGeminiApiBaseUrl(other.getGeminiApiBaseUrl());
+        setHuggingFaceApiBaseUrl(other.getHuggingFaceApiBaseUrl());
+
+        setSummarizatorKind(other.getSummarizatorKind());
+        setTokenEstimatorKind(other.getTokenEstimatorKind());
+        setEmbeddingModel(other.getEmbeddingModel());
+        setTemperature(other.getTemperature());
+        setContextWindowSize(other.getContextWindowSize());
+
+        setDocumentSplitterKind(other.getDocumentSplitterKind());
+        setDocumentSplitterChunkSize(other.getDocumentSplitterChunkSize());
+        setDocumentSplitterOverlapSize(other.getDocumentSplitterOverlapSize());
+
+        setResponseEngineKind(other.getResponseEngineKind());
+        setRagMaxResultsCount(other.getRagMaxResultsCount());
+        setRagMinScore(other.getRagMinScore());
+
+        setChattingSystemMessageTemplate(other.getChattingSystemMessageTemplate());
+        setChattingUserMessageTemplate(other.getChattingUserMessageTemplate());
+        setSummarizationChunkSystemMessageTemplate(other.getSummarizationChunkSystemMessageTemplate());
+        setSummarizationCombineSystemMessageTemplate(other.getSummarizationCombineSystemMessageTemplate());
+        setSummarizationFullDocumentSystemMessageTemplate(other.getSummarizationFullDocumentSystemMessageTemplate());
+        setCitationParsingSystemMessageTemplate(other.getCitationParsingSystemMessageTemplate());
+        setMarkdownChatExportTemplate(other.getMarkdownChatExportTemplate());
+
+        setGenerateFollowUpQuestions(other.getGenerateFollowUpQuestions());
+        setFollowUpQuestionsCount(other.getFollowUpQuestionsCount());
+        setFollowUpQuestionsTemplate(other.getFollowUpQuestionsTemplate());
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
@@ -574,16 +632,16 @@ public class AiPreferences {
         this.documentSplitterOverlapSize.set(documentSplitterOverlapSize);
     }
 
-    public ObjectProperty<AnswerEngineKind> answerEngineKindProperty() {
-        return answerEngineKind;
+    public ObjectProperty<ResponseEngineKind> responseEngineKindProperty() {
+        return responseEngineKind;
     }
 
-    public AnswerEngineKind getAnswerEngineKind() {
-        return answerEngineKind.get();
+    public ResponseEngineKind getResponseEngineKind() {
+        return responseEngineKind.get();
     }
 
-    public void setAnswerEngineKind(AnswerEngineKind answerEngineKind) {
-        this.answerEngineKind.set(answerEngineKind);
+    public void setResponseEngineKind(ResponseEngineKind responseEngineKind) {
+        this.responseEngineKind.set(responseEngineKind);
     }
 
     public IntegerProperty ragMaxResultsCountProperty() {
@@ -650,12 +708,12 @@ public class AiPreferences {
         ).flatMap(List::stream).toList();
     }
 
-    public List<? extends Property<?>> getAnswerEngineProperties() {
+    public List<? extends Property<?>> getResponseEngineProperties() {
         return List.of(
                 aiFeaturesEnabledCurrently,
                 embeddingModel,
                 customizeExpertSettings,
-                answerEngineKind,
+                responseEngineKind,
                 ragMaxResultsCount,
                 ragMinScore
         );

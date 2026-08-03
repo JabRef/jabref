@@ -79,7 +79,10 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
@@ -98,8 +101,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 import org.jabref.model.database.BibDatabaseMode;
@@ -171,6 +174,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
+    public static final String IMPORT_KEYWORD_DELIMITERS = "importKeywordDelimiters";
+    public static final String IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY = "importKeywordDelimiterParsingStrategy";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
 
@@ -271,7 +276,12 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
+    public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
+    public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
+    public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
+    public static final String OO_PANDOC_PATH = "ooPandocPath";
+    public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -386,6 +396,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
+    private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
@@ -400,6 +411,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
 
     // region Push to application preferences
@@ -1630,10 +1642,20 @@ public class JabRefCliPreferences implements CliPreferences {
         BibEntryPreferences defaultValues = BibEntryPreferences.getDefault();
 
         bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0));
+                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0),
+                get(IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters()),
+                BibEntryPreferences.ImportDelimiterParsingStrategy.valueOf(get(
+                        IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                        defaultValues.getImportDelimiterParsingStrategy().name())));
 
         bindObject(bibEntryPreferences.keywordSeparatorProperty(), KEYWORD_SEPARATOR, defaultValues.getKeywordSeparator(),
                 String::valueOf, separator -> separator.charAt(0));
+        bindString(bibEntryPreferences.importKeywordDelimitersProperty(), IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters());
+        bindObject(bibEntryPreferences.importDelimiterParsingStrategyProperty(),
+                IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                defaultValues.getImportDelimiterParsingStrategy(),
+                BibEntryPreferences.ImportDelimiterParsingStrategy::name,
+                BibEntryPreferences.ImportDelimiterParsingStrategy::valueOf);
 
         return bibEntryPreferences;
     }
@@ -2045,6 +2067,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         AiPreferences defaultValues = AiPreferences.getDefault();
+        migrateLegacyAiResponseEngineKind(defaultValues);
 
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED, defaultValues.getAiFeaturesEnabled()),
@@ -2068,7 +2091,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND, defaultValues.getDocumentSplitterKind().name())),
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaultValues.documentSplitterChunkSizeProperty().get()),
                 getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaultValues.documentSplitterOverlapSizeProperty().get()),
-                AnswerEngineKind.safeValueOf(get(AI_ANSWER_ENGINE_KIND, defaultValues.getAnswerEngineKind().name())),
+                ResponseEngineKind.safeValueOf(get(AI_RESPONSE_ENGINE_KIND, defaultValues.getResponseEngineKind().name())),
                 getInt(AI_RAG_MAX_RESULTS_COUNT, defaultValues.ragMaxResultsCountProperty().get()),
                 getDouble(AI_RAG_MIN_SCORE, defaultValues.ragMinScoreProperty().get()),
                 get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, defaultValues.getChattingSystemMessageTemplate()),
@@ -2110,7 +2133,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindInt(aiPreferences.documentSplitterChunkSizeProperty(), AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaultValues.documentSplitterChunkSizeProperty().get());
         bindInt(aiPreferences.documentSplitterOverlapSizeProperty(), AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaultValues.documentSplitterOverlapSizeProperty().get());
 
-        bindObject(aiPreferences.answerEngineKindProperty(), AI_ANSWER_ENGINE_KIND, defaultValues.getAnswerEngineKind(), AnswerEngineKind::name, AnswerEngineKind::safeValueOf);
+        bindObject(aiPreferences.responseEngineKindProperty(), AI_RESPONSE_ENGINE_KIND, defaultValues.getResponseEngineKind(), ResponseEngineKind::name, ResponseEngineKind::safeValueOf);
         bindInt(aiPreferences.ragMaxResultsCountProperty(), AI_RAG_MAX_RESULTS_COUNT, defaultValues.ragMaxResultsCountProperty().get());
         bindDouble(aiPreferences.ragMinScoreProperty(), AI_RAG_MIN_SCORE, defaultValues.ragMinScoreProperty().get());
 
@@ -2128,6 +2151,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return aiPreferences;
     }
+
+    private void migrateLegacyAiResponseEngineKind(AiPreferences defaultValues) {
+        if (!hasKey(AI_RESPONSE_ENGINE_KIND) && hasKey(AI_ANSWER_ENGINE_KIND)) {
+            put(AI_RESPONSE_ENGINE_KIND, get(AI_ANSWER_ENGINE_KIND, defaultValues.getResponseEngineKind().name()));
+        }
+    }
     // endregion
 
     // region OCR preferences
@@ -2139,9 +2168,11 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         ocrPreferences = new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
+        bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2489,18 +2520,33 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat()),
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()));
+                getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
+                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
+                getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
+                getStringList(OO_EXTERNAL_BST_STYLES),
+                get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
+                getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()));
 
         bindString(openOfficePreferences.executablePathProperty(), OO_EXECUTABLE_PATH, defaultValues.getExecutablePath());
         bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
         bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
         bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
+        bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
         bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
+        bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindCustomList(openOfficePreferences.getExternalCslStyles(), OO_EXTERNAL_CSL_STYLES, defaultValues.getExternalCslStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(openOfficePreferences.getExternalBstStyles(), OO_EXTERNAL_BST_STYLES, defaultValues.getExternalBstStyles(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindString(openOfficePreferences.pandocPathProperty(), OO_PANDOC_PATH, defaultValues.getPandocPath());
+        bindCustom(openOfficePreferences.bstCitationFormatProperty(), OO_BST_CITATION_FORMAT,
+                defaultValues.getBstCitationFormat(),
+                (_, _, newValue) -> put(OO_BST_CITATION_FORMAT, newValue.name()),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat())),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(defaultValues.getBstCitationFormat()));
         bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
         // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
         bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
@@ -2515,17 +2561,27 @@ public class JabRefCliPreferences implements CliPreferences {
         return openOfficePreferences;
     }
 
-    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [CitationStyle], otherwise
-    /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
-    /// path is absent, the repository is missing, or the JStyle cannot be created.
+    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [org.jabref.logic.citationstyle.CitationStyle], otherwise
+    /// Handles CSL (`.csl`), BST (`.bst`), and JStyle (`.jstyle`) files.
+    /// Falls back to `defaultStyle` when the path is absent or the style cannot be created.
     private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {
         String currentStylePath = get(OO_CURRENT_STYLE, defaultStyle.getPath());
 
         if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
             return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                 .orElse(CSLStyleLoader.getDefaultStyle());
+        } else if (currentStylePath.endsWith(".bst")) {
+            // Internal BST style (classpath resource path starting with /resource/openoffice/)
+            if (currentStylePath.startsWith("/")) {
+                return BstStyle.createInternal(currentStylePath);
+            }
+            // External BST style (absolute filesystem path)
+            java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
+            if (java.nio.file.Files.exists(bstPath)) {
+                return new BstStyle(bstPath);
+            }
+            LOGGER.warn("BST style file not found: {}", currentStylePath);
         } else if (journalAbbreviationRepository != null) {
-            // For now, must be a JStyle. In the future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
                 return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
             } catch (IOException ex) {
@@ -2533,6 +2589,15 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         return defaultStyle;
+    }
+
+    private BstCitationFormat getBstCitationFormatFromPrefs(BstCitationFormat defaultFormat) {
+        String stored = get(OO_BST_CITATION_FORMAT, defaultFormat.name());
+        try {
+            return BstCitationFormat.valueOf(stored);
+        } catch (IllegalArgumentException e) {
+            return defaultFormat;
+        }
     }
     // endregion
 

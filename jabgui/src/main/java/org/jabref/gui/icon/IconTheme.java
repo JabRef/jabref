@@ -193,6 +193,7 @@ public class IconTheme {
         COPY_TO_FOLDER(MaterialDesignC.CONTENT_COPY),
         RENAME(MaterialDesignR.RENAME_BOX),
         DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
+        OCR(MaterialDesignT.TEXT_RECOGNITION),
         REMOVE_LINK(MaterialDesignL.LINK_OFF),
         AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),

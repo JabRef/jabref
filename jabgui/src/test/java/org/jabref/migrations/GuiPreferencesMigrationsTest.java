@@ -92,7 +92,7 @@ class GuiPreferencesMigrationsTest {
                 \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
                 \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
                 \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
-                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
         when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
@@ -102,8 +102,8 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
-    void previewStyleUnchangedWhenMigrationPatternIsMissing() {
-        String unchangedPreviewStyle = """
+    void previewStyleAbstractFormatterMigratesWhenOtherPatternsAreMissing() {
+        String oldPreviewStyle = """
                 <font face="sans-serif">__NEWLINE__\
                 Custom preview style with no migration patterns.__NEWLINE__\
                 \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
@@ -112,11 +112,20 @@ class GuiPreferencesMigrationsTest {
                 \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
                 </font>__NEWLINE__""";
 
-        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(unchangedPreviewStyle);
+        String migratedPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
-        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, unchangedPreviewStyle);
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, migratedPreviewStyle);
     }
 
     @Test
