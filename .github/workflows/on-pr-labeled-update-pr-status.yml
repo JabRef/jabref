@@ -41,8 +41,14 @@ jobs:
 
           # "gh pr ready" only works on open draft PRs. Anything else (merged from the merge queue, closed,
           # already ready for review) would make it exit non-zero and thus fail this workflow.
-          if [ "$(jq -r .state <<< "$PR")" != "OPEN" ] || [ "$(jq -r .isDraft <<< "$PR")" != "true" ]; then
-            echo "⊘ PR is not an open draft - nothing to mark ready for review"
+          STATE=$(jq -r .state <<< "$PR")
+          if [ "$STATE" != "OPEN" ]; then
+            echo "⊘ PR is $STATE - only open PRs can be marked ready for review"
+            exit 0
+          fi
+
+          if [ "$(jq -r .isDraft <<< "$PR")" != "true" ]; then
+            echo "⊘ PR is not a draft - it is already ready for review"
             exit 0
           fi
 
