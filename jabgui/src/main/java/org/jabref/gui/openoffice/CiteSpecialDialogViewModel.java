@@ -7,12 +7,12 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.openoffice.style.CitationType;
 
-public class AdvancedCiteDialogViewModel {
+public class CiteSpecialDialogViewModel {
 
     private final StringProperty pageInfo = new SimpleStringProperty("");
     private final ObjectProperty<CitationType> citationType;
 
-    public AdvancedCiteDialogViewModel(CitationType citationType) {
+    public CiteSpecialDialogViewModel(CitationType citationType) {
         this.citationType = new SimpleObjectProperty<>(citationType);
     }
 

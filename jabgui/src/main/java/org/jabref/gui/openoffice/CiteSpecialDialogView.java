@@ -13,7 +13,7 @@ import org.jabref.model.openoffice.style.CitationType;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewModel> {
+public class CiteSpecialDialogView extends BaseDialog<CiteSpecialDialogViewModel> {
 
     private final CitationType initialCitationType;
 
@@ -24,9 +24,9 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
     @FXML private RadioButton authorOnly;
     @FXML private RadioButton yearOnly;
     @FXML private ToggleGroup citeToggleGroup;
-    private AdvancedCiteDialogViewModel viewModel;
+    private CiteSpecialDialogViewModel viewModel;
 
-    public AdvancedCiteDialogView(CitationType initialCitationType) {
+    public CiteSpecialDialogView(CitationType initialCitationType) {
         this.initialCitationType = initialCitationType;
 
         ViewLoader.view(this)
@@ -45,7 +45,7 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
 
     @FXML
     private void initialize() {
-        viewModel = new AdvancedCiteDialogViewModel(initialCitationType);
+        viewModel = new CiteSpecialDialogViewModel(initialCitationType);
 
         inPar.setUserData(CitationType.AUTHORYEAR_PAR);
         inText.setUserData(CitationType.AUTHORYEAR_INTEXT);
