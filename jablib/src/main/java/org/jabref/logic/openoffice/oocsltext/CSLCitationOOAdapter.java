@@ -75,7 +75,7 @@ public class CSLCitationOOAdapter {
 
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
-    private final Supplier<List<BibDatabaseContext>> databasesSupplier;
+    private final Supplier<List<BibDatabaseContext>> citationLookupDatabasesSupplier;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final OpenOfficePreferences openOfficePreferences;
 
@@ -83,10 +83,10 @@ public class CSLCitationOOAdapter {
     private CSLCitationType citationType;
     private boolean needsCSLReferenceMarkConversion = true;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> citationLookupDatabasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
-        this.databasesSupplier = databasesSupplier;
+        this.citationLookupDatabasesSupplier = citationLookupDatabasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
         this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
@@ -117,7 +117,7 @@ public class CSLCitationOOAdapter {
         try {
             int convertedMarks = markManager.convertReferenceMarks(
                     openOfficePreferences.getReferenceMarkFormat(),
-                    databasesSupplier.get(),
+                    citationLookupDatabasesSupplier.get(),
                     bibEntryTypesManager);
             LOGGER.debug("Converted {} reference marks to {}", convertedMarks, openOfficePreferences.getReferenceMarkFormat());
         } finally {
@@ -466,22 +466,17 @@ public class CSLCitationOOAdapter {
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
 
         /*
-        Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
-        So, to get all databases in real time without having to refresh the connection, we obtain all open databases via the state manager
+        Entries from multiple libraries may need to be updated, and new libraries could have been opened after the
+        document connection. We therefore resolve the currently configured OpenOffice lookup scope in real time.
         */
+        List<BibDatabaseContext> citationLookupDatabases = citationLookupDatabasesSupplier.get();
 
-        // Collect all open databases
-        List<BibDatabaseContext> databaseContexts = databasesSupplier.get();
-        List<BibDatabase> databases = new ArrayList<>();
-        for (BibDatabaseContext databaseContext : databaseContexts) {
-            databases.add(databaseContext.getDatabase());
-        }
-
-        // We first get a list of all cited entries to create a unified database context
-        List<BibEntry> citedEntries = databases.stream()
-                                               .flatMap(db -> db.getEntries().stream())
-                                               .filter(this::isCitedEntry)
-                                               .toList();
+        // We first get a list of all cited entries from the configured lookup scope to create a unified database context
+        List<BibEntry> citedEntries = citationLookupDatabases.stream()
+                                                             .map(BibDatabaseContext::getDatabase)
+                                                             .flatMap(db -> db.getEntries().stream())
+                                                             .filter(this::isCitedEntry)
+                                                             .toList();
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);

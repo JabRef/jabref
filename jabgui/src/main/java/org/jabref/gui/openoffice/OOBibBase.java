@@ -94,7 +94,9 @@ public class OOBibBase {
         readStyleInPreference(doc);
         if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-            Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
+            // CSL revisits existing reference marks later and resolves citation keys from that mark data again,
+            // so it needs the current lookup scope lazily. JStyle and BST operate on the concrete databases passed per action.
+            Supplier<List<BibDatabaseContext>> databasesSupplier = () -> getDatabasesForCitationLookup(stateManager, openOfficePreferences);
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
         }
@@ -113,6 +115,14 @@ public class OOBibBase {
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
         }
+    }
+
+    private static List<BibDatabaseContext> getDatabasesForCitationLookup(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
+        if (openOfficePreferences.getUseAllDatabases()) {
+            return List.copyOf(stateManager.getOpenDatabases());
+        }
+
+        return stateManager.getActiveDatabase().stream().toList();
     }
 
     /// A simple test for document availability.
@@ -1130,7 +1140,7 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-            // Collect only cited entries from all databases
+            // Collect entries from the databases selected by the OpenOffice lookup preference
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
                                               .toList();

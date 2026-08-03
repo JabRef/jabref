@@ -18,9 +18,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -689,23 +687,13 @@ public class OpenOfficePanel {
             }
         });
 
-        ToggleGroup toggleGroup = new ToggleGroup();
-        RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
-        RadioMenuItem useAllBases = new RadioMenuItem(Localization.lang("Look up BibTeX entries in all open libraries"));
-        useActiveBase.setToggleGroup(toggleGroup);
-        useAllBases.setToggleGroup(toggleGroup);
+        CheckMenuItem useActiveBaseOnly = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
+        useActiveBaseOnly.setSelected(!openOfficePreferences.getUseAllDatabases());
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
 
-        if (openOfficePreferences.getUseAllDatabases()) {
-            useAllBases.setSelected(true);
-        } else {
-            useActiveBase.setSelected(true);
-        }
-
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
-        useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
+        useActiveBaseOnly.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBaseOnly.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {
             openOfficePreferences.clearConnectionSettings();
             dialogService.notify(Localization.lang("Cleared connection settings"));
@@ -723,8 +711,7 @@ public class OpenOfficePanel {
                 addSpaceAfter,
                 zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
-                useActiveBase,
-                useAllBases,
+                useActiveBaseOnly,
                 new SeparatorMenuItem(),
                 setPandocPath,
                 autoDetectPandoc,
