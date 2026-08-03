@@ -20,7 +20,7 @@ import tools.maran.svgnode.SvgNode;
 /// special styling.
 ///
 /// Bridges three CSS properties (which font icons already honor) onto this node:
-/// - `-fx-icon-color` → [#setSvgColor(Paint)]
+/// - `-fx-icon-color` → [#setColor(Paint)]
 /// - `-glyph-size` (Ikonli alias used in existing theme CSS) → [#setSize(double)]
 /// - `-fx-icon-size` (absolute, e.g. `.action-icon`) → [#setSize(double)]
 /// - `-fx-font-size` (em, e.g. `.mainToolbar` at `1.7em`) → [#setSize(double)], resolved
@@ -100,7 +100,7 @@ public class JabRefSvgIcon extends SvgNode {
                 protected void invalidated() {
                     Paint color = get();
                     if (color != null) {
-                        setSvgColor(color);
+                        setColor(color);
                     }
                 }
             };

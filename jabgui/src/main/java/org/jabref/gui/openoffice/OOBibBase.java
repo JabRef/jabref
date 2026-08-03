@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
 import org.jabref.logic.openoffice.action.EditSeparate;
@@ -50,6 +52,9 @@ import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
@@ -85,6 +90,7 @@ public class OOBibBase {
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
+        readStyleInPreference(doc);
         if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
@@ -128,6 +134,66 @@ public class OOBibBase {
     /// The title of the current document, or Optional.empty()
     public Optional<String> getCurrentDocumentTitle() {
         return this.connection.getCurrentDocumentTitle();
+    }
+
+    OOVoidResult<OOError> readStyleInPreference() {
+        if (!isConnectedToDocument()) {
+            return OOVoidResult.ok();
+        }
+
+        OOResult<XTextDocument, OOError> document = getXTextDocument();
+        if (document.isError()) {
+            return document.asVoidResult();
+        }
+
+        return readStyleInPreference(document.get());
+    }
+
+    private OOVoidResult<OOError> readStyleInPreference(XTextDocument doc) {
+        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+            return OOVoidResult.ok();
+        }
+
+        try {
+            ZoteroDocumentPreferences.findCitationStyle(doc, CSLStyleLoader.getStyles())
+                                     .ifPresent(openOfficePreferences::setCurrentStyle);
+            return OOVoidResult.ok();
+        } catch (WrappedTargetException e) {
+            LOGGER.warn("Could not read Zotero document preferences", e);
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
+    }
+
+    OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {
+        if (!isConnectedToDocument()) {
+            return OOVoidResult.ok();
+        }
+
+        OOResult<XTextDocument, OOError> document = getXTextDocument();
+        if (document.isError()) {
+            return document.asVoidResult();
+        }
+
+        return writeZoteroDocumentStyle(document.get(), citationStyle);
+    }
+
+    private OOVoidResult<OOError> writeZoteroDocumentStyle(XTextDocument doc, CitationStyle citationStyle) {
+        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+            return OOVoidResult.ok();
+        }
+
+        try {
+            boolean result = ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
+            if (!result) {
+                return OOVoidResult.error(new OOError(
+                        Localization.lang("Problem modifying citation"),
+                        Localization.lang("Could not update document preferences.")));
+            }
+            return OOVoidResult.ok();
+        } catch (IllegalTypeException | NotRemoveableException | PropertyVetoException | WrappedTargetException e) {
+            LOGGER.warn("Could not update Zotero document preferences", e);
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
     }
 
     /* ******************************************************
@@ -581,6 +647,11 @@ public class OOBibBase {
             return OOVoidResult.error(OOError.fromMisc(e));
         }
 
+        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        if (documentPreferencesResult.isError()) {
+            return documentPreferencesResult;
+        }
+
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
@@ -807,7 +878,7 @@ public class OOBibBase {
 
         if (!result.newDatabase.hasEntries()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                             + " no citation keys"
                             + " which could also be found in your current library."));
@@ -817,7 +888,7 @@ public class OOBibBase {
         List<String> unresolvedKeys = result.unresolvedKeys;
         if (!unresolvedKeys.isEmpty()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                                     + " at least %0 citation keys"
                                     + " which could not be found in your current library."
@@ -985,6 +1056,11 @@ public class OOBibBase {
     /// @param errorTitle    Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
+        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        if (documentPreferencesResult.isError()) {
+            return documentPreferencesResult;
+        }
+
         return updateCSLBibliography(dialogService, databases, citationStyle, doc, fcursor, errorTitle, cslCitationOOAdapter, cslUpdateBibliography);
     }
 

@@ -39,7 +39,6 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BackgroundTask;
@@ -84,13 +83,20 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
-    public WebSearchTabViewModel(CliPreferences preferences, ReadOnlyBooleanProperty refAiEnabled, TaskExecutor taskExecutor) {
-        this.importerPreferences = preferences.getImporterPreferences();
-        this.grobidPreferences = preferences.getGrobidPreferences();
-        this.doiPreferences = preferences.getDOIPreferences();
-        this.filePreferences = preferences.getFilePreferences();
-        this.importFormatPreferences = preferences.getImportFormatPreferences();
-        this.libraryPreferences = preferences.getLibraryPreferences();
+    public WebSearchTabViewModel(ImporterPreferences importerPreferences,
+                                 GrobidPreferences grobidPreferences,
+                                 DOIPreferences doiPreferences,
+                                 FilePreferences filePreferences,
+                                 ImportFormatPreferences importFormatPreferences,
+                                 LibraryPreferences libraryPreferences,
+                                 ReadOnlyBooleanProperty refAiEnabled,
+                                 TaskExecutor taskExecutor) {
+        this.importerPreferences = importerPreferences;
+        this.grobidPreferences = grobidPreferences;
+        this.doiPreferences = doiPreferences;
+        this.filePreferences = filePreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.libraryPreferences = libraryPreferences;
         this.taskExecutor = taskExecutor;
 
         this.refAiEnabled = refAiEnabled;

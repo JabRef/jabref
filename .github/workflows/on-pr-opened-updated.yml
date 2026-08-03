@@ -27,7 +27,7 @@ jobs:
       - name: Check PR mergeability
         id: check_mergeable
         run: |
-          set -ex
+          set -exo pipefail
 
           echo "Checking PR [#$PR_NUMBER](https://github.com/JabRef/jabref/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
 
@@ -51,8 +51,11 @@ jobs:
             # "workflow dispatch" does not trigger subsequent "on completion" runs.
             # Therefore, we emulate ghprcomment here
             if [ "$EVENT" = "workflow_dispatch" ]; then
-              HAS_CONFLICT_COMMENT=$(
-                gh api graphql -f query="
+              # Fail closed: a failing "gh api" must abort the step (via set -e), not be
+              # swallowed into "no comment found" - which would post a duplicate comment.
+              # Redirected to a file rather than captured in a variable, because xtrace
+              # would echo the expanded assignment - all 20 comment bodies - into the log.
+              gh api graphql -f query="
                   query {
                     repository(owner: \"JabRef\", name: \"JabRef\") {
                       pullRequest(number: $PR_NUMBER) {
@@ -62,14 +65,9 @@ jobs:
                       }
                     }
                   }
-                " \
-                | jq -r '.data.repository.pullRequest.comments.nodes[].body' \
-                | grep -q "Conflicts with target branch" \
-                  && echo "true" \
-                  || echo "false"
-              )
+                " --jq '.data.repository.pullRequest.comments.nodes[].body' > comments.txt
 
-              if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
+              if grep -q "Conflicts with target branch" comments.txt; then
                 echo "Already commented about conflicts."
                 # When triggered by another workflow, success is also if there is a merge conflict
                 exit 0;

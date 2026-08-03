@@ -3,8 +3,11 @@ package org.jabref.gui.preferences.entryeditor;
 import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +15,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
@@ -41,9 +43,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CitationCountFetcherType> citationCountFetcherTypes =
+            new SimpleListProperty<>(FXCollections.observableArrayList(CitationCountFetcherType.values()));
 
     /// Working copy of tab configurations — not the live preferences list.
-    /// Written to preferences only in {@link #storeSettings()}.
+    /// Written to preferences only in [#storeSettings()].
     private final ObservableList<EntryEditorTabModel> tabModels = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
@@ -53,11 +57,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
     private boolean mscKeywordDescriptionsInitialized;
 
-    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public EntryEditorTabViewModel(DialogService dialogService,
+                                   EntryEditorPreferences entryEditorPreferences,
+                                   MrDlibPreferences mrDlibPreferences,
+                                   AbbreviationPreferences abbreviationPreferences,
+                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferences.getMrDlibPreferences();
-        this.abbreviationPreferences = preferences.getAbbreviationPreferences();
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.mrDlibPreferences = mrDlibPreferences;
+        this.abbreviationPreferences = abbreviationPreferences;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
@@ -165,6 +173,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
+    }
+
+    public ReadOnlyListProperty<CitationCountFetcherType> citationCountFetcherTypes() {
+        return citationCountFetcherTypes;
     }
 
     // endregion
