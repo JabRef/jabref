@@ -12,7 +12,8 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafxDefault = "26.0.1"
+// Keep version in sync build-support/src/main/java/JournalListMvGenerator.java and build-support/src/main/java/LtwaListMvGenerator.java
+val javafxDefault = "26.0.2"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
@@ -22,7 +23,7 @@ val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -43,7 +44,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.3.0")
+    api("com.dlsc.gemsfx:gemsfx:4.3.2")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -57,14 +58,14 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
-    api("com.googlecode.plist:dd-plist:1.29")
+    api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.1")
     api("com.konghq:unirest-modules-gson:4.10.1")
     api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
-    api("com.squareup.okio:okio-jvm:3.18.0")
+    api("com.squareup.okio:okio-jvm:3.18.1")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
@@ -83,7 +84,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.184")
+    api("io.github.classgraph:classgraph:4.8.186")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
@@ -118,8 +119,8 @@ dependencies.constraints {
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.85")
-    api("org.controlsfx:controlsfx:11.2.3")
-    api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
+    api("org.controlsfx:controlsfx:11.2.4")
+    api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.hk2:hk2-api:4.0.1")
@@ -127,7 +128,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.2.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.3.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
@@ -137,8 +138,8 @@ dependencies.constraints {
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
-    api("org.jsoup:jsoup:1.22.2")
-    api("org.jspecify:jspecify:1.0.0")
+    api("org.jsoup:jsoup:1.23.1")
+    api("org.jspecify:jspecify:1.0.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
@@ -158,5 +159,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.12.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
-    api("tools.maran:svgnode:1.0.0")
+    api("tools.maran:svgnode:2.0.0")
 }

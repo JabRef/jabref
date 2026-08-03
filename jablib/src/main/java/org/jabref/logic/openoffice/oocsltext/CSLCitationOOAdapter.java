@@ -403,28 +403,15 @@ public class CSLCitationOOAdapter {
                                   CSLCitationType citationType,
                                   BibDatabaseContext bibDatabaseContext)
             throws CreationException, com.sun.star.uno.Exception {
-        boolean preceedingSpaceExists;
-        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
-
-        // Check if we're at the start of the document - if yes we set the flag and don't insert a space
-        if (!checkCursor.goLeft((short) 1, true)) {
-            // We're at the start of the document
-            preceedingSpaceExists = true;
-        } else {
-            // If not at the start of document, check if there is a space before
-            preceedingSpaceExists = " ".equals(checkCursor.getString());
-            // If not a space, check if it's a paragraph break
-            if (!preceedingSpaceExists) {
-                preceedingSpaceExists = checkCursor.getString().matches("\\R");
-            }
-        }
+        boolean precedingSpaceExists = CitationOOAdapterUtils.hasPrecedingSpace(cursor);
+        boolean succeedingSpaceExists = CitationOOAdapterUtils.hasSucceedingSpace(cursor);
         markManager.insertReferenceIntoOO(
                 entries,
                 document,
                 cursor,
                 ooText,
-                !preceedingSpaceExists,
-                openOfficePreferences.getAddSpaceAfter(),
+                !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 citationType,
                 bibDatabaseContext,
                 bibEntryTypesManager,

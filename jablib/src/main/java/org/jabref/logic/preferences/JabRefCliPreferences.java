@@ -174,6 +174,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
+    public static final String IMPORT_KEYWORD_DELIMITERS = "importKeywordDelimiters";
+    public static final String IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY = "importKeywordDelimiterParsingStrategy";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
 
@@ -274,6 +276,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
+    public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
@@ -1639,10 +1642,20 @@ public class JabRefCliPreferences implements CliPreferences {
         BibEntryPreferences defaultValues = BibEntryPreferences.getDefault();
 
         bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0));
+                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0),
+                get(IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters()),
+                BibEntryPreferences.ImportDelimiterParsingStrategy.valueOf(get(
+                        IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                        defaultValues.getImportDelimiterParsingStrategy().name())));
 
         bindObject(bibEntryPreferences.keywordSeparatorProperty(), KEYWORD_SEPARATOR, defaultValues.getKeywordSeparator(),
                 String::valueOf, separator -> separator.charAt(0));
+        bindString(bibEntryPreferences.importKeywordDelimitersProperty(), IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters());
+        bindObject(bibEntryPreferences.importDelimiterParsingStrategyProperty(),
+                IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                defaultValues.getImportDelimiterParsingStrategy(),
+                BibEntryPreferences.ImportDelimiterParsingStrategy::name,
+                BibEntryPreferences.ImportDelimiterParsingStrategy::valueOf);
 
         return bibEntryPreferences;
     }
@@ -2507,6 +2520,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat()),
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
+                getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
                 getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
@@ -2517,6 +2531,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
         bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
         bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
+        bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
         bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
         bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
 

@@ -108,7 +108,7 @@ to the test class. A temporary file is now created by `Files.createFile(path)`. 
 Sometimes it is necessary to load a specific resource or to access the resource directory
 
 ```java
-Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+Path resourceDir = Paths.get(MSBibImportExportRoundTripFilesTest.class.getResource("MsBibImportExportRoundTripTest1.bib").toURI()).getParent();
 ```
 
 When the directory is needed, it is important to first point to an actual existing file. Otherwise the wrong directory will be returned.
