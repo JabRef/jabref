@@ -39,6 +39,7 @@ public final class CSLBibliographyMark {
     public static void rebuildCSLBibliography(XTextDocument doc,
                                               CSLCitationOOAdapter cslCitationOOAdapter,
                                               List<BibEntry> entries,
+                                              List<BibDatabaseContext> citationLookupDatabases,
                                               CitationStyle citationStyle,
                                               BibDatabaseContext bibDatabaseContext,
                                               BibEntryTypesManager bibEntryTypesManager,
@@ -53,7 +54,7 @@ public final class CSLBibliographyMark {
             createCSLBibTextSection(doc, referenceMarkFormat);
         }
 
-        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager, referenceMarkFormat);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationLookupDatabases, citationStyle, bibDatabaseContext, bibEntryTypesManager, referenceMarkFormat);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -127,6 +128,7 @@ public final class CSLBibliographyMark {
     private static void populateCSLBibTextSection(XTextDocument doc,
                                                   CSLCitationOOAdapter cslCitationOOAdapter,
                                                   List<BibEntry> entries,
+                                                  List<BibDatabaseContext> citationLookupDatabases,
                                                   CitationStyle citationStyle,
                                                   BibDatabaseContext bibDatabaseContext,
                                                   BibEntryTypesManager bibEntryTypesManager,
@@ -142,9 +144,9 @@ public final class CSLBibliographyMark {
 
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
-                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, citationLookupDatabases, bibDatabaseContext, bibEntryTypesManager);
             case ZOTERO_COMPATIBLE ->
-                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, citationLookupDatabases, bibDatabaseContext, bibEntryTypesManager);
         }
 
         LOGGER.debug("CSL bibliography section population completed");

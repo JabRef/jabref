@@ -53,7 +53,7 @@ class OOBibBaseTest {
         assertTrue(result.isOK());
         verify(doc, never()).lockControllers();
         verify(doc, never()).unlockControllers();
-        verify(cslUpdateBibliography, never()).rebuildCSLBibliography(any(), any(), any(), any(), any(), any());
+        verify(cslUpdateBibliography, never()).rebuildCSLBibliography(any(), any(), any(), any(), any(), any(), any());
         verify(fcursor).restore(doc);
     }
 
@@ -72,6 +72,7 @@ class OOBibBaseTest {
         doThrow(new NoDocumentException()).when(cslUpdateBibliography).rebuildCSLBibliography(
                 eq(doc),
                 eq(cslCitationOOAdapter),
+                any(),
                 any(),
                 eq(citationStyle),
                 any(),

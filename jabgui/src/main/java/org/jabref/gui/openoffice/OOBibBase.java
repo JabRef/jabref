@@ -93,11 +93,7 @@ public class OOBibBase {
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         readStyleInPreference(doc);
         if (cslCitationOOAdapter == null) {
-            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-            // CSL revisits existing reference marks later and resolves citation keys from that mark data again,
-            // so it needs the current lookup scope lazily. JStyle and BST operate on the concrete databases passed per action.
-            Supplier<List<BibDatabaseContext>> databasesSupplier = () -> getDatabasesForCitationLookup(stateManager, openOfficePreferences);
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
         }
         if (bstCitationOOAdapter == null) {
@@ -666,6 +662,10 @@ public class OOBibBase {
                                                    BibEntryTypesManager bibEntryTypesManager,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
+        List<BibDatabaseContext> citationLookupDatabases = getDatabasesForCitationLookup(
+                Injector.instantiateModelOrService(StateManager.class),
+                openOfficePreferences);
+
         boolean convertReferenceMarks;
         try {
             convertReferenceMarks = cslCitationOOAdapter.needsReferenceMarkConversion();
@@ -691,18 +691,18 @@ public class OOBibBase {
             OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
                 try {
                     if (convertReferenceMarks) {
-                        cslCitationOOAdapter.convertReferenceMarksToPreference();
+                        cslCitationOOAdapter.convertReferenceMarksToPreference(citationLookupDatabases);
                     }
 
                     if (citationType == CitationType.AUTHORYEAR_PAR) {
                         // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases, bibEntryTypesManager);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                         // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases, bibEntryTypesManager);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
                         // "Insert empty citation"
-                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
+                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, citationLookupDatabases);
                     }
                     return OOVoidResult.ok();
                 } catch (CreationException | com.sun.star.uno.Exception e) {
@@ -1140,6 +1140,10 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
+            List<BibDatabaseContext> citationLookupDatabases = databases.stream()
+                                                                        .map(BibDatabaseContext::new)
+                                                                        .toList();
+
             // Collect entries from the databases selected by the OpenOffice lookup preference
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
@@ -1168,7 +1172,7 @@ public class OOBibBase {
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
             try {
-                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationLookupDatabases, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));

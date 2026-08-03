@@ -33,6 +33,7 @@ public class CSLUpdateBibliography {
     public void rebuildCSLBibliography(XTextDocument doc,
                                        CSLCitationOOAdapter cslCitationOOAdapter,
                                        List<BibEntry> entries,
+                                       List<BibDatabaseContext> citationLookupDatabases,
                                        CitationStyle citationStyle,
                                        BibDatabaseContext bibDatabaseContext,
                                        BibEntryTypesManager bibEntryTypesManager)
@@ -43,6 +44,7 @@ public class CSLUpdateBibliography {
                 doc,
                 cslCitationOOAdapter,
                 entries,
+                citationLookupDatabases,
                 citationStyle,
                 bibDatabaseContext,
                 bibEntryTypesManager,
