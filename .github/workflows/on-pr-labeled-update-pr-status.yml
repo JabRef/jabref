@@ -39,6 +39,17 @@ jobs:
         run: |
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ steps.check.outputs.pr_number }}/labels --jq '.[].name')
 
+          if echo "$LABELS" | grep -q "^status: to-be-merged$"; then
+            echo "⊘ label to-be-merged found - PR is in the merge queue, nothing to do"
+            exit 0
+          fi
+
+          STATE=$(gh pr view --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }} --json state --jq '.state')
+          if [ "$STATE" != "OPEN" ]; then
+            echo "⊘ PR is $STATE - only open PRs can be marked ready for review"
+            exit 0
+          fi
+
           if echo "$LABELS" | grep -q "^status: ready-for-review$"; then
             echo "✅ label ready-for-review found"
             gh pr ready --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }}
