@@ -43,6 +43,7 @@ import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -324,10 +325,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private void setupBstStylesTab() {
         OpenOfficePreferences openOfficePreferences =
                 preferences.getOpenOfficePreferences(journalAbbreviationRepository);
-                
+
         String pandocPath = openOfficePreferences.getPandocPath();
 
-        if (pandocPath == null || pandocPath.isBlank()) {
+        if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to use BST styles"));
             bstPandocWarning.setStyle("-fx-text-fill: #c9a227;");

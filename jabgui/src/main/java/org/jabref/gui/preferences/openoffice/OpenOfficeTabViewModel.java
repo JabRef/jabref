@@ -16,6 +16,9 @@ import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty pandocPath = new SimpleStringProperty();
@@ -65,18 +68,15 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         task.titleProperty().set(Localization.lang("Auto-detecting pandoc"));
         task.showToUser(true);
 
-        task.onSuccess(result -> {
-            if (result.isPresent()) {
-                String path = result.get();
-                pandocPath.set(path);
-
-                dialogService.notify(
-                        Localization.lang("Pandoc detected at: %0", path));
-            } else {
-                dialogService.notify(
-                        Localization.lang("Pandoc could not be detected automatically"));
-            }
-        });
+        task.onSuccess(result ->
+            result.ifPresentOrElse(
+                    path -> {
+                        pandocPath.set(path);
+                        dialogService.notify(
+                                Localization.lang("Pandoc detected at: %0", path));
+                    },
+                    () -> dialogService.notify(
+                            Localization.lang("Pandoc could not be detected automatically"))));
 
         task.onFailure(_ ->
                 dialogService.notify(

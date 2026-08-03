@@ -16,7 +16,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OpenOfficeTab extends AbstractPreferenceTabView<OpenOfficeTabViewModel> {
 
     public OpenOfficeTab() {
