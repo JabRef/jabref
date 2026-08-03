@@ -86,10 +86,53 @@ class KeywordListTest {
     }
 
     @Test
+    void parseWithMultipleDelimitersSingleKeyword() {
+        assertEquals(new KeywordList("keywordOne"),
+                KeywordList.parseWithMultipleDelimiters("keywordOne", List.of(';', ',')));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersWithSemicolonDelimiter() {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
+                KeywordList.parseWithMultipleDelimiters("keywordOne; keywordTwo", List.of(';', ',')));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersWithCommaDelimiter() {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
+                KeywordList.parseWithMultipleDelimiters("keywordOne, keywordTwo", List.of(';', ',')));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersSplitsOnAllConfiguredDelimiters() {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"),
+                KeywordList.parseWithMultipleDelimiters("keywordOne, keywordTwo; keywordThree", List.of(';', ',')));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersDoesNotSplitConfiguredDelimitersInsideBraces() {
+        assertEquals(new KeywordList("test1", "{2,1}", "test3"),
+                KeywordList.parseWithMultipleDelimiters("test1; {2,1}; test3", List.of(';', ',')));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersDoesNotSplitEscapedConfiguredDelimiters() {
+        assertEquals(new KeywordList("keyword#one", "keywordTwo"),
+                KeywordList.parseWithMultipleDelimiters("keyword\\#one; keywordTwo", List.of(';', '#')));
+    }
+
+    @Test
     void parseHierarchicalChain() {
         Keyword expected = Keyword.of(List.of("Parent", "Node", "Child"));
 
         assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ','));
+    }
+
+    @Test
+    void parseWithMultipleDelimitersHierarchicalChain() {
+        Keyword expected = Keyword.of(List.of("Parent", "Node", "Child"));
+
+        assertEquals(new KeywordList(expected), KeywordList.parseWithMultipleDelimiters("Parent > Node > Child", List.of(';', ',')));
     }
 
     @Test
@@ -174,5 +217,11 @@ class KeywordListTest {
         KeywordList parsed = KeywordList.parse(firstSerialize, delimiter);
         String secondSerialize = KeywordList.serialize(parsed.stream().toList(), delimiter);
         assertEquals(expected, secondSerialize);
+    }
+
+    @Test
+    void serializeWithSpacesEscapesEmbeddedDelimiterAndKeepsReadableSeparatorSpacing() {
+        assertEquals("keyword\\,one, keywordTwo",
+                KeywordList.serializeWithSpaces(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), ','));
     }
 }

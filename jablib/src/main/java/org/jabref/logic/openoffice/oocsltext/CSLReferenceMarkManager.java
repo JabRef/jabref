@@ -2,20 +2,34 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.openoffice.JabRefReferenceMark;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
 import org.jabref.logic.openoffice.ReferenceMark;
+import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.rangesort.RangeSort;
+import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
+import org.jabref.model.openoffice.uno.UnoTextRange;
+import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
 
+import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -40,7 +54,9 @@ import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeIn
 /// Class for generation, insertion and management of all reference marks in the document.
 public class CSLReferenceMarkManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMarkManager.class);
-    private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
+    private static final String FORMATTED_CITATION_TEXT_PROPERTY_PREFIX = "JabRef_formatted_citation_text:";
+    private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]*>");
 
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
@@ -49,6 +65,7 @@ public class CSLReferenceMarkManager {
     private Map<String, Integer> citationKeyToNumber = new HashMap<>();
     private final XTextRangeCompare textRangeCompare;
     private int highestCitationNumber = 0;
+    private int nextZoteroItemId = 1;
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
@@ -60,7 +77,11 @@ public class CSLReferenceMarkManager {
         this.citationType = CSLCitationType.NORMAL;
     }
 
-    public CSLReferenceMark createReferenceMark(List<BibEntry> entries, CSLCitationType citationType) throws Exception {
+    public CSLReferenceMark createReferenceMark(List<BibEntry> entries,
+                                                CSLCitationType citationType,
+                                                BibDatabaseContext bibDatabaseContext,
+                                                BibEntryTypesManager entryTypesManager,
+                                                OpenOfficeReferenceMarkFormat referenceMarkFormat) throws Exception {
         List<String> citationKeys = entries.stream()
                                            .map(entry -> entry.getCitationKey().orElse(CUID.randomCUID2(8).toString()))
                                            .collect(Collectors.toList());
@@ -69,16 +90,161 @@ public class CSLReferenceMarkManager {
                                                     .map(this::getCitationNumber)
                                                     .collect(Collectors.toList());
 
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, citationType, factory);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(
+                entries,
+                citationKeys,
+                citationNumbers,
+                citationType,
+                nextZoteroItemId,
+                factory,
+                bibDatabaseContext,
+                entryTypesManager,
+                referenceMarkFormat,
+                getZoteroUriByCitationKey());
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
+        nextZoteroItemId += entries.size();
         this.citationType = citationType;
         return referenceMark;
     }
 
-    public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, CSLCitationType citationType)
+    private Map<String, String> getZoteroUriByCitationKey() {
+        Map<String, String> zoteroUriByCitationKey = new HashMap<>();
+        for (CSLReferenceMark mark : marksInOrder) {
+            String referenceMarkName = mark.getName();
+            if (!ReferenceMark.isZoteroReferenceMarkName(referenceMarkName)) {
+                continue;
+            }
+
+            ZoteroReferenceMark.extractZoteroUriByCitationKey(referenceMarkName)
+                               .forEach(zoteroUriByCitationKey::putIfAbsent);
+        }
+        return zoteroUriByCitationKey;
+    }
+
+    public boolean isConversionNeededForFirstReferenceMark(OpenOfficeReferenceMarkFormat referenceMarkFormat) {
+        sortMarksInOrder();
+        return marksInOrder.stream()
+                           .findFirst()
+                           .map(mark -> !referenceMarkFormat.matchesReferenceMarkName(mark.getName()))
+                           .orElse(false);
+    }
+
+    public int convertReferenceMarks(OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                     List<BibDatabaseContext> bibDatabaseContexts,
+                                     BibEntryTypesManager entryTypesManager) throws Exception, CreationException {
+        sortMarksInOrder();
+        Map<String, String> zoteroUriByCitationKey = getZoteroUriByCitationKey();
+        int convertedMarks = 0;
+
+        for (CSLReferenceMark mark : List.copyOf(marksInOrder)) {
+            if (referenceMarkFormat.matchesReferenceMarkName(mark.getName())) {
+                continue;
+            }
+
+            Optional<String> convertedName = buildConvertedReferenceMarkName(
+                    mark,
+                    referenceMarkFormat,
+                    bibDatabaseContexts,
+                    entryTypesManager,
+                    zoteroUriByCitationKey);
+            if (convertedName.isEmpty()) {
+                LOGGER.warn("Could not convert reference mark: {}", mark.getName());
+                continue;
+            }
+
+            if (updateReferenceMarkName(mark, convertedName.get())) {
+                convertedMarks++;
+            }
+        }
+
+        readAndUpdateExistingMarks();
+        return convertedMarks;
+    }
+
+    private boolean updateReferenceMarkName(CSLReferenceMark mark, String markName) throws Exception, CreationException {
+        Optional<XTextRange> range = Optional.ofNullable(mark.getTextContent().getAnchor());
+        if (range.isEmpty()) {
+            return false;
+        }
+        updateMarkAndText(mark, getCurrentCitationText(mark), markName);
+        return true;
+    }
+
+    private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
+                                                             OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                                             List<BibDatabaseContext> bibDatabaseContexts,
+                                                             BibEntryTypesManager entryTypesManager,
+                                                             Map<String, String> zoteroUriByCitationKey) {
+        return switch (referenceMarkFormat) {
+            case JABREF_ONLY ->
+                    Optional.of(JabRefReferenceMark.buildReferenceMarkName(
+                            mark.getCitationKeys(),
+                            mark.getCitationNumbers(),
+                            mark.getUniqueId(),
+                            mark.getCitationType()));
+            case ZOTERO_COMPATIBLE ->
+                    buildZoteroReferenceMarkName(mark, bibDatabaseContexts, entryTypesManager, zoteroUriByCitationKey);
+        };
+    }
+
+    private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
+                                                          List<BibDatabaseContext> bibDatabaseContexts,
+                                                          BibEntryTypesManager entryTypesManager,
+                                                          Map<String, String> zoteroUriByCitationKey) {
+        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), bibDatabaseContexts);
+        if (entries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<BibEntry> bibEntries = entries.get();
+        ReferenceMark referenceMark = ZoteroReferenceMark.buildReferenceMark(
+                bibEntries,
+                mark.getCitationKeys(),
+                mark.getCitationNumbers(),
+                nextZoteroItemId,
+                mark.getCitationType(),
+                new BibDatabaseContext(new BibDatabase(bibEntries)),
+                entryTypesManager,
+                zoteroUriByCitationKey);
+        nextZoteroItemId += bibEntries.size();
+        return Optional.of(referenceMark.getName());
+    }
+
+    private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
+                                                               List<BibDatabaseContext> bibDatabaseContexts) {
+        List<BibEntry> entries = new ArrayList<>();
+        for (String citationKey : citationKeys) {
+            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, bibDatabaseContexts);
+            if (entry.isEmpty()) {
+                return Optional.empty();
+            }
+            entries.add(entry.orElseThrow());
+        }
+        return Optional.of(entries);
+    }
+
+    private Optional<BibEntry> findEntryByCitationKey(String citationKey,
+                                                      List<BibDatabaseContext> bibDatabaseContexts) {
+        return bibDatabaseContexts.stream()
+                                  .map(BibDatabaseContext::getDatabase)
+                                  .map(database -> database.getEntryByCitationKey(citationKey))
+                                  .flatMap(Optional::stream)
+                                  .findFirst();
+    }
+
+    public void insertReferenceIntoOO(List<BibEntry> entries,
+                                      XTextDocument doc,
+                                      XTextCursor position,
+                                      OOText ooText,
+                                      boolean insertSpaceBefore,
+                                      boolean insertSpaceAfter,
+                                      CSLCitationType citationType,
+                                      BibDatabaseContext bibDatabaseContext,
+                                      BibEntryTypesManager entryTypesManager,
+                                      OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws CreationException, Exception {
-        CSLReferenceMark mark = createReferenceMark(entries, citationType);
+        CSLReferenceMark mark = createReferenceMark(entries, citationType, bibDatabaseContext, entryTypesManager, referenceMarkFormat);
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
 
@@ -109,6 +275,8 @@ public class CSLReferenceMarkManager {
         // Create DocumentAnnotation and attach it
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, mark.getName(), cursor, true);
         UnoReferenceMark.create(documentAnnotation);
+        UnoUserDefinedProperty.setStringProperty(document, FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + mark.getUniqueId(), ooText.toString());
+        mark.setFormattedCitationText(ooText);
 
         // Move cursor to the end of the inserted content
         cursor.gotoRange(endRange, false);
@@ -131,37 +299,48 @@ public class CSLReferenceMarkManager {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
+        highestCitationNumber = 0;
+        nextZoteroItemId = 1;
         citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
+        Set<String> existingReferenceMarkUniqueIds = new HashSet<>();
 
         for (String name : marks.getElementNames()) {
-            String[] parts = name.split(" ");
-            if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
+            if (ReferenceMark.isReferenceMarkName(name)) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
 
-                ReferenceMark referenceMark = new ReferenceMark(name);
+                Optional<ReferenceMark> parsedReferenceMark;
+                parsedReferenceMark = ReferenceMark.parse(name);
+                if (parsedReferenceMark.isEmpty()) {
+                    continue;
+                }
+                ReferenceMark referenceMark = parsedReferenceMark.get();
                 List<String> citationKeys = referenceMark.getCitationKeys();
                 List<Integer> citationNumbers = referenceMark.getCitationNumbers();
 
                 if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
+                    existingReferenceMarkUniqueIds.add(referenceMark.getUniqueId());
+                    String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + referenceMark.getUniqueId();
+                    UnoUserDefinedProperty.getStringValue(document, storageKey)
+                                          .map(OOText::fromString)
+                                          .ifPresent(mark::setFormattedCitationText);
                     marksByName.put(name, mark);
                     marksInOrder.add(mark);
                     citationType = referenceMark.getCitationType();
-
-                    for (int i = 0; i < citationKeys.size(); i++) {
-                        String key = citationKeys.get(i);
-                        int number = citationNumbers.get(i);
-                        citationKeyToNumber.put(key, number);
-                        highestCitationNumber = Math.max(highestCitationNumber, number);
+                    if (ReferenceMark.isZoteroReferenceMarkName(name)) {
+                        nextZoteroItemId = Math.max(nextZoteroItemId, ZoteroReferenceMark.getMaxItemId(name) + 1);
                     }
                 } else {
                     LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
                 }
             }
         }
+
+        removeUnusedFormattedCitationTextProperties(existingReferenceMarkUniqueIds);
+        rebuildCitationNumberState();
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
 
@@ -175,7 +354,26 @@ public class CSLReferenceMarkManager {
         }
     }
 
+    private void removeUnusedFormattedCitationTextProperties(Set<String> existingReferenceMarkUniqueIds) {
+        for (String propertyName : UnoUserDefinedProperty.getListOfNames(document)
+                                                         .stream()
+                                                         .filter(name -> name.startsWith(FORMATTED_CITATION_TEXT_PROPERTY_PREFIX))
+                                                         .filter(name -> !existingReferenceMarkUniqueIds.contains(
+                                                                 name.substring(FORMATTED_CITATION_TEXT_PROPERTY_PREFIX.length())))
+                                                         .toList()) {
+            try {
+                UnoUserDefinedProperty.removeIfExists(document, propertyName);
+            } catch (NotRemoveableException ex) {
+                LOGGER.warn("Could not remove unused formatted CSL citation text property: {}", propertyName, ex);
+            }
+        }
+    }
+
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
+        if (ReferenceMark.isZoteroReferenceMarkName(oldName)) {
+            return oldName;
+        }
+
         String[] parts = oldName.split(" ");
 
         /*
@@ -186,7 +384,7 @@ public class CSLReferenceMarkManager {
         String citationType = parts[parts.length - 1];
         int uniqueIdIndex = parts.length - 2;
 
-        if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
+        if (parts[0].startsWith(JabRefReferenceMark.PREFIXES[0]) && parts[1].startsWith(JabRefReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
             StringBuilder newName = new StringBuilder();
             for (int i = 0; i < uniqueIdIndex; i += 2) {
                 // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
@@ -194,12 +392,39 @@ public class CSLReferenceMarkManager {
                     newName.append(", ");
                 }
                 newName.append(parts[i]).append(" ");
-                newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
+                newName.append(JabRefReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
             }
             newName.append(" ").append(parts[uniqueIdIndex]).append(" ").append(citationType);
             return newName.toString();
         }
         return oldName;
+    }
+
+    private void rebuildCitationNumberState() {
+        sortMarksInOrder();
+        citationKeyToNumber.clear();
+        highestCitationNumber = 0;
+
+        for (CSLReferenceMark mark : marksInOrder) {
+            List<String> citationKeys = mark.getCitationKeys();
+            List<Integer> citationNumbers = new ArrayList<>(mark.getCitationNumbers());
+            for (int i = 0; i < citationKeys.size(); i++) {
+                String citationKey = citationKeys.get(i);
+                int citationNumber = i < citationNumbers.size() ? citationNumbers.get(i) : 0;
+                if (citationNumber <= 0) {
+                    citationNumber = citationKeyToNumber.computeIfAbsent(citationKey, _ -> ++highestCitationNumber);
+                    if (i < citationNumbers.size()) {
+                        citationNumbers.set(i, citationNumber);
+                    } else {
+                        citationNumbers.add(citationNumber);
+                    }
+                } else {
+                    citationKeyToNumber.putIfAbsent(citationKey, citationNumber);
+                    highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+                }
+            }
+            mark.setCitationNumbers(citationNumbers);
+        }
     }
 
     private void updateAllCitationNumbers() throws Exception, CreationException {
@@ -223,38 +448,56 @@ public class CSLReferenceMarkManager {
                 assignedNumbers.add(assignedNumber);
             }
 
+            String currentCitationText = getCurrentCitationText(mark);
             mark.setCitationNumbers(assignedNumbers);
-            updateMarkAndTextWithNewNumbers(mark, assignedNumbers);
+            updateMarkAndTextWithNewNumbers(mark, assignedNumbers, currentCitationText);
         }
 
         citationKeyToNumber = newCitationKeyToNumber;
     }
 
-    private String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
-        Matcher matcher = CITATION_NUMBER_PATTERN.matcher(currentText);
+    static String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
         StringBuilder result = new StringBuilder();
-        int lastEnd = 0;
         int numberIndex = 0;
+        int lastEnd = 0;
 
-        while (matcher.find()) {
-            result.append(currentText, lastEnd, matcher.start(2));
-            if (numberIndex < newNumbers.size()) {
-                result.append(newNumbers.get(numberIndex));
-            } else {
-                // If we've run out of new numbers, increment the last used number
-                result.append(newNumbers.getLast() + (numberIndex - newNumbers.size() + 1));
-            }
-            numberIndex++;
-            lastEnd = matcher.end(2);
+        Matcher tagMatcher = HTML_TAG_PATTERN.matcher(currentText);
+        while (tagMatcher.find()) {
+            numberIndex = appendUpdatedCitationTextSegment(
+                    result,
+                    currentText.substring(lastEnd, tagMatcher.start()),
+                    newNumbers,
+                    numberIndex);
+            result.append(currentText, tagMatcher.start(), tagMatcher.end());
+            lastEnd = tagMatcher.end();
         }
-        result.append(currentText.substring(lastEnd));
+
+        appendUpdatedCitationTextSegment(
+                result,
+                currentText.substring(lastEnd),
+                newNumbers,
+                numberIndex);
 
         return result.toString();
     }
 
-    private void updateMarkAndTextWithNewNumbers(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception, CreationException {
+    private static int appendUpdatedCitationTextSegment(StringBuilder result, String textSegment, List<Integer> newNumbers, int numberIndex) {
+        Matcher matcher = CITATION_NUMBER_PATTERN.matcher(textSegment);
+        int lastEnd = 0;
+
+        while (numberIndex < newNumbers.size() && matcher.find()) {
+            result.append(textSegment, lastEnd, matcher.start());
+            result.append(newNumbers.get(numberIndex));
+            numberIndex++;
+            lastEnd = matcher.end();
+        }
+
+        result.append(textSegment.substring(lastEnd));
+        return numberIndex;
+    }
+
+    private void updateMarkAndTextWithNewNumbers(CSLReferenceMark mark, List<Integer> newNumbers, String currentText) throws Exception, CreationException {
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
-        String currentText = mark.getTextContent().getAnchor().getString();
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
         updateMarkAndText(mark, updatedText, updatedName);
@@ -270,23 +513,28 @@ public class CSLReferenceMarkManager {
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
         String updatedName = mark.getName();
+        if (ReferenceMark.isZoteroReferenceMarkName(updatedName)) {
+            updateMarkAndText(mark, newText, ZoteroReferenceMark.updateCitationType(updatedName, citationType));
+            return;
+        }
+
         // Remove citation marker first
-        if (updatedName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.EMPTY_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.NORMAL_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
+        if (updatedName.endsWith(JabRefReferenceMark.IN_TEXT_MARKER)) {
+            updatedName = updatedName.substring(0, updatedName.length() - JabRefReferenceMark.IN_TEXT_MARKER.length() - 1);
+        } else if (updatedName.endsWith(JabRefReferenceMark.EMPTY_MARKER)) {
+            updatedName = updatedName.substring(0, updatedName.length() - JabRefReferenceMark.EMPTY_MARKER.length() - 1);
+        } else if (updatedName.endsWith(JabRefReferenceMark.NORMAL_MARKER)) {
+            updatedName = updatedName.substring(0, updatedName.length() - JabRefReferenceMark.NORMAL_MARKER.length() - 1);
         }
 
         // Then add the new marker
         String marker = switch (citationType) {
             case IN_TEXT ->
-                    ReferenceMark.IN_TEXT_MARKER;
+                    JabRefReferenceMark.IN_TEXT_MARKER;
             case EMPTY ->
-                    ReferenceMark.EMPTY_MARKER;
+                    JabRefReferenceMark.EMPTY_MARKER;
             case NORMAL ->
-                    ReferenceMark.NORMAL_MARKER;
+                    JabRefReferenceMark.NORMAL_MARKER;
         };
 
         updateMarkAndText(mark, newText, updatedName + " " + marker);
@@ -295,6 +543,7 @@ public class CSLReferenceMarkManager {
     private void updateMarkAndText(CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
+        String oldUniqueId = mark.getUniqueId();
 
         if (range != null) {
             XText text = range.getText();
@@ -307,12 +556,14 @@ public class CSLReferenceMarkManager {
 
             // Store the start position before writing
             XTextRange startRange = cursor.getStart();
+            XTextCursor writeCursor = text.createTextCursorByRange(startRange);
+            OOTextIntoOO.removeEscapementFormatting(writeCursor);
 
             // Update the text using OOTextIntoOO
-            OOTextIntoOO.write(document, cursor, ooText);
+            OOTextIntoOO.write(document, writeCursor, ooText);
 
             // Store the end position after writing
-            XTextRange endRange = cursor.getEnd();
+            XTextRange endRange = writeCursor.getEnd();
 
             // Move cursor to wrap the entire inserted content
             cursor.gotoRange(startRange, false);
@@ -321,10 +572,44 @@ public class CSLReferenceMarkManager {
             // Create and attach DocumentAnnotation
             DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, markName, cursor, true);
             UnoReferenceMark.create(documentAnnotation);
+            Optional<ReferenceMark> newReferenceMark = ReferenceMark.parse(markName);
+            if (newReferenceMark.isEmpty()) {
+                LOGGER.warn("Could not store citation format for reference mark: {}", markName);
+            } else {
+                ReferenceMark referenceMark = newReferenceMark.orElseThrow();
+                String newUniqueId = referenceMark.getUniqueId();
+                UnoUserDefinedProperty.setStringProperty(document, FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + newUniqueId, ooText.toString());
+                mark.setFormattedCitationText(ooText);
+                if (!oldUniqueId.equals(newUniqueId)) {
+                    UnoUserDefinedProperty.removeIfExists(document, FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + oldUniqueId);
+                }
+            }
 
             // Move cursor to the end
             cursor.gotoRange(endRange, false);
         }
+    }
+
+    private String getCurrentCitationText(CSLReferenceMark mark) throws WrappedTargetException {
+        Optional<OOText> formattedCitationText = mark.getFormattedCitationText();
+        if (formattedCitationText.isEmpty()) {
+            String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + mark.getUniqueId();
+            formattedCitationText = UnoUserDefinedProperty.getStringValue(document, storageKey)
+                                                          .map(OOText::fromString);
+            formattedCitationText.ifPresent(mark::setFormattedCitationText);
+        }
+
+        if (formattedCitationText.isPresent()) {
+            return formattedCitationText.get().toString();
+        }
+
+        XTextRange range = mark.getTextContent().getAnchor();
+        if (range == null) {
+            return "";
+        }
+
+        LOGGER.debug("Formatted CSL citation text is missing for reference mark {}", mark.getName());
+        return range.getString();
     }
 
     public int getCitationNumber(String citationKey) {
@@ -349,15 +634,52 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<RangeSortEntry<CSLReferenceMark>> sortEntries = new ArrayList<>();
+
+        for (CSLReferenceMark mark : marksInOrder) {
+            XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling reference mark without anchor: {}", mark.getName());
+                continue;
+            }
+            sortEntries.add(new RangeSortEntry<>(range, 0, mark));
+        }
+
+        RangeSort.RangePartitions<RangeSortEntry<CSLReferenceMark>> partitions =
+                RangeSort.partitionAndSortRanges(sortEntries);
+
+        for (List<RangeSortEntry<CSLReferenceMark>> partition : partitions.getPartitions()) {
+            int indexInPartition = 0;
+            for (RangeSortEntry<CSLReferenceMark> sortEntry : partition) {
+                sortEntry.setIndexInPosition(indexInPartition++);
+
+                Optional<XTextRange> footnoteMarkRange =
+                        UnoTextRange.getFootnoteMarkRange(sortEntry.getRange());
+                footnoteMarkRange.ifPresent(sortEntry::setRange);
+            }
+        }
+
+        sortEntries.sort(this::compareTextRanges);
+
+        marksInOrder.clear();
+        sortEntries.stream()
+                   .map(RangeSortEntry::getContent)
+                   .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(XTextRange r1, XTextRange r2) {
+    private int compareTextRanges(RangeSortEntry<CSLReferenceMark> first, RangeSortEntry<CSLReferenceMark> second) {
+        int rangeComparison;
         try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
+            rangeComparison = textRangeCompare.compareRegionStarts(second.getRange(), first.getRange());
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
-            return 0;
+            rangeComparison = 0;
         }
+
+        if (rangeComparison != 0) {
+            return rangeComparison;
+        }
+
+        return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
     }
 }

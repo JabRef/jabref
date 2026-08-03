@@ -45,11 +45,13 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
+import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -60,7 +62,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
@@ -513,7 +514,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
-        Button chip = new Button("+ " + FieldTextMapper.getDisplayName(field));
+        Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
         chip.getStyleClass().add("all-fields-add-chip");
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
@@ -566,8 +567,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
-        if (editor instanceof LinkedFilesEditor) {
-            // Sizes itself to (file count + 1) rows; a fixed weight-based height would override that.
+        if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
+            // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
         }
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {

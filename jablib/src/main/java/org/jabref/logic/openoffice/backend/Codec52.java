@@ -19,8 +19,8 @@ class Codec52 {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
             // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
-            // citationType is always "1" "2" or "3"
-            Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
+            // citationType is "1".."3" (JabRef 5.2) or "4".."6" (partial markers, see #7861)
+            Pattern.compile(BIB_CITATION + "(\\d*)_([1-6])_(.*)");
 
     private Codec52() {
     }
@@ -50,6 +50,12 @@ class Codec52 {
                     CitationType.AUTHORYEAR_INTEXT;
             case 3 ->
                     CitationType.INVISIBLE_CIT;
+            case 4 ->
+                    CitationType.AUTHORYEAR_NOPAR;
+            case 5 ->
+                    CitationType.AUTHOR_ONLY;
+            case 6 ->
+                    CitationType.YEAR_ONLY;
             default ->
                     throw new IllegalArgumentException("Invalid CitationType code");
         };
@@ -63,6 +69,12 @@ class Codec52 {
                     2;
             case INVISIBLE_CIT ->
                     3;
+            case AUTHORYEAR_NOPAR ->
+                    4;
+            case AUTHOR_ONLY ->
+                    5;
+            case YEAR_ONLY ->
+                    6;
         };
     }
 

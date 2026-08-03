@@ -42,7 +42,58 @@ jobs:
           name: pr_number
           path: pr_number.txt
 
+  changes:
+    name: Detect relevant source changes
+    runs-on: ubuntu-slim
+    outputs:
+      run-gradle-ci-requirements: ${{ steps.determine.outputs.run-gradle-ci-requirements }}
+      run-gradle-ci-full: ${{ steps.determine.outputs.run-gradle-ci-full }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'pull_request'
+        with:
+          fetch-depth: 0
+          show-progress: 'false'
+      - id: changed-non-workflow-non-markdown-files
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files_ignore: |
+            .github/workflows/**
+            **/*.md
+      - id: changed-requirements-docs
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            docs/requirements/**/*.md
+      - id: changed-tests-code-workflow
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .github/workflows/tests-code.yml
+      - name: Determine whether Gradle jobs should run
+        id: determine
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "merge_group" ]]; then
+            echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
+            echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" || "${{ steps.changed-non-workflow-non-markdown-files.outputs.any_changed }}" == "true" ]]; then
+            echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
+            echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ steps.changed-requirements-docs.outputs.any_changed }}" == "true" ]]; then
+            echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
+            echo "run-gradle-ci-full=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run-gradle-ci-requirements=false" >> "$GITHUB_OUTPUT"
+            echo "run-gradle-ci-full=false" >> "$GITHUB_OUTPUT"
+          fi
+
   dependencyscopes:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     name: Dependency Scopes
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
@@ -57,6 +108,8 @@ jobs:
         run: gradle checkAllModuleInfo
 
   format:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
@@ -68,6 +121,8 @@ jobs:
           artifact-name: formatting-fix-patch
 
   format-javadoc:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
@@ -96,7 +151,8 @@ jobs:
     name: Checkstyle
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
-    needs: format
+    needs: [ changes, format ]
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     steps:
       - name: Checkout source
         uses: actions/checkout@v7
@@ -111,7 +167,8 @@ jobs:
     name: OpenRewrite
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
-    needs: checkstyle
+    needs: [ changes, checkstyle ]
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     steps:
       - name: Checkout source
         uses: actions/checkout@v7
@@ -136,6 +193,8 @@ jobs:
   modernizer:
     name: Modernizer
     # too slow on ubuntu-slim
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -191,6 +250,10 @@ jobs:
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-madrlint-
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'corretto'
+          java-version: '25'
       - name: Setup JBang
         # Pinned to a commit for deterministic CI; comment tracks the tag.
         uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
@@ -294,6 +357,8 @@ jobs:
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     name: JavaDoc
     # Sometimes takes longer than 15 minutes, therefore not ubuntu-slim
     runs-on: ubuntu-latest
@@ -307,58 +372,78 @@ jobs:
       - run: gradle javadoc
 
   tests:
+    needs: changes
     name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
+      - name: Skip tests because no source-relevant files changed
+        if: needs.changes.outputs.run-gradle-ci-full != 'true'
+        run: echo "Skipping tests because no source-relevant files changed."
       - name: Checkout source
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
       - name: Run ${{ matrix.module }} tests
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+      - name: Run JabKit portable smoke test
+        if: (needs.changes.outputs.run-gradle-ci-full == 'true') && (matrix.module == 'jabkit')
+        run: gradle :jabkit:runJabKitPortableSmokeTest
       - name: Prepare format failed test results
-        if: failure()
+        if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: xml-twig-tools xsltproc
           version: 1.0
       - name: Format failed test results
-        if: failure()
+        if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()
         run: scripts/after-failure.sh
 
   tests-windows:
+    needs: changes
     name: "Unit tests (Windows)"
     if: >
       github.repository_owner == 'JabRef' &&
       (
         github.event_name == 'push' ||
         github.event_name == 'workflow_dispatch' ||
-        github.event_name == 'pull_request'
+        github.event_name == 'pull_request' ||
+        github.event_name == 'merge_group'
       )
     runs-on: windows-latest
     strategy:
       matrix:
         module: [ jablib ]
     steps:
+      - name: Skip Windows tests because no source-relevant files changed
+        if: needs.changes.outputs.run-gradle-ci-full != 'true'
+        run: echo "Skipping Windows tests because no source-relevant files changed."
       - name: Checkout source
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
       - name: Run ${{ matrix.module }} tests
+        if: needs.changes.outputs.run-gradle-ci-full == 'true'
         run: gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
 
   tests-windows-file-based:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-full == 'true'
     name: "Unit tests (Windows) - file-based"
     runs-on: windows-latest
     steps:
@@ -385,21 +470,9 @@ jobs:
         env:
           CI: "true"
 
-  tests-jabkit-smoke:
-    name: "JabKit Smoke Test"
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - run: gradle :jabkit:runJabKitPortableSmokeTest
-
   databasetests:
-    if: (github.repository_owner == 'JabRef')
+    needs: changes
+    if: github.repository_owner == 'JabRef' && needs.changes.outputs.run-gradle-ci-full == 'true'
     name: Database tests
     runs-on: ubuntu-latest
     services:
@@ -429,7 +502,8 @@ jobs:
           DBMS: "postgresql"
 
   publish:
-    if: github.ref == 'refs/heads/main'
+    needs: changes
+    if: github.ref == 'refs/heads/main' && needs.changes.outputs.run-gradle-ci-full == 'true'
     uses: ./.github/workflows/publish.yml
     secrets:
       KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
@@ -454,9 +528,10 @@ jobs:
         uses: ./.github/actions/jbang-check
 
   jbang-pr:
+    needs: changes
     name: JBang (PR)
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main' && needs.changes.outputs.run-gradle-ci-full == 'true'
     steps:
       - name: Checkout source
         uses: actions/checkout@v7
@@ -552,6 +627,8 @@ jobs:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   requirements_coverage:
+    needs: changes
+    if: needs.changes.outputs.run-gradle-ci-requirements == 'true'
     name: "Validate requirement coverage"
     runs-on: ubuntu-slim
     steps:

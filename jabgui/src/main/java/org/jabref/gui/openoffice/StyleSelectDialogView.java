@@ -11,10 +11,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
@@ -29,9 +31,13 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.TaskExecutor;
@@ -53,10 +59,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private final CSLStyleLoader cslStyleLoader;
     private final JStyleLoader jStyleLoader;
+    private final BstStyleLoader bstStyleLoader;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     @FXML private Tab cslStyleTab;
     @FXML private Tab jStyleTab;
+    @FXML private Tab bstStyleTab;
 
     // CSL Styles TableView
     @FXML private TableView<CSLStyleSelectViewModel> cslStylesTable;
@@ -71,8 +79,18 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TableColumn<JStyleSelectViewModel, String> jStyleFileColumn;
     @FXML private TableColumn<JStyleSelectViewModel, Boolean> jStyleDeleteColumn;
 
+    // BST Styles TableView
+    @FXML private TableView<BstStyleSelectViewModel> bstStylesTable;
+    @FXML private TableColumn<BstStyleSelectViewModel, String> bstNameColumn;
+    @FXML private TableColumn<BstStyleSelectViewModel, String> bstFileColumn;
+    @FXML private TableColumn<BstStyleSelectViewModel, Boolean> bstDeleteColumn;
+
     @FXML private Button addCslButton;
     @FXML private Button addJStyleButton;
+    @FXML private Button addBstStyleButton;
+    @FXML private RadioButton numericFormatButton;
+    @FXML private RadioButton authorYearFormatButton;
+    @FXML private VBox bstPreviewBox;
 
     @FXML private VBox cslPreviewBox;
     @FXML private VBox jStylePreviewBox;
@@ -93,9 +111,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     /// ViewModel for the CitationStyle entries in the TableView
 
-    public StyleSelectDialogView(CSLStyleLoader cslStyleLoader, JStyleLoader jStyleLoader, JournalAbbreviationRepository journalAbbreviationRepository) {
+    public StyleSelectDialogView(CSLStyleLoader cslStyleLoader,
+                                 JStyleLoader jStyleLoader,
+                                 BstStyleLoader bstStyleLoader,
+                                 JournalAbbreviationRepository journalAbbreviationRepository) {
         this.cslStyleLoader = cslStyleLoader;
         this.jStyleLoader = jStyleLoader;
+        this.bstStyleLoader = bstStyleLoader;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         ViewLoader.view(this)
@@ -114,14 +136,17 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, cslStyleLoader, jStyleLoader, preferences, journalAbbreviationRepository, taskExecutor, bibEntryTypesManager);
+        viewModel = new StyleSelectDialogViewModel(dialogService, cslStyleLoader, jStyleLoader, bstStyleLoader, preferences, journalAbbreviationRepository, taskExecutor, bibEntryTypesManager);
 
         setupCslStylesTab();
         setupJStylesTab();
+        setupBstStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences(journalAbbreviationRepository).getCurrentStyle();
         if (currentStyle instanceof CitationStyle) {
             tabPane.getSelectionModel().select(cslStyleTab);
+        } else if (currentStyle instanceof BstStyle) {
+            tabPane.getSelectionModel().select(bstStyleTab);
         } else {
             tabPane.getSelectionModel().select(jStyleTab);
         }
@@ -294,10 +319,92 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.addJStyleFile();
     }
 
+    private void setupBstStylesTab() {
+        bstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        bstFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
+        bstDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
+
+        new ValueTableCellFactory<BstStyleSelectViewModel, Boolean>()
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
+                    }
+                    event.consume();
+                    if (event.getButton() != MouseButton.PRIMARY) {
+                        return;
+                    }
+                    viewModel.deleteBstStyle(style.getBstStyle());
+                    bstStylesTable.getItems().remove(style);
+                })
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
+                .install(bstDeleteColumn);
+
+        new ViewModelTableRowFactory<BstStyleSelectViewModel>()
+                .withOnMouseClickedEvent((item, event) -> {
+                    if (event.getClickCount() == 2) {
+                        viewModel.selectedBstStyleProperty().setValue(item);
+                        viewModel.storeStylePreferences();
+                        this.setResult(viewModel.getSelectedStyle());
+                        this.close();
+                    }
+                })
+                .install(bstStylesTable);
+
+        bstStylesTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
+            if (newValue != null) {
+                viewModel.selectedBstStyleProperty().setValue(newValue);
+            }
+        });
+
+        bstStylesTable.setItems(viewModel.bstStylesProperty());
+        addBstStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+
+        // Preview - updates whenever the selected BST style changes
+        PreviewViewer bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        bstPreviewBox.getChildren().add(bstPreviewViewer);
+
+        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), vm -> {
+            if (vm != null) {
+                bstPreviewViewer.setLayout(BstPreviewLayout.of(vm.getBstStyle()));
+            }
+        });
+
+        // Select the first style if nothing is selected yet (so preview is not blank on open)
+        if (viewModel.selectedBstStyleProperty().get() == null && !bstStylesTable.getItems().isEmpty()) {
+            bstStylesTable.getSelectionModel().selectFirst();
+        }
+
+        // Citation format radio buttons
+        ToggleGroup formatGroup = new ToggleGroup();
+        numericFormatButton.setToggleGroup(formatGroup);
+        authorYearFormatButton.setToggleGroup(formatGroup);
+
+        BstCitationFormat currentFormat = viewModel.bstCitationFormatProperty().get();
+        numericFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC);
+        authorYearFormatButton.setSelected(currentFormat == BstCitationFormat.AUTHOR_YEAR);
+
+        numericFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.NUMERIC);
+            }
+        });
+        authorYearFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.AUTHOR_YEAR);
+            }
+        });
+    }
+
+    @FXML
+    private void addBstStyleFile() {
+        viewModel.addBstStyleFile();
+    }
+
     /// When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
     /// This function scrolls to the last selected style, while taking care of the delay.
     private void onDialogShown(DialogEvent event) {
-        if (!cslStylesTable.getItems().isEmpty()) {
+        if (!cslStylesTable.getItems().isEmpty() || !bstStylesTable.getItems().isEmpty()) {
             Platform.runLater(this::scrollToCurrentStyle);
         }
     }
@@ -314,6 +421,15 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {
                     cslStylesTable.scrollTo(i);
                     cslStylesTable.getSelectionModel().select(i);
+                    break;
+                }
+            }
+        } else if (currentStyle instanceof BstStyle currentBstStyle) {
+            for (int i = 0; i < bstStylesTable.getItems().size(); i++) {
+                BstStyleSelectViewModel item = bstStylesTable.getItems().get(i);
+                if (item.getStylePath().equals(currentBstStyle.getPath())) {
+                    bstStylesTable.scrollTo(i);
+                    bstStylesTable.getSelectionModel().select(i);
                     break;
                 }
             }
