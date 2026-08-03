@@ -1,11 +1,13 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -76,7 +78,7 @@ class DOAJFetcherTest {
     @Test
     void appendSingleWord() throws URISyntaxException {
         URIBuilder builder = new URIBuilder("http://example.com/test");
-        DOAJFetcher.addPath(builder, "/example");
+        DOAJFetcher.addPath(builder, "example");
         assertEquals("http://example.com/test/example", builder.build().toASCIIString());
     }
 
@@ -99,5 +101,11 @@ class DOAJFetcherTest {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "example two");
         assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());
+    }
+
+    @Test
+    void urlForQuery() throws URISyntaxException, MalformedURLException {
+        assertEquals("https://doaj.org/api/search/articles/JabRef%20AND%20MRI?pageSize=30",
+                fetcher.getURLForQuery(SearchBasedFetcher.getQueryNode("JabRef MRI")).toString());
     }
 }

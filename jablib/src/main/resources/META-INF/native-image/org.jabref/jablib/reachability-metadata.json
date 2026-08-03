@@ -267,6 +267,12 @@
       "serializable": true
     },
     {
+      "type": "org.jabref.model.database.BibDatabase"
+    },
+    {
+      "type": "org.jabref.model.database.KeyChangeListener"
+    },
+    {
       "type": "sun.text.resources.cldr.FormatData"
     },
     {
@@ -317,15 +323,12 @@
       "glob": "protectedterms/months_weekdays.terms"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "build.properties"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "journals/journal-list.mv"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "journals/ltwa-list.mv"
     },
     {

@@ -28,17 +28,23 @@ import org.xml.sax.SAXException;
 
 public class PicaXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+            DocumentBuilder dbuild = createDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
         } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
+    }
+
+    private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(DISALLOW_DOCTYPE_DECLARATION, true);
+        return documentBuilderFactory.newDocumentBuilder();
     }
 
     private List<BibEntry> parseEntries(Document content) {

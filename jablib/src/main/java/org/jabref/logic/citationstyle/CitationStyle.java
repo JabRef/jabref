@@ -15,6 +15,8 @@ public class CitationStyle implements OOStyle {
     private static final String ALPHANUMERIC_STYLE = "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690";
 
     private final String filePath;
+    private final String styleId;
+    private final String styleClass;
     private final String title;
     private final String shortTitle;
     private final boolean isNumericStyle;
@@ -23,8 +25,19 @@ public class CitationStyle implements OOStyle {
     private final String source;
     private final boolean isInternalStyle;
 
-    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source, boolean isInternalStyle) {
+    public CitationStyle(@NonNull String filePath,
+                         @NonNull String styleId,
+                         @NonNull String styleClass,
+                         @NonNull String title,
+                         @NonNull String shortTitle,
+                         boolean isNumericStyle,
+                         boolean hasBibliography,
+                         boolean usesHangingIndent,
+                         @NonNull String source,
+                         boolean isInternalStyle) {
         this.filePath = Path.of(filePath).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
+        this.styleId = styleId;
+        this.styleClass = styleClass;
         this.title = title;
         this.shortTitle = shortTitle;
         this.isNumericStyle = isNumericStyle;
@@ -34,13 +47,55 @@ public class CitationStyle implements OOStyle {
         this.isInternalStyle = isInternalStyle;
     }
 
+    public CitationStyle(@NonNull String filePath,
+                         @NonNull String title,
+                         @NonNull String shortTitle,
+                         boolean isNumericStyle,
+                         boolean hasBibliography,
+                         boolean usesHangingIndent,
+                         @NonNull String source,
+                         boolean isInternalStyle) {
+        this(
+                filePath,
+                "",                 // styleId
+                "",                 // styleClass
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                usesHangingIndent,
+                source,
+                isInternalStyle);
+    }
+
     /// Creates a new citation style with an auto-determined internal/external state.
-    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source) {
-        this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
+    public CitationStyle(@NonNull String filePath,
+                         @NonNull String title,
+                         @NonNull String shortTitle,
+                         boolean isNumericStyle,
+                         boolean hasBibliography,
+                         boolean usesHangingIndent,
+                         @NonNull String source) {
+        this(filePath,
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                usesHangingIndent,
+                source,
+                !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public String getStyleId() {
+        return styleId;
+    }
+
+    public String getStyleClass() {
+        return styleClass;
     }
 
     public String getShortTitle() {

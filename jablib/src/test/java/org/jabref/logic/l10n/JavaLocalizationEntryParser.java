@@ -10,18 +10,26 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 @ResourceLock("Localization.lang")
 class JavaLocalizationEntryParser {
 
+    private enum CommentState {
+        NORMAL,
+        LINE_COMMENT,
+        BLOCK_COMMENT,
+        STRING,
+        CHARACTER,
+        TEXT_BLOCK
+    }
+
     private static final String INFINITE_WHITESPACE = "\\s*";
     private static final String DOT = "\\.";
     private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
 
-    private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "menuTitle" + INFINITE_WHITESPACE + "\\(");
     private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
 
     private static final String QUOTATION_PLACEHOLDER = "QUOTATIONPLACEHOLDER";
     private static final Pattern QUOTATION_SYMBOL_PATTERN = Pattern.compile(QUOTATION_PLACEHOLDER);
 
-    public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
-        List<String> parameters = getLocalizationParameter(content, type);
+    public static List<String> getLanguageKeysInString(String content) {
+        List<String> parameters = getLocalizationParameter(content);
 
         List<String> result = new ArrayList<>();
 
@@ -74,15 +82,13 @@ class JavaLocalizationEntryParser {
         return languageKey;
     }
 
-    public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
+    public static List<String> getLocalizationParameter(String rawContent) {
         List<String> result = new ArrayList<>();
 
-        Matcher matcher;
-        if (type == LocalizationBundleForTest.LANG) {
-            matcher = LOCALIZATION_START_PATTERN.matcher(content);
-        } else {
-            matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
-        }
+        // Comments may contain `Localization.lang(...)` snippets, which are no real usages.
+        String content = blankOutComments(rawContent);
+
+        Matcher matcher = LOCALIZATION_START_PATTERN.matcher(content);
         while (matcher.find()) {
             // find contents between the brackets, covering multi-line strings as well
             int index = matcher.end();
@@ -106,5 +112,95 @@ class JavaLocalizationEntryParser {
         }
 
         return result;
+    }
+
+    /// Replaces the content of all Java comments (`//`, `///`, `/* */`, javadoc) by spaces.
+    /// Newlines are kept, so that the result has the same length as the input and the same
+    /// line structure. String literals, text blocks, and character literals are left untouched,
+    /// so a `//` inside a string (e.g. a URL) does not start a comment.
+    static String blankOutComments(String source) {
+        char[] chars = source.toCharArray();
+
+        CommentState state = CommentState.NORMAL;
+        char quote = '\0';
+
+        for (int i = 0; i < chars.length; i++) {
+            switch (state) {
+                case NORMAL -> {
+                    if (startsWith(chars, i, '/', '/')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
+                        i++;
+                        state = CommentState.LINE_COMMENT;
+                    } else if (startsWith(chars, i, '/', '*')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
+                        i++;
+                        state = CommentState.BLOCK_COMMENT;
+                    } else if (startsTextBlock(chars, i)) {
+                        i += 2;
+                        state = CommentState.TEXT_BLOCK;
+                    } else if (chars[i] == '"') {
+                        quote = '"';
+                        state = CommentState.STRING;
+                    } else if (chars[i] == '\'') {
+                        quote = '\'';
+                        state = CommentState.CHARACTER;
+                    }
+                }
+
+                case LINE_COMMENT -> {
+                    if (chars[i] == '\n') {
+                        state = CommentState.NORMAL;
+                    } else {
+                        chars[i] = ' ';
+                    }
+                }
+
+                case BLOCK_COMMENT -> {
+                    if (startsWith(chars, i, '*', '/')) {
+                        chars[i] = ' ';
+                        chars[i + 1] = ' ';
+                        i++;
+                        state = CommentState.NORMAL;
+                    } else if (chars[i] != '\n') {
+                        chars[i] = ' ';
+                    }
+                }
+
+                case STRING,
+                     CHARACTER -> {
+                    if (chars[i] == '\\') {
+                        i++; // skip escaped character
+                    } else if (chars[i] == quote) {
+                        state = CommentState.NORMAL;
+                    }
+                }
+
+                case TEXT_BLOCK -> {
+                    if (chars[i] == '\\') {
+                        i++; // skip escaped character
+                    } else if (startsTextBlock(chars, i)) {
+                        i += 2;
+                        state = CommentState.NORMAL;
+                    }
+                }
+            }
+        }
+
+        return new String(chars);
+    }
+
+    private static boolean startsWith(char[] chars, int index, char first, char second) {
+        return index + 1 < chars.length
+                && chars[index] == first
+                && chars[index + 1] == second;
+    }
+
+    private static boolean startsTextBlock(char[] chars, int index) {
+        return index + 2 < chars.length
+                && chars[index] == '"'
+                && chars[index + 1] == '"'
+                && chars[index + 2] == '"';
     }
 }
