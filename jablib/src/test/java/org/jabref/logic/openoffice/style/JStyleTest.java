@@ -987,16 +987,17 @@ class JStyleTest {
                                                                   Boolean[] isFirstAppearanceOfSource,
                                                                   String[] pageInfos) throws IOException {
         JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
-        assertEquals(expected,
-                getCitationMarkerForType(
-                        style,
-                        entries,
-                        entryDBMap,
-                        citationType,
-                        uniquefiers,
-                        isFirstAppearanceOfSource,
-                        pageInfos
-                )
+
+        String actual = getCitationMarkerForType(
+                style,
+                entries,
+                entryDBMap,
+                citationType,
+                uniquefiers,
+                isFirstAppearanceOfSource,
+                pageInfos
         );
+
+        assertEquals(expected, actual);
     }
 }
