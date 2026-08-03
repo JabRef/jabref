@@ -2548,7 +2548,7 @@ journalInfo .grid-cell-b {
 }
 
 .bibtex-code-area {
-    -fx-font-family: 'Liberation Mono';
+    -fx-font-family: 'JetBrains Mono';
     -fx-font-size: 0.9em;
 }
 

@@ -92,7 +92,7 @@ public class JabRefGUI extends Application {
     private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
-    private static final String LIBERATION_MONO_FONT_RESOURCE = "fonts/LiberationMono-Regular.ttf";
+    private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
@@ -287,18 +287,18 @@ public class JabRefGUI extends Application {
 
     /// Registers bundled fonts so they can be referenced by family name in CSS.
     private void loadBundledFonts() {
-        try (InputStream stream = JabRefGUI.class.getClassLoader().getResourceAsStream(LIBERATION_MONO_FONT_RESOURCE)) {
+        try (InputStream stream = JabRefGUI.class.getClassLoader().getResourceAsStream(BIBTEX_EDITOR_FONT_RESOURCE)) {
             if (stream == null) {
-                LOGGER.warn("Could not find bundled font {}", LIBERATION_MONO_FONT_RESOURCE);
+                LOGGER.warn("Could not find bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE);
                 return;
             }
 
             Font font = Font.loadFont(stream, -1);
             if (font == null) {
-                LOGGER.warn("Could not load bundled font {}, falling back to the platform default", LIBERATION_MONO_FONT_RESOURCE);
+                LOGGER.warn("Could not load bundled font {}, falling back to the platform default", BIBTEX_EDITOR_FONT_RESOURCE);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not load bundled font {}", LIBERATION_MONO_FONT_RESOURCE, e);
+            LOGGER.warn("Could not load bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE, e);
         }
     }
 
