@@ -90,7 +90,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -864,12 +863,14 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // TODO: This could be a wrong database, because the user might have switched to another library
         //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
-        BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
 
         // Snapshot taken here, on the JavaFX Application Thread: the background task must not iterate the live
         // entry list, which the user can modify while the matching runs.
-        List<BibEntry> libraryEntries = List.copyOf(database.getEntries());
-        BibDatabaseMode databaseMode = BibDatabaseModeDetection.inferMode(database);
+        List<BibEntry> libraryEntries = databaseContext.map(context -> List.copyOf(context.getDatabase().getEntries()))
+                                                       .orElseGet(List::of);
+        BibDatabaseMode databaseMode = databaseContext.map(BibDatabaseContext::getMode)
+                                                      .orElse(BibDatabaseMode.BIBLATEX);
 
         this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache, libraryEntries, databaseMode)
             .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
