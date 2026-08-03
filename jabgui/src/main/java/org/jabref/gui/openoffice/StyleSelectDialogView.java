@@ -32,7 +32,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
@@ -332,10 +331,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
-            bstPandocWarning.setStyle("-fx-text-fill: #c9a227;");
-        } else if (!new PandocLatexConverter(pandocPath).isAvailable()) {
-            bstPandocWarning.setText(
-                    Localization.lang("Pandoc is not available at: %0", pandocPath));
             bstPandocWarning.setStyle("-fx-text-fill: #c9a227;");
         } else {
             bstPandocWarning.setText(
