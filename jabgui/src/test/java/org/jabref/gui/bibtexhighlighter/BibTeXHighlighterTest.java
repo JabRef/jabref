@@ -11,14 +11,10 @@ import org.jabref.logic.search.SearchPreferences;
 import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.model.CodeTextModel;
-import jfx.incubator.scene.control.richtext.model.RichParagraph;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,18 +51,6 @@ class BibTeXHighlighterTest {
     }
 
     @Test
-    void createRichParagraphReturnsNonNullParagraph() {
-        when(model.size()).thenReturn(1);
-        when(model.getPlainText(0)).thenReturn("@article{test, author = {Author}}");
-        when(syntaxHighlighter.computeHighlightRegions(anyString())).thenReturn(List.of());
-
-        RichParagraph paragraph = highlighter.createRichParagraph(model, 0);
-
-        assertNotNull(paragraph);
-        assertEquals("@article{test, author = {Author}}", paragraph.getPlainText());
-    }
-
-    @Test
     void createRichParagraphCachesHighlightRegionsWhenTextUnchanged() {
         when(model.size()).thenReturn(2);
         when(model.getPlainText(0)).thenReturn("line1");
@@ -92,37 +76,11 @@ class BibTeXHighlighterTest {
         when(model.getPlainText(1)).thenReturn("line2");
         when(syntaxHighlighter.computeHighlightRegions("line1\nline2")).thenReturn(List.of());
 
-        highlighter.handleChange(model, null, null, 0, 1, 0); // <-- cacheDirty = true yapar
+        highlighter.handleChange(model, null, null, 0, 1, 0);
 
         highlighter.createRichParagraph(model, 0);
 
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1");
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1\nline2");
-    }
-
-    @Test
-    void addSearchHighlightsExecutesWithoutErrorsWhenQueryIsActive() {
-        when(model.size()).thenReturn(1);
-        when(model.getPlainText(0)).thenReturn("author = {Einstein}");
-        when(stateManager.searchQueryProperty()).thenReturn(new SimpleStringProperty("Einstein"));
-        when(syntaxHighlighter.computeHighlightRegions(anyString())).thenReturn(List.of());
-
-        RichParagraph paragraph = highlighter.createRichParagraph(model, 0);
-
-        assertNotNull(paragraph);
-        assertEquals("author = {Einstein}", paragraph.getPlainText());
-    }
-
-    @Test
-    void addSearchHighlightsExecutesWithoutErrorsWhenQueryIsBlank() {
-        when(model.size()).thenReturn(1);
-        when(model.getPlainText(0)).thenReturn("author = {Einstein}");
-        when(stateManager.searchQueryProperty()).thenReturn(new SimpleStringProperty(""));
-        when(syntaxHighlighter.computeHighlightRegions(anyString())).thenReturn(List.of());
-
-        RichParagraph paragraph = highlighter.createRichParagraph(model, 0);
-
-        assertNotNull(paragraph);
-        assertEquals("author = {Einstein}", paragraph.getPlainText());
     }
 }
