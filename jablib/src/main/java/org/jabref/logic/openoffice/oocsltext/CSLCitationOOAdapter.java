@@ -485,6 +485,10 @@ public class CSLCitationOOAdapter {
                                                      .map(unifiedDatabase::getEntryByCitationKey)
                                                      .flatMap(Optional::stream)
                                                      .toList();
+                if (entries.isEmpty()) {
+                    LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
+                    continue;
+                }
                 String citation = createInTextCitationGroupText(style, isAlphaNumericStyle, isNumericStyle, entries, unifiedBibDatabaseContext);
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.IN_TEXT);
             }
@@ -496,6 +500,10 @@ public class CSLCitationOOAdapter {
                                                      .map(unifiedDatabase::getEntryByCitationKey)
                                                      .flatMap(Optional::stream)
                                                      .toList();
+                if (entries.isEmpty()) {
+                    LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
+                    continue;
+                }
 
                 // We re-generate the citation in the new style and update it in the document
                 String citation = createCitationText(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
