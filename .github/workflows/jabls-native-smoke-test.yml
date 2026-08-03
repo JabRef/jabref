@@ -9,6 +9,7 @@ on:
       - 'jabls/**'
       - 'jabls-cli/**'
       - 'jablib/**'
+      - '!jablib/src/test/**'
       - 'versions/**'
       - '.github/workflows/jabls-native-smoke-test.yml'
   pull_request:
@@ -16,6 +17,7 @@ on:
       - 'jabls/**'
       - 'jabls-cli/**'
       - 'jablib/**'
+      - '!jablib/src/test/**'
       - 'versions/**'
       - '.github/workflows/jabls-native-smoke-test.yml'
   merge_group:
