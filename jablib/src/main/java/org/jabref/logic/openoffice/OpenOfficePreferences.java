@@ -305,7 +305,7 @@ public class OpenOfficePreferences {
     }
 
     /// Path to the pandoc executable used for BST bibliography rendering.
-    /// Defaults to `"pandoc"` (system PATH). Users can override via the OO settings menu.
+    /// Defaults to `"pandoc"` (system PATH). Users can override it in Preferences > OpenOffice/LibreOffice.
     public String getPandocPath() {
         return pandocPath.get();
     }

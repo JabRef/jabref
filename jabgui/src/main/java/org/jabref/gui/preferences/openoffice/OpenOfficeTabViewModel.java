@@ -17,9 +17,13 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeTabViewModel.class);
 
     private final StringProperty pandocPath = new SimpleStringProperty();
 
@@ -69,7 +73,7 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         task.showToUser(true);
 
         task.onSuccess(result ->
-            result.ifPresentOrElse(
+                result.ifPresentOrElse(
                     path -> {
                         pandocPath.set(path);
                         dialogService.notify(
@@ -78,9 +82,11 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
                     () -> dialogService.notify(
                             Localization.lang("Pandoc could not be detected automatically"))));
 
-        task.onFailure(_ ->
+        task.onFailure(exception -> {
+                LOGGER.warn("Auto-detection of pandoc path failed", exception);
                 dialogService.notify(
-                        Localization.lang("Auto-detection of pandoc path failed")));
+                        Localization.lang("Auto-detection of pandoc path failed"));
+        });
 
         taskExecutor.execute(task);
     }

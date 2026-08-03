@@ -70,7 +70,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
-- We moved Pandoc path setting into Preferences under OpenOffice/LibreOffice to improve the user experience. The BST style shows the configured Pandoc path state. [#16352](https://github.com/JabRef/jabref/issues/16352)
 
 ### Fixed
 

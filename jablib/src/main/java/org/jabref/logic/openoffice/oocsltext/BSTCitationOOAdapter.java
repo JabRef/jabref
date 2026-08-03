@@ -95,7 +95,7 @@ public class BSTCitationOOAdapter {
         if (!pandoc.isAvailable()) {
             throw new IllegalStateException(
                     "pandoc is not available at the configured path. "
-                            + "Please ensure pandoc is installed and configure its path via the OO settings menu.");
+                            + "Please ensure pandoc is installed and configure its path in Preferences > OpenOffice/LibreOffice.");
         }
 
         OOText title = OOFormat.paragraph(
