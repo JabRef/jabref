@@ -165,6 +165,10 @@ def default_binary(repository_root: Path) -> Path:
     return windows_binary if windows_binary.is_file() else binary
 
 
+# Retries guard against the picked port being taken before JabLS can bind it.
+MAX_STARTUP_ATTEMPTS = 3
+
+
 def find_available_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
         probe.bind(("127.0.0.1", 0))
@@ -191,6 +195,17 @@ def connect_to_server(
             time.sleep(0.1)
 
     raise SmokeTestFailure(f"JabLS did not listen on port {port}: {last_error}")
+
+
+def terminate_process(process: subprocess.Popen[bytes]) -> None:
+    if process.poll() is not None:
+        return
+    process.terminate()
+    try:
+        process.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.wait(timeout=2)
 
 
 def write_fixtures(work_directory: Path) -> SmokeFixtures:
@@ -500,7 +515,6 @@ def main() -> int:
         )
         return 1
 
-    port = find_available_port()
     connection: LspConnection | None = None
     process: subprocess.Popen[bytes] | None = None
     succeeded = False
@@ -514,18 +528,27 @@ def main() -> int:
         try:
             with log_path.open("wb") as server_log:
                 # 1. Start the native executable on a free port and save its log for failures.
-                process = subprocess.Popen(
-                    [str(binary), "--port", str(port)],
-                    cwd=repository_root,
-                    stdout=server_log,
-                    stderr=subprocess.STDOUT,
-                )
-                print(f"PASS  native JabLS started on port {port}")
+                for attempt in range(1, MAX_STARTUP_ATTEMPTS + 1):
+                    port = find_available_port()
+                    process = subprocess.Popen(
+                        [str(binary), "--port", str(port)],
+                        cwd=repository_root,
+                        stdout=server_log,
+                        stderr=subprocess.STDOUT,
+                    )
+                    # 2. Retry until JabLS accepts one TCP connection, then keep it open.
+                    try:
+                        socket_connection = connect_to_server(
+                            process, port, arguments.startup_timeout
+                        )
+                        break
+                    except SmokeTestFailure:
+                        terminate_process(process)
+                        process = None
+                        if attempt == MAX_STARTUP_ATTEMPTS:
+                            raise
 
-                # 2. Retry until JabLS accepts one TCP connection, then keep it open.
-                socket_connection = connect_to_server(
-                    process, port, arguments.startup_timeout
-                )
+                print(f"PASS  native JabLS started on port {port}")
                 connection = LspConnection(socket_connection, arguments.message_timeout)
                 print("PASS  connected to JabLS over TCP")
 
@@ -549,13 +572,8 @@ def main() -> int:
         finally:
             if connection is not None:
                 connection.close()
-            if process is not None and process.poll() is None:
-                process.terminate()
-                try:
-                    process.wait(timeout=2)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait(timeout=2)
+            if process is not None:
+                terminate_process(process)
 
         if not succeeded or arguments.show_server_log:
             print_debug_information(log_path, connection)
