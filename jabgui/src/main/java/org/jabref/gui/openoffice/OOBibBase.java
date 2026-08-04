@@ -625,7 +625,6 @@ public class OOBibBase {
                         citationType,
                         citationStyle,
                         bibDatabaseContext,
-                        bibEntryTypesManager,
                         cursor,
                         syncOptions);
             } else if (style instanceof BstStyle bstStyle) {
@@ -664,7 +663,6 @@ public class OOBibBase {
                                                    CitationType citationType,
                                                    CitationStyle citationStyle,
                                                    BibDatabaseContext currentEntryContext,
-                                                   BibEntryTypesManager bibEntryTypesManager,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
         List<BibDatabase> lookupDatabases = getLookupDatabases(
