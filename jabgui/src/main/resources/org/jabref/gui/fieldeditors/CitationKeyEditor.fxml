@@ -9,3 +9,4 @@
     <EditorTextField fx:id="textField"/>
     <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button"/>
 </fx:root>
+
