@@ -49,14 +49,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
-/// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
-/// It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
+/// It is tightly coupled with [CSLReferenceMarkManager] for management of reference marks tied to the CSL citations.
+/// It uses [OpenOfficePreferences] to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
 /// Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
 ///
-/// @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
+/// Implementation note: UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
 /// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
 /// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
-/// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
+/// For example, see the comment inside [CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext)].
 public class CSLCitationOOAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLCitationOOAdapter.class);
@@ -81,7 +81,8 @@ public class CSLCitationOOAdapter {
     private CSLCitationType citationType;
     private boolean needsCSLReferenceMarkConversion = true;
 
-    public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+            throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.bibEntryTypesManager = bibEntryTypesManager;
@@ -156,10 +157,7 @@ public class CSLCitationOOAdapter {
 
     /// Inserts a citation for a group of entries.
     /// Comparable to LaTeX's \cite command.
-    public void insertCitation(XTextCursor cursor,
-                               CitationStyle selectedStyle,
-                               List<BibEntry> entries,
-                               BibDatabaseContext currentEntryContext)
+    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
         String style = selectedStyle.getSource();
@@ -188,10 +186,7 @@ public class CSLCitationOOAdapter {
     /// Comparable to LaTeX's \citet command.
     ///
     /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext) insertCitation} method.
-    public void insertInTextCitation(XTextCursor cursor,
-                                     CitationStyle selectedStyle,
-                                     List<BibEntry> entries,
-                                     BibDatabaseContext currentEntryContext)
+    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
@@ -212,10 +207,7 @@ public class CSLCitationOOAdapter {
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertJabRefBibliography(XTextCursor cursor,
-                                         CitationStyle selectedStyle,
-                                         List<BibEntry> entries,
-                                         List<BibDatabase> lookupDatabases)
+    public void insertJabRefBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> lookupDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -263,10 +255,7 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public void insertZoteroBibliography(XTextCursor cursor,
-                                         CitationStyle selectedStyle,
-                                         List<BibEntry> entries,
-                                         List<BibDatabase> lookupDatabases)
+    public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> lookupDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -450,9 +439,7 @@ public class CSLCitationOOAdapter {
     /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
     /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
     /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
-    private void updateAllCitationsWithNewStyle(CitationStyle style,
-                                                CSLCitationType citationType,
-                                                List<BibDatabase> lookupDatabases)
+    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType, List<BibDatabase> lookupDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
