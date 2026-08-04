@@ -364,7 +364,7 @@ public class CSLCitationOOAdapter {
         return OOFormat.setLocaleNone(OOText.fromString(bibliographyText.toString()));
     }
 
-    private static TabStop @NonNull [] createTabStops(int @NonNull... positions) {
+    private static TabStop @NonNull [] createTabStops(int @NonNull ... positions) {
         TabStop[] tabStops = new TabStop[positions.length];
         for (int i = 0; i < positions.length; i++) {
             tabStops[i] = new TabStop();
