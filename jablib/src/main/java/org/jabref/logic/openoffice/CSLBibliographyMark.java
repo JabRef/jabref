@@ -8,7 +8,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
@@ -41,7 +40,6 @@ public final class CSLBibliographyMark {
                                               List<BibEntry> entries,
                                               List<BibDatabase> lookupDatabases,
                                               CitationStyle citationStyle,
-                                              BibEntryTypesManager bibEntryTypesManager,
                                               OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
@@ -53,7 +51,7 @@ public final class CSLBibliographyMark {
             createCSLBibTextSection(doc, referenceMarkFormat);
         }
 
-        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupDatabases, citationStyle, bibEntryTypesManager, referenceMarkFormat);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, lookupDatabases, citationStyle, referenceMarkFormat);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -129,7 +127,6 @@ public final class CSLBibliographyMark {
                                                   List<BibEntry> entries,
                                                   List<BibDatabase> lookupDatabases,
                                                   CitationStyle citationStyle,
-                                                  BibEntryTypesManager bibEntryTypesManager,
                                                   OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
@@ -142,9 +139,9 @@ public final class CSLBibliographyMark {
 
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
-                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupDatabases, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, lookupDatabases);
             case ZOTERO_COMPATIBLE ->
-                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupDatabases, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, lookupDatabases);
         }
 
         LOGGER.debug("CSL bibliography section population completed");

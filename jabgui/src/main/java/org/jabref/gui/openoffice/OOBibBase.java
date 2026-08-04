@@ -705,11 +705,11 @@ public class OOBibBase {
                         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case).
                         cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, lookupDatabases);
                         // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                         cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, lookupDatabases);
                         // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext, bibEntryTypesManager);
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
                         cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, lookupDatabases);
                         // "Insert empty citation"
@@ -1175,7 +1175,7 @@ public class OOBibBase {
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
             try {
-                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, databases, citationStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, databases, citationStyle);
             } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));

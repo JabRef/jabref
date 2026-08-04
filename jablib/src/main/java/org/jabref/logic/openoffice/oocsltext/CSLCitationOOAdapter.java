@@ -159,8 +159,7 @@ public class CSLCitationOOAdapter {
     public void insertCitation(XTextCursor cursor,
                                CitationStyle selectedStyle,
                                List<BibEntry> entries,
-                               BibDatabaseContext currentEntryContext,
-                               BibEntryTypesManager bibEntryTypesManager)
+                               BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
         String style = selectedStyle.getSource();
@@ -172,7 +171,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, currentEntryContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, currentEntryContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, currentEntryContext, this.bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -188,12 +187,11 @@ public class CSLCitationOOAdapter {
     /// Inserts in-text citations for a group of entries.
     /// Comparable to LaTeX's \citet command.
     ///
-    /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
+    /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext) insertCitation} method.
     public void insertInTextCitation(XTextCursor cursor,
                                      CitationStyle selectedStyle,
                                      List<BibEntry> entries,
-                                     BibDatabaseContext currentEntryContext,
-                                     BibEntryTypesManager bibEntryTypesManager)
+                                     BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
@@ -217,8 +215,7 @@ public class CSLCitationOOAdapter {
     public void insertJabRefBibliography(XTextCursor cursor,
                                          CitationStyle selectedStyle,
                                          List<BibEntry> entries,
-                                         List<BibDatabase> lookupDatabases,
-                                         BibEntryTypesManager bibEntryTypesManager)
+                                         List<BibDatabase> lookupDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -244,7 +241,7 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, currentEntryContext, bibEntryTypesManager).getFirst();
+                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, currentEntryContext, this.bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
@@ -255,7 +252,7 @@ public class CSLCitationOOAdapter {
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, currentEntryContext, bibEntryTypesManager);
+            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, currentEntryContext, this.bibEntryTypesManager);
 
             for (String bibliographyEntry : bibliographyEntries) {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
@@ -269,8 +266,7 @@ public class CSLCitationOOAdapter {
     public void insertZoteroBibliography(XTextCursor cursor,
                                          CitationStyle selectedStyle,
                                          List<BibEntry> entries,
-                                         List<BibDatabase> lookupDatabases,
-                                         BibEntryTypesManager bibEntryTypesManager)
+                                         List<BibDatabase> lookupDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -295,7 +291,7 @@ public class CSLCitationOOAdapter {
                 selectedStyle.getSource(),
                 HTML_OUTPUT_FORMAT,
                 currentEntryContext,
-                bibEntryTypesManager);
+                this.bibEntryTypesManager);
         if (bibliography.isEmpty()) {
             return;
         }
@@ -551,7 +547,7 @@ public class CSLCitationOOAdapter {
         if (isAlphaNumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, bibDatabaseContext, this.bibEntryTypesManager);
         }
 
         citation = CSLFormatUtils.transformHTML(citation);

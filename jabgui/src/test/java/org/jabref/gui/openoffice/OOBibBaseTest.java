@@ -53,7 +53,7 @@ class OOBibBaseTest {
         assertTrue(result.isOK());
         verify(doc, never()).lockControllers();
         verify(doc, never()).unlockControllers();
-        verify(cslUpdateBibliography, never()).rebuildCSLBibliography(any(), any(), any(), any(), any(), any());
+        verify(cslUpdateBibliography, never()).rebuildCSLBibliography(any(), any(), any(), any(), any());
         verify(fcursor).restore(doc);
     }
 
@@ -74,8 +74,7 @@ class OOBibBaseTest {
                 eq(cslCitationOOAdapter),
                 any(),
                 any(),
-                eq(citationStyle),
-                any());
+                eq(citationStyle));
 
         OOVoidResult<OOError> result = OOBibBase.updateCSLBibliography(
                 dialogService,

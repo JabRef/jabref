@@ -7,7 +7,6 @@ import org.jabref.logic.openoffice.CSLBibliographyMark;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 
@@ -34,8 +33,7 @@ public class CSLUpdateBibliography {
                                        CSLCitationOOAdapter cslCitationOOAdapter,
                                        List<BibEntry> entries,
                                        List<BibDatabase> lookupDatabases,
-                                       CitationStyle citationStyle,
-                                       BibEntryTypesManager bibEntryTypesManager)
+                                       CitationStyle citationStyle)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
@@ -45,7 +43,6 @@ public class CSLUpdateBibliography {
                 entries,
                 lookupDatabases,
                 citationStyle,
-                bibEntryTypesManager,
                 openOfficePreferences.getReferenceMarkFormat());
 
         LOGGER.debug("Finished rebuilding CSL bibliography");
