@@ -75,13 +75,14 @@ public class OOBibBase {
     private final OOBibBaseConnect connection;
 
     private final OpenOfficePreferences openOfficePreferences;
+    private final BibEntryTypesManager bibEntryTypesManager;
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
     private BSTCitationOOAdapter bstCitationOOAdapter;
     private BstUpdateBibliography bstUpdateBibliography;
 
-    public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
+    public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws
             BootstrapException,
             CreationException, IOException, InterruptedException {
@@ -89,12 +90,13 @@ public class OOBibBase {
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
         this.openOfficePreferences = openOfficePreferences;
+        this.bibEntryTypesManager = bibEntryTypesManager;
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         readStyleInPreference(doc);
         if (cslCitationOOAdapter == null) {
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
             cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
         }
         if (bstCitationOOAdapter == null) {

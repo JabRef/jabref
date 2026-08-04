@@ -537,7 +537,7 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
-        return new OOBibBase(loPath, dialogService, openOfficePreferences);
+        return new OOBibBase(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
