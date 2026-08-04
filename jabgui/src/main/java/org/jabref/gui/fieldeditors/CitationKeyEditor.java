@@ -20,6 +20,7 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.views.ViewLoader;
 
 import jakarta.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
