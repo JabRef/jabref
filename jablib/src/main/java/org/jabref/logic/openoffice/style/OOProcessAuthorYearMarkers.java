@@ -13,7 +13,6 @@ import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroups;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
-import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.CitedKey;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
@@ -133,13 +132,12 @@ class OOProcessAuthorYearMarkers {
         setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-            final boolean inParenthesis = group.citationType == CitationType.AUTHORYEAR_PAR;
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
             List<Citation> cits = group.getCitationsInLocalOrder();
             List<CitationMarkerEntry> citationMarkerEntries = OOListUtil.map(cits, e -> e);
             OOText citMarker = style.createCitationMarker(citationMarkerEntries,
-                    inParenthesis,
+                    group.citationType,
                     strictlyUnique);
             group.setCitationMarker(Optional.of(citMarker));
         }

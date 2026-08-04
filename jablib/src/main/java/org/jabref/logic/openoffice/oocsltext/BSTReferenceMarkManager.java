@@ -327,6 +327,10 @@ public class BSTReferenceMarkManager {
 
         for (BSTReferenceMark mark : marksInOrder) {
             XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling BST reference mark without anchor: {}", mark.getName());
+                continue;
+            }
             sortEntries.add(new RangeSortEntry<>(range, 0, mark));
         }
 
