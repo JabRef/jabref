@@ -112,8 +112,6 @@ public class OOBibBase {
         }
     }
 
-
-
     /// A simple test for document availability.
     ///
     /// See also `isDocumentConnectionMissing` for a test actually attempting to use the connection.
