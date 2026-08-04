@@ -347,7 +347,7 @@ public class OpenOfficePanel {
     private void exportEntries() {
         List<BibDatabase> databases = getDatabaseList();
         boolean returnPartialResult = false;
-        Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);
+        Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, currentStyle, returnPartialResult);
         if (newDatabase.isPresent()) {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
             LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -465,7 +465,7 @@ public class OpenOfficePanel {
         merge.setDisable(!canRefreshDocument || cslStyleSelected);
         unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
         manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
         modifyBibliographyProperties.setDisable(!(cslStyleSelected || bstStyleSelected));
     }
 

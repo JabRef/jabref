@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedSet;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -159,6 +161,16 @@ public class BSTCitationOOAdapter {
                     openOfficePreferences.getCslBibliographyBodyFormat());
             OOTextIntoOO.write(document, cursor, ooBreak);
         }
+    }
+
+    public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
+        markManager.readExistingMarks();
+
+        SequencedSet<String> identifiers = new LinkedHashSet<>();
+        for (BSTReferenceMark mark : markManager.getMarksInOrder().reversed()) {
+            identifiers.addAll(mark.getCitationKeys());
+        }
+        return List.copyOf(identifiers);
     }
 
     /// Returns `true` if the given entry has already been cited in the document.

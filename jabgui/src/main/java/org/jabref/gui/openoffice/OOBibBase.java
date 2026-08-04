@@ -900,7 +900,7 @@ public class OOBibBase {
     /// Does not refresh the bibliography.
     ///
     /// @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
-    public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
+    public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, OOStyle style, boolean returnPartialResult) {
         final Optional<BibDatabase> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Unable to generate new library");
 
@@ -915,8 +915,14 @@ public class OOBibBase {
         ExportCited.GenerateDatabaseResult result = null;
         try {
             UnoUndo.enterUndoContext(doc, "Changes during \"Export cited\"");
-            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult =
-                    ExportCited.generateDatabase(doc, databases);
+            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult;
+            if (style instanceof CitationStyle) {
+                generateResult = exportCitedForCSL(databases);
+            } else if (style instanceof BstStyle) {
+                generateResult = exportCitedForBST(databases);
+            } else {
+                generateResult = ExportCited.generateDatabase(doc, databases);
+            }
             if (testDialog(errorTitle, generateResult.asVoidResult().mapError(OOError::from))) {
                 return FAIL;
             }
@@ -953,6 +959,30 @@ public class OOBibBase {
             }
         }
         return Optional.of(result.newDatabase);
+    }
+
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases) {
+        if (cslCitationOOAdapter == null) {
+            return OOResult.error(new JabRefException("CSL citation adapter is not initialized"));
+        }
+
+        try {
+            return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(cslCitationOOAdapter.getCitedCitationKeys(), databases));
+        } catch (WrappedTargetException | NoSuchElementException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
+    }
+
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases) {
+        if (bstCitationOOAdapter == null) {
+            return OOResult.error(new JabRefException("BST citation adapter is not initialized"));
+        }
+
+        try {
+            return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(bstCitationOOAdapter.getCitedIdentifiers(), databases));
+        } catch (WrappedTargetException | NoSuchElementException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
     }
 
     /// GUI action, refreshes citation markers and bibliography.

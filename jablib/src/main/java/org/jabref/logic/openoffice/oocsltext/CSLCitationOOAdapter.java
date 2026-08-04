@@ -3,8 +3,10 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -550,6 +552,16 @@ public class CSLCitationOOAdapter {
         }
 
         return citation;
+    }
+
+    public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
+        markManager.readExistingMarks();
+
+        SequencedSet<String> citationKeys = new LinkedHashSet<>();
+        for (CSLReferenceMark mark : markManager.getMarksInOrder().reversed()) {
+            citationKeys.addAll(mark.getCitationKeys());
+        }
+        return List.copyOf(citationKeys);
     }
 
     /// Checks if an entry has already been cited before in the document.

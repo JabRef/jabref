@@ -133,10 +133,11 @@ public class BSTReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         identifierToNumber.clear();
+        highestCitationNumber = 0;
         citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -175,6 +176,10 @@ public class BSTReferenceMarkManager {
         }
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
 
         if (isNumberUpdateRequired) {
             try {
@@ -295,6 +300,11 @@ public class BSTReferenceMarkManager {
             // Move cursor to the end
             cursor.gotoRange(endRange, false);
         }
+    }
+
+    public List<BSTReferenceMark> getMarksInOrder() {
+        sortMarksInOrder();
+        return marksInOrder;
     }
 
     public int getCitationNumber(String identifier) {
