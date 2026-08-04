@@ -1,5 +1,8 @@
 package org.jabref.logic.ocr;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum EngineSelection {
     OCRMYPDF("OCRmyPDF"),
     DOCLING("Docling");
