@@ -588,9 +588,10 @@ public class OpenOfficePanel {
             return;
         }
 
+        List<BibDatabase> lookupDatabases = getBaseList();
         Optional<Update.SyncOptions> syncOptions =
                 openOfficePreferences.getSyncWhenCiting()
-                ? Optional.of(new Update.SyncOptions(getBaseList()))
+                ? Optional.of(new Update.SyncOptions(lookupDatabases))
                 : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
@@ -599,7 +600,7 @@ public class OpenOfficePanel {
         }
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
-                getBaseList(),
+                lookupDatabases,
                 currentStyle,
                 citationType,
                 pageInfo,
