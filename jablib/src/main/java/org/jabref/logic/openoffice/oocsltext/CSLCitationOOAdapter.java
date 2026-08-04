@@ -555,6 +555,9 @@ public class CSLCitationOOAdapter {
     }
 
     public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
+        // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
+        // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
+        // full readAndUpdateExistingMarks() refresh.
         CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document);
         exportMarkManager.readExistingMarks();
 

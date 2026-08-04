@@ -164,6 +164,8 @@ public class BSTCitationOOAdapter {
     }
 
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
+        // Use a transient manager here so export only inspects marks. Reusing the adapter's live manager would
+        // disturb its cached numbering state for subsequent BST operations before the next full refresh.
         BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document);
         exportMarkManager.readExistingMarks();
 
