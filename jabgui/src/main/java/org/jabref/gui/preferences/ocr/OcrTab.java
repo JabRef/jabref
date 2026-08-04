@@ -30,11 +30,11 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     private void buildView() {
         setContent(form()
 
-                .section(Localization.lang("OCR engine selection"), engine -> engine
-                        .combo(Localization.lang("OCR engine"),
+                .section(Localization.lang("OCR engine"), engine -> engine
+                        .combo(Localization.lang("Engine selection"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName))
 
-                .section(Localization.lang("OCR engine path"), path -> path
+                .section(Localization.lang("Engine path"), path -> path
                         .custom(buildEnginePathRow()))
 
                 .section(Localization.lang("Handling of pre-existing text"), scanned -> scanned
