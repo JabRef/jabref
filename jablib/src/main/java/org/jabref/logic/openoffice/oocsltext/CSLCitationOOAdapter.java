@@ -555,10 +555,11 @@ public class CSLCitationOOAdapter {
     }
 
     public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
-        markManager.readExistingMarks();
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document);
+        exportMarkManager.readExistingMarks();
 
         SequencedSet<String> citationKeys = new LinkedHashSet<>();
-        for (CSLReferenceMark mark : markManager.getMarksInOrder().reversed()) {
+        for (CSLReferenceMark mark : exportMarkManager.getMarksInOrder().reversed()) {
             citationKeys.addAll(mark.getCitationKeys());
         }
         return List.copyOf(citationKeys);

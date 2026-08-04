@@ -917,9 +917,9 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Changes during \"Export cited\"");
             OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult;
             if (style instanceof CitationStyle) {
-                generateResult = exportCitedForCSL(databases);
+                generateResult = exportCitedForCSL(databases, doc);
             } else if (style instanceof BstStyle) {
-                generateResult = exportCitedForBST(databases);
+                generateResult = exportCitedForBST(databases, doc);
             } else {
                 generateResult = ExportCited.generateDatabase(doc, databases);
             }
@@ -961,25 +961,23 @@ public class OOBibBase {
         return Optional.of(result.newDatabase);
     }
 
-    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases) {
-        if (cslCitationOOAdapter == null) {
-            return OOResult.error(new JabRefException("CSL citation adapter is not initialized"));
-        }
-
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases, XTextDocument doc) {
         try {
+            if (cslCitationOOAdapter == null) {
+                initializeCitationAdapter(doc);
+            }
             return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(cslCitationOOAdapter.getCitedCitationKeys(), databases));
         } catch (WrappedTargetException | NoSuchElementException e) {
             return OOResult.error(new JabRefException(e.getMessage(), e));
         }
     }
 
-    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases) {
-        if (bstCitationOOAdapter == null) {
-            return OOResult.error(new JabRefException("BST citation adapter is not initialized"));
-        }
-
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases, XTextDocument doc) {
         try {
-            return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(bstCitationOOAdapter.getCitedIdentifiers(), databases));
+            if (bstCitationOOAdapter == null) {
+                initializeCitationAdapter(doc);
+            }
+            return OOResult.ok(ExportCited.generateDatabaseFromIdentifiers(bstCitationOOAdapter.getCitedIdentifiers(), databases));
         } catch (WrappedTargetException | NoSuchElementException e) {
             return OOResult.error(new JabRefException(e.getMessage(), e));
         }

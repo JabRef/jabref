@@ -164,10 +164,11 @@ public class BSTCitationOOAdapter {
     }
 
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
-        markManager.readExistingMarks();
+        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document);
+        exportMarkManager.readExistingMarks();
 
         SequencedSet<String> identifiers = new LinkedHashSet<>();
-        for (BSTReferenceMark mark : markManager.getMarksInOrder().reversed()) {
+        for (BSTReferenceMark mark : exportMarkManager.getMarksInOrder().reversed()) {
             identifiers.addAll(mark.getCitationKeys());
         }
         return List.copyOf(identifiers);
