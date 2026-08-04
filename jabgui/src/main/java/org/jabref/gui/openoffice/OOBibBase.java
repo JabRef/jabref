@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -52,7 +51,6 @@ import org.jabref.model.openoffice.uno.UnoUndo;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
@@ -114,17 +112,7 @@ public class OOBibBase {
         }
     }
 
-    private static List<BibDatabase> getLookupDatabases(StateManager stateManager, OpenOfficePreferences openOfficePreferences) {
-        if (openOfficePreferences.getUseAllDatabases()) {
-            return stateManager.getOpenDatabases().stream()
-                               .map(BibDatabaseContext::getDatabase)
-                               .toList();
-        }
 
-        return stateManager.getActiveDatabase().stream()
-                           .map(BibDatabaseContext::getDatabase)
-                           .toList();
-    }
 
     /// A simple test for document availability.
     ///
@@ -560,6 +548,7 @@ public class OOBibBase {
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
+                                     List<BibDatabase> lookupDatabases,
                                      OOStyle style,
                                      CitationType citationType,
                                      String pageInfo,
@@ -624,6 +613,7 @@ public class OOBibBase {
                         citationType,
                         citationStyle,
                         bibDatabaseContext,
+                        lookupDatabases,
                         cursor,
                         syncOptions);
             } else if (style instanceof BstStyle bstStyle) {
@@ -662,11 +652,9 @@ public class OOBibBase {
                                                    CitationType citationType,
                                                    CitationStyle citationStyle,
                                                    BibDatabaseContext currentEntryContext,
+                                                   List<BibDatabase> lookupDatabases,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
-        List<BibDatabase> lookupDatabases = getLookupDatabases(
-                Injector.instantiateModelOrService(StateManager.class),
-                openOfficePreferences);
 
         boolean convertReferenceMarks;
         try {

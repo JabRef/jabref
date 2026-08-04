@@ -599,6 +599,7 @@ public class OpenOfficePanel {
         }
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
+                getBaseList(),
                 currentStyle,
                 citationType,
                 pageInfo,
