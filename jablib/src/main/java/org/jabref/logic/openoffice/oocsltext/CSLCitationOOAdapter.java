@@ -463,13 +463,8 @@ public class CSLCitationOOAdapter {
         } else if (citationType == CSLCitationType.IN_TEXT) {
             // Now, for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<String> citationKeys = mark.getCitationKeys();
-                List<BibEntry> entries = citationKeys.stream()
-                                                     .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
+                List<BibEntry> entries = getResolvedEntriesForMark(mark, unifiedDatabase);
                 if (entries.isEmpty()) {
-                    LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
                     continue;
                 }
                 String citation = createInTextCitationGroupText(style, isAlphaNumericStyle, isNumericStyle, entries, unifiedBibDatabaseContext);
@@ -478,13 +473,8 @@ public class CSLCitationOOAdapter {
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<String> citationKeys = mark.getCitationKeys();
-                List<BibEntry> entries = citationKeys.stream()
-                                                     .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
+                List<BibEntry> entries = getResolvedEntriesForMark(mark, unifiedDatabase);
                 if (entries.isEmpty()) {
-                    LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
                     continue;
                 }
 
@@ -494,6 +484,18 @@ public class CSLCitationOOAdapter {
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.NORMAL);
             }
         }
+    }
+
+    private List<BibEntry> getResolvedEntriesForMark(CSLReferenceMark mark, BibDatabase unifiedDatabase) {
+        List<String> citationKeys = mark.getCitationKeys();
+        List<BibEntry> entries = citationKeys.stream()
+                                             .map(unifiedDatabase::getEntryByCitationKey)
+                                             .flatMap(Optional::stream)
+                                             .toList();
+        if (entries.isEmpty()) {
+            LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
+        }
+        return entries;
     }
 
     /// Helper method for creating citations for `updateAllCitationsWithNewStyle` and `insertCitation`.
