@@ -12,7 +12,8 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafxDefault = "26.0.1"
+// Keep version in sync build-support/src/main/java/JournalListMvGenerator.java and build-support/src/main/java/LtwaListMvGenerator.java
+val javafxDefault = "26.0.2"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
@@ -85,6 +86,7 @@ dependencies.constraints {
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:4.8.186")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
+    api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -106,7 +108,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.3")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
@@ -154,8 +156,8 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
-    api("org.xmlunit:xmlunit-core:2.12.0")
-    api("org.xmlunit:xmlunit-matchers:2.12.0")
+    api("org.xmlunit:xmlunit-core:2.13.0")
+    api("org.xmlunit:xmlunit-matchers:2.13.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svgnode:2.0.0")

@@ -448,6 +448,9 @@ public class OpenOfficePanel {
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
         boolean emptyCitationSupported = currentStyle instanceof JStyle || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
         boolean bstStyleSelected = currentStyle instanceof BstStyle;
+        boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
+                && !jStyle.isNumberEntries()
+                && !jStyle.isCitationKeyCiteMarkers();
         boolean canGenerateBibliography = (currentStyle instanceof JStyle)
                 || (currentStyle instanceof BstStyle)
                 || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
@@ -458,7 +461,7 @@ public class OpenOfficePanel {
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite || !emptyCitationSupported);
-        pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
+        pushEntriesAdvanced.setDisable(!canCite || !specialCitationSupported);
 
         update.setDisable(!canRefreshDocument || !canGenerateBibliography);
         merge.setDisable(!canRefreshDocument || cslStyleSelected);
@@ -539,19 +542,6 @@ public class OpenOfficePanel {
         return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
-    /// Given the withText and inParenthesis options, return the corresponding citationType.
-    ///
-    /// @param withText      False means invisible citation (no text).
-    /// @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
-    private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
-        if (!withText) {
-            return CitationType.INVISIBLE_CIT;
-        }
-        return inParenthesis
-               ? CitationType.AUTHORYEAR_PAR
-               : CitationType.AUTHORYEAR_INTEXT;
-    }
-
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
@@ -581,15 +571,14 @@ public class OpenOfficePanel {
 
         String pageInfo = null;
         if (addPageInfo) {
-            boolean withText = citationType.withText();
-
-            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
+            Optional<CiteSpecialDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new CiteSpecialDialogView(openOfficePreferences.getCiteSpecialCitationType()));
             if (citeDialogViewModel.isPresent()) {
-                AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
+                CiteSpecialDialogViewModel model = citeDialogViewModel.get();
                 if (!model.pageInfoProperty().getValue().isEmpty()) {
                     pageInfo = model.pageInfoProperty().getValue();
                 }
-                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue());
+                citationType = model.citationTypeProperty().getValue();
+                openOfficePreferences.setCiteSpecialCitationType(citationType);
             } else {
                 // user canceled
                 return;
