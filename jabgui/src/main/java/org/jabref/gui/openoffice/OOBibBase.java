@@ -540,14 +540,14 @@ public class OOBibBase {
     ///
     /// @param entries            The entries to cite.
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
-    /// @param lookupDatabases    The databases selected for citation lookup in this action.
+    /// @param selectedDatabases  The databases selected for citation lookup in this action.
     /// @param style              The bibliography style we are using.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
     /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
-                                     List<BibDatabase> lookupDatabases,
+                                     List<BibDatabase> selectedDatabases,
                                      OOStyle style,
                                      CitationType citationType,
                                      String pageInfo,
@@ -612,7 +612,7 @@ public class OOBibBase {
                         citationType,
                         citationStyle,
                         bibDatabaseContext,
-                        lookupDatabases,
+                        selectedDatabases,
                         cursor,
                         syncOptions);
             } else if (style instanceof BstStyle bstStyle) {
@@ -643,7 +643,7 @@ public class OOBibBase {
     ///
     /// @param entries             The entries to cite.
     /// @param currentEntryContext The database the entries belong to. Used when creating the citation mark.
-    /// @param lookupDatabases     The databases selected for resolving existing CSL citations during this action.
+    /// @param selectedDatabases   The databases selected for resolving existing CSL citations during this action.
     /// @param citationType        Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
     /// @param citationStyle       Indicates style, name and path of citation
     /// @param syncOptions         Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
@@ -652,7 +652,7 @@ public class OOBibBase {
                                                    CitationType citationType,
                                                    CitationStyle citationStyle,
                                                    BibDatabaseContext currentEntryContext,
-                                                   List<BibDatabase> lookupDatabases,
+                                                   List<BibDatabase> selectedDatabases,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
 
@@ -681,22 +681,22 @@ public class OOBibBase {
             OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
                 try {
                     if (convertReferenceMarks) {
-                        cslCitationOOAdapter.convertReferenceMarksToPreference(lookupDatabases);
+                        cslCitationOOAdapter.convertReferenceMarksToPreference(selectedDatabases);
                     }
 
                     if (citationType == CitationType.AUTHORYEAR_PAR) {
                         // If current citation style is not the same as passed-in citation type, then change it to the new citation style.
                         // If current citation type is not "NORMAL", then change it to "NORMAL".
                         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case).
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, lookupDatabases);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.NORMAL, currentEntryContext, selectedDatabases);
                         // "Cite" button
                         cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, lookupDatabases);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.IN_TEXT, currentEntryContext, selectedDatabases);
                         // "Cite in-text" button
                         cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     } else if (citationType == CitationType.INVISIBLE_CIT) {
-                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, lookupDatabases);
+                        cslCitationOOAdapter.prepareCitationInsertion(citationStyle, CSLCitationType.EMPTY, currentEntryContext, selectedDatabases);
                         // "Insert empty citation"
                         cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, currentEntryContext);
                     }
@@ -1136,7 +1136,7 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-            // Collect entries from the databases selected by the OpenOffice lookup preference
+            // Collect entries from the selected databases, depending on whether the OpenOffice panel's "active tab only" peference is enabled.
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
                                               .toList();

@@ -32,7 +32,7 @@ public class CSLUpdateBibliography {
     public void rebuildCSLBibliography(XTextDocument doc,
                                        CSLCitationOOAdapter cslCitationOOAdapter,
                                        List<BibEntry> entries,
-                                       List<BibDatabase> lookupDatabases,
+                                       List<BibDatabase> selectedDatabases,
                                        CitationStyle citationStyle)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
@@ -41,7 +41,7 @@ public class CSLUpdateBibliography {
                 doc,
                 cslCitationOOAdapter,
                 entries,
-                lookupDatabases,
+                selectedDatabases,
                 citationStyle,
                 openOfficePreferences.getReferenceMarkFormat());
 

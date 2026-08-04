@@ -111,11 +111,11 @@ public class CSLCitationOOAdapter {
         return conversionNeeded;
     }
 
-    public void convertReferenceMarksToPreference(List<BibDatabase> lookupDatabases) throws CreationException, com.sun.star.uno.Exception {
+    public void convertReferenceMarksToPreference(List<BibDatabase> selectedDatabases) throws CreationException, com.sun.star.uno.Exception {
         try {
             int convertedMarks = markManager.convertReferenceMarks(
                     openOfficePreferences.getReferenceMarkFormat(),
-                    lookupDatabases,
+                    selectedDatabases,
                     bibEntryTypesManager);
             LOGGER.debug("Converted {} reference marks to {}", convertedMarks, openOfficePreferences.getReferenceMarkFormat());
         } finally {
@@ -123,15 +123,15 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> lookupDatabases)
+    public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> selectedDatabases)
             throws CreationException, Exception {
         linkZoteroCitations(currentEntryContext);
-        setCitationStyleParameters(newStyle, newCitationType, lookupDatabases);
+        setCitationStyleParameters(newStyle, newCitationType, selectedDatabases);
     }
 
     /// This method is used to determine whether citation style and citation type should be updated.
     /// Citation type and citation style are extracted into one method for more readability and uniformity.
-    private void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType, List<BibDatabase> lookupDatabases)
+    private void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType, List<BibDatabase> selectedDatabases)
             throws CreationException, Exception {
         boolean styleChanged;
         boolean citationTypeIsChanged;
@@ -151,7 +151,7 @@ public class CSLCitationOOAdapter {
         }
 
         if (styleChanged || citationTypeIsChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, newCitationType, lookupDatabases);
+            updateAllCitationsWithNewStyle(currentStyle, newCitationType, selectedDatabases);
         }
     }
 
@@ -207,7 +207,7 @@ public class CSLCitationOOAdapter {
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertJabRefBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> lookupDatabases)
+    public void insertJabRefBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -217,7 +217,7 @@ public class CSLCitationOOAdapter {
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, citationType, lookupDatabases);
+        updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
         markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
@@ -255,7 +255,7 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> lookupDatabases)
+    public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -265,7 +265,7 @@ public class CSLCitationOOAdapter {
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, citationType, lookupDatabases);
+        updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
         markManager.readAndUpdateExistingMarks();
 
         BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(entries));
@@ -439,16 +439,16 @@ public class CSLCitationOOAdapter {
     /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
     /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
     /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
-    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType, List<BibDatabase> lookupDatabases)
+    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
 
         // We first get a list of all cited entries from the configured lookup scope to create a unified database context
-        List<BibEntry> citedEntries = lookupDatabases.stream()
-                                                     .flatMap(db -> db.getEntries().stream())
-                                                     .filter(this::isCitedEntry)
-                                                     .toList();
+        List<BibEntry> citedEntries = selectedDatabases.stream()
+                                                       .flatMap(db -> db.getEntries().stream())
+                                                       .filter(this::isCitedEntry)
+                                                       .toList();
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
