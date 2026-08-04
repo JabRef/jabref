@@ -56,6 +56,8 @@ import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
+    private static final String PANDOC_WARNING_LABEL_STYLE = "-fx-text-fill: #c9a227;";
+
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
 
@@ -331,7 +333,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
-            bstPandocWarning.setStyle("-fx-text-fill: #c9a227;");
+            bstPandocWarning.setStyle(PANDOC_WARNING_LABEL_STYLE);
         } else {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path: %0", pandocPath));
