@@ -83,9 +83,7 @@ public class OOBibBase {
     private BstUpdateBibliography bstUpdateBibliography;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
-            throws
-            BootstrapException,
-            CreationException, IOException, InterruptedException {
+            throws BootstrapException, CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
