@@ -661,10 +661,6 @@ public class OpenOfficePanel {
         addSpaceBefore.selectedProperty().set(openOfficePreferences.getAddSpaceBefore());
         addSpaceBefore.setOnAction(_ -> openOfficePreferences.setAddSpaceBefore(addSpaceBefore.isSelected()));
 
-        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add space after citation"));
-        addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
-        addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
-
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
@@ -673,9 +669,9 @@ public class OpenOfficePanel {
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
-        updatePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
+        updatePreferences(currentStyle, addSpaceBefore, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            updatePreferences(currentStyle, addSpaceBefore, addSpaceAfter, zoteroCompatibilityMode);
+            updatePreferences(currentStyle, addSpaceBefore, zoteroCompatibilityMode);
 
             switch (newValue) {
                 case JStyle _ -> {
@@ -721,7 +717,6 @@ public class OpenOfficePanel {
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceBefore,
-                addSpaceAfter,
                 zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
                 useActiveBase,
@@ -741,27 +736,21 @@ public class OpenOfficePanel {
 
     private void updatePreferences(OOStyle currentStyle,
                                          CheckMenuItem addSpaceBefore,
-                                         CheckMenuItem addSpaceAfter,
                                          CheckMenuItem zoteroCompatibilityMode) {
         boolean isJStyle = currentStyle instanceof JStyle;
 
         if (isJStyle) {
             addSpaceBefore.setSelected(false);
-            addSpaceAfter.setSelected(false);
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setAddSpaceBefore(false);
-            openOfficePreferences.setAddSpaceAfter(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         } else {
             addSpaceBefore.setSelected(true);
-            addSpaceAfter.setSelected(true);
             openOfficePreferences.setAddSpaceBefore(true);
-            openOfficePreferences.setAddSpaceAfter(true);
         }
 
         zoteroCompatibilityMode.setDisable(isJStyle);
         addSpaceBefore.setDisable(isJStyle);
-        addSpaceAfter.setDisable(isJStyle);
     }
 
     private void browsePandocPath() {

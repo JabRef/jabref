@@ -411,7 +411,7 @@ public class CSLCitationOOAdapter {
                 cursor,
                 ooText,
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
+                !succeedingSpaceExists,
                 citationType,
                 bibDatabaseContext,
                 bibEntryTypesManager,

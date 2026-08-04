@@ -44,7 +44,6 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceBefore;
-    private final BooleanProperty addSpaceAfter;
     private final BooleanProperty zoteroCompatibilityMode;
     private final ObservableList<String> externalBstStyles;
     private final StringProperty pandocPath;
@@ -63,7 +62,6 @@ public class OpenOfficePreferences {
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
                                  boolean addSpaceBefore,
-                                 boolean addSpaceAfter,
                                  boolean zoteroCompatibilityMode,
                                  List<String> externalBstStyles,
                                  String pandocPath,
@@ -81,7 +79,6 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
-        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
         this.pandocPath = new SimpleStringProperty(pandocPath);
@@ -105,7 +102,6 @@ public class OpenOfficePreferences {
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceBefore
-                true,                                           // addSpaceAfter
                 false,                                          // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
@@ -268,18 +264,6 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceBefore(boolean addSpaceBefore) {
         this.addSpaceBefore.setValue(addSpaceBefore);
-    }
-
-    public boolean getAddSpaceAfter() {
-        return addSpaceAfter.get();
-    }
-
-    public BooleanProperty addSpaceAfterProperty() {
-        return addSpaceAfter;
-    }
-
-    public void setAddSpaceAfter(boolean addSpaceAfter) {
-        this.addSpaceAfter.setValue(addSpaceAfter);
     }
 
     public boolean getZoteroCompatibilityMode() {

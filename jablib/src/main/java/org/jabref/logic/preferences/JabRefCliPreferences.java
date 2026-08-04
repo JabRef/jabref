@@ -278,7 +278,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
     public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
-    public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
     public static final String OO_PANDOC_PATH = "ooPandocPath";
@@ -2523,7 +2522,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
                 getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
-                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
                 get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
@@ -2535,7 +2533,6 @@ public class JabRefCliPreferences implements CliPreferences {
         bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
         bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
         bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
-        bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
         bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
