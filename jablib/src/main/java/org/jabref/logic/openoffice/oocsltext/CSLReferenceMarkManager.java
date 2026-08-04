@@ -46,6 +46,7 @@ import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +78,7 @@ public class CSLReferenceMarkManager {
         this.citationType = CSLCitationType.NORMAL;
     }
 
-    public CSLReferenceMark createReferenceMark(List<BibEntry> entries,
+    public CSLReferenceMark createReferenceMark(@NonNull List<BibEntry> entries,
                                                 CSLCitationType citationType,
                                                 BibDatabaseContext bibDatabaseContext,
                                                 BibEntryTypesManager entryTypesManager,
@@ -108,7 +109,7 @@ public class CSLReferenceMarkManager {
         return referenceMark;
     }
 
-    private Map<String, String> getZoteroUriByCitationKey() {
+    private @NonNull Map<String, String> getZoteroUriByCitationKey() {
         Map<String, String> zoteroUriByCitationKey = new HashMap<>();
         for (CSLReferenceMark mark : marksInOrder) {
             String referenceMarkName = mark.getName();
@@ -162,7 +163,7 @@ public class CSLReferenceMarkManager {
         return convertedMarks;
     }
 
-    private boolean updateReferenceMarkName(CSLReferenceMark mark, String markName) throws Exception, CreationException {
+    private boolean updateReferenceMarkName(@NonNull CSLReferenceMark mark, String markName) throws Exception, CreationException {
         Optional<XTextRange> range = Optional.ofNullable(mark.getTextContent().getAnchor());
         if (range.isEmpty()) {
             return false;
@@ -172,7 +173,7 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
-                                                             OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                                             @NonNull OpenOfficeReferenceMarkFormat referenceMarkFormat,
                                                              List<BibDatabase> lookupDatabases,
                                                              BibEntryTypesManager entryTypesManager,
                                                              Map<String, String> zoteroUriByCitationKey) {
@@ -188,7 +189,7 @@ public class CSLReferenceMarkManager {
         };
     }
 
-    private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
+    private Optional<String> buildZoteroReferenceMarkName(@NonNull CSLReferenceMark mark,
                                                           List<BibDatabase> lookupDatabases,
                                                           BibEntryTypesManager entryTypesManager,
                                                           Map<String, String> zoteroUriByCitationKey) {
@@ -211,7 +212,7 @@ public class CSLReferenceMarkManager {
         return Optional.of(referenceMark.getName());
     }
 
-    private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
+    private Optional<List<BibEntry>> findEntriesByCitationKeys(@NonNull List<String> citationKeys,
                                                                List<BibDatabase> lookupDatabases) {
         List<BibEntry> entries = new ArrayList<>();
         for (String citationKey : citationKeys) {
@@ -224,8 +225,8 @@ public class CSLReferenceMarkManager {
         return Optional.of(entries);
     }
 
-    private Optional<BibEntry> findEntryByCitationKey(String citationKey,
-                                                      List<BibDatabase> lookupDatabases) {
+    private @NonNull Optional<BibEntry> findEntryByCitationKey(String citationKey,
+                                                               @NonNull List<BibDatabase> lookupDatabases) {
         return lookupDatabases.stream()
                               .map(database -> database.getEntryByCitationKey(citationKey))
                               .flatMap(Optional::stream)
@@ -234,7 +235,7 @@ public class CSLReferenceMarkManager {
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
                                       XTextDocument doc,
-                                      XTextCursor position,
+                                      @NonNull XTextCursor position,
                                       OOText ooText,
                                       boolean insertSpaceBefore,
                                       boolean insertSpaceAfter,
@@ -455,7 +456,7 @@ public class CSLReferenceMarkManager {
         citationKeyToNumber = newCitationKeyToNumber;
     }
 
-    static String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
+    static @NonNull String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
         StringBuilder result = new StringBuilder();
         int numberIndex = 0;
         int lastEnd = 0;
@@ -480,7 +481,7 @@ public class CSLReferenceMarkManager {
         return result.toString();
     }
 
-    private static int appendUpdatedCitationTextSegment(StringBuilder result, String textSegment, List<Integer> newNumbers, int numberIndex) {
+    private static int appendUpdatedCitationTextSegment(StringBuilder result, String textSegment, @NonNull List<Integer> newNumbers, int numberIndex) {
         Matcher matcher = CITATION_NUMBER_PATTERN.matcher(textSegment);
         int lastEnd = 0;
 
@@ -495,7 +496,7 @@ public class CSLReferenceMarkManager {
         return numberIndex;
     }
 
-    private void updateMarkAndTextWithNewNumbers(CSLReferenceMark mark, List<Integer> newNumbers, String currentText) throws Exception, CreationException {
+    private void updateMarkAndTextWithNewNumbers(@NonNull CSLReferenceMark mark, List<Integer> newNumbers, String currentText) throws Exception, CreationException {
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
@@ -510,7 +511,7 @@ public class CSLReferenceMarkManager {
         mark.setCitationNumbers(newNumbers);
     }
 
-    public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
+    public void updateMarkAndTextWithNewStyle(@NonNull CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
         String updatedName = mark.getName();
         if (ReferenceMark.isZoteroReferenceMarkName(updatedName)) {
             updateMarkAndText(mark, newText, ZoteroReferenceMark.updateCitationType(updatedName, citationType));
@@ -539,7 +540,7 @@ public class CSLReferenceMarkManager {
         updateMarkAndText(mark, newText, updatedName + " " + marker);
     }
 
-    private void updateMarkAndText(CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
+    private void updateMarkAndText(@NonNull CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
         String oldUniqueId = mark.getUniqueId();
@@ -589,7 +590,7 @@ public class CSLReferenceMarkManager {
         }
     }
 
-    private String getCurrentCitationText(CSLReferenceMark mark) throws WrappedTargetException {
+    private String getCurrentCitationText(@NonNull CSLReferenceMark mark) throws WrappedTargetException {
         Optional<OOText> formattedCitationText = mark.getFormattedCitationText();
         if (formattedCitationText.isEmpty()) {
             String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + mark.getUniqueId();
@@ -666,7 +667,7 @@ public class CSLReferenceMarkManager {
                    .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(RangeSortEntry<CSLReferenceMark> first, RangeSortEntry<CSLReferenceMark> second) {
+    private int compareTextRanges(@NonNull RangeSortEntry<CSLReferenceMark> first, @NonNull RangeSortEntry<CSLReferenceMark> second) {
         int rangeComparison;
         try {
             rangeComparison = textRangeCompare.compareRegionStarts(second.getRange(), first.getRange());

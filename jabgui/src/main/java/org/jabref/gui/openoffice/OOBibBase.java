@@ -60,6 +60,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,11 +201,11 @@ public class OOBibBase {
      *
      * ******************************************************/
 
-    void showDialog(OOError err) {
+    void showDialog(@NonNull OOError err) {
         err.showErrorDialog(dialogService);
     }
 
-    OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
+    OOVoidResult<OOError> collectResults(String errorTitle, @NonNull List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
                             .filter(OOVoidResult::isError)
                             .map(e -> e.getError().getLocalizedMessage())
@@ -216,11 +217,11 @@ public class OOBibBase {
         }
     }
 
-    boolean testDialog(OOVoidResult<OOError> res) {
+    boolean testDialog(@NonNull OOVoidResult<OOError> res) {
         return res.ifError(ex -> ex.showErrorDialog(dialogService)).isError();
     }
 
-    boolean testDialog(String errorTitle, OOVoidResult<OOError> res) {
+    boolean testDialog(String errorTitle, @NonNull OOVoidResult<OOError> res) {
         return res.ifError(e -> showDialog(e.setTitle(errorTitle))).isError();
     }
 
@@ -264,7 +265,7 @@ public class OOBibBase {
         return result.mapError(detail -> new OOError(errorTitle, messageOnFailureToObtain));
     }
 
-    private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend frontend) {
+    private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, @NonNull OOFrontend frontend) {
         final String errorTitle = "Overlapping ranges";
         boolean requireSeparation = false;
         int maxReportedOverlaps = 10;
@@ -275,7 +276,7 @@ public class OOBibBase {
                        .mapError(OOError::from);
     }
 
-    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, OOFrontend frontend, OOStyle style) {
+    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, @NonNull OOFrontend frontend, OOStyle style) {
         final String errorTitle = "Ranges overlapping with cursor";
 
         List<RangeForOverlapCheck<CitationGroupId>> userRanges;
@@ -449,7 +450,7 @@ public class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    public OOVoidResult<OOError> checkStylesExistInTheDocument(JStyle jStyle, XTextDocument doc) {
+    public OOVoidResult<OOError> checkStylesExistInTheDocument(@NonNull JStyle jStyle, XTextDocument doc) {
         String pathToStyleFile = jStyle.getPath();
 
         List<OOVoidResult<OOError>> results = new ArrayList<>();
@@ -734,9 +735,9 @@ public class OOBibBase {
                                                       XTextDocument doc,
                                                       CitationType citationType,
                                                       JStyle jStyle,
-                                                      OOResult<OOFrontend, OOError> frontend,
-                                                      OOResult<XTextCursor, OOError> cursor,
-                                                      BibDatabaseContext bibDatabaseContext,
+                                                      @NonNull OOResult<OOFrontend, OOError> frontend,
+                                                      @NonNull OOResult<XTextCursor, OOError> cursor,
+                                                      @NonNull BibDatabaseContext bibDatabaseContext,
                                                       Optional<Update.SyncOptions> syncOptions,
                                                       String pageInfo,
                                                       OOResult<FunctionalTextViewCursor, OOError> fcursor) {
@@ -763,7 +764,7 @@ public class OOBibBase {
 
     /// Helper method for guiActionInsertEntry - handles BST citation insertion.
     private OOVoidResult<OOError> insertBstCitation(List<BibEntry> entries,
-                                                    XTextDocument doc,
+                                                    @NonNull XTextDocument doc,
                                                     BstStyle bstStyle,
                                                     BibDatabaseContext bibDatabaseContext,
                                                     OOResult<XTextCursor, OOError> cursor) {
@@ -1030,7 +1031,7 @@ public class OOBibBase {
     /// @param frontend,fcursor Used to synchronize document.
     /// @param errorTitle       Error message for user.
     private OOVoidResult<OOError> updateJStyleBibliography(List<BibDatabase> databases, JStyle jStyle, XTextDocument doc, OOFrontend frontend,
-                                                           OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
+                                                           @NonNull OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
         OOResult<List<String>, JabRefException> syncResult;
         try {
             UnoUndo.enterUndoContext(doc, "Refresh bibliography");
@@ -1066,7 +1067,7 @@ public class OOBibBase {
     /// @param doc        Text document.
     /// @param fcursor    Used to synchronize document.
     /// @param errorTitle Error message for user.
-    private OOVoidResult<OOError> updateBstBibliography(List<BibDatabase> databases, BstStyle bstStyle,
+    private OOVoidResult<OOError> updateBstBibliography(@NonNull List<BibDatabase> databases, BstStyle bstStyle,
                                                         XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor,
                                                         String errorTitle) {
@@ -1126,12 +1127,12 @@ public class OOBibBase {
     }
 
     static OOVoidResult<OOError> updateCSLBibliography(DialogService dialogService,
-                                                       List<BibDatabase> databases,
+                                                       @NonNull List<BibDatabase> databases,
                                                        CitationStyle citationStyle,
                                                        XTextDocument doc,
                                                        OOResult<FunctionalTextViewCursor, OOError> fcursor,
                                                        String errorTitle,
-                                                       CSLCitationOOAdapter cslCitationOOAdapter,
+                                                       @NonNull CSLCitationOOAdapter cslCitationOOAdapter,
                                                        CSLUpdateBibliography cslUpdateBibliography) {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
