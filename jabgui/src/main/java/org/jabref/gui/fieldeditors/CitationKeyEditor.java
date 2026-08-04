@@ -4,6 +4,11 @@ import java.util.Collections;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -18,13 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
-
 import jakarta.inject.Inject;
-
-import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
 
 public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
