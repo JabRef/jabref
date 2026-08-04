@@ -688,13 +688,13 @@ public class OpenOfficePanel {
             }
         });
 
-        CheckMenuItem useActiveTabOnly = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
-        useActiveTabOnly.setSelected(!openOfficePreferences.getUseAllDatabases());
+        CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
+        onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        useActiveTabOnly.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveTabOnly.isSelected()));
+        onlyUseActiveTab.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!onlyUseActiveTab.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {
             openOfficePreferences.clearConnectionSettings();
             dialogService.notify(Localization.lang("Cleared connection settings"));
@@ -712,7 +712,7 @@ public class OpenOfficePanel {
                 addSpaceAfter,
                 zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
-                useActiveTabOnly,
+                onlyUseActiveTab,
                 new SeparatorMenuItem(),
                 setPandocPath,
                 autoDetectPandoc,
