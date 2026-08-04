@@ -15,7 +15,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrMyPdfEngine;
 import org.jabref.logic.ocr.OcrResult;
@@ -76,10 +75,14 @@ public class OcrLinkedFileAction extends SimpleCommand {
             return;
         }
         OcrEngine ocrEngine;
-        if (preferences.getOcrPreferences().getEngineSelection() == EngineSelection.OCRMYPDF) {
-            ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
-        } else {
-            ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
+        switch (preferences.getOcrPreferences().getEngineSelection()) {
+            case OCRMYPDF ->
+                    ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
+            case DOCLING ->
+                    ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
+            default -> {
+                return;
+            }
         }
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
