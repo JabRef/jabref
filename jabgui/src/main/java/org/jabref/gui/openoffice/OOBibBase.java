@@ -917,9 +917,9 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Changes during \"Export cited\"");
             OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult;
             if (style instanceof CitationStyle) {
-                generateResult = exportCitedForCSL(databases, doc);
+                generateResult = exportCitedForCSL(databases);
             } else if (style instanceof BstStyle) {
-                generateResult = exportCitedForBST(databases, doc);
+                generateResult = exportCitedForBST(databases);
             } else {
                 generateResult = ExportCited.generateDatabase(doc, databases);
             }
@@ -961,22 +961,20 @@ public class OOBibBase {
         return Optional.of(result.newDatabase);
     }
 
-    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases, XTextDocument doc) {
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases) {
+        assert cslCitationOOAdapter != null;
+
         try {
-            if (cslCitationOOAdapter == null) {
-                initializeCitationAdapter(doc);
-            }
             return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(cslCitationOOAdapter.getCitedCitationKeys(), databases));
         } catch (WrappedTargetException | NoSuchElementException e) {
             return OOResult.error(new JabRefException(e.getMessage(), e));
         }
     }
 
-    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases, XTextDocument doc) {
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases) {
+        assert bstCitationOOAdapter != null;
+
         try {
-            if (bstCitationOOAdapter == null) {
-                initializeCitationAdapter(doc);
-            }
             return OOResult.ok(ExportCited.generateDatabaseFromIdentifiers(bstCitationOOAdapter.getCitedIdentifiers(), databases));
         } catch (WrappedTargetException | NoSuchElementException e) {
             return OOResult.error(new JabRefException(e.getMessage(), e));
