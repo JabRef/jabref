@@ -71,8 +71,6 @@ import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.tobiasdiez.easybind.EasyBind;
-import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +120,7 @@ public class OpenOfficePanel {
     private final SimpleObjectProperty<OOStyle> currentStyleProperty;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           @NonNull GuiPreferences preferences,
+                           GuiPreferences preferences,
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
@@ -368,8 +366,7 @@ public class OpenOfficePanel {
         }
     }
 
-    @Contract(" -> new")
-    private @NonNull List<BibDatabase> getDatabaseList() {
+    private List<BibDatabase> getDatabaseList() {
         if (openOfficePreferences.getUseAllDatabases()) {
             return new ArrayList<>(stateManager.getOpenDatabases().stream()
                                                .map(BibDatabaseContext::getDatabase)
@@ -480,7 +477,7 @@ public class OpenOfficePanel {
 
         Task<OOBibBase> connectTask = new Task<>() {
             @Override
-            protected @NonNull OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
+            protected OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 Path path = Path.of(openOfficePreferences.getExecutablePath());
@@ -539,8 +536,7 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    @Contract("_ -> new")
-    private @NonNull OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
+    private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
         return new OOBibBase(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 
@@ -615,7 +611,7 @@ public class OpenOfficePanel {
     ///
     /// @param entries A list of entries to be checked
     /// @return true if all entries have citation keys, if it so may be after generating them
-    private boolean checkThatEntriesHaveKeys(@NonNull List<BibEntry> entries) {
+    private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
         // Found one, no need to look further for now
         boolean emptyKeys = entries.stream()
@@ -654,7 +650,7 @@ public class OpenOfficePanel {
         }
     }
 
-    private @NonNull ContextMenu createSettingsPopup() {
+    private ContextMenu createSettingsPopup() {
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
