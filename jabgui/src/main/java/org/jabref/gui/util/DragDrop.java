@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 public class DragDrop {
     private static final Logger LOGGER = LoggerFactory.getLogger(DragDrop.class);
 
-    public static void handleDropOfFiles(List<Path> files, TransferMode transferMode, ExternalFilesEntryLinker fileLinker, BibEntry entry) {
+    public static boolean handleDropOfFiles(List<Path> files, TransferMode transferMode, ExternalFilesEntryLinker fileLinker, BibEntry entry) {
         List<Path> nonBibFiles = files.stream().filter(file -> !FileUtil.isBibFile(file)).toList();
         if (nonBibFiles.isEmpty()) {
-            return;
+            return false;
         }
 
         // Depending on the pressed modifier, move/copy/link files to drop target
@@ -37,5 +37,6 @@ public class DragDrop {
                 fileLinker.linkFilesToEntry(entry, nonBibFiles);
             }
         }
+        return true;
     }
 }

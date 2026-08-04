@@ -157,8 +157,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
             TransferMode transferMode = event.getTransferMode();
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
-            success = true;
+            success = DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
         }
 
         event.setDropCompleted(success);

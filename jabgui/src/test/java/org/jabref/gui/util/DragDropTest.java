@@ -11,6 +11,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -25,8 +27,9 @@ class DragDropTest {
         BibEntry entry = new BibEntry();
         List<Path> bibFiles = List.of(Path.of("test.bib"), Path.of("another.bib"));
 
-        DragDrop.handleDropOfFiles(bibFiles, TransferMode.MOVE, fileLinker, entry);
+        boolean result = DragDrop.handleDropOfFiles(bibFiles, TransferMode.MOVE, fileLinker, entry);
 
+        assertFalse(result);
         verifyNoInteractions(fileLinker);
     }
 
@@ -38,8 +41,9 @@ class DragDropTest {
         Path bibFile = Path.of("test.bib");
         List<Path> files = List.of(pdfFile, bibFile);
 
-        DragDrop.handleDropOfFiles(files, TransferMode.MOVE, fileLinker, entry);
+        boolean result = DragDrop.handleDropOfFiles(files, TransferMode.MOVE, fileLinker, entry);
 
+        assertTrue(result);
         verify(fileLinker).coveOrMoveFilesSteps(eq(entry), eq(List.of(pdfFile)), eq(true));
     }
 }

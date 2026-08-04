@@ -532,7 +532,7 @@ public class FileUtil {
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter("bib"::equals).isPresent();
+        return getFileExtension(file).filter("bib"::equalsIgnoreCase).isPresent();
     }
 
     /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)

@@ -444,7 +444,11 @@ class FileUtilTest {
     @Test
     void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        Path bibUpperFile = Files.createFile(rootDir.resolve("test_upper.BIB"));
+        Path bibMixedFile = Files.createFile(rootDir.resolve("test_mixed.Bib"));
         assertTrue(FileUtil.isBibFile(bibFile));
+        assertTrue(FileUtil.isBibFile(bibUpperFile));
+        assertTrue(FileUtil.isBibFile(bibMixedFile));
     }
 
     @Test

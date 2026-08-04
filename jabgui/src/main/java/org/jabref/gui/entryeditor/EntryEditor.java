@@ -220,8 +220,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
                 // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                 // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
-                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
-                success = true;
+                success = DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
             }
 
             event.setDropCompleted(success);
