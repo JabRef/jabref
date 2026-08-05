@@ -8,6 +8,8 @@ import org.jabref.logic.preferences.FetcherApiKey;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JournalInformationFetcherKeyTest {
 
@@ -31,7 +33,7 @@ class JournalInformationFetcherKeyTest {
 
     @Test
     void matchesNormalizedJournalNames() {
-        assertEquals(true, JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal-of Molecular, Biology"));
-        assertEquals(false, JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal of Cell Biology"));
+        assertTrue(JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal-of Molecular, Biology"));
+        assertFalse(JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal of Cell Biology"));
     }
 }
