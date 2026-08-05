@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -19,8 +20,8 @@ public class JournalInfoView extends VBox {
     @FXML private LineChart<String, Double> citedByCountChart;
     private final JournalInfoViewModel viewModel;
 
-    public JournalInfoView() {
-        this.viewModel = new JournalInfoViewModel();
+    public JournalInfoView(ImporterPreferences importerPreferences) {
+        this.viewModel = new JournalInfoViewModel(importerPreferences);
 
         ViewLoader.view(this)
                   .root(this)

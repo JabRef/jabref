@@ -10,6 +10,7 @@ import java.util.Optional;
 import javafx.util.Pair;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.journals.JournalInformation;
 import org.jabref.logic.l10n.Localization;
@@ -31,6 +32,15 @@ public class JournalInformationFetcher implements WebFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
     private static final String CROSSREF_API_URL = "https://api.crossref.org/journals/";
     private static final String OPENALEX_API_URL = "https://api.openalex.org/sources";
+    private final ImporterPreferences importerPreferences;
+
+    public JournalInformationFetcher(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
+
+    public JournalInformationFetcher() {
+        this(ImporterPreferences.getDefault());
+    }
 
     @Override
     public String getName() {
@@ -77,10 +87,7 @@ public class JournalInformationFetcher implements WebFetcher {
     }
 
     private Optional<OpenAlexInformation> getOpenAlexInformation(String issn, String journalName) {
-        String url = issn.isBlank()
-                     ? OPENALEX_API_URL + "?search=" + URLEncoder.encode(journalName, StandardCharsets.UTF_8) + "&per-page=1"
-                     : OPENALEX_API_URL + "/issn:" + issn;
-        Optional<OpenAlexInformation> journalInformation = getJson(url)
+        Optional<OpenAlexInformation> journalInformation = getJson(getOpenAlexUrl(issn, journalName), OpenAlex.FETCHER_NAME)
                 .flatMap(this::getOpenAlexSource)
                 .flatMap(this::parseOpenAlexInformation);
         if (!issn.isBlank()) {
@@ -89,18 +96,31 @@ public class JournalInformationFetcher implements WebFetcher {
         return journalInformation.filter(journal -> journal.title().equalsIgnoreCase(journalName.trim()));
     }
 
+    String getOpenAlexUrl(String issn, String journalName) {
+        String url = issn.isBlank()
+                     ? OPENALEX_API_URL + "?search=" + URLEncoder.encode(journalName, StandardCharsets.UTF_8) + "&per-page=1"
+                     : OPENALEX_API_URL + "/issn:" + issn;
+        return importerPreferences.getApiKey(OpenAlex.FETCHER_NAME)
+                                  .map(apiKey -> url + (issn.isBlank() ? "&" : "?") + "api_key=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8))
+                                  .orElse(url);
+    }
+
     private Optional<JSONObject> getJson(String url) {
+        return getJson(url, "journal information provider");
+    }
+
+    private Optional<JSONObject> getJson(String url, String provider) {
         try {
             HttpResponse<JsonNode> response = Unirest.get(url)
                                                      .header("Accept", "application/json")
                                                      .asJson();
             if ((response.getStatus() < 200) || (response.getStatus() >= 300) || (response.getBody() == null)) {
-                LOGGER.debug("Journal information request to {} returned HTTP {}", url, response.getStatus());
+                LOGGER.debug("Journal information request to {} returned HTTP {}", provider, response.getStatus());
                 return Optional.empty();
             }
             return Optional.ofNullable(response.getBody().getObject());
         } catch (UnirestException e) {
-            LOGGER.debug("Could not retrieve journal information from {}", url, e);
+            LOGGER.debug("Could not retrieve journal information from {}", provider, e);
             return Optional.empty();
         }
     }

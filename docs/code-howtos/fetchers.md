@@ -31,7 +31,7 @@ JabRef supports different kinds of fetchers:
 * `FulltextFetcher`: Searches for a PDF for an exiting bibliography entry
 * `SearchBasedFetcher`: Searches providers using a given query and returns a set of (new) bibliography entry. The user-facing side is implemented in the UI described at [https://docs.jabref.org/collect/import-using-online-bibliographic-database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
 
-`JournalInformationFetcher` supplies the Entry Editor's journal-information popup. It uses Crossref for journal identity (title, publisher, ISSNs) and OpenAlex for the h-index and yearly work and citation counts.
+`JournalInformationFetcher` supplies the Entry Editor's journal-information popup. It uses Crossref for journal identity (title, publisher, ISSNs) and OpenAlex for the h-index and yearly work and citation counts. If enabled in the preferences, it uses the configured OpenAlex API key.
 
 There are more fetchers supported by JabRef. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` (Ctrl+H in IntelliJ).
 
