@@ -125,10 +125,10 @@ public class JournalInformationFetcher implements WebFetcher {
                 return Optional.empty();
             }
             if ((response.getStatus() < 200) || (response.getStatus() >= 300)) {
-                throw new FetcherException("{} returned HTTP {}".formatted(provider, response.getStatus()));
+                throw new FetcherException("%s returned HTTP %d".formatted(provider, response.getStatus()));
             }
             if (response.getBody() == null) {
-                throw new FetcherException("{} returned an empty response".formatted(provider));
+                throw new FetcherException("%s returned an empty response".formatted(provider));
             }
             return Optional.ofNullable(response.getBody().getObject());
         } catch (UnirestException e) {
