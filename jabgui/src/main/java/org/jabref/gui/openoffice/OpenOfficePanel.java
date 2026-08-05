@@ -315,9 +315,11 @@ public class OpenOfficePanel {
         });
 
         modifyBibliographyProperties.setMaxWidth(Double.MAX_VALUE);
+        modifyBibliographyProperties.setTooltip(new Tooltip(Localization.lang("Modify formatting of the references list")));
         modifyBibliographyProperties.setOnAction(_ -> modifyBibliographyProperties());
 
         exportCitations.setMaxWidth(Double.MAX_VALUE);
+        exportCitations.setTooltip(new Tooltip(Localization.lang("Collect cited entries into a new library")));
         exportCitations.setOnAction(_ -> exportEntries());
 
         updateButtonAvailability();
