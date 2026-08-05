@@ -128,20 +128,12 @@ public class OOBibBase {
 
     /// @return true if we are connected to a document
     public boolean isDocumentConnectionMissing() {
-        boolean missing = this.connection.isDocumentConnectionMissing();
-        if (missing) {
-            clearCitationAdapters();
-        }
-        return missing;
+        return this.connection.isDocumentConnectionMissing();
     }
 
     /// Either return an XTextDocument or return JabRefException.
     public OOResult<XTextDocument, OOError> getXTextDocument() {
-        OOResult<XTextDocument, OOError> result = this.connection.getXTextDocument();
-        if (result.isError()) {
-            clearCitationAdapters();
-        }
-        return result;
+        return this.connection.getXTextDocument();
     }
 
     /// The title of the current document, or Optional.empty()
