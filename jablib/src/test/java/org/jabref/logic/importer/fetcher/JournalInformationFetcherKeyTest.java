@@ -28,4 +28,10 @@ class JournalInformationFetcherKeyTest {
 
         assertEquals("https://api.openalex.org/sources/issn:1545-4509", fetcher.getOpenAlexUrl("1545-4509", ""));
     }
+
+    @Test
+    void matchesNormalizedJournalNames() {
+        assertEquals(true, JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal-of Molecular, Biology"));
+        assertEquals(false, JournalInformationFetcher.haveMatchingNames("Journal of Molecular Biology", "Journal of Cell Biology"));
+    }
 }
