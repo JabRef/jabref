@@ -5,8 +5,7 @@
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.CitationKeyEditor"
-         alignment="CENTER_LEFT"
          spacing="4.0">
     <EditorTextField fx:id="textField"/>
-    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button" style="-fx-padding: 0.333em 1em;"/>
+    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button"/>
 </fx:root>
