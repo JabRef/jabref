@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 }
 
@@ -61,5 +62,16 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
+    }
+}
+
+graalvmNative {
+    // LOCAL-ONLY (macOS): CI configures a GraalVM toolchain, so this must NOT be committed.
+    toolchainDetection = false
+    binaries {
+        named("main") {
+            imageName.set("jabsrv")
+            mainClass.set("org.jabref.http.server.cli.ServerCli")
+        }
     }
 }
