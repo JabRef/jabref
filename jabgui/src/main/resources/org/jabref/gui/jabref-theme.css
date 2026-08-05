@@ -177,7 +177,7 @@
 .icon-button {
     -fx-border-width: 0;
     -fx-background-color: -jr-icon-background;
-    -fx-padding: 0.5em;
+    -fx-padding: 0.333em 1em;
 }
 
 .icon-buttonNoSpaceBottom:hover,
