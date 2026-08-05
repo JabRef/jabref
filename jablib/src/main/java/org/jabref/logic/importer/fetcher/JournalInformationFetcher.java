@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javafx.util.Pair;
 
@@ -136,14 +138,14 @@ public class JournalInformationFetcher implements WebFetcher {
         }
     }
 
-    private java.util.stream.Stream<JSONObject> getOpenAlexSources(JSONObject response) {
+    private Stream<JSONObject> getOpenAlexSources(JSONObject response) {
         JSONArray results = response.optJSONArray("results");
         if (results == null) {
-            return java.util.stream.Stream.of(response);
+            return Stream.of(response);
         }
-        return java.util.stream.IntStream.range(0, results.length())
-                                  .mapToObj(index -> Optional.ofNullable(results.optJSONObject(index)))
-                                  .flatMap(Optional::stream);
+        return IntStream.range(0, results.length())
+                        .mapToObj(index -> Optional.ofNullable(results.optJSONObject(index)))
+                        .flatMap(Optional::stream);
     }
 
     private Optional<JournalIdentity> parseCrossrefInformation(JSONObject response) {
