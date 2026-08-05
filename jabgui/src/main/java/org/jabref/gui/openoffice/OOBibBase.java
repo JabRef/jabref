@@ -89,16 +89,23 @@ public class OOBibBase {
         this.bibEntryTypesManager = bibEntryTypesManager;
     }
 
+    /// Adapter lifecycle is tied to the currently selected document. Keep creation here so cite/export/
+    /// bibliography actions only ever use adapters that were initialized as part of document selection.
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         readStyleInPreference(doc);
-        if (cslCitationOOAdapter == null) {
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
-            cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        }
-        if (bstCitationOOAdapter == null) {
-            bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
-            bstUpdateBibliography = new BstUpdateBibliography();
-        }
+        clearCitationAdapters();
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
+        cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
+        bstUpdateBibliography = new BstUpdateBibliography();
+    }
+
+    /// Clear all document-bound helpers after connection loss or before switching to another document.
+    private void clearCitationAdapters() {
+        cslCitationOOAdapter = null;
+        cslUpdateBibliography = null;
+        bstCitationOOAdapter = null;
+        bstUpdateBibliography = null;
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
@@ -121,12 +128,20 @@ public class OOBibBase {
 
     /// @return true if we are connected to a document
     public boolean isDocumentConnectionMissing() {
-        return this.connection.isDocumentConnectionMissing();
+        boolean missing = this.connection.isDocumentConnectionMissing();
+        if (missing) {
+            clearCitationAdapters();
+        }
+        return missing;
     }
 
     /// Either return an XTextDocument or return JabRefException.
     public OOResult<XTextDocument, OOError> getXTextDocument() {
-        return this.connection.getXTextDocument();
+        OOResult<XTextDocument, OOError> result = this.connection.getXTextDocument();
+        if (result.isError()) {
+            clearCitationAdapters();
+        }
+        return result;
     }
 
     /// The title of the current document, or Optional.empty()
