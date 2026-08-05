@@ -61,10 +61,27 @@ public class JournalInformationFetcher implements WebFetcher {
             throw journalNotFoundException();
         }
 
-        Optional<JournalIdentity> crossrefInformation = getCrossrefInformation(cleanedIssn);
-        Optional<OpenAlexInformation> openAlexInformation = getOpenAlexInformation(cleanedIssn, journalName);
+        List<FetcherException> providerFailures = new ArrayList<>(2);
+        Optional<JournalIdentity> crossrefInformation;
+        try {
+            crossrefInformation = getCrossrefInformation(cleanedIssn);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not retrieve journal information from {}", CROSSREF_PROVIDER, e);
+            crossrefInformation = Optional.empty();
+            providerFailures.add(e);
+        }
+
+        Optional<OpenAlexInformation> openAlexInformation;
+        try {
+            openAlexInformation = getOpenAlexInformation(cleanedIssn, journalName);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not retrieve journal information from {}", OpenAlex.FETCHER_NAME, e);
+            openAlexInformation = Optional.empty();
+            providerFailures.add(e);
+        }
+
         if (crossrefInformation.isEmpty() && openAlexInformation.isEmpty()) {
-            throw journalNotFoundException();
+            throw providerFailures.stream().findFirst().orElseGet(JournalInformationFetcher::journalNotFoundException);
         }
 
         return Optional.of(createJournalInformation(crossrefInformation, openAlexInformation));
@@ -168,10 +185,18 @@ public class JournalInformationFetcher implements WebFetcher {
                 response.optString("display_name"),
                 response.optString("host_organization_name"),
                 getJoinedArray(response, "issn"),
-                (summaryStats != null) && summaryStats.has("h_index") ? Integer.toString(summaryStats.getInt("h_index")) : "",
+                getHIndex(summaryStats),
                 getYearlyValues(response.optJSONArray("counts_by_year"), "works_count"),
                 getYearlyValues(response.optJSONArray("counts_by_year"), "cited_by_count")
         ));
+    }
+
+    private static String getHIndex(JSONObject summaryStats) {
+        if (summaryStats == null) {
+            return "";
+        }
+        Object hIndex = summaryStats.opt("h_index");
+        return hIndex instanceof Number number ? Integer.toString(number.intValue()) : "";
     }
 
     private JournalInformation createJournalInformation(
@@ -222,8 +247,13 @@ public class JournalInformationFetcher implements WebFetcher {
         List<Pair<Integer, Double>> values = new ArrayList<>(yearlyCounts.length());
         for (int index = 0; index < yearlyCounts.length(); index++) {
             JSONObject yearlyCount = yearlyCounts.optJSONObject(index);
-            if ((yearlyCount != null) && yearlyCount.has("year") && yearlyCount.has(key)) {
-                values.add(new Pair<>(yearlyCount.getInt("year"), yearlyCount.getDouble(key)));
+            if (yearlyCount == null) {
+                continue;
+            }
+            Object year = yearlyCount.opt("year");
+            Object value = yearlyCount.opt(key);
+            if ((year instanceof Number yearNumber) && (value instanceof Number valueNumber)) {
+                values.add(new Pair<>(yearNumber.intValue(), valueNumber.doubleValue()));
             }
         }
         return values.stream().sorted(Comparator.comparing(Pair::getKey)).toList();
