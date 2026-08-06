@@ -13,7 +13,7 @@ Needs: impl
 ## Retrieve journal information from public sources
 `req~fetchers.journal-information~1`
 
-The journal-information popup retrieves journal identity information and metrics directly from public metadata providers without relying on the JabRef Online service.
+The journal-information popup retrieves journal identity information and metrics directly from public metadata providers.
 
 Needs: impl
 
