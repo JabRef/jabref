@@ -131,7 +131,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int convertReferenceMarks(OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                     List<BibDatabaseContext> bibDatabaseContexts,
+                                     List<BibDatabase> selectedDatabases,
                                      BibEntryTypesManager entryTypesManager) throws Exception, CreationException {
         sortMarksInOrder();
         Map<String, String> zoteroUriByCitationKey = getZoteroUriByCitationKey();
@@ -145,7 +145,7 @@ public class CSLReferenceMarkManager {
             Optional<String> convertedName = buildConvertedReferenceMarkName(
                     mark,
                     referenceMarkFormat,
-                    bibDatabaseContexts,
+                    selectedDatabases,
                     entryTypesManager,
                     zoteroUriByCitationKey);
             if (convertedName.isEmpty()) {
@@ -173,7 +173,7 @@ public class CSLReferenceMarkManager {
 
     private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
                                                              OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                                             List<BibDatabaseContext> bibDatabaseContexts,
+                                                             List<BibDatabase> selectedDatabases,
                                                              BibEntryTypesManager entryTypesManager,
                                                              Map<String, String> zoteroUriByCitationKey) {
         return switch (referenceMarkFormat) {
@@ -184,15 +184,15 @@ public class CSLReferenceMarkManager {
                             mark.getUniqueId(),
                             mark.getCitationType()));
             case ZOTERO_COMPATIBLE ->
-                    buildZoteroReferenceMarkName(mark, bibDatabaseContexts, entryTypesManager, zoteroUriByCitationKey);
+                    buildZoteroReferenceMarkName(mark, selectedDatabases, entryTypesManager, zoteroUriByCitationKey);
         };
     }
 
     private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
-                                                          List<BibDatabaseContext> bibDatabaseContexts,
+                                                          List<BibDatabase> selectedDatabases,
                                                           BibEntryTypesManager entryTypesManager,
                                                           Map<String, String> zoteroUriByCitationKey) {
-        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), bibDatabaseContexts);
+        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), selectedDatabases);
         if (entries.isEmpty()) {
             return Optional.empty();
         }
@@ -212,10 +212,10 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
-                                                               List<BibDatabaseContext> bibDatabaseContexts) {
+                                                               List<BibDatabase> selectedDatabases) {
         List<BibEntry> entries = new ArrayList<>();
         for (String citationKey : citationKeys) {
-            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, bibDatabaseContexts);
+            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, selectedDatabases);
             if (entry.isEmpty()) {
                 return Optional.empty();
             }
@@ -225,12 +225,11 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<BibEntry> findEntryByCitationKey(String citationKey,
-                                                      List<BibDatabaseContext> bibDatabaseContexts) {
-        return bibDatabaseContexts.stream()
-                                  .map(BibDatabaseContext::getDatabase)
-                                  .map(database -> database.getEntryByCitationKey(citationKey))
-                                  .flatMap(Optional::stream)
-                                  .findFirst();
+                                                      List<BibDatabase> selectedDatabases) {
+        return selectedDatabases.stream()
+                                .map(database -> database.getEntryByCitationKey(citationKey))
+                                .flatMap(Optional::stream)
+                                .findFirst();
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,

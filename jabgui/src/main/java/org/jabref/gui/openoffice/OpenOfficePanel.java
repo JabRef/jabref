@@ -18,9 +18,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -292,17 +290,17 @@ public class OpenOfficePanel {
             if (getOrUpdateTheStyle(title)) {
                 return;
             }
-            List<BibDatabase> databases = getBaseList();
+            List<BibDatabase> databases = getDatabaseList();
             ooBase.guiActionUpdateDocument(databases, currentStyle);
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(_ -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
+        merge.setOnAction(_ -> ooBase.guiActionMergeCitationGroups(getDatabaseList(), currentStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(_ -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
+        unmerge.setOnAction(_ -> ooBase.guiActionSeparateCitations(getDatabaseList(), currentStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -347,7 +345,7 @@ public class OpenOfficePanel {
     }
 
     private void exportEntries() {
-        List<BibDatabase> databases = getBaseList();
+        List<BibDatabase> databases = getDatabaseList();
         boolean returnPartialResult = false;
         Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);
         if (newDatabase.isPresent()) {
@@ -368,7 +366,7 @@ public class OpenOfficePanel {
         }
     }
 
-    private List<BibDatabase> getBaseList() {
+    private List<BibDatabase> getDatabaseList() {
         if (openOfficePreferences.getUseAllDatabases()) {
             return new ArrayList<>(stateManager.getOpenDatabases().stream()
                                                .map(BibDatabaseContext::getDatabase)
@@ -442,7 +440,7 @@ public class OpenOfficePanel {
     private void updateButtonAvailability() {
         boolean isConnectedToDocument = ooBase != null && !ooBase.isDocumentConnectionMissing();
         boolean hasStyle = currentStyle != null;
-        boolean hasDatabase = !getBaseList().isEmpty();
+        boolean hasDatabase = !getDatabaseList().isEmpty();
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
@@ -539,7 +537,7 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
-        return new OOBibBase(loPath, dialogService, openOfficePreferences);
+        return new OOBibBase(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
@@ -590,9 +588,10 @@ public class OpenOfficePanel {
             return;
         }
 
+        List<BibDatabase> selectedDatabases = getDatabaseList();
         Optional<Update.SyncOptions> syncOptions =
                 openOfficePreferences.getSyncWhenCiting()
-                ? Optional.of(new Update.SyncOptions(getBaseList()))
+                ? Optional.of(new Update.SyncOptions(selectedDatabases))
                 : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
@@ -601,7 +600,7 @@ public class OpenOfficePanel {
         }
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
-                entryTypesManager,
+                selectedDatabases,
                 currentStyle,
                 citationType,
                 pageInfo,
@@ -689,23 +688,13 @@ public class OpenOfficePanel {
             }
         });
 
-        ToggleGroup toggleGroup = new ToggleGroup();
-        RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
-        RadioMenuItem useAllBases = new RadioMenuItem(Localization.lang("Look up BibTeX entries in all open libraries"));
-        useActiveBase.setToggleGroup(toggleGroup);
-        useAllBases.setToggleGroup(toggleGroup);
+        CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
+        onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
 
-        if (openOfficePreferences.getUseAllDatabases()) {
-            useAllBases.setSelected(true);
-        } else {
-            useActiveBase.setSelected(true);
-        }
-
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
-        useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
+        onlyUseActiveTab.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!onlyUseActiveTab.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {
             openOfficePreferences.clearConnectionSettings();
             dialogService.notify(Localization.lang("Cleared connection settings"));
@@ -723,8 +712,7 @@ public class OpenOfficePanel {
                 addSpaceAfter,
                 zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
-                useActiveBase,
-                useAllBases,
+                onlyUseActiveTab,
                 new SeparatorMenuItem(),
                 setPandocPath,
                 autoDetectPandoc,
