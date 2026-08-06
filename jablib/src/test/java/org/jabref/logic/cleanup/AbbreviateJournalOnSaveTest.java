@@ -37,10 +37,10 @@ class AbbreviateJournalOnSaveTest {
 
         List<FieldChange> changes = cleanup.cleanup(entry);
 
-        List<FieldChange> expected = List.of(
+        List<FieldChange> expectedChanges = List.of(
                 new FieldChange(entry, StandardField.JOURNAL, "Annals of Mathematics and Pure and Applied Sciences", "Ann. Math. Pure Appl. Sci.")
         );
-        assertEquals(expected, changes);
+        assertEquals(expectedChanges, changes);
 
         BibEntry expectedEntry = new BibEntry()
                 .withField(StandardField.JOURNAL, "Ann. Math. Pure Appl. Sci.");
