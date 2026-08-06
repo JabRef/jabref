@@ -215,9 +215,12 @@ public class MetaData {
     }
 
     public void clearLibraryAbbreviationType() {
-        libraryAbbreviationType = null;
-        postChange();
+    if (this.libraryAbbreviationType == null) {
+        return;
     }
+    this.libraryAbbreviationType = null;
+    postChange();
+}
 
     public boolean isProtected() {
         return isProtected;
