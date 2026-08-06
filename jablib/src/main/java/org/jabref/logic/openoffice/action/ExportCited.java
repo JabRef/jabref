@@ -72,7 +72,7 @@ public class ExportCited {
 
         List<BibEntry> entriesToInsert = new ArrayList<>();
         SequencedSet<String> seenIdentifiers = new LinkedHashSet<>(identifiers);
-        Set<String> seenCrossReferences = new HashSet<>();
+        Set<String> seenCrossReferences = new HashSet<>(); // Only add crossReference once.
 
         for (String identifier : seenIdentifiers) {
             Optional<LookupResult> lookupResult = lookupFunction.apply(identifier, databases);
@@ -81,16 +81,20 @@ public class ExportCited {
                 continue;
             }
 
+            // If entry found
             BibEntry entry = lookupResult.get().entry();
             BibDatabase loopDatabase = lookupResult.get().database();
 
+            // Insert a copy of the entry
             BibEntry clonedEntry = new BibEntry(entry);
             entriesToInsert.add(clonedEntry);
 
+            // Check if the cloned entry has a cross-reference field
             clonedEntry.getField(StandardField.CROSSREF)
                        .ifPresent(crossReference -> {
                            boolean isNew = seenCrossReferences.add(crossReference);
                            if (isNew) {
+                               // Add it if it is in the current library
                                loopDatabase.getEntryByCitationKey(crossReference)
                                            .ifPresent(entriesToInsert::add);
                            }
