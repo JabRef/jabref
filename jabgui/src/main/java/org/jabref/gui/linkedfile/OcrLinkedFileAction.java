@@ -81,6 +81,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
             case DOCLING ->
                     ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
             default -> {
+                LOGGER.error("switch doesn't cover all variants of EngineSelection");
                 return;
             }
         }
