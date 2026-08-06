@@ -322,8 +322,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedOnlineFiles());
 
         setResultConverter(button -> {
+            preferences.getFilePreferences().setDownloadLinkedOnlineFiles(downloadLinkedOnlineFiles.isSelected());
             if (button == importButton) {
-                preferences.getFilePreferences().setDownloadLinkedOnlineFiles(downloadLinkedOnlineFiles.isSelected());
                 List<BibEntry> selectedEntries = viewModel.getCheckedEntries().stream().toList();
                 GroupTreeNode selectedGroup = groupListView.getSelectionModel().getSelectedItem();
                 if (selectedGroup != null && selectedGroup.getGroup() instanceof ExplicitGroup) {
