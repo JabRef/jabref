@@ -8,9 +8,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Cited references are collected from the citations in citation groups.
 ///
 /// They contain backreferences to the corresponding citations in `where`. This allows the extra information generated using [CitedReferences] to be distributed back to the in-text citations.
+@NullMarked
 public class CitedReference implements ComparableCitedReference, CitationMarkerNormEntry, CitationMarkerNumericBibEntry {
 
     public final String citationKey;

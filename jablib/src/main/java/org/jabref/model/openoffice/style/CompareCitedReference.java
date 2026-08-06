@@ -5,10 +5,13 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
+
 /*
  * Given a Comparator<BibEntry> provide a Comparator<ComparableCitedReference> that also handles
  * unresolved citation keys.
  */
+@NullMarked
 public class CompareCitedReference implements Comparator<ComparableCitedReference> {
 
     private final Comparator<BibEntry> entryComparator;
