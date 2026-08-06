@@ -93,10 +93,9 @@ public class OOBibBase {
     /// bibliography actions only ever use adapters that were initialized as part of document selection.
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         readStyleInPreference(doc);
-        // Plain reassignment would be enough for most helpers, but the listener registered in
-        // CSLCitationOOAdapter(XTextDocument, OpenOfficePreferences, BibEntryTypesManager) can keep an older
-        // adapter alive after it has otherwise been orphaned. Clear all document-bound helpers first so a new
-        // document connection always starts from a clean adapter set before reassignment.
+        // Plain reassignment would be enough for most helpers, but CSLCitationOOAdapter registers a listener on
+        // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
+        // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
         cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
