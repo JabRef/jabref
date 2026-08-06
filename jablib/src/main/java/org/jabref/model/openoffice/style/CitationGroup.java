@@ -1,6 +1,5 @@
 package org.jabref.model.openoffice.style;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +60,7 @@ public class CitationGroup {
         this.dataModel = dataModel;
         this.groupId = groupId;
         this.citationType = citationType;
-        this.citationsInStorageOrder = Collections.unmodifiableList(citationsInStorageOrder);
+        this.citationsInStorageOrder = List.copyOf(citationsInStorageOrder);
         this.localOrder = OOListUtil.makeIndices(citationsInStorageOrder.size());
         this.referenceMarkNameForLinking = referenceMarkNameForLinking;
         this.indexInGlobalOrder = Optional.empty();
