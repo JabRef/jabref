@@ -319,10 +319,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
+        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedOnlineFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {
+                preferences.getFilePreferences().setDownloadLinkedOnlineFiles(downloadLinkedOnlineFiles.isSelected());
                 List<BibEntry> selectedEntries = viewModel.getCheckedEntries().stream().toList();
                 GroupTreeNode selectedGroup = groupListView.getSelectionModel().getSelectedItem();
                 if (selectedGroup != null && selectedGroup.getGroup() instanceof ExplicitGroup) {

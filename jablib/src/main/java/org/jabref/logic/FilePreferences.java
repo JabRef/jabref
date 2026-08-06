@@ -30,6 +30,7 @@ public class FilePreferences {
     private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
+    private final BooleanProperty downloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
@@ -56,6 +57,7 @@ public class FilePreferences {
                 DEFAULT_FILENAME_PATTERNS[1],        // fileNamePattern
                 "",                                  // fileDirectoryPattern
                 true,                                // downloadLinkedFiles
+                true,                                // downloadLinkedOnlineFiles
                 true,                                // fulltextIndexLinkedFiles
                 Directories.getUserDirectory(),      // workingDirectory
                 true,                                // createBackup
@@ -78,6 +80,7 @@ public class FilePreferences {
                            boolean autoRenameFilesOnChange,
                            String fileNamePattern,
                            String fileDirectoryPattern,
+                           boolean downloadLinkedOnlineFiles,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
@@ -98,6 +101,7 @@ public class FilePreferences {
         this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
+        this.downloadLinkedOnlineFiles.setValue(downloadLinkedOnlineFiles);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
@@ -188,6 +192,18 @@ public class FilePreferences {
 
     public BooleanProperty downloadLinkedFilesProperty() {
         return downloadLinkedFiles;
+    }
+
+    public boolean shouldDownloadLinkedOnlineFiles() {
+        return downloadLinkedOnlineFiles.get();
+    }
+
+    public BooleanProperty downloadLinkedOnlineFilesProperty() {
+        return downloadLinkedOnlineFiles;
+    }
+
+    public void setDownloadLinkedOnlineFiles(boolean shouldDownloadLinkedOnlineFiles) {
+        this.downloadLinkedOnlineFiles.set(shouldDownloadLinkedOnlineFiles);
     }
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
