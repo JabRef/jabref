@@ -7,6 +7,7 @@ import javafx.scene.control.ProgressIndicator;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.journalinfo.JournalInfoView;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -17,7 +18,7 @@ import org.controlsfx.control.PopOver;
 
 public class PopOverUtil {
 
-    public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
+    public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor, ImporterPreferences importerPreferences) {
         Optional<String> optionalIssn = entry.getField(StandardField.ISSN);
         Optional<String> optionalJournalName = entry.getFieldOrAlias(StandardField.JOURNAL);
 
@@ -33,7 +34,7 @@ public class PopOverUtil {
             popOver.show(button, 0);
 
             BackgroundTask
-                    .wrap(() -> new JournalInfoView().populateJournalInformation(optionalIssn.orElse(""), optionalJournalName.orElse("")))
+                    .wrap(() -> new JournalInfoView(importerPreferences).populateJournalInformation(optionalIssn.orElse(""), optionalJournalName.orElse("")))
                     .onSuccess(updatedNode -> {
                         popOver.setContentNode(updatedNode);
                         popOver.show(button, 0);
