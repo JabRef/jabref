@@ -96,7 +96,7 @@ public class CitationGroup {
     }
 
     public List<Integer> getLocalOrder() {
-        return Collections.unmodifiableList(localOrder);
+        return List.copyOf(localOrder);
     }
 
     /*
