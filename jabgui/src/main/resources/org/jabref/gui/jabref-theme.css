@@ -177,6 +177,10 @@
 .icon-button {
     -fx-border-width: 0;
     -fx-background-color: -jr-icon-background;
+    -fx-padding:0.5em;
+}
+
+.generate-citation-key-button {
     -fx-padding: 0.333em 1em;
 }
 
