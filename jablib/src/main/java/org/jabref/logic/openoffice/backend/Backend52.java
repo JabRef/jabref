@@ -362,7 +362,7 @@ public class Backend52 {
                     if (group.numberOfCitations() == 0) {
                         pageInfo = Optional.empty();
                     } else {
-                        pageInfo = getPageInfoFromData(group).map(e -> OOText.toString(e));
+                        pageInfo = getPageInfoFromData(group).map(pageInfoText -> OOText.toString(pageInfoText));
                     }
                     CitationEntry entry = new CitationEntry(name, context, pageInfo);
                     citations.add(entry);

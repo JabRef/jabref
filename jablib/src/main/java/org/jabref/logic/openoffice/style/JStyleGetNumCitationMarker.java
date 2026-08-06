@@ -183,7 +183,7 @@ class JStyleGetNumCitationMarker {
         final String bracketAfter = style.getBracketAfter();
 
         // Sort a copy of entries
-        List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
+        List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, entry -> entry);
         sorted.sort(JStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["

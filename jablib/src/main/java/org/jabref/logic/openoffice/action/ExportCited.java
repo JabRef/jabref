@@ -14,6 +14,7 @@ import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.style.CitedReference;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.util.OOResult;
 
@@ -44,10 +45,10 @@ public class ExportCited {
     public static OOResult<GenerateDatabaseResult, JabRefException> generateDatabase(XTextDocument doc, List<BibDatabase> databases) {
         try {
             OOFrontend frontend = new OOFrontend(doc);
-            List<String> citationKeys = frontend.citationGroups.getCitedKeysUnordered()
+            List<String> citationKeys = frontend.citationGroups.getCitedReferencesUnordered()
                                                                .values()
                                                                .stream()
-                                                               .map(citedKey -> citedKey.citationKey)
+                                                               .map(CitedReference::getCitationKey)
                                                                .toList();
             return OOResult.ok(generateDatabaseFromCitationKeys(citationKeys, databases));
         } catch (NoDocumentException | WrappedTargetException e) {
