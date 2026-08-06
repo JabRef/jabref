@@ -120,17 +120,17 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
      * Setters for CitationGroups.distribute()
      */
     public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> pair) {
-        Citation citation = pair.a;
-        citation.citationLookupResult = pair.b;
+        Citation citation = pair.a();
+        citation.citationLookupResult = pair.b();
     }
 
     public static void setNumber(OOPair<Citation, Optional<Integer>> pair) {
-        Citation citation = pair.a;
-        citation.number = pair.b;
+        Citation citation = pair.a();
+        citation.number = pair.b();
     }
 
     public static void setUniqueLetter(OOPair<Citation, Optional<String>> pair) {
-        Citation citation = pair.a;
-        citation.uniqueLetter = pair.b;
+        Citation citation = pair.a();
+        citation.uniqueLetter = pair.b();
     }
 }

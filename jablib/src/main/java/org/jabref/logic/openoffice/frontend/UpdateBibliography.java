@@ -94,7 +94,7 @@ public class UpdateBibliography {
     /// Assumes the section named BIB_SECTION_NAME exists.
     private static void populateBibTextSection(XTextDocument doc,
                                                OOFrontend frontend,
-                                               CitedReferences bibliography,
+                                               CitedReferences citedReferences,
                                                JStyle style,
                                                boolean alwaysAddCitedOnPages)
             throws
@@ -110,7 +110,7 @@ public class UpdateBibliography {
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
         OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,
-                bibliography,
+                citedReferences,
                 style,
                 alwaysAddCitedOnPages);
         OOTextIntoOO.write(doc, cursor, bibliographyText);
