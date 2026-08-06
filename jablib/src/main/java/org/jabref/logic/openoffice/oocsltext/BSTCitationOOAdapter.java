@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /// Inserts BST-styled citations and bibliography into a LibreOffice document.
 ///
 /// In-text citation format (numeric `[n]` or author-year `(Name, Year)`) is controlled by
-/// [OpenOfficePreferences.getBstCitationFormat]. The bibliography is always rendered by the
+/// [OpenOfficePreferences#getBstCitationFormat]. The bibliography is always rendered by the
 /// BST engine regardless of the citation format setting.
 @NullMarked
 public class BSTCitationOOAdapter {
@@ -64,9 +64,9 @@ public class BSTCitationOOAdapter {
         markManager.readAndUpdateExistingMarks();
     }
 
-    /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences.getBstCitationFormat]:
-    /// - [BstCitationFormat.NUMERIC]: `[1]`, `[1, 3]`, ...
-    /// - [BstCitationFormat.AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
+    /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences#getBstCitationFormat]:
+    /// - [BstCitationFormat#NUMERIC]: `[1]`, `[1, 3]`, ...
+    /// - [BstCitationFormat#AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
