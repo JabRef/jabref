@@ -11,36 +11,36 @@ import org.jabref.model.entry.BibEntry;
 
 public class CitedReferences {
 
-    /// Order-preserving map from citation keys to associated data.
-    private LinkedHashMap<String, CitedReference> data;
+    /// Order-preserving map from citation keys to cited references.
+    private LinkedHashMap<String, CitedReference> citedReferenceByCitationKey;
 
-    CitedReferences(LinkedHashMap<String, CitedReference> data) {
-        this.data = data;
+    CitedReferences(LinkedHashMap<String, CitedReference> citedReferenceByCitationKey) {
+        this.citedReferenceByCitationKey = citedReferenceByCitationKey;
     }
 
     /// The cited references in their current order.
     public List<CitedReference> values() {
-        return new ArrayList<>(data.values());
+        return new ArrayList<>(citedReferenceByCitationKey.values());
     }
 
     public CitedReference get(String citationKey) {
-        return data.get(citationKey);
+        return citedReferenceByCitationKey.get(citationKey);
     }
 
     /// Sort entries for the bibliography.
     void sortByComparator(Comparator<BibEntry> entryComparator) {
-        List<CitedReference> citedReferences = new ArrayList<>(data.values());
+        List<CitedReference> citedReferences = new ArrayList<>(citedReferenceByCitationKey.values());
         citedReferences.sort(new CompareCitedReference(entryComparator, true));
-        LinkedHashMap<String, CitedReference> newData = new LinkedHashMap<>();
+        LinkedHashMap<String, CitedReference> sortedCitedReferenceByCitationKey = new LinkedHashMap<>();
         for (CitedReference citedReference : citedReferences) {
-            newData.put(citedReference.citationKey, citedReference);
+            sortedCitedReferenceByCitationKey.put(citedReference.citationKey, citedReference);
         }
-        data = newData;
+        citedReferenceByCitationKey = sortedCitedReferenceByCitationKey;
     }
 
     void numberCitedReferencesInCurrentOrder() {
         int index = 1;
-        for (CitedReference citedReference : data.values()) {
+        for (CitedReference citedReference : citedReferenceByCitationKey.values()) {
             if (citedReference.getLookupResult().isPresent()) {
                 citedReference.setNumber(Optional.of(index));
                 index++;
@@ -52,25 +52,25 @@ public class CitedReferences {
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
-        for (CitedReference citedReference : this.data.values()) {
+        for (CitedReference citedReference : this.citedReferenceByCitationKey.values()) {
             citedReference.lookupInDatabases(databases);
         }
     }
 
     void distributeLookupResults(CitationGroups citationGroups) {
-        for (CitedReference citedReference : this.data.values()) {
+        for (CitedReference citedReference : this.citedReferenceByCitationKey.values()) {
             citedReference.distributeLookupResult(citationGroups);
         }
     }
 
     void distributeNumbers(CitationGroups citationGroups) {
-        for (CitedReference citedReference : this.data.values()) {
+        for (CitedReference citedReference : this.citedReferenceByCitationKey.values()) {
             citedReference.distributeNumber(citationGroups);
         }
     }
 
     public void distributeUniqueLetters(CitationGroups citationGroups) {
-        for (CitedReference citedReference : this.data.values()) {
+        for (CitedReference citedReference : this.citedReferenceByCitationKey.values()) {
             citedReference.distributeUniqueLetter(citationGroups);
         }
     }
