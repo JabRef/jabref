@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
@@ -44,6 +46,8 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -346,6 +350,48 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     public void addSource(String title, Supplier<BibEntry> supplier) {
         viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, supplier, taskExecutor));
+    }
+
+    public void addFetchedColumn(String title, IdBasedFetcher fetcher, String id) {
+        addSource(title, () -> {
+            try {
+                return fetcher.performSearchById(id).orElse(null);
+            } catch (FetcherException e) {
+                LOGGER.warn("Failed to fetch BibEntry for {} using {}", id, title, e);
+                return null;
+            }
+        });
+    }
+
+    /// Starts automatic identifier fetching for the columns already added via [#addSource]. Must be called after
+    /// all initial sources have been added, since it only considers the columns present at call time.
+    public void enableAutomaticIdentifierFetching() {
+        for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : List.copyOf(viewModel.entriesProperty())) {
+            if (!entrySourceColumn.isLoadingProperty().getValue()) {
+                triggerAutomaticIdentifierFetch(entrySourceColumn);
+            } else {
+                entrySourceColumn.isLoadingProperty().addListener(new ChangeListener<>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean isLoading) {
+                        if (!isLoading) {
+                            entrySourceColumn.isLoadingProperty().removeListener(this);
+                            triggerAutomaticIdentifierFetch(entrySourceColumn);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void triggerAutomaticIdentifierFetch(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {
+        BibEntry entry = entrySourceColumn.entryProperty().get();
+        if (entry == null) {
+            return;
+        }
+        viewModel.findNewFetchableIdentifiers(entry).forEach((field, value) ->
+                WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences())
+                           .ifPresent(fetcher -> addFetchedColumn(
+                                   Localization.lang("From %0", FieldTextMapper.getDisplayName(field)), fetcher, value)));
     }
 
     private class FieldRow {

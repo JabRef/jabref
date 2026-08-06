@@ -18,6 +18,7 @@ import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
+import org.jabref.model.openoffice.style.CitationType;
 
 public class OpenOfficePreferences {
 
@@ -42,11 +43,13 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyHeaderFormat;
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
+    private final BooleanProperty addSpaceBefore;
     private final BooleanProperty addSpaceAfter;
     private final BooleanProperty zoteroCompatibilityMode;
     private final ObservableList<String> externalBstStyles;
     private final StringProperty pandocPath;
     private final ObjectProperty<BstCitationFormat> bstCitationFormat;
+    private final ObjectProperty<CitationType> citeSpecialCitationType;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -59,11 +62,13 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
+                                 boolean addSpaceBefore,
                                  boolean addSpaceAfter,
                                  boolean zoteroCompatibilityMode,
                                  List<String> externalBstStyles,
                                  String pandocPath,
-                                 BstCitationFormat bstCitationFormat) {
+                                 BstCitationFormat bstCitationFormat,
+                                 CitationType citeSpecialCitationType) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -75,11 +80,13 @@ public class OpenOfficePreferences {
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
+        this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
         this.pandocPath = new SimpleStringProperty(pandocPath);
         this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
+        this.citeSpecialCitationType = new SimpleObjectProperty<>(citeSpecialCitationType);
     }
 
     private OpenOfficePreferences() {
@@ -87,7 +94,7 @@ public class OpenOfficePreferences {
                 OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
                            : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
                                      : DEFAULT_LINUX_EXEC_PATH,
-                true,                             // useAllDatabases
+                true,                                           // useAllDatabases
                 false,                                          // syncWhenCiting
                 List.of(),                                      // externalJStyles
                 JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
@@ -97,11 +104,13 @@ public class OpenOfficePreferences {
                 "Heading 2",                                    // cslBibliographyHeaderFormat
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
+                true,                                           // addSpaceBefore
                 true,                                           // addSpaceAfter
-                true,                                            // zoteroCompatibilityMode
+                true,                                           // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
-                BstCitationFormat.NUMERIC                       // bstCitationFormat
+                BstCitationFormat.NUMERIC,                      // bstCitationFormat
+                CitationType.AUTHORYEAR_INTEXT                  // citeSpecialCitationType
         );
     }
 
@@ -249,6 +258,18 @@ public class OpenOfficePreferences {
         externalCslStyles.setAll(paths);
     }
 
+    public boolean getAddSpaceBefore() {
+        return addSpaceBefore.get();
+    }
+
+    public BooleanProperty addSpaceBeforeProperty() {
+        return addSpaceBefore;
+    }
+
+    public void setAddSpaceBefore(boolean addSpaceBefore) {
+        this.addSpaceBefore.setValue(addSpaceBefore);
+    }
+
     public boolean getAddSpaceAfter() {
         return addSpaceAfter.get();
     }
@@ -312,5 +333,17 @@ public class OpenOfficePreferences {
 
     public void setBstCitationFormat(BstCitationFormat format) {
         this.bstCitationFormat.set(format);
+    }
+
+    public CitationType getCiteSpecialCitationType() {
+        return citeSpecialCitationType.get();
+    }
+
+    public ObjectProperty<CitationType> citeSpecialCitationTypeProperty() {
+        return citeSpecialCitationType;
+    }
+
+    public void setCiteSpecialCitationType(CitationType citeSpecialCitationType) {
+        this.citeSpecialCitationType.set(citeSpecialCitationType);
     }
 }

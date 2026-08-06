@@ -66,6 +66,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -197,26 +198,29 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (currentStyle == null) {
+        if (ooBase != null && ooBase.testDialog(title, ooBase.readStyleInPreference())) {
+            return FAIL;
+        }
+
+        currentStyle = openOfficePreferences.getCurrentStyle();
+        currentStyleProperty.set(currentStyle);
+        updateButtonAvailability();
+
+        if (!(currentStyle instanceof JStyle jStyle)) {
+            return PASS;
+        }
+
+        try {
+            jStyle = jStyleLoader.getUsedJstyle();
+            jStyle.ensureUpToDate();
             currentStyle = openOfficePreferences.getCurrentStyle();
             currentStyleProperty.set(currentStyle);
-        } else {
-            if (currentStyle instanceof JStyle jStyle) {
-                try {
-                    jStyle = jStyleLoader.getUsedJstyle();
-                    jStyle.ensureUpToDate();
-                } catch (IOException ex) {
-                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                    String msg = Localization.lang("Unable to reload style file")
-                            + "'" + jStyle.getPath() + "'"
-                            + "\n" + ex.getMessage();
-                    new OOError(title, msg, ex).showErrorDialog(dialogService);
-                    return FAIL;
-                }
-            } else {
-                // CSL and BST styles don't need to be reloaded from disk
-                return PASS;
-            }
+            updateButtonAvailability();
+        } catch (IOException ex) {
+            LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+            String msg = Localization.lang("Unable to reload style file '%0'. %1", jStyle.getPath(), String.valueOf(ex.getMessage()));
+            new OOError(title, msg, ex).showErrorDialog(dialogService);
+            return FAIL;
         }
         return PASS;
     }
@@ -229,6 +233,9 @@ public class OpenOfficePanel {
         selectDocument.setOnAction(_ -> {
             try {
                 ooBase.guiActionSelectDocument(false);
+                currentStyle = openOfficePreferences.getCurrentStyle();
+                currentStyleProperty.set(currentStyle);
+                updateButtonAvailability();
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
                 LOGGER.warn("Unable to select document to work on", ex);
@@ -252,6 +259,10 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
+                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
+                                 if (ooBase.testDialog(Localization.lang("Problem modifying citation"), result)) {
+                                     return;
+                                 }
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              } else if (currentStyle instanceof BstStyle bstStyle) {
                                  dialogService.notify(Localization.lang("Currently selected BST style: '%0'", bstStyle.getName()));
@@ -437,16 +448,20 @@ public class OpenOfficePanel {
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
         boolean emptyCitationSupported = currentStyle instanceof JStyle || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
         boolean bstStyleSelected = currentStyle instanceof BstStyle;
+        boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
+                && !jStyle.isNumberEntries()
+                && !jStyle.isCitationKeyCiteMarkers();
         boolean canGenerateBibliography = (currentStyle instanceof JStyle)
                 || (currentStyle instanceof BstStyle)
                 || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
+        setStyleFile.setDisable(!isConnectedToDocument);
 
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite || !emptyCitationSupported);
-        pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
+        pushEntriesAdvanced.setDisable(!canCite || !specialCitationSupported);
 
         update.setDisable(!canRefreshDocument || !canGenerateBibliography);
         merge.setDisable(!canRefreshDocument || cslStyleSelected);
@@ -484,7 +499,8 @@ public class OpenOfficePanel {
                 return;
             }
 
-            // Enable actions that depend on a connection
+            currentStyle = openOfficePreferences.getCurrentStyle();
+            currentStyleProperty.set(currentStyle);
             updateButtonAvailability();
         });
 
@@ -526,19 +542,6 @@ public class OpenOfficePanel {
         return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
-    /// Given the withText and inParenthesis options, return the corresponding citationType.
-    ///
-    /// @param withText      False means invisible citation (no text).
-    /// @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
-    private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
-        if (!withText) {
-            return CitationType.INVISIBLE_CIT;
-        }
-        return inParenthesis
-               ? CitationType.AUTHORYEAR_PAR
-               : CitationType.AUTHORYEAR_INTEXT;
-    }
-
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
@@ -568,15 +571,14 @@ public class OpenOfficePanel {
 
         String pageInfo = null;
         if (addPageInfo) {
-            boolean withText = citationType.withText();
-
-            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
+            Optional<CiteSpecialDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new CiteSpecialDialogView(openOfficePreferences.getCiteSpecialCitationType()));
             if (citeDialogViewModel.isPresent()) {
-                AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
+                CiteSpecialDialogViewModel model = citeDialogViewModel.get();
                 if (!model.pageInfoProperty().getValue().isEmpty()) {
                     pageInfo = model.pageInfoProperty().getValue();
                 }
-                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue());
+                citationType = model.citationTypeProperty().getValue();
+                openOfficePreferences.setCiteSpecialCitationType(citationType);
             } else {
                 // user canceled
                 return;
@@ -655,6 +657,10 @@ public class OpenOfficePanel {
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
+        CheckMenuItem addSpaceBefore = new CheckMenuItem(Localization.lang("Add space before citation"));
+        addSpaceBefore.selectedProperty().set(openOfficePreferences.getAddSpaceBefore());
+        addSpaceBefore.setOnAction(_ -> openOfficePreferences.setAddSpaceBefore(addSpaceBefore.isSelected()));
+
         CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add space after citation"));
         addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
         addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
@@ -713,6 +719,7 @@ public class OpenOfficePanel {
 
         contextMenu.getItems().addAll(
                 autoSync,
+                addSpaceBefore,
                 addSpaceAfter,
                 zoteroCompatibilityMode,
                 new SeparatorMenuItem(),

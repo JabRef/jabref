@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
 import org.jabref.logic.openoffice.action.EditSeparate;
@@ -50,11 +52,15 @@ import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +91,7 @@ public class OOBibBase {
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
+        readStyleInPreference(doc);
         if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
@@ -128,6 +135,66 @@ public class OOBibBase {
     /// The title of the current document, or Optional.empty()
     public Optional<String> getCurrentDocumentTitle() {
         return this.connection.getCurrentDocumentTitle();
+    }
+
+    OOVoidResult<OOError> readStyleInPreference() {
+        if (!isConnectedToDocument()) {
+            return OOVoidResult.ok();
+        }
+
+        OOResult<XTextDocument, OOError> document = getXTextDocument();
+        if (document.isError()) {
+            return document.asVoidResult();
+        }
+
+        return readStyleInPreference(document.get());
+    }
+
+    private OOVoidResult<OOError> readStyleInPreference(XTextDocument doc) {
+        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+            return OOVoidResult.ok();
+        }
+
+        try {
+            ZoteroDocumentPreferences.findCitationStyle(doc, CSLStyleLoader.getStyles())
+                                     .ifPresent(openOfficePreferences::setCurrentStyle);
+            return OOVoidResult.ok();
+        } catch (WrappedTargetException e) {
+            LOGGER.warn("Could not read Zotero document preferences", e);
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
+    }
+
+    OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {
+        if (!isConnectedToDocument()) {
+            return OOVoidResult.ok();
+        }
+
+        OOResult<XTextDocument, OOError> document = getXTextDocument();
+        if (document.isError()) {
+            return document.asVoidResult();
+        }
+
+        return writeZoteroDocumentStyle(document.get(), citationStyle);
+    }
+
+    private OOVoidResult<OOError> writeZoteroDocumentStyle(XTextDocument doc, CitationStyle citationStyle) {
+        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+            return OOVoidResult.ok();
+        }
+
+        try {
+            boolean result = ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
+            if (!result) {
+                return OOVoidResult.error(new OOError(
+                        Localization.lang("Problem modifying citation"),
+                        Localization.lang("Could not update document preferences.")));
+            }
+            return OOVoidResult.ok();
+        } catch (IllegalTypeException | NotRemoveableException | PropertyVetoException | WrappedTargetException e) {
+            LOGGER.warn("Could not update Zotero document preferences", e);
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
     }
 
     /* ******************************************************
@@ -238,35 +305,57 @@ public class OOBibBase {
      *
      * ******************************************************/
 
-    private static OOVoidResult<OOError> checkIfOpenOfficeIsRecordingChanges(XTextDocument doc) {
+    private OOVoidResult<OOError> checkCitationMarkersOutsidePendingDeletions(XTextDocument doc, OOStyle style, OOFrontend frontend) {
         String errorTitle = Localization.lang("Recording and/or Recorded changes");
         try {
-            boolean recordingChanges = UnoRedlines.getRecordChanges(doc);
-            int nRedlines = UnoRedlines.countRedlines(doc);
-            if (recordingChanges || (nRedlines > 0)) {
-                String msg = "";
-                if (recordingChanges) {
-                    msg += Localization.lang("Cannot work with"
-                            + " [Edit]/[Track Changes]/[Record] turned on.");
-                }
-                if (nRedlines > 0) {
-                    if (recordingChanges) {
-                        msg += "\n";
-                    }
-                    msg += Localization.lang("Changes by JabRef"
-                            + " could result in unexpected interactions with"
-                            + " recorded changes.");
-                    msg += "\n";
-                    msg += Localization.lang("Use [Edit]/[Track Changes]/[Manage] to resolve them first.");
-                }
-                return OOVoidResult.error(new OOError(errorTitle, msg));
+            // Keep the common path cheap: only run the overlap scan while Writer is actively
+            // recording changes.
+            if (!UnoRedlines.getRecordChanges(doc)) {
+                return OOVoidResult.ok();
             }
+
+            List<XTextRange> citationRanges = frontend.getCitationRanges(doc, style)
+                                                      .stream()
+                                                      .map(RangeForOverlapCheck::getRange)
+                                                      .toList();
+            if (UnoRedlines.countDeletedRangesTouching(doc, citationRanges) == 0) {
+                return OOVoidResult.ok();
+            }
+            String msg = Localization.lang("Citations inside deletions that have not been accepted yet may reappear.")
+                    + "\n"
+                    + Localization.lang("Use [Edit]/[Track Changes]/[Manage] to resolve them first.");
+            return OOVoidResult.error(new OOError(errorTitle, msg));
         } catch (WrappedTargetException ex) {
-            String msg = Localization.lang("Error while checking if Writer"
-                    + " is recording changes or has recorded changes.");
+            String msg = Localization.lang("Error while checking if Writer is recording changes or has recorded changes.");
             return OOVoidResult.error(new OOError(errorTitle, msg, ex));
+        } catch (NoDocumentException ex) {
+            return OOVoidResult.error(OOError.from(ex).setTitle(errorTitle));
         }
-        return OOVoidResult.ok();
+    }
+
+    /// Run a marker-rewriting action with change recording suspended.
+    ///
+    /// This prevents duplicated citations when Writer's change recording is enabled: deleting the
+    /// old marker would otherwise only mark it as deleted, leaving old and new marker side by side.
+    private <T> T supplyWithTrackChangesSuspended(XTextDocument doc, Supplier<T> action) {
+        List<T> holder = new ArrayList<>(1);
+        try {
+            UnoRedlines.withRecordChangesSuspended(doc, () -> holder.add(action.get()));
+        } catch (UnoRedlines.TrackChangesRestoreException ex) {
+            LOGGER.warn("Could not restore change recording", ex);
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Track changes"),
+                    Localization.lang("JabRef updated the document, but could not restore Track Changes."
+                            + " Please verify [Edit]/[Track Changes]/[Record]."));
+            return holder.getFirst();
+        } catch (WrappedTargetException ex) {
+            LOGGER.warn("Could not suspend change recording", ex);
+            if (!holder.isEmpty()) {
+                return holder.getFirst();
+            }
+            return action.get();
+        }
+        return holder.getFirst();
     }
 
     OOVoidResult<OOError> styleIsRequired(OOStyle style) {
@@ -409,11 +498,6 @@ public class OOBibBase {
         }
         XTextDocument doc = odoc.get();
 
-        if (testDialog(errorTitle, checkIfOpenOfficeIsRecordingChanges(doc))) {
-            LOGGER.warn(errorTitle);
-            return FAIL;
-        }
-
         OOResult<List<CitationEntry>, JabRefException> result = ManageCitations.getCitationEntries(doc);
         if (testDialog(errorTitle, result.asVoidResult().mapError(OOError::from))) {
             return FAIL;
@@ -496,9 +580,12 @@ public class OOBibBase {
         }
 
         if (style instanceof JStyle jStyle) {
+            OOVoidResult<OOError> pendingDeletionOverlap = syncOptions.isPresent()
+                                                           ? checkCitationMarkersOutsidePendingDeletions(doc, style, frontend.get())
+                                                           : OOVoidResult.ok();
             if (testDialog(errorTitle,
                     checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    pendingDeletionOverlap)) {
                 return;
             }
         }
@@ -581,24 +668,39 @@ public class OOBibBase {
             return OOVoidResult.error(OOError.fromMisc(e));
         }
 
+        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        if (documentPreferencesResult.isError()) {
+            return documentPreferencesResult;
+        }
+
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
 
-            if (convertReferenceMarks) {
-                cslCitationOOAdapter.convertReferenceMarksToPreference();
-            }
+            OOVoidResult<OOError> insertResult = supplyWithTrackChangesSuspended(doc, () -> {
+                try {
+                    if (convertReferenceMarks) {
+                        cslCitationOOAdapter.convertReferenceMarksToPreference();
+                    }
 
-            if (citationType == CitationType.AUTHORYEAR_PAR) {
-                // "Cite" button
-                cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-            } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                // "Cite in-text" button
-                cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-            } else if (citationType == CitationType.INVISIBLE_CIT) {
-                // "Insert empty citation"
-                cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    if (citationType == CitationType.AUTHORYEAR_PAR) {
+                        // "Cite" button
+                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                        // "Cite in-text" button
+                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    } else if (citationType == CitationType.INVISIBLE_CIT) {
+                        // "Insert empty citation"
+                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    }
+                    return OOVoidResult.ok();
+                } catch (CreationException | com.sun.star.uno.Exception e) {
+                    return OOVoidResult.error(OOError.fromMisc(e));
+                }
+            });
+            if (insertResult.isError()) {
+                return insertResult;
             }
 
             // If "Automatically sync bibliography when inserting citations" is enabled
@@ -606,8 +708,6 @@ public class OOBibBase {
                 syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             }
             return OOVoidResult.ok();
-        } catch (CreationException | com.sun.star.uno.Exception e) {
-            return OOVoidResult.error(OOError.fromMisc(e));
         } finally {
             // Release controller lock
             doc.unlockControllers();
@@ -648,7 +748,9 @@ public class OOBibBase {
         }
 
         if (syncOptions.isPresent()) {
-            return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get()).asVoidResult().mapError(OOError::from);
+            return supplyWithTrackChangesSuspended(doc,
+                    () -> Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get())
+                                .asVoidResult().mapError(OOError::from));
         }
         return OOVoidResult.ok();
     }
@@ -661,10 +763,14 @@ public class OOBibBase {
                                                     OOResult<XTextCursor, OOError> cursor) {
         try {
             doc.lockControllers();
-            bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
-            return OOVoidResult.ok();
-        } catch (CreationException | com.sun.star.uno.Exception e) {
-            return OOVoidResult.error(OOError.fromMisc(e));
+            return supplyWithTrackChangesSuspended(doc, () -> {
+                try {
+                    bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
+                    return OOVoidResult.ok();
+                } catch (CreationException | com.sun.star.uno.Exception e) {
+                    return OOVoidResult.error(OOError.fromMisc(e));
+                }
+            });
         } finally {
             doc.unlockControllers();
         }
@@ -688,8 +794,7 @@ public class OOBibBase {
 
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    checkStylesExistInTheDocument(jStyle, doc))) {
                 return;
             }
 
@@ -701,16 +806,22 @@ public class OOBibBase {
                     return;
                 }
                 OOFrontend frontend = ofrontend.get();
+                if (testDialog(errorTitle, checkCitationMarkersOutsidePendingDeletions(doc, jStyle, frontend))) {
+                    return;
+                }
 
-                OOResult<Boolean, JabRefException> mergeResult = EditMerge.mergeCitationGroups(doc, frontend, jStyle);
+                OOResult<Boolean, JabRefException> mergeResult = supplyWithTrackChangesSuspended(doc,
+                        () -> EditMerge.mergeCitationGroups(doc, frontend, jStyle));
                 if (testDialog(errorTitle, mergeResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
 
                 if (mergeResult.get()) {
-                    UnoCrossRef.refresh(doc);
-                    Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                    OOResult<List<String>, JabRefException> syncResult = Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
+                    OOResult<List<String>, JabRefException> syncResult = supplyWithTrackChangesSuspended(doc, () -> {
+                        UnoCrossRef.refresh(doc);
+                        Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
+                        return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
+                    });
                     testDialog(errorTitle, syncResult.asVoidResult().mapError(OOError::from));
                 }
             } finally {
@@ -741,8 +852,7 @@ public class OOBibBase {
 
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    checkStylesExistInTheDocument(jStyle, doc))) {
                 return;
             }
 
@@ -754,16 +864,22 @@ public class OOBibBase {
                     return;
                 }
                 OOFrontend frontend = ofrontend.get();
+                if (testDialog(errorTitle, checkCitationMarkersOutsidePendingDeletions(doc, jStyle, frontend))) {
+                    return;
+                }
 
-                OOResult<Boolean, JabRefException> separateResult = EditSeparate.separateCitations(doc, frontend, databases, jStyle);
+                OOResult<Boolean, JabRefException> separateResult = supplyWithTrackChangesSuspended(doc,
+                        () -> EditSeparate.separateCitations(doc, frontend, databases, jStyle));
                 if (testDialog(errorTitle, separateResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
 
                 if (separateResult.get()) {
-                    UnoCrossRef.refresh(doc);
-                    Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                    OOResult<List<String>, JabRefException> syncResult = Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
+                    OOResult<List<String>, JabRefException> syncResult = supplyWithTrackChangesSuspended(doc, () -> {
+                        UnoCrossRef.refresh(doc);
+                        Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
+                        return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
+                    });
                     testDialog(errorTitle, syncResult.asVoidResult().mapError(OOError::from));
                 }
             } finally {
@@ -807,7 +923,7 @@ public class OOBibBase {
 
         if (!result.newDatabase.hasEntries()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                             + " no citation keys"
                             + " which could also be found in your current library."));
@@ -817,7 +933,7 @@ public class OOBibBase {
         List<String> unresolvedKeys = result.unresolvedKeys;
         if (!unresolvedKeys.isEmpty()) {
             dialogService.showErrorDialogAndWait(
-                    Localization.lang(errorTitle),
+                    errorTitle,
                     Localization.lang("Your OpenOffice/LibreOffice document references"
                                     + " at least %0 citation keys"
                                     + " which could not be found in your current library."
@@ -854,8 +970,7 @@ public class OOBibBase {
         if (style instanceof JStyle jStyle) {
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    checkStylesExistInTheDocument(jStyle, doc))) {
                 return;
             }
 
@@ -865,28 +980,39 @@ public class OOBibBase {
             }
             OOFrontend frontend = ofrontend.get();
 
-            if (testDialog(errorTitle, checkRangeOverlaps(doc, frontend))) {
+            if (testDialog(errorTitle,
+                    checkRangeOverlaps(doc, frontend),
+                    checkCitationMarkersOutsidePendingDeletions(doc, jStyle, frontend))) {
                 return;
             }
 
-            testDialog(errorTitle, updateJStyleBibliography(databases, jStyle, doc, frontend, fcursor, errorTitle));
+            testDialog(errorTitle, supplyWithTrackChangesSuspended(doc,
+                    () -> updateJStyleBibliography(databases, jStyle, doc, frontend, fcursor, errorTitle)));
         } else if (style instanceof CitationStyle citationStyle) {
             if (!citationStyle.hasBibliography()) {
                 return;
             }
+            OOResult<OOFrontend, OOError> ofrontend = getFrontend(doc);
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    ofrontend.asVoidResult())) {
                 return;
             }
-            testDialog(errorTitle, updateCSLBibliography(databases, citationStyle, doc, fcursor, errorTitle));
+            testDialog(errorTitle,
+                    checkCitationMarkersOutsidePendingDeletions(doc, citationStyle, ofrontend.get()),
+                    supplyWithTrackChangesSuspended(doc,
+                            () -> updateCSLBibliography(databases, citationStyle, doc, fcursor, errorTitle)));
         } else if (style instanceof BstStyle bstStyle) {
+            OOResult<OOFrontend, OOError> ofrontend = getFrontend(doc);
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    ofrontend.asVoidResult())) {
                 return;
             }
-            testDialog(errorTitle, updateBstBibliography(databases, bstStyle, doc, fcursor, errorTitle));
+            testDialog(errorTitle,
+                    checkCitationMarkersOutsidePendingDeletions(doc, bstStyle, ofrontend.get()),
+                    supplyWithTrackChangesSuspended(doc,
+                            () -> updateBstBibliography(databases, bstStyle, doc, fcursor, errorTitle)));
         }
     }
 
@@ -985,6 +1111,11 @@ public class OOBibBase {
     /// @param errorTitle    Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
+        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        if (documentPreferencesResult.isError()) {
+            return documentPreferencesResult;
+        }
+
         return updateCSLBibliography(dialogService, databases, citationStyle, doc, fcursor, errorTitle, cslCitationOOAdapter, cslUpdateBibliography);
     }
 
