@@ -488,6 +488,9 @@ public class OpenOfficePanel {
         };
 
         connectTask.setOnSucceeded(_ -> {
+            if (ooBase != null) {
+                ooBase.dispose();
+            }
             ooBase = connectTask.getValue();
 
             try {

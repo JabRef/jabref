@@ -106,10 +106,17 @@ public class OOBibBase {
 
     /// Clear all document-bound helpers after connection loss or before switching to another document.
     private void clearCitationAdapters() {
+        if (cslCitationOOAdapter != null) {
+            cslCitationOOAdapter.dispose();
+        }
         cslCitationOOAdapter = null;
         cslUpdateBibliography = null;
         bstCitationOOAdapter = null;
         bstUpdateBibliography = null;
+    }
+
+    public void dispose() {
+        clearCitationAdapters();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {

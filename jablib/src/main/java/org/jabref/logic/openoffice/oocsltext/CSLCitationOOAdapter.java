@@ -11,6 +11,8 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.beans.value.ChangeListener;
+
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -82,6 +84,7 @@ public class CSLCitationOOAdapter {
     private CitationStyle currentStyle;
     private CSLCitationType citationType;
     private boolean needsCSLReferenceMarkConversion = true;
+    private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
     public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
@@ -89,7 +92,8 @@ public class CSLCitationOOAdapter {
         this.markManager = new CSLReferenceMarkManager(doc);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
-        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
+        this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
+        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener(zoteroCompatibilityModeListener);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
@@ -98,6 +102,10 @@ public class CSLCitationOOAdapter {
 
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
+    }
+
+    public void dispose() {
+        openOfficePreferences.zoteroCompatibilityModeProperty().removeListener(zoteroCompatibilityModeListener);
     }
 
     public boolean needsReferenceMarkConversion() throws WrappedTargetException, NoSuchElementException {
