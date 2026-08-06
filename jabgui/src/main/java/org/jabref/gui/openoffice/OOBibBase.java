@@ -114,6 +114,14 @@ public class OOBibBase {
         bstUpdateBibliography = null;
     }
 
+    /// `dispose` in SE is usually treated as a lifecycle hook which means that the concerned object is no longer to be used.
+    ///
+    /// It is arguable that this wrapper logically adds no extra functionality over `clearCitationAdapters` (the
+    /// private helper), but it is to maintain a semantic split when called from [OpenOfficePanel] externally - meaning
+    /// clear related resources without knowing "what".
+    ///
+    /// When called internally, we use the private helper as it does not come with the meaning mentioned above, as we
+    /// are about to reuse the same `ooBase` object.
     public void dispose() {
         clearCitationAdapters();
     }
