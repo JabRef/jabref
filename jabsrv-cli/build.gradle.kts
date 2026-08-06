@@ -66,8 +66,6 @@ javaModulePackaging {
 }
 
 graalvmNative {
-    // LOCAL-ONLY (macOS): CI configures a GraalVM toolchain, so this must NOT be committed.
-    toolchainDetection = false
     binaries {
         named("main") {
             imageName.set("jabsrv")

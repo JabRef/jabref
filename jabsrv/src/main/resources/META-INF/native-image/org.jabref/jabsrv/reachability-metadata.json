@@ -857,12 +857,9 @@
     },
     {
       "type": "org.jabref.http.dto.GlobalExceptionMapper",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.dto.GroupDTO",
@@ -888,31 +885,15 @@
     },
     {
       "type": "org.jabref.http.dto.GsonMessageBodyReader",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ],
-      "fields": [
-        {
-          "name": "gson"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.dto.GsonMessageBodyWriter",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ],
-      "fields": [
-        {
-          "name": "gson"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.dto.LibraryQueryMatch",
@@ -962,12 +943,9 @@
     },
     {
       "type": "org.jabref.http.server.CORSFilter",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.cayw.CAYWQueryParams",
@@ -1015,29 +993,9 @@
     },
     {
       "type": "org.jabref.http.server.cayw.CAYWResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "getCitation",
-          "parameterTypes": [
-            "org.jabref.http.server.cayw.CAYWQueryParams"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "formatterService"
-        },
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.cli.ServerCli",
@@ -1055,45 +1013,15 @@
     },
     {
       "type": "org.jabref.http.server.command.CommandResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.CitationsResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "lookup",
-          "parameterTypes": [
-            "java.lang.String",
-            "java.lang.String"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "citationCacheService"
-        },
-        {
-          "name": "entryTypesManager"
-        },
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        },
-        {
-          "name": "uiMessageHandler"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.CitationsResource$LookupMatch"
@@ -1135,176 +1063,51 @@
     },
     {
       "type": "org.jabref.http.server.resources.EntriesResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.EntryResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "getPlainRepresentation",
-          "parameterTypes": [
-            "java.lang.String",
-            "java.lang.String"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.GroupsResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "get",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.LibrariesQueryResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "query",
-          "parameterTypes": [
-            "org.jabref.http.dto.LibraryQueryRequest"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.LibrariesResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "get",
-          "parameterTypes": []
-        }
-      ],
-      "fields": [
-        {
-          "name": "gson"
-        },
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.LibraryResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "getBibtex",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        },
-        {
-          "name": "getClsItemJson",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        },
-        {
-          "name": "getJson",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "entryTypesManager"
-        },
-        {
-          "name": "gson"
-        },
-        {
-          "name": "preferences"
-        },
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.MapResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        },
-        {
-          "name": "getJabMapJson",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ],
-      "fields": [
-        {
-          "name": "srvStateManager"
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.http.server.resources.RootResource",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.model.database.BibDatabase"
