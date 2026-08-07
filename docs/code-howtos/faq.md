@@ -5,6 +5,25 @@ parent: Code Howtos
 
 Following is a list of common errors encountered by developers which lead to failing tests, with their common solutions:
 
+## git hints
+
+* Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
+* Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
+* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
+* Awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
+
+## Failing GitHub workflow "Sync fork with upstream"
+
+To ease development, a GitHub workflow automatically updates your `main` branch daily.
+However, it is not allowed to update your files if the GitHub workflows are updated by the JabRef team.
+Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch".
+
+To solve this issue, open your GitHub repository in your browser.
+Then, click "Sync fork" to get your fork up-to-date and get the workflow passing again.
+
+![Sync fork](https://github.com/user-attachments/assets/5c1b0a17-0fde-4ce8-ac46-d9477a65c345)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
@@ -20,9 +39,9 @@ Background: [OpenRewrite](https://docs.openrewrite.org/) is an automated refacto
 
 ### `org.jabref.logic.l10n.LocalizationConsistencyTest findMissingLocalizationKeys` <span style="color:red">FAILED</span>
 
-You have probably used Strings that are visible on the UI (to the user) but not wrapped them using `Localization.lang(...)` and added them to the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties).
+You have probably used Strings that are visible on the UI (to the user) but not wrapped them using `Localization.lang(...)` and added them to the [localization properties file](https://github.com/JabRef/jabref/blob/main/jablib/src/main/resources/l10n/JabRef_en.properties).
 
-Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
+Read more about the [background and format of localization](https://devdocs.jabref.org/code-howtos/localization.html) in JabRef.
 
 ### `org.jabref.logic.l10n.LocalizationConsistencyTest findObsoleteLocalizationKeys` <span style="color:red">FAILED</span>
 
@@ -30,28 +49,28 @@ Navigate to the unused key-value pairs in the file and remove them.
 You can always click on the details of the failing test to pinpoint which keys are unused.
 
 Background: There are localization keys in the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code.
-Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
+Read more about the [background and format of localization](https://devdocs.jabref.org/code-howtos/localization.html) in JabRef.
 
-### `org.jabref.logic.citationstyle.CitationStyle discoverCitationStyles` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
+### `org.jabref.logic.citationstyle.CitationStyleCatalogGenerator generateCitationStyleCatalog` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
 
-Check the directory `src/main/resources/csl-styles`.
+Check the directory `jablib/src/main/resources/csl-styles`.
 If it is missing or empty, run `git submodule update`.
 Now, check inside if `ieee.csl` exists.
 If it does not, run `git reset --hard` **inside that directory**.
 
 ### `java.lang.IllegalArgumentException`: Unable to load locale en-US <span style="color:red">ERROR: Could not generate BibEntry citation. The CSL engine could not create a preview for your item.</span>
 
-Check the directory `src/main/resources/csl-locales`.
+Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
-### `org.jabref.architecture.MainArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
+### `org.jabref.support.CommonArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
 
 Check if you've used `System.out.println(...)` (the standard output stream) to log anything into the console.
 This is an architectural violation, as you should use the Logger instead for logging.
-More details on how to log can be found [here](https://devdocs.jabref.org/code-howtos/logging.html).
+More details on [how to log](https://devdocs.jabref.org/code-howtos/logging.html).
 
-### `org.jabref.architecture.MainArchitectureTest doNotUseLogicInModel` <span style="color:red">FAILED</span>
+### `org.jabref.support.CommonArchitectureTest doNotUseLogicInModel` <span style="color:red">FAILED</span>
 
 One common case when this test fails is when you put any class purely containing business logic inside the `model` package (i.e., inside the directory `org/jabref/model/`).
 To fix this, shift the class to a sub-package within the `logic` package (i.e., the directory`org/jabref/logic/`).
@@ -67,8 +86,8 @@ This test is triggered when any kind of documentation is touched (be it the JabR
 
 ### Failing <b>Fetcher</b> tests
 
-Fetcher tests are run when any file in the `.../fetcher` directory has been touched. If you have changed any fetcher logic, check if the changes are correct. You can look for more details on how to locally run fetcher tests [here](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
-Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look [here](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
+Fetcher tests are run when any file in the `.../fetcher` directory has been touched. If you have changed any fetcher logic, check if the changes are correct. You can look for more details on how to locally [run fetcher tests](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
+Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look at [commiting and pushing changes to fetcher tests](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
 
 ## Gradle outputs
 
@@ -91,7 +110,7 @@ You probably chose the wrong gradle task:
 
 ### The problem
 
-Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org` or `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
 
 ![Changed submodules](../images/submodules.png)
 
@@ -102,16 +121,18 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`:
+For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
 
 ```bash
-git merge origin/main
-git checkout main -- src/main/resources/csl-styles
-... git commit ... 
+git fetch upstream --prune
+git merge upstream/main
+git checkout upstream/main -- jablib/src/main/abbrv.jabref.org
+git checkout upstream/main -- jablib/src/main/resources/csl-styles
+git checkout upstream/main -- jablib/src/main/resources/csl-locales
+git checkout upstream/main -- jablib/src/main/resources/ltwa
+git commit -m "Fix submodules"
 git push
 ```
-
-And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 #### Alternative method (if the above doesn't work)
 
@@ -124,7 +145,7 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
     ```bash
-    cd src/main/resources/csl-styles
+    cd jablib/src/main/resources/csl-styles
     ```
 
 3. Find the latest submodule commit id from remote (github):
@@ -147,6 +168,59 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 ### Prevention
 
-To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+To avoid this, avoid staging using any of these commands:
+
+* `git add .`
+* `git add jablib/src/main` (or any path prefix)
+* `git commit -a`
+
+Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+
+## Q: I get `java: package org.jabref.logic.journals does not exist`
+
+A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+
+Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
+
+## IDE import issues
+
+One might see following error:
+
+```text
+Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
+> Plugin with id 'org.jabref.gradle.module' not found.
+```
+
+This happened on Debian 12, with IntelliJ IDEA 2025.2.4 (Ultimate Edition).
+The workaround is to compile JabRef once from the command line.
+
+* Linux: Execute `./gradlew :jabgui:compileJava`
+* Windows (Powershell): Execute `.\gradlew :jabgui:compileJava`
+
+In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
+
+1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
+2. Move the file to your JabRef project directory
+3. Compile JabRef
+
+   * Windows: `.\gg.cmd gradle:java@24 jabgui:compileJava`
+   * Linux: `sh -x ./gg.cmd gradle:java@24 jabgui:compileJava`
+
+4. Wait until the command execution completes.
+
+After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
+
+## Gradle
+
+### Run `gradle` from command line
+
+Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle builds files.
+It is easily possible to run Gradle from the command line without installing a separate JDK manually.
+
+1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
+2. Run `gradle`:
+
+   * Linux/macOS: `sh -x ./gg.cmd gradle :jabgui:run`
+   * Windows: `.\gg.cmd gradle :jabgui:run`
 
 <!-- markdownlint-disable-file MD033 -->

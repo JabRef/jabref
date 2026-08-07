@@ -1,0 +1,490 @@
+package org.jabref.logic.crawler;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.database.DatabaseMerger;
+import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SaveException;
+import org.jabref.logic.git.SlrGitHandler;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.study.FetchResult;
+import org.jabref.model.study.QueryResult;
+import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyQuery;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Answers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class StudyRepositoryTest {
+    private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
+    CitationKeyPatternPreferences citationKeyPatternPreferences;
+    CliPreferences preferences;
+    LibraryPreferences libraryPreferences;
+    ImportFormatPreferences importFormatPreferences;
+    SaveConfiguration saveConfiguration;
+    BibEntryTypesManager entryTypesManager;
+    @TempDir
+    Path tempRepositoryDirectory;
+    StudyRepository studyRepository;
+    SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
+    String hashCodeQuantum = String.valueOf("Quantum".hashCode());
+    String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
+    String hashCodeSoftwareEngineering = String.valueOf("\"Software Engineering\"".hashCode());
+
+    /// Set up mocks
+    @BeforeEach
+    void setUpMocks() throws IOException, URISyntaxException, JabRefException {
+        libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        citationKeyPatternPreferences = CitationKeyGeneratorTestUtils.getInstanceForTesting();
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');  // <-- ADD THIS
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getTimestampPreferences().getTimestampField()).then(_ -> StandardField.TIMESTAMP);
+        entryTypesManager = new BibEntryTypesManager();
+        getTestStudyRepository();
+    }
+
+    @Test
+    void providePathToNonExistentRepositoryThrowsException() {
+        Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
+
+        assertThrows(IOException.class, () -> new StudyRepository(
+                nonExistingRepositoryDirectory,
+                gitHandler,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                entryTypesManager));
+    }
+
+    /// Tests whether the file structure of the repository is created correctly from the study definitions file.
+    @Test
+    void quantumRepositoryStructureCorrectlyCreated() {
+        // When repository is instantiated the directory structure is created
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
+    }
+
+    @Test
+    void cloudComputingRepositoryStructureCorrectlyCreated() {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
+    }
+
+    @Test
+    void softwareEngineeringRepositoryStructureCorrectlyCreated() {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
+    void quantumFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
+    void cloudComputingFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
+    void softwareEngineeringFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", fileName)));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedQuantumFile() {
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedCloudComputingFile() {
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedSoftwareEngineeringFile() {
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
+    }
+
+    /// This tests whether the repository returns the stored bib entries correctly.
+    @Test
+    void bibEntriesCorrectlyStored() throws IOException, URISyntaxException {
+        setUpTestResultFile();
+        List<BibEntry> result = studyRepository.getFetcherResultEntries("Quantum", "ArXiv").getEntries();
+        assertEquals(getArXivQuantumMockResults(), result);
+    }
+
+    @Test
+    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertEquals(getArXivQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
+        assertEquals(getSpringerQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
+    }
+
+    @Test
+    void fetcherGroupIsCreatedInFetcherResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext arXivResult = getTestStudyRepository()
+                .getFetcherResultEntries("Quantum", "ArXiv");
+
+        Optional<GroupTreeNode> root = arXivResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+        assertTrue(root.get().getChildren().stream()
+                       .anyMatch(child -> "ArXiv".equals(child.getGroup().getName())));
+    }
+
+    @Test
+    void fetcherGroupsCreatedInStudyResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext studyResult = getTestStudyRepository().getStudyResultEntries();
+
+        Optional<GroupTreeNode> root = studyResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+
+        List<String> groupNames = root.get().getChildren().stream()
+                                      .map(child -> child.getGroup().getName())
+                                      .toList();
+
+        assertThat(groupNames, hasItems("ArXiv", "Springer"));
+    }
+
+    @Test
+    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        List<QueryResult> mockResults = getMockResults();
+
+        List<BibEntry> arxivEntries = getArXivQuantumMockResultsWithGroups();
+        arxivEntries.getFirst().setField(StandardField.GROUPS, "ArXiv, Springer");
+
+        List<BibEntry> expected = new ArrayList<>();
+        expected.addAll(arxivEntries);
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(1));
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(2));
+
+        studyRepository.persist(mockResults);
+
+        assertEquals(expected, getTestStudyRepository().getQueryResultEntries("Quantum").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
+    }
+
+    @Test
+    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        List<QueryResult> mockResults = getMockResults();
+        studyRepository.persist(mockResults);
+        assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
+    }
+
+    @Test
+    void resolvesResultLimitsWithCatalogOverrideAndStudyDefault() {
+        Study study = studyRepository.getStudy();
+        study.setMaxResultsPerCatalog(100);
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+
+        String overriddenCatalog = study.getCatalogs().getFirst().getName();
+        assertEquals(500, limits.get(overriddenCatalog));
+        assertEquals(100, limits.get(study.getCatalogs().get(1).getName()));
+    }
+
+    @Test
+    void resolvesResultLimitCaseInsensitively() {
+        Study study = studyRepository.getStudy();
+        String catalogName = study.getCatalogs().getFirst().getName();
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+
+        assertEquals(500, limits.get(catalogName.toUpperCase(Locale.ROOT)));
+    }
+
+    @Test
+    void resolvesToDefaultWhenNoLimitSet() {
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+        // no study default, no catalog override -> every catalog resolves to the default
+        limits.forEach((catalog, limit) ->
+                assertEquals(StudyRepository.DEFAULT_RESULT_LIMIT, limit,
+                        () -> "Catalog '" + catalog + "' did not resolve to the default"));
+    }
+
+    @Test
+    void studyLockFileCreatedAfterPersist() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertTrue(Files.exists(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME)));
+    }
+
+    @Test
+    void studyLockRecordsEffectiveQueryForEachEnabledCatalog() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+
+        assertEquals(3, lock.getQueries().size());
+        StudyQuery quantumLock = lock.getQueries().getFirst();
+        assertEquals("Quantum", quantumLock.getQuery());
+        assertEquals(Map.of("Springer", "Quantum", "arXiv", "Quantum", "Medline/PubMed", "Quantum"), quantumLock.getCatalogSpecific());
+    }
+
+    @Test
+    void studyLockExcludesCatalogsWithoutFetcher() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getCatalogs().add(new StudyCatalog("NotAFetcher", true));
+
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("NotAFetcher"));
+    }
+
+    @Test
+    void studyLockExcludesDisabledCatalogs() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("IEEEXplore"));
+    }
+
+    @Test
+    void studyLockPreservesCatalogSpecificOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        Map<String, String> effectiveQueries = parseStudyLock().getQueries().getFirst().getCatalogSpecific();
+        assertEquals("ti:Quantum", effectiveQueries.get("arXiv"));
+        assertEquals("Quantum", effectiveQueries.get("Springer"));
+    }
+
+    @Test
+    void studyLockMatchesOverrideCaseInsensitively() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ARXIV", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("ti:Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockUsesFirstOverrideWhenKeysDifferOnlyByCase() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Map<String, String> catalogSpecific = studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific();
+        catalogSpecific.put("arxiv", "ti:First");
+        catalogSpecific.put("ARXIV", "ti:Second");
+
+        studyRepository.persist(getMockResults());
+
+        // StudyFetcher uses the first case-insensitive match, so the lock must record the same one
+        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockFallsBackToQueryForBlankOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", " ");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockContentIsIdenticalWhenPersistedAgain() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Path lockFile = tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME);
+
+        studyRepository.persist(getMockResults());
+        String firstContent = Files.readString(lockFile);
+        studyRepository.persist(getMockResults());
+
+        assertEquals(firstContent, Files.readString(lockFile));
+    }
+
+    @Test
+    void studyLockPreservesResultLimits() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().setMaxResultsPerCatalog(100);
+        studyRepository.getStudy().getCatalogs().getFirst().setMaxResults(500);
+
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+        assertEquals(100, lock.getMaxResultsPerCatalog());
+        assertEquals(500, lock.getCatalogs().getFirst().getMaxResults());
+    }
+
+    private Study parseStudyLock() throws IOException {
+        return new StudyYamlParser().parseStudyYamlFile(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
+    }
+
+    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
+        setUpTestStudyDefinitionFile();
+        studyRepository = new StudyRepository(
+                tempRepositoryDirectory,
+                gitHandler,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                entryTypesManager);
+        return studyRepository;
+    }
+
+    /// Copies the study definition file into the test repository
+    private void setUpTestStudyDefinitionFile() throws URISyntaxException {
+        Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
+    }
+
+    /// This overwrites the existing result file in the repository with a result file containing multiple BibEntries.
+    /// The repository has to exist before this method is called.
+    private void setUpTestResultFile() throws URISyntaxException {
+        Path queryDirectory = Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum");
+        Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
+        URL resultFile = this.getClass().getResource("ArXivQuantumMock.bib");
+        FileUtil.copyFile(Path.of(resultFile.toURI()), resultFileLocation, true);
+        resultFileLocation = Path.of(queryDirectory.toString(), "Springer" + ".bib");
+        resultFile = this.getClass().getResource("SpringerQuantumMock.bib");
+        FileUtil.copyFile(Path.of(resultFile.toURI()), resultFileLocation, true);
+    }
+
+    private BibDatabase getNonDuplicateBibEntryResult() {
+        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResultsWithGroups());
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResultsWithGroups()));
+        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResultsWithGroups()));
+        return mockResults;
+    }
+
+    private List<QueryResult> getMockResults() {
+        QueryResult resultQuantum =
+                new QueryResult("Quantum", List.of(
+                        new FetchResult("ArXiv", new BibDatabase(stripCitationKeys(getArXivQuantumMockResults()))),
+                        new FetchResult("Springer", new BibDatabase(stripCitationKeys(getSpringerQuantumMockResults())))));
+        QueryResult resultCloudComputing = new QueryResult("Cloud Computing", List.of(new FetchResult("Springer", new BibDatabase(getSpringerCloudComputingMockResults()))));
+        return List.of(resultQuantum, resultCloudComputing);
+    }
+
+    /// Strips the citation key from fetched entries as these normally do not have a citation key
+    private List<BibEntry> stripCitationKeys(List<BibEntry> entries) {
+        entries.forEach(bibEntry -> bibEntry.setCitationKey(""));
+        return entries;
+    }
+
+    private List<BibEntry> getArXivQuantumMockResults() {
+        BibEntry entry1 = new BibEntry()
+                .withCitationKey("Blaha")
+                .withField(StandardField.AUTHOR, "Stephen Blaha")
+                .withField(StandardField.TITLE, "Quantum Computers and Quantum Computer Languages: Quantum Assembly Language and Quantum C Language");
+        entry1.setType(StandardEntryType.Article);
+        BibEntry entry2 = new BibEntry()
+                .withCitationKey("Kaye")
+                .withField(StandardField.AUTHOR, "Phillip Kaye and Michele Mosca")
+                .withField(StandardField.TITLE, "Quantum Networks for Generating Arbitrary Quantum States");
+        entry2.setType(StandardEntryType.Article);
+        BibEntry entry3 = new BibEntry()
+                .withCitationKey("Watrous")
+                .withField(StandardField.AUTHOR, "John Watrous")
+                .withField(StandardField.TITLE, "Quantum Computational Complexity");
+        entry3.setType(StandardEntryType.Article);
+
+        return List.of(entry1, entry2, entry3);
+    }
+
+    private List<BibEntry> getSpringerQuantumMockResults() {
+        // This is a duplicate of entry 1 of ArXiv
+        BibEntry entry1 = new BibEntry()
+                .withCitationKey("Blaha")
+                .withField(StandardField.AUTHOR, "Stephen Blaha")
+                .withField(StandardField.TITLE, "Quantum Computers and Quantum Computer Languages: Quantum Assembly Language and Quantum C Language");
+        entry1.setType(StandardEntryType.Article);
+        BibEntry entry2 = new BibEntry()
+                .withCitationKey("Kroeger")
+                .withField(StandardField.AUTHOR, "H. Kröger")
+                .withField(StandardField.TITLE, "Nonlinear Dynamics In Quantum Physics -- Quantum Chaos and Quantum Instantons");
+        entry2.setType(StandardEntryType.Article);
+        BibEntry entry3 = new BibEntry()
+                .withField(StandardField.AUTHOR, "Zieliński, Cezary")
+                .withField(StandardField.TITLE, "Automatic Control, Robotics, and Information Processing");
+        entry3.setType(StandardEntryType.Article);
+
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), citationKeyPatternPreferences);
+        citationKeyGenerator.generateAndSetKey(entry3);
+
+        return List.of(entry1, entry2, entry3);
+    }
+
+    private List<BibEntry> getSpringerCloudComputingMockResults() {
+        BibEntry entry1 = new BibEntry()
+                .withCitationKey("Gritzalis")
+                .withField(StandardField.AUTHOR, "Gritzalis, Dimitris and Stergiopoulos, George and Vasilellis, Efstratios and Anagnostopoulou, Argiro")
+                .withField(StandardField.TITLE, "Readiness Exercises: Are Risk Assessment Methodologies Ready for the Cloud?");
+        entry1.setType(StandardEntryType.Article);
+        BibEntry entry2 = new BibEntry()
+                .withCitationKey("Rangras")
+                .withField(StandardField.AUTHOR, "Rangras, Jimit and Bhavsar, Sejal")
+                .withField(StandardField.TITLE, "Design of Framework for Disaster Recovery in Cloud Computing");
+        entry2.setType(StandardEntryType.Article);
+        return List.of(entry1, entry2);
+    }
+
+    private List<BibEntry> getArXivQuantumMockResultsWithGroups() {
+        return getArXivQuantumMockResults().stream()
+                                           .map(e -> e.withField(StandardField.GROUPS, "ArXiv"))
+                                           .toList();
+    }
+
+    private List<BibEntry> getSpringerQuantumMockResultsWithGroups() {
+        return getSpringerQuantumMockResults().stream()
+                                              .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                              .toList();
+    }
+
+    private List<BibEntry> getSpringerCloudComputingMockResultsWithGroups() {
+        return getSpringerCloudComputingMockResults().stream()
+                                                     .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                                     .toList();
+    }
+}

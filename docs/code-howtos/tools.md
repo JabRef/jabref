@@ -4,69 +4,58 @@ parent: Code Howtos
 # Useful development tooling
 
 This page lists some software we consider useful.
+Tool usage hints are provided at the [FAQ page](faq.md).
 
-## Browser plugins
+## Working with GitHub
 
-* [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
-* [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
-* [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
+GitHub is a great platform to collaborate.
+It can be enhanced to be even more pleasant.
 
-## git hints
+### Browser plugins to enahnce GitHub
 
-Here, we collect some helpful git hints
+* (strongly recommended) [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
+* (recommended) [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
+* (optional) [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
+* (optional) [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
 
-* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
-* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
-* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
+### Command line tooling
 
-### Rebase everything as one commit on main
+[`gh` tool](https://cli.github.com/) is GitHub's CLI tool.
+The most important feature is to run [`gh pr checkout <number>`](https://cli.github.com/manual/gh_pr_checkout) to checkout another PR.
+This is useful for trying out other pull requests, which in turn favours community engagement.
 
-* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
-* Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
-* Merge recent commits: `git merge upstream/main`
-* If there are conflicts, resolve them
-* Reset index to upstream/main: `git reset upstream/main`
-* Review the changes and create a new commit using git gui: `git gui`
-* Do a force push: `git push -f origin`
+Note: Running JabRef using gradle from the command line requires a JDK to be installed.
+One can also test without a JDK installed.
+See [How to try any JabRef pull request](https://blog.jabref.org/2025/05/31/run-pr/).
 
-See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github.com/articles/syncing-a-fork/)
+## Drawing diagrams
+
+A free tool to make UI mockups: <https://draw.io> with `Software -> Mockups` shapes.
+
+Inside the Markdown files, [Mermaid](https://mermaid.js.org/) can be used.
+This is "diagrams as code", please get familiar with that concept.
+
+## Screenshots
+
+We recommend [Flameshot](https://flameshot.org/) and [Greenshot](https://getgreenshot.org/) to enable proper annotation of screenshots.
+GitHub allows direct paste of images from the clipboard. Thus, copy the annotated image and paste it directly in your PR description.
+
+## Tooling for Linux
+
+In case you use `bash` as your shell, we recommend installing [Oh My Bash](https://ohmybash.nntoan.com/) to make the experience even more awesome.
 
 ## Tooling for Windows
 
-(As Administrator - one time)
+### Better console applications: Windows Terminal plus clink
 
-1. Install [chocolatey](https://chocolatey.org)
-2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal"`
-3. `choco install notepadplusplus`
-4. If you want to have your JDK also managed via chocolatey: `choco install temurin`
+* Install [Windows Terminal](https://aka.ms/terminal)
+* Install [clink](http://mridgers.github.io/clink/), to have Unix keys (<kbd>Alt</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, etc.) also available at the prompt of `cmd.exe`
+* Install [Oh My Posh](https://ohmyposh.dev/) for a better PowerShell.
 
-Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
+## Tools for working with XMP
 
-### General git tooling on Windows
+Validate XMP: <https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator>
 
-* Use [git for windows](https://git-for-windows.github.io), no additional git tooling required
-  * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation. Aim: Store password for GitHub permanently for `https` repository locations
-* [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
+## More Readings
 
-### Better console applications
-
-#### ConEmu plus clink
-
-* `choco install conemu clink`
-* [ConEmu](http://conemu.github.io) -> Preview Version - Aim: Colorful console with tabs
-  * At first start:
-    * "Choose your startup task ...": \`{Bash::Git bash\}}
-    * `OK`
-    * Upper right corner: "Settings..." (third entrry Eintrag)
-    * Startup/Tasks: Choose task no. 7 ("Bash::Git bash"). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
-    * `Save Settings`
-* [clink](http://mridgers.github.io/clink/) - Aim: Unix keys (<kbd>Alt</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, etc.) also available at the prompt of `cmd.exe`
-
-#### Other bundles
-
-* [Cmder](https://cmder.app/) - bundles ConEmu plus clink
-
-### Tools for working with XMP
-
-* Validate XMP: <https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator>
+Check out [awesome lists](https://github.com/sindresorhus/awesome), especially [awesome-java](https://github.com/akullpp/awesome-java#readme).

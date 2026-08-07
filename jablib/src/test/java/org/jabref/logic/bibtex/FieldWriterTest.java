@@ -1,0 +1,212 @@
+package org.jabref.logic.bibtex;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+class FieldWriterTest {
+
+    private FieldWriter writer;
+
+    static Stream<Arguments> keepHashSignInComment() {
+        return Stream.of(Arguments.of("""
+                        # Changelog
+
+                        All notable changes to this project will be documented in this file.
+                        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+                        We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
+                        In case, there is no issue present, the pull request implementing the feature is linked.
+
+                        Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
+
+                        ## [Unreleased]"""),
+                // Source: https://github.com/JabRef/jabref/issues/7010#issue-720030293
+                Arguments.of(
+                        """
+                                #### Goal
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                #### Achievement\s
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                #### Method
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,"""
+                ),
+                // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
+                Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
+        );
+    }
+
+    @BeforeEach
+    void setUp() {
+        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), List.of());
+        writer = new FieldWriter(fieldPreferences);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void keepHashSignInComment(String text) {
+        String writeResult = writer.write(StandardField.COMMENT, text);
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
+        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
+    }
+
+    @Test
+    void noNormalizationOfNewlinesInAbstractField() {
+        String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
+        String result = writer.write(StandardField.ABSTRACT, text);
+        // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
+        String expected = "{" + text + "}";
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void preserveNewlineInAbstractField() {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = writer.write(StandardField.ABSTRACT, text);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void preserveMultipleNewlinesInAbstractField() {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = writer.write(StandardField.ABSTRACT, text);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void preserveNewlineInReviewField() {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = writer.write(StandardField.REVIEW, text);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void whitespaceFromNonMultiLineFieldsKept() {
+        // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
+        // We want to have a clean architecture for reading and writing
+        // Normalizing is done during write (and not during read)
+        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the field writer
+
+        String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
+        String expected = "{" + original + "}";
+
+        String title = writer.write(StandardField.TITLE, original);
+        String any = writer.write(new UnknownField("anyotherfield"), original);
+
+        assertEquals(expected, title);
+        assertEquals(expected, any);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'\\{', '{'",
+            "'\\}', '}'",
+            "'\\{\\{', '{{'",
+            "'\\{\\}', '{\\}'",
+            "'\\{\\}', '\\{}'",
+            "'Incorporating evolutionary {Measures into Conservation Prioritization}', 'Incorporating evolutionary {Measures into Conservation Prioritization}'",
+            "'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}', 'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}'",
+    })
+    void unbalancedBracesSanitized(String expected, String input) {
+        assertEquals("{" + expected + "}", writer.write(StandardField.COMMENT, input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{",
+            "}",
+            "{{",
+            "\\{}"})
+    void checkUnbalancedBraces(String input) {
+        assertNotEquals(List.of(), FieldWriter.checkBalancedBraces(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\\{\\}",
+            "Incorporating evolutionary {Measures into Conservation Prioritization}",
+            "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}",
+            "{Measures into Conservation Prioritization}"})
+    void checkBalancedBraces(String input) {
+        assertEquals(List.of(), FieldWriter.checkBalancedBraces(input));
+    }
+
+    @Test
+    void hashEnclosedWordsGetRealStringsInMonthField() {
+        String text = "#jan# - #feb#";
+        assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void hashWorksSimple() {
+        String text = "#text";
+        assertEquals("{#text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void escapedHashWorksSimple() {
+        String text = "\\#text";
+        assertEquals("{\\#text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void doubleHashesRemoved() {
+        String text = "te##xt";
+        assertEquals("{text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void multipleSpacesNotShrunkOnSingleLineField() {
+        String text = "t  w  o";
+        assertEquals("{t  w  o}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void doubleSpacesAreKept() {
+        String text = "  text      ";
+        assertEquals("{  text      }", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void spacesAreNotTrimmedAtMultilineField() {
+        String text = "  text      ";
+        assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
+    }
+
+    @Test
+    void multipleSpacesKeptOnMultiLineField() {
+        String text = "t  w  o";
+        assertEquals("{t  w  o}", writer.write(StandardField.COMMENT, text));
+    }
+
+    @Test
+    void finalNewLineIsKeptAtMultilineField() {
+        String text = "  text      " + OS.NEWLINE;
+        assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
+    }
+}

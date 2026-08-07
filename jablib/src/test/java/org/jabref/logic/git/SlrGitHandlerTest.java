@@ -1,0 +1,119 @@
+package org.jabref.logic.git;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.NoopGitSystemReader;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
+import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.util.SystemReader;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
+class SlrGitHandlerTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandlerTest.class);
+
+    @TempDir
+    Path repositoryPath;
+
+    private SlrGitHandler gitHandler;
+
+    @BeforeEach
+    void setUpGitHandler() {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+
+        gitHandler = new SlrGitHandler(repositoryPath, gitPreferences);
+        gitHandler.initIfNeeded();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
+    }
+
+    @Test
+    void calculateDiffOnBranch() throws IOException, GitAPIException {
+        String expectedPatch =
+                "diff --git a/TestFolder/Test1.txt b/TestFolder/Test1.txt\n" +
+                        "index 74809e3..2ae1945 100644\n" +
+                        "--- a/TestFolder/Test1.txt\n" +
+                        "+++ b/TestFolder/Test1.txt\n" +
+                        "@@ -1 +1,2 @@\n" +
+                        "+This is a new line of text 2\n" +
+                        " This is a new line of text\n";
+
+        gitHandler.checkoutBranch("branch1");
+        Files.createDirectory(Path.of(repositoryPath.toString(), "TestFolder"));
+        Files.createFile(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"));
+        Files.writeString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"), "This is a new line of text\n");
+        gitHandler.createCommitOnCurrentBranch("Commit 1 on branch1", false);
+
+        Files.createFile(Path.of(repositoryPath.toString(), "Test2.txt"));
+        Files.writeString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"), "This is a new line of text 2\n" + Files.readString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt")));
+        gitHandler.createCommitOnCurrentBranch("Commit 2 on branch1", false);
+
+        LOGGER.debug(gitHandler.calculatePatchOfNewSearchResults("branch1"));
+        assertEquals(expectedPatch, gitHandler.calculatePatchOfNewSearchResults("branch1"));
+    }
+
+    @Test
+    void calculatePatch() throws IOException, GitAPIException {
+        Map<Path, String> expected = new HashMap<>();
+        expected.put(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"), "This is a new line of text 2");
+
+        Map<Path, String> result = gitHandler.parsePatchForAddedEntries(
+                "diff --git a/TestFolder/Test1.txt b/TestFolder/Test1.txt\n" +
+                        "index 74809e3..2ae1945 100644\n" +
+                        "--- a/TestFolder/Test1.txt\n" +
+                        "+++ b/TestFolder/Test1.txt\n" +
+                        "@@ -1 +1,2 @@\n" +
+                        "+This is a new line of text 2\n" +
+                        " This is a new line of text");
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void applyPatch() throws IOException, GitAPIException {
+        gitHandler.checkoutBranch("branch1");
+        Files.createFile(Path.of(repositoryPath.toString(), "Test1.txt"));
+        gitHandler.createCommitOnCurrentBranch("Commit on branch1", false);
+        gitHandler.checkoutBranch("branch2");
+        Files.createFile(Path.of(repositoryPath.toString(), "Test2.txt"));
+        Files.writeString(Path.of(repositoryPath.toString(), "Test1.txt"), "This is a new line of text");
+        gitHandler.createCommitOnCurrentBranch("Commit on branch2.", false);
+
+        gitHandler.checkoutBranch("branch1");
+        gitHandler.appendLatestSearchResultsOntoCurrentBranch("TestMessage", "branch2");
+
+        assertEquals("This is a new line of text", Files.readString(Path.of(repositoryPath.toString(), "Test1.txt")));
+    }
+}

@@ -1,0 +1,245 @@
+package org.jabref.logic.importer.fetcher;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
+
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher, CustomizableKeyFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
+
+    private static final String SOURCE_ID_SEARCH = "https://api.semanticscholar.org/v1/paper/";
+    private static final String SOURCE_WEB_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search?";
+    private final ImporterPreferences importerPreferences;
+
+    public SemanticScholar(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
+
+    /// Tries to find a fulltext URL for a given BibTex entry.
+    ///
+    /// Uses the DOI if present, otherwise the arXiv identifier.
+    ///
+    /// @param entry The Bibtex entry
+    /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+    /// @throws IOException      if a page could not be fetched correctly
+    /// @throws FetcherException if the received page differs from what was expected
+    @Override
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
+        Optional<ArXivIdentifier> arXiv = entry.getField(StandardField.EPRINT).flatMap(ArXivIdentifier::parse);
+
+        Document html = null;
+        if (doi.isPresent()) {
+            try {
+                // Retrieve PDF link
+                String source = SOURCE_ID_SEARCH + doi.get().asString();
+                Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
+                                               .userAgent(URLDownload.USER_AGENT)
+                                               .header("Accept", "text/html; charset=utf-8")
+                                               .referrer("https://www.google.com")
+                                               .ignoreHttpErrors(true);
+                importerPreferences.getApiKey(getName()).ifPresent(
+                        key -> jsoupRequest.header("x-api-key", key));
+                html = jsoupRequest.get();
+            } catch (IOException e) {
+                LOGGER.info("Error for pdf lookup with DOI");
+            }
+        }
+        if (arXiv.isPresent() && entry.getField(StandardField.EPRINT).isPresent()) {
+            // Check if entry is a match
+            String arXivString = entry.getField(StandardField.EPRINT).get();
+            if (!arXivString.startsWith("arXiv:")) {
+                arXivString = "arXiv:" + arXivString;
+            }
+            String source = SOURCE_ID_SEARCH + arXivString;
+            Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
+                                           .userAgent(URLDownload.USER_AGENT)
+                                           .referrer("https://www.google.com")
+                                           .header("Accept", "text/html; charset=utf-8")
+                                           .ignoreHttpErrors(true);
+            importerPreferences.getApiKey(getName()).ifPresent(
+                    key -> jsoupRequest.header("x-api-key", key));
+            html = jsoupRequest.get();
+        }
+        if (html == null) {
+            return Optional.empty();
+        }
+
+        Element metaTag = html.selectFirst("meta[name=citation_pdf_url]");
+        if (metaTag == null) {
+            return Optional.empty();
+        }
+        String link = metaTag.attr("content");
+        if (StringUtil.isNullOrEmpty(link)) {
+            return Optional.empty();
+        }
+        LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
+        return Optional.of(URLUtil.create(link));
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
+
+    String getURLBySource(String source) throws IOException, FetcherException {
+        URLDownload download = new URLDownload(source);
+        importerPreferences.getApiKey(getName()).ifPresent(
+                key -> download.addHeader("x-api-key", key));
+        JSONObject json = new JSONObject(download.asString());
+        if (!json.has("paperId")) {
+            throw new FetcherException("Page does not contain field \"paperId\"");
+        }
+        String paperId = json.get("paperId").toString();
+        LOGGER.debug("URL for source: https://www.semanticscholar.org/paper/{}", paperId);
+        return "https://www.semanticscholar.org/paper/" + paperId;
+    }
+
+    @Override
+    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `query` parameter, so raw queries
+    /// bypass [DefaultQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
+        uriBuilder.addParameter("query", query);
+        uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
+        // All fields need to be specified
+        uriBuilder.addParameter("fields", "paperId,externalIds,url,title,abstract,venue,year,authors");
+        URL result = uriBuilder.build().toURL();
+        LOGGER.debug("URL for query: {}", result);
+        return result;
+    }
+
+    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
+    @Override
+    public Parser getParser() {
+        return inputStream -> {
+
+            JSONObject response = JsonReader.toJsonObject(inputStream);
+            LOGGER.debug("Response for Parser: {}", response);
+            if (response.isEmpty()) {
+                return List.of();
+            }
+
+            int total = response.getInt("total");
+            if (total == 0) {
+                return List.of();
+            } else if (response.has("next")) {
+                total = Math.min(total, response.getInt("next") - response.getInt("offset"));
+            }
+
+            // Response contains a list
+            JSONArray items = response.getJSONArray("data");
+            List<BibEntry> entries = new ArrayList<>(items.length());
+            for (int i = 0; i < total; i++) {
+                JSONObject item = items.getJSONObject(i);
+                BibEntry entry = jsonItemToBibEntry(item);
+                entries.add(entry);
+            }
+
+            return entries;
+        };
+    }
+
+    /// This is copy-paste from CrossRef, need to be checked.
+    ///
+    /// @param item an entry received, needs to be parsed into a BibEntry
+    /// @return The BibEntry that corresponds to the received object
+    /// @throws ParseException if the JSONObject could not be parsed
+    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+        try {
+            BibEntry entry = new BibEntry(StandardEntryType.Article);
+            entry.setField(StandardField.URL, item.optString("url"));
+            entry.setField(StandardField.TITLE, item.optString("title"));
+            entry.setField(StandardField.ABSTRACT, item.optString("abstract"));
+            entry.setField(StandardField.VENUE, item.optString("venue"));
+            entry.setField(StandardField.YEAR, item.optString("year"));
+
+            entry.setField(StandardField.AUTHOR,
+                    IntStream.range(0, item.optJSONArray("authors").length())
+                             .mapToObj(item.optJSONArray("authors")::getJSONObject)
+                             .map(author -> author.has("name") ? author.getString("name") : "")
+                             .collect(Collectors.joining(" and ")));
+
+            JSONObject externalIds = item.optJSONObject("externalIds");
+            entry.setField(StandardField.DOI, externalIds.optString("DOI"));
+            if (externalIds.has("ArXiv")) {
+                entry.setField(StandardField.EPRINT, externalIds.getString("ArXiv"));
+                entry.setField(StandardField.EPRINTTYPE, "arXiv");
+            }
+            entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
+            return entry;
+        } catch (JSONException exception) {
+            throw new ParseException("SemanticScholar API JSON format has changed", exception);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "SemanticScholar";
+    }
+
+    /// Looks for hits which are matched by the given {@link BibEntry}.
+    ///
+    /// @param entry entry to search bibliographic information for
+    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @throws FetcherException if an error linked to the Fetcher applies
+    @Override
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+        Optional<String> title = entry.getTitle();
+        if (title.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return performSearch(title.get());
+    }
+}

@@ -2,41 +2,110 @@
 # Since this pull request has write permissions on the target repo, we should **NOT** execute any untrusted code.
 # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 # Based on https://github.com/spring-projects/spring-security/pull/15477/files
----
+
 name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests", "On PR opened"]
-    types:
-      - completed
+    # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
+    workflows: [ "Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md" ]
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
+    types: [ completed ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+      workflow_run_id:
+        description: 'Workflow run id'
+        required: true
 
 jobs:
   comment:
-    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     if: ${{ github.repository == 'JabRef/jabref' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: read
-      contents: write
+      contents: read
+      issues: write
       pull-requests: write
     timeout-minutes: 10
     steps:
+      - name: Show GitHub context
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          WORKFLOW_RUN_ID: ${{ github.event.inputs.workflow_run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "PR_NUMBER=${PR_NUMBER}"
+          echo "WORKFLOW_RUN_ID=${WORKFLOW_RUN_ID}"
+          echo "EVENT_NAME=${EVENT_NAME}"
+          echo "WORKFLOW=${WORKFLOW}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          echo "Workflow $WORKFLOW" >> $GITHUB_STEP_SUMMARY
+
       - name: Download PR number
-        uses: actions/download-artifact@v4
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: actions/download-artifact@v8
+        continue-on-error: true
         with:
           name: pr_number
+          path: ${{ runner.temp }}/pr-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
+
       - name: Read pr_number.txt
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: read-pr_number
         run: |
-          PR_NUMBER=$(cat pr_number.txt)
+          ARTIFACT_FILE="${{ runner.temp }}/pr-artifacts/pr_number.txt"
+          if [ ! -f "$ARTIFACT_FILE" ]; then
+            echo "No pr_number.txt found in downloaded artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! IFS= read -r PR_NUMBER < "$ARTIFACT_FILE"; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_NUMBER="${PR_NUMBER%$'\r'}"
+
+          if sed -n '2,$p' "$ARTIFACT_FILE" | grep -q '^'; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           echo "Read PR number $PR_NUMBER"
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v4
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout
+        # required for gh tool and .github/ghprcomment.yml
+        uses: actions/checkout@v7
+        with:
+          show-progress: 'false'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+        with:
+          packages: jq
+          version: 1.0
       - name: Is PR from forked?
-        if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        if: ${{ github.event_name != 'workflow_dispatch' && steps.read-pr_number.outputs.pr_number != '' }}
         id: isCrossRepository
         run: |
           isCrossRepository=$(gh pr view $pr_number --json isCrossRepository --jq '.isCrossRepository')
@@ -45,18 +114,89 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
-      - name: Checkout
-        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
-        uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: jbang
-        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
-        uses: jbangdev/jbang-action@v0.124.0
-        with:
-          script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
-          scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
-          trust: https://github.com/koppor/ghprcomment/
+
+      # Set a common variable for PR number and workflow_run_id from either event.
+      - name: Set variables
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: set-vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "workflow_run_id=${{ github.event.inputs.workflow_run_id }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ steps.read-pr_number.outputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "workflow_run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Check if PR has 'dev: no-bot-comments' label"
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: check-label
+        run: |
+          has_label=$(gh pr view "${{ steps.set-vars.outputs.pr_number }}" --json labels -q \
+            '.labels[].name' | grep -Fxq "dev: no-bot-comments" && echo "true" || echo "false")
+          echo "has_label=$has_label" >> "$GITHUB_OUTPUT"
         env:
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup JBang (included at setup-gralde)
+      - uses: ./.github/actions/setup-gradle
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+
+      - name: ghprcomment@main
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: |
+          jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
+          jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
+        env:
+          GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+
+      - name: 'Adapt label "status: changes-required"'
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: |
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
+
+          REPO="${{ github.repository }}"
+
+          COMMENTS=$(gh api \
+            repos/$REPO/issues/$PR_NUMBER/comments \
+            --jq '.[] | select(.user.login=="jabref-machine")')
+
+          # Qodo comments in review threads (not issue comments); a thread counts as long as it is
+          # active (not resolved, not outdated) and the PR author has not replied to it
+          QODO_THREADS=$(gh api graphql \
+            -f owner="${REPO%/*}" -f repo="${REPO#*/}" -F pr="$PR_NUMBER" \
+            -f query='
+              query($owner: String!, $repo: String!, $pr: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $pr) {
+                    author { login }
+                    reviewThreads(first: 100) {
+                      nodes {
+                        isResolved
+                        isOutdated
+                        comments(first: 100) { nodes { author { login } } }
+                      }
+                    }
+                  }
+                }
+              }' \
+            --jq '.data.repository.pullRequest as $pr
+              | [ $pr.reviewThreads.nodes[]
+                  | select((.isResolved or .isOutdated) | not)
+                  | [.comments.nodes[].author.login // ""]
+                  | select(.[0] == "qodo-free-for-open-source-projects")
+                  | select([.[1:][] | select(. == $pr.author.login)] == [])
+                ] | length')
+
+          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 ]]; then
+            echo "Bot comments - adding label changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments,status: stale" --add-label "status: changes-required"
+            echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No bot comments - removing label changes-required and adding no-bot-comments"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: no-bot-comments"
+            echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}

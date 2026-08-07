@@ -1,0 +1,306 @@
+package org.jabref.migrations;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.theme.Theme;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class GuiPreferencesMigrationsTest {
+
+    private JabRefGuiPreferences preferences;
+
+    private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
+            "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+    private final String[] newStylePatterns = new String[] {"[citationkey]",
+            "[citationkey] - [title]"};
+
+    @BeforeEach
+    void setUp() {
+        preferences = mock(JabRefGuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Injector.setModelOrService(CliPreferences.class, preferences);
+    }
+
+    @Test
+    void oldStyleBibtexkeyPattern0() {
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[0]);
+        when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
+
+        verify(preferences).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, newStylePatterns[0]);
+    }
+
+    @Test
+    void oldStyleBibtexkeyPattern1() {
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[1]);
+        when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
+
+        verify(preferences).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, newStylePatterns[1]);
+    }
+
+    @Test
+    void arbitraryBibtexkeyPattern() {
+        String arbitraryPattern = "[anyUserPrividedString]";
+
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
+
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
+
+        verify(preferences, never()).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, arbitraryPattern);
+    }
+
+    @Test
+    void previewStyleReviewToComment() {
+        String oldPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__\
+                \\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
+
+        String newPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__\
+                \\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
+                \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
+
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyle(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, newPreviewStyle);
+    }
+
+    @Test
+    void previewStyleAbstractFormatterMigratesWhenOtherPatternsAreMissing() {
+        String oldPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        String migratedPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyle(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, migratedPreviewStyle);
+    }
+
+    @Test
+    void previewStyleNameChanged() {
+        String oldCycle = "Customized preview style;ieee.csl";
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_CYCLE), anyString())).thenReturn(oldCycle);
+
+        PreferencesMigrations.upgradeBuiltinPreviewName(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_CYCLE, "PREVIEW;ieee.csl");
+    }
+
+    @Test
+    void upgradeColumnPreferencesAlreadyMigrated() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
+
+        verify(preferences, never()).put(JabRefGuiPreferences.COLUMN_NAMES, "anyString");
+        verify(preferences, never()).put(JabRefGuiPreferences.COLUMN_WIDTHS, "anyString");
+    }
+
+    @Test
+    void upgradeColumnPreferencesFromWithoutTypes() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
+        List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
+        List<String> newSortTypes = Arrays.asList("ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING");
+
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, updatedNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES, newSortTypes);
+    }
+
+    @Test
+    void changeColumnPreferencesVariableNamesFor51() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+
+        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
+        when(preferences.getStringList("columnNames")).thenReturn(columnNames);
+        when(preferences.getStringList("columnWidths")).thenReturn(columnWidths);
+        when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
+        when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
+
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(List.of());
+
+        PreferencesMigrations.changeColumnVariableNamesFor51(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, columnWidths);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, columnWidths);
+    }
+
+    @Test
+    void changeColumnPreferencesVariableNamesBackwardsCompatibility() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+
+        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
+        when(preferences.getStringList("columnNames")).thenReturn(columnNames);
+        when(preferences.getStringList("columnWidths")).thenReturn(columnWidths);
+        when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
+        when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
+
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(List.of());
+
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
+
+        verify(preferences, never()).put("columnNames", "anyString");
+        verify(preferences, never()).put("columnWidths", "anyString");
+        verify(preferences, never()).put("mainTableColumnSortTypes", "anyString");
+        verify(preferences, never()).put("mainTableColumnSortOrder", "anyString");
+    }
+
+    @Test
+    void restoreColumnVariablesForBackwardCompatibility() {
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
+        List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
+
+        when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
+
+        when(preferences.get(eq("mainFontSize"), any())).thenReturn("11.2");
+
+        PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
+
+        verify(preferences).putStringList("columnNames", columnNames);
+        verify(preferences).putStringList("columnWidths", columnWidths);
+        verify(preferences).put("columnSortTypes", "");
+        verify(preferences).put("columnSortOrder", "");
+
+        verify(preferences).putInt("mainFontSize", 11);
+    }
+
+    @Test
+    void moveApiKeysToKeyRing() throws PasswordAccessException {
+        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+        when(preferences.getInternalPreferences().getUserHostInfo().getUserHostString()).thenReturn("user-host");
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
+            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+        }
+    }
+
+    @Test
+    void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
+        when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
+        when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
+        when(preferences.get(anyString(), anyString())).thenReturn("");
+
+        PreferencesMigrations.upgradeCleanups(preferences);
+
+        verify(preferences).putStringList(JabRefCliPreferences.CLEANUP_JOBS, List.of("CLEAN_UP_DOI", "RENAME_PDF"));
+    }
+
+    @Test
+    void resolveBibTexStringsFields() {
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
+        when(preferences.get(eq(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS), any())).thenReturn(oldPrefsValue);
+
+        PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
+        verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);
+    }
+
+    @Test
+    void upgradeThemeMigratesOldDarkCssToDarkTheme() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.dark());
+    }
+
+    @Test
+    void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.light());
+    }
+}

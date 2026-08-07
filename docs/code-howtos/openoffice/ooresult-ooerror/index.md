@@ -9,7 +9,7 @@ grand_parent: Code Howtos
 
 ### Relieve GUI panel code
 
-On the question of where should we catch exceptions in relation to GUI code it was suggested (Jonatan Asketorp [here](https://github.com/koppor/jabref/pull/496#discussion_r629695493), "most of them (all?) should be handled latest in the ViewModel.") that catching them early could help simplifying the higher levels.
+On the question of where should we catch exceptions in relation to GUI code it was suggested (Jonatan Asketorp in [this thread](https://github.com/koppor/jabref/pull/496#discussion_r629695493), "most of them (all?) should be handled latest in the ViewModel.") that catching them early could help simplifying the higher levels.
 
 ### Same messages in different contexts
 

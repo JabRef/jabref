@@ -1,0 +1,118 @@
+package org.jabref.toolkit.commands;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.ai.preferences.AiPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.exporter.ExportPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.SearchPreferences;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.search.SearchDisplayMode;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.toolkit.util.CapturingCommandLine;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Answers;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public abstract class AbstractJabKitTest {
+    protected final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+    protected final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final AiPreferences aiPreferences = mock(AiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+    protected CapturingCommandLine commandLine;
+
+    @BeforeEach()
+    void setup() {
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        when(exportPreferences.getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+
+        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        // The deep-stub mock returns nulls for citation-key generation, which the integrity
+        // check and the database writers rely on; provide a real preferences object instead.
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
+                new SimpleObjectProperty<>(',')));
+        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
+                SearchDisplayMode.FILTER,
+                EnumSet.noneOf(SearchFlags.class),
+                false,
+                false,
+                false,
+                0,
+                0,
+                0));
+        when(preferences.getAiPreferences()).thenReturn(aiPreferences);
+
+        JabKit jabKit = new JabKit(preferences, entryTypesManager);
+        commandLine = new CapturingCommandLine(jabKit, JabKit.createFactory());
+    }
+
+    /// Gets class resource as fully qualified string.
+    /// Useful for scenarios where you want a resource as a command line argument
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as fully qualified string
+    String getClassResourceAsFullyQualifiedString(String resourceName) {
+        return getClassResourceAsPath(resourceName).toAbsolutePath().toString();
+    }
+
+    /// Gets class resource as a path.
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as path
+    protected Path getClassResourceAsPath(String resourceName) {
+        try {
+            return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
+                       .toAbsolutePath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e);
+        }
+    }
+
+    protected static void assertFileExists(Path file) throws IOException {
+        String listedFiles = Files.list(file.getParent())
+                                  .map(path -> "'" + path.getFileName().toString() + "'")
+                                  .collect(Collectors.joining(", "));
+
+        assertTrue(Files.exists(file), "file  '" + file.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
+    }
+
+    protected static void assertFileDoesntExist(Path file) {
+        assertFalse(Files.exists(file), "file '" + file.getFileName().toString() + "' shouldn't exist, but does");
+    }
+}

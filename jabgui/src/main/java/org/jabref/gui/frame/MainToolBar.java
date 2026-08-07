@@ -1,0 +1,198 @@
+package org.jabref.gui.frame;
+
+import javafx.geometry.Orientation;
+import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.cleanup.CleanupAction;
+import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.edit.EditAction;
+import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.exporter.SaveAction;
+import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
+import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
+import com.tobiasdiez.easybind.Subscription;
+import org.controlsfx.control.PopOver;
+
+public class MainToolBar extends ToolBar {
+    private final LibraryTabContainer frame;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
+    private final GlobalSearchBar globalSearchBar;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
+    private final GuiPreferences preferences;
+    private final AiService aiService;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final ClipBoardManager clipBoardManager;
+    private SimpleCommand backCommand;
+    private SimpleCommand forwardCommand;
+    private final CountingUndoManager undoManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+
+    private PopOver entryFromIdPopOver;
+    private PopOver progressViewPopOver;
+    private Subscription taskProgressSubscription;
+
+    public MainToolBar(LibraryTabContainer tabContainer,
+                       GuiPushToApplicationCommand pushToApplicationCommand,
+                       GlobalSearchBar globalSearchBar,
+                       DialogService dialogService,
+                       StateManager stateManager,
+                       GuiPreferences preferences,
+                       AiService aiService,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       TaskExecutor taskExecutor,
+                       BibEntryTypesManager entryTypesManager,
+                       ClipBoardManager clipBoardManager,
+                       CountingUndoManager undoManager,
+                       JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.frame = tabContainer;
+        this.pushToApplicationCommand = pushToApplicationCommand;
+        this.globalSearchBar = globalSearchBar;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.preferences = preferences;
+        this.aiService = aiService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
+        this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
+
+        createToolBar();
+    }
+
+    private void createToolBar() {
+        final ActionFactory factory = new ActionFactory();
+
+        final Region leftSpacer = new Region();
+        final Region rightSpacer = new Region();
+
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        initNavigationCommands();
+
+        // Setup Toolbar
+
+        getItems().addAll(
+                new HBox(
+                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
+
+                leftSpacer,
+
+                globalSearchBar,
+
+                rightSpacer,
+
+                new HBox(
+                        factory.createIconButton(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.BACK, backCommand),
+                        factory.createIconButton(StandardActions.FORWARD, forwardCommand)),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        pushToApplicationButton,
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository))),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.INFOCENTER, new SimpleCommand() {
+                            @Override
+                            public void execute() {
+                                InfoCenterPane infoCenterPane = Injector.instantiateModelOrService(InfoCenterPane.class);
+                                infoCenterPane.setShowInfoCenter(!infoCenterPane.isShowInfoCenter());
+                            }
+                        })
+                ),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
+
+        leftSpacer.setPrefWidth(50);
+        leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
+        leftSpacer.setMaxWidth(Region.USE_PREF_SIZE);
+        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
+        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
+
+        getStyleClass().add("mainToolbar");
+    }
+
+    private void initNavigationCommands() {
+        backCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoBackProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().back();
+                }
+            }
+        };
+
+        forwardCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoForwardProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().forward();
+                }
+            }
+        };
+    }
+}

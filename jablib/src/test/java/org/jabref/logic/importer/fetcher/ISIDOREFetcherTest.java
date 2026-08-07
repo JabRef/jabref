@@ -1,0 +1,143 @@
+package org.jabref.logic.importer.fetcher;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
+import org.jabref.testutils.category.FetcherTest;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@FetcherTest
+class ISIDOREFetcherTest {
+
+    @TempDir
+    static Path tempDir;
+
+    private ISIDOREFetcher fetcher;
+
+    /// Fetcher tests run without going through `Launcher`/`JabKitLauncher`, so the merged
+    /// JRE + JabRef trust manager (which contains CA roots not yet present in every JVM's cacerts, e.g.
+    /// HARICA TLS ECC Root CA 2021, used by isidore.science) is never installed. Install it here so
+    /// [URLDownload] sees the same trust configuration as the packaged app.
+    @BeforeAll
+    static void configureTrustStore() throws IOException {
+        TrustStoreManager.createTruststoreFileIfNotExist(tempDir.resolve("truststore.jks"));
+    }
+
+    @BeforeEach
+    void setup() {
+        this.fetcher = new ISIDOREFetcher();
+    }
+
+    @Test
+    @Disabled("Different result returned")
+    void checkArticle1() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon")
+                .withField(StandardField.AUTHOR, "Oscar Egu and Patrick Bonnel")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.JOURNAL, "Travel Behaviour and Society")
+                .withField(StandardField.PUBLISHER, "HAL CCSD, Elsevier")
+                .withField(StandardField.DOI, "10.1016/j.tbs.2019.12.003")
+                .withField(StandardField.URL, "https://isidore.science/document/10670/1.hrzlqd");
+
+        List<BibEntry> actual = fetcher.performSearch("Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon");
+
+        assertEquals(List.of(expected), actual);
+    }
+
+    @Test
+    @Disabled("Returns too much results")
+    void checkArticle2() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ")
+                .withField(StandardField.AUTHOR, "Benoît Rapoport")
+                .withField(StandardField.YEAR, "2016")
+                .withField(StandardField.JOURNAL, "Population (édition française)")
+                .withField(StandardField.PUBLISHER, "HAL CCSD, INED - Institut national d’études démographiques")
+                .withField(StandardField.DOI, "10.3917/popu.1601.0153")
+                .withField(StandardField.URL, "https://isidore.science/document/10670/1.d2vlam");
+
+        List<BibEntry> actual = fetcher.performSearch("Inequality – What Can Be Done");
+
+        assertEquals(List.of(expected), actual);
+    }
+
+    @Test
+    void checkThesis() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Thesis)
+                .withField(StandardField.TITLE, "Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system")
+                .withField(StandardField.AUTHOR, "Wensheng Xie")
+                .withField(StandardField.YEAR, "2024");
+
+        List<BibEntry> actual = fetcher.performSearch("Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system");
+
+        // The results obtained by the fetcher contain three entries (as of 2024), and the first matches our expected entry. So, we can use actual.getFirst(), but shall still use findFirst() in case the order of returned items changes.
+        Optional<BibEntry> matchingEntry = actual.stream()
+                                                 .filter(entry -> entry.equals(expected))
+                                                 .findFirst();
+
+        assertEquals(Optional.of(expected), matchingEntry);
+    }
+
+    @Test
+    @Disabled("No result returned. Searched for `Salvage Lymph Node`, results are returned")
+    void checkArticle3() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Salvage Lymph Node Dissection for Nodal Recurrent Prostate Cancer: A Systematic Review.")
+                .withField(StandardField.AUTHOR, "G. Ploussard and G. Gandaglia and H. Borgmann and P. de Visschere and I. Heidegger and A. Kretschmer and R. Mathieu and C. Surcel and D. Tilki and I. Tsaur and M. Valerio and R. van den Bergh and P. Ost and A. Briganti")
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.JOURNAL, "European urology")
+                .withField(StandardField.DOI, "10.1016/j.eururo.2018.10.041")
+                .withField(StandardField.URL, "https://isidore.science/document/10670/1.zm7q2x");
+
+        List<BibEntry> actual = fetcher.performSearch("Salvage Lymph Node Dissection for Nodal Recurrent Prostate Cancer: A Systematic Review.");
+
+        assertEquals(List.of(expected), actual);
+    }
+
+    @Test
+    void noResults() throws FetcherException {
+        List<BibEntry> actual = fetcher.performSearch("nothing notthingham jojoyolo");
+        assertEquals(List.of(), actual);
+    }
+
+    @Test
+    void author() throws FetcherException {
+        List<BibEntry> actual = fetcher.performSearch("author=\"Adam Strange\"");
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Howard Green and Karen Boyland and Adam Strange")
+                .withField(StandardField.DOI, "doi:10.3406/htn.1990.2970")
+                .withField(StandardField.TITLE, "Le rôle des pépinières dans le développement des entreprises accueillies : essai d'évaluation. L'exemple du Yorkshire -Humberside (R.U.)")
+                .withField(StandardField.YEAR, "1990")
+        ), actual);
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void performRawSearchQueryPagedFindsEntry() throws FetcherException {
+        Page<BibEntry> page = fetcher.performRawSearchQueryPaged("Corporate Social Responsibility", 0);
+        assertFalse(page.getContent().isEmpty());
+    }
+}

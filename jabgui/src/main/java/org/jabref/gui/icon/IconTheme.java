@@ -1,0 +1,380 @@
+package org.jabref.gui.icon;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
+import org.jspecify.annotations.NullMarked;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignD;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignG;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignH;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignN;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignO;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
+@NullMarked
+public class IconTheme {
+
+    public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
+    public static final Color DEFAULT_GROUP_COLOR = Color.web("#8a8a8a");
+    public static final Color SELECTED_COLOR = Color.web("#50618F");
+    private static final List<String> LOGO_SET = List.of(
+            "jabrefIcon16",
+            "jabrefIcon20",
+            "jabrefIcon32",
+            "jabrefIcon40",
+            "jabrefIcon48",
+            "jabrefIcon64",
+            "jabrefIcon128");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
+
+    private static final String ICON_PATH_PREFIX = "/images/external/";
+    private static final String DEFAULT_ICON_PATH = ICON_PATH_PREFIX + "red.png";
+    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"));
+
+    private IconTheme() {
+    }
+
+    public static Image getJabRefIcon() {
+        return new Image(getIconUrl("jabrefIcon48").toString());
+    }
+
+    public static List<Image> getLogoSet() {
+        return LOGO_SET.stream()
+                       .map(name -> new Image(getIconUrl(name).toString()))
+                       .toList();
+    }
+
+    public static Optional<JabRefIcon> findJabRefIcon(String iconCode) {
+        String normalizedIconCode = iconCode.toUpperCase(Locale.ENGLISH);
+
+        try {
+            return Optional.of(JabRefIcons.valueOf(normalizedIconCode));
+        } catch (IllegalArgumentException ignored) {
+            return java.util.Arrays.stream(JabRefIcons.values())
+                                   .filter(icon -> icon.matchesPersistedName(normalizedIconCode))
+                                   .findFirst()
+                                   .map(JabRefIcon.class::cast);
+        }
+    }
+
+    private static URL getIconUrl(String name) {
+        if (!KEY_TO_ICON.containsKey(name)) {
+            LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
+        }
+        String path = KEY_TO_ICON.getOrDefault(name, DEFAULT_ICON_PATH);
+        return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
+    }
+
+    /// Reads file mapping icon keys to image file names, prefixing each value with {@link #ICON_PATH_PREFIX}.
+    ///
+    /// @param url The URL to read information from.
+    /// @return A Map containing all key-value pairs found.
+    private static Map<String, String> readIconThemeFile(URL url) {
+        Properties properties = new Properties();
+        try (InputStream in = url.openStream()) {
+            properties.load(in);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to read default icon theme.", e);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        for (String key : properties.stringPropertyNames()) {
+            result.put(key, ICON_PATH_PREFIX + properties.getProperty(key));
+        }
+        return result;
+    }
+
+    public enum JabRefIcons implements JabRefIcon {
+
+        ADD(MaterialDesignP.PLUS_CIRCLE_OUTLINE),
+        ADD_FILLED(MaterialDesignP.PLUS_CIRCLE),
+        ADD_NOBOX(MaterialDesignP.PLUS),
+        ADD_ARTICLE(MaterialDesignP.PLUS),
+        ADD_ENTRY(MaterialDesignP.PLAYLIST_PLUS),
+        CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
+        EDIT_ENTRY(MaterialDesignT.TOOLTIP_EDIT),
+        EDIT_STRINGS(MaterialDesignT.TOOLTIP_TEXT),
+        FOLDER(MaterialDesignF.FOLDER_OUTLINE),
+        REMOVE(MaterialDesignM.MINUS_BOX),
+        REMOVE_NOBOX(MaterialDesignM.MINUS),
+        FILE(MaterialDesignF.FILE_OUTLINE),
+        PDF_FILE(MaterialDesignF.FILE_PDF_BOX),
+        DOI(MaterialDesignB.BARCODE_SCAN),
+        DUPLICATE(MaterialDesignC.CONTENT_DUPLICATE),
+        EDIT(MaterialDesignP.PENCIL),
+        NEW(MaterialDesignF.FOLDER_PLUS),
+        SAVE(MaterialDesignC.CONTENT_SAVE),
+        SAVE_ALL(MaterialDesignC.CONTENT_SAVE_ALL),
+        CLOSE(MaterialDesignC.CLOSE_CIRCLE),
+        PASTE(JabRefMaterialDesignIcon.PASTE),
+        CUT(MaterialDesignC.CONTENT_CUT),
+        COPY(MaterialDesignC.CONTENT_COPY),
+        COMMENT(MaterialDesignC.COMMENT),
+        REDO(MaterialDesignR.REDO),
+        UNDO(MaterialDesignU.UNDO),
+        MARKER(MaterialDesignM.MARKER),
+        REFRESH(MaterialDesignR.REFRESH),
+        MEMORYSTICK(MaterialDesignU.USB_FLASH_DRIVE_OUTLINE),
+        DELETE_ENTRY(MaterialDesignD.DELETE),
+        SEARCH(MaterialDesignM.MAGNIFY),
+        FILE_SEARCH(MaterialDesignF.FILE_FIND),
+        FILE_STAR(MaterialDesignF.FILE_STAR),
+        PDF_METADATA_READ(MaterialDesignF.FORMAT_ALIGN_TOP),
+        PDF_METADATA_WRITE(MaterialDesignF.FORMAT_ALIGN_BOTTOM),
+        ADVANCED_SEARCH(Color.CYAN, MaterialDesignM.MAGNIFY),
+        PREFERENCES(MaterialDesignC.COG),
+        SELECTORS(MaterialDesignS.STAR_SETTINGS),
+        HELP(MaterialDesignH.HELP_CIRCLE),
+        UP(MaterialDesignA.ARROW_UP),
+        DOWN(MaterialDesignA.ARROW_DOWN),
+        LEFT(MaterialDesignA.ARROW_LEFT_BOLD),
+        RIGHT(MaterialDesignA.ARROW_RIGHT_BOLD),
+        SOURCE(MaterialDesignC.CODE_BRACES),
+        MAKE_KEY(MaterialDesignK.KEY_VARIANT),
+        CLEANUP_ENTRIES(MaterialDesignB.BROOM),
+        PRIORITY(MaterialDesignF.FLAG),
+        PRIORITY_HIGH(Color.RED, MaterialDesignF.FLAG),
+        PRIORITY_MEDIUM(Color.ORANGE, MaterialDesignF.FLAG),
+        PRIORITY_LOW(Color.rgb(111, 204, 117), MaterialDesignF.FLAG),
+        PRINTED(MaterialDesignP.PRINTER),
+        RANKING(MaterialDesignS.STAR),
+        RANK1(MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE),
+        RANK2(MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE),
+        RANK3(MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE),
+        RANK4(MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE),
+        RANK5(MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR, MaterialDesignS.STAR),
+        WWW(MaterialDesignW.WEB),
+        GROUP_INCLUDING(MaterialDesignF.FILTER_OUTLINE),
+        GROUP_REFINING(MaterialDesignF.FILTER),
+        AUTO_GROUP(MaterialDesignA.AUTO_FIX),
+        GROUP_INTERSECTION(JabRefMaterialDesignIcon.SET_CENTER),
+        GROUP_UNION(JabRefMaterialDesignIcon.SET_ALL),
+        EMAIL(MaterialDesignE.EMAIL),
+        EXPORT_TO_CLIPBOARD(MaterialDesignC.CLIPBOARD_ARROW_LEFT),
+        ATTACH_FILE(MaterialDesignP.PAPERCLIP),
+        AUTO_FILE_LINK(MaterialDesignF.FILE_FIND),
+        AUTO_RENAME(MaterialDesignA.AUTO_FIX),
+        DOWNLOAD_FILE(MaterialDesignD.DOWNLOAD),
+        MOVE_TO_FOLDER(MaterialDesignF.FILE_SEND),
+        COPY_TO_FOLDER(MaterialDesignC.CONTENT_COPY),
+        RENAME(MaterialDesignR.RENAME_BOX),
+        DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
+        OCR(MaterialDesignT.TEXT_RECOGNITION),
+        REMOVE_LINK(MaterialDesignL.LINK_OFF),
+        AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
+        QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
+        QUALITY(MaterialDesignC.CERTIFICATE),
+        OPEN(MaterialDesignF.FOLDER_OUTLINE),
+        OPEN_LIST(MaterialDesignF.FOLDER_OPEN_OUTLINE),
+        ADD_ROW(MaterialDesignS.SERVER_PLUS),
+        REMOVE_ROW(MaterialDesignS.SERVER_MINUS),
+        PICTURE(MaterialDesignF.FILE_IMAGE),
+        READ_STATUS_READ(Color.rgb(111, 204, 117, 1), MaterialDesignE.EYE),
+        READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignE.EYE),
+        READ_STATUS(MaterialDesignE.EYE),
+        RELEVANCE(MaterialDesignS.STAR_CIRCLE),
+        MERGE_ENTRIES(MaterialDesignC.COMPARE),
+        CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
+        PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),
+        PLAIN_TEXT_IMPORT_DONE(MaterialDesignC.CHECKBOX_MARKED_CIRCLE_OUTLINE),
+        DONATE(MaterialDesignG.GIFT),
+        MOVE_TAB_ARROW(MaterialDesignA.ARROW_UP_BOLD),
+        OPTIONAL(MaterialDesignL.LABEL_OUTLINE),
+        REQUIRED(MaterialDesignL.LABEL),
+        INTEGRITY_FAIL(Color.RED, MaterialDesignC.CLOSE_CIRCLE),
+        INTEGRITY_INFO(MaterialDesignI.INFORMATION),
+        INTEGRITY_WARN(MaterialDesignA.ALERT_CIRCLE),
+        INTEGRITY_SUCCESS(MaterialDesignC.CHECKBOX_MARKED_CIRCLE_OUTLINE),
+        GITHUB(MaterialDesignG.GITHUB),
+        TOGGLE_ENTRY_PREVIEW(MaterialDesignL.LIBRARY),
+        TOGGLE_GROUPS(MaterialDesignV.VIEW_LIST),
+        SHOW_PREFERENCES_LIST(MaterialDesignV.VIEW_LIST),
+        WRITE_XMP(MaterialDesignI.IMPORT),
+        FILE_WORD(MaterialDesignF.FILE_WORD),
+        FILE_EXCEL(MaterialDesignF.FILE_EXCEL),
+        FILE_POWERPOINT(MaterialDesignF.FILE_POWERPOINT),
+        FILE_TEXT(MaterialDesignF.FILE_DOCUMENT),
+        FILE_MULTIPLE(MaterialDesignF.FILE_MULTIPLE),
+        FILE_OPENOFFICE(JabRefMaterialDesignIcon.OPEN_OFFICE),
+        APPLICATION_GENERIC(MaterialDesignA.APPLICATION),
+        APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS),
+        APPLICATION_LYX(JabRefMaterialDesignIcon.LYX),
+        APPLICATION_TEXSTUDIO(JabRefMaterialDesignIcon.TEX_STUDIO),
+        APPLICATION_TEXMAKER(JabRefMaterialDesignIcon.TEX_MAKER),
+        APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
+        APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
+        APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
+        APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
+        APPLICATION_TEXWORKS(JabRefMaterialDesignIcon.TEXWORKS),
+        APPLICATION_VSCODE(JabRefMaterialDesignIcon.VSCODE),
+        KEY_BINDINGS(MaterialDesignK.KEYBOARD),
+        FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
+        CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),
+        SUCCESS(MaterialDesignC.CHECK_CIRCLE),
+        CHECK(MaterialDesignC.CHECK),
+        WARNING(MaterialDesignA.ALERT),
+        ERROR(MaterialDesignA.ALERT_CIRCLE),
+        REG_EX(MaterialDesignR.REGEX),
+        FULLTEXT(MaterialDesignF.FILE_EYE),
+        FILTER(MaterialDesignF.FILTER),
+        INVERT(MaterialDesignI.INVERT_COLORS),
+        CONSOLE(MaterialDesignC.CONSOLE),
+        FORUM(MaterialDesignF.FORUM),
+        FACEBOOK(MaterialDesignF.FACEBOOK),
+        MASTODON(MaterialDesignM.MASTODON),
+        LINKEDIN(MaterialDesignL.LINKEDIN),
+        TWITTER(MaterialDesignT.TWITTER),
+        BLOG(MaterialDesignR.RSS),
+        DATE_PICKER(MaterialDesignC.CALENDAR),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignR.RECORD),
+        DEFAULT_GROUP_ICON(MaterialDesignF.FILE_TREE),
+        DEFAULT_GROUP_ICON_COLUMN(MaterialDesignL.LABEL_OUTLINE),
+        ALL_ENTRIES_GROUP_ICON(MaterialDesignD.DATABASE),
+        IMPORT(MaterialDesignC.CALL_RECEIVED),
+        EXPORT(MaterialDesignC.CALL_MADE),
+        PREVIOUS_LEFT(MaterialDesignC.CHEVRON_LEFT),
+        PREVIOUS_UP(MaterialDesignC.CHEVRON_UP),
+        NEXT_RIGHT(MaterialDesignC.CHEVRON_RIGHT),
+        NEXT_DOWN(MaterialDesignC.CHEVRON_DOWN),
+        LIST_MOVE_LEFT(MaterialDesignC.CHEVRON_LEFT),
+        LIST_MOVE_UP(MaterialDesignC.CHEVRON_UP),
+        LIST_MOVE_RIGHT(MaterialDesignC.CHEVRON_RIGHT),
+        LIST_MOVE_DOWN(MaterialDesignC.CHEVRON_DOWN),
+        FIT_WIDTH(MaterialDesignA.ARROW_EXPAND_ALL),
+        FIT_SINGLE_PAGE(MaterialDesignN.NOTE),
+        ZOOM_OUT(MaterialDesignM.MAGNIFY_MINUS),
+        ZOOM_IN(MaterialDesignM.MAGNIFY_PLUS),
+        ENTRY_TYPE(MaterialDesignP.PENCIL),
+        NEW_GROUP(MaterialDesignP.PLUS),
+        OPEN_LINK(MaterialDesignO.OPEN_IN_NEW),
+        LOOKUP_IDENTIFIER(MaterialDesignS.SEARCH_WEB),
+        ADD_ENTRY_IMMEDIATE(MaterialDesignP.PLUS),
+        ADD_ENTRY_IDENTIFIER(MaterialDesignC.CALL_RECEIVED),
+        ADD_ENTRY_PLAINTEXT(MaterialDesignP.PLUS_BOX),
+        LINKED_FILE_ADD(MaterialDesignP.PLUS),
+        FETCH_FULLTEXT(MaterialDesignS.SEARCH_WEB),
+        FETCH_BY_IDENTIFIER(MaterialDesignC.CLIPBOARD_ARROW_DOWN),
+        TOGGLE_ABBREVIATION(MaterialDesignF.FORMAT_ALIGN_CENTER),
+        VIEW_JOURNAL_INFO(MaterialDesignI.INFORMATION_VARIANT),
+        NEW_FILE(MaterialDesignP.PLUS),
+        DOWNLOAD(MaterialDesignD.DOWNLOAD),
+        OWNER(MaterialDesignA.ACCOUNT),
+        CLOSE_JABREF(MaterialDesignD.DOOR),
+        ARTICLE(MaterialDesignF.FILE_DOCUMENT),
+        BOOK(MaterialDesignB.BOOK_OPEN_PAGE_VARIANT),
+        LATEX_CITATIONS(JabRefMaterialDesignIcon.TEX_STUDIO),
+        LATEX_FILE_DIRECTORY(MaterialDesignF.FOLDER_OUTLINE),
+        LATEX_FILE(MaterialDesignF.FILE_OUTLINE),
+        LATEX_COMMENT(MaterialDesignC.COMMENT_TEXT_OUTLINE),
+        LATEX_LINE(MaterialDesignF.FORMAT_LINE_SPACING),
+        PASSWORD_REVEALED(MaterialDesignE.EYE),
+        ADD_ABBREVIATION_LIST(MaterialDesignP.PLUS),
+        OPEN_ABBREVIATION_LIST(MaterialDesignF.FOLDER_OUTLINE),
+        REMOVE_ABBREVIATION_LIST(MaterialDesignM.MINUS),
+        ADD_ABBREVIATION(MaterialDesignP.PLAYLIST_PLUS),
+        REMOVE_ABBREVIATION(MaterialDesignP.PLAYLIST_MINUS),
+        REMOTE_DATABASE(MaterialDesignD.DATABASE),
+        HOME(MaterialDesignH.HOME),
+        LINK(MaterialDesignL.LINK),
+        LINK_VARIANT(MaterialDesignL.LINK_VARIANT),
+        PROTECT_STRING(MaterialDesignC.CODE_BRACES),
+        SELECT_ICONS(MaterialDesignA.APPS),
+        KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
+        KEEP_ON_TOP(MaterialDesignP.PIN),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF),
+        OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW),
+        REMOVE_TAGS(MaterialDesignC.CLOSE),
+        ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
+        ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
+        ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY),
+        CONSISTENCY_UNSET_FIELD(MaterialDesignM.MINUS),
+        CONSISTENCY_REQUIRED_FIELD(MaterialDesignC.CLOSE),
+        CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
+        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),
+        ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
+        GIT_SYNC(MaterialDesignG.GIT),
+        RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
+        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
+
+        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
+        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+
+        private final JabRefIcon icon;
+
+        JabRefIcons(Ikon... icons) {
+            icon = new IkonliIcon(icons);
+        }
+
+        JabRefIcons(Color color, Ikon... icons) {
+            icon = new IkonliIcon(color, icons);
+        }
+
+        JabRefIcons(String svgPath) {
+            icon = new SvgIcon(name(), svgPath);
+        }
+
+        @Override
+        public boolean matches(Node graphicNode) {
+            return icon.matches(graphicNode);
+        }
+
+        @Override
+        public Node getGraphicNode() {
+            return icon.getGraphicNode();
+        }
+
+        @Override
+        public JabRefIcon withSize(int size) {
+            return icon.withSize(size);
+        }
+
+        @Override
+        public JabRefIcon withColor(Color color) {
+            return icon.withColor(color);
+        }
+
+        @Override
+        public JabRefIcon disabled() {
+            return icon.disabled();
+        }
+
+        private boolean matchesPersistedName(String persistedIconName) {
+            return name().equals(persistedIconName) || icon.name().equalsIgnoreCase(persistedIconName);
+        }
+    }
+}

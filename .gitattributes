@@ -13,4 +13,5 @@ gradlew text eol=lf
 *.properties text eol=lf
 
 CHANGELOG.md merge=union
+jablib/src/main/resources/l10n/JabRef_en.properties merge=union
 src/main/resources/l10n/JabRef_en.properties merge=union

@@ -1,0 +1,199 @@
+package org.jabref.logic.search;
+
+import java.util.EnumSet;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+
+import org.jabref.model.search.SearchDisplayMode;
+import org.jabref.model.search.SearchFlags;
+
+import com.google.common.annotations.VisibleForTesting;
+
+public class SearchPreferences {
+
+    private final ObservableSet<SearchFlags> searchFlags;
+    private final BooleanProperty usePostgresSearch;
+    private final BooleanProperty keepWindowOnTop;
+    private final DoubleProperty searchWindowHeight;
+    private final DoubleProperty searchWindowWidth;
+    private final DoubleProperty searchWindowDividerPosition;
+    private final BooleanProperty keepSearchString;
+    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
+
+    private SearchPreferences() {
+        this(
+                SearchDisplayMode.FILTER,  // Search display mode
+                false,                     // Regular expression
+                false,                     // Case sensitive
+                false,                     // Fulltext
+                false,                     // Use postgres search
+                false,                     // Keep search string
+                true,                      // Keep window on top
+                176.0,                     // Search window height
+                600.0,                     // Search window width
+                0.5                        // Search window divider position
+        );
+    }
+
+    public SearchPreferences(SearchDisplayMode searchDisplayMode,
+                             boolean isRegularExpression,
+                             boolean isCaseSensitive,
+                             boolean isFulltext,
+                             boolean usePostgresSearch,
+                             boolean keepSearchString,
+                             boolean keepWindowOnTop,
+                             double searchWindowHeight,
+                             double searchWindowWidth,
+                             double searchWindowDividerPosition) {
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), usePostgresSearch, keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
+        if (isRegularExpression) {
+            searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
+        }
+        if (isCaseSensitive) {
+            searchFlags.add(SearchFlags.CASE_SENSITIVE);
+        }
+        if (isFulltext) {
+            searchFlags.add(SearchFlags.FULLTEXT);
+        }
+    }
+
+    @VisibleForTesting
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean usePostgresSearch, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+        this.searchFlags = FXCollections.observableSet(searchFlags);
+
+        this.usePostgresSearch = new SimpleBooleanProperty(usePostgresSearch);
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
+        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
+        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
+        this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
+    }
+
+    public static SearchPreferences getDefault() {
+        return new SearchPreferences();
+    }
+
+    public EnumSet<SearchFlags> getSearchFlags() {
+        // copy of returns an exception when the EnumSet is empty
+        if (searchFlags.isEmpty()) {
+            return EnumSet.noneOf(SearchFlags.class);
+        }
+        return EnumSet.copyOf(searchFlags);
+    }
+
+    public ObservableSet<SearchFlags> getObservableSearchFlags() {
+        return searchFlags;
+    }
+
+    public void setSearchFlag(SearchFlags flag, boolean value) {
+        if (searchFlags.contains(flag) && !value) {
+            searchFlags.remove(flag);
+        } else if (!searchFlags.contains(flag) && value) {
+            searchFlags.add(flag);
+        }
+    }
+
+    public boolean isRegularExpression() {
+        return searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);
+    }
+
+    public boolean isCaseSensitive() {
+        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
+    }
+
+    public boolean isFulltext() {
+        return searchFlags.contains(SearchFlags.FULLTEXT);
+    }
+
+    public boolean shouldKeepSearchString() {
+        return keepSearchString.get();
+    }
+
+    public boolean shouldKeepWindowOnTop() {
+        return keepWindowOnTop.get();
+    }
+
+    public BooleanProperty keepWindowOnTopProperty() {
+        return keepWindowOnTop;
+    }
+
+    public void setKeepWindowOnTop(boolean keepWindowOnTop) {
+        this.keepWindowOnTop.set(keepWindowOnTop);
+    }
+
+    public double getSearchWindowHeight() {
+        return this.searchWindowHeight.get();
+    }
+
+    public double getSearchWindowWidth() {
+        return this.searchWindowWidth.get();
+    }
+
+    public Double getSearchWindowDividerPosition() {
+        return this.searchWindowDividerPosition.get();
+    }
+
+    public DoubleProperty getSearchWindowHeightProperty() {
+        return this.searchWindowHeight;
+    }
+
+    public DoubleProperty getSearchWindowWidthProperty() {
+        return this.searchWindowWidth;
+    }
+
+    public SearchDisplayMode getSearchDisplayMode() {
+        return searchDisplayMode.get();
+    }
+
+    public DoubleProperty getSearchWindowDividerPositionProperty() {
+        return this.searchWindowDividerPosition;
+    }
+
+    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
+        return this.searchDisplayMode;
+    }
+
+    public BooleanProperty keepSearchStringProperty() {
+        return keepSearchString;
+    }
+
+    public void setSearchWindowHeight(double height) {
+        this.searchWindowHeight.set(height);
+    }
+
+    public void setSearchWindowWidth(double width) {
+        this.searchWindowWidth.set(width);
+    }
+
+    public void setSearchWindowDividerPosition(double position) {
+        this.searchWindowDividerPosition.set(position);
+    }
+
+    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
+        this.searchDisplayMode.set(searchDisplayMode);
+    }
+
+    public void setKeepSearchString(boolean keepSearchString) {
+        this.keepSearchString.set(keepSearchString);
+    }
+
+    public boolean shouldUsePostgresSearch() {
+        return usePostgresSearch.get();
+    }
+
+    public BooleanProperty usePostgresSearchProperty() {
+        return usePostgresSearch;
+    }
+
+    public void setUsePostgresSearch(boolean usePostgresSearch) {
+        this.usePostgresSearch.set(usePostgresSearch);
+    }
+}

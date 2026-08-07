@@ -3,22 +3,23 @@ name: Update Gradle Wrapper
 on:
   schedule:
     - cron: "0 5 * * 1"
+  pull_request:
+    paths:
+      - .github/workflows/update-gradle-wrapper.yml
   workflow_dispatch:
 
 jobs:
   update-gradle-wrapper:
     if: github.repository == 'JabRef/jabref'
+    # ubuntu-slim does not offer Java (required by the update action)
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup JDK
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
         with:
-          java-version: 23.0.1
-          distribution: 'temurin'
-
+          persist-credentials: false
       - name: Update Gradle Wrapper
+        # See https://github.com/JabRef/jabref/pull/15034
+        if: false
         uses: gradle-update/update-gradle-wrapper-action@v2
         with:
           labels: dependencies

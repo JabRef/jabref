@@ -1,0 +1,399 @@
+package org.jabref.gui.slr;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyQuery;
+
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// This class controls the user interface of the study definition management dialog. The UI elements and their layout
+/// are defined in the FXML file.
+public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
+
+    @FXML private TextField studyTitle;
+    @FXML private TextField addAuthor;
+    @FXML private TextField addResearchQuestion;
+    @FXML private TextField addQuery;
+    @FXML private TextField studyDirectory;
+    @FXML private Button selectStudyDirectory;
+    @FXML private Button shareOnSearchRxivButton;
+
+    @FXML private ButtonType saveSurveyButtonType;
+    @FXML private Label helpIcon;
+
+    @FXML private TableView<String> authorTableView;
+    @FXML private TableColumn<String, String> authorsColumn;
+    @FXML private TableColumn<String, String> authorsActionColumn;
+
+    @FXML private TableView<String> questionTableView;
+    @FXML private TableColumn<String, String> questionsColumn;
+    @FXML private TableColumn<String, String> questionsActionColumn;
+
+    @FXML private TableView<StudyQuery> queryTableView;
+    @FXML private TableColumn<StudyQuery, String> queriesColumn;
+    @FXML private TableColumn<StudyQuery, String> queriesActionColumn;
+
+    @FXML private TableView<StudyCatalogItem> catalogTable;
+    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
+
+    @FXML private Label directoryWarning;
+
+    @FXML private Label validationHeaderLabel;
+    @FXML private Label titleValidationLabel;
+    @FXML private Label authorsValidationLabel;
+    @FXML private Label questionsValidationLabel;
+    @FXML private Label queriesValidationLabel;
+    @FXML private Label catalogsValidationLabel;
+
+    @Inject private DialogService dialogService;
+    @Inject private GuiPreferences preferences;
+
+    private ManageStudyDefinitionViewModel viewModel;
+
+    // not present if new study is created;
+    // present if existing study is edited
+    private final Optional<Study> study;
+
+    // Either the proposed directory (on new study creation)
+    // or the "real" directory of the study
+    private final Path pathToStudyDataDirectory;
+
+    /// This is used to create a new study
+    ///
+    /// @param pathToStudyDataDirectory This directory is proposed in the file chooser
+    public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
+        this.pathToStudyDataDirectory = pathToStudyDataDirectory;
+        this.setTitle(Localization.lang("Define study parameters"));
+        this.study = Optional.empty();
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        setupSaveSurveyButton(false);
+    }
+
+    /// This is used to edit an existing study.
+    ///
+    /// @param study          the study to edit
+    /// @param studyDirectory the directory of the study
+    public ManageStudyDefinitionView(Study study, Path studyDirectory) {
+        this.pathToStudyDataDirectory = studyDirectory;
+        this.setTitle(Localization.lang("Manage study definition"));
+        this.study = Optional.of(study);
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        setupSaveSurveyButton(true);
+    }
+
+    private void setupSaveSurveyButton(boolean isEdit) {
+        Button saveSurveyButton = (Button) this.getDialogPane().lookupButton(saveSurveyButtonType);
+
+        if (!isEdit) {
+            saveSurveyButton.setText(Localization.lang("Start survey"));
+        }
+
+        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+                                                Bindings.isEmpty(viewModel.getQueries()),
+                                                Bindings.isEmpty(viewModel.getCatalogs())),
+                                        Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                        viewModel.getDirectory().isEmpty()),
+                directoryWarning.visibleProperty()));
+
+        setResultConverter(button -> {
+            if (button == saveSurveyButtonType) {
+                viewModel.updateSelectedCatalogs();
+                return viewModel.saveStudy();
+            }
+            // Cancel button will return null
+            return null;
+        });
+    }
+
+    @FXML
+    private void initialize() {
+        if (study.isEmpty()) {
+            viewModel = new ManageStudyDefinitionViewModel(
+                    preferences.getImportFormatPreferences(),
+                    preferences.getImporterPreferences(),
+                    preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
+                    dialogService);
+        } else {
+            viewModel = new ManageStudyDefinitionViewModel(
+                    study.get(),
+                    pathToStudyDataDirectory,
+                    preferences.getImportFormatPreferences(),
+                    preferences.getImporterPreferences(),
+                    preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
+                    dialogService);
+
+            // The directory of the study cannot be changed
+            studyDirectory.setEditable(false);
+            selectStudyDirectory.setDisable(true);
+        }
+
+        // Listen whether any catalogs are removed from selection -> Add back to the catalog selector
+        studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
+        studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
+
+        initAuthorTab();
+        initQuestionsTab();
+        initQueriesTab();
+        initCatalogsTab();
+        initValidationBindings();
+        shareOnSearchRxivButton.disableProperty().bind(
+                Bindings.or(
+                        Bindings.isEmpty(viewModel.getQueries()),
+                        ActionHelper.noCatalogEnabled(viewModel.getCatalogs())
+                ));
+    }
+
+    private void updateDirectoryWarning(Path directory) {
+        if (!Files.isDirectory(directory)) {
+            directoryWarning.setText(Localization.lang("Warning: The selected directory is not a valid directory."));
+            directoryWarning.setVisible(true);
+        } else {
+            try (Stream<Path> entries = Files.list(directory)) {
+                if (entries.findAny().isPresent()) {
+                    directoryWarning.setText(Localization.lang("Warning: The selected directory is not empty."));
+                    directoryWarning.setVisible(true);
+                } else {
+                    directoryWarning.setVisible(false);
+                }
+            } catch (IOException e) {
+                directoryWarning.setText(Localization.lang("Warning: Failed to check if the directory is empty."));
+                directoryWarning.setVisible(true);
+            }
+        }
+    }
+
+    private void initAuthorTab() {
+        setupCommonPropertiesForTables(addAuthor, this::addAuthor, authorsColumn, authorsActionColumn);
+        setupCellFactories(authorsColumn, authorsActionColumn, Function.identity(), viewModel::deleteAuthor);
+        authorTableView.setItems(viewModel.getAuthors());
+    }
+
+    private void initQuestionsTab() {
+        setupCommonPropertiesForTables(addResearchQuestion, this::addResearchQuestion, questionsColumn, questionsActionColumn);
+        setupCellFactories(questionsColumn, questionsActionColumn, Function.identity(), viewModel::deleteQuestion);
+        questionTableView.setItems(viewModel.getResearchQuestions());
+    }
+
+    private void initQueriesTab() {
+        setupCommonPropertiesForTables(addQuery, this::addQuery, queriesColumn, queriesActionColumn);
+        setupCellFactories(queriesColumn, queriesActionColumn, StudyQuery::getQuery, viewModel::deleteQuery);
+        queryTableView.setItems(viewModel.getQueries());
+
+        // TODO: Keep until PR #7279 is merged
+        helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
+                .add(Localization.lang("Query terms are separated by spaces."))
+                .add(Localization.lang("All query terms are joined using the logical AND, and OR operators") + ".")
+                .add(Localization.lang("If the sequence of terms is relevant wrap them in double quotes") + "(\").")
+                .add(Localization.lang("An example:") + " rain AND (clouds OR drops) AND \"precipitation distribution\"")
+                .toString()));
+    }
+
+    private void initCatalogsTab() {
+        new ViewModelTableRowFactory<StudyCatalogItem>()
+                .withOnMouseClickedEvent((entry, event) -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        entry.setEnabled(!entry.isEnabled());
+                    }
+                })
+                .install(catalogTable);
+
+        if (study.isEmpty()) {
+            viewModel.initializeSelectedCatalogs();
+        }
+
+        catalogColumn.setReorderable(false);
+        catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        catalogEnabledColumn.setResizable(false);
+        catalogEnabledColumn.setReorderable(false);
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
+
+        catalogColumn.setEditable(false);
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+
+        catalogReasonColumn.setReorderable(false);
+        catalogReasonColumn.setCellValueFactory(param -> param.getValue().reasonProperty());
+        catalogReasonColumn.setCellFactory(column -> {
+            TextField textField = new TextField();
+            TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        textField.setText(item == null ? "" : item);
+                        setGraphic(textField);
+                    }
+                }
+            };
+            textField.focusedProperty().addListener((_, _, isNowFocused) -> {
+                if (!isNowFocused) {
+                    TableView<StudyCatalogItem> tableView = cell.getTableView();
+                    int index = cell.getIndex();
+                    if (tableView != null && index >= 0 && index < tableView.getItems().size()) {
+                        tableView.getItems().get(index).setReason(textField.getText());
+                    }
+                }
+            });
+            textField.setOnAction(event -> cell.getTableView().requestFocus());
+            return cell;
+        });
+        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
+        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
+        catalogReasonColumn.setGraphic(catalogReasonHeader);
+        catalogReasonColumn.setText("");
+
+        catalogTable.setItems(viewModel.getCatalogs());
+    }
+
+    private void initValidationBindings() {
+        // Header label
+        validationHeaderLabel.textProperty().bind(viewModel.validationHeaderMessageProperty());
+        validationHeaderLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.validationHeaderMessageProperty()));
+        validationHeaderLabel.managedProperty().bind(validationHeaderLabel.visibleProperty());
+
+        // Specific validation messages
+        titleValidationLabel.textProperty().bind(viewModel.titleValidationMessageProperty());
+        titleValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.titleValidationMessageProperty()));
+        titleValidationLabel.managedProperty().bind(titleValidationLabel.visibleProperty());
+
+        authorsValidationLabel.textProperty().bind(viewModel.authorsValidationMessageProperty());
+        authorsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.authorsValidationMessageProperty()));
+        authorsValidationLabel.managedProperty().bind(authorsValidationLabel.visibleProperty());
+
+        questionsValidationLabel.textProperty().bind(viewModel.questionsValidationMessageProperty());
+        questionsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.questionsValidationMessageProperty()));
+        questionsValidationLabel.managedProperty().bind(questionsValidationLabel.visibleProperty());
+
+        queriesValidationLabel.textProperty().bind(viewModel.queriesValidationMessageProperty());
+        queriesValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.queriesValidationMessageProperty()));
+        queriesValidationLabel.managedProperty().bind(queriesValidationLabel.visibleProperty());
+
+        catalogsValidationLabel.textProperty().bind(viewModel.catalogsValidationMessageProperty());
+        catalogsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.catalogsValidationMessageProperty()));
+        catalogsValidationLabel.managedProperty().bind(catalogsValidationLabel.visibleProperty());
+    }
+
+    private void setupCommonPropertiesForTables(Node addControl,
+                                                Runnable addAction,
+                                                TableColumn<?, String> contentColumn,
+                                                TableColumn<?, String> actionColumn) {
+        addControl.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                addAction.run();
+            }
+        });
+
+        contentColumn.setReorderable(false);
+        contentColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        actionColumn.setReorderable(false);
+        actionColumn.setResizable(false);
+    }
+
+    @FXML
+    private void shareOnSearchRxiv() {
+        viewModel.shareOnSearchRxiv(pathToStudyDataDirectory);
+    }
+
+    /// Generic over the row type so that all three columns (authors, research questions, queries)
+    /// can share the same delete button setup. {@code displayExtractor} pulls the display string
+    /// from each row - {@link Function#identity()} for the {@code String} columns (authors and
+    /// questions), {@link org.jabref.model.study.StudyQuery#getQuery()} for the queries column.
+    private <T> void setupCellFactories(TableColumn<T, String> contentColumn,
+                                        TableColumn<T, String> actionColumn,
+                                        Function<T, String> displayExtractor,
+                                        Consumer<T> removeAction) {
+        contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
+        actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
+        new ValueTableCellFactory<T, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                        removeAction.accept(rowItem))
+                .install(actionColumn);
+    }
+
+    @FXML
+    private void addAuthor() {
+        viewModel.addAuthor(addAuthor.getText());
+        addAuthor.setText("");
+    }
+
+    @FXML
+    private void addResearchQuestion() {
+        viewModel.addResearchQuestion(addResearchQuestion.getText());
+        addResearchQuestion.setText("");
+    }
+
+    @FXML
+    private void addQuery() {
+        viewModel.addQuery(addQuery.getText());
+        addQuery.setText("");
+    }
+
+    @FXML
+    public void selectStudyDirectory() {
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(pathToStudyDataDirectory)
+                .build();
+
+        Optional<Path> selectedDirectoryOptional = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
+        selectedDirectoryOptional.ifPresent(selectedDirectory -> {
+            viewModel.setStudyDirectory(Optional.of(selectedDirectory));
+            updateDirectoryWarning(selectedDirectory);
+        });
+    }
+}

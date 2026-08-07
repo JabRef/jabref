@@ -1,0 +1,349 @@
+package org.jabref.logic.openoffice;
+
+import java.util.List;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import org.jabref.logic.citationstyle.CSLStyleLoader;
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.JStyleLoader;
+import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.os.OS;
+import org.jabref.model.openoffice.style.CitationType;
+
+public class OpenOfficePreferences {
+
+    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\LibreOffice\\program";
+    public static final String WINDOWS_EXECUTABLE = "soffice.exe";
+
+    public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
+    public static final String OSX_EXECUTABLE = "soffice";
+
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
+    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
+    public static final String LINUX_EXECUTABLE = "soffice";
+
+    private final StringProperty executablePath;
+    private final BooleanProperty useAllDatabases;
+    private final BooleanProperty syncWhenCiting;
+    private final ObservableList<String> externalJStyles;
+    private final StringProperty currentJStyle;
+    private final ObjectProperty<OOStyle> currentStyle;
+    private final BooleanProperty alwaysAddCitedOnPages;
+    private final StringProperty cslBibliographyTitle;
+    private final StringProperty cslBibliographyHeaderFormat;
+    private final StringProperty cslBibliographyBodyFormat;
+    private final ObservableList<String> externalCslStyles;
+    private final BooleanProperty addSpaceBefore;
+    private final BooleanProperty addSpaceAfter;
+    private final BooleanProperty zoteroCompatibilityMode;
+    private final ObservableList<String> externalBstStyles;
+    private final StringProperty pandocPath;
+    private final ObjectProperty<BstCitationFormat> bstCitationFormat;
+    private final ObjectProperty<CitationType> citeSpecialCitationType;
+
+    public OpenOfficePreferences(String executablePath,
+                                 boolean useAllDatabases,
+                                 boolean syncWhenCiting,
+                                 List<String> externalJStyles,
+                                 String currentJStyle,
+                                 OOStyle currentStyle,
+                                 boolean alwaysAddCitedOnPages,
+                                 String cslBibliographyTitle,
+                                 String cslBibliographyHeaderFormat,
+                                 String cslBibliographyBodyFormat,
+                                 List<String> externalCslStyles,
+                                 boolean addSpaceBefore,
+                                 boolean addSpaceAfter,
+                                 boolean zoteroCompatibilityMode,
+                                 List<String> externalBstStyles,
+                                 String pandocPath,
+                                 BstCitationFormat bstCitationFormat,
+                                 CitationType citeSpecialCitationType) {
+        this.executablePath = new SimpleStringProperty(executablePath);
+        this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
+        this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
+        this.externalJStyles = FXCollections.observableArrayList(externalJStyles);
+        this.currentJStyle = new SimpleStringProperty(currentJStyle);
+        this.currentStyle = new SimpleObjectProperty<>(currentStyle);
+        this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
+        this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
+        this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
+        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
+        this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
+        this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
+        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+        this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
+        this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
+        this.pandocPath = new SimpleStringProperty(pandocPath);
+        this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
+        this.citeSpecialCitationType = new SimpleObjectProperty<>(citeSpecialCitationType);
+    }
+
+    private OpenOfficePreferences() {
+        this(
+                OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
+                           : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
+                                     : DEFAULT_LINUX_EXEC_PATH,
+                true,                                           // useAllDatabases
+                false,                                          // syncWhenCiting
+                List.of(),                                      // externalJStyles
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
+                CSLStyleLoader.getDefaultStyle(),               // currentStyle
+                false,                                          // alwaysAddCitedOnPages
+                "References",                                   // cslBibliographyTitle
+                "Heading 2",                                    // cslBibliographyHeaderFormat
+                "Text body",                                    // cslBibliographyBodyFormat
+                List.of(),                                      // externalCslStyles
+                true,                                           // addSpaceBefore
+                true,                                           // addSpaceAfter
+                true,                                           // zoteroCompatibilityMode
+                List.of(),                                      // externalBstStyles
+                "pandoc",                                       // pandocPath
+                BstCitationFormat.NUMERIC,                      // bstCitationFormat
+                CitationType.AUTHORYEAR_INTEXT                  // citeSpecialCitationType
+        );
+    }
+
+    public static OpenOfficePreferences getDefault() {
+        return new OpenOfficePreferences();
+    }
+
+    public void clearConnectionSettings() {
+        this.executablePath.set("");
+    }
+
+    public void clearCurrentJStyle() {
+        this.currentJStyle.set("");
+    }
+
+    /// path to soffice-file
+    public String getExecutablePath() {
+        return executablePath.get();
+    }
+
+    public StringProperty executablePathProperty() {
+        return executablePath;
+    }
+
+    public void setExecutablePath(String executablePath) {
+        this.executablePath.setValue(executablePath);
+    }
+
+    /// true if all databases should be used when citing
+    public boolean getUseAllDatabases() {
+        return useAllDatabases.get();
+    }
+
+    public BooleanProperty useAllDatabasesProperty() {
+        return useAllDatabases;
+    }
+
+    public void setUseAllDatabases(boolean useAllDatabases) {
+        this.useAllDatabases.set(useAllDatabases);
+    }
+
+    /// true if the reference list is updated when adding a new citation
+    public boolean getSyncWhenCiting() {
+        return syncWhenCiting.get();
+    }
+
+    public BooleanProperty syncWhenCitingProperty() {
+        return syncWhenCiting;
+    }
+
+    public void setSyncWhenCiting(boolean syncWhenCiting) {
+        this.syncWhenCiting.setValue(syncWhenCiting);
+    }
+
+    /// list with paths to external style files
+    public ObservableList<String> getExternalJStyles() {
+        return externalJStyles;
+    }
+
+    public void setExternalJStyles(List<String> list) {
+        externalJStyles.setAll(list);
+    }
+
+    /// path to the used style file
+    public String getCurrentJStyle() {
+        return currentJStyle.get();
+    }
+
+    public StringProperty currentJStyleProperty() {
+        return currentJStyle;
+    }
+
+    public void setCurrentJStyle(String currentJStyle) {
+        this.currentJStyle.set(currentJStyle);
+    }
+
+    public OOStyle getCurrentStyle() {
+        return currentStyle.get();
+    }
+
+    public ObjectProperty<OOStyle> currentStyleProperty() {
+        return currentStyle;
+    }
+
+    public void setCurrentStyle(OOStyle style) {
+        this.currentStyle.set(style);
+        if (style instanceof CitationStyle citationStyle) {
+            this.cslBibliographyBodyFormat.set(CSLFormatUtils.getDefaultBodyFormatForStyle(citationStyle));
+        }
+    }
+
+    public boolean getAlwaysAddCitedOnPages() {
+        return this.alwaysAddCitedOnPages.get();
+    }
+
+    public BooleanProperty alwaysAddCitedOnPagesProperty() {
+        return this.alwaysAddCitedOnPages;
+    }
+
+    public void setAlwaysAddCitedOnPages(boolean alwaysAddCitedOnPages) {
+        this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);
+    }
+
+    public StringProperty cslBibliographyTitleProperty() {
+        return cslBibliographyTitle;
+    }
+
+    public String getCslBibliographyTitle() {
+        return cslBibliographyTitle.get();
+    }
+
+    public void setCslBibliographyTitle(String title) {
+        this.cslBibliographyTitle.set(title);
+    }
+
+    public StringProperty cslBibliographyHeaderFormatProperty() {
+        return cslBibliographyHeaderFormat;
+    }
+
+    public String getCslBibliographyHeaderFormat() {
+        return cslBibliographyHeaderFormat.get();
+    }
+
+    public void setCslBibliographyHeaderFormat(String headerFormat) {
+        this.cslBibliographyHeaderFormat.set(headerFormat);
+    }
+
+    public StringProperty cslBibliographyBodyFormatProperty() {
+        return cslBibliographyBodyFormat;
+    }
+
+    public String getCslBibliographyBodyFormat() {
+        return cslBibliographyBodyFormat.get();
+    }
+
+    public void setCslBibliographyBodyFormat(String format) {
+        this.cslBibliographyBodyFormat.set(format);
+    }
+
+    public ObservableList<String> getExternalCslStyles() {
+        return externalCslStyles;
+    }
+
+    public void setExternalCslStyles(List<String> paths) {
+        externalCslStyles.setAll(paths);
+    }
+
+    public boolean getAddSpaceBefore() {
+        return addSpaceBefore.get();
+    }
+
+    public BooleanProperty addSpaceBeforeProperty() {
+        return addSpaceBefore;
+    }
+
+    public void setAddSpaceBefore(boolean addSpaceBefore) {
+        this.addSpaceBefore.setValue(addSpaceBefore);
+    }
+
+    public boolean getAddSpaceAfter() {
+        return addSpaceAfter.get();
+    }
+
+    public BooleanProperty addSpaceAfterProperty() {
+        return addSpaceAfter;
+    }
+
+    public void setAddSpaceAfter(boolean addSpaceAfter) {
+        this.addSpaceAfter.setValue(addSpaceAfter);
+    }
+
+    public boolean getZoteroCompatibilityMode() {
+        return zoteroCompatibilityMode.get();
+    }
+
+    public BooleanProperty zoteroCompatibilityModeProperty() {
+        return zoteroCompatibilityMode;
+    }
+
+    public void setZoteroCompatibilityMode(boolean zoteroCompatibilityMode) {
+        this.zoteroCompatibilityMode.set(zoteroCompatibilityMode);
+    }
+
+    public OpenOfficeReferenceMarkFormat getReferenceMarkFormat() {
+        return zoteroCompatibilityMode.get()
+               ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
+               : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
+    }
+
+    /// List of paths to external BST style files.
+    public ObservableList<String> getExternalBstStyles() {
+        return externalBstStyles;
+    }
+
+    public void setExternalBstStyles(List<String> paths) {
+        externalBstStyles.setAll(paths);
+    }
+
+    /// Path to the pandoc executable used for BST bibliography rendering.
+    /// Defaults to `"pandoc"` (system PATH). Users can override via the OO settings menu.
+    public String getPandocPath() {
+        return pandocPath.get();
+    }
+
+    public StringProperty pandocPathProperty() {
+        return pandocPath;
+    }
+
+    public void setPandocPath(String path) {
+        this.pandocPath.set(path);
+    }
+
+    public BstCitationFormat getBstCitationFormat() {
+        return bstCitationFormat.get();
+    }
+
+    public ObjectProperty<BstCitationFormat> bstCitationFormatProperty() {
+        return bstCitationFormat;
+    }
+
+    public void setBstCitationFormat(BstCitationFormat format) {
+        this.bstCitationFormat.set(format);
+    }
+
+    public CitationType getCiteSpecialCitationType() {
+        return citeSpecialCitationType.get();
+    }
+
+    public ObjectProperty<CitationType> citeSpecialCitationTypeProperty() {
+        return citeSpecialCitationType;
+    }
+
+    public void setCiteSpecialCitationType(CitationType citeSpecialCitationType) {
+        this.citeSpecialCitationType.set(citeSpecialCitationType);
+    }
+}

@@ -1,11 +1,17 @@
 version: 2
 updates:
   - package-ecosystem: gradle
-    directory: "/"
+    directories:
+      - "/build-logic"   # versions of 3rd party gradle plugins
+      - "jablib"
+      - "/versions"      # versions of 3rd party dependencies of all JabRef modules
+      - "/"              # plugins
     schedule:
-      interval: weekly
-    labels:
-      - "dependencies"
+      interval: daily
+    cooldown:
+      default-days: 1
+    open-pull-requests-limit: 10
+    labels: [ ]
     ignore:
       - dependency-name: com.microsoft.azure:applicationinsights-core
         versions:
@@ -13,19 +19,79 @@ updates:
       - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
         versions:
           - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
-  - package-ecosystem: gradle
-    directory: "buildSrc/"
-    schedule:
-      interval: weekly
-    labels:
-      - "dependencies"
+
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 1
     schedule:
       interval: weekly
-    labels:
-      - "dependencies"
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/check-formatting"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/format-java"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/jbang-check"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/package"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/pr-gate"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+  - package-ecosystem: "github-actions"
+    directory: ".github/actions/setup-gradle"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]
+
   - package-ecosystem: "gitsubmodule"
     directory: "/"
+    cooldown:
+      default-days: 1
     schedule:
       interval: weekly
+      day: wednesday
+    labels: [ ]
+
+  - package-ecosystem: "maven"
+    directories:
+      - "jablib-examples/maven3/doi-to-bibtex"
+    cooldown:
+      default-days: 1
+    schedule:
+      interval: weekly
+      day: wednesday
+    labels: [ ]

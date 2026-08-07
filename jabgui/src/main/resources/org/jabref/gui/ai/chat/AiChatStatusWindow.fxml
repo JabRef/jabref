@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.DialogPane?>
+<?import org.jabref.gui.ai.chat.AiChatStatusView?>
+<DialogPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.ai.chat.AiChatStatusWindow"
+        prefWidth="900">
+    <content>
+        <AiChatStatusView
+                fx:id="aiChatStatusView"/>
+    </content>
+</DialogPane>

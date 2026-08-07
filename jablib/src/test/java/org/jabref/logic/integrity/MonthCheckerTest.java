@@ -1,0 +1,97 @@
+package org.jabref.logic.integrity;
+
+import java.util.Optional;
+
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+@ResourceLock("Localization.lang")
+class MonthCheckerTest {
+
+    private MonthChecker checker;
+    private MonthChecker checkerBiblatex;
+
+    @BeforeEach
+    void setUp() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        checker = new MonthChecker(databaseContext);
+        databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
+        checkerBiblatex = new MonthChecker(databaseBiblatex);
+    }
+
+    @Test
+    void bibTexAcceptsThreeLetterAbbreviationsWithHashMarks() {
+        assertEquals(Optional.empty(), checker.checkValue("#mar#"));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptWhateverThreeLetterAbbreviations() {
+        assertNotEquals(Optional.empty(), checker.checkValue("#bla#"));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptThreeLetterAbbreviationsWithNoHashMarks() {
+        assertNotEquals(Optional.empty(), checker.checkValue("Dec"));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptFullInput() {
+        assertNotEquals(Optional.empty(), checker.checkValue("December"));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptRandomString() {
+        assertNotEquals(Optional.empty(), checker.checkValue("Lorem"));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptInteger() {
+        assertNotEquals(Optional.empty(), checker.checkValue("10"));
+    }
+
+    @Test
+    void bibLaTexAcceptsThreeLetterAbbreviationsWithHashMarks() {
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("#jan#"));
+    }
+
+    @Test
+    void bibLaTexDoesNotAcceptThreeLetterAbbreviationsWithNoHashMarks() {
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("jan"));
+    }
+
+    @Test
+    void bibLaTexDoesNotAcceptFullInput() {
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("January"));
+    }
+
+    @Test
+    void bibLaTexDoesNotAcceptRandomString() {
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem"));
+    }
+
+    @Test
+    void bibLaTexAcceptsInteger() {
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("10"));
+    }
+
+    @Test
+    void checkValueDoesNotAcceptPartialMatches() {
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("January123"));
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("#jan#trailing"));
+    }
+
+    @Test
+    void checkValueAcceptsZeroPaddedMonths() {
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("01"));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("09"));
+    }
+}

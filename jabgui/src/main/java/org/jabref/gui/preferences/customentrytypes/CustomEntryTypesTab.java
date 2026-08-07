@@ -1,0 +1,519 @@
+package org.jabref.gui.preferences.customentrytypes;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+
+import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.textfield.TextFields;
+
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
+public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
+
+    private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
+    private final TextField addNewEntryType = new TextField();
+    private final TableView<FieldViewModel> fields = new TableView<>();
+    private final TextField addNewField = new TextField();
+    private final Button addNewEntryTypeButton = new Button();
+    private final Button addNewFieldButton = new Button(Localization.lang("Add"));
+    private final CheckComboBox<FieldProperty> fieldPropertyCheckComboBox = new CheckComboBox<>();
+
+    private final CustomLocalDragboard localDragboard;
+
+    public CustomEntryTypesTab() {
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                           .orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
+        BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository();
+
+        this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferences);
+        this.localDragboard = stateManager.getLocalDragboard();
+
+        buildView();
+
+        setupEntryTypesTable();
+        setupFieldsTable();
+        setupFieldPropertyCheckComboBox();
+
+        addNewField.disableProperty().bind(viewModel.selectedEntryTypeProperty().isNull());
+
+        addNewEntryType.setOnAction(_ -> addEntryType());
+        addNewField.setOnAction(_ -> addNewField());
+        addNewField.textProperty().addListener((_, _, _) -> updateAddNewFieldButtonText());
+
+        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
+        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+
+        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.textProperty());
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("Entry types");
+    }
+
+    @Override
+    public String getTitle() {
+        return Localization.lang("Custom entry types");
+    }
+
+    private void buildView() {
+        setContent(form()
+                .custom(new HBox(GAP, buildEntryTypesColumn(), buildFieldsColumn()), columns -> columns
+                        .validate(viewModel.entryTypeValidationStatus(), addNewEntryType)
+                        .validate(viewModel.fieldValidationStatus(), addNewField))
+                .build());
+    }
+
+    private Node buildEntryTypesColumn() {
+        Label header = new Label(Localization.lang("Entry types"));
+        header.getStyleClass().add("sectionHeader");
+
+        entryTypesTable.setMinWidth(Region.USE_PREF_SIZE);
+        VBox.setVgrow(entryTypesTable, Priority.ALWAYS);
+
+        addNewEntryType.setPromptText("Type new entry type...");
+
+        addNewEntryTypeButton.setPrefSize(20.0, 20.0);
+        addNewEntryTypeButton.getStyleClass().addAll("icon-button", "narrow");
+        addNewEntryTypeButton.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
+        addNewEntryTypeButton.setTooltip(new Tooltip(Localization.lang("Add new entry type")));
+        addNewEntryTypeButton.setOnAction(_ -> addEntryType());
+
+        VBox column = new VBox(GAP, header, entryTypesTable, new HBox(GAP, addNewEntryType, addNewEntryTypeButton));
+        column.setPrefWidth(100.0);
+        return column;
+    }
+
+    private Node buildFieldsColumn() {
+        Label header = new Label(Localization.lang("Required and optional fields"));
+        header.getStyleClass().add("sectionHeader");
+
+        fields.setMinWidth(Region.USE_PREF_SIZE);
+        VBox.setVgrow(fields, Priority.ALWAYS);
+
+        addNewField.setPrefWidth(150.0);
+        addNewField.setPromptText(Localization.lang("Field..."));
+
+        fieldPropertyCheckComboBox.setPrefWidth(180.0);
+
+        addNewFieldButton.setPrefWidth(100.0);
+        addNewFieldButton.setOnAction(_ -> addNewField());
+
+        HBox addFieldRow = new HBox(GAP, addNewField, fieldPropertyCheckComboBox, addNewFieldButton);
+        addFieldRow.setAlignment(Pos.BASELINE_CENTER);
+
+        Button resetButton = new Button(Localization.lang("Reset to default"));
+        resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        resetButton.setTooltip(new Tooltip(Localization.lang("Reset entry types and fields to defaults")));
+        resetButton.setOnAction(_ -> resetEntryTypes());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox bottomRow = new HBox(GAP, new VBox(5.0, addFieldRow), spacer, resetButton);
+        bottomRow.setAlignment(Pos.BASELINE_LEFT);
+
+        VBox column = new VBox(GAP, header, fields, bottomRow);
+        HBox.setHgrow(column, Priority.ALWAYS);
+        return column;
+    }
+
+    private void setupFieldPropertyCheckComboBox() {
+        fieldPropertyCheckComboBox.getItems().addAll(
+                Arrays.stream(FieldProperty.values())
+                      // MULTILINE_TEXT property should be controlled by "multiline" box
+                      .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                      .toList()
+        );
+
+        addNewField.textProperty().addListener((_, _, newVal) -> {
+            fieldPropertyCheckComboBox.getCheckModel().clearChecks();
+            EntryTypeViewModel selectedEntryTypeViewModel = viewModel.selectedEntryTypeProperty().get();
+            if (selectedEntryTypeViewModel == null) {
+                fieldPropertyCheckComboBox.setDisable(true);
+                return;
+            }
+
+            if (newVal.isBlank()) {
+                fieldPropertyCheckComboBox.setDisable(true);
+                return;
+            }
+
+            EntryType selectedEntryType = selectedEntryTypeViewModel.entryType().getValue().getType();
+            Field field = FieldFactory.parseField(selectedEntryType, newVal);
+            boolean isStandardField = !(field instanceof UnknownField);
+            fieldPropertyCheckComboBox.setDisable(isStandardField);
+
+            if (isStandardField) {
+                field.getProperties()
+                     .stream()
+                     .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                     .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
+            }
+
+            String displayName = FieldTextMapper.getDisplayName(field);
+
+            Optional<FieldViewModel> existingField = selectedEntryTypeViewModel.fields()
+                                                                               .stream()
+                                                                               .filter(fieldViewModel ->
+                                                                                       fieldViewModel.displayNameProperty()
+                                                                                                     .getValue()
+                                                                                                     .equalsIgnoreCase(displayName)
+                                                                               )
+                                                                               .findFirst();
+
+            existingField.stream()
+                         .flatMap(fieldViewModel -> fieldViewModel.getProperties().stream())
+                         .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                         .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
+
+            selectedEntryTypeViewModel.fields()
+                                      .stream()
+                                      .filter(fieldViewModel ->
+                                              fieldViewModel.displayNameProperty()
+                                                            .getValue()
+                                                            .equalsIgnoreCase(displayName))
+                                      .findFirst()
+                                      .stream()
+                                      .flatMap(existingFieldViewModel -> existingFieldViewModel.getProperties().stream())
+                                      .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                                      .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
+        });
+    }
+
+    private void setupEntryTypesTable() {
+        entryTypesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<EntryTypeViewModel, String> entryTypColumn = new TableColumn<>(Localization.lang("Entry Type"));
+        entryTypColumn.setMinWidth(100.0);
+        entryTypColumn.setPrefWidth(100.0);
+        entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
+
+        TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn = new TableColumn<>();
+        entryTypeActionsColumn.setMinWidth(40.0);
+        entryTypeActionsColumn.setMaxWidth(40.0);
+        entryTypeActionsColumn.setResizable(false);
+
+        entryTypesTable.getColumns().add(entryTypColumn);
+        entryTypesTable.getColumns().add(entryTypeActionsColumn);
+
+        // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
+        fields.setEditable(true);
+        entryTypesTable.setItems(viewModel.entryTypes());
+        entryTypesTable.getSelectionModel().selectFirst();
+
+        entryTypeActionsColumn.setSortable(false);
+        entryTypeActionsColumn.setReorderable(false);
+        entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
+        new ValueTableCellFactory<EntryTypeViewModel, String>()
+                .withGraphic((type, _) -> {
+                    if (type instanceof CustomEntryTypeViewModel) {
+                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                    } else {
+                        return null;
+                    }
+                })
+                .withTooltip((type, name) -> {
+                    if (type instanceof CustomEntryTypeViewModel) {
+                        return Localization.lang("Remove entry type") + " " + name;
+                    } else {
+                        return null;
+                    }
+                })
+                .withOnMouseClickedEvent((type, _) -> {
+                    if (type instanceof CustomEntryTypeViewModel) {
+                        return _ -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
+                    } else {
+                        return _ -> {
+                        };
+                    }
+                })
+                .install(entryTypeActionsColumn);
+
+        viewModel.selectedEntryTypeProperty().bind(entryTypesTable.getSelectionModel().selectedItemProperty());
+        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
+
+        EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
+            if (type != null) {
+                ObservableList<FieldViewModel> items = type.fields();
+                fields.setItems(items);
+            } else {
+                fields.setItems(null);
+            }
+            addNewField.clear();
+            fieldPropertyCheckComboBox.getCheckModel().clearChecks();
+        });
+    }
+
+    private void setupFieldsTable() {
+        fields.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<FieldViewModel, String> fieldNameColumn = new TableColumn<>(Localization.lang("Field"));
+        fieldNameColumn.setMinWidth(120.0);
+
+        TableColumn<FieldViewModel, Boolean> fieldTypeColumn = new TableColumn<>();
+        fieldTypeColumn.setMinWidth(40.0);
+        fieldTypeColumn.setMaxWidth(40.0);
+
+        TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn = new TableColumn<>();
+        fieldTypeMultilineColumn.setMinWidth(40.0);
+        fieldTypeMultilineColumn.setMaxWidth(40.0);
+        fieldTypeMultilineColumn.setResizable(false);
+
+        TableColumn<FieldViewModel, String> fieldTypeActionColumn = new TableColumn<>();
+        fieldTypeActionColumn.setMinWidth(40.0);
+        fieldTypeActionColumn.setMaxWidth(40.0);
+        fieldTypeActionColumn.setResizable(false);
+
+        fields.getColumns().add(fieldNameColumn);
+        fields.getColumns().add(fieldTypeColumn);
+        fields.getColumns().add(fieldTypeMultilineColumn);
+        fields.getColumns().add(fieldTypeActionColumn);
+
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().displayNameProperty());
+        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fieldNameColumn.setEditable(true);
+        fieldNameColumn.setOnEditCommit((TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
+            String newDisplayName = event.getNewValue();
+            if (newDisplayName.isBlank()) {
+                dialogService.notify(Localization.lang("Name cannot be empty"));
+                event.getTableView().edit(-1, null);
+                event.getTableView().refresh();
+                return;
+            }
+
+            FieldViewModel fieldViewModel = event.getRowValue();
+            String currentDisplayName = fieldViewModel.displayNameProperty().getValue();
+            // The first predicate will check if the user input the original field name or doesn't edit anything after double click
+            boolean fieldExists = !newDisplayName.equals(currentDisplayName) && viewModel.displayNameExists(newDisplayName);
+            if (fieldExists) {
+                dialogService.notify(Localization.lang("Unable to change field name. \"%0\" already in use.", newDisplayName));
+                event.getTableView().edit(-1, null);
+            } else {
+                fieldViewModel.displayNameProperty().setValue(newDisplayName);
+            }
+            event.getTableView().refresh();
+        });
+
+        fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
+        fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
+        makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
+
+        fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
+        fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
+        makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
+
+        fieldTypeActionColumn.setSortable(false);
+        fieldTypeActionColumn.setReorderable(false);
+        fieldTypeActionColumn.setEditable(false);
+        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().displayNameProperty());
+
+        new ValueTableCellFactory<FieldViewModel, String>()
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
+                .withOnMouseClickedEvent(_ -> _ -> {
+                    viewModel.removeField(fields.getSelectionModel().getSelectedItem());
+                    updateAddNewFieldButtonText();
+                })
+                .install(fieldTypeActionColumn);
+
+        new ViewModelTableRowFactory<FieldViewModel>()
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .setOnDragExited(this::handleOnDragExited)
+                .install(fields);
+
+        TextFields.bindAutoCompletion(
+                addNewField,
+                viewModel.fieldsForAdding().stream()
+                         .map(Field::getName)
+                         .collect(Collectors.toList())
+        );
+
+        // selected field will show in addNewField box with its properties
+        fields.getSelectionModel().selectedItemProperty().addListener((_, _, newSelection) -> {
+            fieldPropertyCheckComboBox.getCheckModel().clearChecks();
+            if (newSelection != null) {
+                addNewField.setText(newSelection.displayNameProperty().getValue());
+
+                ObservableList<FieldProperty> properties = newSelection.getProperties();
+                if (!properties.isEmpty()) {
+                    properties.stream()
+                              .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                              .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
+                }
+            }
+        });
+    }
+
+    private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
+        Label label = new Label();
+        label.setText(text);
+        label.setRotate(-90);
+        label.setMinWidth(80);
+        column.setGraphic(new Group(label));
+        column.getStyleClass().add("rotated");
+    }
+
+    private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent
+            event) {
+        if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+            ControlHelper.setDroppingPseudoClasses(row, event);
+        }
+    }
+
+    private void handleOnDragDetected(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, MouseEvent
+            event) {
+        row.startFullDrag();
+        FieldViewModel field = fields.getSelectionModel().getSelectedItem();
+
+        ClipboardContent content = new ClipboardContent();
+        Dragboard dragboard = fields.startDragAndDrop(TransferMode.MOVE);
+        content.put(DragAndDropDataFormats.FIELD, "");
+        localDragboard.putValue(FieldViewModel.class, field);
+        dragboard.setContent(content);
+        event.consume();
+    }
+
+    private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
+        if (localDragboard.hasType(FieldViewModel.class)) {
+            FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
+            fields.getItems().remove(field);
+
+            if (row.isEmpty()) {
+                fields.getItems().add(field);
+            } else {
+                // decide based on drop position whether to add the element before or after
+                int offset = event.getY() > (row.getHeight() / 2) ? 1 : 0;
+                fields.getItems().add(row.getIndex() + offset, field);
+            }
+        }
+        event.setDropCompleted(true);
+        event.consume();
+    }
+
+    private void handleOnDragExited(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, DragEvent dragEvent) {
+        ControlHelper.removeDroppingPseudoClasses(row);
+    }
+
+    private void updateAddNewFieldButtonText() {
+        EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+        if ((selectedEntryType == null) || addNewField.getText().isBlank()) {
+            addNewFieldButton.setText(Localization.lang("Add"));
+            return;
+        }
+
+        EntryType entryType = selectedEntryType.entryType().getValue().getType();
+        Field field = FieldFactory.parseField(entryType, addNewField.getText().trim());
+        boolean fieldExists = viewModel.displayNameExists(FieldTextMapper.getDisplayName(field));
+        addNewFieldButton.setText(fieldExists ? Localization.lang("Modify") : Localization.lang("Add"));
+    }
+
+    private void addEntryType() {
+        if (!viewModel.entryTypeValidationStatus().isValid()) {
+            return;
+        }
+
+        String entryTypeName = viewModel.entryTypeToAddProperty().getValue();
+        for (EntryTypeViewModel existingEntryType : entryTypesTable.getItems()) {
+            if (existingEntryType.entryType().getValue().getType().getName().equalsIgnoreCase(entryTypeName)) {
+                this.entryTypesTable.getSelectionModel().select(existingEntryType);
+                this.entryTypesTable.scrollTo(existingEntryType);
+                return;
+            }
+        }
+
+        EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
+        this.entryTypesTable.getSelectionModel().select(newlyAdded);
+        this.entryTypesTable.scrollTo(newlyAdded);
+    }
+
+    private void addNewField() {
+        if (!viewModel.fieldValidationStatus().isValid()) {
+            return;
+        }
+
+        ObservableList<FieldProperty> checkedProperties = fieldPropertyCheckComboBox.getCheckModel().getCheckedItems();
+        viewModel.addNewField(checkedProperties).ifPresent(newlyAdded -> {
+            this.fields.getSelectionModel().select(newlyAdded);
+            this.fields.scrollTo(newlyAdded);
+        });
+    }
+
+    private void resetEntryTypes() {
+        boolean reset = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Reset entry types and fields to defaults"),
+                Localization.lang("This will reset all entry types to their default values and remove all custom entry types"),
+                Localization.lang("Reset to default"));
+        if (reset) {
+            viewModel.resetAllCustomEntryTypes();
+            viewModel.resetMultilineFieldsToDefault();
+            fields.getSelectionModel().clearSelection();
+            entryTypesTable.getSelectionModel().clearSelection();
+            viewModel.setValues();
+            entryTypesTable.refresh();
+        }
+    }
+
+    /// For multiline property, fields with the same name in each entry type will be updated as the standard fields are global.
+    private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
+        BooleanProperty property = item.getValue().multilineProperty();
+        property.addListener((_, _, isSelected) -> {
+            viewModel.entryTypes().forEach(typeViewModel -> {
+                typeViewModel.fields().stream()
+                             .filter(field -> field.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                             .forEach(field -> field.multilineProperty().set(isSelected));
+            });
+        });
+        return property;
+    }
+}

@@ -1,0 +1,5 @@
+title: "\format[RemoveLatexCommands,RemoveBrackets]{\title}"
+collection: publications
+\begin{note}excerpt: "\format[RemoveLatexCommands,RemoveBrackets]{\note}"
+\end{note}\begin{journal}venue: "\format[RemoveLatexCommands,RemoveBrackets]{\journal}"
+\end{journal}category: manuscripts

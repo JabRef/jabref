@@ -1,0 +1,5 @@
+jdk:
+  - openjdk25
+install:
+  - ./gradlew :versions:publishToMavenLocal
+  - ./gradlew :jablib:publishToMavenLocal

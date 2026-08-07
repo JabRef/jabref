@@ -1,0 +1,66 @@
+package org.jabref.logic.util.io;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.jabref.logic.FilePreferences;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+
+import org.jspecify.annotations.NonNull;
+
+/// Search class for files. <br>
+/// <br>
+/// This class provides some functionality to search in a {@link org.jabref.model.database.BibDatabase} for files. <br>
+public class DatabaseFileLookup {
+
+    private final Set<Path> fileCache = new HashSet<>();
+
+    private final List<Path> possibleFilePaths;
+
+    private final Path pathOfDatabase;
+
+    /// Creates an instance by passing a {@link org.jabref.model.database.BibDatabase} which will be used for the searches.
+    public DatabaseFileLookup(@NonNull BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))
+                                    .orElse(new ArrayList<>());
+
+        for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
+            fileCache.addAll(parseFileField(entry));
+        }
+        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
+    }
+
+    /// Returns whether the File `file` is present in the database
+    /// as an attached File to an {@link BibEntry}. <br>
+    /// <br>
+    /// To do this, the field specified by the key **file** will be searched
+    /// for the provided file for every {@link BibEntry} in the database. <br>
+    /// <br>
+    /// For the matching, the absolute file paths will be used.
+    ///
+    /// @return `true`, if the file Object is stored in at least one
+    /// entry in the database, otherwise `false`.
+    public boolean lookupDatabase(Path pathname) {
+        return fileCache.contains(pathname);
+    }
+
+    private List<Path> parseFileField(@NonNull BibEntry entry) {
+        return entry.getFiles().stream()
+                    .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
+                    .map(file -> file.findIn(possibleFilePaths))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+    }
+
+    /// @return "" if the path does not exist
+    public Path getPathOfDatabase() {
+        return pathOfDatabase;
+    }
+}

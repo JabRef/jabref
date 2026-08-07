@@ -1,0 +1,268 @@
+package org.jabref.gui.preferences.ai;
+
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.forms.PasswordFieldEditor;
+import org.jabref.logic.ai.AiNamingUtils;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.preferences.AiPreferences;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
+import org.jabref.model.ai.llm.AiProvider;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.unitfx.IntegerInputField;
+
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
+
+public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
+
+    private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
+
+    private final BooleanBinding aiDisabled;
+
+    private TabPane templatesTabPane;
+
+    public AiTab(AiPreferences workingAiPreferences) {
+        this.viewModel = new AiTabViewModel(
+                preferences.getAiPreferences(),
+                workingAiPreferences,
+                Injector.instantiateModelOrService(AiService.class).getModelService(),
+                taskExecutor);
+        this.aiDisabled = viewModel.enableAi().not();
+
+        buildView();
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("AI");
+    }
+
+    private void buildView() {
+        setContent(form()
+
+                .section(Localization.lang("General"), general -> general
+                                // [impl->feat~ai.llms.providers~1]
+                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
+                                .info(Localization.lang("AI functionality in Jabref includes:"))
+                                .info(Localization.lang("• Chatting with entries."))
+                                .info(Localization.lang("• Summarizing entries."))
+                                .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
+                        generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
+
+                .section(Localization.lang("Connection"), connection -> connection
+                        .combo(Localization.lang("AI provider"),
+                                viewModel.aiProvidersProperty(),
+                                viewModel.selectedAiProviderProperty(),
+                                AiNamingUtils::getDisplayName,
+                                provider -> provider.disableWhen(viewModel.disableBasicSettingsProperty()))
+                        .field(Localization.lang("Chat model"), buildChatModelCombo(),
+                                chatModel -> chatModel.disableWhen(viewModel.disableBasicSettingsProperty())
+                                                      .validate(viewModel.getChatModelValidationStatus()))
+                        .field(Localization.lang("API key"), PasswordFieldEditor.create(viewModel.apiKeyProperty())
+                                                                                .withRevealButton()
+                                                                                .withClearButton()
+                                                                                .field(),
+                                key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
+                                          .validate(viewModel.getApiTokenValidationStatus())))
+
+                .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
+                                .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
+                                        customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
+                                .group(expert -> expert
+                                                .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
+                                                        baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
+                                                                          .validate(viewModel.getApiBaseUrlValidationStatus()))
+                                                .searchableCombo(Localization.lang("Embedding model"),
+                                                        viewModel.embeddingModelsProperty(),
+                                                        viewModel.selectedEmbeddingModelProperty(),
+                                                        PredefinedEmbeddingModel::fullInfo,
+                                                        embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
+                                                .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                                                // The six numeric expert settings, as two columns of caption-above-field cells.
+                                                // [impl->req~ai.expert-settings.chat-inference-global~1]
+                                                // [impl->req~ai.expert-settings.rag-global~1]
+                                                .columns(expertColumns -> expertColumns
+                                                        .group(leftColumn -> leftColumn
+                                                                .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
+                                                                        windowSize -> windowSize.validate(viewModel.getMessageWindowSizeValidationStatus()))
+                                                                .stackedField(Localization.lang("RAG - maximum results count"), integerField(viewModel.ragMaxResultsCountProperty()),
+                                                                        resultsCount -> resultsCount.validate(viewModel.getRagMaxResultsCountValidationStatus()))
+                                                                .stackedField(Localization.lang("Document splitter - chunk size"), integerField(viewModel.documentSplitterChunkSizeProperty()),
+                                                                        chunkSize -> chunkSize.validate(viewModel.getDocumentSplitterChunkSizeValidationStatus())))
+                                                        .group(rightColumn -> rightColumn
+                                                                .stackedField(Localization.lang("Temperature"), textField(viewModel.temperatureProperty()),
+                                                                        temperature -> temperature.validate(viewModel.getTemperatureTypeValidationStatus())
+                                                                                                  .validate(viewModel.getTemperatureRangeValidationStatus()))
+                                                                .stackedField(Localization.lang("RAG - minimum score"), textField(viewModel.ragMinScoreProperty()),
+                                                                        minScore -> minScore.validate(viewModel.getRagMinScoreTypeValidationStatus())
+                                                                                            .validate(viewModel.getRagMinScoreRangeValidationStatus()))
+                                                                .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
+                                                                        overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
+                                                .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
+                                        // Disabling the group covers every expert control above; individual controls
+                                        // only add their own extra conditions on top.
+                                        expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
+                                                                  .disableWhen(viewModel.disableExpertSettingsProperty())),
+                        expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
+
+                // [impl->req~ai.expert-settings.templates~1]
+                .section(Localization.lang("Templates"), templates -> templates
+                                .custom(buildTemplatesRegion()),
+                        templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
+
+                .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
+                        // [impl->req~ai.ingestion.automatic-trigger~1]
+                        .checkbox(Localization.lang("Automatically generate embeddings for new entries"), viewModel.autoGenerateEmbeddings(),
+                                embeddings -> embeddings.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateEmbeddings())))
+                        // [impl->req~ai.summarization.entries.auto~1]
+                        .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
+                                summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
+                        .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
+                                followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
+                        .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
+                        // [impl->req~ai.response-engines.default~1]
+                        .combo(Localization.lang("Default response engine"),
+                                viewModel.responseEngineKindsProperty(),
+                                viewModel.responseEngineProperty(),
+                                AiNamingUtils::getDisplayName,
+                                engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
+                        // [impl->req~ai.summarization.algorithm.default~1]
+                        .combo(Localization.lang("Default summarization algorithm"),
+                                viewModel.summarizationAlgorithmsProperty(),
+                                viewModel.summarizationAlgorithmProperty(),
+                                AiNamingUtils::getDisplayName,
+                                algorithm -> algorithm.disableWhen(viewModel.disableExpertSettingsProperty()))
+                        .combo(Localization.lang("Default token estimation algorithm"),
+                                viewModel.tokenEstimationAlgorithmsProperty(),
+                                viewModel.tokenEstimationAlgorithmProperty(),
+                                AiNamingUtils::getDisplayName,
+                                estimator -> estimator.disableWhen(viewModel.disableExpertSettingsProperty())))
+                .build());
+    }
+
+    /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.
+    private ComboBox<String> buildChatModelCombo() {
+        ComboBox<String> combo = new ComboBox<>();
+        combo.setEditable(true);
+        combo.setMaxWidth(Double.MAX_VALUE);
+        combo.itemsProperty().bind(viewModel.chatModelsProperty());
+        combo.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
+        viewModel.selectedAiProviderProperty().addListener((_, _, newValue) -> {
+            if (newValue == AiProvider.HUGGING_FACE) {
+                combo.setPromptText(HUGGING_FACE_CHAT_MODEL_PROMPT);
+            }
+        });
+        return combo;
+    }
+
+    private Spinner<Integer> buildFollowUpQuestionsCountSpinner() {
+        Spinner<Integer> spinner = new Spinner<>();
+        spinner.setEditable(true);
+        spinner.setMaxWidth(100.0);
+        spinner.setValueFactory(AiTabViewModel.followUpQuestionsCountValueFactory);
+        spinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
+        spinner.disableProperty().bind(viewModel.generateFollowUpQuestionsProperty().not());
+        return spinner;
+    }
+
+    /// [IntegerInputField] holds a nullable `Integer`; mirror it onto the view model's
+    /// primitive property in both directions, mapping `null` to zero.
+    private IntegerInputField integerField(IntegerProperty value) {
+        IntegerInputField field = new IntegerInputField();
+        field.valueProperty().addListener((_, _, newValue) -> value.set(newValue == null ? 0 : newValue));
+        value.addListener((_, _, newValue) -> field.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+        return field;
+    }
+
+    private TextField textField(StringProperty value) {
+        TextField field = new TextField();
+        field.textProperty().bindBidirectional(value);
+        return field;
+    }
+
+    /// One tab per prompt template, plus the two reset buttons underneath.
+    private Node buildTemplatesRegion() {
+        templatesTabPane = new TabPane();
+        templatesTabPane.getTabs().addAll(
+                // [impl->req~ai.chat.customize-system-prompt~1]
+                templateTab(Localization.lang("System message for chatting"), viewModel.chattingSystemMessageTemplateProperty(), viewModel::resetChattingSystemMessageTemplate),
+                // [impl->req~ai.response-engines.embeddings-search.prompt~1]
+                // [impl->req~ai.response-engines.full-document.prompt~1]
+                templateTab(Localization.lang("User message for chatting"), viewModel.chattingUserMessageTemplateProperty(), viewModel::resetChattingUserMessageTemplate),
+                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
+                templateTab(Localization.lang("System message for summarization of a chunk"), viewModel.summarizationChunkSystemMessageTemplateProperty(), viewModel::resetSummarizationChunkSystemMessageTemplate),
+                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-combine~1]
+                templateTab(Localization.lang("System message for summarization of several chunks"), viewModel.summarizationCombineSystemMessageTemplateProperty(), viewModel::resetSummarizationCombineSystemMessageTemplate),
+                // [impl->req~ai.summarization.algorithms.full.system-prompt~1]
+                templateTab(Localization.lang("System message for 'full document' summarization"), viewModel.summarizationFullDocumentSystemMessageTemplateProperty(), viewModel::resetSummarizationFullDocumentSystemMessageTemplate),
+                // [impl->req~ai.citation-parsing.system-prompt-config~1]
+                templateTab(Localization.lang("System message for parsing raw citations"), viewModel.citationParsingSystemMessageTemplateProperty(), viewModel::resetCitationParsingSystemMessageTemplate),
+                templateTab(Localization.lang("Markdown chat export template"), viewModel.markdownChatExportTemplateProperty(), viewModel::resetMarkdownChatExportTemplate),
+                templateTab(Localization.lang("Template for follow-up questions"), viewModel.followUpQuestionsTemplateProperty(), viewModel::resetFollowUpQuestionsTemplate));
+
+        Button resetCurrent = resetButton(Localization.lang("Reset current template"), this::resetCurrentTemplate);
+        Button resetAll = resetButton(Localization.lang("Reset templates to default"), viewModel::resetTemplates);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox buttons = new HBox(GAP, resetCurrent, spacer, resetAll);
+        buttons.setAlignment(Pos.CENTER_LEFT);
+
+        return new VBox(GAP, templatesTabPane, buttons);
+    }
+
+    /// A template tab; its reset action is carried on the tab itself so that "reset current
+    /// template" needs no chain of identity comparisons.
+    ///
+    /// The text area sits in a wrapper rather than being the content directly: [Tab] writes
+    /// through to its content's `disable` property (on [Tab#setContent], on being added to a
+    /// [TabPane], and whenever the tab itself is disabled), which throws against a bound
+    /// value. The wrapper absorbs those writes; the text area keeps its own binding and the
+    /// effective state is the union of both.
+    private Tab templateTab(String title, StringProperty template, Runnable reset) {
+        TextArea textArea = new TextArea();
+        textArea.textProperty().bindBidirectional(template);
+        textArea.disableProperty().bind(aiDisabled);
+
+        Tab tab = new Tab(title, new StackPane(textArea));
+        tab.setClosable(false);
+        tab.setUserData(reset);
+        return tab;
+    }
+
+    private void resetCurrentTemplate() {
+        Tab selected = templatesTabPane.getSelectionModel().getSelectedItem();
+        if (selected != null && selected.getUserData() instanceof Runnable reset) {
+            reset.run();
+        }
+    }
+
+    private Button resetButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        button.setOnAction(_ -> action.run());
+        button.disableProperty().bind(aiDisabled);
+        return button;
+    }
+}

@@ -1,0 +1,71 @@
+package org.jabref.toolkit.commands;
+
+import java.nio.file.Path;
+import java.util.concurrent.Callable;
+
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
+
+import picocli.CommandLine;
+
+import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
+import static picocli.CommandLine.Option;
+import static picocli.CommandLine.ParentCommand;
+
+@Command(name = "convert", description = "Convert between bibliography formats.")
+class Convert implements Callable<Integer> {
+
+    @ParentCommand
+    private JabKit jabKit;
+
+    @Mixin
+    private JabKit.SharedOptions sharedOptions;
+
+    @Mixin
+    private InputOption inputOption = new InputOption();
+
+    @Option(names = {"--input-format"}, description = "Input format")
+    private String inputFormat;
+
+    @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output file")
+    private Path outputFile;
+
+    @Option(names = {"--output-format"}, description = "Output format")
+    private String outputFormat = "bibtex";
+
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
+    @Override
+    public Integer call() throws ImportServiceException, ExportServiceException {
+        Path inputFile = inputOption.getInputFile();
+        boolean writeToStdOut = outputFile == null;
+        ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
+
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.getDatabase().getEntries());
+
+        ExportService exportService = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
+
+        if (writeToStdOut) {
+            // [impl->req~jabkit.cli.convert-stdout-format~1]
+            if (!sharedOptions.porcelain) {
+                System.err.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
+            }
+            exportService.exportParserResultToStdOut(parserResult, outputFormat);
+            return 0;
+        }
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
+        }
+        exportService.exportParserResultToFile(parserResult, outputFile, outputFormat);
+        return CommandLine.ExitCode.OK;
+    }
+}

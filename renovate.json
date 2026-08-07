@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "dependencyDashboard": false,
+  "prConcurrentLimit": 1,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        ".jbang/*.java",
+        "build-support/src/main/java/*.java",
+        "jablib-examples/jbang/*.jbang"
+      ],
+      "matchStrings": [
+        "//DEPS (?<depName>\\S+):(\\${\\S+:(?<currentValue>[^ }]+)})",
+        "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?"
+      ],
+      "datasourceTemplate": "maven"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "dockerfile",
+        "gradle",
+        "gradle-wrapper",
+        "github-actions"
+      ],
+      "enabled": false
+    },
+    {
+      "groupName": "all dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
+      "matchDepTypes": ["*"]
+    },
+    {"allowedVersions": "!/ea/i", "matchPackageNames": ["org.openjfx:{/,}**"]}
+  ]
+}

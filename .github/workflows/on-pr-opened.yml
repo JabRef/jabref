@@ -1,74 +1,35 @@
-name: On PR opened
+name: Welcome a first-time contributor
 
 on:
-  # _target is required
   pull_request_target:
+    types: [ opened ]
 
 jobs:
-  move_issue:
-    name: Mark issue as in progress
-    runs-on: ubuntu-latest
+  welcome-first-time-contributor:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
     permissions:
       issues: write
+      pull-requests: write
     steps:
-      - name: Determine issue number
-        id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
+      - uses: plbstl/first-contribution@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
-          ticketPrefix: '#'
-          titleRegex: '^#(?<ticketNumber>\d+)'
-          branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?<ticketNumber>\d+)'
-          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
-          outputOnly: true
-      - name: Move issue to "In Progress" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
-        with:
-          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-          project-url: "https://github.com/orgs/JabRef/projects/5"
-          target-labels: "📍 Assigned"
-          target-column: "In Progress"
-          ignored-columns: ""
-          default-column: "In Progress"
-          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
-          skip-if-not-in-project: true
-      - name: Move issue to "In Progress" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
-        with:
-          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-          project-url: "https://github.com/orgs/JabRef/projects/3"
-          target-labels: "📍 Assigned"
-          target-column: "In Progress"
-          ignored-columns: ""
-          default-column: "In Progress"
-          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
-          skip-if-not-in-project: true
-  conflicts_with_target:
-    name: Conflicts with target branch
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
-      - name: Check PR mergeability
-        id: check_mergeable
-        run: |
-          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
-          if [ "$MERGEABLE" == "CONFLICTING" ]; then
-            echo "❌ Merge conflicts"
-            exit 1
-          fi
-          echo "✅ No merge conflicts"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  upload-pr-number:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create pr_number.txt
-        run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr_number
-          path: pr_number.txt
+          labels: first contrib
+          pr-opened-msg: >
+            Hey @{fc-author}! 👋
+
+
+            Thank you for contributing to JabRef!
+
+
+            We have automated checks in place, based on which you will soon get feedback if any of them are failing.
+            We also use [Qodo](https://www.qodo.ai/) for review assistance.
+            It will update your pull request description with a review help and offer suggestions to improve the pull request.
+
+
+            After all automated checks pass, a maintainer will also review your contribution.
+            Once that happens, you can go through their comments in the "Files changed" tab and act on them, or reply to the conversation if you have further inputs.
+            You can read about the whole pull request process in our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process).
+
+
+            Please ensure that your pull request is in line with our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) and make necessary disclosures.

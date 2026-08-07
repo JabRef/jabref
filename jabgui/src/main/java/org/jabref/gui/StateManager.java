@@ -1,0 +1,106 @@
+package org.jabref.gui;
+
+import java.util.List;
+import java.util.Optional;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
+
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
+import org.jabref.gui.search.SearchType;
+import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DialogWindowState;
+import org.jabref.gui.walkthrough.Walkthrough;
+import org.jabref.http.SrvStateManager;
+import org.jabref.logic.search.SearchContext;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.query.SearchQuery;
+
+import com.tobiasdiez.easybind.EasyBinding;
+
+/// This class manages the GUI-state of JabRef, including:
+///
+///
+/// - currently selected database
+/// - currently selected group
+/// - active search
+/// - active number of search results
+/// - focus owner
+/// - dialog window sizes/positions
+/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+///
+public interface StateManager extends SrvStateManager {
+
+    ObservableList<SidePaneType> getVisibleSidePaneComponents();
+
+    CustomLocalDragboard getLocalDragboard();
+
+    OptionalObjectProperty<LibraryTab> activeTabProperty();
+
+    OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type);
+
+    StringProperty searchQueryProperty();
+
+    IntegerProperty searchResultSize(SearchType type);
+
+    void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
+
+    void setSelectedEntries(List<BibEntry> newSelectedEntries);
+
+    void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups);
+
+    ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context);
+
+    void clearSelectedGroups(BibDatabaseContext context);
+
+    void setActiveDatabase(BibDatabaseContext database);
+
+    OptionalObjectProperty<Node> focusOwnerProperty();
+
+    Optional<Node> getFocusOwner();
+
+    ObservableList<Task<?>> getBackgroundTasks();
+
+    ObservableList<Task<?>> getRunningBackgroundTasks();
+
+    void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task);
+
+    EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning();
+
+    DialogWindowState getDialogWindowState(String className);
+
+    void setDialogWindowState(String className, DialogWindowState state);
+
+    void addSearchHistory(String search);
+
+    ObservableList<String> getWholeSearchHistory();
+
+    List<String> getLastSearchHistory(int size);
+
+    void clearSearchHistory();
+
+    Optional<AiGroupChatWindow> getAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow);
+
+    void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    BooleanProperty getEditorShowing();
+
+    void setActiveWalkthrough(Walkthrough walkthrough);
+
+    Optional<Walkthrough> getActiveWalkthrough();
+
+    BooleanProperty canGoBackProperty();
+
+    BooleanProperty canGoForwardProperty();
+}

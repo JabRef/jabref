@@ -5,4 +5,4 @@ MD013: false
 
 MD033:
   # we have <a> tags with ids and superscript
-  allowed_elements: ['a', 'kbd', 'sup']
+  allowed_elements: [ 'a', 'kbd', 'sup' ]

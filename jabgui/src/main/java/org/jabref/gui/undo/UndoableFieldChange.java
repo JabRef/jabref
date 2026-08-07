@@ -1,0 +1,79 @@
+package org.jabref.gui.undo;
+
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// This class represents a change in any field value. The relevant
+/// information is the BibEntry, the field name, the old and the
+/// new value. Old/new values can be null.
+@NullMarked
+public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableFieldChange.class);
+
+    private final BibEntry entry;
+    private final Field field;
+    @Nullable private final String oldValue;
+    @Nullable private final String newValue;
+
+    public UndoableFieldChange(BibEntry entry, Field field, @Nullable String oldValue, @Nullable String newValue) {
+        this.entry = entry;
+        this.field = field;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+    }
+
+    public UndoableFieldChange(FieldChange change) {
+        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
+    }
+
+    @Override
+    public String getPresentationName() {
+        return Localization.lang("change field %0 of entry %1 from %2 to %3", StringUtil.boldHTML(FieldTextMapper.getDisplayName(field)),
+                StringUtil.boldHTML(entry.getCitationKey().orElse(Localization.lang("undefined"))),
+                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
+    }
+
+    @Override
+    public void undo() {
+        super.undo();
+
+        // Revert the change.
+        try {
+            if (oldValue == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, oldValue);
+            }
+
+            // this is the only exception explicitly thrown here
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("Cannot perform undo", ex);
+        }
+    }
+
+    @Override
+    public void redo() {
+        super.redo();
+
+        // Redo the change.
+        try {
+            if (newValue == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, newValue);
+            }
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("Cannot perform redo", ex);
+        }
+    }
+}

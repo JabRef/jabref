@@ -1,0 +1,281 @@
+import org.gradlex.javamodule.packaging.tasks.Jpackage
+import org.jabref.gradle.EmbeddedPostgresBinaries
+import org.jabref.gradle.useLibericaJdkFull
+
+plugins {
+    id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
+    id("application")
+
+    // Do not activate; causes issues with the modularity plugin (no tests found etc)
+    // id("com.redock.classpathtofile") version "0.1.0"
+}
+
+group = "org.jabref"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
+
+testModuleInfo {
+    requires("org.jabref.testsupport")
+
+    requires("com.github.javaparser.core")
+    requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
+    requires("org.mockito")
+    requires("org.hamcrest")
+
+    requires("org.testfx")
+    requires("org.testfx.junit5")
+
+    requires("com.tngtech.archunit")
+    requires("com.tngtech.archunit.junit5.api")
+
+    runtimeOnly("com.tngtech.archunit.junit5.engine")
+}
+
+// Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
+// The per-module opens/exports declared in org.jabref.gradle.base.dependency-rules.gradle.kts (javafx.base,
+// javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.
+// Qualified opens keep their original target module; unqualified opens/exports are reproduced for the
+// JabRef application module plus ALL-UNNAMED. If a runtime InaccessibleObjectException names another reader
+// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.Toolchains)
+val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
+    // javafx.base
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections.transformation=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/com.sun.javafx.beans=net.bytebuddy",
+    // javafx.fxml
+    "--add-opens", "javafx.fxml/javafx.fxml=org.jabref.jablib",
+    // javafx.graphics
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+    // javafx.controls
+    "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+) else emptyList()
+
+// Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
+// internal com.sun.javafx.* packages are exported via the metadata patches in dependency-rules; when JavaFX
+// comes from the JDK those patches are inert, so javac needs the exports too. Only the exports are required
+// at compile time (--add-opens is reflection-only and applies at runtime via the JVM args above).
+val useLibericaJdkFullCompilerArgs = if (useLibericaJdkFull) listOf(
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref",
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref"
+) else emptyList()
+
+tasks.named<JavaCompile>("compileJava") {
+    options.compilerArgs.addAll(useLibericaJdkFullCompilerArgs)
+}
+
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
+
+dependencies {
+    embeddedPostgresHostBinary?.let { runtimeOnly(javaModuleDependencies.ga(it.moduleName)) }
+}
+
+application {
+    mainClass= "org.jabref.Launcher"
+
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,org.apache.lucene.core,jkeychain",
+
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        // https://github.com/uncomplicate/neanderthal/issues/55
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseStringDeduplication"
+
+        // Default garbage collector (G1) is sufficient
+        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // "-XX:+UseZGC", "-XX:+ZUncommit"
+        // "-XX:+UseG1GC"
+    )
+}
+
+tasks.named<JavaExec>("run") {
+    // "assert" statements in the code should activated when running using gradle
+    enableAssertions = true
+    jvmArgs(application.applicationDefaultJvmArgs)
+    embeddedPostgresHostBinary?.let { jvmArgs("--add-modules", it.moduleName) }
+}
+
+// These modules need to be present in every jpackage runtime image. Keeping them named separately
+// avoids mixing shared image requirements with target-specific embedded Postgres binaries.
+val sharedJpackageImageModules = listOf("jdk.incubator.vector")
+
+val embeddedPostgresBinaryByJpackageTask = mapOf(
+    "jpackageUbuntu-22.04" to EmbeddedPostgresBinaries.linuxAmd64,
+    "jpackageUbuntu-22.04-arm" to EmbeddedPostgresBinaries.linuxArm64,
+    "jpackageMacos-15-intel" to EmbeddedPostgresBinaries.macosAmd64,
+    "jpackageMacos-15" to EmbeddedPostgresBinaries.macosArm64,
+    "jpackageWindows-latest" to EmbeddedPostgresBinaries.windowsAmd64
+)
+
+val embeddedPostgresDependencyByTarget = mapOf(
+    "ubuntu-22.04" to EmbeddedPostgresBinaries.linuxAmd64,
+    "ubuntu-22.04-arm" to EmbeddedPostgresBinaries.linuxArm64,
+    "macos-15-intel" to EmbeddedPostgresBinaries.macosAmd64,
+    "macos-15" to EmbeddedPostgresBinaries.macosArm64,
+    "windows-latest" to EmbeddedPostgresBinaries.windowsAmd64
+)
+
+// Below should eventually replace the 'jlink {}' and doLast-copy configurations above
+javaModulePackaging {
+    verbose = true
+
+    applicationName = "JabRef"
+    applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
+    vendor = "JabRef e.V."
+
+    addModules.addAll(sharedJpackageImageModules)
+
+    // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
+    jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
+    targetsWithOs("windows") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
+        )
+        options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
+            "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
+
+            // Target-speccific options
+            "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
+            "--win-dir-chooser",
+            "--win-shortcut",
+            "--win-menu",
+            "--win-menu-group", "JabRef"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
+            include("jabref-firefox.json")
+            include("jabref-chrome.json")
+            include("JabRefHost.bat")
+            include("JabRefHost.ps1")
+            include("JabRefTopBanner.bmp")
+            include("JabRef.VisualElementsManifest.xml")
+        })
+    }
+    targetsWithOs("linux") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+        )
+        options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("linux").asFile.absolutePath,
+
+            // Target-speccific options
+            "--linux-menu-group", "Office",
+            // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
+            "--linux-shortcut"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
+            include("native-messaging-host/**")
+            include("jabrefHost.py")
+        })
+    }
+    targetsWithOs("macos") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/macos/JabRef.icns",
+        )
+        options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/macos/JabRef.icns",
+            "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("macos").asFile.absolutePath,
+
+            // Target-speccific options
+            "--mac-package-identifier", "JabRef",
+            "--mac-package-name", "JabRef"
+        )
+        if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
+            options.addAll(
+                "--mac-sign",
+                "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
+                "--mac-package-signing-prefix", "org.jabref.",
+            )
+        }
+        targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
+            include("Resources/**")
+        })
+    }
+}
+
+dependencies {
+    embeddedPostgresDependencyByTarget.forEach { (target, binary) ->
+        add("${target}RuntimeClasspath", javaModuleDependencies.ga(binary.moduleName))
+    }
+}
+
+embeddedPostgresHostBinary?.let { hostBinary ->
+    embeddedPostgresDependencyByTarget
+        .filterValues { it != hostBinary }
+        .forEach { (target, _) ->
+            configurations.named("${target}RuntimeClasspath") {
+                exclude(mapOf(
+                    "group" to "io.zonky.test.postgres",
+                    "module" to hostBinary.artifactName
+                ))
+            }
+        }
+}
+
+embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
+    tasks.named<Jpackage>(taskName) {
+        // Include the platform-specific Postgres binary module in the jlink runtime image.
+        addModules.add(binary.moduleName)
+        // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
+        javaOptions.add("--add-modules=${binary.moduleName}")
+        addModules.addAll(sharedJpackageImageModules)
+    }
+}
+
+tasks.test {
+    jvmArgs = listOf(
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
+
+        // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,com.sun.jna"
+
+        // "--add-reads", "org.mockito=java.prefs",
+        // "--add-reads", "org.jabref=wiremock"
+    ) + useLibericaJdkFullJvmArgs
+
+    maxParallelForks = 1
+}

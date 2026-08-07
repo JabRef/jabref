@@ -1,0 +1,114 @@
+# JabRef REST API
+
+// This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
+
+// Start the HTTP server using Gradle > JabRef > jabsrv-cli > Tasks > application > run
+
+### Get a HTML page asking the user to go to /libraries
+
+GET http://localhost:23119
+
+### Get the list of all libraries
+
+GET http://localhost:23119/libraries
+Accept: application/json
+
+### Query entries across all open libraries (single query)
+
+// Each query is a Search.g4 expression. The DOI below is present in the bundled demo (Chocolate.bib),
+// so this returns a match when the server is started without a library file.
+
+POST http://localhost:23119/libraries:query
+Content-Type: application/json
+
+{
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\""]
+}
+
+### Query entries across all open libraries (multiple queries, results returned in input order)
+
+POST http://localhost:23119/libraries:query
+Content-Type: application/json
+
+{
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\"", "title = \"chocolate\""]
+}
+
+### demo cases
+
+// JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
+
+### Get JSON of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/json
+
+### Get plain BibTeX of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/x-bibtex
+
+### Get list of files in Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/pdffiles
+Accept: application/json
+
+### Get CSL JSON of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/x-bibtex-library-csl+json
+
+### Read demo JabMap (Chocolate.jmp)
+
+GET http://localhost:23119/libraries/demo/map
+Accept: application/json
+
+### Save demo JabMap (Chocolate.jmp) note: this might break the data for the demo map
+
+PUT http://localhost:23119/libraries/demo/map
+Content-Type: application/json
+
+{
+  "name": "demo"
+}
+
+### Get HTML-representation of entry preview for "Tokede_2011" of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/Tokede_2011
+Accept: text/html
+
+### Get String-representation of entry preview for "Corti_2009" of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/Corti_2009
+Accept: text/plain
+
+### Get BibTeX of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/x-bibtex
+
+### Get JSON of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/json
+
+### Get CSL JSON of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: application/x-bibtex-library-csl+json
+
+###
+
+# Error Cases
+
+### GET not available library
+
+GET http://localhost:23119/libraries/notfound
+
+### GET HTML entry preview for unknown citation key (404; key is HTML-escaped in the message)
+
+// The citation key below is `<script>alert(1)</script>` URL-encoded. The 404 body is served
+// as text/html, so the key is HTML-escaped (`&lt;script&gt;...`) and not reflected as raw markup.
+
+GET http://localhost:23119/libraries/demo/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E
+Accept: text/html

@@ -1,0 +1,75 @@
+package org.jabref.model.entry.field;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
+/// This class models a field that is not natively known to JabRef.
+/// It might be a custom field added by the user.
+/// It also might originate from an importer if the source "field" cannot be mapped to one of the existing fields by its name and/or properties.
+/// It is not called "CustomField", because there was the idea that StandardFields could be customized.
+///
+/// This can be instantiated with [org.jabref.model.entry.field.FieldFactory#parseField(java.lang.String)]
+public class UnknownField implements Field {
+    private String name;
+    private final EnumSet<FieldProperty> properties;
+
+    public UnknownField(String name) {
+        this.name = name;
+        this.properties = EnumSet.noneOf(FieldProperty.class);
+    }
+
+    public UnknownField(String name, FieldProperty first, FieldProperty... rest) {
+        this.name = name;
+        this.properties = EnumSet.of(first, rest);
+    }
+
+    /// This constructor accepts a list of field properties
+    public UnknownField(String name, List<FieldProperty> properties) {
+        this.name = name;
+        this.properties = EnumSet.copyOf(properties);
+    }
+
+    @Override
+    public EnumSet<FieldProperty> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean isStandardField() {
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Field other)) {
+            return false;
+        }
+        return name.equalsIgnoreCase(other.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name.toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public String toString() {
+        return "UnknownField{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+}

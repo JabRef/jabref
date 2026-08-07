@@ -16,104 +16,26 @@ Click on "Install" choose "CheckStyle-IDEA".<br>
 **Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"Install CheckStyle" %}
-![Install CheckStyle](guidelines-intellij-install-checkstyle.png)
+![Install CheckStyle](13-01-install-checkstyle.png)
 {% endfigure %}
 
 After clicking, IntelliJ asks for confirmation:
 
 {% figure caption:"Third Party Plugin Privacy Notice" %}
-![Third Party Plugin Privacy Notice](guidelines-intellij-checkstyle-confirmation.png)
+![Third Party Plugin Privacy Notice](13-02-checkstyle-confirmation.png)
 {% endfigure %}
 
 If you agree, click on "Agree" and you can continue.
 
-Afterwards, use the "Restart IDE" button to restart IntelliJ.
+Afterward, use the "Restart IDE" button to restart IntelliJ.
 
 {% figure caption:"IntelliJ restart IDE" %}
-![IntelliJ restart IDE](guidelines-intellij-checkstyle-restart-ide.png)
+![IntelliJ restart IDE](13-03-checkstyle-restart-ide.png)
 {% endfigure %}
 
 Click on "Restart" to finally restart.
 
 Wait for IntelliJ coming up again.
-
-Go to **File > Settings... > Editor > Code Style**
-
-Click on the settings wheel (next to the scheme chooser),
-then click "Import Scheme >",
-then click "IntelliJ IDEA code style XML"
-
-{% figure caption:"Location of “Import Scheme > IntelliJ IDEA code style XML”" %}
-![Location of IntelliJ IDEA code style XML](guidelines-intellij-codestyle-import.png)
-{% endfigure %}
-
-You have to browse for the directory `config` in JabRef's code.
-There is an `IntelliJ Code Style.xml`.
-
-{% figure caption:"Browsing for `config/IntelliJ Code Style.xml`" %}
-![Browsing for config/IntelliJ Code Style.xml](guidelines-intellij-codestyle-import-select-xml-file.png)
-{% endfigure %}
-
-Click "OK".
-
-At following dialog is "Import Scheme".
-Click there "OK", too.
-
-{% figure caption:"Import to JabRef" %}
-![Import to JabRef](guidelines-intellij-codestyle-import-as-jabref.png)
-{% endfigure %}
-
-Click on "Apply" to store the preferences.
-
-## Put JabRef's checkstyle configuration in place
-
-Now, put the checkstyle configuration file is in place:
-
-Go to **File > Settings... > Tools > Checkstyle > Configuration File**
-
-Trigger the import dialog of a CheckStyle style by clicking the \[+] button:
-
-{% figure caption:"Trigger the rule import dialog" %}
-![Trigger the rule import dialog](guidelines-intellij-checkstyle-start-import.png)
-{% endfigure %}
-
-Then:
-
-* Put "JabRef" as description.
-* Browse for `config/checkstyle/checkstyle.xml`
-* Tick "Store relative to project location"
-* Click "Next"
-
-{% figure caption:"Filled Rule Import Dialog" %}
-![Filled Rule Import Dialog](guidelines-intellij-checkstyle-import-file.png)
-{% endfigure %}
-
-Click on "Finish"
-
-Activate the CheckStyle configuration file by ticking it in the list
-
-{% figure caption:"JabRef's checkstyle config is activated" %}
-![JabRef's checkstyle config is activated](guidelines-intellij-checkstyle-jabref-active.png)
-{% endfigure %}
-
-Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
-Also, set the "Scan Scope" to "Only Java sources (including tests)".
-
-{% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}
-![Checkstyle is the highest version - and tests are also scanned](guidelines-intellij-checkstyle-final-settings.png)
-{% endfigure %}
-
-Save settings by clicking "Apply" and then "OK"
-
-## Run checkstyle
-
-In the lower part of IntelliJ's window, click on "Checkstyle".
-In "Rules", change to "JabRef".
-Then, you can run a check on all modified files.
-
-{% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
-![JabRef's style is active - and we are ready to run a check on all modified files](guidelines-intellij-checkstyle-window.png)
-{% endfigure %}
 
 ## Have auto format working properly in JavaDoc
 
@@ -124,7 +46,27 @@ Go to **File > Settings... > Editor > Code Style > Java > JavaDoc**.
 At "Other", disable "Wrap at right margin"
 
 {% figure caption:"”Wrap at right margin” disabled" %}
-!["Wrap at right margin" disabled](guidelines-intellij-editor-javadoc-do-not-wrap.png)
+!["Wrap at right margin" disabled](13-12-editor-javadoc-do-not-wrap.png)
+{% endfigure %}
+
+## Enable auto formatting of your code
+
+IntelliJ can automatically reformat your code on save.
+Please make use of this functionality.
+
+Go to **File > Settings... > Tools > Actions on Save**.
+
+1. Check "Reformat code"
+2. Click on "All file types" (on the right)
+3. Uncheck "All file types"
+4. Check "Java"
+5. Check "Optimize imports"
+6. Click on "All file types" (on the right)
+7. Uncheck "All file types" to disable it
+8. Check "Java"
+
+{% figure caption:"Enable autoformatting on save" %}
+![Enable autoformatting on save](13-12.5-auto-formatting.png)
 {% endfigure %}
 
 ## Enable proper import cleanup
@@ -134,7 +76,7 @@ There, enable both "Add unambiguous imports on the fly" and "Optimize imports on
 (Source: [JetBrains help](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements)).
 
 {% figure caption:"Auto import enabled" %}
-![Enable auto import](guidelines-intellij-editor-autoimport.png)
+![Enable auto import](13-13-editor-auto-import.png)
 {% endfigure %}
 
 Press "OK".
@@ -146,10 +88,20 @@ At section "General", disable "File header" and "Imports".
 At section "Java", disable "One-line methods".
 
 {% figure caption:"Code foldings disabled" %}
-![Code foldings disabled](guidelines-settings-intellij-code-foldings.png)
+![Code foldings disabled](13-14-code-foldings.png)
 {% endfigure %}
 
 Press "OK".
+
+## Run checkstyle
+
+In the lower part of IntelliJ's window, click on "Checkstyle".
+In "Rules", change to "JabRef".
+Then, you can run a check on all modified files.
+
+{% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
+![JabRef's style is active - and we are ready to run a check on all modified files](13-11-checkstyle-window.png)
+{% endfigure %}
 
 ## Final comments
 

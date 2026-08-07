@@ -4,6 +4,8 @@ nav_order: 24
 ---
 # Use `#` as indicator for BibTeX string constants
 
+## Context and Problem Statement
+
 Bibtex supports string constants. The entry editor should support that, too.
 Affected code is (at least) `org.jabref.logic.importer.fileformat.BibtexParser#parseFieldContent` and `org.jabref.logic.bibtex.FieldWriter#formatAndResolveStrings`
 

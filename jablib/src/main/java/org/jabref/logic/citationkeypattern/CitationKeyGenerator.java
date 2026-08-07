@@ -1,0 +1,264 @@
+package org.jabref.logic.citationkeypattern;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.regex.PatternSyntaxException;
+
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.util.strings.Transliteration;
+import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CitationKeyGenerator extends BracketedPattern {
+
+    /// All single characters that we can use for extending a key to make it unique.
+    public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+
+    /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
+    /// These characters are disallowed in BibTeX keys.
+    public static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
+
+    private final AbstractCitationKeyPatterns citeKeyPattern;
+    private final BibDatabase database;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final String unwantedCharacters;
+
+    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
+                bibDatabaseContext.getDatabase(),
+                citationKeyPatternPreferences);
+    }
+
+    public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
+                                @NonNull BibDatabase database,
+                                @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citeKeyPattern = citeKeyPattern;
+        this.database = database;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
+    }
+
+    /// Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
+    ///
+    /// @param number The appendix number.
+    /// @return The String to append.
+    private static String getAppendix(int number) {
+        if (number >= APPENDIX_CHARACTERS.length()) {
+            int lastChar = number % APPENDIX_CHARACTERS.length();
+            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);
+        } else {
+            return APPENDIX_CHARACTERS.substring(number, number + 1);
+        }
+    }
+
+    @VisibleForTesting
+    static String removeUnwantedCharacters(String key, String unwantedCharacters) {
+        String newKey = key.chars()
+                           .filter(c -> unwantedCharacters.indexOf(c) == -1)
+                           .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                           .map(CitationKeyGenerator::normalizeSuperscriptOrSubscript)
+                           .filter(c -> c != -1)
+                           .collect(
+                                   StringBuilder::new,
+                                   StringBuilder::appendCodePoint,
+                                   StringBuilder::append
+                           )
+                           .toString();
+
+        // Replace non-English characters like umlauts etc. with a sensible
+        // letter or letter combination that bibtex can accept.
+        return StringUtil.replaceSpecialCharacters(newKey);
+    }
+
+    /// Removes characters, unwanted characters that are illegal in citation keys
+    /// preserving Unicode (e.g., ²) and diacritical characters.
+    ///
+    /// @param key                the citation key to sanitize
+    /// @param unwantedCharacters - pass through [org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences#getUnwantedCharacters()]
+    /// @return the key with illegal and unwanted characters removed
+    public static String removeUnwantedCharactersWithKeepDiacritics(String key, String unwantedCharacters) {
+        return key.chars()
+                  .filter(c -> !Character.isWhitespace(c))
+                  .filter(c -> unwantedCharacters.indexOf(c) == -1)
+                  .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                  .collect(
+                          StringBuilder::new,
+                          StringBuilder::appendCodePoint,
+                          StringBuilder::append
+                  )
+                  .toString();
+    }
+
+    /// Maps Unicode superscript and subscript digits to their ASCII counterparts (e.g., ¹ → 1, ₂ → 2).
+    /// Other characters in the Superscripts and Subscripts block (e.g., ⁿ ⁱ ⁺ ⁻ ⁽ ⁾) are stripped by returning -1.
+    /// All other code points are returned unchanged.
+    private static int normalizeSuperscriptOrSubscript(int codePoint) {
+        // Latin-1 superscript digits ¹²³ live in the Latin-1 Supplement block at non-contiguous code points.
+        if (codePoint == 0x00B9) {
+            return '1';
+        }
+        if (codePoint == 0x00B2) {
+            return '2';
+        }
+        if (codePoint == 0x00B3) {
+            return '3';
+        }
+        // Superscript digits 0, 4..9 (U+2070, U+2074..U+2079)
+        if (codePoint == 0x2070) {
+            return '0';
+        }
+        if (codePoint >= 0x2074 && codePoint <= 0x2079) {
+            return '0' + (codePoint - 0x2070);
+        }
+        // Subscript digits 0..9 (U+2080..U+2089)
+        if (codePoint >= 0x2080 && codePoint <= 0x2089) {
+            return '0' + (codePoint - 0x2080);
+        }
+        // Strip remaining characters in the Superscripts and Subscripts block (non-digit modifiers and signs).
+        if (Character.UnicodeBlock.of(codePoint) == Character.UnicodeBlock.SUPERSCRIPTS_AND_SUBSCRIPTS) {
+            return -1;
+        }
+        return codePoint;
+    }
+
+    public static String cleanKey(String key, String unwantedCharacters) {
+        return CharMatcher.whitespace().removeFrom(removeUnwantedCharacters(key, unwantedCharacters));
+    }
+
+    /// Generate a citation key for the given {@link BibEntry}.
+    ///
+    /// @param entry a {@link BibEntry}
+    /// @return a citation key based on the user's preferences
+    public String generateKey(@NonNull BibEntry entry) {
+        String currentKey = entry.getCitationKey().orElse(null);
+
+        String newKey = createCitationKeyFromPattern(entry);
+        newKey = replaceWithRegex(newKey);
+        newKey = appendLettersToKey(newKey, currentKey);
+        newKey = cleanKey(newKey, unwantedCharacters);
+        return transliterateIfNeeded(newKey);
+    }
+
+    /// A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
+    ///
+    /// @param key    the new key
+    /// @param oldKey the old key
+    /// @return a key, if needed, with an appended letter
+    private String appendLettersToKey(String key, String oldKey) {
+        long occurrences = database.getNumberOfCitationKeyOccurrences(key);
+
+        if ((occurrences > 0) && Objects.equals(oldKey, key)) {
+            occurrences--; // No change, so we can accept one dupe.
+        }
+
+        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+
+        if (alwaysAddLetter || occurrences != 0) {
+            // The key is already in use, so we must modify it.
+            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
+                    == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+
+            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            String moddedKey;
+
+            // @formatter:off
+            do {
+                // @formatter:on
+                moddedKey = key + getAppendix(number);
+                number++;
+
+                occurrences = database.getNumberOfCitationKeyOccurrences(moddedKey);
+                // only happens if #getAddition() is buggy
+                if (Objects.equals(oldKey, moddedKey)) {
+                    occurrences--;
+                }
+            } while (occurrences > 0);
+
+            key = moddedKey;
+        }
+        return key;
+    }
+
+    public String transliterateIfNeeded(String key) {
+        if (!citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKey()) {
+            return key;
+        }
+
+        String result = Transliteration.transliterate(key);
+        return result.replace(" ", "");
+    }
+
+    /// Using preferences, replace matches to the provided regex with a string.
+    ///
+    /// @param key the citation key
+    /// @return the citation key where matches to the regex are replaced
+    private String replaceWithRegex(String key) {
+        // Remove Regular Expressions while generating Keys
+        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
+        if ((regex != null) && !regex.isBlank()) {
+            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
+            try {
+                key = key.replaceAll(regex, replacement);
+            } catch (PatternSyntaxException e) {
+                LOGGER.warn("There is a syntax error in the regular expression \"{}\" used to generate a citation key", regex, e);
+            }
+        }
+        return key;
+    }
+
+    private String createCitationKeyFromPattern(BibEntry entry) {
+        // get the type of entry
+        EntryType entryType = entry.getType();
+        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
+        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
+            return "";
+        }
+        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
+    }
+
+    /// A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
+    ///
+    /// @param entry the {@link BibEntry} that a citation key is generated for
+    /// @return a cleaned citation key for the given {@link BibEntry}
+    private Function<String, String> expandBracketContent(BibEntry entry) {
+        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordSeparator();
+
+        return (String bracket) -> {
+            String expandedPattern;
+            List<String> fieldParts = parseFieldAndModifiers(bracket);
+
+            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);
+            // check whether there is a modifier on the end such as
+            // ":lower":
+            if (fieldParts.size() > 1) {
+                // apply modifiers:
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));
+            }
+            return cleanKey(expandedPattern, unwantedCharacters);
+        };
+    }
+
+    /// Generates a citation key for the given entry, and sets the key.
+    ///
+    /// @param entry the entry to generate the key for
+    /// @return the change to the key (or an empty optional if the key was not changed)
+    public Optional<FieldChange> generateAndSetKey(BibEntry entry) {
+        String newKey = generateKey(entry);
+        return entry.setCitationKey(newKey);
+    }
+}

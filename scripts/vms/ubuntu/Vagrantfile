@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
 
   # https://app.vagrantup.com/caspermeijn/boxes/ubuntu-desktop-24.04
   # GitHub: https://github.com/caspermeijn/vagrant-ubuntu-desktop/tree/main/ubuntu-desktop-24.04
-  # Here, the ubuntu-desktop works without usses
+  # Here, the ubuntu-desktop works without issues
   config.vm.box = "caspermeijn/ubuntu-desktop-24.04"
 
   # Share an additional folder to the guest VM. The first argument is

@@ -1,0 +1,77 @@
+package org.jabref.logic.util;
+
+import java.util.Optional;
+
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// Filters change events and only relays major changes.
+public class CoarseChangeFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoarseChangeFilter.class);
+
+    private final BibDatabaseContext context;
+    private final EventBus eventBus = new EventBus();
+
+    private Optional<Field> lastFieldChanged;
+    private Optional<BibEntry> lastEntryChanged;
+
+    public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
+        this.context = bibDatabaseContext;
+
+        // Listen for change events
+        context.getDatabase().registerListener(this);
+        context.getMetaData().registerListener(this);
+
+        this.lastFieldChanged = Optional.empty();
+        this.lastEntryChanged = Optional.empty();
+    }
+
+    @Subscribe
+    public synchronized void listen(BibDatabaseContextChangedEvent event) {
+        if (event instanceof FieldChangedEvent fieldChange) {
+            // If editing has started
+            boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
+
+            boolean isChangedField = lastFieldChanged.filter(f -> !f.equals(fieldChange.getField())).isPresent();
+            boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
+            boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
+            // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
+            boolean isMajorChange = fieldChange.charactersChangedCount() > 1;
+
+            fieldChange.setFiltered(!(isEditChanged || isMajorChange));
+            // Post each FieldChangedEvent - even the ones being marked as "filtered"
+            // Explanation at https://github.com/JabRef/jabref/pull/6868. - especially necessary for BackupManager and AutoSaveManager
+            eventBus.post(fieldChange);
+
+            lastFieldChanged = Optional.of(fieldChange.getField());
+            lastEntryChanged = Optional.of(fieldChange.getBibEntry());
+        } else {
+            eventBus.post(event);
+        }
+    }
+
+    public void registerListener(Object listener) {
+        eventBus.register(listener);
+    }
+
+    public void unregisterListener(Object listener) {
+        try {
+            eventBus.unregister(listener);
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Listener was not registered before: {}", listener, e);
+        }
+    }
+
+    public void shutdown() {
+        context.getDatabase().unregisterListener(this);
+        context.getMetaData().unregisterListener(this);
+    }
+}

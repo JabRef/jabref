@@ -1,0 +1,55 @@
+package org.jabref.logic.importer;
+
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class ImportFormatReaderParameterlessTest {
+
+    private ImportFormatReader reader;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+
+    @BeforeEach
+    void setUp() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), fileMonitor);
+    }
+
+    @Test
+    void importWithAutoDetectionThrowsExceptionIfNoMatchingImporterWasFound() throws URISyntaxException {
+        Path file = Path.of(ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml").toURI());
+        assertThrows(ImportException.class, () -> reader.importWithAutoDetection(file));
+    }
+
+    @Test
+    void importFromFileWithUnknownFormatThrowsException() {
+        assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
+    }
+
+    @Test
+    void hasImporterForFileReturnsFalseForUnsupportedExtension() {
+        assertFalse(reader.hasImporterForFile(Path.of("dropped-file.csv")));
+    }
+
+    @Test
+    void hasImporterForFileReturnsTrueForSupportedExtension() {
+        assertTrue(reader.hasImporterForFile(Path.of("dropped-file.ris")));
+    }
+}

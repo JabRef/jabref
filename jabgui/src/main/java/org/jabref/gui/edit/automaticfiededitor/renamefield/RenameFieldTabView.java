@@ -1,0 +1,90 @@
+package org.jabref.gui.edit.automaticfiededitor.renamefield;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
+import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+
+import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+
+import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
+
+public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+    private final NamedCompoundEdit compoundEdit;
+    private final DialogService dialogService;
+    private final List<BibEntry> selectedEntries;
+    private final BibDatabase database;
+    private final StateManager stateManager;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    @FXML
+    private Button renameButton;
+    @FXML
+    private ComboBox<Field> fieldComboBox;
+    @FXML
+    private TextField newFieldNameTextField;
+    private RenameFieldViewModel viewModel;
+
+    public RenameFieldTabView(BibDatabase database,
+                              NamedCompoundEdit compoundEdit,
+                              DialogService dialogService,
+                              StateManager stateManager) {
+        this.compoundEdit = compoundEdit;
+        this.dialogService = dialogService;
+        this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
+        this.database = database;
+        this.stateManager = stateManager;
+
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+    }
+
+    @FXML
+    public void initialize() {
+        viewModel = new RenameFieldViewModel(selectedEntries, database, compoundEdit, dialogService, stateManager);
+
+        fieldComboBox.getItems().setAll(FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields()));
+
+        if (!fieldComboBox.getItems().isEmpty()) {
+            fieldComboBox.getSelectionModel().selectFirst();
+        }
+
+        fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
+
+        fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        EasyBind.listen(fieldComboBox.getEditor().textProperty(), _ -> fieldComboBox.commitValue());
+
+        renameButton.disableProperty().bind(viewModel.canRenameProperty().not());
+
+        newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
+
+        Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldNameValidationStatus(), newFieldNameTextField, true));
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("Rename field");
+    }
+
+    @FXML
+    void renameField() {
+        viewModel.renameField();
+    }
+}

@@ -39,7 +39,7 @@ In order to support synchronization, additional metadata is kept for each item:
 - `hash`: This is the hash of the item (i.e., of all the data except for `Version` and `hash`).
 - (Client only) `dirty`: Marks whether the user changed the entry.
 
-`ID` and `Version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
+`ID` and `Version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
 
 {: .note-title }
 > Dirty flags

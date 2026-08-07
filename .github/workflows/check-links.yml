@@ -15,16 +15,21 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   check-links:
     if: github.repository == 'JabRef/jabref'
+    # Does not work on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - name: Run linkspector
-        uses: umbrelladocs/action-linkspector@v1
+        uses: umbrelladocs/action-linkspector@v1.5.5
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review

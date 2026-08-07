@@ -1,0 +1,67 @@
+package org.jabref.logic.citationstyle;
+
+import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesRemovedEvent;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntryChangedEvent;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+/// Caches the generated Citations for quicker access
+/// {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
+public class CitationStyleCache {
+
+    private static final int CACHE_SIZE = 1024;
+
+    private final LoadingCache<BibEntry, String> citationStyleCache;
+
+    // In case null, return empty preview.
+    @Nullable private PreviewLayout citationStyle;
+
+    public CitationStyleCache(BibDatabaseContext databaseContext) {
+        citationStyleCache = Caffeine.newBuilder().maximumSize(CACHE_SIZE).build(entry -> {
+            if (citationStyle != null) {
+                return citationStyle.generatePreview(entry, databaseContext);
+            } else {
+                return "";
+            }
+        });
+        databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
+    }
+
+    /// Returns the citation for the given entry.
+    public String getCitationFor(BibEntry entry) {
+        return citationStyleCache.get(entry);
+    }
+
+    /// Set a new citation style and invalidate all cached styles
+    ///
+    /// @param citationStyle The new citation style
+    public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
+        if (!citationStyle.equals(this.citationStyle)) {
+            this.citationStyle = citationStyle;
+            this.citationStyleCache.invalidateAll();
+        }
+    }
+
+    private class BibDatabaseEntryListener {
+        /// removes the outdated citation of the changed entry
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            citationStyleCache.invalidate(entryChangedEvent.getBibEntry());
+        }
+
+        /// removes the citation of the removed entries as they are not needed anymore
+        @Subscribe
+        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
+            for (BibEntry entry : entriesRemovedEvent.getBibEntries()) {
+                citationStyleCache.invalidate(entry);
+            }
+        }
+    }
+}

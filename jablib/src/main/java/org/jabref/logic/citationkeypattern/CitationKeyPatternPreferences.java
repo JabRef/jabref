@@ -1,0 +1,204 @@
+package org.jabref.logic.citationkeypattern;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+import com.google.common.annotations.VisibleForTesting;
+
+public class CitationKeyPatternPreferences {
+
+    public enum KeySuffix {
+        ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...
+        SECOND_WITH_A,  // CiteKey, CiteKeyA, CiteKeyB ...
+        SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
+    }
+
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
+    ///
+    /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    @VisibleForTesting
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
+
+    private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+
+    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_SEPARATOR = new SimpleObjectProperty<>(',');
+
+    private final BooleanProperty shouldTransliterateFieldsForCitationKey;
+    private final BooleanProperty shouldAvoidOverwriteCiteKey;
+    private final BooleanProperty shouldWarnBeforeOverwriteCiteKey;
+    private final BooleanProperty shouldGenerateCiteKeysBeforeSaving;
+    private final ObjectProperty<KeySuffix> keySuffix;
+    private final StringProperty keyPatternRegex;
+    private final StringProperty keyPatternReplacement;
+    private final StringProperty unwantedCharacters;
+    private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
+    private final SimpleObjectProperty<Character> keywordSeparator;
+
+    /// @param keywordSeparator should always be org.jabref.model.entry.BibEntryPreferences#keywordSeparator
+    public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
+                                         boolean shouldAvoidOverwriteCiteKey,
+                                         boolean shouldWarnBeforeOverwriteCiteKey,
+                                         boolean shouldGenerateCiteKeysBeforeSaving,
+                                         KeySuffix keySuffix,
+                                         String keyPatternRegex,
+                                         String keyPatternReplacement,
+                                         String unwantedCharacters,
+                                         GlobalCitationKeyPatterns keyPatterns,
+                                         ReadOnlyObjectProperty<Character> keywordSeparator) {
+
+        this.shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty(shouldTransliterateFieldsForCitationKey);
+        this.shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty(shouldAvoidOverwriteCiteKey);
+        this.shouldWarnBeforeOverwriteCiteKey = new SimpleBooleanProperty(shouldWarnBeforeOverwriteCiteKey);
+        this.shouldGenerateCiteKeysBeforeSaving = new SimpleBooleanProperty(shouldGenerateCiteKeysBeforeSaving);
+        this.keySuffix = new SimpleObjectProperty<>(keySuffix);
+        this.keyPatternRegex = new SimpleStringProperty(keyPatternRegex);
+        this.keyPatternReplacement = new SimpleStringProperty(keyPatternReplacement);
+        this.unwantedCharacters = new SimpleStringProperty(unwantedCharacters);
+        this.keyPatterns = new SimpleObjectProperty<>(keyPatterns);
+
+        this.keywordSeparator = new SimpleObjectProperty<>();
+        this.keywordSeparator.bind(keywordSeparator);
+    }
+
+    private CitationKeyPatternPreferences() {
+        this(
+                false,                        // shouldTransliterateFieldsForCitationKey
+                false,                        // shouldAvoidOverwriteCiteKey
+                true,                         // shouldWarnBeforeOverwriteCiteKey
+                false,                        // shouldGenerateCiteKeysBeforeSaving
+                KeySuffix.SECOND_WITH_A,
+                "",                           // keyPatternRegex
+                "",                           // keyPatternReplacement
+                DEFAULT_UNWANTED_CHARACTERS,
+                DEFAULT_CITATION_KEY_PATTERN,
+                new SimpleObjectProperty<>()  // keywordDelimiter
+        );
+
+        this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
+    }
+
+    public static CitationKeyPatternPreferences getDefault() {
+        return new CitationKeyPatternPreferences();
+    }
+
+    public boolean shouldTransliterateFieldsForCitationKey() {
+        return shouldTransliterateFieldsForCitationKey.get();
+    }
+
+    public BooleanProperty shouldTransliterateFieldsForCitationKeyProperty() {
+        return shouldTransliterateFieldsForCitationKey;
+    }
+
+    public void setShouldTransliterateFieldsForCitationKey(boolean shouldTransliterateFieldsForCitationKey) {
+        this.shouldTransliterateFieldsForCitationKey.set(shouldTransliterateFieldsForCitationKey);
+    }
+
+    public boolean shouldAvoidOverwriteCiteKey() {
+        return shouldAvoidOverwriteCiteKey.get();
+    }
+
+    public BooleanProperty shouldAvoidOverwriteCiteKeyProperty() {
+        return shouldAvoidOverwriteCiteKey;
+    }
+
+    public void setAvoidOverwriteCiteKey(boolean shouldAvoidOverwriteCiteKey) {
+        this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
+    }
+
+    public boolean shouldWarnBeforeOverwriteCiteKey() {
+        return shouldWarnBeforeOverwriteCiteKey.get();
+    }
+
+    public BooleanProperty shouldWarnBeforeOverwriteCiteKeyProperty() {
+        return shouldWarnBeforeOverwriteCiteKey;
+    }
+
+    public void setWarnBeforeOverwriteCiteKey(boolean shouldWarnBeforeOverwriteCiteKey) {
+        this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);
+    }
+
+    public boolean shouldGenerateCiteKeysBeforeSaving() {
+        return shouldGenerateCiteKeysBeforeSaving.get();
+    }
+
+    public BooleanProperty shouldGenerateCiteKeysBeforeSavingProperty() {
+        return shouldGenerateCiteKeysBeforeSaving;
+    }
+
+    public void setGenerateCiteKeysBeforeSaving(boolean shouldGenerateCiteKeysBeforeSaving) {
+        this.shouldGenerateCiteKeysBeforeSaving.set(shouldGenerateCiteKeysBeforeSaving);
+    }
+
+    public KeySuffix getKeySuffix() {
+        return keySuffix.get();
+    }
+
+    public ObjectProperty<KeySuffix> keySuffixProperty() {
+        return keySuffix;
+    }
+
+    public void setKeySuffix(KeySuffix keySuffix) {
+        this.keySuffix.set(keySuffix);
+    }
+
+    public String getKeyPatternRegex() {
+        return keyPatternRegex.get();
+    }
+
+    public StringProperty keyPatternRegexProperty() {
+        return keyPatternRegex;
+    }
+
+    public void setKeyPatternRegex(String keyPatternRegex) {
+        this.keyPatternRegex.set(keyPatternRegex);
+    }
+
+    public String getKeyPatternReplacement() {
+        return keyPatternReplacement.get();
+    }
+
+    public StringProperty keyPatternReplacementProperty() {
+        return keyPatternReplacement;
+    }
+
+    public void setKeyPatternReplacement(String keyPatternReplacement) {
+        this.keyPatternReplacement.set(keyPatternReplacement);
+    }
+
+    public String getUnwantedCharacters() {
+        return unwantedCharacters.get();
+    }
+
+    public StringProperty unwantedCharactersProperty() {
+        return unwantedCharacters;
+    }
+
+    public void setUnwantedCharacters(String unwantedCharacters) {
+        this.unwantedCharacters.set(unwantedCharacters);
+    }
+
+    public GlobalCitationKeyPatterns getKeyPatterns() {
+        return keyPatterns.get();
+    }
+
+    public ObjectProperty<GlobalCitationKeyPatterns> keyPatternsProperty() {
+        return keyPatterns;
+    }
+
+    public void setKeyPatterns(GlobalCitationKeyPatterns keyPatterns) {
+        this.keyPatterns.set(keyPatterns);
+    }
+
+    public Character getKeywordSeparator() {
+        return keywordSeparator.get();
+    }
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.git.GitCommitDialogView"
+        prefHeight="400.0"
+        prefWidth="600.0">
+    <content>
+        <VBox spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <TextArea fx:id="commitMessage"
+                      prefRowCount="6"
+                      wrapText="true"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:id="commitButton" text="%Commit" buttonData="OK_DONE"/>
+        <ButtonType fx:constant="CANCEL"/>
+    </buttonTypes>
+</DialogPane>

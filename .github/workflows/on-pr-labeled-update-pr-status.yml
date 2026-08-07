@@ -1,0 +1,62 @@
+name: Adapt PR status
+
+on:
+  workflow_run:
+    workflows: [ "On PR labeled" ]
+    types: [ completed ]
+
+jobs:
+  mark-pr-ready-for-review:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-slim
+    permissions:
+      actions: read
+      issues: read
+      pull-requests: write
+    steps:
+      - name: Download artifact from triggering run
+        uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: pr_number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      - name: Check for pr_number.txt
+        id: check
+        run: |
+          if [ -f pr_number.txt ]; then
+            echo "continue=true" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+        with:
+          packages: jq
+          version: 1.0
+      - name: Mark PR ready for review
+        if: steps.check.outputs.continue == 'true'
+        run: |
+          PR=$(gh pr view --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }} --json state,isDraft,labels)
+
+          # "gh pr ready" only works on open draft PRs. Anything else (merged from the merge queue, closed,
+          # already ready for review) would make it exit non-zero and thus fail this workflow.
+          STATE=$(jq -r .state <<< "$PR")
+          if [ "$STATE" != "OPEN" ]; then
+            echo "⊘ PR is $STATE - only open PRs can be marked ready for review"
+            exit 0
+          fi
+
+          if [ "$(jq -r .isDraft <<< "$PR")" != "true" ]; then
+            echo "⊘ PR is not a draft - it is already ready for review"
+            exit 0
+          fi
+
+          if jq -e '.labels[] | select(.name == "status: ready-for-review")' <<< "$PR" > /dev/null; then
+            echo "✅ label ready-for-review found"
+            gh pr ready --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }}
+          else
+            echo "⊘ label ready-for-review not found"
+          fi;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

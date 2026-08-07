@@ -1,0 +1,137 @@
+package org.jabref.logic.cleanup;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import org.jabref.logic.formatter.Formatter;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+
+/// Formats a given entry field with the specified formatter.
+public class FieldFormatterCleanup implements CleanupJob {
+
+    private final Field field;
+    private final Formatter formatter;
+
+    public FieldFormatterCleanup(Field field, Formatter formatter) {
+        this.field = field;
+        this.formatter = formatter;
+    }
+
+    @Override
+    public List<FieldChange> cleanup(BibEntry entry) {
+        return cleanup(entry, Runnable::run);
+    }
+
+    @Override
+    public List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        if (InternalField.INTERNAL_ALL_FIELD == field) {
+            return cleanupAllFields(entry, mutationScheduler);
+        } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD == field) {
+            return cleanupAllTextFields(entry, mutationScheduler);
+        } else {
+            return cleanupSingleField(field, entry, mutationScheduler);
+        }
+    }
+
+    /// Runs the formatter on the specified field in the given entry.
+    ///
+    /// If the formatter returns an empty string, then the field is removed.
+    ///
+    /// @param fieldKey          the field on which to run the formatter
+    /// @param entry             the entry to be cleaned up
+    /// @param mutationScheduler scheduler for field mutations (e.g. FX thread dispatch)
+    /// @return a list of changes of the entry
+    private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        if (!entry.hasField(fieldKey)) {
+            // Not set -> nothing to do
+            return List.of();
+        }
+
+        Optional<String> oldValue = entry.getField(fieldKey);
+        if (oldValue.isEmpty()) {
+            return List.of();
+        }
+
+        // Computation runs on the calling (background) thread:
+        String newValue = formatter.format(oldValue.get());
+
+        if (newValue.equals(oldValue.get())) {
+            return List.of();
+        }
+
+        // Only the actual field mutation is dispatched via the scheduler:
+        String appliedValue;
+        if (newValue.isEmpty()) {
+            mutationScheduler.accept(() -> entry.clearField(fieldKey));
+            appliedValue = null;
+        } else {
+            mutationScheduler.accept(() -> entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION));
+            appliedValue = newValue;
+        }
+        return List.of(new FieldChange(entry, fieldKey, oldValue.get(), appliedValue));
+    }
+
+    private List<FieldChange> cleanupAllFields(BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+
+        for (Field fieldKey : entry.getFields()) {
+            if (!fieldKey.equals(InternalField.KEY_FIELD)) {
+                fieldChanges.addAll(cleanupSingleField(fieldKey, entry, mutationScheduler));
+            }
+        }
+
+        return fieldChanges;
+    }
+
+    private List<FieldChange> cleanupAllTextFields(BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+        Set<Field> fields = new HashSet<>(entry.getFields());
+        FieldFactory.getNotTextFields().forEach(fields::remove);
+        for (Field fieldKey : fields) {
+            if (!fieldKey.equals(InternalField.KEY_FIELD)) {
+                fieldChanges.addAll(cleanupSingleField(fieldKey, entry, mutationScheduler));
+            }
+        }
+
+        return fieldChanges;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Formatter getFormatter() {
+        return formatter;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof FieldFormatterCleanup that) {
+            return Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, formatter);
+    }
+
+    @Override
+    public String toString() {
+        return field + ": " + formatter.getName();
+    }
+}

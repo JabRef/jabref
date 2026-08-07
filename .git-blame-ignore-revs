@@ -1,5 +1,8 @@
 # Automatic code reformatting
+f3cfa496e028dee1cafd0c47553f63cd1243bd8c
 c5bcad738fe6e8dfcb62442a426c2778241515a1
+10189bf2c1a6bc506f03461390f3cc46e5cc0651
+16fd6194b9a0b8282259c00b6fb0d4aa494e4b04
 
 # net.sf.jabref -> org.jabref
 b2ad6eb279f5def38fa21be12cb5dd4545c1ba1a
@@ -23,6 +26,6 @@ bf81b595a77f0f7f254872be6f05a063c44528d8
 
 # This commit should not exist
 185d7345946c29a2a4e2726c912be0c4db4810b9
-# Resulted in this problematic merge commits
+# ... and resulted in this problematic merge commits
 7e1645978b3028df5e65af19f0f819ddfd0f24aa
 a31f396765492ac12eaab228e33eb9d22487403b
