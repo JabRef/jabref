@@ -134,6 +134,22 @@ class ImportHandlerTest {
     }
 
     @Test
+    void downloadLinkedFilesUsesOverrideInsteadOfGeneralPreferenceWhenSet() {
+        importHandler.setDownloadLinkedFilesOverride(true);
+
+        importHandler.downloadLinkedFiles(testEntry);
+
+        Mockito.verify(preferences.getFilePreferences(), Mockito.never()).shouldDownloadLinkedFiles();
+    }
+
+    @Test
+    void downloadLinkedFilesConsultsGeneralPreferenceWhenNoOverrideSet() {
+        importHandler.downloadLinkedFiles(testEntry);
+
+        Mockito.verify(preferences.getFilePreferences(), Mockito.times(1)).shouldDownloadLinkedFiles();
+    }
+
+    @Test
     void cleanUpEntryTest() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(entry);

@@ -12,9 +12,9 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
-## Remember import-dialog download preference independently
-`req~import.download-linked-online-files.remember-independently~1`
+## Give the entries-import dialog's download-linked-files checkbox its own preference
+`req~import.dialog-download-linked-files.remember-independently~1`
 
-The "download linked online files" checkbox in the extension import dialog is backed by its own persisted preference, initialized from and written back to that preference — independent of the general web-search download-linked-files setting.
+The "download linked online files" checkbox in the entries-import review dialog (used by File > Import, Web Search, LaTeX import, and Extract References) is backed by its own persisted preference, initialized from and written back to that preference on every dialog interaction, including cancel. The dialog's choice controls download behavior for that import directly, independent of and without modifying the general web-search download-linked-files setting.
 
 <!-- markdownlint-disable-file MD022 -->

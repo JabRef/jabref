@@ -96,6 +96,7 @@ public class ImportHandler {
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
+    private @Nullable Boolean downloadLinkedFilesOverride;
 
     private record DuplicateDecisionRequest(BibEntry originalEntry,
                                             BibEntry duplicateEntry,
@@ -483,8 +484,19 @@ public class ImportHandler {
         );
     }
 
+    /// Overrides the download decision for files linked in imported entries for this ImportHandler
+    /// instance, instead of consulting the general {@link FilePreferences#shouldDownloadLinkedFiles()}
+    /// preference. Used when the caller already has an explicit, dialog-scoped choice (e.g. the
+    /// entries-import dialog's checkbox) that should not be conflated with the general preference.
+    public void setDownloadLinkedFilesOverride(boolean shouldDownloadLinkedFiles) {
+        this.downloadLinkedFilesOverride = shouldDownloadLinkedFiles;
+    }
+
     public void downloadLinkedFiles(BibEntry entry) {
-        if (preferences.getFilePreferences().shouldDownloadLinkedFiles()) {
+        boolean shouldDownload = downloadLinkedFilesOverride != null
+                ? downloadLinkedFilesOverride
+                : preferences.getFilePreferences().shouldDownloadLinkedFiles();
+        if (shouldDownload) {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
                  .forEach(linkedFile ->

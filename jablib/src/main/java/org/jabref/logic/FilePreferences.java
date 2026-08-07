@@ -30,7 +30,7 @@ public class FilePreferences {
     private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
-    private final BooleanProperty downloadLinkedOnlineFiles = new SimpleBooleanProperty();
+    private final BooleanProperty importDialogDownloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
@@ -57,7 +57,7 @@ public class FilePreferences {
                 DEFAULT_FILENAME_PATTERNS[1],        // fileNamePattern
                 "",                                  // fileDirectoryPattern
                 true,                                // downloadLinkedFiles
-                true,                                // downloadLinkedOnlineFiles
+                true,                                // importDialogDownloadLinkedFiles
                 true,                                // fulltextIndexLinkedFiles
                 Directories.getUserDirectory(),      // workingDirectory
                 true,                                // createBackup
@@ -80,7 +80,7 @@ public class FilePreferences {
                            boolean autoRenameFilesOnChange,
                            String fileNamePattern,
                            String fileDirectoryPattern,
-                           boolean downloadLinkedOnlineFiles,
+                           boolean importDialogDownloadLinkedFiles,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
@@ -101,7 +101,7 @@ public class FilePreferences {
         this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
-        this.downloadLinkedOnlineFiles.setValue(downloadLinkedOnlineFiles);
+        this.importDialogDownloadLinkedFiles.setValue(importDialogDownloadLinkedFiles);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
@@ -194,16 +194,16 @@ public class FilePreferences {
         return downloadLinkedFiles;
     }
 
-    public boolean shouldDownloadLinkedOnlineFiles() {
-        return downloadLinkedOnlineFiles.get();
+    public boolean shouldImportDialogDownloadLinkedFiles() {
+        return importDialogDownloadLinkedFiles.get();
     }
 
-    public BooleanProperty downloadLinkedOnlineFilesProperty() {
-        return downloadLinkedOnlineFiles;
+    public BooleanProperty importDialogDownloadLinkedFilesProperty() {
+        return importDialogDownloadLinkedFiles;
     }
 
-    public void setDownloadLinkedOnlineFiles(boolean shouldDownloadLinkedOnlineFiles) {
-        this.downloadLinkedOnlineFiles.set(shouldDownloadLinkedOnlineFiles);
+    public void setImportDialogDownloadLinkedFiles(boolean shouldImportDialogDownloadLinkedFiles) {
+        this.importDialogDownloadLinkedFiles.set(shouldImportDialogDownloadLinkedFiles);
     }
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {

@@ -2,21 +2,42 @@ package org.jabref.logic;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FilePreferencesTest {
 
     @Test
-    void shouldDownloadLinkedOnlineFilesDefaultsToTrue() {
+    void shouldImportDialogDownloadLinkedFilesDefaultsToTrue() {
         FilePreferences preferences = FilePreferences.getDefault();
-        assertTrue(preferences.shouldDownloadLinkedOnlineFiles());
+        assertTrue(preferences.shouldImportDialogDownloadLinkedFiles());
     }
 
     @Test
-    void setDownloadLinkedOnlineFiles() {
+    void setImportDialogDownloadLinkedFiles() {
         FilePreferences preferences = FilePreferences.getDefault();
-        preferences.setDownloadLinkedOnlineFiles(false);
-        assertFalse(preferences.shouldDownloadLinkedOnlineFiles());
+        preferences.setImportDialogDownloadLinkedFiles(false);
+        assertFalse(preferences.shouldImportDialogDownloadLinkedFiles());
+    }
+
+    @Test
+    void settingImportDialogPreferenceDoesNotAffectGeneralDownloadPreference() {
+        FilePreferences preferences = FilePreferences.getDefault();
+        boolean originalGeneralValue = preferences.shouldDownloadLinkedFiles();
+
+        preferences.setImportDialogDownloadLinkedFiles(!preferences.shouldImportDialogDownloadLinkedFiles());
+
+        assertEquals(originalGeneralValue, preferences.shouldDownloadLinkedFiles());
+    }
+
+    @Test
+    void settingGeneralDownloadPreferenceDoesNotAffectImportDialogPreference() {
+        FilePreferences preferences = FilePreferences.getDefault();
+        boolean originalImportDialogValue = preferences.shouldImportDialogDownloadLinkedFiles();
+
+        preferences.setDownloadLinkedFiles(!preferences.shouldDownloadLinkedFiles());
+
+        assertEquals(originalImportDialogValue, preferences.shouldImportDialogDownloadLinkedFiles());
     }
 }

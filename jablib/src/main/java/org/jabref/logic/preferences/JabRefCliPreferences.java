@@ -306,7 +306,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FILES_IMPORT_NAMEPATTERN = "importFileNamePattern";
     private static final String FILES_IMPORT_DIRPATTERN = "importFileDirPattern";
     private static final String FILES_DOWNLOAD_LINKED = "downloadLinkedFiles";
-    private static final String FILES_DOWNLOAD_LINKED_ONLINE = "downloadLinkedOnlineFiles";
+    private static final String FILES_IMPORT_DIALOG_DOWNLOAD_LINKED = "importDialogDownloadLinkedFiles";
     private static final String FILES_FULLTEXT_INDEX = "fulltextIndexLinkedFiles";
     private static final String FILES_WORKING_DIRECTORY = "workingDirectory";
 
@@ -1748,7 +1748,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FILES_AUTO_RENAME_ON_CHANGE, defaultValues.shouldAutoRenameFilesOnChange()),
                 get(FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern()),
                 get(FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern()),
-                getBoolean(FILES_DOWNLOAD_LINKED_ONLINE, defaultValues.shouldDownloadLinkedOnlineFiles()),
+                getBoolean(FILES_IMPORT_DIALOG_DOWNLOAD_LINKED, defaultValues.shouldImportDialogDownloadLinkedFiles()),
                 getBoolean(FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles()),
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
@@ -1773,7 +1773,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(filePreferences.fileNamePatternProperty(), FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern());
         bindString(filePreferences.fileDirectoryPatternProperty(), FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern());
         bindBoolean(filePreferences.downloadLinkedFilesProperty(), FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles());
-        bindBoolean(filePreferences.downloadLinkedOnlineFilesProperty(), FILES_DOWNLOAD_LINKED_ONLINE, defaultValues.shouldDownloadLinkedOnlineFiles());
+        bindBoolean(filePreferences.importDialogDownloadLinkedFilesProperty(), FILES_IMPORT_DIALOG_DOWNLOAD_LINKED, defaultValues.shouldImportDialogDownloadLinkedFiles());
         bindBoolean(filePreferences.fulltextIndexLinkedFilesProperty(), FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles());
         bindPath(filePreferences.workingDirectoryProperty(), FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory());
         bindBoolean(filePreferences.createBackupProperty(), BACKUP_ENABLED, defaultValues.shouldCreateBackup());

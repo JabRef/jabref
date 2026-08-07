@@ -193,9 +193,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     /// @param targetGroup name of a group the imported entries are additionally assigned to. If it is non-blank and no group with that name exists yet, it is created as a top-level explicit group. A blank/null value assigns no group.
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles, @Nullable String targetGroup) {
-        // Remember the selection in the dialog
-        preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
-
         new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
                 databaseContext.getDatabase(),
                 parserResult.getDatabase());
@@ -212,6 +209,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
+        importHandler.setDownloadLinkedFilesOverride(shouldDownloadFiles);
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
             // Assign the group to the actually imported BibEntry instances (the copies inserted into the
