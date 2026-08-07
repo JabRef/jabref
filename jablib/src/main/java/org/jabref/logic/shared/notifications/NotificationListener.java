@@ -34,16 +34,18 @@ public class NotificationListener implements Runnable {
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
-                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getName())) {
-                            // Only process notifications that are not sent by this processor
-                            notification.getParameter();
+                        // The payload is the PROCESSOR_ID of the sender - skip our own notifications
+                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getParameter())) {
                             dbmsSynchronizer.pullChanges();
                         }
                     }
                 }
             }
         } catch (SQLException exception) {
-            LOGGER.error("Error while listening for updates to PostgresSQL", exception);
+            if (!stop) {
+                // Stopping closes the listener connection, which aborts a pending poll - not an error
+                LOGGER.error("Error while listening for updates to PostgresSQL", exception);
+            }
         }
     }
 

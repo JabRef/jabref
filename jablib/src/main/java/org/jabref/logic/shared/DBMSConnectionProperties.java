@@ -9,7 +9,6 @@ import java.util.Properties;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +31,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     // Not needed for connection, but stored for future login
     private String keyStore;
-
-    @VisibleForTesting
-    public DBMSConnectionProperties(String databaseName) {
-        this.database = databaseName;
-    }
 
     /// Gets all required data from {@link SharedDatabasePreferences} and sets them if present.
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {

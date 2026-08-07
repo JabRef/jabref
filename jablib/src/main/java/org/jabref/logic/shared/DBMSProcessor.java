@@ -48,7 +48,12 @@ public class DBMSProcessor {
 
     protected DatabaseConnectionProperties connectionProperties;
 
+    private final DatabaseConnection dbmsConnection;
+
     private NotificationListener listener;
+
+    // The listener needs its own connection: polling for notifications blocks the connection it runs on
+    private Connection listenerConnection;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
@@ -56,6 +61,7 @@ public class DBMSProcessor {
     private int CURRENT_VERSION_DB_STRUCT = 2;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
+        this.dbmsConnection = dbmsConnection;
         this.connection = dbmsConnection.getConnection();
         this.connectionProperties = dbmsConnection.getProperties();
     }
@@ -160,8 +166,8 @@ public class DBMSProcessor {
                         value TEXT
                     )
                 """);
-        connection.createStatement().executeUpdate("CREATE INDEX idx_field_entry_shared_id ON FIELD (ENTRY_SHARED_ID);");
-        connection.createStatement().executeUpdate("CREATE INDEX idx_field_name ON FIELD (NAME);");
+        connection.createStatement().executeUpdate("CREATE INDEX IF NOT EXISTS idx_field_entry_shared_id ON FIELD (ENTRY_SHARED_ID);");
+        connection.createStatement().executeUpdate("CREATE INDEX IF NOT EXISTS idx_field_name ON FIELD (NAME);");
 
         connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS metadata (
@@ -169,7 +175,7 @@ public class DBMSProcessor {
                         value TEXT
                     )
                 """);
-        connection.createStatement().executeUpdate("CREATE UNIQUE INDEX idx_metadata_key ON METADATA (key);");
+        connection.createStatement().executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS idx_metadata_key ON METADATA (key);");
 
         Map<String, String> metadata = getSharedMetaData();
 
@@ -240,9 +246,32 @@ public class DBMSProcessor {
     }
 
     public void insertEntries(List<BibEntry> bibEntries) {
-        assert bibEntries.stream().filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt() != -1).findAny().isEmpty();
-        insertIntoEntryTable(bibEntries);
-        insertIntoFieldTable(bibEntries);
+        List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
+        insertIntoEntryTable(notYetExistingEntries);
+        insertIntoFieldTable(notYetExistingEntries);
+    }
+
+    /// Filters a list of BibEntry to those which do not yet exist in the database
+    private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
+        List<Integer> localIds = bibEntries.stream()
+                                           .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
+                                           .filter(id -> id != -1)
+                                           .toList();
+        if (localIds.isEmpty()) {
+            return bibEntries;
+        }
+
+        List<Integer> remoteIds = new ArrayList<>();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT shared_id FROM entry")) {
+            while (resultSet.next()) {
+                remoteIds.add(resultSet.getInt("shared_id"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error", e);
+        }
+        return bibEntries.stream()
+                         .filter(entry -> !remoteIds.contains(entry.getSharedBibEntryData().getSharedIdAsInt()))
+                         .toList();
     }
 
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
@@ -624,14 +653,10 @@ public class DBMSProcessor {
     ///
     /// @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-        // Disable cleanup output of ThreadedHousekeeper
-        // Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
         try {
-            connection.createStatement().execute("LISTEN jabrefLiveUpdate");
-            // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
-            // Otherwise, the listener is going to be deleted by Java's garbage collector.
-            PGConnection pgConnection = connection.unwrap(PGConnection.class);
-            listener = new NotificationListener(dbmsSynchronizer, pgConnection);
+            listenerConnection = dbmsConnection.openNewConnection();
+            listenerConnection.createStatement().execute("LISTEN jabrefLiveUpdate");
+            listener = new NotificationListener(dbmsSynchronizer, listenerConnection.unwrap(PGConnection.class));
             HeadlessExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
             LOGGER.error("SQL Error during starting the notification listener", e);
@@ -640,9 +665,13 @@ public class DBMSProcessor {
 
     /// Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
     public void stopNotificationListener() {
+        if (listener == null) {
+            return;
+        }
+        listener.stop();
         try {
-            listener.stop();
-            connection.close();
+            // Also interrupts a pending getNotifications poll on the listener thread
+            listenerConnection.close();
         } catch (SQLException e) {
             LOGGER.error("SQL Error during stopping the notification listener", e);
         }

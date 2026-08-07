@@ -1,26 +1,36 @@
 package org.jabref.logic.shared.notifications;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
+import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.postgresql.PGConnection;
 
-/// TODO: for sizes > 8000 bytes, use a table for exchange
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// Notifies the other clients connected to the same database about changes.
+///
+/// TODO: Send the change itself (see {@link FieldChange}) so receivers can apply it without pulling.
+///       For sizes > 8000 bytes, use a table for exchange.
 public class Notifier {
 
-    private final PGConnection pgConnection;
-    private final Gson gson = new GsonBuilder().create();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Notifier.class);
 
-    public Notifier(PGConnection pgConnection) {
-        this.pgConnection = pgConnection;
+    private final Connection connection;
+
+    public Notifier(Connection connection) {
+        this.connection = connection;
     }
 
     public void notifyAboutChangedField(FieldChangedEvent event) {
-        // FIXME: BibEntry bibEntry = event.getBibEntry();
-
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
-        // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        // connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
+        // The payload identifies the sender, so receivers can skip their own notifications
+        try (PreparedStatement statement = connection.prepareStatement("SELECT pg_notify('jabrefLiveUpdate', ?)")) {
+            statement.setString(1, DBMSProcessor.PROCESSOR_ID);
+            statement.execute();
+        } catch (SQLException e) {
+            LOGGER.error("Could not notify clients about changed field", e);
+        }
     }
 }

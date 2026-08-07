@@ -9,7 +9,6 @@ import java.util.Set;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +18,6 @@ public class DBMSConnection implements DatabaseConnection {
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
-
-    @VisibleForTesting
-    public DBMSConnection(Connection connection, String databaseName) {
-        this.connection = connection;
-        this.properties = new DBMSConnectionProperties(databaseName);
-    }
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
         if (!connectionProperties.isValid()) {
@@ -54,6 +47,16 @@ public class DBMSConnection implements DatabaseConnection {
     @Override
     public Connection getConnection() {
         return this.connection;
+    }
+
+    @Override
+    public Connection openNewConnection() throws SQLException {
+        try {
+            return new DBMSConnection(properties).getConnection();
+        } catch (InvalidDBMSConnectionPropertiesException e) {
+            // Cannot happen: this connection was already opened from the very same properties
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override

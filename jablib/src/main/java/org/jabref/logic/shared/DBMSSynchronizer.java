@@ -34,7 +34,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
-import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,10 +105,20 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// In JabRef (UI), the field is modified
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (event.isFiltered() || !isEventSourceAccepted(event)) {
+        if (!isEventSourceAccepted(event)) {
             return;
         }
-
+        BibEntry bibEntry = event.getBibEntry();
+        if (event.isFiltered() || !isPresentLocalBibEntry(bibEntry) || !checkCurrentConnection()) {
+            // Filtered micro-edits are accumulated here and written on the next major change or on close
+            lastEntryChanged_REMOVEME = Optional.of(bibEntry);
+            return;
+        }
+        synchronizeLocalMetaData();
+        pullWithLastEntry();
+        synchronizeSharedEntry(bibEntry);
+        // Pull changes to detect concurrent modifications - e.g. the entry meanwhile being deleted remotely
+        synchronizeLocalDatabase();
         notifier.notifyAboutChangedField(event);
     }
 
@@ -363,12 +372,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        try {
-            this.notifier = new Notifier(currentConnection.unwrap(PGConnection.class));
-        } catch (SQLException e) {
-            LOGGER.error("Could not get Postgres driver", e);
-            throw new DatabaseNotSupportedException();
-        }
+        this.notifier = new Notifier(currentConnection);
         this.dbmsProcessor = new DBMSProcessor(connection);
         initializeDatabases();
     }
