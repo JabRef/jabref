@@ -464,11 +464,11 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setDisable(!canCite || !specialCitationSupported);
 
         update.setDisable(!canRefreshDocument || !canGenerateBibliography);
-        merge.setDisable(!canRefreshDocument || cslStyleSelected);
-        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
-        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
+        merge.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
+        unmerge.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
+        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
-        modifyBibliographyProperties.setDisable(!(cslStyleSelected || bstStyleSelected));
+        modifyBibliographyProperties.setDisable(!canRefreshDocument || !(cslStyleSelected || bstStyleSelected));
     }
 
     private void connect() {
