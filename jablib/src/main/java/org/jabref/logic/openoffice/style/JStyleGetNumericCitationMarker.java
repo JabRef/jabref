@@ -9,12 +9,12 @@ import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.PageInfo;
 
-class JStyleGetNumCitationMarker {
+class JStyleGetNumericCitationMarker {
 
     // The number encoding "this entry is unresolved"
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
-    private JStyleGetNumCitationMarker() {
+    private JStyleGetNumericCitationMarker() {
     }
 
     /// Defines sort order for CitationMarkerNumericEntry.
@@ -183,7 +183,7 @@ class JStyleGetNumCitationMarker {
 
         // Sort a copy of entries
         List<CitationMarkerNumericEntry> sorted = new ArrayList<>(entries);
-        sorted.sort(JStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
+        sorted.sort(JStyleGetNumericCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
         StringBuilder stringBuilder = new StringBuilder(bracketBefore);
