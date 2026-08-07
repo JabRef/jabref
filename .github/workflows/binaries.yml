@@ -175,6 +175,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
+          HAS_DEV_BINARIES_LABEL_FROM_EVENT: "${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'dev: binaries') || 'false' }}"
           NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
           BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
           BINARIES_RESOURCE_MARKDOWN_CHANGED: ${{ steps.changed-binaries-resource-markdown.outputs.any_changed }}
@@ -184,13 +185,7 @@ jobs:
           set -x
           PS4='+ ${LINENO}: '
 
-          HAS_DEV_BINARIES_LABEL=false
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
-            if echo "$LABELS" | grep -q "^dev: binaries$"; then
-              HAS_DEV_BINARIES_LABEL=true
-            fi
-          fi
+          HAS_DEV_BINARIES_LABEL="$HAS_DEV_BINARIES_LABEL_FROM_EVENT"
 
           if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
