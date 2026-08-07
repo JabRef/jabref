@@ -669,9 +669,9 @@ public class OpenOfficePanel {
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
-        updatePreferences(currentStyle, addSpaceBefore, zoteroCompatibilityMode);
+        updatePreferences(currentStyle, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            updatePreferences(currentStyle, addSpaceBefore, zoteroCompatibilityMode);
+            updatePreferences(newValue, zoteroCompatibilityMode);
 
             switch (newValue) {
                 case JStyle _ -> {
@@ -734,23 +734,15 @@ public class OpenOfficePanel {
         return contextMenu;
     }
 
-    private void updatePreferences(OOStyle currentStyle,
-                                         CheckMenuItem addSpaceBefore,
-                                         CheckMenuItem zoteroCompatibilityMode) {
+    private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode) {
         boolean isJStyle = currentStyle instanceof JStyle;
 
         if (isJStyle) {
-            addSpaceBefore.setSelected(false);
             zoteroCompatibilityMode.setSelected(false);
-            openOfficePreferences.setAddSpaceBefore(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
-        } else {
-            addSpaceBefore.setSelected(true);
-            openOfficePreferences.setAddSpaceBefore(true);
         }
 
         zoteroCompatibilityMode.setDisable(isJStyle);
-        addSpaceBefore.setDisable(isJStyle);
     }
 
     private void browsePandocPath() {

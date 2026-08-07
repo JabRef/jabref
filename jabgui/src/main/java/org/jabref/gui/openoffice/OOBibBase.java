@@ -741,7 +741,8 @@ public class OOBibBase {
                 bibDatabaseContext.getDatabase(),
                 jStyle,
                 citationType,
-                pageInfo).mapError(OOError::from);
+                pageInfo,
+                openOfficePreferences.getAddSpaceBefore()).mapError(OOError::from);
 
         if (insertResult.isError()) {
             return insertResult;
