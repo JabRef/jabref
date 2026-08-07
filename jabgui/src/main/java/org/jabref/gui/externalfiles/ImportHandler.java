@@ -494,8 +494,8 @@ public class ImportHandler {
 
     public void downloadLinkedFiles(BibEntry entry) {
         boolean shouldDownload = downloadLinkedFilesOverride != null
-                ? downloadLinkedFilesOverride
-                : preferences.getFilePreferences().shouldDownloadLinkedFiles();
+                                 ? downloadLinkedFilesOverride
+                                 : preferences.getFilePreferences().shouldDownloadLinkedFiles();
         if (shouldDownload) {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
