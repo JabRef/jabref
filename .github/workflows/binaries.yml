@@ -313,6 +313,7 @@ jobs:
 
   disk-space-check:
     needs: conditions
+    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
@@ -372,6 +373,7 @@ jobs:
 
   compute-matrix:
     needs: conditions
+    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
@@ -445,6 +447,7 @@ jobs:
 
   pre-build:
     needs: [ conditions, disk-space-check ]
+    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-22.04
     outputs:
       AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
@@ -508,6 +511,7 @@ jobs:
 
   build:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
+    if: needs.conditions.outputs.should-build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -832,6 +836,7 @@ jobs:
 
   jabkit-native:
     needs: [ conditions, disk-space-check, pre-build ]
+    if: needs.conditions.outputs.should-build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -1119,6 +1124,8 @@ jobs:
           if-no-files-found: error
 
   upload-pr-nnumber:
+    needs: conditions
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     permissions:
       contents: read
