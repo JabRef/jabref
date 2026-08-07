@@ -691,7 +691,7 @@ public class OpenOfficePanel {
             }
         });
 
-        CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
+        CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the currently selected library only"));
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
