@@ -3,11 +3,15 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
@@ -80,6 +84,7 @@ public class CSLCitationOOAdapter {
     private CitationStyle currentStyle;
     private CSLCitationType citationType;
     private boolean needsCSLReferenceMarkConversion = true;
+    private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
     public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
@@ -87,7 +92,8 @@ public class CSLCitationOOAdapter {
         this.markManager = new CSLReferenceMarkManager(doc);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
-        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
+        this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
+        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener(zoteroCompatibilityModeListener);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
@@ -96,6 +102,10 @@ public class CSLCitationOOAdapter {
 
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
+    }
+
+    public void dispose() {
+        openOfficePreferences.zoteroCompatibilityModeProperty().removeListener(zoteroCompatibilityModeListener);
     }
 
     public boolean needsReferenceMarkConversion() throws WrappedTargetException, NoSuchElementException {
@@ -550,6 +560,20 @@ public class CSLCitationOOAdapter {
         }
 
         return citation;
+    }
+
+    public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
+        // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
+        // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
+        // full readAndUpdateExistingMarks() refresh.
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document);
+        exportMarkManager.readExistingMarks();
+
+        SequencedSet<String> citationKeys = new LinkedHashSet<>();
+        for (CSLReferenceMark mark : exportMarkManager.getMarksInOrder().reversed()) {
+            citationKeys.addAll(mark.getCitationKeys());
+        }
+        return List.copyOf(citationKeys);
     }
 
     /// Checks if an entry has already been cited before in the document.

@@ -89,16 +89,41 @@ public class OOBibBase {
         this.bibEntryTypesManager = bibEntryTypesManager;
     }
 
+    /// Adapter lifecycle is tied to the currently selected document. Keep creation here so cite/export/
+    /// bibliography actions only ever use adapters that were initialized as part of document selection.
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         readStyleInPreference(doc);
-        if (cslCitationOOAdapter == null) {
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
-            cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
+        // Plain reassignment would be enough for most helpers, but CSLCitationOOAdapter registers a listener on
+        // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
+        // before we replace the adapters for the newly selected document.
+        clearCitationAdapters();
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
+        cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
+        bstUpdateBibliography = new BstUpdateBibliography();
+    }
+
+    /// Clear all document-bound helpers after connection loss or before switching to another document.
+    private void clearCitationAdapters() {
+        if (cslCitationOOAdapter != null) {
+            cslCitationOOAdapter.dispose();
         }
-        if (bstCitationOOAdapter == null) {
-            bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
-            bstUpdateBibliography = new BstUpdateBibliography();
-        }
+        cslCitationOOAdapter = null;
+        cslUpdateBibliography = null;
+        bstCitationOOAdapter = null;
+        bstUpdateBibliography = null;
+    }
+
+    /// `dispose` in SE is usually treated as a lifecycle hook which means that the concerned object is no longer to be used.
+    ///
+    /// It is arguable that this wrapper logically adds no extra functionality over `clearCitationAdapters` (the
+    /// private helper), but it is to maintain a semantic split when called from [OpenOfficePanel] externally - meaning
+    /// clear related resources without knowing "what".
+    ///
+    /// When called internally, we use the private helper as it does not come with the meaning mentioned above, as we
+    /// are about to reuse the same `ooBase` object.
+    public void dispose() {
+        clearCitationAdapters();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
@@ -900,7 +925,7 @@ public class OOBibBase {
     /// Does not refresh the bibliography.
     ///
     /// @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
-    public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
+    public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, OOStyle style, boolean returnPartialResult) {
         final Optional<BibDatabase> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Unable to generate new library");
 
@@ -915,8 +940,14 @@ public class OOBibBase {
         ExportCited.GenerateDatabaseResult result = null;
         try {
             UnoUndo.enterUndoContext(doc, "Changes during \"Export cited\"");
-            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult =
-                    ExportCited.generateDatabase(doc, databases);
+            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult;
+            if (style instanceof CitationStyle) {
+                generateResult = exportCitedForCSL(databases);
+            } else if (style instanceof BstStyle) {
+                generateResult = exportCitedForBST(databases);
+            } else {
+                generateResult = ExportCited.generateDatabase(doc, databases);
+            }
             if (testDialog(errorTitle, generateResult.asVoidResult().mapError(OOError::from))) {
                 return FAIL;
             }
@@ -953,6 +984,26 @@ public class OOBibBase {
             }
         }
         return Optional.of(result.newDatabase);
+    }
+
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForCSL(List<BibDatabase> databases) {
+        assert cslCitationOOAdapter != null;
+
+        try {
+            return OOResult.ok(ExportCited.generateDatabaseFromCitationKeys(cslCitationOOAdapter.getCitedCitationKeys(), databases));
+        } catch (WrappedTargetException | NoSuchElementException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
+    }
+
+    private OOResult<ExportCited.GenerateDatabaseResult, JabRefException> exportCitedForBST(List<BibDatabase> databases) {
+        assert bstCitationOOAdapter != null;
+
+        try {
+            return OOResult.ok(ExportCited.generateDatabaseFromIdentifiers(bstCitationOOAdapter.getCitedIdentifiers(), databases));
+        } catch (WrappedTargetException | NoSuchElementException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
     }
 
     /// GUI action, refreshes citation markers and bibliography.
