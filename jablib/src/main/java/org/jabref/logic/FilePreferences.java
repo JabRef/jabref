@@ -202,7 +202,6 @@ public class FilePreferences {
         return downloadLinkedOnlineFiles;
     }
 
-    /// [impl->req~import.download-linked-online-files.remember-independently~1]
     public void setDownloadLinkedOnlineFiles(boolean shouldDownloadLinkedOnlineFiles) {
         this.downloadLinkedOnlineFiles.set(shouldDownloadLinkedOnlineFiles);
     }
