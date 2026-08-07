@@ -1187,7 +1187,7 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-            // Collect entries from the selected databases, depending on whether the OpenOffice panel's "active tab only" peference is enabled.
+            // Collect entries from the selected databases, depending on whether the OpenOffice panel's "currently selected library only" preference is enabled.
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
                                               .toList();
