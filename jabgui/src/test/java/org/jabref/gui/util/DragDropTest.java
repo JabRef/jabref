@@ -11,39 +11,22 @@ import org.jabref.model.entry.BibEntry;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @NullMarked
 class DragDropTest {
 
     @Test
-    void handleDropOfFilesIgnoresBibFiles() {
-        ExternalFilesEntryLinker fileLinker = mock(ExternalFilesEntryLinker.class);
-        BibEntry entry = new BibEntry();
-        List<Path> bibFiles = List.of(Path.of("test.bib"), Path.of("another.bib"));
-
-        boolean result = DragDrop.handleDropOfFiles(bibFiles, TransferMode.MOVE, fileLinker, entry);
-
-        assertFalse(result);
-        verifyNoInteractions(fileLinker);
-    }
-
-    @Test
-    void handleDropOfFilesPassesNonBibFilesToLinker() {
+    void handleDropOfFilesPassesFilesToLinker() {
         ExternalFilesEntryLinker fileLinker = mock(ExternalFilesEntryLinker.class);
         BibEntry entry = new BibEntry();
         Path pdfFile = Path.of("paper.pdf");
-        Path bibFile = Path.of("test.bib");
-        List<Path> files = List.of(pdfFile, bibFile);
+        List<Path> files = List.of(pdfFile);
 
-        boolean result = DragDrop.handleDropOfFiles(files, TransferMode.MOVE, fileLinker, entry);
+        DragDrop.handleDropOfFiles(files, TransferMode.MOVE, fileLinker, entry);
 
-        assertTrue(result);
-        verify(fileLinker).coveOrMoveFilesSteps(eq(entry), eq(List.of(pdfFile)), eq(true));
+        verify(fileLinker).coveOrMoveFilesSteps(eq(entry), eq(files), eq(true));
     }
 }

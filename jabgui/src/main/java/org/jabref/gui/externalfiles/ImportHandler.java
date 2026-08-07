@@ -138,6 +138,11 @@ public class ImportHandler {
         return fileLinker;
     }
 
+    /// Checks whether the given file can be imported as bibliographic entries rather than attached as a file.
+    public boolean canImport(Path file) {
+        return !FileUtil.isPDFFile(file) && (FileUtil.isBibFile(file) || importFormatReader.hasImporterForFile(file));
+    }
+
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, TransferMode transferMode) {
         // TODO: Make a utility class out of this. Package: org.jabref.logic.externalfiles.
         return new BackgroundTask<>() {

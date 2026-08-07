@@ -305,4 +305,24 @@ class ImportHandlerTest {
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
+
+    @Test
+    void canImportReturnsTrueForBibFile() {
+        assertTrue(importHandler.canImport(Path.of("test.bib")));
+    }
+
+    @Test
+    void canImportReturnsFalseForPdfFile() {
+        assertFalse(importHandler.canImport(Path.of("test.pdf")));
+    }
+
+    @Test
+    void canImportReturnsTrueForRisFile() {
+        assertTrue(importHandler.canImport(Path.of("test.ris")));
+    }
+
+    @Test
+    void canImportReturnsFalseForUnknownFile() {
+        assertFalse(importHandler.canImport(Path.of("test.unknown")));
+    }
 }

@@ -581,11 +581,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
-                    List<Path> bibFiles = files.stream().filter(FileUtil::isBibFile).toList();
-                    List<Path> otherFiles = files.stream().filter(file -> !FileUtil.isBibFile(file)).toList();
+                    List<Path> importableFiles = files.stream().filter(importHandler::canImport).toList();
+                    List<Path> otherFiles = files.stream().filter(file -> !importHandler.canImport(file)).toList();
 
-                    if (!bibFiles.isEmpty()) {
-                        importHandler.importFilesInBackground(bibFiles, transferMode).executeWith(taskExecutor);
+                    if (!importableFiles.isEmpty()) {
+                        importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
                     }
                     if (!otherFiles.isEmpty()) {
                         BibEntry entry = target.getEntry();
