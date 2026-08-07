@@ -8,7 +8,6 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.PageInfo;
-import org.jabref.model.openoffice.util.OOListUtil;
 
 class JStyleGetNumCitationMarker {
 
