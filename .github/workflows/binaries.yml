@@ -184,6 +184,14 @@ jobs:
           set -x
           PS4='+ ${LINENO}: '
 
+          HAS_DEV_BINARIES_LABEL=false
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
+            if echo "$LABELS" | grep -q "^dev: binaries$"; then
+              HAS_DEV_BINARIES_LABEL=true
+            fi
+          fi
+
           if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
@@ -191,15 +199,20 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" != "true" && "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "📦 build enabled"
-          echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
+            echo "📦 build forced by label 'dev: binaries'"
+            echo "📦 build forced by label 'dev: binaries'" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "📦 build enabled"
+            echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "should-build=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
@@ -299,9 +312,7 @@ jobs:
             exit 0
           fi
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
-
-          if echo "$LABELS" | grep -q "^dev: binaries$"; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
