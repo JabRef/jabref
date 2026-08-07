@@ -15,7 +15,7 @@ public final class OcrUtils {
 
     public static final String OCR_PDF_PREFIX = "_ocr.pdf";
     public static final int TIMEOUT_MINS = 10;
-    public static final int CHECKING_TIMEOUT = 5;
+    public static final int CHECKING_TIMEOUT = 10;
     public static final Logger LOGGER = LoggerFactory.getLogger(OcrUtils.class);
 
     /// Checks if the OCR engine is available for use.

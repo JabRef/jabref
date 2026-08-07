@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 - We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
+- We added OCR engine selection to the OCR preferences, allowing users to choose the engine they want to use. [#16455](https://github.com/JabRef/jabref/pull/16455)
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 
 ### Changed
