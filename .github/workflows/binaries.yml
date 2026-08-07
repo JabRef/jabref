@@ -1135,8 +1135,7 @@ jobs:
           if-no-files-found: error
 
   upload-pr-nnumber:
-    needs: conditions
-    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-slim
     permissions:
       contents: read
