@@ -144,13 +144,6 @@ public class FileSelectionPage extends WizardPane {
             }
         });
 
-        // Restore header when task completes (even on failure)
-        viewModel.taskActiveProperty().addListener((obs, wasActive, isActive) -> {
-            if (wasActive && !isActive) {
-                showHeader();
-            }
-        });
-
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 
         selectAllButton.disableProperty().bind(viewModel.taskActiveProperty());
@@ -189,11 +182,13 @@ public class FileSelectionPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
-        hideHeader();
-
         if (viewModel.treeRootProperty().get().isEmpty()) {
+            hideHeader();
             ((BorderPane) getContent()).setCenter(progressPane);
             viewModel.startSearch();
+        } else {
+            showHeader();
+            ((BorderPane) getContent()).setCenter(contentPane);
         }
 
         if (!nextButtonBound) {
