@@ -38,7 +38,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -51,7 +50,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -454,6 +452,7 @@ public class OpenOfficePanel {
         boolean canGenerateBibliography = (currentStyle instanceof JStyle)
                 || (currentStyle instanceof BstStyle)
                 || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
+        boolean enableBibliographyProperties = canRefreshDocument && canGenerateBibliography;
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
@@ -468,7 +467,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
         manageCitations.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
-        modifyBibliographyProperties.setDisable(!canRefreshDocument || !canGenerateBibliography);
+        modifyBibliographyProperties.setDisable(!enableBibliographyProperties);
     }
 
     private void connect() {
