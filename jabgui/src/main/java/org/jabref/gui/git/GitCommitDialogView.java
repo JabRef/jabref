@@ -61,16 +61,15 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         });
 
         Platform.runLater(() -> {
-                visualizer.setDecoration(new IconValidationDecorator());
-                visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
-                commitMessage.requestFocus();
-
-                // [impl->req~textinput.clipboard.autofocus~1]
-                final String clipboardText = ClipBoardManager.getContents().trim();
-                if (!StringUtil.isBlank(clipboardText)) {
-                    commitMessage.setText(clipboardText);
-                    commitMessage.selectAll();
-                }
-            });
-        }
+            visualizer.setDecoration(new IconValidationDecorator());
+            visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
+            commitMessage.requestFocus();
+            // [impl->req~textinput.clipboard.autofocus~1]
+            final String clipboardText = ClipBoardManager.getContents().trim();
+            if (!StringUtil.isBlank(clipboardText)) {
+                commitMessage.setText(clipboardText);
+                commitMessage.selectAll();
+            }
+        });
     }
+}

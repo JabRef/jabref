@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 - We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
+- We added autofocus and clipboard prefill to the commit message field in the Git Commit dialog. [#16340](https://github.com/JabRef/jabref/issues/16340)
 
 ### Changed
 
@@ -157,7 +158,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 - We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
-- We added autofocus and clipboard prefill to the commit message field in the Git Commit dialog. [#16340](https://github.com/JabRef/jabref/issues/16340)
 
 ### Changed
 
