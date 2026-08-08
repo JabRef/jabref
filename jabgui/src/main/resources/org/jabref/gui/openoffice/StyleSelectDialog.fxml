@@ -85,6 +85,8 @@
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addBstStyleButton" text="%Add .bst file" onAction="#addBstStyleFile"/>
                         </HBox>
+                        <Label fx:id="bstPandocWarning"
+                                wrapText="true" />
                         <TableView fx:id="bstStylesTable" VBox.vgrow="ALWAYS" prefHeight="300.0">
                             <columns>
                                 <TableColumn fx:id="bstNameColumn" text="%Name" minWidth="200.0" prefWidth="-1.0"/>

@@ -328,7 +328,7 @@ public class OOFrontend {
     public List<RangeForOverlapCheck<CitationGroupId>> viewCursorRanges(XTextDocument doc) {
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
-        Optional<XTextRange> range = UnoCursor.getViewCursor(doc).map(e -> e);
+        Optional<XTextRange> range = UnoCursor.getViewCursor(doc).map(entry -> entry);
         if (range.isPresent()) {
             String description = "cursor";
             result.add(new RangeForOverlapCheck<>(range.get(),

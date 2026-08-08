@@ -10,14 +10,14 @@ import org.jabref.model.entry.BibEntry;
  */
 public class CompareCitation implements Comparator<ComparableCitation> {
 
-    private final CompareCitedKey citedKeyComparator;
+    private final CompareCitedReference citedReferenceComparator;
 
     CompareCitation(Comparator<BibEntry> entryComparator, boolean unresolvedComesFirst) {
-        this.citedKeyComparator = new CompareCitedKey(entryComparator, unresolvedComesFirst);
+        this.citedReferenceComparator = new CompareCitedReference(entryComparator, unresolvedComesFirst);
     }
 
     public int compare(ComparableCitation a, ComparableCitation b) {
-        int res = citedKeyComparator.compare(a, b);
+        int res = citedReferenceComparator.compare(a, b);
 
         // Also consider pageInfo
         if (res == 0) {
