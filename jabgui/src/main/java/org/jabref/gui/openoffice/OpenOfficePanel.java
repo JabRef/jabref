@@ -468,7 +468,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
         manageCitations.setDisable(!canRefreshDocument || cslStyleSelected || bstStyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
-        modifyBibliographyProperties.setDisable(!canRefreshDocument || !(cslStyleSelected || bstStyleSelected));
+        modifyBibliographyProperties.setDisable(!canRefreshDocument || !canGenerateBibliography);
     }
 
     private void connect() {
