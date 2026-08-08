@@ -57,7 +57,7 @@ public class TemplateExporter extends Exporter {
     /// @param displayName Name to display to the user.
     /// @param consoleName Name to call this format in the console.
     /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
+    /// @param directory   Directory in which to find the layout file (a blank string can be passed).
     /// @param extension   Should contain the . (for instance .txt).
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -80,7 +80,7 @@ public class TemplateExporter extends Exporter {
         this(name,
                 name,
                 lfFileName,
-                null,
+                "",
                 StandardFileType.fromExtensions(extension),
                 layoutPreferences,
                 saveOrder);
@@ -91,7 +91,7 @@ public class TemplateExporter extends Exporter {
     /// @param displayName Name to display to the user.
     /// @param consoleName Name to call this format in the console.
     /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
+    /// @param directory   Directory in which to find the layout file (a blank string can be passed).
     /// @param extension   Should contain the . (for instance .txt).
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -108,7 +108,7 @@ public class TemplateExporter extends Exporter {
     /// @param displayName        Name to display to the user.
     /// @param consoleName        Name to call this format in the console.
     /// @param lfFileName         Name of the main layout file.
-    /// @param directory          Directory in which to find the layout file.
+    /// @param directory          Directory in which to find the layout file (a blank string can be passed).
     /// @param extension          Should contain the . (for instance .txt).
     /// @param layoutPreferences  Preferences for layout
     /// @param blankLineBehaviour how to behave regarding blank lines.
@@ -154,7 +154,7 @@ public class TemplateExporter extends Exporter {
         if (customExport) {
             dir = "";
         } else {
-            dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
+            dir = LAYOUT_PREFIX + (directory.isEmpty() ? "" : directory + '/');
         }
 
         // Attempt to get a Reader for the file path given, either by
