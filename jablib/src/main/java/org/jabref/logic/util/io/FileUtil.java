@@ -527,7 +527,7 @@ public class FileUtil {
                    .replace('\\', '/');
     }
 
-    /// Test if the file is a bib file by simply checking the extension to be ".bib"
+    /// Test if the file is a bib file by simply checking the extension to be ".bib" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
@@ -580,13 +580,12 @@ public class FileUtil {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
-    /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
+    /// Test if the file is a pdf file by simply checking the extension to be ".pdf" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
-        Optional<String> extension = FileUtil.getFileExtension(file);
-        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
+        return getFileExtension(file).filter("pdf"::equalsIgnoreCase).isPresent();
     }
 
     /// @return Path of current panel database directory or the standard working directory in case the database was not saved yet

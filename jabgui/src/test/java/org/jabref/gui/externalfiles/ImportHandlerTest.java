@@ -307,22 +307,33 @@ class ImportHandlerTest {
     }
 
     @Test
-    void canImportReturnsTrueForBibFile() {
-        assertTrue(importHandler.canImport(Path.of("test.bib")));
+    void canImportAsBibEntryReturnsTrueForBibFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.bib")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.BIB")));
     }
 
     @Test
-    void canImportReturnsFalseForPdfFile() {
-        assertFalse(importHandler.canImport(Path.of("test.pdf")));
+    void canImportAsBibEntryReturnsFalseForPdfFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.pdf")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.PDF")));
     }
 
     @Test
-    void canImportReturnsTrueForRisFile() {
-        assertTrue(importHandler.canImport(Path.of("test.ris")));
+    void canImportAsBibEntryReturnsTrueForRisFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.ris")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.RIS")));
     }
 
     @Test
-    void canImportReturnsFalseForUnknownFile() {
-        assertFalse(importHandler.canImport(Path.of("test.unknown")));
+    void canImportAsBibEntryReturnsFalseForGenericExtensions() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("notes.txt")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("data.xml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yaml")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForUnknownFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
     }
 }

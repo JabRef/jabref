@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 class DragDropTest {
 
     @Test
-    void handleDropOfFilesPassesFilesToLinker() {
+    void handleDropOfFilesWithMoveMode() {
         ExternalFilesEntryLinker fileLinker = mock(ExternalFilesEntryLinker.class);
         BibEntry entry = new BibEntry();
         Path pdfFile = Path.of("paper.pdf");
@@ -28,5 +28,29 @@ class DragDropTest {
         DragDrop.handleDropOfFiles(files, TransferMode.MOVE, fileLinker, entry);
 
         verify(fileLinker).coveOrMoveFilesSteps(eq(entry), eq(files), eq(true));
+    }
+
+    @Test
+    void handleDropOfFilesWithCopyMode() {
+        ExternalFilesEntryLinker fileLinker = mock(ExternalFilesEntryLinker.class);
+        BibEntry entry = new BibEntry();
+        Path pdfFile = Path.of("paper.pdf");
+        List<Path> files = List.of(pdfFile);
+
+        DragDrop.handleDropOfFiles(files, TransferMode.COPY, fileLinker, entry);
+
+        verify(fileLinker).coveOrMoveFilesSteps(eq(entry), eq(files), eq(false));
+    }
+
+    @Test
+    void handleDropOfFilesWithLinkMode() {
+        ExternalFilesEntryLinker fileLinker = mock(ExternalFilesEntryLinker.class);
+        BibEntry entry = new BibEntry();
+        Path pdfFile = Path.of("paper.pdf");
+        List<Path> files = List.of(pdfFile);
+
+        DragDrop.handleDropOfFiles(files, TransferMode.LINK, fileLinker, entry);
+
+        verify(fileLinker).linkFilesToEntry(eq(entry), eq(files));
     }
 }
