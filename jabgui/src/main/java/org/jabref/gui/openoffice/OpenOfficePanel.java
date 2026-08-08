@@ -728,7 +728,7 @@ public class OpenOfficePanel {
 
         if (!isCSL) {
             inferCslStyleFromDocument.setSelected(false);
-            openOfficePreferences.setZoteroCompatibilityMode(false);
+            openOfficePreferences.setInferCslStyleFromDocument(false);
         }
 
         if (shouldSwitchOffZoteroMode) {
