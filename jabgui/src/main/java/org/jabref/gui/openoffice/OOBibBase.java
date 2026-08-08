@@ -173,7 +173,7 @@ public class OOBibBase {
     }
 
     private OOVoidResult<OOError> readStyleInPreference(XTextDocument doc) {
-        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+        if (!shouldReadStyleInPreference(openOfficePreferences)) {
             return OOVoidResult.ok();
         }
 
@@ -185,6 +185,12 @@ public class OOBibBase {
             LOGGER.warn("Could not read Zotero document preferences", e);
             return OOVoidResult.error(OOError.fromMisc(e));
         }
+    }
+
+    static boolean shouldReadStyleInPreference(OpenOfficePreferences openOfficePreferences) {
+        return openOfficePreferences.getCurrentStyle() instanceof CitationStyle
+                && openOfficePreferences.getZoteroCompatibilityMode()
+                && openOfficePreferences.shouldInferCslStyleFromDocument();
     }
 
     OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {

@@ -673,6 +673,11 @@ public class OpenOfficePanel {
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
         zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> style instanceof JStyle || style instanceof BstStyle));
 
+        CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
+        inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
+        inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
+        inferCslStyleFromDocument.disableProperty().bind(zoteroCompatibilityMode.selectedProperty().not());
+
         updatePreferences(currentStyle, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
             updatePreferences(newValue, zoteroCompatibilityMode);
@@ -706,6 +711,7 @@ public class OpenOfficePanel {
                 autoSync,
                 addSpaceBefore,
                 zoteroCompatibilityMode,
+                inferCslStyleFromDocument,
                 new SeparatorMenuItem(),
                 onlyUseActiveTab,
                 new SeparatorMenuItem(),

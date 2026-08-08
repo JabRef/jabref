@@ -45,6 +45,7 @@ public class OpenOfficePreferences {
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceBefore;
     private final BooleanProperty zoteroCompatibilityMode;
+    private final BooleanProperty inferCslStyleFromDocument;
     private final ObservableList<String> externalBstStyles;
     private final StringProperty pandocPath;
     private final ObjectProperty<BstCitationFormat> bstCitationFormat;
@@ -63,6 +64,7 @@ public class OpenOfficePreferences {
                                  List<String> externalCslStyles,
                                  boolean addSpaceBefore,
                                  boolean zoteroCompatibilityMode,
+                                 boolean inferCslStyleFromDocument,
                                  List<String> externalBstStyles,
                                  String pandocPath,
                                  BstCitationFormat bstCitationFormat,
@@ -80,6 +82,7 @@ public class OpenOfficePreferences {
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
+        this.inferCslStyleFromDocument = new SimpleBooleanProperty(inferCslStyleFromDocument);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
         this.pandocPath = new SimpleStringProperty(pandocPath);
         this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
@@ -103,6 +106,7 @@ public class OpenOfficePreferences {
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceBefore
                 false,                                          // zoteroCompatibilityMode
+                false,                                          // inferCslStyleFromDocument
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
                 BstCitationFormat.NUMERIC,                      // bstCitationFormat
@@ -276,6 +280,18 @@ public class OpenOfficePreferences {
 
     public void setZoteroCompatibilityMode(boolean zoteroCompatibilityMode) {
         this.zoteroCompatibilityMode.set(zoteroCompatibilityMode);
+    }
+
+    public boolean shouldInferCslStyleFromDocument() {
+        return inferCslStyleFromDocument.get();
+    }
+
+    public BooleanProperty inferCslStyleFromDocumentProperty() {
+        return inferCslStyleFromDocument;
+    }
+
+    public void setInferCslStyleFromDocument(boolean inferCslStyleFromDocument) {
+        this.inferCslStyleFromDocument.set(inferCslStyleFromDocument);
     }
 
     public OpenOfficeReferenceMarkFormat getReferenceMarkFormat() {
