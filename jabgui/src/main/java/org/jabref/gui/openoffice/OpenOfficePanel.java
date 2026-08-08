@@ -735,11 +735,6 @@ public class OpenOfficePanel {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
-
-//        if (!zoteroCompatibilityMode.isSelected()) {
-//            inferCslStyleFromDocument.setSelected(false);
-//            openOfficePreferences.setInferCslStyleFromDocument(false);
-//        }
     }
 
     private static boolean isJStyleOrBstStyle(OOStyle style) {
