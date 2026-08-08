@@ -568,21 +568,21 @@ public class SearchToSqlDetailedMatchVisitor extends SearchBaseVisitor<SqlQueryN
         StringBuilder result = new StringBuilder();
         result.append("SELECT ");
         for (Map.Entry<String, String> cteToOperation : cteNamesToOperations.entrySet()) {
-            result.append(String.format("(%s.%s IS NOT NULL) as \"%s\", ", cteToOperation.getKey(), ENTRY_ID, cteToOperation.getValue()));
+            result.append("(%s.%s IS NOT NULL) as \"%s\", ".formatted(cteToOperation.getKey(), ENTRY_ID, cteToOperation.getValue()));
         }
-        result.append(String.format("""
+        result.append("""
                 %s.%s as %s
                 from %s
-                """, LAST_CTE, ENTRY_ID, FINAL_MATCH, LAST_CTE));
+                """.formatted(LAST_CTE, ENTRY_ID, FINAL_MATCH, LAST_CTE));
         for (Map.Entry<String, String> cteToOperation : cteNamesToOperations.entrySet()) {
-            result.append(String.format("left join %s on %s.%s = %s.%s\n", cteToOperation.getKey(),
+            result.append("left join %s on %s.%s = %s.%s\n".formatted(cteToOperation.getKey(),
                     cteToOperation.getKey(), ENTRY_ID, LAST_CTE, ENTRY_ID));
         }
         return result.toString();
     }
 
     private String getUniqueCteName() {
-        return String.format("cte%d", cteCounter++);
+        return "cte%d".formatted(cteCounter++);
     }
 
     private static void setFlags(EnumSet<SearchFlags> flags, SearchFlags matchType, boolean caseSensitive, boolean negation) {

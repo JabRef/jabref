@@ -75,7 +75,7 @@ public final class LibrarySearcherTestCases {
 
                 // case-insensitive vs case-sensitive contains (=, =!)
                 Arguments.of(List.of(TITLE_MIXED_CASED),
-                        new SearchQuery(String.format("title=title AND author=%s", TITLE_MIXED_CASED_AUTHOR)),
+                        new SearchQuery("title=title AND author=%s".formatted(TITLE_MIXED_CASED_AUTHOR)),
                         List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)),
                 Arguments.of(List.of(TITLE_SENTENCE_CASED),
                         new SearchQuery("title =! Title"),
@@ -195,17 +195,17 @@ public final class LibrarySearcherTestCases {
                                 TITLE_UPPER_CASED,
                                 new MatchInformation(true,
                                         new PartialResult(true, "title=title"),
-                                        new PartialResult(true, String.format("author=%s", TITLE_UPPER_CASED_AUTHOR)),
-                                        new PartialResult(false, String.format("author=%s", TITLE_MIXED_CASED_AUTHOR))
+                                        new PartialResult(true, "author=%s".formatted(TITLE_UPPER_CASED_AUTHOR)),
+                                        new PartialResult(false, "author=%s".formatted(TITLE_MIXED_CASED_AUTHOR))
                                 ),
                                 TITLE_MIXED_CASED,
                                 new MatchInformation(true,
                                         new PartialResult(true, "title=title"),
-                                        new PartialResult(false, String.format("author=%s", TITLE_UPPER_CASED_AUTHOR)),
-                                        new PartialResult(true, String.format("author=%s", TITLE_MIXED_CASED_AUTHOR))
+                                        new PartialResult(false, "author=%s".formatted(TITLE_UPPER_CASED_AUTHOR)),
+                                        new PartialResult(true, "author=%s".formatted(TITLE_MIXED_CASED_AUTHOR))
                                 )
                         ),
-                        new SearchQuery(String.format("title=title AND (author=%s OR author=%s)", TITLE_UPPER_CASED_AUTHOR, TITLE_MIXED_CASED_AUTHOR)),
+                        new SearchQuery("title=title AND (author=%s OR author=%s)".formatted(TITLE_UPPER_CASED_AUTHOR, TITLE_MIXED_CASED_AUTHOR)),
                         List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)
                 )
         );
