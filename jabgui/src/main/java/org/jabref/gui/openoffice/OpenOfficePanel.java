@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -670,29 +671,15 @@ public class OpenOfficePanel {
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
-        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> style instanceof JStyle || style instanceof BstStyle));
+        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(OpenOfficePanel::isJStyleOrBstStyle));
 
         CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
         inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
         inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
-        inferCslStyleFromDocument.disableProperty().bind(zoteroCompatibilityMode.selectedProperty().not());
-
-        updatePreferences(currentStyle, zoteroCompatibilityMode, inferCslStyleFromDocument);
-        EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
-
-            switch (newValue) {
-                case JStyle _ -> {
-                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
-                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
-                    }
-                }
-                case CitationStyle _ ->
-                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> {
-                }
-            }
-        });
+        inferCslStyleFromDocument.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !zoteroCompatibilityMode.isSelected() || isJStyleOrBstStyle(currentStyleProperty.get()),
+                zoteroCompatibilityMode.selectedProperty(),
+                currentStyleProperty));
 
         CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the currently selected library only"));
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
@@ -716,24 +703,47 @@ public class OpenOfficePanel {
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
-        if (currentStyle instanceof JStyle) {
-            contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
-        }
+        EasyBind.subscribe(currentStyleProperty, newValue -> {
+            updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
+
+            switch (newValue) {
+                case JStyle _ -> {
+                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
+                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
+                    }
+                }
+                case CitationStyle _ ->
+                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
+                default -> {
+                }
+            }
+        });
+
+        EasyBind.listen(zoteroCompatibilityMode.selectedProperty(), (_, _, isSelected) -> {
+            if (!isSelected) {
+                inferCslStyleFromDocument.setSelected(false);
+                openOfficePreferences.setInferCslStyleFromDocument(false);
+            }
+        });
+
         return contextMenu;
     }
 
     private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
-        boolean shouldSwitchOffZoteroMode = currentStyle instanceof JStyle || currentStyle instanceof BstStyle;
-        boolean isCSL = currentStyle instanceof CitationStyle;
-
-        if (!isCSL) {
-            inferCslStyleFromDocument.setSelected(false);
-            openOfficePreferences.setInferCslStyleFromDocument(false);
-        }
+        boolean shouldSwitchOffZoteroMode = isJStyleOrBstStyle(currentStyle);
 
         if (shouldSwitchOffZoteroMode) {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
+
+        if (!zoteroCompatibilityMode.isSelected()) {
+            inferCslStyleFromDocument.setSelected(false);
+            openOfficePreferences.setInferCslStyleFromDocument(false);
+        }
+    }
+
+    private static boolean isJStyleOrBstStyle(OOStyle style) {
+        return style instanceof JStyle || style instanceof BstStyle;
     }
 }
