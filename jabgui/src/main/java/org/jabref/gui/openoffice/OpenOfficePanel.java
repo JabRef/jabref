@@ -676,9 +676,9 @@ public class OpenOfficePanel {
         inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
         inferCslStyleFromDocument.disableProperty().bind(zoteroCompatibilityMode.selectedProperty().not());
 
-        updatePreferences(currentStyle, zoteroCompatibilityMode);
+        updatePreferences(currentStyle, zoteroCompatibilityMode, inferCslStyleFromDocument);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            updatePreferences(newValue, zoteroCompatibilityMode);
+            updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
 
             switch (newValue) {
                 case JStyle _ -> {
@@ -721,8 +721,14 @@ public class OpenOfficePanel {
         return contextMenu;
     }
 
-    private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode) {
+    private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
         boolean isJStyle = currentStyle instanceof JStyle;
+        boolean isCSL = currentStyle instanceof CitationStyle;
+
+        if (!isCSL) {
+            inferCslStyleFromDocument.setSelected(false);
+            openOfficePreferences.setZoteroCompatibilityMode(false);
+        }
 
         if (isJStyle) {
             zoteroCompatibilityMode.setSelected(false);
