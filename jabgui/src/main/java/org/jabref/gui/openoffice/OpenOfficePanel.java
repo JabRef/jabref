@@ -672,6 +672,7 @@ public class OpenOfficePanel {
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
+        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> style instanceof JStyle));
 
         updatePreferences(currentStyle, zoteroCompatibilityMode);
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
@@ -724,7 +725,5 @@ public class OpenOfficePanel {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
-
-        zoteroCompatibilityMode.setDisable(isJStyle);
     }
 }
