@@ -727,30 +727,4 @@ public class OpenOfficePanel {
 
         zoteroCompatibilityMode.setDisable(isJStyle);
     }
-
-    private void browsePandocPath() {
-        FileDialogConfiguration config = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
-                .build();
-        dialogService.showFileOpenDialog(config).ifPresent(path -> {
-            openOfficePreferences.setPandocPath(path.toString());
-            dialogService.notify(Localization.lang("Pandoc path set to: %0", path.toString()));
-        });
-    }
-
-    private void autoDetectPandocPath() {
-        BackgroundTask<java.util.Optional<String>> task = BackgroundTask.wrap(PandocLatexConverter::autoDetect);
-        task.titleProperty().set(Localization.lang("Auto-detecting pandoc"));
-        task.showToUser(true);
-        task.onSuccess(result -> {
-            if (result.isPresent()) {
-                openOfficePreferences.setPandocPath(result.get());
-                dialogService.notify(Localization.lang("Pandoc detected at: %0", result.get()));
-            } else {
-                dialogService.notify(Localization.lang("Pandoc could not be detected automatically"));
-            }
-        });
-        task.onFailure(_ -> dialogService.notify(Localization.lang("Auto-detection of pandoc path failed")));
-        taskExecutor.execute(task);
-    }
 }
