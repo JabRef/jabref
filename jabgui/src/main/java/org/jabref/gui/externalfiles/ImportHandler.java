@@ -83,6 +83,7 @@ public class ImportHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
 
     private static final String FILENAME_FALLBACK = "downloaded.pdf";
+    private static final Set<String> EXCLUDED_CENTER_DROP_EXTENSIONS = Set.of("pdf", "txt", "xml", "yml", "yaml");
 
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
@@ -135,8 +136,6 @@ public class ImportHandler {
                 fileupdateMonitor);
         this.undoManager = undoManager;
     }
-
-    private static final Set<String> EXCLUDED_CENTER_DROP_EXTENSIONS = Set.of("pdf", "txt", "xml", "yml", "yaml");
 
     public ExternalFilesEntryLinker getFileLinker() {
         return fileLinker;
