@@ -461,9 +461,9 @@ public class OpenOfficePanel {
         citeSpecial.setDisable(!canCite || !specialCitationSupported);
 
         updateBibliography.setDisable(!canGenerateBibliography);
-        merge.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
-        unmerge.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
-        manageCitations.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
+        merge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
         modifyBibliographyProperties.setDisable(!canGenerateBibliography);
     }
