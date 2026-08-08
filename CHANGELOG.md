@@ -70,6 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We refined the "Search for unlinked files" dialog: it now applies JabRef's theme styling, the help button has been removed, the sort option is renamed from "Default" to "Grouped by directory", and the page header is correctly hidden while a search is running and restored when results appear or the page is re-entered. [#16158](https://github.com/JabRef/jabref/issues/16158)
 
 ### Fixed
 
