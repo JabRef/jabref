@@ -722,9 +722,9 @@ public class OpenOfficePanel {
     }
 
     private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode) {
-        boolean isJStyle = currentStyle instanceof JStyle;
+        boolean shouldSwitchOffZoteroMode = currentStyle instanceof JStyle || currentStyle instanceof BstStyle;
 
-        if (isJStyle) {
+        if (shouldSwitchOffZoteroMode) {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
