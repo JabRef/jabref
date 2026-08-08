@@ -450,9 +450,8 @@ public class OpenOfficePanel {
         boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
                 && !jStyle.isNumberEntries()
                 && !jStyle.isCitationKeyCiteMarkers();
-        boolean canGenerateBibliography = isConnectedToDocument
-                && hasDatabase))
-                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography();
+        boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
+                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
@@ -737,10 +736,10 @@ public class OpenOfficePanel {
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
 
-        if (!zoteroCompatibilityMode.isSelected()) {
-            inferCslStyleFromDocument.setSelected(false);
-            openOfficePreferences.setInferCslStyleFromDocument(false);
-        }
+//        if (!zoteroCompatibilityMode.isSelected()) {
+//            inferCslStyleFromDocument.setSelected(false);
+//            openOfficePreferences.setInferCslStyleFromDocument(false);
+//        }
     }
 
     private static boolean isJStyleOrBstStyle(OOStyle style) {
