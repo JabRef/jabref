@@ -104,23 +104,14 @@ public class CffExporter extends Exporter {
         options.setIndicatorIndent(2);
         Yaml yaml = new Yaml(options);
 
-        BibEntry main = null;
-        boolean mainIsDummy = false;
-        int countOfSoftwareAndDataSetEntries = 0;
-        for (BibEntry entry : entriesToTransform) {
-            if (entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset) {
-                main = entry;
-                countOfSoftwareAndDataSetEntries++;
-            }
-        }
-        if (countOfSoftwareAndDataSetEntries == 1) {
-            // If there is only one software or dataset entry, use it as the main entry
-            entriesToTransform.remove(main);
-        } else {
-            // If there are no software or dataset entries, create a dummy main entry holding the given entries
-            main = new BibEntry(StandardEntryType.Software);
-            mainIsDummy = true;
-        }
+        List<BibEntry> softwareOrDatasetEntries =
+                entriesToTransform.stream()
+                                  .filter(entry ->
+                                          entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset)
+                                  .toList();
+
+        boolean mainIsDummy = softwareOrDatasetEntries.size() != 1;
+        BibEntry main = mainIsDummy ? new BibEntry(StandardEntryType.Software) : softwareOrDatasetEntries.getLast();
 
         // Transform main entry to CFF format
         Map<String, Object> cffData = transformEntry(main, true, mainIsDummy);
