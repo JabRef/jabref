@@ -104,12 +104,14 @@ public class CffExporter extends Exporter {
         options.setIndicatorIndent(2);
         Yaml yaml = new Yaml(options);
 
+        // Find software or dataset entries
         List<BibEntry> softwareOrDatasetEntries =
                 entriesToTransform.stream()
                                   .filter(entry ->
                                           entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset)
                                   .toList();
 
+        // If the found software/dataset entries is not only one, then create a dummy main entry holding the given entries
         boolean mainIsDummy = softwareOrDatasetEntries.size() != 1;
         BibEntry main = mainIsDummy ? new BibEntry(StandardEntryType.Software) : softwareOrDatasetEntries.getLast();
 
