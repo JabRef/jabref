@@ -464,7 +464,7 @@ public class OpenOfficePanel {
         merge.setDisable(!isConnectedToDocument || !jstyleSelected);
         unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
         manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
         modifyBibliographyProperties.setDisable(!canGenerateBibliography);
     }
 
