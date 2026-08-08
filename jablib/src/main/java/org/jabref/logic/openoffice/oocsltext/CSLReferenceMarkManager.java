@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -294,7 +293,7 @@ public class CSLReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
@@ -304,7 +303,6 @@ public class CSLReferenceMarkManager {
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
-        Set<String> existingReferenceMarkUniqueIds = new HashSet<>();
 
         for (String name : marks.getElementNames()) {
             if (ReferenceMark.isReferenceMarkName(name)) {
@@ -321,7 +319,6 @@ public class CSLReferenceMarkManager {
 
                 if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
-                    existingReferenceMarkUniqueIds.add(referenceMark.getUniqueId());
                     String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + referenceMark.getUniqueId();
                     UnoUserDefinedProperty.getStringValue(document, storageKey)
                                           .map(OOText::fromString)
@@ -338,10 +335,16 @@ public class CSLReferenceMarkManager {
             }
         }
 
+        LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
+        Set<String> existingReferenceMarkUniqueIds = marksInOrder.stream()
+                                                                 .map(CSLReferenceMark::getUniqueId)
+                                                                 .collect(Collectors.toSet());
         removeUnusedFormattedCitationTextProperties(existingReferenceMarkUniqueIds);
         rebuildCitationNumberState();
-
-        LOGGER.debug("Read {} existing marks", marksByName.size());
 
         if (isNumberUpdateRequired) {
             try {
