@@ -82,10 +82,11 @@ jobs:
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"
           echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
-          cat <<EOF
-          PR Body:
-          $PR_BODY
-          EOF
+          # Not a heredoc: PR bodies are attacker-controlled, and an unquoted
+          # heredoc expands backticks and $(...) in them - code execution in a
+          # workflow that holds "issues: write".
+          echo "PR Body:"
+          printf '%s\n' "$PR_BODY"
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
             | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
