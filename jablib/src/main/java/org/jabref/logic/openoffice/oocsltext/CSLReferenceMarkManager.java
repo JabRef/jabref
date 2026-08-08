@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,7 +130,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int convertReferenceMarks(OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                     List<BibDatabaseContext> bibDatabaseContexts,
+                                     List<BibDatabase> selectedDatabases,
                                      BibEntryTypesManager entryTypesManager) throws Exception, CreationException {
         sortMarksInOrder();
         Map<String, String> zoteroUriByCitationKey = getZoteroUriByCitationKey();
@@ -145,7 +144,7 @@ public class CSLReferenceMarkManager {
             Optional<String> convertedName = buildConvertedReferenceMarkName(
                     mark,
                     referenceMarkFormat,
-                    bibDatabaseContexts,
+                    selectedDatabases,
                     entryTypesManager,
                     zoteroUriByCitationKey);
             if (convertedName.isEmpty()) {
@@ -173,7 +172,7 @@ public class CSLReferenceMarkManager {
 
     private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
                                                              OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                                             List<BibDatabaseContext> bibDatabaseContexts,
+                                                             List<BibDatabase> selectedDatabases,
                                                              BibEntryTypesManager entryTypesManager,
                                                              Map<String, String> zoteroUriByCitationKey) {
         return switch (referenceMarkFormat) {
@@ -184,15 +183,15 @@ public class CSLReferenceMarkManager {
                             mark.getUniqueId(),
                             mark.getCitationType()));
             case ZOTERO_COMPATIBLE ->
-                    buildZoteroReferenceMarkName(mark, bibDatabaseContexts, entryTypesManager, zoteroUriByCitationKey);
+                    buildZoteroReferenceMarkName(mark, selectedDatabases, entryTypesManager, zoteroUriByCitationKey);
         };
     }
 
     private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
-                                                          List<BibDatabaseContext> bibDatabaseContexts,
+                                                          List<BibDatabase> selectedDatabases,
                                                           BibEntryTypesManager entryTypesManager,
                                                           Map<String, String> zoteroUriByCitationKey) {
-        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), bibDatabaseContexts);
+        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), selectedDatabases);
         if (entries.isEmpty()) {
             return Optional.empty();
         }
@@ -212,10 +211,10 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
-                                                               List<BibDatabaseContext> bibDatabaseContexts) {
+                                                               List<BibDatabase> selectedDatabases) {
         List<BibEntry> entries = new ArrayList<>();
         for (String citationKey : citationKeys) {
-            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, bibDatabaseContexts);
+            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, selectedDatabases);
             if (entry.isEmpty()) {
                 return Optional.empty();
             }
@@ -225,12 +224,11 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<BibEntry> findEntryByCitationKey(String citationKey,
-                                                      List<BibDatabaseContext> bibDatabaseContexts) {
-        return bibDatabaseContexts.stream()
-                                  .map(BibDatabaseContext::getDatabase)
-                                  .map(database -> database.getEntryByCitationKey(citationKey))
-                                  .flatMap(Optional::stream)
-                                  .findFirst();
+                                                      List<BibDatabase> selectedDatabases) {
+        return selectedDatabases.stream()
+                                .map(database -> database.getEntryByCitationKey(citationKey))
+                                .flatMap(Optional::stream)
+                                .findFirst();
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
@@ -295,7 +293,7 @@ public class CSLReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
@@ -305,7 +303,6 @@ public class CSLReferenceMarkManager {
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
-        Set<String> existingReferenceMarkUniqueIds = new HashSet<>();
 
         for (String name : marks.getElementNames()) {
             if (ReferenceMark.isReferenceMarkName(name)) {
@@ -322,7 +319,6 @@ public class CSLReferenceMarkManager {
 
                 if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
-                    existingReferenceMarkUniqueIds.add(referenceMark.getUniqueId());
                     String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + referenceMark.getUniqueId();
                     UnoUserDefinedProperty.getStringValue(document, storageKey)
                                           .map(OOText::fromString)
@@ -339,10 +335,16 @@ public class CSLReferenceMarkManager {
             }
         }
 
+        LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
+        Set<String> existingReferenceMarkUniqueIds = marksInOrder.stream()
+                                                                 .map(CSLReferenceMark::getUniqueId)
+                                                                 .collect(Collectors.toSet());
         removeUnusedFormattedCitationTextProperties(existingReferenceMarkUniqueIds);
         rebuildCitationNumberState();
-
-        LOGGER.debug("Read {} existing marks", marksByName.size());
 
         if (isNumberUpdateRequired) {
             try {
@@ -638,6 +640,10 @@ public class CSLReferenceMarkManager {
 
         for (CSLReferenceMark mark : marksInOrder) {
             XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling reference mark without anchor: {}", mark.getName());
+                continue;
+            }
             sortEntries.add(new RangeSortEntry<>(range, 0, mark));
         }
 

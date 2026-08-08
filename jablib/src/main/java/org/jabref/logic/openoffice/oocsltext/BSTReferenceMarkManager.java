@@ -133,10 +133,11 @@ public class BSTReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         identifierToNumber.clear();
+        highestCitationNumber = 0;
         citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -175,6 +176,10 @@ public class BSTReferenceMarkManager {
         }
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
 
         if (isNumberUpdateRequired) {
             try {
@@ -297,6 +302,11 @@ public class BSTReferenceMarkManager {
         }
     }
 
+    public List<BSTReferenceMark> getMarksInOrder() {
+        sortMarksInOrder();
+        return marksInOrder;
+    }
+
     public int getCitationNumber(String identifier) {
         Integer override = identifierToNumber.get(identifier);
         if (override != null) {
@@ -327,6 +337,10 @@ public class BSTReferenceMarkManager {
 
         for (BSTReferenceMark mark : marksInOrder) {
             XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling BST reference mark without anchor: {}", mark.getName());
+                continue;
+            }
             sortEntries.add(new RangeSortEntry<>(range, 0, mark));
         }
 

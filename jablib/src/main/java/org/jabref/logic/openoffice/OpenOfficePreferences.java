@@ -18,6 +18,7 @@ import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
+import org.jabref.model.openoffice.style.CitationType;
 
 public class OpenOfficePreferences {
 
@@ -48,6 +49,7 @@ public class OpenOfficePreferences {
     private final ObservableList<String> externalBstStyles;
     private final StringProperty pandocPath;
     private final ObjectProperty<BstCitationFormat> bstCitationFormat;
+    private final ObjectProperty<CitationType> citeSpecialCitationType;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -65,7 +67,8 @@ public class OpenOfficePreferences {
                                  boolean zoteroCompatibilityMode,
                                  List<String> externalBstStyles,
                                  String pandocPath,
-                                 BstCitationFormat bstCitationFormat) {
+                                 BstCitationFormat bstCitationFormat,
+                                 CitationType citeSpecialCitationType) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -83,6 +86,7 @@ public class OpenOfficePreferences {
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
         this.pandocPath = new SimpleStringProperty(pandocPath);
         this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
+        this.citeSpecialCitationType = new SimpleObjectProperty<>(citeSpecialCitationType);
     }
 
     private OpenOfficePreferences() {
@@ -105,7 +109,8 @@ public class OpenOfficePreferences {
                 true,                                           // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
-                BstCitationFormat.NUMERIC                       // bstCitationFormat
+                BstCitationFormat.NUMERIC,                      // bstCitationFormat
+                CitationType.AUTHORYEAR_INTEXT                  // citeSpecialCitationType
         );
     }
 
@@ -305,7 +310,7 @@ public class OpenOfficePreferences {
     }
 
     /// Path to the pandoc executable used for BST bibliography rendering.
-    /// Defaults to `"pandoc"` (system PATH). Users can override via the OO settings menu.
+    /// Defaults to `"pandoc"` (system PATH). Users can override it in Preferences > OpenOffice/LibreOffice.
     public String getPandocPath() {
         return pandocPath.get();
     }
@@ -328,5 +333,17 @@ public class OpenOfficePreferences {
 
     public void setBstCitationFormat(BstCitationFormat format) {
         this.bstCitationFormat.set(format);
+    }
+
+    public CitationType getCiteSpecialCitationType() {
+        return citeSpecialCitationType.get();
+    }
+
+    public ObjectProperty<CitationType> citeSpecialCitationTypeProperty() {
+        return citeSpecialCitationType;
+    }
+
+    public void setCiteSpecialCitationType(CitationType citeSpecialCitationType) {
+        this.citeSpecialCitationType.set(citeSpecialCitationType);
     }
 }
