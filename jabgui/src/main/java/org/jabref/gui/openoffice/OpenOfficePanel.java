@@ -462,10 +462,10 @@ public class OpenOfficePanel {
         citeSpecial.setDisable(!canCite || !specialCitationSupported);
 
         updateBibliography.setDisable(!canGenerateBibliography);
-        merge.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
-        unmerge.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
-        manageCitations.setDisable(!isConnectedToDocument || !hasStyle || cslStyleSelected || bstStyleSelected);
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
+        merge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
         modifyBibliographyProperties.setDisable(!canGenerateBibliography);
     }
 
@@ -723,7 +723,7 @@ public class OpenOfficePanel {
     }
 
     private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
-        boolean isJStyle = currentStyle instanceof JStyle;
+        boolean shouldSwitchOffZoteroMode = currentStyle instanceof JStyle || currentStyle instanceof BstStyle;
         boolean isCSL = currentStyle instanceof CitationStyle;
 
         if (!isCSL) {
@@ -731,7 +731,7 @@ public class OpenOfficePanel {
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
 
-        if (isJStyle) {
+        if (shouldSwitchOffZoteroMode) {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
         }
