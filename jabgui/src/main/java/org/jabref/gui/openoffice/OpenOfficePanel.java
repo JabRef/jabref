@@ -450,7 +450,8 @@ public class OpenOfficePanel {
                 && !jStyle.isNumberEntries()
                 && !jStyle.isCitationKeyCiteMarkers();
         boolean canGenerateBibliography = isConnectedToDocument
-                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
+                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography())
+                && hasDatabase);
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
