@@ -711,7 +711,8 @@ public class OpenOfficePanel {
                         contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
                     }
                 }
-                case CitationStyle _ ->
+                case CitationStyle _,
+                     BstStyle _ ->
                         contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
                 default -> {
                 }
