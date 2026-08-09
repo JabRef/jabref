@@ -666,11 +666,12 @@ public class OpenOfficePanel {
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+        alwaysAddCitedOnPagesText.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof JStyle)));
 
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
-        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> style instanceof CitationStyle));
+        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof CitationStyle)));
 
         CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
         inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
@@ -694,6 +695,7 @@ public class OpenOfficePanel {
 
         contextMenu.getItems().addAll(
                 autoSync,
+                alwaysAddCitedOnPagesText,
                 addSpaceBefore,
                 zoteroCompatibilityMode,
                 inferCslStyleFromDocument,
@@ -704,19 +706,6 @@ public class OpenOfficePanel {
 
         EasyBind.subscribe(currentStyleProperty, newValue -> {
             updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
-
-            switch (newValue) {
-                case JStyle _ -> {
-                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
-                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
-                    }
-                }
-                case CitationStyle _,
-                     BstStyle _ ->
-                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> {
-                }
-            }
         });
 
         EasyBind.subscribe(zoteroCompatibilityMode.selectedProperty(), isSelected -> {
