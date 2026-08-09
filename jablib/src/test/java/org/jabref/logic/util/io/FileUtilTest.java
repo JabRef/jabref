@@ -458,6 +458,22 @@ class FileUtilTest {
     }
 
     @Test
+    void isPDFFile() throws IOException {
+        Path pdfFile = Files.createFile(rootDir.resolve("test.pdf"));
+        Path pdfUpperFile = Files.createFile(rootDir.resolve("test_upper.PDF"));
+        Path pdfMixedFile = Files.createFile(rootDir.resolve("test_mixed.Pdf"));
+        assertTrue(FileUtil.isPDFFile(pdfFile));
+        assertTrue(FileUtil.isPDFFile(pdfUpperFile));
+        assertTrue(FileUtil.isPDFFile(pdfMixedFile));
+    }
+
+    @Test
+    void isNotPDFFile() throws IOException {
+        Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        assertFalse(FileUtil.isPDFFile(bibFile));
+    }
+
+    @Test
     void isShortcutFileReturnsTrueForPathEndingInLnk() {
         assertTrue(FileUtil.isShortcutFile(Path.of("test.lnk")));
     }

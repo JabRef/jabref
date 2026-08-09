@@ -28,11 +28,22 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Test;
+
 @ResourceLock("Localization.lang")
 public class ImporterTest {
+
+    @Test
+    void supportsFileExtensionIsCaseInsensitive() {
+        RisImporter risImporter = new RisImporter();
+        assertTrue(risImporter.supportsFileExtension("ris"));
+        assertTrue(risImporter.supportsFileExtension("RIS"));
+        assertTrue(risImporter.supportsFileExtension("Ris"));
+    }
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
 
