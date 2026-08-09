@@ -229,10 +229,10 @@ class JStyleGetCitationMarker {
     /// @param fields A list of fields, to look up, using first nonempty hit. If backup fields are needed, separate field names by /. E.g. to use "author" with "editor" as backup, specify `FieldFactory.serializeOrFields(StandardField.AUTHOR, StandardField.EDITOR)`
     /// @return The resolved field content, or an empty string if the field(s) were empty.
     private static String getCitationMarkerField(JStyle style,
-                                                 @NonNull CitationLookupResult db,
+                                                 @NonNull CitationLookupResult citationLookupResult,
                                                  OrFields fields) {
         Optional<FieldAndContent> optionalFieldAndContent =
-                getRawCitationMarkerField(db.entry, db.database, fields);
+                getRawCitationMarkerField(citationLookupResult.entry, citationLookupResult.database, fields);
 
         if (optionalFieldAndContent.isEmpty()) {
             // No luck? Return an empty string:
@@ -253,12 +253,12 @@ class JStyleGetCitationMarker {
         return result;
     }
 
-    private static AuthorList getAuthorList(JStyle style, CitationLookupResult db) {
+    private static AuthorList getAuthorList(JStyle style, CitationLookupResult citationLookupResult) {
         // The bibtex fields providing author names, e.g. "author" or
         // "editor".
         OrFields authorFieldNames = style.getAuthorFieldNames();
 
-        String authorListAsString = getCitationMarkerField(style, db, authorFieldNames);
+        String authorListAsString = getCitationMarkerField(style, citationLookupResult, authorFieldNames);
         return AuthorList.parse(authorListAsString);
     }
 
@@ -429,7 +429,7 @@ class JStyleGetCitationMarker {
                     stringBuilder.append(pageInfoPart);
                 }
             } else {
-                CitationLookupResult db = entry.getLookupResult().get();
+                CitationLookupResult citationLookupResult = entry.getLookupResult().get();
 
                 int maxAuthors = purpose == AuthorYearMarkerPurpose.NORMALIZED
                                  ? style.getMaxAuthors()
@@ -440,7 +440,7 @@ class JStyleGetCitationMarker {
                 }
 
                 if (emitAuthors) {
-                    AuthorList authorList = getAuthorList(style, db);
+                    AuthorList authorList = getAuthorList(style, citationLookupResult);
                     String authorString = formatAuthorList(style, authorList, maxAuthors, andString);
                     stringBuilder.append(authorString);
                     stringBuilder.append(yearSep);
@@ -451,7 +451,7 @@ class JStyleGetCitationMarker {
                 }
 
                 if (emitYear) {
-                    String year = getCitationMarkerField(style, db, yearFieldNames);
+                    String year = getCitationMarkerField(style, citationLookupResult, yearFieldNames);
                     if (year != null) {
                         stringBuilder.append(year);
                     }

@@ -8,38 +8,38 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 
-/// Cited keys are collected from the citations in citation groups.
+import org.jspecify.annotations.NullMarked;
+
+/// Cited references are collected from the citations in citation groups.
 ///
-/// They contain backreferences to the corresponding citations in `where`. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
-public class CitedKey implements
-        ComparableCitedKey,
-        CitationMarkerNormEntry,
-        CitationMarkerNumericBibEntry {
+/// They contain backreferences to the corresponding citations in `where`. This allows the extra information generated using [CitedReferences] to be distributed back to the in-text citations.
+@NullMarked
+public class CitedReference implements ComparableCitedReference, CitationMarkerNormEntry, CitationMarkerNumericBibEntry {
 
     public final String citationKey;
     private final List<CitationPath> where;
 
-    private Optional<CitationLookupResult> db;
+    private Optional<CitationLookupResult> citationLookupResult;
     private Optional<Integer> number; // For Numbered citation styles.
     private Optional<String> uniqueLetter; // For AuthorYear citation styles.
-    private Optional<OOText> normCitMarker;  // For AuthorYear citation styles.
+    private Optional<OOText> normalizedCitationMarker;  // For AuthorYear citation styles.
 
-    CitedKey(String citationKey, CitationPath path, Citation citation) {
+    CitedReference(String citationKey, CitationPath path, Citation citation) {
         this.citationKey = citationKey;
         this.where = new ArrayList<>(); // remember order
         this.where.add(path);
 
         // synchronized with Citation
-        this.db = citation.getLookupResult();
+        this.citationLookupResult = citation.getLookupResult();
         this.number = citation.getNumber();
         this.uniqueLetter = citation.getUniqueLetter();
 
-        // CitedKey only
-        this.normCitMarker = Optional.empty();
+        // CitedReference only
+        this.normalizedCitationMarker = Optional.empty();
     }
 
     /*
-     * Implement ComparableCitedKey
+     * Implement ComparableCitedReference
      */
     @Override
     public String getCitationKey() {
@@ -48,7 +48,7 @@ public class CitedKey implements
 
     @Override
     public Optional<BibEntry> getBibEntry() {
-        return db.map(e -> e.entry);
+        return citationLookupResult.map(citationLookupResult -> citationLookupResult.entry);
     }
 
     /*
@@ -56,7 +56,7 @@ public class CitedKey implements
      */
     @Override
     public Optional<CitationLookupResult> getLookupResult() {
-        return db;
+        return citationLookupResult;
     }
 
     /*
@@ -84,26 +84,26 @@ public class CitedKey implements
     }
 
     public Optional<OOText> getNormalizedCitationMarker() {
-        return normCitMarker;
+        return normalizedCitationMarker;
     }
 
-    public void setNormalizedCitationMarker(Optional<OOText> normCitMarker) {
-        this.normCitMarker = normCitMarker;
+    public void setNormalizedCitationMarker(Optional<OOText> normalizedCitationMarker) {
+        this.normalizedCitationMarker = normalizedCitationMarker;
     }
 
     /// Appends to end of `where`
-    void addPath(CitationPath path, Citation cit) {
+    void addPath(CitationPath path, Citation citation) {
         this.where.add(path);
 
         // Check consistency
-        if (!cit.getLookupResult().equals(this.db)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.db");
+        if (!citation.getLookupResult().equals(this.citationLookupResult)) {
+            throw new IllegalStateException("CitedReference.addPath: mismatch on citation.citationLookupResult");
         }
-        if (!cit.getNumber().equals(this.number)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.number");
+        if (!citation.getNumber().equals(this.number)) {
+            throw new IllegalStateException("CitedReference.addPath: mismatch on citation.number");
         }
-        if (!cit.getUniqueLetter().equals(this.uniqueLetter)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.uniqueLetter");
+        if (!citation.getUniqueLetter().equals(this.uniqueLetter)) {
+            throw new IllegalStateException("CitedReference.addPath: mismatch on citation.uniqueLetter");
         }
     }
 
@@ -111,11 +111,11 @@ public class CitedKey implements
      * Lookup
      */
     void lookupInDatabases(List<BibDatabase> databases) {
-        this.db = Citation.lookup(databases, this.citationKey);
+        this.citationLookupResult = Citation.lookup(databases, this.citationKey);
     }
 
     void distributeLookupResult(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);
+        citationGroups.distributeToCitations(where, Citation::setLookupResult, citationLookupResult);
     }
 
     /*
