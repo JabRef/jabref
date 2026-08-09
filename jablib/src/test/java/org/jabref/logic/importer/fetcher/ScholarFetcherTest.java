@@ -144,7 +144,7 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
         assertEquals(20, firstPage.getSize());
         assertEquals(20, secondPage.getSize());
 
-        for(BibEntry bibEntry : firstPage.getContent()) {
+        for (BibEntry bibEntry : firstPage.getContent()) {
             assertFalse(secondPage.getContent().contains(bibEntry), "%s contained in %s".formatted(bibEntry, secondPage.getContent()));
         }
     }
