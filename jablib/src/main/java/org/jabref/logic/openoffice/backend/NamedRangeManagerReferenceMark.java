@@ -19,11 +19,12 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
     public NamedRange createNamedRange(XTextDocument doc,
                                        String refMarkName,
                                        XTextCursor position,
+                                       boolean insertSpaceBefore,
                                        boolean insertSpaceAfter,
                                        boolean withoutBrackets)
             throws
             CreationException {
-        return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
+        return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
     }
 
     @Override

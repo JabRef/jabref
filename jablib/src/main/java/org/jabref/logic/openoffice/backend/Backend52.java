@@ -144,15 +144,17 @@ public class Backend52 {
     ///
     /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
     ///
-    /// @param citationKeys     Keys to be cited.
-    /// @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
-    /// @param position         Collapsed to its end.
-    /// @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
+    /// @param citationKeys      Keys to be cited.
+    /// @param pageInfos         An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
+    /// @param position          Collapsed to its end.
+    /// @param insertSpaceBefore We insert a space before the mark.
+    /// @param insertSpaceAfter  We insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
+                                             boolean insertSpaceBefore,
                                              boolean insertSpaceAfter)
             throws
             CreationException,
@@ -212,6 +214,7 @@ public class Backend52 {
         NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
                 markName,
                 position,
+                insertSpaceBefore,
                 insertSpaceAfter,
                 withoutBrackets);
 

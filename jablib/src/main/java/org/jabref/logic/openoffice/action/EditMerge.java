@@ -65,6 +65,7 @@ public class EditMerge {
                     List<String> citationKeys = OOListUtil.map(newCitations, Citation::getCitationKey);
 
                     /* insertSpaceAfter: no, it is already there (or could be) */
+                    boolean insertSpaceBefore = false;
                     boolean insertSpaceAfter = false;
                     UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                             doc,
@@ -74,6 +75,7 @@ public class EditMerge {
                             OOText.fromString("tmp"),
                             textCursor,
                             style,
+                            insertSpaceBefore,
                             insertSpaceAfter);
                 }
 
