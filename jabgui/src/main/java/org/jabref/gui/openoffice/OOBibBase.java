@@ -779,7 +779,8 @@ public class OOBibBase {
                 jStyle,
                 citationType,
                 pageInfo,
-                openOfficePreferences.getAddSpaceBefore()).mapError(OOError::from);
+                openOfficePreferences.getAddSpaceBefore(),
+                openOfficePreferences.getAddSpaceAfter()).mapError(OOError::from);
 
         if (insertResult.isError()) {
             return insertResult;

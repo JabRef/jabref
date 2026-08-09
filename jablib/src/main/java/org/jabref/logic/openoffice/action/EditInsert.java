@@ -58,7 +58,8 @@ public class EditInsert {
                                                                     JStyle style,
                                                                     CitationType citationType,
                                                                     String pageInfo,
-                                                                    boolean insertSpaceBefore) {
+                                                                    boolean insertSpaceBefore,
+                                                                    boolean insertSpaceAfter) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -97,7 +98,7 @@ public class EditInsert {
                     cursor,
                     style,
                     insertSpaceBefore,
-                    true /* insertSpaceAfter */);
+                    insertSpaceAfter);
             return OOVoidResult.ok();
         } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));

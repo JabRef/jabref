@@ -82,7 +82,7 @@ public class BSTCitationOOAdapter {
         markManager.insertReferenceIntoOO(
                 entries, document, cursor, ooText,
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                !succeedingSpaceExists,
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 CSLCitationType.NORMAL);
         markManager.setRealTimeNumberUpdateRequired(
                 openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);

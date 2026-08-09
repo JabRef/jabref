@@ -400,7 +400,7 @@ public class CSLCitationOOAdapter {
                 cursor,
                 ooText,
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                !succeedingSpaceExists,
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 citationType,
                 currentEntryContext,
                 bibEntryTypesManager,
