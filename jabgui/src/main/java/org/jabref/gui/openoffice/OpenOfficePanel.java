@@ -718,7 +718,7 @@ public class OpenOfficePanel {
             }
         });
 
-        EasyBind.listen(zoteroCompatibilityMode.selectedProperty(), (_, _, isSelected) -> {
+        EasyBind.subscribe(zoteroCompatibilityMode.selectedProperty(), isSelected -> {
             if (!isSelected) {
                 inferCslStyleFromDocument.setSelected(false);
                 openOfficePreferences.setInferCslStyleFromDocument(false);
