@@ -13,12 +13,14 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
+import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.OODataModel;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.openoffice.util.OOVoidResult;
@@ -29,6 +31,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 
 public class EditInsert {
 
@@ -59,7 +62,8 @@ public class EditInsert {
                                                                     CitationType citationType,
                                                                     String pageInfo,
                                                                     boolean insertSpaceBefore,
-                                                                    boolean insertSpaceAfter) {
+                                                                    boolean insertSpaceAfter,
+                                                                    XComponentContext context) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -89,7 +93,7 @@ public class EditInsert {
 
         try {
             UnoScreenRefresh.lockControllers(doc);
-            UpdateCitationMarkers.createAndFillCitationGroup(frontend,
+            CitationGroup group = UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                     doc,
                     citationKeys,
                     pageInfos,
@@ -99,6 +103,10 @@ public class EditInsert {
                     style,
                     insertSpaceBefore,
                     insertSpaceAfter);
+            if (!insertSpaceAfter) {
+                frontend.getMarkRange(doc, group)
+                        .ifPresent(range -> UnoDispatch.resetAttributesAtRangeEnd(context, doc, range));
+            }
             return OOVoidResult.ok();
         } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));

@@ -97,9 +97,9 @@ public class OOBibBase {
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
-        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences);
         bstUpdateBibliography = new BstUpdateBibliography();
     }
 
@@ -780,7 +780,8 @@ public class OOBibBase {
                 citationType,
                 pageInfo,
                 openOfficePreferences.getAddSpaceBefore(),
-                openOfficePreferences.getAddSpaceAfter()).mapError(OOError::from);
+                openOfficePreferences.getAddSpaceAfter(),
+                connection.getComponentContext()).mapError(OOError::from);
 
         if (insertResult.isError()) {
             return insertResult;

@@ -35,6 +35,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,15 +52,17 @@ public class BSTCitationOOAdapter {
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
 
     private final XTextDocument document;
+    private final XComponentContext context;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BSTCitationOOAdapter(XTextDocument document, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XTextDocument document, XComponentContext context, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
         this.document = document;
+        this.context = context;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new BSTReferenceMarkManager(document);
+        this.markManager = new BSTReferenceMarkManager(document, context);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }
@@ -166,7 +169,7 @@ public class BSTCitationOOAdapter {
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
         // Use a transient manager here so export only inspects marks. Reusing the adapter's live manager would
         // disturb its cached numbering state for subsequent BST operations before the next full refresh.
-        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document);
+        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document, context);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> identifiers = new LinkedHashSet<>();

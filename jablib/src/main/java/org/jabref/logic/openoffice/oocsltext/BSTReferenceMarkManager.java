@@ -17,6 +17,8 @@ import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.rangesort.RangeSort;
 import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.UnoCast;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 
@@ -35,6 +37,7 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +52,7 @@ public class BSTReferenceMarkManager {
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
 
     private final XTextDocument document;
+    private final XComponentContext context;
     private final XMultiServiceFactory factory;
     private final Map<String, BSTReferenceMark> marksByName = new HashMap<>();
     private final List<BSTReferenceMark> marksInOrder = new ArrayList<>();
@@ -58,8 +62,9 @@ public class BSTReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public BSTReferenceMarkManager(XTextDocument document) {
+    public BSTReferenceMarkManager(XTextDocument document, XComponentContext context) {
         this.document = document;
+        this.context = context;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
         this.isNumberUpdateRequired = false;
@@ -114,7 +119,7 @@ public class BSTReferenceMarkManager {
 
         // Create DocumentAnnotation and attach it
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, mark.getName(), cursor, true);
-        UnoReferenceMark.create(documentAnnotation);
+        XNamed referenceMark = UnoReferenceMark.create(documentAnnotation);
 
         // Move cursor to the end of the inserted content
         cursor.gotoRange(endRange, false);
@@ -131,6 +136,11 @@ public class BSTReferenceMarkManager {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
+        if (!insertSpaceAfter) {
+            UnoCast.cast(XTextContent.class, referenceMark)
+                   .map(XTextContent::getAnchor)
+                   .ifPresent(range -> UnoDispatch.resetAttributesAtRangeEnd(context, document, range));
+        }
     }
 
     public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {

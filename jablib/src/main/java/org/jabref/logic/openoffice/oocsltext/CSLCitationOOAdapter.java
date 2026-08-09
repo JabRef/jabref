@@ -46,6 +46,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.SecondFieldAlign;
 import org.jspecify.annotations.NonNull;
@@ -77,6 +78,7 @@ public class CSLCitationOOAdapter {
     private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
 
     private final XTextDocument document;
+    private final XComponentContext context;
     private final CSLReferenceMarkManager markManager;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final OpenOfficePreferences openOfficePreferences;
@@ -86,10 +88,11 @@ public class CSLCitationOOAdapter {
     private boolean needsCSLReferenceMarkConversion = true;
     private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
-    public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+    public CSLCitationOOAdapter(XTextDocument doc, XComponentContext context, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
-        this.markManager = new CSLReferenceMarkManager(doc);
+        this.context = context;
+        this.markManager = new CSLReferenceMarkManager(doc, context);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
         this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
@@ -566,7 +569,7 @@ public class CSLCitationOOAdapter {
         // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
         // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
         // full readAndUpdateExistingMarks() refresh.
-        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document);
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document, context);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> citationKeys = new LinkedHashSet<>();

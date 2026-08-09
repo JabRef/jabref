@@ -91,16 +91,16 @@ public class UpdateCitationMarkers {
     /// @param position          Location to insert at.
     /// @param insertSpaceBefore A space inserted before the reference mark makes it easier to separate from the text coming before.
     /// @param insertSpaceAfter  A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
-    public static void createAndFillCitationGroup(OOFrontend frontend,
-                                                  XTextDocument doc,
-                                                  List<String> citationKeys,
-                                                  @NonNull List<Optional<OOText>> pageInfos,
-                                                  CitationType citationType,
-                                                  OOText citationText,
-                                                  XTextCursor position,
-                                                  JStyle style,
-                                                  boolean insertSpaceBefore,
-                                                  boolean insertSpaceAfter)
+    public static CitationGroup createAndFillCitationGroup(OOFrontend frontend,
+                                                           XTextDocument doc,
+                                                           List<String> citationKeys,
+                                                           @NonNull List<Optional<OOText>> pageInfos,
+                                                           CitationType citationType,
+                                                           OOText citationText,
+                                                           XTextCursor position,
+                                                           JStyle style,
+                                                           boolean insertSpaceBefore,
+                                                           boolean insertSpaceAfter)
             throws
             NotRemoveableException,
             WrappedTargetException,
@@ -131,5 +131,6 @@ public class UpdateCitationMarkers {
             frontend.cleanFillCursorForCitationGroup(doc, group);
         }
         position.collapseToEnd();
+        return group;
     }
 }
