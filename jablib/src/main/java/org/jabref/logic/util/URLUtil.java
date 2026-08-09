@@ -81,15 +81,13 @@ public class URLUtil {
             return false;
         }
 
-        String trimmedUrl = url.trim();
-
         // Check if the URL has a protocol (http://, https://, ftp://)
-        if (!URL_PATTERN.matcher(trimmedUrl).matches()) {
+        if (!URL_PATTERN.matcher(url).matches()) {
             return false;
         }
 
         try {
-            create(trimmedUrl);
+            create(url);
             return true;
         } catch (MalformedURLException | IllegalArgumentException e) {
             return false;

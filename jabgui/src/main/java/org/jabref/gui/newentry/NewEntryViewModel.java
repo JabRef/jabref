@@ -1,5 +1,7 @@
 package org.jabref.gui.newentry;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,7 +148,7 @@ public class NewEntryViewModel {
         urlText = new SimpleStringProperty();
         urlTextValidator = new FunctionBasedValidator<>(
                 urlText,
-                URLUtil::isURL,
+                input -> input != null && URLUtil.isURL(input.trim()),
                 ValidationMessage.error(Localization.lang("You must specify a valid URL.")));
         urlWorker = null;
 
@@ -409,6 +411,20 @@ public class NewEntryViewModel {
         }
     }
 
+    /// Reduces a user-provided URL to its scheme and host for logging, since the rest of the URL (userinfo, path,
+    /// query, fragment) commonly carries credentials or access tokens that must not end up in application logs.
+    private static String sanitizeUrlForLogging(String url) {
+        try {
+            URI uri = new URI(url.trim());
+            if (uri.getScheme() == null || uri.getHost() == null) {
+                return "<invalid url>";
+            }
+            return uri.getScheme() + "://" + uri.getHost();
+        } catch (URISyntaxException | NullPointerException e) {
+            return "<invalid url>";
+        }
+    }
+
     public void executeEnterUrl() {
         executing.setValue(true);
 
@@ -418,7 +434,7 @@ public class NewEntryViewModel {
         urlWorker.setOnFailed(_ -> {
             final Throwable exception = urlWorker.getException();
             final String exceptionMessage = exception.getMessage();
-            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", urlText.getValue(), exception);
+            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", sanitizeUrlForLogging(urlText.getValue()), exception);
 
             final String dialogTitle = Localization.lang("Failed to create entry from URL");
             dialogService.showInformationDialogAndWait(
