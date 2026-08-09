@@ -54,6 +54,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -96,6 +97,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -132,7 +134,9 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 bibEntryTypesManager,
                 journalAbbreviationRepository,
                 keyBindingRepository,
-                searchCitationsRelationsService);
+                searchCitationsRelationsService,
+                bibTeXSyntaxHighlighter
+        );
 
         this.viewModel = new EntryEditorViewModel(
                 stateManager,

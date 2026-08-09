@@ -12,7 +12,8 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafxDefault = "26.0.1"
+// Keep version in sync build-support/src/main/java/JournalListMvGenerator.java and build-support/src/main/java/LtwaListMvGenerator.java
+val javafxDefault = "26.0.2"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
@@ -22,7 +23,7 @@ val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -64,11 +65,11 @@ dependencies.constraints {
     api("com.konghq:unirest-modules-gson:4.10.1")
     api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
-    api("com.squareup.okio:okio-jvm:3.18.0")
+    api("com.squareup.okio:okio-jvm:3.18.1")
     api("com.squareup.retrofit2:retrofit:3.0.0")
-    api("com.tngtech.archunit:archunit:1.4.2")
-    api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
-    api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
+    api("com.tngtech.archunit:archunit:1.5.0")
+    api("com.tngtech.archunit:archunit-junit5-api:1.5.0")
+    api("com.tngtech.archunit:archunit-junit5-engine:1.5.0")
     api("com.uber.nullaway:nullaway:0.13.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
@@ -83,8 +84,9 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.185")
+    api("io.github.classgraph:classgraph:4.8.186")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
+    api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -106,7 +108,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.3")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
@@ -137,8 +139,8 @@ dependencies.constraints {
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
-    api("org.jsoup:jsoup:1.22.2")
-    api("org.jspecify:jspecify:1.0.0")
+    api("org.jsoup:jsoup:1.23.1")
+    api("org.jspecify:jspecify:1.0.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
@@ -154,9 +156,9 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
-    api("org.xmlunit:xmlunit-core:2.12.0")
-    api("org.xmlunit:xmlunit-matchers:2.12.0")
+    api("org.xmlunit:xmlunit-core:2.13.0")
+    api("org.xmlunit:xmlunit-matchers:2.13.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
-    api("tools.maran:svgnode:1.0.0")
+    api("tools.maran:svgnode:2.0.0")
 }

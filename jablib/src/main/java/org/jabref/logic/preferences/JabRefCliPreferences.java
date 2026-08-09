@@ -78,6 +78,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -115,6 +116,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
@@ -282,6 +284,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
     public static final String OO_PANDOC_PATH = "ooPandocPath";
     public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
+    public static final String OO_CITE_SPECIAL_CITATION_TYPE = "ooCiteSpecialCitationType";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -410,6 +413,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region OCR preferences
+    private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
@@ -2169,10 +2173,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
-                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())));
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
+        bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2525,7 +2531,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
                 get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
-                getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()));
+                getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()),
+                getCitationTypeFromPrefs(defaultValues.getCiteSpecialCitationType()));
 
         bindString(openOfficePreferences.executablePathProperty(), OO_EXECUTABLE_PATH, defaultValues.getExecutablePath());
         bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
@@ -2547,6 +2554,11 @@ public class JabRefCliPreferences implements CliPreferences {
                 (_, _, newValue) -> put(OO_BST_CITATION_FORMAT, newValue.name()),
                 () -> openOfficePreferences.bstCitationFormatProperty().set(getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat())),
                 () -> openOfficePreferences.bstCitationFormatProperty().set(defaultValues.getBstCitationFormat()));
+        bindCustom(openOfficePreferences.citeSpecialCitationTypeProperty(), OO_CITE_SPECIAL_CITATION_TYPE,
+                defaultValues.getCiteSpecialCitationType(),
+                (_, _, newValue) -> put(OO_CITE_SPECIAL_CITATION_TYPE, newValue.name()),
+                () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(getCitationTypeFromPrefs(defaultValues.getCiteSpecialCitationType())),
+                () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(defaultValues.getCiteSpecialCitationType()));
         bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
         // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
         bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
@@ -2597,6 +2609,15 @@ public class JabRefCliPreferences implements CliPreferences {
             return BstCitationFormat.valueOf(stored);
         } catch (IllegalArgumentException e) {
             return defaultFormat;
+        }
+    }
+
+    private CitationType getCitationTypeFromPrefs(CitationType defaultType) {
+        String stored = get(OO_CITE_SPECIAL_CITATION_TYPE, defaultType.name());
+        try {
+            return CitationType.valueOf(stored);
+        } catch (IllegalArgumentException e) {
+            return defaultType;
         }
     }
     // endregion
