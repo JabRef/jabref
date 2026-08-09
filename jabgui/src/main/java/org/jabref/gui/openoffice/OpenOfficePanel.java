@@ -450,9 +450,8 @@ public class OpenOfficePanel {
         boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
                 && !jStyle.isNumberEntries()
                 && !jStyle.isCitationKeyCiteMarkers();
-        boolean canGenerateBibliography = isConnectedToDocument
-                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography())
-                && hasDatabase);
+        boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
+                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
@@ -735,11 +734,6 @@ public class OpenOfficePanel {
         if (shouldSwitchOffZoteroMode) {
             zoteroCompatibilityMode.setSelected(false);
             openOfficePreferences.setZoteroCompatibilityMode(false);
-        }
-
-        if (!zoteroCompatibilityMode.isSelected()) {
-            inferCslStyleFromDocument.setSelected(false);
-            openOfficePreferences.setInferCslStyleFromDocument(false);
         }
     }
 }
