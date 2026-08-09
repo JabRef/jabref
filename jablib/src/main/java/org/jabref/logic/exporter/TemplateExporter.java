@@ -29,12 +29,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Base class for export formats based on templates.
+@NullMarked
 public class TemplateExporter extends Exporter {
 
     static final String LAYOUT_PREFIX = "/resource/layout/";
@@ -100,7 +101,7 @@ public class TemplateExporter extends Exporter {
     /// @param blankLineBehaviour how to behave regarding blank lines.
     public TemplateExporter(String displayName,
                             String consoleName,
-                            @NonNull String lfFileName,
+                            String lfFileName,
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
@@ -163,16 +164,14 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext,
-                       Path file,
-                       @NonNull List<BibEntry> entries) throws IOException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
         export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     @Override
-    public void export(@NonNull final BibDatabaseContext databaseContext,
+    public void export(final BibDatabaseContext databaseContext,
                        final Path file,
-                       @NonNull List<BibEntry> entries,
+                       List<BibEntry> entries,
                        List<Path> fileDirForDatabase,
                        JournalAbbreviationRepository abbreviationRepository) throws IOException {
         Charset encodingToUse = StandardCharsets.UTF_8;
