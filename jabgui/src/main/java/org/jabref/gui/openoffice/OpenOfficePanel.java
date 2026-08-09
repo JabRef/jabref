@@ -671,13 +671,13 @@ public class OpenOfficePanel {
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
-        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(OpenOfficePanel::isJStyleOrBstStyle));
+        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> style instanceof CitationStyle));
 
         CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
         inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
         inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
         inferCslStyleFromDocument.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> !zoteroCompatibilityMode.isSelected() || isJStyleOrBstStyle(currentStyleProperty.get()),
+                () -> !zoteroCompatibilityMode.isSelected() || !(currentStyleProperty.get() instanceof CitationStyle),
                 zoteroCompatibilityMode.selectedProperty(),
                 currentStyleProperty));
 
@@ -730,7 +730,7 @@ public class OpenOfficePanel {
     }
 
     private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
-        boolean shouldSwitchOffZoteroMode = isJStyleOrBstStyle(currentStyle);
+        boolean shouldSwitchOffZoteroMode = !(currentStyle instanceof CitationStyle);
 
         if (shouldSwitchOffZoteroMode) {
             zoteroCompatibilityMode.setSelected(false);
@@ -741,9 +741,5 @@ public class OpenOfficePanel {
             inferCslStyleFromDocument.setSelected(false);
             openOfficePreferences.setInferCslStyleFromDocument(false);
         }
-    }
-
-    private static boolean isJStyleOrBstStyle(OOStyle style) {
-        return style instanceof JStyle || style instanceof BstStyle;
     }
 }
