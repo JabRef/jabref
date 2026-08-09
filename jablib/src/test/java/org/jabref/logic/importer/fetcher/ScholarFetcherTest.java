@@ -16,7 +16,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
-import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -26,6 +25,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +74,7 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = ScholarFetcher.jsonItemToBibEntry(jsonObject);
 
-        assertEquals(Optional.of("7184"), bibEntry.getField(new UnknownField("scholarAPiId")));
+        assertEquals(Optional.of("7184"), bibEntry.getField(new UnknownField("scholarapi")));
         assertEquals(Optional.of("2008-12-01"), bibEntry.getField(StandardField.DATE));
         assertEquals(Optional.of("2008"), bibEntry.getField(StandardField.YEAR));
         assertEquals(Optional.of("Methylated N-(4-N,N-Dimethylaminobenzyl) Chitosan, a Novel Chitosan Derivative, Enhances Paracellular Permeability Across Intestinal Epithelial Cells (Caco-2)"), bibEntry.getField(StandardField.TITLE));
@@ -136,8 +136,16 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
 
     @Test
     @Override
-    @DisabledOnCIServer("Unstable on CI")
-    public void pageSearchReturnsUniqueResultsPerPage() {
-        // Implementation is done in the interface
+    public void pageSearchReturnsUniqueResultsPerPage() throws FetcherException {
+        String query = queryForUniqueResultsPerPage();
+        Page<BibEntry> firstPage = getPagedFetcher().performSearchPaged(query, 0);
+        Page<BibEntry> secondPage = getPagedFetcher().performSearchPaged(query, 1);
+
+        assertEquals(20, firstPage.getSize());
+        assertEquals(20, secondPage.getSize());
+
+        for(BibEntry bibEntry : firstPage.getContent()) {
+            assertFalse(secondPage.getContent().contains(bibEntry), "%s contained in %s".formatted(bibEntry, secondPage.getContent()));
+        }
     }
 }

@@ -35,9 +35,11 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "ScholarAPI";
 
@@ -87,11 +89,13 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             String publishedDateOnly = publishedDate.split("T")[0];
             entry.withField(StandardField.DATE, publishedDateOnly);
             entry.withField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
+
+            // ScholarAPI's has_text/has_pdf flags for future fulltext-fetcher integration without needing to re fetch metadata to check availability first
             entry.withField(new UnknownField("scholarApiHasText"), String.valueOf(scholarJsonEntry.getBoolean("has_text")));
             entry.withField(new UnknownField("scholarApiHasPdf"), String.valueOf(scholarJsonEntry.getBoolean("has_pdf")));
 
             if (scholarJsonEntry.has("id")) {
-                entry.withField(new UnknownField("scholarAPiId"), scholarJsonEntry.getString("id"));
+                entry.withField(new UnknownField("scholarapi"), scholarJsonEntry.getString("id"));
             }
 
             if (scholarJsonEntry.has("doi")) {
