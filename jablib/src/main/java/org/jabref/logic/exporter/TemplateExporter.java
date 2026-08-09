@@ -30,6 +30,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,21 +52,6 @@ public class TemplateExporter extends Exporter {
     private final SelfContainedSaveOrder saveOrder;
     private final BlankLineBehaviour blankLineBehaviour;
     private boolean customExport;
-
-    /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    ///
-    /// @param displayName Name to display to the user.
-    /// @param consoleName Name to call this format in the console.
-    /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file (a blank string can be passed).
-    /// @param extension   Should contain the . (for instance .txt).
-    public TemplateExporter(String displayName,
-                            String consoleName,
-                            String lfFileName,
-                            String directory,
-                            FileType extension) {
-        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
-    }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
@@ -100,7 +86,7 @@ public class TemplateExporter extends Exporter {
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder) {
-        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
+        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, BlankLineBehaviour.KEEP_BLANKS);
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -118,7 +104,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SelfContainedSaveOrder saveOrder,
+                            @Nullable SelfContainedSaveOrder saveOrder,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (lfFileName.endsWith(LAYOUT_EXTENSION)) {

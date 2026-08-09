@@ -114,6 +114,9 @@ public class CffExporter extends Exporter {
         // If the found software/dataset entries is not only one, then create a dummy main entry holding the given entries
         boolean mainIsDummy = softwareOrDatasetEntries.size() != 1;
         BibEntry main = mainIsDummy ? new BibEntry(StandardEntryType.Software) : softwareOrDatasetEntries.getLast();
+        if (!mainIsDummy) {
+            entriesToTransform.remove(main);
+        }
 
         // Transform main entry to CFF format
         Map<String, Object> cffData = transformEntry(main, true, mainIsDummy);
