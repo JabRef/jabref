@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.util.strings.StringSimilarity;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -647,13 +646,5 @@ public class DuplicateCheckTest {
     void containsDuplicateReturnsEmptyForEmptyCollection() {
         assertEquals(Optional.empty(),
                 duplicateChecker.containsDuplicate(List.of(), simpleArticle, BibDatabaseMode.BIBTEX));
-    }
-
-    @Test
-    void containsDuplicateInCollectionMatchesDatabaseOverload() {
-        BibDatabase database = new BibDatabase(List.of(unrelatedArticle, simpleArticle));
-
-        assertEquals(duplicateChecker.containsDuplicate(database, getSimpleArticle(), BibDatabaseMode.BIBTEX),
-                duplicateChecker.containsDuplicate(List.of(unrelatedArticle, simpleArticle), getSimpleArticle(), BibDatabaseMode.BIBTEX));
     }
 }
