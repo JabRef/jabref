@@ -860,6 +860,12 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Snapshots the active library on the JavaFX Application Thread, so the background matching task never
     /// iterates the live entry list, which the user can modify while the search runs. Taken once per trigger
     /// and shared by the citing and cited-by searches.
+    ///
+    /// TODO: This could be a wrong database, because the user might have switched to another library.
+    ///       Snapshotting when the search is triggered instead of when its result arrives narrows the window,
+    ///       but does not close it - this is still the *active* library, not the entry's own one.
+    ///       If we were on fixing this, we would need to a) associate a BibEntry with a database or
+    ///       b) pass the database at "bindToEntry".
     private LibrarySnapshot snapshotActiveLibrary() {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         List<BibEntry> libraryEntries = databaseContext.map(context -> List.copyOf(context.getDatabase().getEntries()))
