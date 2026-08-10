@@ -44,8 +44,11 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     // Fixed width of the "API key saved" indicator column.
     private static final double KEY_INDICATOR_WIDTH = 24.0;
 
-    // Key glyph used to mark a fetcher that already has a saved API key.
+    // Shown when a fetcher has a user-configured key that will actually survive a restart
     private static final String KEY_SAVED_GLYPH = "\uD83D\uDD11"; // 🔑
+
+    // Shown when a fetcher has a user-configured key that only lives for the current run
+    private static final String KEY_SESSION_ONLY_GLYPH = "\uD83D\uDD53"; // 🕓
 
     private final VBox fetchersContainer = new VBox();
 
@@ -236,18 +239,26 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return indicator;
     }
 
-    /// Refreshes the glyph/tooltip of an existing indicator to reflect whether the given
-    /// fetcher currently has a non-blank saved API key.
+    /// Refreshes the glyph/tooltip of an existing indicator to reflect the given fetcher's current
+    /// API key state.
     private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
         boolean hasSavedKey = item.isCustomizable()
-                && !StringUtil.isBlank(item.getApiKey());
+                && !StringUtil.isBlank(item.getApiKey())
+                && item.shouldUseCustomApiKey();
 
-        if (hasSavedKey) {
+        if (!hasSavedKey) {
+            indicator.setText("");
+            indicator.setTooltip(null);
+            return;
+        }
+
+        boolean willPersist = viewModel.apiKeyPersistAvailable().get() && viewModel.getApikeyPersistProperty().get();
+        if (willPersist) {
             indicator.setText(KEY_SAVED_GLYPH);
             indicator.setTooltip(new Tooltip(Localization.lang("API key is saved")));
         } else {
-            indicator.setText("");
-            indicator.setTooltip(null);
+            indicator.setText(KEY_SESSION_ONLY_GLYPH);
+            indicator.setTooltip(new Tooltip(Localization.lang("API key is set for this session only")));
         }
     }
 
