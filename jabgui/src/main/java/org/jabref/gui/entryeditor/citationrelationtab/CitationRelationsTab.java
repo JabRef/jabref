@@ -492,9 +492,8 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             // switch the fetcher will not trigger refresh from the remote, therefore we trigger it explicitly.
-            LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
-            searchForRelations(citingComponents, citedByComponents, false, librarySnapshot);
-            searchForRelations(citedByComponents, citingComponents, false, librarySnapshot);
+            searchForRelations(citingComponents, citedByComponents, false);
+            searchForRelations(citedByComponents, citingComponents, false);
         });
 
         // Create SplitPane to hold all nodes above
@@ -503,9 +502,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView, citingComponents);
 
         // switch to the tab will not trigger refresh from the remote
-        LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
-        searchForRelations(citingComponents, citedByComponents, false, librarySnapshot);
-        searchForRelations(citedByComponents, citingComponents, false, librarySnapshot);
+        searchForRelations(citingComponents, citedByComponents, false);
+        searchForRelations(citedByComponents, citingComponents, false);
 
         return container;
     }
@@ -795,13 +793,12 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private void searchForRelations(CitationComponents citationComponents,
                                     CitationComponents otherCitationComponents,
-                                    boolean bypassCache,
-                                    LibrarySnapshot librarySnapshot) {
+                                    boolean bypassCache) {
         if (citationComponents.entry().getDOI().isEmpty()) {
             setUpEmptyPanel(citationComponents, otherCitationComponents);
             return;
         }
-        executeSearch(citationComponents, bypassCache, librarySnapshot);
+        executeSearch(citationComponents, bypassCache);
     }
 
     private void setUpEmptyPanel(CitationComponents citationComponents,
@@ -826,9 +823,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                               if (identifier.isPresent()) {
                                   citationComponents.entry().setField(StandardField.DOI, identifier.get().asString());
                                   // if the DOI is successfully looked up (requested by the user), trigger refresh from the remote
-                                  LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
-                                  executeSearch(citationComponents, true, librarySnapshot);
-                                  executeSearch(otherCitationComponents, true, librarySnapshot);
+                                  executeSearch(citationComponents, true);
+                                  executeSearch(otherCitationComponents, true);
                               } else {
                                   dialogService.notify(Localization.lang("No DOI found."));
                                   setUpEmptyPanel(citationComponents, otherCitationComponents);
@@ -858,8 +854,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Snapshots the active library on the JavaFX Application Thread, so the background matching task never
-    /// iterates the live entry list, which the user can modify while the search runs. Taken once per trigger
-    /// and shared by the citing and cited-by searches.
+    /// iterates the live entry list, which the user can modify while the search runs.
     ///
     /// TODO: This could be a wrong database, because the user might have switched to another library.
     ///       Snapshotting when the search is triggered instead of when its result arrives narrows the window,
@@ -875,7 +870,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         return new LibrarySnapshot(libraryEntries, databaseMode);
     }
 
-    private void executeSearch(CitationComponents citationComponents, boolean bypassCache, LibrarySnapshot librarySnapshot) {
+    private void executeSearch(CitationComponents citationComponents, boolean bypassCache) {
+        LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
         citationComponents.listView().setItems(observableList);
 
@@ -1070,7 +1066,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 && label.getText().startsWith(Localization.lang("Error"));
 
         if (hasError) {
-            searchForRelations(citationComponents, otherCitationComponents, true, snapshotActiveLibrary());
+            searchForRelations(citationComponents, otherCitationComponents, true);
             return;
         }
 
@@ -1088,7 +1084,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
         }
 
-        searchForRelations(citationComponents, otherCitationComponents, true, snapshotActiveLibrary());
+        searchForRelations(citationComponents, otherCitationComponents, true);
     }
 
     /// Immutable snapshot of the active library, taken on the JavaFX Application Thread and consumed by the
