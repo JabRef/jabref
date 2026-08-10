@@ -73,6 +73,7 @@ public class NamedRangeReferenceMark implements NamedRange {
     private static void createReprInDocument(XTextDocument doc,
                                              String refMarkName,
                                              XTextCursor position,
+                                             boolean insertSpaceBefore,
                                              boolean insertSpaceAfter,
                                              boolean withoutBrackets)
             throws
@@ -101,9 +102,11 @@ public class NamedRangeReferenceMark implements NamedRange {
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
         UnoReferenceMark.create(documentAnnotation);
 
-        // eat the first inserted space
-        cursorBefore.goRight((short) 1, true);
-        cursorBefore.setString("");
+        if (!insertSpaceBefore) {
+            // eat the first inserted space
+            cursorBefore.goRight((short) 1, true);
+            cursorBefore.setString("");
+        }
         if (!insertSpaceAfter) {
             // eat the second inserted space
             cursorAfter.goLeft((short) 1, true);
@@ -114,12 +117,13 @@ public class NamedRangeReferenceMark implements NamedRange {
     static NamedRangeReferenceMark create(XTextDocument doc,
                                           String refMarkName,
                                           XTextCursor position,
+                                          boolean insertSpaceBefore,
                                           boolean insertSpaceAfter,
                                           boolean withoutBrackets)
             throws
             CreationException {
 
-        createReprInDocument(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
+        createReprInDocument(doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
         return new NamedRangeReferenceMark(refMarkName);
     }
 
@@ -129,7 +133,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                               .map(e -> new NamedRangeReferenceMark(refMarkName));
+                               .map(entry -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /// Remove it from the document.
@@ -230,9 +234,10 @@ public class NamedRangeReferenceMark implements NamedRange {
                 full.setString("");
                 UnoReferenceMark.removeIfExists(doc, name);
 
+                final boolean insertSpaceBefore = false;
                 final boolean insertSpaceAfter = false;
                 final boolean withoutBrackets = false;
-                createReprInDocument(doc, name, full, insertSpaceAfter, withoutBrackets);
+                createReprInDocument(doc, name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
             }
         }
 

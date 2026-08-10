@@ -78,6 +78,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -278,8 +279,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
     public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
-    public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
+    public static final String OO_INFER_CSL_STYLE_FROM_DOCUMENT = "ooInferCslStyleFromDocument";
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
     public static final String OO_PANDOC_PATH = "ooPandocPath";
     public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
@@ -412,6 +413,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region OCR preferences
+    private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
@@ -2171,10 +2173,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
-                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())));
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
+        bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2523,8 +2527,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
                 getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
-                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
+                getBoolean(OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
                 get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
                 getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()),
@@ -2535,8 +2539,8 @@ public class JabRefCliPreferences implements CliPreferences {
         bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
         bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
         bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
-        bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
         bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
+        bindBoolean(openOfficePreferences.inferCslStyleFromDocumentProperty(), OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);

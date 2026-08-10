@@ -177,15 +177,17 @@ public class OOFrontend {
     ///
     /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
     ///
-    /// @param citationKeys     In storage order
-    /// @param pageInfos        In storage order
-    /// @param position         Collapsed to its end.
-    /// @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
+    /// @param citationKeys      In storage order
+    /// @param pageInfos         In storage order
+    /// @param position          Collapsed to its end.
+    /// @param insertSpaceBefore If true, we insert a space before the mark.
+    /// @param insertSpaceAfter  If true, we insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
+                                             boolean insertSpaceBefore,
                                              boolean insertSpaceAfter)
             throws
             CreationException,
@@ -203,6 +205,7 @@ public class OOFrontend {
                 pageInfos,
                 citationType,
                 position,
+                insertSpaceBefore,
                 insertSpaceAfter);
 
         this.citationGroups.afterCreateCitationGroup(group);
@@ -325,7 +328,7 @@ public class OOFrontend {
     public List<RangeForOverlapCheck<CitationGroupId>> viewCursorRanges(XTextDocument doc) {
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
-        Optional<XTextRange> range = UnoCursor.getViewCursor(doc).map(e -> e);
+        Optional<XTextRange> range = UnoCursor.getViewCursor(doc).map(entry -> entry);
         if (range.isPresent()) {
             String description = "cursor";
             result.add(new RangeForOverlapCheck<>(range.get(),
