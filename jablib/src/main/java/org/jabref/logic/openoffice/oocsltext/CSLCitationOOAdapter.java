@@ -77,8 +77,8 @@ public class CSLCitationOOAdapter {
             "^(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*|(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*$");
     private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
-    private final XComponentContext context;
     private final CSLReferenceMarkManager markManager;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final OpenOfficePreferences openOfficePreferences;
@@ -88,11 +88,11 @@ public class CSLCitationOOAdapter {
     private boolean needsCSLReferenceMarkConversion = true;
     private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
-    public CSLCitationOOAdapter(XTextDocument doc, XComponentContext context, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+    public CSLCitationOOAdapter(XComponentContext componentContext, XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = doc;
-        this.context = context;
-        this.markManager = new CSLReferenceMarkManager(doc, context);
+        this.markManager = new CSLReferenceMarkManager(componentContext, doc);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
         this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;

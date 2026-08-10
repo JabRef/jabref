@@ -13,14 +13,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
-import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.OODataModel;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
-import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.openoffice.util.OOVoidResult;
@@ -53,7 +51,8 @@ public class EditInsert {
 
     /// @param cursor   Where to insert.
     /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
-    public static OOVoidResult<JabRefException> insertCitationGroup(XTextDocument doc,
+    public static OOVoidResult<JabRefException> insertCitationGroup(XComponentContext context,
+                                                                    XTextDocument doc,
                                                                     OOFrontend frontend,
                                                                     XTextCursor cursor,
                                                                     List<BibEntry> entries,
@@ -62,8 +61,7 @@ public class EditInsert {
                                                                     CitationType citationType,
                                                                     String pageInfo,
                                                                     boolean insertSpaceBefore,
-                                                                    boolean insertSpaceAfter,
-                                                                    XComponentContext context) {
+                                                                    boolean insertSpaceAfter) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -93,7 +91,8 @@ public class EditInsert {
 
         try {
             UnoScreenRefresh.lockControllers(doc);
-            CitationGroup group = UpdateCitationMarkers.createAndFillCitationGroup(frontend,
+            UpdateCitationMarkers.createAndFillCitationGroup(frontend,
+                    context,
                     doc,
                     citationKeys,
                     pageInfos,
@@ -103,10 +102,6 @@ public class EditInsert {
                     style,
                     insertSpaceBefore,
                     insertSpaceAfter);
-            if (!insertSpaceAfter) {
-                frontend.getMarkRange(doc, group)
-                        .ifPresent(range -> UnoDispatch.resetAttributesAtRangeEnd(context, doc, range));
-            }
             return OOVoidResult.ok();
         } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));

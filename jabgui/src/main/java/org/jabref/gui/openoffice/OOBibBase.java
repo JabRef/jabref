@@ -97,9 +97,9 @@ public class OOBibBase {
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
-        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences, bibEntryTypesManager);
+        cslCitationOOAdapter = new CSLCitationOOAdapter(connection.getComponentContext(), doc, openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(connection.getComponentContext(), doc, openOfficePreferences);
         bstUpdateBibliography = new BstUpdateBibliography();
     }
 
@@ -771,7 +771,8 @@ public class OOBibBase {
                                                       Optional<Update.SyncOptions> syncOptions,
                                                       String pageInfo,
                                                       OOResult<FunctionalTextViewCursor, OOError> fcursor) {
-        OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
+        OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(connection.getComponentContext(),
+                doc,
                 frontend.get(),
                 cursor.get(),
                 entries,
@@ -780,8 +781,7 @@ public class OOBibBase {
                 citationType,
                 pageInfo,
                 openOfficePreferences.getAddSpaceBefore(),
-                openOfficePreferences.getAddSpaceAfter(),
-                connection.getComponentContext()).mapError(OOError::from);
+                openOfficePreferences.getAddSpaceAfter()).mapError(OOError::from);
 
         if (insertResult.isError()) {
             return insertResult;
@@ -851,7 +851,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> mergeResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditMerge.mergeCitationGroups(doc, frontend, jStyle));
+                        () -> EditMerge.mergeCitationGroups(connection.getComponentContext(), doc, frontend, jStyle));
                 if (testDialog(errorTitle, mergeResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
@@ -909,7 +909,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> separateResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditSeparate.separateCitations(doc, frontend, databases, jStyle));
+                        () -> EditSeparate.separateCitations(connection.getComponentContext(), doc, frontend, databases, jStyle));
                 if (testDialog(errorTitle, separateResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }

@@ -43,6 +43,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NonNull;
 
 public class OOFrontend {
@@ -182,7 +183,8 @@ public class OOFrontend {
     /// @param position          Collapsed to its end.
     /// @param insertSpaceBefore If true, we insert a space before the mark.
     /// @param insertSpaceAfter  If true, we insert a space after the mark, that carries on format of characters from the original position.
-    public CitationGroup createCitationGroup(XTextDocument doc,
+    public CitationGroup createCitationGroup(XComponentContext context,
+                                             XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
@@ -200,7 +202,8 @@ public class OOFrontend {
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
-        CitationGroup group = backend.createCitationGroup(doc,
+        CitationGroup group = backend.createCitationGroup(context,
+                doc,
                 citationKeys,
                 pageInfos,
                 citationType,

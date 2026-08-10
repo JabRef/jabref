@@ -41,8 +41,8 @@ public class OOBibBaseConnect {
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBaseConnect.class);
 
     private final DialogService dialogService;
-    private final XComponentContext context;
     private final XDesktop xDesktop;
+    private final XComponentContext componentContext;
 
     /// Created when connected to a document.
     ///
@@ -55,14 +55,14 @@ public class OOBibBaseConnect {
             CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
-        this.context = Bootstrap.bootstrap(loPath);
-        this.xDesktop = createDesktop(context);
+        this.componentContext = Bootstrap.bootstrap(loPath);
+        this.xDesktop = createDesktop(componentContext);
     }
 
     private XDesktop createDesktop(XComponentContext context)
             throws
-            CreationException,
-            BootstrapException, IOException, InterruptedException {
+            CreationException {
+
         XMultiComponentFactory sem = context.getServiceManager();
 
         // Create the desktop, which is the root frame of the
@@ -73,12 +73,11 @@ public class OOBibBaseConnect {
         } catch (com.sun.star.uno.Exception e) {
             throw new CreationException(e.getMessage());
         }
-        return UnoCast.cast(XDesktop.class, desktop)
-                      .orElseThrow(() -> new CreationException("Could not create OpenOffice desktop"));
+        return UnoCast.cast(XDesktop.class, desktop).get();
     }
 
     XComponentContext getComponentContext() {
-        return context;
+        return componentContext;
     }
 
     /// Close any open office connection, if none exists does nothing

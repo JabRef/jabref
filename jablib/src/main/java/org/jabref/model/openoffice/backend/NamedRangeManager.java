@@ -9,10 +9,12 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 
 public interface NamedRangeManager {
 
-    NamedRange createNamedRange(XTextDocument doc,
+    NamedRange createNamedRange(XComponentContext context,
+                                XTextDocument doc,
                                 String markName,
                                 XTextCursor position,
                                 boolean insertSpaceBefore,

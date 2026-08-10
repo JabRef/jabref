@@ -1,111 +1,98 @@
 package org.jabref.model.openoffice.uno;
 
-import java.util.Optional;
-
 import com.sun.star.beans.PropertyValue;
-import com.sun.star.frame.XController;
 import com.sun.star.frame.XDispatchHelper;
 import com.sun.star.frame.XDispatchProvider;
-import com.sun.star.lang.XMultiComponentFactory;
+import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
-import com.sun.star.text.XTextViewCursor;
+import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Executes a LibreOffice UI command against the document's controller.
+///
+/// Used to reach SwTextNode::DontExpandFormat, which has no UNO equivalent:
+/// `.uno:ResetAttributes` -> SwDoc::ResetAttrs(bTextAttr=true) -> DontExpandFormat,
+/// which sets the DontExpand flag on text hints ending at the view cursor, stopping
+/// a ReferenceMark from absorbing the next typed character. See tdf#81720.
+///
+/// The flag is one-shot, but one is enough: after a character survives, the caret sits
+/// past the mark's end and the bleed condition can no longer hold. What this does not
+/// protect against is the caret returning to that boundary (click, delete, undo) — see
+/// the repair path in `CSLReferenceMarkManager`.
 @NullMarked
 public class UnoDispatch {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UnoDispatch.class);
+    private static final String DISPATCH_HELPER_SERVICE = "com.sun.star.frame.DispatchHelper";
     private static final String RESET_ATTRIBUTES_COMMAND = ".uno:ResetAttributes";
     private static final PropertyValue[] EMPTY_DISPATCH_ARGUMENTS = new PropertyValue[0];
 
     private UnoDispatch() {
     }
 
-    /// Prevents a reference mark ending at the current view cursor from expanding into the next typed character.
+    /// Arms LibreOffice's one-shot `DontExpand` protection when the insertion cursor ends exactly
+    /// at the citation boundary.
     ///
-    /// `.uno:ResetAttributes` reaches LibreOffice's `DontExpandFormat` path, which has no direct UNO equivalent.
-    /// The command acts on the view cursor and is visible in undo history as "Clear Direct Formatting", so this method
-    /// first checks that the view cursor is collapsed exactly at the mark end. The flag is one-shot and does not protect
-    /// against the caret returning to the same boundary later.
-    public static void resetAttributesAtRangeEnd(XComponentContext context, XTextDocument document, XTextRange range) {
+    /// `.uno:ResetAttributes` acts on the view cursor and shows up in undo history as
+    /// "Clear Direct Formatting", so this helper first verifies that the live insertion cursor is
+    /// collapsed and ends at the same position as `endRange`.
+    public static void resetAttributesAtRangeEnd(XComponentContext context,
+                                                 XTextDocument doc,
+                                                 XTextCursor cursor,
+                                                 XTextRange endRange) {
         try {
-            if (!isViewCursorAtRangeEnd(document, range)) {
+            XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, cursor.getText());
+            if ((compare == null) || !cursor.isCollapsed()) {
                 return;
             }
 
-            execute(context, document, RESET_ATTRIBUTES_COMMAND, EMPTY_DISPATCH_ARGUMENTS);
+            if (compare.compareRegionEnds(cursor, endRange) == 0) {
+                execute(context, doc, RESET_ATTRIBUTES_COMMAND, EMPTY_DISPATCH_ARGUMENTS);
+            }
         } catch (com.sun.star.uno.RuntimeException exception) {
-            LOGGER.debug("Could not reset attributes at the end of the reference mark", exception);
+            LOGGER.debug("Could not compare insertion cursor with citation end", exception);
         }
     }
 
-    /// Executes a LibreOffice UI command against the document's controller.
-    ///
-    /// Dispatch commands are UI-level mitigations here. Failures are logged at debug level and never propagated.
+    /// Re-arms `DontExpand` for a recreated mark when the user's view cursor is still at that
+    /// boundary after a numeric citation update.
+    public static void resetAttributesAtRangeEnd(XComponentContext context,
+                                                 XTextDocument doc,
+                                                 XTextRange endRange) {
+        try {
+            UnoCursor.getViewCursor(doc)
+                     .ifPresent(viewCursor -> resetAttributesAtRangeEnd(context, doc, viewCursor, endRange));
+        } catch (com.sun.star.uno.RuntimeException exception) {
+            LOGGER.debug("Could not resolve view cursor for resetting attributes", exception);
+        }
+    }
+
     public static void execute(XComponentContext context,
-                               XTextDocument document,
+                               XTextDocument doc,
                                String unoUrl,
                                PropertyValue[] arguments) {
         try {
-            getDispatchProvider(document).ifPresent(dispatchProvider ->
-                    createDispatchHelper(context).ifPresent(dispatchHelper ->
-                            executeDispatch(dispatchProvider, dispatchHelper, unoUrl, arguments)));
-        } catch (com.sun.star.uno.RuntimeException exception) {
-            LOGGER.debug("Could not execute UNO dispatch command: {}", unoUrl, exception);
+            Object dispatchHelperObject = context.getServiceManager().createInstanceWithContext(DISPATCH_HELPER_SERVICE, context);
+            XDispatchHelper dispatchHelper = UnoRuntime.queryInterface(XDispatchHelper.class, dispatchHelperObject);
+            if (dispatchHelper == null) {
+                LOGGER.debug("Could not query XDispatchHelper for UNO dispatch {}", unoUrl);
+                return;
+            }
+
+            XDispatchProvider dispatchProvider = UnoRuntime.queryInterface(XDispatchProvider.class, doc.getCurrentController());
+            if (dispatchProvider == null) {
+                LOGGER.debug("Could not query XDispatchProvider for UNO dispatch {}", unoUrl);
+                return;
+            }
+
+            dispatchHelper.executeDispatch(dispatchProvider, unoUrl, "", 0, arguments);
+        } catch (com.sun.star.uno.Exception | com.sun.star.uno.RuntimeException exception) {
+            LOGGER.debug("Could not execute UNO dispatch {}", unoUrl, exception);
         }
-    }
-
-    /// Make sure cursor does not select texts
-    private static boolean isViewCursorAtRangeEnd(XTextDocument document, XTextRange range) {
-        return UnoCursor.getViewCursor(document)
-                        .filter(XTextViewCursor::isCollapsed)
-                        .map(viewCursor -> rangeEndsAtSamePosition(viewCursor, range))
-                        .orElse(false);
-    }
-
-    private static boolean rangeEndsAtSamePosition(XTextRange first, XTextRange second) {
-        try {
-            return UnoCast.cast(XTextRangeCompare.class, second.getText())
-                          .map(textRangeCompare -> textRangeCompare.compareRegionEnds(first, second) == 0)
-                          .orElse(false);
-        } catch (com.sun.star.uno.RuntimeException exception) {
-            LOGGER.debug("Could not compare text ranges before resetting attributes", exception);
-            return false;
-        }
-    }
-
-    private static Optional<XDispatchProvider> getDispatchProvider(XTextDocument document) {
-        return UnoTextDocument.getCurrentController(document)
-                              .map(XController::getFrame)
-                              .flatMap(frame -> UnoCast.cast(XDispatchProvider.class, frame));
-    }
-
-    private static Optional<XDispatchHelper> createDispatchHelper(XComponentContext context) {
-        XMultiComponentFactory serviceManager = context.getServiceManager();
-        if (serviceManager == null) {
-            return Optional.empty();
-        }
-
-        try {
-            Object dispatchHelper = serviceManager.createInstanceWithContext(
-                    "com.sun.star.frame.DispatchHelper",
-                    context);
-            return UnoCast.cast(XDispatchHelper.class, dispatchHelper);
-        } catch (com.sun.star.uno.Exception exception) {
-            LOGGER.debug("Could not create UNO dispatch helper", exception);
-            return Optional.empty();
-        }
-    }
-
-    private static void executeDispatch(XDispatchProvider dispatchProvider,
-                                        XDispatchHelper dispatchHelper,
-                                        String unoUrl,
-                                        PropertyValue[] arguments) {
-        dispatchHelper.executeDispatch(dispatchProvider, unoUrl, "", 0, arguments);
     }
 }

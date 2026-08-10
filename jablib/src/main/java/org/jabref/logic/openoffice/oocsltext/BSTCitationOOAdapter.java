@@ -51,18 +51,18 @@ public class BSTCitationOOAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
-    private final XComponentContext context;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BSTCitationOOAdapter(XTextDocument document, XComponentContext context, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XComponentContext componentContext, XTextDocument document, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = document;
-        this.context = context;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new BSTReferenceMarkManager(document, context);
+        this.markManager = new BSTReferenceMarkManager(componentContext, document);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }

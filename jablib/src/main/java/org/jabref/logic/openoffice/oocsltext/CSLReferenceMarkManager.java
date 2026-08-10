@@ -24,7 +24,6 @@ import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.rangesort.RangeSort;
 import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
-import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
@@ -60,8 +59,8 @@ public class CSLReferenceMarkManager {
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]*>");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
-    private final XComponentContext context;
     private final XMultiServiceFactory factory;
     private final Map<String, CSLReferenceMark> marksByName = new HashMap<>();
     private final List<CSLReferenceMark> marksInOrder = new ArrayList<>();
@@ -72,9 +71,9 @@ public class CSLReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public CSLReferenceMarkManager(XTextDocument document, XComponentContext context) {
+    public CSLReferenceMarkManager(XComponentContext componentContext, XTextDocument document) {
+        this.componentContext = componentContext;
         this.document = document;
-        this.context = context;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
         this.isNumberUpdateRequired = false;
@@ -277,7 +276,7 @@ public class CSLReferenceMarkManager {
 
         // Create DocumentAnnotation and attach it
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, mark.getName(), cursor, true);
-        XNamed referenceMark = UnoReferenceMark.create(documentAnnotation);
+        UnoReferenceMark.create(documentAnnotation);
         UnoUserDefinedProperty.setStringProperty(document, FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + mark.getUniqueId(), ooText.toString());
         mark.setFormattedCitationText(ooText);
 
@@ -296,10 +295,9 @@ public class CSLReferenceMarkManager {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
+
         if (!insertSpaceAfter) {
-            UnoCast.cast(XTextContent.class, referenceMark)
-                   .map(XTextContent::getAnchor)
-                   .ifPresent(range -> UnoDispatch.resetAttributesAtRangeEnd(context, document, range));
+            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, position, endRange);
         }
     }
 
@@ -521,6 +519,8 @@ public class CSLReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(componentContext, document, anchor));
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
