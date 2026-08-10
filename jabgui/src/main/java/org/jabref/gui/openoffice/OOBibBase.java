@@ -60,6 +60,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,9 +98,10 @@ public class OOBibBase {
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
-        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences, bibEntryTypesManager);
+        XComponentContext componentContext = connection.getComponentContext();
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, componentContext, openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, componentContext, openOfficePreferences);
         bstUpdateBibliography = new BstUpdateBibliography();
     }
 
