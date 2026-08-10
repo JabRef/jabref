@@ -565,11 +565,16 @@ public class CSLCitationOOAdapter {
         return citation;
     }
 
+    public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
+        this.citationType = markManager.getCitationType();
+    }
+
     public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
         // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
         // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
         // full readAndUpdateExistingMarks() refresh.
-        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document, context);
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(componentContext, document);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> citationKeys = new LinkedHashSet<>();

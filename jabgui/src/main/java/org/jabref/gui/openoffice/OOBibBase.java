@@ -1133,6 +1133,13 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create BST bibliography");
 
+            try {
+                bstCitationOOAdapter.refreshCitationState();
+            } catch (WrappedTargetException | NoSuchElementException exception) {
+                LOGGER.error("Could not refresh BST citation state", exception);
+                return OOVoidResult.error(OOError.fromMisc(exception).setTitle(errorTitle));
+            }
+
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(db -> db.getEntries().stream())
                                                    .filter(bstCitationOOAdapter::isCitedEntry)
@@ -1202,6 +1209,12 @@ public class OOBibBase {
                                               .toList();
 
             cslCitationOOAdapter.linkZoteroCitations(new BibDatabaseContext(new BibDatabase(entries)));
+            try {
+                cslCitationOOAdapter.refreshCitationState();
+            } catch (WrappedTargetException | NoSuchElementException exception) {
+                LOGGER.error("Could not refresh CSL citation state", exception);
+                return OOVoidResult.error(OOError.fromMisc(exception).setTitle(errorTitle));
+            }
 
             List<BibEntry> citedEntries = entries.stream()
                                                  .filter(cslCitationOOAdapter::isCitedEntry)
