@@ -113,8 +113,7 @@ public class FrameDndHandler {
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 TransferMode mode = tabDragEvent.getTransferMode();
-                org.jabref.model.TransferMode modelTransferMode = toModelTransferMode(mode);
-
+                org.jabref.model.TransferMode modelTransferMode= org.jabref.model.TransferMode.from(mode);
                 destinationLibraryTab.dropEntry(sourceBibDatabaseContext, originalEntries, entryCopies, modelTransferMode);
                 success = true;
             } else if (hasGroups(dragboard)) {
@@ -124,22 +123,6 @@ public class FrameDndHandler {
 
             tabDragEvent.setDropCompleted(success);
             tabDragEvent.consume();
-        }
-    }
-
-    private org.jabref.model.TransferMode toModelTransferMode(TransferMode javafxTransferMode) {
-        if (javafxTransferMode == null) {
-            return org.jabref.model.TransferMode.NONE;
-        }
-        switch (javafxTransferMode) {
-            case COPY -> {
-                return org.jabref.model.TransferMode.COPY;
-            }
-            case MOVE -> {
-                return org.jabref.model.TransferMode.MOVE;
-            }
-            default ->
-                    throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
         }
     }
 
