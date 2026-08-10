@@ -225,7 +225,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return container;
     }
 
-
     private Label buildApiKeyIndicator(WebSearchTabViewModel.FetcherViewModel item) {
         Label indicator = new Label();
         indicator.getStyleClass().add("api-key-indicator");
