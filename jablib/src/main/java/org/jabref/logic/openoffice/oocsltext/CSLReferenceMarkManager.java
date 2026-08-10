@@ -30,6 +30,7 @@ import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
 
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -58,6 +59,8 @@ public class CSLReferenceMarkManager {
     private static final String FORMATTED_CITATION_TEXT_PROPERTY_PREFIX = "JabRef_formatted_citation_text:";
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]*>");
+    private static final Pattern FULL_SUPERSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sup>.*</sup>(?:</span>)?$");
+    private static final Pattern FULL_SUBSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sub>.*</sub>(?:</span>)?$");
 
     private final XComponentContext componentContext;
     private final XTextDocument document;
@@ -233,6 +236,30 @@ public class CSLReferenceMarkManager {
                                 .map(database -> database.getEntryByCitationKey(citationKey))
                                 .flatMap(Optional::stream)
                                 .findFirst();
+    }
+
+    private void restoreEscapementFormattingIfNeeded(String text, XTextCursor cursor) {
+        XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        if (propertySet == null) {
+            return;
+        }
+
+        try {
+            if (FULL_SUPERSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) 33);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            } else if (FULL_SUBSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) -10);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            }
+        } catch (com.sun.star.beans.UnknownPropertyException
+                 | com.sun.star.beans.PropertyVetoException
+                 | com.sun.star.lang.WrappedTargetException
+                 | com.sun.star.uno.RuntimeException exception) {
+            LOGGER.warn("Could not restore escapement formatting for rewritten citation text", exception);
+        }
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
@@ -510,6 +537,11 @@ public class CSLReferenceMarkManager {
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
+        if (updatedName.equals(mark.getName()) && updatedText.equals(currentText)) {
+            mark.setCitationNumbers(newNumbers);
+            return;
+        }
+
         updateMarkAndText(mark, updatedText, updatedName);
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -580,6 +612,7 @@ public class CSLReferenceMarkManager {
             // Move cursor to wrap the entire inserted content
             cursor.gotoRange(startRange, false);
             cursor.gotoRange(endRange, true);
+            restoreEscapementFormattingIfNeeded(newText, cursor);
 
             // Create and attach DocumentAnnotation
             DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, markName, cursor, true);
