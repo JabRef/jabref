@@ -225,9 +225,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return container;
     }
 
-    /// Builds the "API key saved" indicator shown next to a fetcher's name.
-    /// The column is always added to the row (even for fetchers without a saved/possible key)
-    /// so that "Configure API key" buttons remain vertically aligned across all rows.
+
     private Label buildApiKeyIndicator(WebSearchTabViewModel.FetcherViewModel item) {
         Label indicator = new Label();
         indicator.getStyleClass().add("api-key-indicator");
