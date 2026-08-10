@@ -323,7 +323,9 @@ public class CSLReferenceMarkManager {
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
 
-        if (!insertSpaceAfter) {
+        if (containsEscapementMarkup(ooText.toString())) {
+            OOTextIntoOO.removeEscapementFormatting(position);
+        } else if (!insertSpaceAfter) {
             UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, position, endRange);
         }
     }
@@ -552,7 +554,15 @@ public class CSLReferenceMarkManager {
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
         Optional.ofNullable(newContent.getAnchor())
-                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(componentContext, document, anchor));
+                .ifPresent(anchor -> {
+                    if (!containsEscapementMarkup(updatedText)) {
+                        UnoDispatch.resetAttributesAtRangeEnd(componentContext, document, anchor);
+                    }
+                });
+    }
+
+    private static boolean containsEscapementMarkup(String text) {
+        return text.contains("<sup>") || text.contains("<sub>");
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
