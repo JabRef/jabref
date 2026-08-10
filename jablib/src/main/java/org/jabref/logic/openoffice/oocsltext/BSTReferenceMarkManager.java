@@ -137,7 +137,7 @@ public class BSTReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
 
         if (!insertSpaceAfter) {
-            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, position, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, endRange);
         }
     }
 

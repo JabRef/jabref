@@ -326,7 +326,7 @@ public class CSLReferenceMarkManager {
         if (containsEscapementMarkup(ooText.toString())) {
             OOTextIntoOO.removeEscapementFormatting(position);
         } else if (!insertSpaceAfter) {
-            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, position, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, endRange);
         }
     }
 

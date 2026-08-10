@@ -124,7 +124,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         position.gotoRange(cursorAfter.getEnd(), false);
 
         if (!insertSpaceAfter && context.isPresent()) {
-            UnoDispatch.resetAttributesAtRangeEnd(context.orElseThrow(), doc, position, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(context.orElseThrow(), doc, endRange);
         }
     }
 
