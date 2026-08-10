@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import javafx.beans.value.ObservableValue;
@@ -22,8 +21,8 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.validation.Severity;
 import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.Subscription;
@@ -243,8 +242,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (validationProperty != null) {
                         ReadOnlyConstrainedProperty<?, ValidationMessage> validation = validationProperty.call(viewModel);
-                        highestMessage(validation)
-                                .ifPresent(message -> setTooltip(new Tooltip(message.message())));
+                        ValidationVisualizer.highestMessage(validation)
+                                            .ifPresent(message -> setTooltip(new Tooltip(message.message())));
 
                         subscriptions.add(BindingsHelper.includePseudoClassWhen(
                                 this,
@@ -254,11 +253,5 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                 }
             }
         };
-    }
-
-    private static Optional<ValidationMessage> highestMessage(ReadOnlyConstrainedProperty<?, ValidationMessage> validation) {
-        List<ValidationMessage> invalid = validation.getDiagnostics().invalidSubList();
-        return invalid.stream().filter(message -> message.severity() == Severity.ERROR).findFirst()
-                      .or(() -> invalid.stream().findFirst());
     }
 }
