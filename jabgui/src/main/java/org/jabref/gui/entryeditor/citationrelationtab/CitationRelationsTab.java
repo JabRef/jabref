@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
 import javax.swing.undo.UndoManager;
@@ -79,6 +80,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
@@ -909,22 +911,36 @@ public class CitationRelationsTab extends EntryEditorTab {
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
-                citingTask = BackgroundTask.wrap(
-                        () -> matchAgainstLibrary(
-                                this.searchCitationsRelationsService.searchCites(entry, bypassCache, citingTask::isCancelled),
-                                libraryEntries, databaseMode, citingTask::isCancelled)
-                );
+                citingTask = createSearchTask(
+                        isCancelled -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, isCancelled),
+                        libraryEntries, databaseMode);
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
-                citedByTask = BackgroundTask.wrap(
-                        () -> matchAgainstLibrary(
-                                this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, citedByTask::isCancelled),
-                                libraryEntries, databaseMode, citedByTask::isCancelled)
-                );
+                citedByTask = createSearchTask(
+                        isCancelled -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, isCancelled),
+                        libraryEntries, databaseMode);
                 yield citedByTask;
             }
         };
+    }
+
+    /// Wraps fetching and duplicate matching into a task whose cancellation checks are bound to *that very task*.
+    /// They must not read [#citingTask]/[#citedByTask] instead: those fields are reassigned - or set to `null` -
+    /// on the JavaFX Application Thread as soon as another entry is selected, so a check evaluated after the fetch
+    /// returned would either hit `null` or observe an unrelated, newer task.
+    private BackgroundTask<List<CitationRelationItem>> createSearchTask(CitationFetch fetch,
+                                                                        List<BibEntry> libraryEntries,
+                                                                        BibDatabaseMode databaseMode) {
+        AtomicReference<BackgroundTask<List<CitationRelationItem>>> selfReference = new AtomicReference<>();
+        BooleanSupplier isCancelled = () -> {
+            BackgroundTask<List<CitationRelationItem>> self = selfReference.get();
+            return (self != null) && self.isCancelled();
+        };
+        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(
+                () -> matchAgainstLibrary(fetch.fetch(isCancelled), libraryEntries, databaseMode, isCancelled));
+        selfReference.set(task);
+        return task;
     }
 
     private List<CitationRelationItem> matchAgainstLibrary(List<BibEntry> fetchedList,
@@ -1072,5 +1088,12 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Immutable snapshot of the active library, taken on the JavaFX Application Thread and consumed by the
     /// background duplicate matching in [#matchAgainstLibrary].
     private record LibrarySnapshot(List<BibEntry> entries, BibDatabaseMode mode) {
+    }
+
+    /// One of the two citation searches of [SearchCitationsRelationsService], parameterized over the cancellation
+    /// check so that [#createSearchTask] can supply the one belonging to the task it is currently building.
+    @FunctionalInterface
+    private interface CitationFetch {
+        List<BibEntry> fetch(BooleanSupplier isCancelled) throws FetcherException;
     }
 }
