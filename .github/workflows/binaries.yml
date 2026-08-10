@@ -191,6 +191,15 @@ jobs:
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -198,6 +207,15 @@ jobs:
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -319,28 +337,24 @@ jobs:
 
   disk-space-check:
     needs: conditions
-    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
-      - name: No upload
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
-        shell: bash
-        run: |
-          echo "⊘ no upload – skipping upload"
-          echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
-          echo "available=false" >> "$GITHUB_OUTPUT"
-      - name: Setup SSH key
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         id: diskspace
         shell: bash
         run: |
+          if [[ "${{ needs.conditions.outputs.upload-to-builds-jabref-org }}" != "true" ]]; then
+            echo "⊘ no upload – skipping upload"
+            echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+
           PR_NUMBER="${{ github.event.pull_request.number }}"
           if [[ -z "$PR_NUMBER" ]]; then
             echo "☁️ Not a pull request event – skipping disk space check – will upload"
@@ -379,7 +393,6 @@ jobs:
 
   compute-matrix:
     needs: conditions
-    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
@@ -453,7 +466,6 @@ jobs:
 
   pre-build:
     needs: [ conditions, disk-space-check ]
-    if: needs.conditions.outputs.should-build == 'true'
     runs-on: ubuntu-22.04
     outputs:
       AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
@@ -517,7 +529,6 @@ jobs:
 
   build:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
-    if: needs.conditions.outputs.should-build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -842,7 +853,6 @@ jobs:
 
   jabkit-native:
     needs: [ conditions, disk-space-check, pre-build ]
-    if: needs.conditions.outputs.should-build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -1130,7 +1140,8 @@ jobs:
           if-no-files-found: error
 
   upload-pr-nnumber:
-    if: ${{ github.event_name == 'pull_request' }}
+    needs: conditions
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     permissions:
       contents: read
