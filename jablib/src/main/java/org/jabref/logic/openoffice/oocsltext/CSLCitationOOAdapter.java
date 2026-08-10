@@ -139,6 +139,7 @@ public class CSLCitationOOAdapter {
     public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> selectedDatabases)
             throws CreationException, Exception {
         linkZoteroCitations(currentEntryContext);
+        refreshCitationState();
         setCitationStyleParameters(newStyle, newCitationType, selectedDatabases);
     }
 
@@ -424,7 +425,6 @@ public class CSLCitationOOAdapter {
                     currentEntryContext,
                     bibEntryTypesManager);
             LOGGER.debug("Linked {} Zotero citations to JabRef entries", linkedCitations);
-            markManager.readAndUpdateExistingMarks();
         } catch (NoDocumentException | CreationException | Exception e) {
             LOGGER.warn("Could not link Zotero citations to JabRef entries", e);
         }
