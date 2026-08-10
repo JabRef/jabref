@@ -18,7 +18,7 @@ Fetchers are the implementation of the [search using online services](https://do
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer)                                            | [Springer Nature API portal](https://dev.springernature.com). Use the "Meta API" API key.                      | `SpringerNatureAPIKey`         | 5000 calls/day                                                                        |
 | [Wiley (TDM)](https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining)                                                         | [Wiley TDM portal](https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining)                 | `WileyTdmApiKey`               | 3 articles/second **AND** 60 requests/10min                                           |
 | [Zentralblatt Math](https://www.zbmath.org)                                                                                                       | (none)                                                                                                         | (none)                         | Depending on the current network                                                      |
-| [ScholarApi](https://scholarapi.net/)                                                                                                             | [ScholarApi User Account](https://scholarapi.net/auth/register)                                                | `ScholarApiKey`                | 1000 free credits per key                                                             |                                                                                                                                                  |                                                                                                                |                                |                                                                                       |
+| [ScholarApi](https://scholarapi.net/)                                                                                                             | [ScholarApi User Account](https://scholarapi.net/auth/register)                                                | `ScholarApiKey`                | 1000 free credits per key                                                             |
 
 "Depending on the current network" means that it depends on whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
@@ -31,6 +31,8 @@ JabRef supports different kinds of fetchers:
 * `SearchBasedFetcher`: Searches providers using a given query and returns a set of (new) bibliography entry. The user-facing side is implemented in the UI described at [https://docs.jabref.org/collect/import-using-online-bibliographic-database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
 
 There are more fetchers supported by JabRef. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` (Ctrl+H in IntelliJ).
+
+Fetchers with a documented request limit use `FetcherRateLimiter`. Express limits with `ofRequestsPerInterval` when a provider specifies requests per time window; use `ofRequestsPerSecond` for limits returned dynamically by an API. A limiter is shared across all instances of a fetcher so parallel searches respect the provider-wide request rate.
 
 ## Fulltext Fetchers
 

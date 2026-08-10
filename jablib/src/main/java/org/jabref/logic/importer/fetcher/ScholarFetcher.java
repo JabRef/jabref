@@ -49,7 +49,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
 
-    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,\s]+)", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
@@ -187,10 +187,14 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             boolean isLastPage = resultCount < getPageSize();
 
             if (!isLastPage) {
-                Optional.ofNullable(response.optString("next_indexed_after", null))
-                        .ifPresent(cursor -> cursorCacheMap.put(
-                                new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
-                                cursor));
+                Optional<String> cursor = Optional.ofNullable(response.optString("next_indexed_after", null))
+                                                  .filter(StringUtil::isNotBlank);
+                if (cursor.isEmpty()) {
+                    throw new FetcherException(url, "More results are available but returned no pagination cursor", null);
+                }
+                cursorCacheMap.put(
+                        new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
+                        cursor.get());
             }
 
             List<BibEntry> entries = new ArrayList<>();

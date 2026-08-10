@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -132,20 +131,5 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
     @Override
     public String getTestJournal() {
         return "";
-    }
-
-    @Test
-    @Override
-    public void pageSearchReturnsUniqueResultsPerPage() throws FetcherException {
-        String query = queryForUniqueResultsPerPage();
-        Page<BibEntry> firstPage = getPagedFetcher().performSearchPaged(query, 0);
-        Page<BibEntry> secondPage = getPagedFetcher().performSearchPaged(query, 1);
-
-        assertEquals(20, firstPage.getSize());
-        assertEquals(20, secondPage.getSize());
-
-        for (BibEntry bibEntry : firstPage.getContent()) {
-            assertFalse(secondPage.getContent().contains(bibEntry), "%s contained in %s".formatted(bibEntry, secondPage.getContent()));
-        }
     }
 }
