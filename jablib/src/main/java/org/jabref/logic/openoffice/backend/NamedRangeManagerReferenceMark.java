@@ -17,8 +17,8 @@ import com.sun.star.uno.XComponentContext;
 public class NamedRangeManagerReferenceMark implements NamedRangeManager {
 
     @Override
-    public NamedRange createNamedRange(XComponentContext context,
-                                       XTextDocument doc,
+    public NamedRange createNamedRange(XTextDocument doc,
+                                       XComponentContext context,
                                        String refMarkName,
                                        XTextCursor position,
                                        boolean insertSpaceBefore,
@@ -26,7 +26,7 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                                        boolean withoutBrackets)
             throws
             CreationException {
-        return NamedRangeReferenceMark.create(context, doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+        return NamedRangeReferenceMark.create(doc, context, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
     }
 
     @Override
@@ -46,4 +46,3 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                 .map(x -> x);
     }
 }
-

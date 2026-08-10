@@ -31,8 +31,8 @@ public class EditSeparate {
     private EditSeparate() {
     }
 
-    public static OOResult<Boolean, JabRefException> separateCitations(XComponentContext context,
-                                                                       XTextDocument doc,
+    public static OOResult<Boolean, JabRefException> separateCitations(XTextDocument doc,
+                                                                       XComponentContext context,
                                                                        OOFrontend frontend,
                                                                        List<BibDatabase> databases,
                                                                        JStyle style) {
@@ -75,8 +75,8 @@ public class EditSeparate {
                         Citation citation = citations.get(i);
 
                         UpdateCitationMarkers.createAndFillCitationGroup(frontend,
-                                context,
                                 doc,
+                                context,
                                 List.of(citation.citationKey),
                                 List.of(citation.getPageInfo()),
                                 group.citationType,

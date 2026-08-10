@@ -57,12 +57,12 @@ public class BSTCitationOOAdapter {
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BSTCitationOOAdapter(XComponentContext componentContext, XTextDocument document, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XTextDocument document, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
         this.componentContext = componentContext;
         this.document = document;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new BSTReferenceMarkManager(componentContext, document);
+        this.markManager = new BSTReferenceMarkManager(document, componentContext);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }
@@ -173,7 +173,7 @@ public class BSTCitationOOAdapter {
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
         // Use a transient manager here so export only inspects marks. Reusing the adapter's live manager would
         // disturb its cached numbering state for subsequent BST operations before the next full refresh.
-        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(componentContext, document);
+        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document, componentContext);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> identifiers = new LinkedHashSet<>();

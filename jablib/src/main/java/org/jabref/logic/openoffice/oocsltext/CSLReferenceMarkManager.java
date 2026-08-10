@@ -74,7 +74,7 @@ public class CSLReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public CSLReferenceMarkManager(XComponentContext componentContext, XTextDocument document) {
+    public CSLReferenceMarkManager(XTextDocument document, XComponentContext componentContext) {
         this.componentContext = componentContext;
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
@@ -326,7 +326,7 @@ public class CSLReferenceMarkManager {
         if (containsEscapementMarkup(ooText.toString())) {
             OOTextIntoOO.removeEscapementFormatting(position);
         } else if (!insertSpaceAfter) {
-            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(doc, componentContext, endRange);
         }
     }
 
@@ -556,7 +556,7 @@ public class CSLReferenceMarkManager {
         Optional.ofNullable(newContent.getAnchor())
                 .ifPresent(anchor -> {
                     if (!containsEscapementMarkup(updatedText)) {
-                        UnoDispatch.resetAttributesAtRangeEnd(componentContext, document, anchor);
+                        UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor);
                     }
                 });
     }

@@ -97,9 +97,9 @@ public class OOBibBase {
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
-        cslCitationOOAdapter = new CSLCitationOOAdapter(connection.getComponentContext(), doc, openOfficePreferences, bibEntryTypesManager);
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        bstCitationOOAdapter = new BSTCitationOOAdapter(connection.getComponentContext(), doc, openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, connection.getComponentContext(), openOfficePreferences);
         bstUpdateBibliography = new BstUpdateBibliography();
     }
 
@@ -771,8 +771,8 @@ public class OOBibBase {
                                                       Optional<Update.SyncOptions> syncOptions,
                                                       String pageInfo,
                                                       OOResult<FunctionalTextViewCursor, OOError> fcursor) {
-        OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(connection.getComponentContext(),
-                doc,
+        OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
+                connection.getComponentContext(),
                 frontend.get(),
                 cursor.get(),
                 entries,
@@ -851,7 +851,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> mergeResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditMerge.mergeCitationGroups(connection.getComponentContext(), doc, frontend, jStyle));
+                        () -> EditMerge.mergeCitationGroups(doc, connection.getComponentContext(), frontend, jStyle));
                 if (testDialog(errorTitle, mergeResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
@@ -909,7 +909,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> separateResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditSeparate.separateCitations(connection.getComponentContext(), doc, frontend, databases, jStyle));
+                        () -> EditSeparate.separateCitations(doc, connection.getComponentContext(), frontend, databases, jStyle));
                 if (testDialog(errorTitle, separateResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }

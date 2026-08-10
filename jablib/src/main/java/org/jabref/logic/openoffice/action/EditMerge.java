@@ -40,7 +40,7 @@ public class EditMerge {
     }
 
     /// @return true if modified document
-    public static OOResult<Boolean, JabRefException> mergeCitationGroups(XComponentContext context, XTextDocument doc, OOFrontend frontend, JStyle style) {
+    public static OOResult<Boolean, JabRefException> mergeCitationGroups(XTextDocument doc, XComponentContext context, OOFrontend frontend, JStyle style) {
         try {
             boolean madeModifications;
 
@@ -69,8 +69,8 @@ public class EditMerge {
                     boolean insertSpaceBefore = false;
                     boolean insertSpaceAfter = false;
                     UpdateCitationMarkers.createAndFillCitationGroup(frontend,
-                            context,
                             doc,
+                            context,
                             citationKeys,
                             pageInfos,
                             citationType,

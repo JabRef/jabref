@@ -51,8 +51,8 @@ public class EditInsert {
 
     /// @param cursor   Where to insert.
     /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
-    public static OOVoidResult<JabRefException> insertCitationGroup(XComponentContext context,
-                                                                    XTextDocument doc,
+    public static OOVoidResult<JabRefException> insertCitationGroup(XTextDocument doc,
+                                                                    XComponentContext context,
                                                                     OOFrontend frontend,
                                                                     XTextCursor cursor,
                                                                     List<BibEntry> entries,
@@ -92,8 +92,8 @@ public class EditInsert {
         try {
             UnoScreenRefresh.lockControllers(doc);
             UpdateCitationMarkers.createAndFillCitationGroup(frontend,
-                    context,
                     doc,
+                    context,
                     citationKeys,
                     pageInfos,
                     citationType,

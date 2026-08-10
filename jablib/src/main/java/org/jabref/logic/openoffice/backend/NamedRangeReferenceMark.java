@@ -76,8 +76,8 @@ public class NamedRangeReferenceMark implements NamedRange {
         return cursor;
     }
 
-    private static void createReprInDocument(Optional<XComponentContext> context,
-                                             XTextDocument doc,
+    private static void createReprInDocument(XTextDocument doc,
+                                             Optional<XComponentContext> context,
                                              String refMarkName,
                                              XTextCursor position,
                                              boolean insertSpaceBefore,
@@ -124,7 +124,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         position.gotoRange(cursorAfter.getEnd(), false);
 
         if (!insertSpaceAfter && context.isPresent()) {
-            UnoDispatch.resetAttributesAtRangeEnd(context.orElseThrow(), doc, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(doc, context.orElseThrow(), endRange);
         }
     }
 
@@ -147,8 +147,8 @@ public class NamedRangeReferenceMark implements NamedRange {
         }
     }
 
-    static NamedRangeReferenceMark create(XComponentContext context,
-                                          XTextDocument doc,
+    static NamedRangeReferenceMark create(XTextDocument doc,
+                                          XComponentContext context,
                                           String refMarkName,
                                           XTextCursor position,
                                           boolean insertSpaceBefore,
@@ -157,7 +157,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             throws
             CreationException {
 
-        createReprInDocument(Optional.of(context), doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+        createReprInDocument(doc, Optional.of(context), refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
         return new NamedRangeReferenceMark(refMarkName);
     }
 
@@ -271,7 +271,7 @@ public class NamedRangeReferenceMark implements NamedRange {
                 final boolean insertSpaceBefore = false;
                 final boolean insertSpaceAfter = false;
                 final boolean withoutBrackets = false;
-                createReprInDocument(findComponentContext(doc), doc, name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+                createReprInDocument(doc, findComponentContext(doc), name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
             }
         }
 

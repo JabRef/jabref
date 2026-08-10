@@ -13,8 +13,8 @@ import com.sun.star.uno.XComponentContext;
 
 public interface NamedRangeManager {
 
-    NamedRange createNamedRange(XComponentContext context,
-                                XTextDocument doc,
+    NamedRange createNamedRange(XTextDocument doc,
+                                XComponentContext context,
                                 String markName,
                                 XTextCursor position,
                                 boolean insertSpaceBefore,

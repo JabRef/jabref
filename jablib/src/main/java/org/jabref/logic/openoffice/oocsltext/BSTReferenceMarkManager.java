@@ -61,7 +61,7 @@ public class BSTReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public BSTReferenceMarkManager(XComponentContext componentContext, XTextDocument document) {
+    public BSTReferenceMarkManager(XTextDocument document, XComponentContext componentContext) {
         this.componentContext = componentContext;
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
@@ -137,7 +137,7 @@ public class BSTReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
 
         if (!insertSpaceAfter) {
-            UnoDispatch.resetAttributesAtRangeEnd(componentContext, doc, endRange);
+            UnoDispatch.resetAttributesAtRangeEnd(doc, componentContext, endRange);
         }
     }
 
@@ -274,7 +274,7 @@ public class BSTReferenceMarkManager {
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
         Optional.ofNullable(newContent.getAnchor())
-                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(componentContext, document, anchor));
+                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
     }
 
     private void updateMarkAndText(BSTReferenceMark mark, String newText, String markName) throws Exception, CreationException {

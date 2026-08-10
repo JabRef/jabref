@@ -3,7 +3,6 @@ package org.jabref.model.openoffice.uno;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.frame.XDispatchHelper;
 import com.sun.star.frame.XDispatchProvider;
-import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
@@ -41,8 +40,8 @@ public class UnoDispatch {
     /// `.uno:ResetAttributes` acts on the view cursor and shows up in undo history as
     /// "Clear Direct Formatting", so this helper first verifies that the live insertion cursor is
     /// collapsed and ends at the same position as `endRange`.
-    public static void resetAttributesAtRangeEnd(XComponentContext context,
-                                                 XTextDocument doc,
+    public static void resetAttributesAtRangeEnd(XTextDocument doc,
+                                                 XComponentContext context,
                                                  XTextCursor cursor,
                                                  XTextRange endRange) {
         try {
@@ -52,7 +51,7 @@ public class UnoDispatch {
             }
 
             if (compare.compareRegionEnds(cursor, endRange) == 0) {
-                execute(context, doc, RESET_ATTRIBUTES_COMMAND, EMPTY_DISPATCH_ARGUMENTS);
+                execute(doc, context, RESET_ATTRIBUTES_COMMAND, EMPTY_DISPATCH_ARGUMENTS);
             }
         } catch (com.sun.star.uno.RuntimeException exception) {
             LOGGER.debug("Could not compare insertion cursor with citation end", exception);
@@ -61,19 +60,19 @@ public class UnoDispatch {
 
     /// Re-arms `DontExpand` for a recreated mark when the user's view cursor is still at that
     /// boundary after a numeric citation update.
-    public static void resetAttributesAtRangeEnd(XComponentContext context,
-                                                 XTextDocument doc,
+    public static void resetAttributesAtRangeEnd(XTextDocument doc,
+                                                 XComponentContext context,
                                                  XTextRange endRange) {
         try {
             UnoCursor.getViewCursor(doc)
-                     .ifPresent(viewCursor -> resetAttributesAtRangeEnd(context, doc, viewCursor, endRange));
+                     .ifPresent(viewCursor -> resetAttributesAtRangeEnd(doc, context, viewCursor, endRange));
         } catch (com.sun.star.uno.RuntimeException exception) {
             LOGGER.debug("Could not resolve view cursor for resetting attributes", exception);
         }
     }
 
-    public static void execute(XComponentContext context,
-                               XTextDocument doc,
+    public static void execute(XTextDocument doc,
+                               XComponentContext context,
                                String unoUrl,
                                PropertyValue[] arguments) {
         try {

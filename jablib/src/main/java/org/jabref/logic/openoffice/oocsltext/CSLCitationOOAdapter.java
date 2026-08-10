@@ -88,11 +88,11 @@ public class CSLCitationOOAdapter {
     private boolean needsCSLReferenceMarkConversion = true;
     private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
-    public CSLCitationOOAdapter(XComponentContext componentContext, XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+    public CSLCitationOOAdapter(XTextDocument doc, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
         this.componentContext = componentContext;
         this.document = doc;
-        this.markManager = new CSLReferenceMarkManager(componentContext, doc);
+        this.markManager = new CSLReferenceMarkManager(doc, componentContext);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
         this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
@@ -574,7 +574,7 @@ public class CSLCitationOOAdapter {
         // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
         // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
         // full readAndUpdateExistingMarks() refresh.
-        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(componentContext, document);
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document, componentContext);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> citationKeys = new LinkedHashSet<>();

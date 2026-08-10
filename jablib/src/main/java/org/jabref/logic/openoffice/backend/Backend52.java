@@ -150,8 +150,8 @@ public class Backend52 {
     /// @param position          Collapsed to its end.
     /// @param insertSpaceBefore We insert a space before the mark.
     /// @param insertSpaceAfter  We insert a space after the mark, that carries on format of characters from the original position.
-    public CitationGroup createCitationGroup(XComponentContext context,
-                                             XTextDocument doc,
+    public CitationGroup createCitationGroup(XTextDocument doc,
+                                             XComponentContext context,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
@@ -213,8 +213,8 @@ public class Backend52 {
          * Apply to document
          */
         boolean withoutBrackets = citationType == CitationType.INVISIBLE_CIT;
-        NamedRange namedRange = this.citationStorageManager.createNamedRange(context,
-                doc,
+        NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
+                context,
                 markName,
                 position,
                 insertSpaceBefore,
@@ -405,4 +405,3 @@ public class Backend52 {
         }
     }
 }
-
