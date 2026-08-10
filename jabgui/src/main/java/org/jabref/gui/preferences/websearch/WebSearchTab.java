@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -39,6 +40,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     // Estimate for header height (used in table prefHeight calculation)
     private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
+
+    // Fixed width of the "API key saved" indicator column.
+    private static final double KEY_INDICATOR_WIDTH = 24.0;
+
+    // Key glyph used to mark a fetcher that already has a saved API key.
+    private static final String KEY_SAVED_GLYPH = "\uD83D\uDD11"; // 🔑
 
     private final VBox fetchersContainer = new VBox();
 
@@ -189,6 +196,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         Label nameLabel = new Label(item.getName());
         nameLabel.getStyleClass().add("fetcher-name");
 
+        Label apiKeyIndicator = buildApiKeyIndicator(item);
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -203,11 +212,43 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         Button configureButton = new Button(Localization.lang("Configure API key"));
         configureButton.getStyleClass().add("configure-button");
-        configureButton.setOnAction(_ -> showApiKeyDialog(item));
+        configureButton.setOnAction(_ -> {
+            showApiKeyDialog(item);
+            updateApiKeyIndicator(apiKeyIndicator, item);
+        });
         configureButton.setVisible(item.isCustomizable());
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        container.getChildren().addAll(enabledCheckBox, nameLabel, apiKeyIndicator, spacer, helpButton, configureButton);
         return container;
+    }
+
+    /// Builds the "API key saved" indicator shown next to a fetcher's name.
+    /// The column is always added to the row (even for fetchers without a saved/possible key)
+    /// so that "Configure API key" buttons remain vertically aligned across all rows.
+    private Label buildApiKeyIndicator(WebSearchTabViewModel.FetcherViewModel item) {
+        Label indicator = new Label();
+        indicator.getStyleClass().add("api-key-indicator");
+        indicator.setMinWidth(KEY_INDICATOR_WIDTH);
+        indicator.setPrefWidth(KEY_INDICATOR_WIDTH);
+        indicator.setMaxWidth(KEY_INDICATOR_WIDTH);
+        indicator.setAlignment(Pos.CENTER);
+        updateApiKeyIndicator(indicator, item);
+        return indicator;
+    }
+
+    /// Refreshes the glyph/tooltip of an existing indicator to reflect whether the given
+    /// fetcher currently has a non-blank saved API key.
+    private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
+        boolean hasSavedKey = item.isCustomizable()
+                && !StringUtil.isBlank(item.getApiKey());
+
+        if (hasSavedKey) {
+            indicator.setText(KEY_SAVED_GLYPH);
+            indicator.setTooltip(new Tooltip(Localization.lang("API key is saved")));
+        } else {
+            indicator.setText("");
+            indicator.setTooltip(null);
+        }
     }
 
     private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
