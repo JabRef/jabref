@@ -267,17 +267,21 @@ public class PreferencesMigrations {
     /// This conflicts with JabRef's keybindings for "Search document identifier online" (alt+F) and
     /// "Focus group list" (alt+S), which both trigger the action AND insert the character in text fields.
     /// Fix: migrate these to `shortcut+alt+letter` which uses Cmd+Alt on macOS (no character conflict).
-    private static void upgradeKeyBindingsMacOSAltConflicts(JabRefCliPreferences prefs) {
+    static void upgradeKeyBindingsMacOSAltConflicts(JabRefCliPreferences prefs) {
         List<String> bindNames = new ArrayList<>(prefs.getStringList(JabRefGuiPreferences.BIND_NAMES));
         List<String> bindings = new ArrayList<>(prefs.getStringList(JabRefGuiPreferences.BINDINGS));
+
+        if (bindNames.isEmpty() || bindings.isEmpty() || bindNames.size() != bindings.size()) {
+            return;
+        }
 
         for (int i = 0; i < bindNames.size(); i++) {
             String name = bindNames.get(i);
             String binding = bindings.get(i);
 
-            if ("LOOKUP_DOC_IDENTIFIER".equals(name) && "alt+F".equals(binding)) {
+            if ("Search document identifier online".equals(name) && "alt+F".equals(binding)) {
                 bindings.set(i, "shortcut+alt+F");
-            } else if ("FOCUS_GROUP_LIST".equals(name) && "alt+s".equals(binding)) {
+            } else if ("Focus group list".equals(name) && "alt+s".equals(binding)) {
                 bindings.set(i, "shortcut+alt+G");
             }
         }

@@ -303,4 +303,53 @@ class GuiPreferencesMigrationsTest {
 
         verify(workspacePreferences).setTheme(Theme.light());
     }
+
+    @Test
+    void upgradeKeyBindingsMacOSAltConflictsMigratesAltF() {
+        List<String> bindNames = List.of("Search document identifier online", "Focus group list", "Help");
+        List<String> bindings = List.of("alt+F", "alt+s", "F1");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeKeyBindingsMacOSAltConflicts(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("shortcut+alt+F", "shortcut+alt+G", "F1"));
+    }
+
+    @Test
+    void upgradeKeyBindingsMacOSAltConflictsSkipsAlreadyMigratedBindings() {
+        List<String> bindNames = List.of("Search document identifier online", "Focus group list");
+        List<String> bindings = List.of("shortcut+alt+F", "shortcut+alt+G");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeKeyBindingsMacOSAltConflicts(preferences);
+
+        verify(preferences, never()).putStringList(anyString(), any());
+    }
+
+    @Test
+    void upgradeKeyBindingsMacOSAltConflictsHandlesMismatchedListSizes() {
+        List<String> bindNames = List.of("Search document identifier online");
+        List<String> bindings = List.of("alt+F", "alt+s", "F1");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeKeyBindingsMacOSAltConflicts(preferences);
+
+        verify(preferences, never()).putStringList(anyString(), any());
+    }
+
+    @Test
+    void upgradeKeyBindingsMacOSAltConflictsHandlesEmptyLists() {
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of());
+
+        PreferencesMigrations.upgradeKeyBindingsMacOSAltConflicts(preferences);
+
+        verify(preferences, never()).putStringList(anyString(), any());
+    }
 }
