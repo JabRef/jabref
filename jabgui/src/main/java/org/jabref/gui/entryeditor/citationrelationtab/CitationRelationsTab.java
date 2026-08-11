@@ -809,7 +809,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
         link.setOnAction(_ -> {
-            CrossRef doiFetcher = new CrossRef();
+            CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
             BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
                           .onRunning(() -> {

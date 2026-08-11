@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiPredicate;
 
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
@@ -39,6 +40,7 @@ public class FulltextFetchers {
     private static final int FETCHER_TIMEOUT = 120;
 
     private final Set<FulltextFetcher> fetchers;
+    private final ImporterPreferences importerPreferences;
 
     private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
         try {
@@ -52,12 +54,17 @@ public class FulltextFetchers {
     };
 
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences), importerPreferences);
     }
 
     @VisibleForTesting
     FulltextFetchers(Set<FulltextFetcher> fetchers) {
+        this(fetchers, ImporterPreferences.getDefault());
+    }
+
+    private FulltextFetchers(Set<FulltextFetcher> fetchers, ImporterPreferences importerPreferences) {
         this.fetchers = new HashSet<>(fetchers);
+        this.importerPreferences = importerPreferences;
     }
 
     public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
@@ -76,14 +83,12 @@ public class FulltextFetchers {
                      .filter(Optional::isPresent)
                      .map(Optional::get)
                      .filter(res -> (res.source()) != null)
-                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()).reversed())
-                     .findFirst();
+                     .max(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()));
     }
 
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            WebFetchers.getIdFetcherForIdentifier(DOI.class)
-                       .findIdentifier(clonedEntry)
+            new CrossRef(importerPreferences).findIdentifier(clonedEntry)
                        .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);

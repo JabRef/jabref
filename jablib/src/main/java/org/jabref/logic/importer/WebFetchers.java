@@ -128,9 +128,9 @@ public class WebFetchers {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
+    public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz, ImporterPreferences importerPreferences) {
         if (clazz == DOI.class) {
-            return (IdFetcher<T>) new CrossRef();
+            return (IdFetcher<T>) new CrossRef(importerPreferences);
         } else {
             throw new IllegalArgumentException("No fetcher found for identifier" + clazz.getCanonicalName());
         }
@@ -165,7 +165,7 @@ public class WebFetchers {
         // set.add(new GoogleScholar(importFormatPreferences));
         searchBasedFetchers.add(new DBLPFetcher(importFormatPreferences));
         searchBasedFetchers.add(new SpringerNatureWebFetcher(importerPreferences));
-        searchBasedFetchers.add(new CrossRef());
+        searchBasedFetchers.add(new CrossRef(importerPreferences));
         searchBasedFetchers.add(new OpenAlex(importerPreferences));
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
@@ -202,10 +202,10 @@ public class WebFetchers {
         set.add(new SsrnFetcher(importFormatPreferences));
         set.add(new EuropePmcFetcher());
         set.add(new MedlineFetcher(importerPreferences));
-        set.add(new TitleFetcher(importFormatPreferences));
+        set.add(new TitleFetcher(importFormatPreferences, importerPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new CrossRef());
+        set.add(new CrossRef(importerPreferences));
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new LOBIDFetcher());
         set.add(new IacrEprintFetcher(importFormatPreferences));
@@ -222,7 +222,7 @@ public class WebFetchers {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
 
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
-        set.add(new CrossRef());
+        set.add(new CrossRef(importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
@@ -247,10 +247,14 @@ public class WebFetchers {
 
     /// @return sorted set containing id fetchers
     public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+        return getIdFetchers(importFormatPreferences, ImporterPreferences.getDefault());
+    }
+
+    public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
 
         set.add(new ArXivFetcher(importFormatPreferences));
-        set.add(new CrossRef());
+        set.add(new CrossRef(importerPreferences));
 
         return set;
     }
@@ -290,6 +294,7 @@ public class WebFetchers {
         Set<CustomizableKeyFetcher> fetchers = Set.of(
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new BiodiversityLibrary(importerPreferences),
+                new CrossRef(importerPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
                 new MedlineFetcher(importerPreferences),
                 new OpenAlex(importerPreferences),

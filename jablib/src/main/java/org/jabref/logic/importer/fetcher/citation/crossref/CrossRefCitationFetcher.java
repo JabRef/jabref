@@ -14,7 +14,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
@@ -54,7 +53,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private CrossRef crossRefForDoi = new CrossRef();
+    private final CrossRef crossRefForDoi;
 
     public CrossRefCitationFetcher(
             ImporterPreferences importerPreferences,
@@ -69,6 +68,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         this.grobidPreferences = grobidPreferences;
         this.aiPreferences = aiPreferences;
         this.chatModel = chatModel;
+        this.crossRefForDoi = new CrossRef(importerPreferences);
     }
 
     @Override
@@ -114,9 +114,9 @@ public class CrossRefCitationFetcher implements CitationFetcher {
                                                  .withField(StandardField.NOTE, "Could not retrieve reference information from CrossRef")
                                                  .withChanged(true);
                                      }
-                                     return getBibEntryFromText(parser, unstructured.asText());
+                                     return getBibEntryFromText(parser, unstructured.asString());
                                  } else {
-                                     return getBibEntryFromDoi(doiNode.asText(), unstructured);
+                                     return getBibEntryFromDoi(doiNode.asString(), unstructured);
                                  }
                              }))
                              .toList();
@@ -148,7 +148,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private void setField(BibEntry bibEntry, Field field, JsonNode reference, String path) {
         JsonNode node = reference.at(path);
         if (!node.isMissingNode()) {
-            bibEntry.setField(field, node.asText());
+            bibEntry.setField(field, node.asString());
         }
     }
 
@@ -196,8 +196,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     // Clone of org.jabref.logic.importer.FulltextFetchers.findDoiForEntry
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            WebFetchers.getIdFetcherForIdentifier(DOI.class)
-                       .findIdentifier(clonedEntry)
+            crossRefForDoi.findIdentifier(clonedEntry)
                        .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
