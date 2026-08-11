@@ -64,7 +64,7 @@ public enum KeyBinding {
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "shortcut+UP", KeyBindingCategory.VIEW),
     FIND_UNLINKED_FILES("Search for unlinked local files", Localization.lang("Search for unlinked local files"), "shift+F7", KeyBindingCategory.QUALITY),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt+1", KeyBindingCategory.VIEW),
-    FOCUS_GROUP_LIST("Focus group list", Localization.lang("Focus group list"), "alt+s", KeyBindingCategory.VIEW),
+    FOCUS_GROUP_LIST("Focus group list", Localization.lang("Focus group list"), "shortcut+alt+G", KeyBindingCategory.VIEW),
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_LIBRARY("Import into current library...", Localization.lang("Import into current library..."), "shortcut+I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_LIBRARY("Import into new library...", Localization.lang("Import into new library..."), "shortcut+alt+I", KeyBindingCategory.FILE),
@@ -128,7 +128,7 @@ public enum KeyBinding {
     SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT),
     GROUP_RENAME("Rename group", Localization.lang("Rename group"), "F2", KeyBindingCategory.EDIT),
     MERGE_WITH_FETCHED_ENTRY("Get bibliographic data from %0, \"DOI/ISBN/...\"", Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), "F5", KeyBindingCategory.EDIT),
-    LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "alt+F", KeyBindingCategory.EDIT),
+    LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "shortcut+alt+F", KeyBindingCategory.EDIT),
     RENAME_FILE_TO_NAME("Rename file(s) to configured filename format pattern", Localization.lang("Rename file(s) to configured filename format pattern"), "shortcut+P", KeyBindingCategory.EDIT);
 
     private final String constant;
