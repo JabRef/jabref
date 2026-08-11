@@ -197,7 +197,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
             crossRefForDoi.findIdentifier(clonedEntry)
-                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
+                          .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }

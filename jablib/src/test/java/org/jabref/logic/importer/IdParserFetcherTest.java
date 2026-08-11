@@ -36,7 +36,7 @@ class IdParserFetcherTest {
         Parser parser = mock(Parser.class);
         ProgressInputStream stream = new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
         BibEntry fetchedEntry = new BibEntry();
-        fetchedEntry.setField(StandardField.DOI, "10.1000/example");
+        fetchedEntry.withField(StandardField.DOI, "10.1000/example");
         when(urlDownload.asInputStream()).thenReturn(stream);
         when(parser.parseEntries(stream)).thenReturn(List.of(fetchedEntry));
         IdParserFetcher<DOI> fetcher = mockFetcher(url, urlDownload, parser);
