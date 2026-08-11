@@ -29,8 +29,12 @@ public class IngestionTaskAggregator {
     }
 
     public synchronized Pair<Future<Void>, GenerateEmbeddingsTask> startWithFuture(GenerateEmbeddingsTaskRequest request) {
+        return startWithFuture(request, true);
+    }
+
+    public synchronized Pair<Future<Void>, GenerateEmbeddingsTask> startWithFuture(GenerateEmbeddingsTaskRequest request, boolean showToUser) {
         return generateEmbeddingsTasks.computeIfAbsent(request.linkedFile(), _ -> {
-            GenerateEmbeddingsTask task = new GenerateEmbeddingsTask(request);
+            GenerateEmbeddingsTask task = new GenerateEmbeddingsTask(request, showToUser);
             task.onFinished(() -> generateEmbeddingsTasks.remove(request.linkedFile()));
             Future<Void> future = taskExecutor.execute(task);
             return new Pair<>(future, task);
@@ -38,7 +42,11 @@ public class IngestionTaskAggregator {
     }
 
     public synchronized GenerateEmbeddingsTask start(GenerateEmbeddingsTaskRequest request) {
-        return startWithFuture(request).getValue();
+        return startWithFuture(request, true).getValue();
+    }
+
+    public synchronized GenerateEmbeddingsTask start(GenerateEmbeddingsTaskRequest request, boolean showToUser) {
+        return startWithFuture(request, showToUser).getValue();
     }
 
     public synchronized Pair<Future<Void>, GenerateEmbeddingsForSeveralTask> start(GenerateEmbeddingsForSeveralTaskRequest request) {
