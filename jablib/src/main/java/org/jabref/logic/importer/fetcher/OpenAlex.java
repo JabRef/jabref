@@ -64,7 +64,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             Map.entry("article", StandardEntryType.Article),
             Map.entry("other", StandardEntryType.Misc),
             Map.entry("dataset", StandardEntryType.Dataset),
-            Map.entry("book-chapter", StandardEntryType.InCollection),
+            Map.entry("book-chapter", StandardEntryType.InBook),
             Map.entry("dissertation", StandardEntryType.Thesis),
             Map.entry("conference-paper", StandardEntryType.InProceedings),
             Map.entry("book", StandardEntryType.Book),
@@ -79,11 +79,11 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             Map.entry("editorial", StandardEntryType.Article),
             Map.entry("review", StandardEntryType.Article),
             Map.entry("software", StandardEntryType.Software),
-            Map.entry("supplementary-materials", StandardEntryType.Dataset),
+            Map.entry("supplementary-materials", StandardEntryType.Misc),
             Map.entry("letter", StandardEntryType.Article),
             Map.entry("erratum", StandardEntryType.Article),
-            Map.entry("standard", StandardEntryType.Manual),
-            Map.entry("retraction", StandardEntryType.Article),
+            Map.entry("standard", StandardEntryType.Misc),
+            Map.entry("retraction", StandardEntryType.Misc),
             Map.entry("data-paper", StandardEntryType.Article),
             Map.entry("software-paper", StandardEntryType.Article)
     );
