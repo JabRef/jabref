@@ -18,6 +18,7 @@ import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.gui.welcome.DonationPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;

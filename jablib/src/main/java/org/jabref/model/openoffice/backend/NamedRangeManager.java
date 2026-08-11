@@ -15,6 +15,7 @@ public interface NamedRangeManager {
     NamedRange createNamedRange(XTextDocument doc,
                                 String markName,
                                 XTextCursor position,
+                                boolean insertSpaceBefore,
                                 boolean insertSpaceAfter,
                                 boolean withoutBrackets)
             throws

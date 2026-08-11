@@ -14,8 +14,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.rangesort.RangeSort;
+import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
+import org.jabref.model.openoffice.uno.UnoTextRange;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -130,10 +133,11 @@ public class BSTReferenceMarkManager {
         position.gotoRange(cursorAfter.getEnd(), false);
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         identifierToNumber.clear();
+        highestCitationNumber = 0;
         citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -172,6 +176,10 @@ public class BSTReferenceMarkManager {
         }
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
 
         if (isNumberUpdateRequired) {
             try {
@@ -294,6 +302,11 @@ public class BSTReferenceMarkManager {
         }
     }
 
+    public List<BSTReferenceMark> getMarksInOrder() {
+        sortMarksInOrder();
+        return marksInOrder;
+    }
+
     public int getCitationNumber(String identifier) {
         Integer override = identifierToNumber.get(identifier);
         if (override != null) {
@@ -320,15 +333,52 @@ public class BSTReferenceMarkManager {
         // Editing a mark removes and recreates the content, which shifts subsequent
         // anchors. Operating from the bottom avoids temporarily inverted sequences
         // like [3] above [2] above [1] during refresh.
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<RangeSortEntry<BSTReferenceMark>> sortEntries = new ArrayList<>();
+
+        for (BSTReferenceMark mark : marksInOrder) {
+            XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling BST reference mark without anchor: {}", mark.getName());
+                continue;
+            }
+            sortEntries.add(new RangeSortEntry<>(range, 0, mark));
+        }
+
+        RangeSort.RangePartitions<RangeSortEntry<BSTReferenceMark>> partitions =
+                RangeSort.partitionAndSortRanges(sortEntries);
+
+        for (List<RangeSortEntry<BSTReferenceMark>> partition : partitions.getPartitions()) {
+            int indexInPartition = 0;
+            for (RangeSortEntry<BSTReferenceMark> sortEntry : partition) {
+                sortEntry.setIndexInPosition(indexInPartition++);
+
+                Optional<XTextRange> footnoteMarkRange =
+                        UnoTextRange.getFootnoteMarkRange(sortEntry.getRange());
+                footnoteMarkRange.ifPresent(sortEntry::setRange);
+            }
+        }
+
+        sortEntries.sort(this::compareTextRanges);
+
+        marksInOrder.clear();
+        sortEntries.stream()
+                   .map(RangeSortEntry::getContent)
+                   .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(XTextRange range1, XTextRange range2) {
+    private int compareTextRanges(RangeSortEntry<BSTReferenceMark> first, RangeSortEntry<BSTReferenceMark> second) {
+        int rangeComparison;
         try {
-            return range1 != null && range2 != null ? textRangeCompare.compareRegionStarts(range1, range2) : 0;
+            rangeComparison = textRangeCompare.compareRegionStarts(second.getRange(), first.getRange());
         } catch (IllegalArgumentException exception) {
             LOGGER.warn("Error comparing text ranges: {}", exception.getMessage(), exception);
-            return 0;
+            rangeComparison = 0;
         }
+
+        if (rangeComparison != 0) {
+            return rangeComparison;
+        }
+
+        return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
     }
 }
