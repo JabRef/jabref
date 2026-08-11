@@ -236,8 +236,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return indicator;
     }
 
-    /// Refreshes the glyph/tooltip of an existing indicator to reflect the given fetcher's current
-    /// API key state.
     private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
         boolean hasSavedKey = item.isCustomizable()
                 && !StringUtil.isBlank(item.getApiKey())
