@@ -275,18 +275,23 @@ public class PreferencesMigrations {
             return;
         }
 
+        boolean changed = false;
         for (int i = 0; i < bindNames.size(); i++) {
             String name = bindNames.get(i);
             String binding = bindings.get(i);
 
             if ("Search document identifier online".equals(name) && "alt+F".equals(binding)) {
                 bindings.set(i, "shortcut+alt+F");
+                changed = true;
             } else if ("Focus group list".equals(name) && "alt+s".equals(binding)) {
                 bindings.set(i, "shortcut+alt+G");
+                changed = true;
             }
         }
 
-        prefs.putStringList(JabRefGuiPreferences.BINDINGS, bindings);
+        if (changed) {
+            prefs.putStringList(JabRefGuiPreferences.BINDINGS, bindings);
+        }
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
