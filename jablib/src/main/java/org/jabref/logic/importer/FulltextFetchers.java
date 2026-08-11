@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiPredicate;
 
-import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
@@ -88,7 +87,8 @@ public class FulltextFetchers {
 
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            new CrossRef(importerPreferences).findIdentifier(clonedEntry)
+            WebFetchers.getIdFetcherForIdentifier(DOI.class, importerPreferences)
+                       .findIdentifier(clonedEntry)
                        .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
