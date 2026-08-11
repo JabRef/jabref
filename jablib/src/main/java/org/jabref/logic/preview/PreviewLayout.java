@@ -57,4 +57,33 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
         return null;
     }
+
+    @Nullable
+    static PreviewLayout of(String layoutIdentifier,
+                            List<CustomizedTextPreviewLayout> customizedPreviewLayouts,
+                            List<Path> bstLayoutPaths,
+                            LayoutFormatterPreferences preferences,
+                            JournalAbbreviationRepository abbreviationRepository,
+                            BibEntryTypesManager entryTypesManager) {
+        if (CSLStyleUtils.isCitationStyleFile(layoutIdentifier)) {
+            return CSLStyleUtils.createCitationStyleFromFile(layoutIdentifier)
+                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
+                                .orElse(null);
+        }
+        if (BstPreviewLayout.isBstStyleFile(layoutIdentifier)) {
+            return bstLayoutPaths.stream()
+                                 .filter(path -> path.endsWith(layoutIdentifier))
+                                 .map(BstPreviewLayout::new)
+                                 .findFirst()
+                                 .orElse(null);
+        }
+
+        // Text-based (customized) styles are resolved by stable id, not display name — names are user-editable.
+        return customizedPreviewLayouts.stream()
+                                       .filter(c -> c.id().equals(layoutIdentifier))
+                                       .findFirst()
+                                       .<PreviewLayout>map(c -> TextBasedPreviewLayout.of(
+                                               c.id(), c.name(), c.text(), preferences, abbreviationRepository))
+                                       .orElse(null);
+    }
 }
