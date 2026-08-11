@@ -138,7 +138,7 @@ public class WebFetchers {
 
     public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(Field field) {
         if (field == StandardField.DOI) {
-            return Optional.of(new CrossRef());
+            return Optional.of(new CrossRef(ImporterPreferences.getDefault()));
         }
         return Optional.empty();
     }
