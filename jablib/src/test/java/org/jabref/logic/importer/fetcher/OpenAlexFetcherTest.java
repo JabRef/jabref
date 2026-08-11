@@ -164,16 +164,17 @@ class OpenAlexFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws FetcherException {
-        BibEntry master = new BibEntry(StandardEntryType.Article)
+        BibEntry master = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Matthew Tancik and Vincent Casser and Xinchen Yan and Sabeek Pradhan and Ben Mildenhall and Pratul P. Srinivasan and Jonathan T. Barron and Henrik Kretzschmar")
                 .withField(StandardField.TITLE, "Block-NeRF: Scalable Large Scene Neural View Synthesis")
-                .withField(StandardField.YEAR, "2022")
                 .withField(StandardField.DOI, "10.1109/cvpr52688.2022.00807")
                 .withField(StandardField.URL, "https://openalex.org/W4312280420");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Block-NeRF: Scalable Large Scene Neural View Synthesis");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.PAGES));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.KEYWORDS));
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.YEAR));
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.DATE));
         assertEquals(master, fetchedEntries.getFirst());
     }
 

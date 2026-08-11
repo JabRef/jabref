@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,7 +33,10 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -55,6 +60,33 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAlex.class);
 
     private static final String URL_PATTERN = "https://api.openalex.org/works";
+    private static final Map<String, EntryType> OPENALEX_TYPE_TO_ENTRY_TYPE = Map.ofEntries(
+            Map.entry("article", StandardEntryType.Article),
+            Map.entry("other", StandardEntryType.Misc),
+            Map.entry("dataset", StandardEntryType.Dataset),
+            Map.entry("book-chapter", StandardEntryType.InCollection),
+            Map.entry("dissertation", StandardEntryType.Thesis),
+            Map.entry("conference-paper", StandardEntryType.InProceedings),
+            Map.entry("book", StandardEntryType.Book),
+            Map.entry("preprint", StandardEntryType.Online),
+            Map.entry("paratext", StandardEntryType.Misc),
+            Map.entry("conference-abstract", StandardEntryType.InProceedings),
+            Map.entry("report", StandardEntryType.Report),
+            Map.entry("reference-entry", StandardEntryType.InReference),
+            Map.entry("book-review", BiblatexNonStandardEntryType.Review),
+            Map.entry("libguides", StandardEntryType.Online),
+            Map.entry("peer-review", BiblatexNonStandardEntryType.Review),
+            Map.entry("editorial", StandardEntryType.Article),
+            Map.entry("review", StandardEntryType.Article),
+            Map.entry("software", StandardEntryType.Software),
+            Map.entry("supplementary-materials", StandardEntryType.Dataset),
+            Map.entry("letter", StandardEntryType.Article),
+            Map.entry("erratum", StandardEntryType.Article),
+            Map.entry("standard", StandardEntryType.Manual),
+            Map.entry("retraction", StandardEntryType.Article),
+            Map.entry("data-paper", StandardEntryType.Article),
+            Map.entry("software-paper", StandardEntryType.Article)
+    );
 
     private final ImporterPreferences importerPreferences;
 
@@ -65,6 +97,18 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @Override
     public String getName() {
         return FETCHER_NAME;
+    }
+
+    @VisibleForTesting
+    EntryType mapOpenAlexTypeToEntryType(String openAlexType) {
+        String normalizedOpenAlexType = openAlexType.toLowerCase(Locale.ENGLISH);
+
+        EntryType entryType = OPENALEX_TYPE_TO_ENTRY_TYPE.get(normalizedOpenAlexType);
+        if (entryType != null) {
+            return entryType;
+        }
+
+        return new UnknownEntryType(openAlexType);
     }
 
     @VisibleForTesting
@@ -178,7 +222,10 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             DoiCleanup DoiCleanup = new DoiCleanup();
             BibEntry entry = new BibEntry();
 
-            entry.setType(EntryTypeFactory.parse(item.getString("type")));
+            String openAlexType = item.optString("type", null);
+            if (openAlexType != null) {
+                entry.setType(mapOpenAlexTypeToEntryType(openAlexType));
+            }
 
             entry.setField(StandardField.TITLE, item.optString("title"));
 
@@ -289,7 +336,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     .filter(Objects::nonNull)
                     .map(primaryLocation -> primaryLocation.optString("pdf_url", ""))
                     .filter(StringUtil::isNotBlank)
-                    .map(Unchecked.function(pdfUrl -> URLUtil.create(pdfUrl)));
+                    .map(Unchecked.function(URLUtil::create));
         } catch (RuntimeException e) {
             LOGGER.warn("Malformed URL", e);
             throw (MalformedURLException) e.getCause();
@@ -314,7 +361,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
 
     private List<BibEntry> workUrlsToBibEntryList(@Nullable JSONArray workUrlArray) {
         if (workUrlArray == null) {
-            List.of();
+            return List.of();
         }
         // TODO: This could be batched - see https://github.com/JabRef/jabref/pull/15023#issuecomment-3846630255
         return IntStream.range(0, workUrlArray.length())
@@ -351,7 +398,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         }
         return IntStream.range(0, workUrlArray.length())
                         .mapToObj(workUrlArray::getJSONObject)
-                        .map(Unchecked.function(jsonItem -> jsonItemToBibEntry(jsonItem)))
+                        .map(Unchecked.function(this::jsonItemToBibEntry))
                         .toList();
     }
 
@@ -421,7 +468,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         // Instead, we perform a search for works that cite the given work's ID
         try {
             return getWorkObject(entry, List.of("id"))
-                    .map(work -> work.optString("id"))
+                    .map(work -> work.optString("id", null))
                     .filter(Objects::nonNull)
                     .map(Unchecked.function(id ->
                             getUriBuilder("", List.of())
