@@ -68,6 +68,7 @@ public class EditSeparate {
                     // Create a citation group for each citation.
                     final int last = citations.size() - 1;
                     for (int i = 0; i < citations.size(); i++) {
+                        boolean insertSpaceBefore = false;
                         boolean insertSpaceAfter = i != last;
                         Citation citation = citations.get(i);
 
@@ -79,6 +80,7 @@ public class EditSeparate {
                                 OOText.fromString(citation.citationKey),
                                 textCursor,
                                 style,
+                                insertSpaceBefore,
                                 insertSpaceAfter);
 
                         textCursor.collapseToEnd();

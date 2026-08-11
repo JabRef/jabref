@@ -98,7 +98,7 @@ public class IndexManager {
         if (newValue) {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
@@ -111,7 +111,7 @@ public class IndexManager {
     private void updateOnStart() {
         new BackgroundTask<>() {
             @Override
-            public Object call() {
+            public Void call() {
                 bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
@@ -122,7 +122,7 @@ public class IndexManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
@@ -133,7 +133,7 @@ public class IndexManager {
     public void addToIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
-            public Object call() {
+            public Void call() {
                 bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
@@ -143,7 +143,7 @@ public class IndexManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     linkedFilesIndexer.addToIndex(entries, this);
                     return null;
                 }
@@ -154,7 +154,7 @@ public class IndexManager {
     public void removeFromIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
-            public Object call() {
+            public Void call() {
                 bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
@@ -164,7 +164,7 @@ public class IndexManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     linkedFilesIndexer.removeFromIndex(entries, this);
                     return null;
                 }
@@ -227,7 +227,7 @@ public class IndexManager {
 
                     new BackgroundTask<>() {
                         @Override
-                        public Object call() {
+                        public Void call() {
                             for (Field snapshot : fieldsSnapshot) {
                                 bibFieldsIndexer.updateEntry(pendingEntry, snapshot);
                             }
@@ -242,7 +242,7 @@ public class IndexManager {
                         if (fileValues != null) {
                             new BackgroundTask<>() {
                                 @Override
-                                public Object call() {
+                                public Void call() {
                                     linkedFilesIndexer.updateEntry(pendingEntry, fileValues.oldValue(), fileValues.newValue(), this);
                                     return null;
                                 }
@@ -258,7 +258,7 @@ public class IndexManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     linkedFilesIndexer.rebuildIndex(this);
                     return null;
                 }
@@ -298,7 +298,7 @@ public class IndexManager {
         } else {
             new BackgroundTask<>() {
                 @Override
-                public Object call() {
+                public Void call() {
                     indexUpdateThrottler.shutdown();
                     return null;
                 }

@@ -29,7 +29,7 @@ jobs:
         with:
           show-progress: 'false'
       - name: Run linkspector
-        uses: umbrelladocs/action-linkspector@v1.5.4
+        uses: umbrelladocs/action-linkspector@v1.5.5
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review

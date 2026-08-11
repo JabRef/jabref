@@ -57,7 +57,8 @@ public class EditInsert {
                                                                     BibDatabase database,
                                                                     JStyle style,
                                                                     CitationType citationType,
-                                                                    String pageInfo) {
+                                                                    String pageInfo,
+                                                                    boolean insertSpaceBefore) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -77,7 +78,7 @@ public class EditInsert {
             citeText = OOText.fromString("[-]"); // A dash only. Only refresh later.
         } else {
             citeText = style.createCitationMarker(citations,
-                    citationType.inParenthesis(),
+                    citationType,
                     NonUniqueCitationMarker.FORGIVEN);
         }
 
@@ -95,6 +96,7 @@ public class EditInsert {
                     citeText,
                     cursor,
                     style,
+                    insertSpaceBefore,
                     true /* insertSpaceAfter */);
             return OOVoidResult.ok();
         } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {

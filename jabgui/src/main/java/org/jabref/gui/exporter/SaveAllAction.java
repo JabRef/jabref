@@ -8,10 +8,9 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -21,13 +20,17 @@ public class SaveAllAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public SaveAllAction(Supplier<List<LibraryTab>> tabsSupplier, GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
+    public SaveAllAction(Supplier<List<LibraryTab>> tabsSupplier, GuiPreferences preferences, DialogService dialogService, StateManager stateManager, BibEntryTypesManager entryTypesManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabsSupplier = tabsSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.executable.bind(needsDatabase(stateManager));
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class SaveAllAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Saving all libraries..."));
 
         for (LibraryTab libraryTab : tabsSupplier.get()) {
-            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
+            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
             boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
                 dialogService.notify(Localization.lang("Could not save file."));

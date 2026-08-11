@@ -32,8 +32,8 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// Example: document.pdf -> document_ocr.pdf.
     ///
     /// @param pdfPath the file to perform OCR on.
-    /// @return {@link OcrResult.Success} containing the path to the searchable PDF,
-    /// or {@link OcrResult.Failure} with an error message if OCR failed.
+    /// @return [OcrResult.Success] containing the path to the searchable PDF,
+    /// or [OcrResult.Failure] with an error message if OCR failed.
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) {
         if (!OcrUtils.isAvailable(ocrPreferences)) {
