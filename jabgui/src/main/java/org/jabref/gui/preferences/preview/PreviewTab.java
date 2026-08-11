@@ -14,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -40,6 +41,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -54,17 +56,27 @@ import org.fxmisc.richtext.LineNumberFactory;
 public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     // Controls of the custom available/chosen region, built in code and wired in wireControls().
-    private ListView<PreviewLayout> availableListView;
+    private ListView<PreviewLayout> cslListView;
+    //    private ListView<PreviewLayout> cslListView;
+    private ListView<PreviewLayout> customizedListView;
     private ListView<PreviewLayout> chosenListView;
+    private TabPane availableTabPane;   // TODO: see if needs to be refactored
+    private Tab cslTab;
+    private Tab customizedTab;
+    private Tab previousTab;    // used to remember the context of last focused tab
     private Button toRightButton;
     private Button toLeftButton;
     private Button sortUpButton;
     private Button sortDownButton;
+    private Button addCustomStyleButton;
+    private Button removeCustomStyleButton;
     private Label readOnlyLabel;
     private Button resetDefaultButton;
     private Tab previewTab;
     private CodeArea editArea;
     private CustomTextField searchBox;
+    private TextField styleNameField;
+    private boolean isCommittingStyleName = false;
 
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -117,10 +129,46 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Filter"));
 
-        availableListView = layoutListView();
-        VBox availableBox = new VBox(4.0, sectionLabel(Localization.lang("Available")), searchBox, availableListView);
+        //        availableListView = layoutListView();
+        //        VBox availableBox = new VBox(4.0, sectionLabel(Localization.lang("Available")), searchBox, availableListView);
+        //        HBox.setHgrow(availableBox, Priority.ALWAYS);
+        //        VBox.setVgrow(availableListView, Priority.ALWAYS);
+
+        cslListView = layoutListView();
+        customizedListView = layoutListView();
+        this.cslTab = new Tab(Localization.lang("CSL"), cslListView);
+        cslTab.setClosable(false);
+        previousTab = cslTab;
+
+        //        this.customizedTab = new Tab(Localization.lang("Customized"), customizedListView);
+        addCustomStyleButton = new Button();
+        removeCustomStyleButton = new Button();
+
+        addCustomStyleButton.getStyleClass().add("icon-button");
+        removeCustomStyleButton.getStyleClass().add("icon-button");
+
+        addCustomStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+        removeCustomStyleButton.setGraphic(IconTheme.JabRefIcons.REMOVE.getGraphicNode());
+
+        addCustomStyleButton.setPrefWidth(30);
+        removeCustomStyleButton.setPrefWidth(30);
+
+        VBox buttonBox = new VBox(5, addCustomStyleButton, removeCustomStyleButton);
+        buttonBox.setAlignment(Pos.TOP_CENTER);
+
+        HBox customizedPane = new HBox(5);
+        customizedPane.getChildren().addAll(customizedListView, buttonBox);
+        HBox.setHgrow(customizedListView, Priority.ALWAYS);
+
+        customizedTab = new Tab(Localization.lang("Customized"), customizedPane);
+        customizedTab.setClosable(false);
+
+        availableTabPane = new TabPane(cslTab, customizedTab);
+        availableTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        VBox.setVgrow(availableTabPane, Priority.ALWAYS);
+        VBox availableBox = new VBox(4.0, sectionLabel(Localization.lang("Available")), searchBox, availableTabPane);
         HBox.setHgrow(availableBox, Priority.ALWAYS);
-        VBox.setVgrow(availableListView, Priority.ALWAYS);
 
         toRightButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_RIGHT, this::toRightButtonAction);
         toLeftButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_LEFT, this::toLeftButtonAction);
@@ -156,6 +204,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         AnchorPane.setBottomAnchor(tabPane, 0.0);
         AnchorPane.setRightAnchor(tabPane, 0.0);
 
+        styleNameField = new TextField();
+        styleNameField.setPromptText(Localization.lang("Style name"));
+        EasyBind.subscribe(viewModel.styleNameProperty(), styleNameField::setText);
+        styleNameField.editableProperty().bind(viewModel.selectedIsEditableProperty());
+        styleNameField.setOnAction(_ -> commitStyleNameEdit()); // Commit on Enter
+        //        styleNameField.focusedProperty().addListener((_, wasFocused, isFocused) -> {  // unfocus commit
+        //            // Commit on focus-lost from the styleNameField
+        //            if (wasFocused && !isFocused) {
+        //                commitStyleNameEdit(true);
+        //            }
+        //        });
+        //        styleNameField.setOnKeyPressed(this::cancelRenameOnEscapeKeyPress); // allow to cancel rename with esc key
+
         readOnlyLabel = new Label(Localization.lang("Read only"));
         resetDefaultButton = new Button();
         resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
@@ -163,7 +224,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         resetDefaultButton.setPrefSize(20.0, 20.0);
         resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
         resetDefaultButton.setOnAction(_ -> resetDefaultButtonAction());
-        HBox topRight = new HBox(5.0, readOnlyLabel, resetDefaultButton);
+        //        HBox topRight = new HBox(5.0, readOnlyLabel, resetDefaultButton);
+        HBox topRight = new HBox(10, readOnlyLabel,
+                resetDefaultButton,
+                new Label(Localization.lang("Name")),
+                styleNameField);
+
         topRight.setAlignment(Pos.CENTER_RIGHT);
         AnchorPane.setTopAnchor(topRight, 2.0);
         AnchorPane.setRightAnchor(topRight, 5.0);
@@ -237,6 +303,23 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> viewModel.addBstStyle(bstFile));
     }
 
+    /*
+    TODO: fix duplicate adding into selected
+    fix arrow buttons, cannot add from customized into selected
+    swapping csl->customized, cannot drag and drop
+
+    csl into selected, I can add, but the csl does not lose it's value
+    but when I move selected back into csl, it creates duplicate values. - fix
+
+    when using arrow button, it remembers the last click, not whats highlighted on respective side
+    and then it moves the same entry into the selected
+    this only applies to when we move entries into Selected, from customized.
+    click right, click left, click right, then click right button, it moves the last right clicked
+    into the right, instead of left highlighted into the right.
+
+    double clicking left side allows for duplicates on right/selected side
+
+     */
     private void wireControls() {
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
@@ -251,19 +334,60 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
 
-        availableListView.setItems(viewModel.getFilteredAvailableLayouts());
-        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
+        //        cslListView.setItems(viewModel.getFilteredAvailableLayouts());
+        cslListView.setItems(viewModel.getFilteredCslLayouts());
+        customizedListView.setItems(viewModel.getFilteredCustomizedLayouts());
+
+        viewModel.availableSelectionModelProperty().setValue(cslListView.getSelectionModel());
+        availableTabPane.getSelectionModel()
+                        .selectedItemProperty()
+                        .addListener((obs, oldTab, newTab) -> {
+
+                            if (newTab == cslTab) {
+                                viewModel.availableSelectionModelProperty()
+                                         .setValue(cslListView.getSelectionModel());
+                            } else {
+                                viewModel.availableSelectionModelProperty()
+                                         .setValue(customizedListView.getSelectionModel());
+                            }
+                            previousTab = newTab;
+                            focusRightButtonBinding();
+                        });
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
                 .withContextMenu(this::createContextMenu)
-                .install(availableListView);
-        availableListView.setOnDragOver(this::dragOver);
-        availableListView.setOnDragDetected(this::dragDetectedInAvailable);
-        availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
-        availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
-        availableListView.setOnMouseClicked(this::mouseClickedAvailable);
-        availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
+                .install(cslListView);
+
+        new ViewModelListCellFactory<PreviewLayout>()
+                .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenu)
+                .install(customizedListView);
+
+        cslListView.setOnDragOver(this::dragOver);
+        cslListView.setOnDragDetected(this::dragDetectedInAvailable);
+        cslListView.setOnDragDropped(event -> dragDropped(viewModel.cslListProperty(), event));
+        cslListView.setOnKeyTyped(event -> jumpToSearchKey(cslListView, event));
+        //        cslListView.setOnMouseClicked(this::mouseClickedAvailable);
+        cslListView.setOnMouseClicked(event -> {
+            viewModel.availableSelectionModelProperty()
+                     .setValue(cslListView.getSelectionModel());
+            mouseClickedAvailable(event);
+        });
+        cslListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        cslListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
+                viewModel.setPreviewLayout(newValue));
+
+        customizedListView.setOnDragOver(this::dragOver);
+        customizedListView.setOnDragDetected(this::dragDetectedInAvailable);
+        customizedListView.setOnDragDropped(event -> dragDropped(viewModel.customizedListProperty(), event));
+        customizedListView.setOnKeyTyped(event -> jumpToSearchKey(customizedListView, event));
+        //        customizedListView.setOnMouseClicked(this::mouseClickedAvailable);
+        customizedListView.setOnMouseClicked(event -> {
+            viewModel.availableSelectionModelProperty().setValue(customizedListView.getSelectionModel());
+            mouseClickedAvailable(event);
+        });
+        customizedListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        customizedListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
@@ -277,11 +401,27 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
         chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
-        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
+        //        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
+        chosenListView.setOnMouseClicked(event -> {
+            viewModel.chosenSelectionModelProperty()
+                     .setValue(chosenListView.getSelectionModel());
+            mouseClickedChosen(event);
+        });
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
+        addCustomStyleButton.setOnAction(event -> {
+            viewModel.addCustomizedStyle();
+            customizedListView.refresh();   // TODO: remove this if not needed
+        });
+
+        removeCustomStyleButton.setOnAction(event -> {
+            viewModel.removeCustomizedStyle();
+            customizedListView.refresh();   // TODO: remove this if not needed
+        });
+
+        removeCustomStyleButton.disableProperty().bind(customizedListView.getSelectionModel().selectedItemProperty().isNull());
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
         toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -291,16 +431,18 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         previewViewer.setDatabaseContext(new BibDatabaseContext());
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
-        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        //        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+        //                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        previewViewer.visibleProperty().bind(viewModel.selectedLayoutProperty().isNotNull());
+
         previewTab.setContent(previewViewer);
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
-
+        //        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+        //                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        editArea.visibleProperty().bind(viewModel.selectedLayoutProperty().isNotNull());
         BindingsHelper.bindBidirectional(
                 editArea.textProperty(),
                 viewModel.sourceTextProperty(),
@@ -354,11 +496,30 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         viewModel.dragOver(event);
     }
 
+    //    private void dragDetectedInAvailable(MouseEvent event) {
+    //        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+    //        if (!selectedLayouts.isEmpty()) {
+    //            Dragboard dragboard = cslListView.startDragAndDrop(TransferMode.MOVE);
+    //            viewModel.dragDetected(viewModel.cslListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
+    //        }
+    //        event.consume();
+    //    }
+
     private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+        ListView<PreviewLayout> sourceListView;
+        ListProperty<PreviewLayout> sourceListProperty;
+        if (availableTabPane.getSelectionModel().getSelectedItem() == cslTab) {
+            sourceListView = this.cslListView;
+            sourceListProperty = viewModel.cslListProperty();
+        } else {
+            sourceListView = this.customizedListView;
+            sourceListProperty = viewModel.customizedListProperty();
+        }
+
         if (!selectedLayouts.isEmpty()) {
-            Dragboard dragboard = availableListView.startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
+            Dragboard dragboard = sourceListView.startDragAndDrop(TransferMode.MOVE);
+            viewModel.dragDetected(sourceListProperty, viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
@@ -375,21 +536,48 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
+        // Only switch tabs when routing OUT of Selected INTO Available
+        // dropping in Selected has no need to refocus the Available tabs.
+        if (success && targetList != viewModel.chosenListProperty()) {
+            focusTabOnLastRoutedLayout();
+        }
         event.consume();
     }
 
     private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
         boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
+        //        if (success) {
+        //            focusTabOnLastRoutedLayout();
+        //        }
         event.consume();
     }
 
+    //    public void toRightButtonAction() {
+    //        viewModel.addToChosen();
+    //    }
     public void toRightButtonAction() {
-        viewModel.addToChosen();
+        //        if (availableTabPane.getSelectionModel().getSelectedItem() == cslTab) {
+        if (previousTab == cslTab) {
+            viewModel.addToChosen(viewModel.cslListProperty());
+        } else {
+            viewModel.addToChosen(viewModel.customizedListProperty());
+        }
     }
 
+    //    public void toLeftButtonAction() {
+    //        viewModel.removeFromChosen();
+    //    }
     public void toLeftButtonAction() {
         viewModel.removeFromChosen();
+        focusTabOnLastRoutedLayout();
+        //        if (previousTab == cslTab) {
+        //            viewModel.removeFromChosen();
+        //            //            viewModel.removeFromChosen(viewModel.cslListProperty());
+        //        } else {
+        //            viewModel.removeFromChosen();
+        //            //            viewModel.removeFromChosen(viewModel.customizedListProperty());
+        //        }
     }
 
     public void sortUpButtonAction() {
@@ -404,16 +592,41 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         viewModel.resetDefaultLayout();
     }
 
+    //    private void mouseClickedAvailable(MouseEvent event) {
+    //        if (event.getClickCount() == 2) {
+    //            viewModel.addToChosen();
+    //            event.consume();
+    //        }
+    //    }
+
     private void mouseClickedAvailable(MouseEvent event) {
         if (event.getClickCount() == 2) {
-            viewModel.addToChosen();
+            if (previousTab == cslTab) {
+                viewModel.addToChosen(viewModel.cslListProperty());
+            } else {
+                viewModel.addToChosen(viewModel.customizedListProperty());
+            }
             event.consume();
         }
     }
 
+    //    private void mouseClickedChosen(MouseEvent event) {
+    //        if (event.getClickCount() == 2) {
+    //            viewModel.removeFromChosen();
+    //            event.consume();
+    //        }
+    //    }
+
     private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
+            focusTabOnLastRoutedLayout();
+            //            if (previousTab == cslTab) {
+            //                viewModel.removeFromChosen(viewModel.cslListProperty());
+            //            } else {
+            //                viewModel.removeFromChosen(viewModel.customizedListProperty());
+            //            }
+            //            viewModel.removeFromChosen(viewModel.cslListProperty());
             event.consume();
         }
     }
@@ -428,4 +641,49 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         }
         return null;
     }
+
+    private void focusTabOnLastRoutedLayout() {
+        PreviewLayout moved = viewModel.lastRoutedLayoutProperty().getValue();
+        if (moved != null) {
+            availableTabPane.getSelectionModel()
+                            .select((moved instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
+            //            availableTabPane.getSelectionModel().select(customizedTab);
+        }
+    }
+
+    private void focusRightButtonBinding() {
+        toRightButton.disableProperty().unbind();
+        toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty()
+                                                      .getValue()
+                                                      .selectedItemProperty()
+                                                      .isNull());
+    }
+
+    private void commitStyleNameEdit() {
+        if (isCommittingStyleName) {
+            return;
+        }
+        try {
+            isCommittingStyleName = true;
+            viewModel.renameSelectedStyle(styleNameField.getText());
+            customizedListView.refresh();   // refresh view to display rename in 'customized'
+            chosenListView.refresh();       // refresh view to display rename in 'selected'
+        } finally {
+            isCommittingStyleName = false;
+        }
+
+        //        viewModel.renameSelectedStyle(styleNameField.getText());
+        //        customizedListView.refresh();   // refresh view to display rename in 'customized'
+    }
+
+    //    private void cancelRenameOnEscapeKeyPress(KeyEvent event) {
+    //        if (event.getCode() == KeyCode.ESCAPE) {
+    //            styleNameField.setText(viewModel.selectedLayoutProperty().getValue() != null
+    //                                   ? viewModel.selectedLayoutProperty().getValue().getDisplayName()
+    //                                   : "");
+    //            chosenListView.requestFocus();
+    //            //            editArea.requestFocus();
+    //            event.consume();
+    //        }
+    //    }
 }

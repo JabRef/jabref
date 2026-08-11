@@ -136,10 +136,12 @@ public record ClipboardContentGenerator(
                                                                        .filter(TextBasedPreviewLayout.class::isInstance)
                                                                        .map(TextBasedPreviewLayout.class::cast)
                                                                        .findFirst();
-        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
-                previewPreferences.getCustomPreviewLayout(),
+        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse((TextBasedPreviewLayout.of(
+                TextBasedPreviewLayout.NAME,
+                TextBasedPreviewLayout.DEFAULT,
                 layoutFormatterPreferences,
-                abbreviationRepository));
+                abbreviationRepository
+        )));
 
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
