@@ -44,6 +44,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceBefore;
+    private final BooleanProperty addSpaceAfter;
     private final BooleanProperty zoteroCompatibilityMode;
     private final BooleanProperty inferCslStyleFromDocument;
     private final ObservableList<String> externalBstStyles;
@@ -63,6 +64,7 @@ public class OpenOfficePreferences {
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
                                  boolean addSpaceBefore,
+                                 boolean addSpaceAfter,
                                  boolean zoteroCompatibilityMode,
                                  boolean inferCslStyleFromDocument,
                                  List<String> externalBstStyles,
@@ -81,6 +83,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceBefore = new SimpleBooleanProperty(addSpaceBefore);
+        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
         this.inferCslStyleFromDocument = new SimpleBooleanProperty(inferCslStyleFromDocument);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
@@ -105,6 +108,7 @@ public class OpenOfficePreferences {
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceBefore
+                false,                                          // addSpaceAfter
                 false,                                          // zoteroCompatibilityMode
                 false,                                          // inferCslStyleFromDocument
                 List.of(),                                      // externalBstStyles
@@ -268,6 +272,18 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceBefore(boolean addSpaceBefore) {
         this.addSpaceBefore.setValue(addSpaceBefore);
+    }
+
+    public boolean getAddSpaceAfter() {
+        return addSpaceAfter.get();
+    }
+
+    public BooleanProperty addSpaceAfterProperty() {
+        return addSpaceAfter;
+    }
+
+    public void setAddSpaceAfter(boolean addSpaceAfter) {
+        this.addSpaceAfter.setValue(addSpaceAfter);
     }
 
     public boolean getZoteroCompatibilityMode() {
