@@ -45,7 +45,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private static final double KEY_INDICATOR_WIDTH = 24.0;
 
     // Shown when a fetcher has a user-configured key that will actually survive a restart
-    private static final String KEY_SAVED_GLYPH = "\uD83D\uDD11"; // 🔑
+    private static final String KEY_SAVED_GLYPH = "\uD83D\uDCBE"; // 💾
 
     // Shown when a fetcher has a user-configured key that only lives for the current run
     private static final String KEY_SESSION_ONLY_GLYPH = "\uD83D\uDD53"; // 🕓
