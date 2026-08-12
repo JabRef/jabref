@@ -318,7 +318,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "<i>(1)<i>",
+                        "<i>(1)</i>",
                         getStyle("Acta Orthopædica Belgica")
                 ),
 
