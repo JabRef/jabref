@@ -72,21 +72,43 @@ class ZoteroCitationMarkParserTest {
             }
             """;
 
-    String zoteroCitation = "ZOTERO_ITEM CSL_CITATION " + JOURNAL_ARTICLE_CSL_JSON + " test1234";
-
     @Test
     void parseJournalArticle() {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse(zoteroCitation);
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJson(JOURNAL_ARTICLE_CSL_JSON);
         BibEntry entry = entries.getFirst();
 
         assertEquals(StandardEntryType.Article, entry.getType());
         assertEquals(Optional.of("Zotero-587"), entry.getCitationKey());
     }
 
+    @Test
+    void parsePrefersJabRefUriCitationKeyOverZoteroItemId() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJson("""
+                {
+                  "citationItems": [
+                    {
+                      "id": 587,
+                      "uris": [
+                        "http://zotero.org/users/123/items/ABCD1234",
+                        "http://www.jabref.org/Smith2020"
+                      ],
+                      "itemData": {
+                        "type": "article-journal",
+                        "title": "Reference mark compatibility"
+                      }
+                    }
+                  ]
+                }
+                """);
+        BibEntry entry = entries.getFirst();
+
+        assertEquals(Optional.of("Smith2020"), entry.getCitationKey());
+    }
+
     @ParameterizedTest
     @MethodSource
     void parseJournalArticleField(StandardField field, String expectedValue) {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse(zoteroCitation);
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJson(JOURNAL_ARTICLE_CSL_JSON);
         BibEntry entry = entries.getFirst();
 
         assertEquals(Optional.of(expectedValue), entry.getField(field));
@@ -108,8 +130,8 @@ class ZoteroCitationMarkParserTest {
     @ParameterizedTest
     @MethodSource
     void parseCSLJSON(CSLTestCase testCase) {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse("""
-                ZOTERO_ITEM CSL_CITATION {"citationItems":[{"id":600,"itemData":{%s}}]} test1234
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJson("""
+                {"citationItems":[{"id":600,"itemData":{%s}}]}
                 """.formatted(testCase.itemData()));
         BibEntry entry = entries.getFirst();
 
@@ -401,6 +423,19 @@ class ZoteroCitationMarkParserTest {
         assertEquals(Optional.of("A journal"), entry.getField(StandardField.JOURNALTITLE));
         assertEquals(Optional.of("Doe, Jane"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("2021"), entry.getField(StandardField.YEAR));
+    }
+
+    @Test
+    void parseCslJsonItemsMapsIssuedRaw() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems("""
+                {
+                  "type": "article-journal",
+                  "title": "An article",
+                  "issued": {"raw": "2021"}
+                }
+                """);
+
+        assertEquals(Optional.of("2021"), entries.getFirst().getField(StandardField.YEAR));
     }
 
     @ParameterizedTest

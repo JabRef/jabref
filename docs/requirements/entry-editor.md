@@ -12,6 +12,13 @@ When users search or select a group not containing the entry shown in the Entry 
 
 Needs: impl
 
+## Validation decoration is initialized before opening the entry editor
+`req~entry-editor.validation-decoration.startup~1`
+
+ControlsFX validation decoration is initialized during GUI startup, so opening the first entry editor does not replace the JavaFX scene root and trigger a full CSS reapplication on the entry-editor interaction path.
+
+Needs: impl
+
 ## Citations tab should show citation preview on hover
 `req~entry-editor.citations.hover-preview~1`
 

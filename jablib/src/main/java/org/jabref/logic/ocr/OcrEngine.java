@@ -13,11 +13,6 @@ public interface OcrEngine {
     /// @return the result of the OCR operation with the extracted text or an error message.
     OcrResult performOcrAndEmbedText(Path pdfPath);
 
-    /// Checks if the OCR engine is available for use.
-    ///
-    /// @return true if the engine is available, false otherwise.
-    boolean isAvailable();
-
     /// Gets the name of the OCR engine.
     ///
     /// @return the name of the OCR engine (e.g., "OCRmyPDF", "Tesseract").

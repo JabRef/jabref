@@ -1,0 +1,90 @@
+name: JabLS Native Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths:
+      - 'jabls/**'
+      - 'jabls-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabls-native-smoke-test.yml'
+  pull_request:
+    paths:
+      - 'jabls/**'
+      - 'jabls-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabls-native-smoke-test.yml'
+  merge_group:
+  workflow_dispatch:
+    inputs:
+      upload-as-artifact:
+        description: "Upload the native binary as a workflow artifact"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  native-smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            runOnPullRequest: true
+          - os: macos-15
+            runOnPullRequest: false
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} JabLS native smoke test
+    timeout-minutes: 60
+
+    steps:
+      - name: Skip native build (not needed for this event)
+        if: github.event_name == 'pull_request' && matrix.runOnPullRequest != true
+        run: echo "Skipping macOS native build on pull_request; it runs in the merge queue."
+
+      - name: Checkout
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+
+      - name: Set up GraalVM
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabLS native binary
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        run: gradle :jabls-cli:nativeCompile
+
+      - name: Run JabLS native smoke test
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        run: python3 jabls-cli/src/test/nativeimage/jabls-smoke-test.py
+
+      - name: Upload JabLS native binary
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabls-native-${{ matrix.os }}
+          path: jabls-cli/build/native/nativeCompile/
+          if-no-files-found: error
