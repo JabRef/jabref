@@ -332,6 +332,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 cellButton.setGraphicTextGap(0);
                 getChildren().add(cellButton);
                 cellButton.maxWidthProperty().bind(widthProperty());
+                if (content.isEmpty()) {
+                    cellButton.prefWidthProperty().bind(widthProperty());
+                }
                 HBox.setHgrow(cellButton, Priority.ALWAYS);
 
                 // Text
@@ -355,7 +358,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                     cellButton.setSelected(true);
                 }
 
-                if (field.equals(StandardField.DOI)) {
+                if (field.equals(StandardField.DOI) && !content.isEmpty()) {
                     Button doiButton = ControlHelper.iconButton(IconTheme.JabRefIcons.LOOKUP_IDENTIFIER);
                     HBox.setHgrow(doiButton, Priority.NEVER);
                     doiButton.prefHeightProperty().bind(cellButton.heightProperty());
