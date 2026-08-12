@@ -31,8 +31,11 @@ import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
+import org.jabref.logic.cleanup.SaveActionsConverter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.importer.util.SaveActionsDTOConverter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -45,9 +48,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveActionsDTO;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -297,6 +304,29 @@ public class BibDatabaseWriter {
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
         }
+
+        writeMetaDataJson(metaData);
+    }
+
+    protected void writeMetaDataJson(MetaData metaData) throws IOException {
+        JsonObject metaDataJson = new JsonObject();
+
+        if (metaData.getSaveActions().isPresent()) {
+            FieldFormatterCleanupActions saveActions = metaData.getSaveActions().get();
+            SaveActionsDTO saveActionsDTO = SaveActionsConverter.toDTO(saveActions);
+            JsonObject saveActionsJson = SaveActionsDTOConverter.toJson(saveActionsDTO);
+            metaDataJson.add(MetaData.SAVE_ACTIONS, saveActionsJson);
+        }
+
+        if (metaDataJson.isEmpty()) {
+            return;
+        }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        bibWriter.write(COMMENT_PREFIX + "{" + MetaData.META_FLAG_V1 + OS.NEWLINE);
+        bibWriter.write(gson.toJson(metaDataJson));
+        bibWriter.writeLine(OS.NEWLINE + "}");
+        bibWriter.finishBlock();
     }
 
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {

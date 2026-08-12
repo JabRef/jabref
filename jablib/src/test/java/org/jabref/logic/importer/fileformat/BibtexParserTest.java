@@ -60,6 +60,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,7 @@ import static org.mockito.Mockito.when;
 
 /// Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
 ///
-/// Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
+/// Tests cannot be executed concurrently, because Localization is used at [BibtexParser#parseAndAddEntry(String)]
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @ResourceLock("Localization.lang")
 class BibtexParserTest {
@@ -388,7 +389,7 @@ class BibtexParserTest {
         ParserResult result = parser.parse(Reader.of("""
                 This file was created with JabRef 2.1 beta 2.
                 Encoding: Cp1252
-
+                
                 @INPROCEEDINGS{CroAnnHow05,
                   author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
                   title = {Effective work practices for floss development: A model and propositions},
@@ -971,7 +972,7 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(Reader.of("""
                         @article{test,a = {a
-
+                        
                         b},b = {a
                         \s
                         b},c = {a\s
@@ -1212,7 +1213,7 @@ class BibtexParserTest {
                           DOI                      = {10.1109/CICC.2011.6055279},
                           ISSN                     = {0886-5930}
                         }
-
+                        
                         @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
 
         FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
@@ -1236,7 +1237,7 @@ class BibtexParserTest {
                           DOI                      = {10.1109/CICC.2011.6055279},
                           ISSN                     = {0886-5930}
                         }
-
+                        
                         @Comment{jabref-meta: saveActions:enabled;
                         month[normalize_month]
                         pages[normalize_page_numbers]
@@ -1310,6 +1311,55 @@ class BibtexParserTest {
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    void integrationTestSaveActionsJson() throws IOException {
+        ParserResult parserResult = parser.parse(
+                Reader.of("""
+                        @Comment{jabref-meta-0.1.0
+                        {
+                          "saveActions": {
+                            "state": true,
+                            "title": ["lower_case"]
+                          }
+                        }
+                        }
+                        """));
+
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+        List<FieldFormatterCleanup> expected = List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()));
+        List<FieldFormatterCleanup> actual = saveActions.getConfiguredActions();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void malformedSaveActionsJsonDoesNotAbortParsing() throws IOException {
+        ParserResult parserResult = parser.parse(
+                Reader.of("""
+                        @Comment{jabref-meta-0.1.0
+                        {
+                          "saveActions": {
+                            "state": true,
+                            "title": ["lower_case"
+                          }
+                        }
+                        }
+                        @Article{test,
+                          title = {Title},
+                        }
+                        """));
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Title");
+
+        assertEquals(List.of(expectedEntry), parserResult.getDatabase().getEntries());
+        assertEquals(Optional.empty(), parserResult.getMetaData().getSaveActions());
+        assertEquals(1, parserResult.warnings().size());
+        assertTrue(parserResult.getErrorMessage().contains("Ill-formed JSON metadata comment in BIB file"));
     }
 
     @Test
@@ -1468,7 +1518,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1480,7 +1530,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Static Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1538,7 +1588,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
-
+                
                 @article{Swain:2023aa,
                     author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1550,7 +1600,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1562,7 +1612,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Smart Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1655,7 +1705,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
-
+                
                 @article{Swain:2023aa,
                     author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1667,7 +1717,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1679,7 +1729,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Static Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1694,7 +1744,7 @@ class BibtexParserTest {
                 </array>
                 </plist>
                 }}
-
+                
                 @comment{BibDesk Smart Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -2228,7 +2278,7 @@ class BibtexParserTest {
                 @Article{Test2017,
                   keywords = {bbb},
                 }
-
+                
                 @Article{,
                   keywords = {asdf,asdf,asdf},
                 },
@@ -2279,7 +2329,7 @@ class BibtexParserTest {
                 @Article{Test2017,
                     bdsk-file-1 = {////=},
                 }
-
+                
                 @Article{Test2,
                    bdsk-file-1 = {YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAFgAdccmVsYXRpdmVQYXRoWWFsaWFzRGF0YV8QVi4uLy4uLy4uL1BhcGVycy9Bc2hlaW0yMDA1IFRoZSBHZW9ncmFwaHkgb2YgSW5ub3ZhdGlvbiBSZWdpb25hbCBJbm5vdmF0aW9uIFN5c3RlbXMucGRm0hcLGBlXTlMuZGF0YU8RAkoAAAAAAkoAAgAADE1hY2ludG9zaCBIRAAAAAAAAAAAAAAAAAAAAM6T/wtIKwAAACI+9B9Bc2hlaW0yMDA1IFRoZSBHZW9nciMyMjQ4QzkucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIkjJw6jvRAAAAAAAAAAAAAMAAgAACSAAAAAAAAAAAAAAAAAAAAAGUGFwZXJzABAACAAAzpPw+wAAABEACAAAw6jhNAAAAAEAEAAiPvQAIjTXACHV2wAHw2AAAgBQTWFjaW50b3NoIEhEOlVzZXJzOgBpbGlwcGVydDoARG9jdW1lbnRzOgBQYXBlcnM6AEFzaGVpbTIwMDUgVGhlIEdlb2dyIzIyNDhDOS5wZGYADgCOAEYAQQBzAGgAZQBpAG0AMgAwADAANQAgAFQAaABlACAARwBlAG8AZwByAGEAcABoAHkAIABvAGYAIABJAG4AbgBvAHYAYQB0AGkAbwBuACAAUgBlAGcAaQBvAG4AYQBsACAASQBuAG4AbwB2AGEAdABpAG8AbgAgAFMAeQBzAHQAZQBtAHMALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAGZVc2Vycy9pbGlwcGVydC9Eb2N1bWVudHMvUGFwZXJzL0FzaGVpbTIwMDUgVGhlIEdlb2dyYXBoeSBvZiBJbm5vdmF0aW9uIFJlZ2lvbmFsIElubm92YXRpb24gU3lzdGVtcy5wZGYAEwABLwAAFQACAA///wAAgAbSGxwdHlokY2xhc3NuYW1lWCRjbGFzc2VzXU5TTXV0YWJsZURhdGGjHR8gVk5TRGF0YVhOU09iamVjdNIbHCIjXE5TRGljdGlvbmFyeaIiIF8QD05TS2V5ZWRBcmNoaXZlctEmJ1Ryb290gAEACAARABoAIwAtADIANwBAAEYATQBVAGAAZwBqAGwAbgBxAHMAdQB3AIQAjgDnAOwA9ANCA0QDSQNUA10DawNvA3YDfwOEA5EDlAOmA6kDrgAAAAAAAAIBAAAAAAAAACgAAAAAAAAAAAAAAAAAAAOw},
                 },
@@ -2293,5 +2343,25 @@ class BibtexParserTest {
                 .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseCommentToJson() {
+        String comment = """
+                jabref-meta-0.1.0
+                {
+                  "saveActions" :
+                  {
+                    "state": true
+                  }
+                }
+                """;
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        Optional<JsonObject> actualJson = parser.parseCommentToJson(comment);
+        JsonObject expectedSaveActions = new JsonObject();
+        expectedSaveActions.addProperty("state", true);
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.add("saveActions", expectedSaveActions);
+        assertEquals(Optional.of(expectedJson), actualJson);
     }
 }
