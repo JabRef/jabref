@@ -318,7 +318,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "(<i>1</i>)",
+                        "<i>(1)</i>",
                         getStyle("Acta Orthopædica Belgica")
                 ),
 
@@ -334,7 +334,7 @@ class CSLFormatUtilsTest {
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
                 Arguments.of(
-                        "<sup>1</sup>)",
+                        "<sup>1)</sup>",
                         getStyle("Chemical and Pharmaceutical Bulletin")
                 ),
 
@@ -440,7 +440,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "(<i>1,2</i>)",
+                        "<i>(1,2)</i>",
                         getStyle("Acta Orthopædica Belgica")
                 ),
 
@@ -455,7 +455,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "<sup>1,2</sup>)",
+                        "<sup>1,2)</sup>",
                         getStyle("Chemical and Pharmaceutical Bulletin")
                 ),
 
