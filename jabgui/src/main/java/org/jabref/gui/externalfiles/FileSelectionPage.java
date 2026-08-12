@@ -37,12 +37,13 @@ import org.jabref.gui.documentviewer.PdfDocumentViewer;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -60,9 +61,10 @@ public class FileSelectionPage extends WizardPane {
 
     private final UnlinkedFilesDialogViewModel viewModel;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
+    private final ImportFormatPreferences importFormatPreferences;
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
-    private final PdfXmpImporter xmpImporter;
     private @Nullable BackgroundTask<?> currentMetadataTask;
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
@@ -82,10 +84,14 @@ public class FileSelectionPage extends WizardPane {
     private Button collapseAllButton;
     private boolean nextButtonBound = false;
 
-    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel, XmpPreferences xmpPreferences) {
+    public FileSelectionPage(StateManager stateManager,
+                             UnlinkedFilesDialogViewModel viewModel,
+                             ImportFormatPreferences importFormatPreferences,
+                             TaskExecutor taskExecutor) {
         this.viewModel = viewModel;
         this.stateManager = stateManager;
-        this.xmpImporter = new PdfXmpImporter(xmpPreferences);
+        this.taskExecutor = taskExecutor;
+        this.importFormatPreferences = importFormatPreferences;
 
         setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
@@ -129,7 +135,7 @@ public class FileSelectionPage extends WizardPane {
         enablePreviewCheckBox = new CheckBox(Localization.lang("Enable preview"));
         enablePreviewCheckBox.setSelected(false);
 
-        pdfPreview = new PdfDocumentViewer();
+        pdfPreview = new PdfDocumentViewer(taskExecutor);
         VBox.setVgrow(pdfPreview, Priority.ALWAYS);
 
         Label metadataLabel = new Label(Localization.lang("Extracted metadata"));
@@ -236,14 +242,22 @@ public class FileSelectionPage extends WizardPane {
         cancelCurrentMetadataTask();
         metadataPreview.setText(Localization.lang("Loading metadata..."));
 
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> xmpImporter.importDatabase(selectedPath));
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(selectedPath));
         currentMetadataTask = task;
-        task.onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> metadataPreview.setText(formatParserResult(result))));
+        task.onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (currentMetadataTask != task) {
+                return;
+            }
+            metadataPreview.setText(formatParserResult(result));
+        }));
         task.onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (currentMetadataTask != task) {
+                return;
+            }
             LOGGER.warn("Could not extract PDF metadata for {}", selectedPath, exception);
             metadataPreview.setText(Localization.lang("Could not extract Metadata from: %0", selectedPath.getFileName().toString()));
         }));
-        task.executeWith(viewModel.getTaskExecutor());
+        task.executeWith(taskExecutor);
     }
 
     private boolean isPreviewActive() {
@@ -297,8 +311,17 @@ public class FileSelectionPage extends WizardPane {
         }
     }
 
+    /// Cancels any in-flight preview work.
+    public void cancelPreviewTasks() {
+        cancelCurrentMetadataTask();
+        pdfPreview.cancelCurrent();
+    }
+
     private String formatParserResult(ParserResult result) {
-        if (result.isEmpty() || !result.getDatabase().hasEntries()) {
+        if (result.isInvalid() || result.hasWarnings()) {
+            return result.getErrorMessage();
+        }
+        if (!result.getDatabase().hasEntries()) {
             return Localization.lang("No extracted metadata available.");
         }
         return formatBibEntry(result.getDatabase().getEntries().getFirst());
@@ -333,6 +356,11 @@ public class FileSelectionPage extends WizardPane {
                 }
             });
         }
+    }
+
+    @Override
+    public void onExitingPage(Wizard wizard) {
+        cancelPreviewTasks();
     }
 
     private class TreeContextAction extends SimpleCommand {

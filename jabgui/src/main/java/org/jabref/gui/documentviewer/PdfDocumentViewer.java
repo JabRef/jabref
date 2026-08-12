@@ -35,11 +35,7 @@ public class PdfDocumentViewer extends StackPane {
     private final TaskExecutor taskExecutor;
     private @Nullable BackgroundTask<byte[]> currentTask;
 
-    public PdfDocumentViewer() {
-        this(new UiTaskExecutor());
-    }
-
-    PdfDocumentViewer(TaskExecutor taskExecutor) {
+    public PdfDocumentViewer(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
         pdfView = new PDFView();
 
@@ -82,9 +78,13 @@ public class PdfDocumentViewer extends StackPane {
         BackgroundTask<byte[]> task = BackgroundTask.wrap(() -> Files.readAllBytes(document));
 
         task.onSuccess(bytes -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (currentTask != task) {
+                return;
+            }
             try {
                 pdfView.load(new ByteArrayInputStream(bytes));
                 pdfView.setPage(currentPage.get());
+                pdfView.setSearchText(highlightText.get());
                 pdfView.setVisible(true);
                 placeholderLabel.setVisible(false);
                 LOGGER.debug("Successfully loaded PDF document: {}", document);
@@ -97,6 +97,9 @@ public class PdfDocumentViewer extends StackPane {
         }));
 
         task.onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (currentTask != task) {
+                return;
+            }
             LOGGER.error("Could not load PDF document {}", document, exception);
             pdfView.setVisible(false);
             placeholderLabel.setText(Localization.lang("Could not load PDF: %0", document.getFileName().toString()));
