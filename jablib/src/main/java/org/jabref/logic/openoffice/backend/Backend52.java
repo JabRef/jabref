@@ -32,6 +32,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +151,7 @@ public class Backend52 {
     /// @param insertSpaceBefore We insert a space before the mark.
     /// @param insertSpaceAfter  We insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
+                                             XComponentContext context,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
@@ -212,6 +214,7 @@ public class Backend52 {
          */
         boolean withoutBrackets = citationType == CitationType.INVISIBLE_CIT;
         NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
+                context,
                 markName,
                 position,
                 insertSpaceBefore,
@@ -402,4 +405,3 @@ public class Backend52 {
         }
     }
 }
-

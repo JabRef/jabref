@@ -18,6 +18,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,7 @@ public class UpdateCitationMarkers {
     /// @param insertSpaceAfter  A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
     public static void createAndFillCitationGroup(OOFrontend frontend,
                                                   XTextDocument doc,
+                                                  XComponentContext context,
                                                   List<String> citationKeys,
                                                   @NonNull List<Optional<OOText>> pageInfos,
                                                   CitationType citationType,
@@ -114,6 +116,7 @@ public class UpdateCitationMarkers {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
         CitationGroup group = frontend.createCitationGroup(doc,
+                context,
                 citationKeys,
                 pageInfos,
                 citationType,
