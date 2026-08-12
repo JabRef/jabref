@@ -60,7 +60,7 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
     @Nullable
     static PreviewLayout of(String layoutIdentifier,
-                            List<CustomizedTextPreviewLayout> customizedPreviewLayouts,
+                            List<CustomizedPreviewStyle> customizedPreviewLayouts,
                             List<Path> bstLayoutPaths,
                             LayoutFormatterPreferences preferences,
                             JournalAbbreviationRepository abbreviationRepository,

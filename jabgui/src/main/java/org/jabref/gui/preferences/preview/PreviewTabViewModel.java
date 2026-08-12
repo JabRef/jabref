@@ -43,7 +43,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
-import org.jabref.logic.preview.CustomizedTextPreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
@@ -324,7 +324,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         cslListProperty.clear();
         customizedListProperty.clear();
-        for (CustomizedTextPreviewLayout stored : previewPreferences.getCustomizedPreviewLayouts()) {
+        for (CustomizedPreviewStyle stored : previewPreferences.getCustomizedPreviewLayouts()) {
             TextBasedPreviewLayout textBasedPreviewLayout = new TextBasedPreviewLayout(stored.id(), stored.name(), stored.text(), layoutFormatterPreferences, abbreviationRepository);
             if (chosenListProperty.stream().noneMatch(currLayout -> currLayout instanceof TextBasedPreviewLayout textLayout && textLayout.getId().equals(stored.id()))) {
                 customizedListProperty.getValue().add(textBasedPreviewLayout);
@@ -467,13 +467,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             chosenListProperty.add(defaultLayout);
         }
 
-        List<CustomizedTextPreviewLayout> toStore = java.util.stream.Stream.concat(
-                                                                customizedListProperty.stream(),
-                                                                chosenListProperty.stream().filter(TextBasedPreviewLayout.class::isInstance))
-                                                                           .map(TextBasedPreviewLayout.class::cast)
-                                                                           .distinct()
-                                                                           .map(layout -> new CustomizedTextPreviewLayout(layout.getId(), layout.getDisplayName(), layout.getText()))
-                                                                           .toList();
+        List<CustomizedPreviewStyle> toStore = java.util.stream.Stream.concat(
+                                                           customizedListProperty.stream(),
+                                                           chosenListProperty.stream().filter(TextBasedPreviewLayout.class::isInstance))
+                                                                      .map(TextBasedPreviewLayout.class::cast)
+                                                                      .distinct()
+                                                                      .map(layout -> new CustomizedPreviewStyle(layout.getId(), layout.getDisplayName(), layout.getText()))
+                                                                      .toList();
         previewPreferences.getCustomizedPreviewLayouts().setAll(toStore);
 
         //        if (findLayoutByName(TextBasedPreviewLayout.NAME) instanceof TextBasedPreviewLayout customLayout) {
