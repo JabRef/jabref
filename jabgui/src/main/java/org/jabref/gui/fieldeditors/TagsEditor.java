@@ -73,6 +73,7 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
     private Optional<Keyword> draggedTag = Optional.empty();
     private long tagOrderUpdateGeneration;
     private boolean tagOrderUpdateScheduled;
+    private boolean updatingTagOrder;
 
     protected TagsEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
@@ -141,7 +142,11 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
         /// but stop auto-sorting once the user reorders tags manually via drag-and-drop.
         /// Sorting during the list change would mutate the list while the bidirectional binding
         /// is still applying that change.
-        tagListProperty.addListener((_, _, _) -> scheduleTagOrderUpdate());
+        tagListProperty.addListener((_, _, _) -> {
+            if (!updatingTagOrder) {
+                scheduleTagOrderUpdate();
+            }
+        });
     }
 
     private void scheduleTagOrderUpdate() {
@@ -150,19 +155,27 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
             return;
         }
 
+        enqueueTagOrderUpdate(scheduledGeneration);
+    }
+
+    private void enqueueTagOrderUpdate(long scheduledGeneration) {
         tagOrderUpdateScheduled = true;
-        Platform.runLater(() -> {
-            try {
-                if (scheduledGeneration == tagOrderUpdateGeneration) {
-                    updateTagOrder();
-                }
-            } finally {
-                tagOrderUpdateScheduled = false;
-                if (scheduledGeneration != tagOrderUpdateGeneration) {
-                    scheduleTagOrderUpdate();
-                }
-            }
-        });
+        Platform.runLater(() -> runTagOrderUpdate(scheduledGeneration));
+    }
+
+    private void runTagOrderUpdate(long scheduledGeneration) {
+        tagOrderUpdateScheduled = false;
+        if (scheduledGeneration != tagOrderUpdateGeneration) {
+            enqueueTagOrderUpdate(tagOrderUpdateGeneration);
+            return;
+        }
+
+        try {
+            updatingTagOrder = true;
+            updateTagOrder();
+        } finally {
+            updatingTagOrder = false;
+        }
     }
 
     private void updateTagOrder() {
