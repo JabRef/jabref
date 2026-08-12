@@ -73,7 +73,7 @@ public final class CSLFormatUtils {
         html = StringEscapeUtils.unescapeHtml4(html);
 
         // Handle margins (spaces between citation number and text)
-        html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
+        html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div>\\s*<div class=\"csl-right-inline\">\\s*(.*?)</div>", "$1 $2");
 
         // Remove unsupported tags
         html = html.replaceAll("<div[^>]*>", "");

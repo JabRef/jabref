@@ -72,7 +72,8 @@ public class CSLCitationOOAdapter {
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
     private static final Pattern CSL_LEFT_RIGHT_MARGIN_PATTERN = Pattern.compile(
-            "<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>");
+            "<div class=\"csl-left-margin\">(.*?)</div>\\s*<div class=\"csl-right-inline\">(.*?)</div>");
+    private static final Pattern LEADING_RIGHT_INLINE_WHITESPACE_PATTERN = Pattern.compile("^(?:\\s|&nbsp;|&#160;)+");
     private static final Pattern EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN = Pattern.compile(
             "^(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*|(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*$");
     private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
@@ -368,14 +369,20 @@ public class CSLCitationOOAdapter {
         StringJoiner bibliographyText = new StringJoiner(
                 "<p oo:ParaStyleName=\"%s\">".formatted(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
         for (String bibliographyEntry : bibliography.getEntries()) {
-            String formattedBibliographyEntry = CSL_LEFT_RIGHT_MARGIN_PATTERN.matcher(bibliographyEntry)
-                                                                             .replaceAll("$1\t$2");
+            String formattedBibliographyEntry = replaceLeftRightMarginBlocksWithSpace(bibliographyEntry);
             formattedBibliographyEntry = CSLFormatUtils.transformHTML(formattedBibliographyEntry);
             formattedBibliographyEntry = EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN.matcher(formattedBibliographyEntry)
                                                                                              .replaceAll("");
             bibliographyText.add(formattedBibliographyEntry);
         }
         return OOFormat.setLocaleNone(OOText.fromString(bibliographyText.toString()));
+    }
+
+    static String replaceLeftRightMarginBlocksWithSpace(String bibliographyEntry) {
+        return CSL_LEFT_RIGHT_MARGIN_PATTERN.matcher(bibliographyEntry)
+                                            .replaceAll(matchResult -> matchResult.group(1)
+                                                    + " "
+                                                    + LEADING_RIGHT_INLINE_WHITESPACE_PATTERN.matcher(matchResult.group(2)).replaceFirst(""));
     }
 
     private static TabStop[] createTabStops(int... positions) {
