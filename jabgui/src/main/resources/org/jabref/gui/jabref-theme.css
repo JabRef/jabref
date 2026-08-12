@@ -177,11 +177,24 @@
 .icon-button {
     -fx-border-width: 0;
     -fx-background-color: -jr-icon-background;
-    -fx-padding:0.5em;
+    -fx-padding: 0.5em;
 }
 
-.generate-citation-key-button {
+#generateCitationKeyButton {
     -fx-padding: 0.333em 1em;
+}
+
+#journalInfoButton,
+#toggleAbbreviationButton{
+    -fx-padding: 0.4em 0.5em 0.3em 0.5em;
+}
+
+#journalInfoButtonISSN,
+#fetchInformationByIdentifierButton,
+#shortenDOIButton,
+#lookupIdentifierButton,
+#OpenDOIButton{
+    -fx-padding: 0.3em 0.5em 0.4em 0.5em;
 }
 
 .icon-buttonNoSpaceBottom:hover,

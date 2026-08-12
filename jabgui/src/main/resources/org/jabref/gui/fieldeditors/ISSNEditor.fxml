@@ -8,7 +8,7 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.ISSNEditor">
     <EditorTextField fx:id="textField"/>
-        <Button fx:id="journalInfoButton"
+        <Button fx:id="journalInfoButtonISSN"
                 onAction="#showJournalInfo"
                 styleClass="icon-button">
             <graphic>

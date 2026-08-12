@@ -24,7 +24,8 @@
         </graphic>
     </Button>
 
-    <Button disable="${controller.viewModel.isInvalidIdentifier}"
+    <Button fx:id="OpenDOIButton"
+            disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#openExternalLink"
             styleClass="icon-button">
         <graphic>

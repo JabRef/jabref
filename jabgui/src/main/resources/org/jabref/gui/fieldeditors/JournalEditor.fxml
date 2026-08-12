@@ -19,7 +19,8 @@
                 <Tooltip text="%View journal info"/>
             </tooltip>
         </Button>
-        <Button onAction="#toggleAbbreviation"
+        <Button fx:id="toggleAbbreviationButton"
+                onAction="#toggleAbbreviation"
                 styleClass="icon-button">
             <graphic>
                 <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
