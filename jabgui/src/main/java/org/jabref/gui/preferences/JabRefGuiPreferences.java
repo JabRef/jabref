@@ -59,7 +59,7 @@ import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
-import org.jabref.logic.preview.CustomizedTextPreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.strings.StringUtil;
@@ -851,7 +851,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
         // Mutable lists required
-        List<CustomizedTextPreviewLayout> customizedLayouts = getCustomizedPreviewLayouts(defaultValues.getCustomizedPreviewLayouts());
+        List<CustomizedPreviewStyle> customizedLayouts = getCustomizedPreviewLayouts(defaultValues.getCustomizedPreviewLayouts());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customizedLayouts);
         //        String customPreviewLayout = get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout());
         //        List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
@@ -936,7 +936,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
     }
 
-    private List<PreviewLayout> getPreviewLayouts(List<String> cycle, List<CustomizedTextPreviewLayout> customizedLayouts) {
+    private List<PreviewLayout> getPreviewLayouts(List<String> cycle, List<CustomizedPreviewStyle> customizedLayouts) {
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
             cycle.addAll(List.of(
@@ -1022,7 +1022,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     //        }
     //        return result.isEmpty() ? defaults : result;
     //    }
-    private List<CustomizedTextPreviewLayout> getCustomizedPreviewLayouts(List<CustomizedTextPreviewLayout> defaults) {
+    private List<CustomizedPreviewStyle> getCustomizedPreviewLayouts(List<CustomizedPreviewStyle> defaults) {
         if (!hasKey(PREVIEW_STYLE_CUSTOMIZED_ID + "0")) {
             return migrateLegacyCustomPreviewLayout(defaults);
         }
@@ -1031,10 +1031,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         List<String> names = getSeries(PREVIEW_STYLE_CUSTOMIZED_NAME);
         List<String> texts = getSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT);
 
-        List<CustomizedTextPreviewLayout> result = new ArrayList<>();
+        List<CustomizedPreviewStyle> result = new ArrayList<>();
         int count = Math.min(ids.size(), Math.min(names.size(), texts.size()));
         for (int i = 0; i < count; i++) {
-            result.add(new CustomizedTextPreviewLayout(
+            result.add(new CustomizedPreviewStyle(
                     ids.get(i),
                     names.get(i),
                     texts.get(i).replace("__NEWLINE__", "\n")));
@@ -1055,14 +1055,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     //        }
     //    }
 
-    private void storeCustomizedPreviewLayouts(List<CustomizedTextPreviewLayout> layouts) {
+    private void storeCustomizedPreviewLayouts(List<CustomizedPreviewStyle> layouts) {
         if (layouts.isEmpty()) {
             purgeSeries(PREVIEW_STYLE_CUSTOMIZED_ID, 0);
             purgeSeries(PREVIEW_STYLE_CUSTOMIZED_NAME, 0);
             purgeSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT, 0);
         } else {
             for (int i = 0; i < layouts.size(); i++) {
-                CustomizedTextPreviewLayout layout = layouts.get(i);
+                CustomizedPreviewStyle layout = layouts.get(i);
                 put(PREVIEW_STYLE_CUSTOMIZED_ID + i, layout.id());
                 put(PREVIEW_STYLE_CUSTOMIZED_NAME + i, layout.name());
                 put(PREVIEW_STYLE_CUSTOMIZED_TEXT + i, layout.text().replace("\n", "__NEWLINE__"));
@@ -1074,11 +1074,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     // Migrates the pre-multi-style single PREVIEW_STYLE value into a one-element customized-styles list. Then writes the new key immediately so this only runs once.
-    private List<CustomizedTextPreviewLayout> migrateLegacyCustomPreviewLayout(List<CustomizedTextPreviewLayout> defaults) {
+    private List<CustomizedPreviewStyle> migrateLegacyCustomPreviewLayout(List<CustomizedPreviewStyle> defaults) {
         if (hasKey(PREVIEW_STYLE)) {
             String legacyText = get(PREVIEW_STYLE, "").replace("__NEWLINE__", "\n");
             if (StringUtil.isNotBlank(legacyText)) {
-                CustomizedTextPreviewLayout migrated = new CustomizedTextPreviewLayout(
+                CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(
                         UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, legacyText);
                 storeCustomizedPreviewLayouts(List.of(migrated));
                 return List.of(migrated);
