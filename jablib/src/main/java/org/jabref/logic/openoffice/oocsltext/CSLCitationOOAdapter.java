@@ -261,12 +261,12 @@ public class CSLCitationOOAdapter {
         if (selectedStyle.isNumericStyle()) {
             for (BibEntry entry : bibliographyEntries) {
                 String bibliographyEntry = CitationStyleGenerator.generateBibliography(
-                        List.of(entry),
-                        style,
-                        HTML_OUTPUT_FORMAT,
-                        currentEntryContext,
-                        bibEntryTypesManager)
-                                                              .getFirst();
+                                                                         List.of(entry),
+                                                                         style,
+                                                                         HTML_OUTPUT_FORMAT,
+                                                                         currentEntryContext,
+                                                                         bibEntryTypesManager)
+                                                                 .getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
