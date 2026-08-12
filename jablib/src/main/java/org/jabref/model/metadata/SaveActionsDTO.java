@@ -6,5 +6,5 @@ import java.util.Map;
 
 public class SaveActionsDTO {
     public boolean state = false;
-    public Map<String, List<String>> actions = new LinkedHashMap<>();
+    public Map<String, List<String>> fieldFormatterCleanups = new LinkedHashMap<>();
 }

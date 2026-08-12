@@ -11,7 +11,7 @@ import org.jabref.model.metadata.SaveActionsDTO;
 public class SaveActionsConverter {
     public static FieldFormatterCleanupActions fromDTO(SaveActionsDTO saveActionsDTO) {
         List<FieldFormatterCleanup> actions = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : saveActionsDTO.actions.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : saveActionsDTO.fieldFormatterCleanups.entrySet()) {
             Field field = FieldFactory.parseField(entry.getKey());
             for (String formatterName : entry.getValue()) {
                 actions.add(new FieldFormatterCleanup(field, FieldFormatterCleanupActions.getFormatterFromString(formatterName)));
@@ -26,7 +26,7 @@ public class SaveActionsConverter {
         for (FieldFormatterCleanup action : saveActions.getConfiguredActions()) {
             String field = action.getField().getName();
             String formatter = action.getFormatter().getKey();
-            saveActionsDTO.actions
+            saveActionsDTO.fieldFormatterCleanups
                     .computeIfAbsent(field, _ -> new ArrayList<>())
                     .add(formatter);
         }

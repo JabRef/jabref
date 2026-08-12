@@ -800,15 +800,17 @@ class BibDatabaseWriterTest {
                 {
                   "saveActions": {
                     "state": true,
-                    "title": [
-                      "lower_case"
-                    ],
-                    "journal": [
-                      "title_case"
-                    ],
-                    "day": [
-                      "upper_case"
-                    ]
+                    "fieldFormatterCleanups": {
+                      "title": [
+                        "lower_case"
+                      ],
+                      "journal": [
+                        "title_case"
+                      ],
+                      "day": [
+                        "upper_case"
+                      ]
+                    }
                   }
                 }
                 }
@@ -824,7 +826,9 @@ class BibDatabaseWriterTest {
                 {
                   "saveActions": {
                     "state": true,
-                    "title": ["lower_case"]
+                    "fieldFormatterCleanups": {
+                      "title": ["lower_case"]
+                    }
                   }
                 }
                 }
@@ -850,9 +854,11 @@ class BibDatabaseWriterTest {
                 {
                   "saveActions": {
                     "state": true,
-                    "title": [
-                      "lower_case"
-                    ]
+                    "fieldFormatterCleanups": {
+                      "title": [
+                        "lower_case"
+                      ]
+                    }
                   }
                 }
                 }
