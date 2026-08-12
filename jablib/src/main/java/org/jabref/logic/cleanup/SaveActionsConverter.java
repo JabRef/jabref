@@ -3,26 +3,21 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveActionsDTO;
 
 public class SaveActionsConverter {
     public static FieldFormatterCleanupActions fromDTO(SaveActionsDTO saveActionsDTO) {
-        boolean enabled = saveActionsDTO.state;
-        StringBuilder actionsStringBuilder = new StringBuilder();
+        List<FieldFormatterCleanup> actions = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : saveActionsDTO.actions.entrySet()) {
-            StringJoiner joiner = new StringJoiner(",");
-            for (String formatter : entry.getValue()) {
-                joiner.add(formatter);
+            Field field = FieldFactory.parseField(entry.getKey());
+            for (String formatterName : entry.getValue()) {
+                actions.add(new FieldFormatterCleanup(field, FieldFormatterCleanupActions.getFormatterFromString(formatterName)));
             }
-            actionsStringBuilder.append(entry.getKey())
-                                .append("[")
-                                .append(joiner)
-                                .append(']');
         }
-        List<FieldFormatterCleanup> actions = FieldFormatterCleanupMapper.parseActions(actionsStringBuilder.toString());
-        return new FieldFormatterCleanupActions(enabled, actions);
+        return new FieldFormatterCleanupActions(saveActionsDTO.state, actions);
     }
 
     public static SaveActionsDTO toDTO(FieldFormatterCleanupActions saveActions) {

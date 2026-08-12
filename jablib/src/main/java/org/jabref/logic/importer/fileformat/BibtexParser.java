@@ -66,6 +66,7 @@ import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -98,6 +99,7 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// FIXME: This class relies on `char`, but should use [java.lang.Character] to be fully Unicode compliant.
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
+    private static final Gson GSON = new Gson();
     private static final int LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
@@ -421,14 +423,28 @@ public class BibtexParser implements Parser {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
         } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
-            parsedJsonMetaData = parseCommentToJson(comment);
+            parsedJsonMetaData = parseCommentToJson(comment, new ParserResult.Range(startLine, startColumn, line, column));
+
+            // JSON metadata comments are always re-written by JabRef and not stored in the file
+            dumpTextReadSoFarToString();
         }
     }
 
     Optional<JsonObject> parseCommentToJson(String comment) {
-        Gson gson = new Gson();
+        return parseCommentToJson(comment, null);
+    }
+
+    private Optional<JsonObject> parseCommentToJson(String comment, ParserResult.Range range) {
         String content = comment.substring(MetaData.META_FLAG_V1.length());
-        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
+        try {
+            return Optional.ofNullable(GSON.fromJson(content, JsonObject.class));
+        } catch (JsonParseException exception) {
+            LOGGER.debug("Could not parse JabRef JSON metadata comment", exception);
+            if (range != null) {
+                parserResult.addException(range, new ParseException("Ill-formed JSON metadata comment in BIB file", exception));
+            }
+            return Optional.empty();
+        }
     }
 
     /// Adds BibDesk group entries to the JabRef database

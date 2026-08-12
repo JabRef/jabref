@@ -780,7 +780,7 @@ class BibDatabaseWriterTest {
     @Test
     void writeSaveActions() throws IOException {
         FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
-                Arrays.asList(
+                List.of(
                         new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
                         new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),
                         new FieldFormatterCleanup(StandardField.DAY, new UpperCaseFormatter())));
@@ -800,11 +800,11 @@ class BibDatabaseWriterTest {
                 {
                   "saveActions": {
                     "state": true,
-                    "journal": [
-                      "title_case"
-                    ],
                     "title": [
                       "lower_case"
+                    ],
+                    "journal": [
+                      "title_case"
                     ],
                     "day": [
                       "upper_case"
@@ -812,7 +812,51 @@ class BibDatabaseWriterTest {
                   }
                 }
                 }
-                """;
+                """.replace("\n", OS.NEWLINE);
+
+        assertEquals(expected, stringWriter.toString());
+    }
+
+    @Test
+    void roundtripUnchangedEntryWithJsonMetadataDoesNotDuplicateJsonMetadata() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "saveActions": {
+                    "state": true,
+                    "title": ["lower_case"]
+                  }
+                }
+                }
+                @Article{test,
+                  title = {Title},
+                }
+                """));
+
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
+
+        String expected = """
+                @Article{test,
+                  title = {title},
+                }
+
+                @Comment{jabref-meta: saveActions:enabled;
+                title[lower_case]
+                ;}
+
+                @Comment{jabref-meta-0.1.0
+                {
+                  "saveActions": {
+                    "state": true,
+                    "title": [
+                      "lower_case"
+                    ]
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
