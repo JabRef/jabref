@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
-class Codec52Test {
+class JStyleReferenceMarkTest {
 
     @Test
     void citationTypesRoundTripInReferenceMarkNames() {
         for (CitationType citationType : CitationType.values()) {
-            String markName = Codec52.getUniqueMarkName(Set.of(), List.of("key1", "key2"), citationType);
-            Codec52.ParsedMarkName parsedMarkName = Codec52.parseMarkName(markName).orElseThrow();
+            String markName = JStyleReferenceMark.getUniqueMarkName(Set.of(), List.of("key1", "key2"), citationType);
+            JStyleReferenceMark.ParsedMarkName parsedMarkName = JStyleReferenceMark.parseMarkName(markName).orElseThrow();
 
             assertEquals("", parsedMarkName.index);
             assertEquals(citationType, parsedMarkName.citationType);
@@ -28,10 +28,10 @@ class Codec52Test {
     @Test
     void parseMarkNameRecognizesExtendedCitationTypeCodes() {
         assertEquals(CitationType.AUTHORYEAR_NOPAR,
-                Codec52.parseMarkName("JR_cite_4_key").orElseThrow().citationType);
+                JStyleReferenceMark.parseMarkName("JR_cite_4_key").orElseThrow().citationType);
         assertEquals(CitationType.AUTHOR_ONLY,
-                Codec52.parseMarkName("JR_cite_5_key").orElseThrow().citationType);
+                JStyleReferenceMark.parseMarkName("JR_cite_5_key").orElseThrow().citationType);
         assertEquals(CitationType.YEAR_ONLY,
-                Codec52.parseMarkName("JR_cite_6_key").orElseThrow().citationType);
+                JStyleReferenceMark.parseMarkName("JR_cite_6_key").orElseThrow().citationType);
     }
 }
