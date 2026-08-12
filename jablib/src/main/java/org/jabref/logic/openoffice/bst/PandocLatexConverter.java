@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /// Converts LaTeX fragments to HTML by shelling out to pandoc.
 ///
 /// The path to pandoc is read from [OpenOfficePreferences] and can be changed by the user
-/// via the OpenOffice panel settings menu. Use [autoDetect] to find pandoc automatically.
+/// in Preferences > OpenOffice/LibreOffice. Use [autoDetect] to find pandoc automatically.
 @NullMarked
 public class PandocLatexConverter {
 

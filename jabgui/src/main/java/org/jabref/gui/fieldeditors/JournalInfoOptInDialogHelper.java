@@ -29,7 +29,7 @@ public class JournalInfoOptInDialogHelper {
 
         boolean journalInfoEnabled = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remote services"),
-                Localization.lang("Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"));
+                Localization.lang("Allow sending journal title and ISSN to Crossref and OpenAlex for fetching journal information"));
 
         preferences.setEnableJournalPopup(journalInfoEnabled
                                           ? EntryEditorPreferences.JournalPopupEnabled.ENABLED

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
 import javax.swing.undo.UndoManager;
 
@@ -78,6 +80,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
@@ -89,7 +92,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -110,8 +112,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
-    private static BackgroundTask<List<BibEntry>> citingTask;
-    private static BackgroundTask<List<BibEntry>> citedByTask;
+    private static BackgroundTask<List<CitationRelationItem>> citingTask;
+    private static BackgroundTask<List<CitationRelationItem>> citedByTask;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
@@ -851,7 +853,25 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setPlaceholder(lookingUpDoiLabel);
     }
 
+    /// Snapshots the active library on the JavaFX Application Thread, so the background matching task never
+    /// iterates the live entry list, which the user can modify while the search runs.
+    ///
+    /// TODO: This could be a wrong database, because the user might have switched to another library.
+    ///       Snapshotting when the search is triggered instead of when its result arrives narrows the window,
+    ///       but does not close it - this is still the *active* library, not the entry's own one.
+    ///       If we were on fixing this, we would need to a) associate a BibEntry with a database or
+    ///       b) pass the database at "bindToEntry".
+    private LibrarySnapshot snapshotActiveLibrary() {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        List<BibEntry> libraryEntries = databaseContext.map(context -> List.copyOf(context.getDatabase().getEntries()))
+                                                       .orElseGet(List::of);
+        BibDatabaseMode databaseMode = databaseContext.map(BibDatabaseContext::getMode)
+                                                      .orElse(BibDatabaseMode.BIBLATEX);
+        return new LibrarySnapshot(libraryEntries, databaseMode);
+    }
+
     private void executeSearch(CitationComponents citationComponents, boolean bypassCache) {
+        LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
         citationComponents.listView().setItems(observableList);
 
@@ -861,11 +881,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask.cancel(false);
         }
 
-        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache)
+        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache, librarySnapshot.entries(), librarySnapshot.mode())
             .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
-            .onSuccess(fetchedList -> onSearchForRelationsSucceed(
+            .onSuccess(citationRelationItems -> onSearchForRelationsSucceed(
                     citationComponents,
-                    fetchedList,
+                    citationRelationItems,
                     observableList
             ))
             .onFailure(exception -> {
@@ -887,43 +907,67 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// TODO: Make the method return a callable and let the calling method create the background task.
-    private BackgroundTask<List<BibEntry>> createBackgroundTask(
-            BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache
+    private BackgroundTask<List<CitationRelationItem>> createBackgroundTask(
+            BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache,
+            List<BibEntry> libraryEntries, BibDatabaseMode databaseMode
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
-                citingTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, citingTask::isCancelled)
-                );
+                citingTask = createSearchTask(
+                        isCancelled -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, isCancelled),
+                        libraryEntries, databaseMode);
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
-                citedByTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, citedByTask::isCancelled)
-                );
+                citedByTask = createSearchTask(
+                        isCancelled -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, isCancelled),
+                        libraryEntries, databaseMode);
                 yield citedByTask;
             }
         };
     }
 
+    /// Wraps fetching and duplicate matching into a task whose cancellation checks are bound to *that very task*.
+    /// They must not read [#citingTask]/[#citedByTask] instead: those fields are reassigned - or set to `null` -
+    /// on the JavaFX Application Thread as soon as another entry is selected, so a check evaluated after the fetch
+    /// returned would either hit `null` or observe an unrelated, newer task.
+    private BackgroundTask<List<CitationRelationItem>> createSearchTask(CitationFetch fetch,
+                                                                        List<BibEntry> libraryEntries,
+                                                                        BibDatabaseMode databaseMode) {
+        AtomicReference<BackgroundTask<List<CitationRelationItem>>> selfReference = new AtomicReference<>();
+        BooleanSupplier isCancelled = () -> {
+            BackgroundTask<List<CitationRelationItem>> self = selfReference.get();
+            return (self != null) && self.isCancelled();
+        };
+        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(
+                () -> matchAgainstLibrary(fetch.fetch(isCancelled), libraryEntries, databaseMode, isCancelled));
+        selfReference.set(task);
+        return task;
+    }
+
+    private List<CitationRelationItem> matchAgainstLibrary(List<BibEntry> fetchedList,
+                                                           List<BibEntry> libraryEntries,
+                                                           BibDatabaseMode databaseMode,
+                                                           BooleanSupplier isCancelled) {
+        List<CitationRelationItem> citationRelationItems = new ArrayList<>(fetchedList.size());
+        for (BibEntry fetchedEntry : fetchedList) {
+            if (isCancelled.getAsBoolean()) {
+                return List.of();
+            }
+            citationRelationItems.add(
+                    duplicateCheck.containsDuplicate(libraryEntries, fetchedEntry, databaseMode)
+                                  .map(localEntry -> new CitationRelationItem(fetchedEntry, localEntry, true))
+                                  .orElseGet(() -> new CitationRelationItem(fetchedEntry, false)));
+        }
+        return citationRelationItems;
+    }
+
     private void onSearchForRelationsSucceed(CitationComponents citationComponents,
-                                             List<BibEntry> fetchedList,
+                                             List<CitationRelationItem> citationRelationItems,
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(citationComponents.abortButton(), citationComponents.progress());
 
-        // TODO: This could be a wrong database, because the user might have switched to another library
-        //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
-        BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
-        observableList.setAll(
-                fetchedList.stream().map(entry ->
-                                   duplicateCheck.containsDuplicate(
-                                                         database,
-                                                         entry,
-                                                         BibDatabaseModeDetection.inferMode(database))
-                                                 .map(localEntry -> new CitationRelationItem(entry, localEntry, true))
-                                                 .orElseGet(() -> new CitationRelationItem(entry, false)))
-                           .toList()
-        );
+        observableList.setAll(citationRelationItems);
 
         if (observableList.isEmpty()) {
             Label placeholder = new Label(Localization.lang("No articles found"));
@@ -937,7 +981,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         showNodes(citationComponents.refreshButton(), citationComponents.importButton());
     }
 
-    private void prepareToSearchForRelations(CitationComponents citationComponents, BackgroundTask<List<BibEntry>> task) {
+    private void prepareToSearchForRelations(CitationComponents citationComponents, BackgroundTask<List<CitationRelationItem>> task) {
         showNodes(citationComponents.abortButton(), citationComponents.progress());
         hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
 
@@ -1041,5 +1085,17 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         searchForRelations(citationComponents, otherCitationComponents, true);
+    }
+
+    /// Immutable snapshot of the active library, taken on the JavaFX Application Thread and consumed by the
+    /// background duplicate matching in [#matchAgainstLibrary].
+    private record LibrarySnapshot(List<BibEntry> entries, BibDatabaseMode mode) {
+    }
+
+    /// One of the two citation searches of [SearchCitationsRelationsService], parameterized over the cancellation
+    /// check so that [#createSearchTask] can supply the one belonging to the task it is currently building.
+    @FunctionalInterface
+    private interface CitationFetch {
+        List<BibEntry> fetch(BooleanSupplier isCancelled) throws FetcherException;
     }
 }
