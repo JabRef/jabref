@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedSet;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /// Inserts BST-styled citations and bibliography into a LibreOffice document.
 ///
 /// In-text citation format (numeric `[n]` or author-year `(Name, Year)`) is controlled by
-/// [OpenOfficePreferences.getBstCitationFormat]. The bibliography is always rendered by the
+/// [OpenOfficePreferences#getBstCitationFormat]. The bibliography is always rendered by the
 /// BST engine regardless of the citation format setting.
 @NullMarked
 public class BSTCitationOOAdapter {
@@ -48,23 +51,25 @@ public class BSTCitationOOAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BSTCitationOOAdapter(XTextDocument document, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XTextDocument document, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = document;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new BSTReferenceMarkManager(document);
+        this.markManager = new BSTReferenceMarkManager(document, componentContext);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }
 
-    /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences.getBstCitationFormat]:
-    /// - [BstCitationFormat.NUMERIC]: `[1]`, `[1, 3]`, ...
-    /// - [BstCitationFormat.AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
+    /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences#getBstCitationFormat]:
+    /// - [BstCitationFormat#NUMERIC]: `[1]`, `[1, 3]`, ...
+    /// - [BstCitationFormat#AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
@@ -95,7 +100,7 @@ public class BSTCitationOOAdapter {
         if (!pandoc.isAvailable()) {
             throw new IllegalStateException(
                     "pandoc is not available at the configured path. "
-                            + "Please ensure pandoc is installed and configure its path via the OO settings menu.");
+                            + "Please ensure pandoc is installed and configure its path in Preferences > OpenOffice/LibreOffice.");
         }
 
         OOText title = OOFormat.paragraph(
@@ -159,6 +164,23 @@ public class BSTCitationOOAdapter {
                     openOfficePreferences.getCslBibliographyBodyFormat());
             OOTextIntoOO.write(document, cursor, ooBreak);
         }
+    }
+
+    public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
+    }
+
+    public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
+        // Use a transient manager here so export only inspects marks. Reusing the adapter's live manager would
+        // disturb its cached numbering state for subsequent BST operations before the next full refresh.
+        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document, componentContext);
+        exportMarkManager.readExistingMarks();
+
+        SequencedSet<String> identifiers = new LinkedHashSet<>();
+        for (BSTReferenceMark mark : exportMarkManager.getMarksInOrder().reversed()) {
+            identifiers.addAll(mark.getCitationKeys());
+        }
+        return List.copyOf(identifiers);
     }
 
     /// Returns `true` if the given entry has already been cited in the document.
