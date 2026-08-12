@@ -42,4 +42,11 @@ class CrossRefUrlTest {
 
         assertEquals("query.bibliographic=A%20title&rows=20&offset=0", url.getQuery());
     }
+
+    @Test
+    void testUrlIncludesApiKey() {
+        CrossRef fetcher = new CrossRef(mock(ImporterPreferences.class));
+
+        assertEquals("https://api.crossref.org/works?query=test&rows=1&mailto=user%40example.org", fetcher.getTestUrl("user@example.org"));
+    }
 }
