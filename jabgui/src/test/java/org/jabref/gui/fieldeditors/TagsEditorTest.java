@@ -62,6 +62,22 @@ class TagsEditorTest extends ApplicationTest {
         assertEquals(List.of(new Keyword("Gamma")), editor.getTags());
     }
 
+    @Test
+    void rapidTagUpdatesAreSortedUsingTheLatestList() {
+        interact(() -> tags.setAll(List.of(new Keyword("Alpha"), new Keyword("Beta"), new Keyword("Gamma"))));
+        interact((Runnable) tags::get);
+
+        interact(() -> {
+            tags.setAll(List.of(new Keyword("Alpha"), new Keyword("Beta")));
+            tags.setAll(List.of(new Keyword("Zulu"), new Keyword("Beta")));
+            tags.setAll(List.of(new Keyword("Gamma"), new Keyword("Alpha")));
+        });
+        interact((Runnable) tags::get);
+        interact((Runnable) tags::get);
+
+        assertEquals(List.of(new Keyword("Alpha"), new Keyword("Gamma")), editor.getTags());
+    }
+
     private static class TestTagsEditor extends TagsEditor {
 
         TestTagsEditor() {

@@ -71,6 +71,8 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedTag = Optional.empty();
+    private long tagOrderUpdateGeneration;
+    private boolean tagOrderUpdateScheduled;
 
     protected TagsEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
@@ -139,7 +141,28 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
         /// but stop auto-sorting once the user reorders tags manually via drag-and-drop.
         /// Sorting during the list change would mutate the list while the bidirectional binding
         /// is still applying that change.
-        tagListProperty.addListener((_, _, _) -> Platform.runLater(this::updateTagOrder));
+        tagListProperty.addListener((_, _, _) -> scheduleTagOrderUpdate());
+    }
+
+    private void scheduleTagOrderUpdate() {
+        long scheduledGeneration = ++tagOrderUpdateGeneration;
+        if (tagOrderUpdateScheduled) {
+            return;
+        }
+
+        tagOrderUpdateScheduled = true;
+        Platform.runLater(() -> {
+            try {
+                if (scheduledGeneration == tagOrderUpdateGeneration) {
+                    updateTagOrder();
+                }
+            } finally {
+                tagOrderUpdateScheduled = false;
+                if (scheduledGeneration != tagOrderUpdateGeneration) {
+                    scheduleTagOrderUpdate();
+                }
+            }
+        });
     }
 
     private void updateTagOrder() {
