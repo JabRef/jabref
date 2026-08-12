@@ -175,6 +175,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
+          HAS_DEV_BINARIES_LABEL_FROM_EVENT: "${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'dev: binaries') || 'false' }}"
           NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
           BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
           BINARIES_RESOURCE_MARKDOWN_CHANGED: ${{ steps.changed-binaries-resource-markdown.outputs.any_changed }}
@@ -184,22 +185,47 @@ jobs:
           set -x
           PS4='+ ${LINENO}: '
 
+          HAS_DEV_BINARIES_LABEL="$HAS_DEV_BINARIES_LABEL_FROM_EVENT"
+
           if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" != "true" && "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "📦 build enabled"
-          echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
+            echo "📦 build forced by label 'dev: binaries'"
+            echo "📦 build forced by label 'dev: binaries'" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "📦 build enabled"
+            echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "should-build=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
@@ -299,9 +325,7 @@ jobs:
             exit 0
           fi
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
-
-          if echo "$LABELS" | grep -q "^dev: binaries$"; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -317,23 +341,20 @@ jobs:
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
-      - name: No upload
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
-        shell: bash
-        run: |
-          echo "⊘ no upload – skipping upload"
-          echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
-          echo "available=false" >> "$GITHUB_OUTPUT"
-      - name: Setup SSH key
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         id: diskspace
         shell: bash
         run: |
+          if [[ "${{ needs.conditions.outputs.upload-to-builds-jabref-org }}" != "true" ]]; then
+            echo "⊘ no upload – skipping upload"
+            echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+
           PR_NUMBER="${{ github.event.pull_request.number }}"
           if [[ -z "$PR_NUMBER" ]]; then
             echo "☁️ Not a pull request event – skipping disk space check – will upload"
@@ -1119,6 +1140,8 @@ jobs:
           if-no-files-found: error
 
   upload-pr-nnumber:
+    needs: conditions
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     permissions:
       contents: read

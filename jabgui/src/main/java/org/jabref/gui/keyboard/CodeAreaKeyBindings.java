@@ -7,8 +7,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.NavigationActions;
+import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.TextPos;
 
 public class CodeAreaKeyBindings {
 
@@ -21,94 +21,95 @@ public class CodeAreaKeyBindings {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
                 case EDITOR_DELETE -> {
-                    codeArea.deleteNextChar();
+                    codeArea.delete();
                     event.consume();
                 }
                 case EDITOR_BACKWARD -> {
-                    codeArea.previousChar(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveLeft();
                     event.consume();
                 }
                 case EDITOR_FORWARD -> {
-                    codeArea.nextChar(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveRight();
                     event.consume();
                 }
                 case EDITOR_WORD_BACKWARD -> {
-                    codeArea.wordBreaksBackwards(2, NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveWordLeft();
                     event.consume();
                 }
                 case EDITOR_WORD_FORWARD -> {
-                    codeArea.wordBreaksForwards(2, NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveWordRight();
                     event.consume();
                 }
                 case EDITOR_BEGINNING_DOC -> {
-                    codeArea.start(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveDocumentStart();
                     event.consume();
                 }
                 case EDITOR_UP -> {
-                    codeArea.paragraphStart(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveParagraphStart();
                     event.consume();
                 }
                 case EDITOR_BEGINNING -> {
-                    codeArea.lineStart(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveLineStart();
                     event.consume();
                 }
                 case EDITOR_END_DOC -> {
-                    codeArea.end(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveDocumentEnd();
                     event.consume();
                 }
                 case EDITOR_DOWN -> {
-                    codeArea.paragraphEnd(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveParagraphEnd();
                     event.consume();
                 }
                 case EDITOR_END -> {
-                    codeArea.lineEnd(NavigationActions.SelectionPolicy.CLEAR);
+                    codeArea.moveLineEnd();
                     event.consume();
                 }
                 case EDITOR_CAPITALIZE -> {
-                    int pos = codeArea.getCaretPosition();
-                    String text = codeArea.getText(0, codeArea.getText().length());
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
                     ResultingStringState res = StringManipulator.capitalize(pos, text);
-                    codeArea.replaceText(res.text);
-                    codeArea.displaceCaret(res.caretPosition);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
                 case EDITOR_LOWERCASE -> {
-                    int pos = codeArea.getCaretPosition();
-                    String text = codeArea.getText(0, codeArea.getText().length());
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
                     ResultingStringState res = StringManipulator.lowercase(pos, text);
-                    codeArea.replaceText(res.text);
-                    codeArea.displaceCaret(res.caretPosition);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
                 case EDITOR_UPPERCASE -> {
-                    int pos = codeArea.getCaretPosition();
-                    String text = codeArea.getText(0, codeArea.getText().length());
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
                     ResultingStringState res = StringManipulator.uppercase(pos, text);
                     codeArea.clear();
-                    codeArea.replaceText(res.text);
-                    codeArea.displaceCaret(res.caretPosition);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
                 case EDITOR_KILL_LINE -> {
-                    int pos = codeArea.getCaretPosition();
-                    codeArea.replaceText(codeArea.getText(0, pos));
-                    codeArea.displaceCaret(pos);
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
+                    codeArea.setText(text.substring(0, pos));
+                    codeArea.select(offsetToTextPos(codeArea, pos));
                     event.consume();
                 }
                 case EDITOR_KILL_WORD -> {
-                    int pos = codeArea.getCaretPosition();
-                    String text = codeArea.getText(0, codeArea.getText().length());
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
                     ResultingStringState res = StringManipulator.killWord(pos, text);
-                    codeArea.replaceText(res.text);
-                    codeArea.displaceCaret(res.caretPosition);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
                 case EDITOR_KILL_WORD_BACKWARD -> {
-                    int pos = codeArea.getCaretPosition();
-                    String text = codeArea.getText(0, codeArea.getText().length());
+                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
+                    String text = codeArea.getText();
                     ResultingStringState res = StringManipulator.backwardKillWord(pos, text);
-                    codeArea.replaceText(res.text);
-                    codeArea.displaceCaret(res.caretPosition);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
             }
@@ -131,44 +132,98 @@ public class CodeAreaKeyBindings {
             return;
         }
 
-        NavigationActions.SelectionPolicy policy = event.isShiftDown()
-                                                   ? NavigationActions.SelectionPolicy.EXTEND
-                                                   : NavigationActions.SelectionPolicy.CLEAR;
-
+        boolean extendSelection = event.isShiftDown();
         boolean optionOnly = event.isAltDown() && !event.isMetaDown() && !event.isControlDown();
         boolean commandOnly = event.isMetaDown() && !event.isAltDown() && !event.isControlDown();
 
         if (isHorizontal) {
             if (optionOnly) {
                 if (code == KeyCode.LEFT) {
-                    codeArea.wordBreaksBackwards(2, policy);
+                    if (extendSelection) {
+                        codeArea.selectWordLeft();
+                    } else {
+                        codeArea.moveWordLeft();
+                    }
                 } else {
-                    codeArea.wordBreaksForwards(2, policy);
+                    if (extendSelection) {
+                        codeArea.selectWordRight();
+                    } else {
+                        codeArea.moveWordRight();
+                    }
                 }
                 event.consume();
             } else if (commandOnly) {
                 if (code == KeyCode.LEFT) {
-                    codeArea.lineStart(policy);
+                    if (extendSelection) {
+                        codeArea.selectToLineStart();
+                    } else {
+                        codeArea.moveLineStart();
+                    }
                 } else {
-                    codeArea.lineEnd(policy);
+                    if (extendSelection) {
+                        codeArea.selectToLineEnd();
+                    } else {
+                        codeArea.moveLineEnd();
+                    }
                 }
                 event.consume();
             }
         } else if (optionOnly) {
             if (code == KeyCode.UP) {
-                codeArea.paragraphStart(policy);
+                if (extendSelection) {
+                    codeArea.selectParagraphStart();
+                } else {
+                    codeArea.moveParagraphStart();
+                }
             } else {
-                codeArea.paragraphEnd(policy);
+                if (extendSelection) {
+                    codeArea.selectParagraphEnd();
+                } else {
+                    codeArea.moveParagraphEnd();
+                }
             }
             event.consume();
         } else if (commandOnly) {
             if (code == KeyCode.UP) {
-                codeArea.start(policy);
+                if (extendSelection) {
+                    codeArea.selectToDocumentStart();
+                } else {
+                    codeArea.moveDocumentStart();
+                }
             } else {
-                codeArea.end(policy);
+                if (extendSelection) {
+                    codeArea.selectToDocumentEnd();
+                } else {
+                    codeArea.moveDocumentEnd();
+                }
             }
             event.consume();
         }
     }
-}
 
+    /// Converts a flat document offset (as used by {@link StringManipulator}) into a
+    /// paragraph/column based {@link TextPos}, by walking the paragraphs of the model.
+    /// Assumes a single-character line separator (matches JabRef's BibTeX source usage).
+    private static TextPos offsetToTextPos(CodeArea codeArea, int offset) {
+        int remaining = offset;
+        int paragraphCount = codeArea.getParagraphCount();
+        for (int i = 0; i < paragraphCount; i++) {
+            String line = codeArea.getPlainText(i);
+            int lineLength = line.length();
+            if (remaining <= lineLength) {
+                return TextPos.ofLeading(i, remaining);
+            }
+            remaining -= lineLength + 1; // +1 for the line separator
+        }
+        return codeArea.getDocumentEnd();
+    }
+
+    /// Inverse of {@link #offsetToTextPos(CodeArea, int)}.
+    private static int textPosToOffset(CodeArea codeArea, TextPos pos) {
+        int offset = 0;
+        for (int i = 0; i < pos.index(); i++) {
+            offset += codeArea.getPlainText(i).length() + 1;
+        }
+        return offset + pos.offset();
+    }
+}

@@ -249,6 +249,10 @@ jobs:
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-madrlint-
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'corretto'
+          java-version: '25'
       - name: Setup JBang
         # Pinned to a commit for deterministic CI; comment tracks the tag.
         uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
@@ -391,7 +395,7 @@ jobs:
         env:
           CI: "true"
       - name: Run JabKit portable smoke test
-        if: matrix.module == 'jabkit'
+        if: (needs.changes.outputs.run-gradle-ci-full == 'true') && (matrix.module == 'jabkit')
         run: gradle :jabkit:runJabKitPortableSmokeTest
       - name: Prepare format failed test results
         if: needs.changes.outputs.run-gradle-ci-full == 'true' && failure()

@@ -15,14 +15,14 @@ import org.jspecify.annotations.NonNull;
 /// How and what is encoded in reference mark names under JabRef 5.2.
 ///
 /// - pageInfo does not appear here. It is not encoded in the mark name.
-class Codec52 {
+class JStyleReferenceMark {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
             // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
-            // citationType is always "1" "2" or "3"
-            Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
+            // citationType is "1".."3" (JabRef 5.2) or "4".."6" (partial markers, see #7861)
+            Pattern.compile(BIB_CITATION + "(\\d*)_([1-6])_(.*)");
 
-    private Codec52() {
+    private JStyleReferenceMark() {
     }
 
     /// This is what we get back from parsing a refMarkName.
@@ -50,6 +50,12 @@ class Codec52 {
                     CitationType.AUTHORYEAR_INTEXT;
             case 3 ->
                     CitationType.INVISIBLE_CIT;
+            case 4 ->
+                    CitationType.AUTHORYEAR_NOPAR;
+            case 5 ->
+                    CitationType.AUTHOR_ONLY;
+            case 6 ->
+                    CitationType.YEAR_ONLY;
             default ->
                     throw new IllegalArgumentException("Invalid CitationType code");
         };
@@ -63,6 +69,12 @@ class Codec52 {
                     2;
             case INVISIBLE_CIT ->
                     3;
+            case AUTHORYEAR_NOPAR ->
+                    4;
+            case AUTHOR_ONLY ->
+                    5;
+            case YEAR_ONLY ->
+                    6;
         };
     }
 
@@ -104,7 +116,7 @@ class Codec52 {
         String index = citeMatcher.group(1);
         int citTypeCode = Integer.parseInt(citeMatcher.group(2));
         CitationType citationType = citationTypeFromInt(citTypeCode);
-        return Optional.of(new Codec52.ParsedMarkName(index, citationType, keys));
+        return Optional.of(new JStyleReferenceMark.ParsedMarkName(index, citationType, keys));
     }
 
     /// @return true if name matches the pattern used for JabRef reference mark names.
@@ -117,7 +129,7 @@ class Codec52 {
     /// @param names The list to be filtered.
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return names.stream()
-                    .filter(Codec52::isJabRefReferenceMarkName)
+                    .filter(JStyleReferenceMark::isJabRefReferenceMarkName)
                     .collect(Collectors.toList());
     }
 }

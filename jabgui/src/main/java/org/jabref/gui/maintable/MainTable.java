@@ -14,8 +14,10 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -215,11 +217,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
         placeholderBox.setAlignment(Pos.CENTER);
 
-        updatePlaceholder(placeholderBox);
+        VBox loadingPlaceholder = new VBox(new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS));
+        loadingPlaceholder.setAlignment(Pos.CENTER);
 
-        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox));
+        updatePlaceholder(placeholderBox, loadingPlaceholder);
 
-        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox));
+        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+
+        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+
+        libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -633,9 +640,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.citationMergeMode = citationMerge;
     }
 
-    private void updatePlaceholder(VBox placeholderBox) {
+    private void updatePlaceholder(Node noContentPlaceholder, Node loadingPlaceholder) {
+        if (libraryTab.getLoading().get()) {
+            this.setPlaceholder(loadingPlaceholder);
+            return;
+        }
+
         if (database.getDatabase().getEntries().isEmpty()) {
-            this.setPlaceholder(placeholderBox);
+            this.setPlaceholder(noContentPlaceholder);
             // [impl->req~maintable.focus~1]
             requestFocus();
         } else {
