@@ -831,9 +831,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                                   setUpEmptyPanel(otherCitationComponents, citationComponents);
                               }
                           }).onFailure(ex -> {
+                              LOGGER.error("Error while looking up DOI", ex);
                               hideNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), "Error " + ex.getMessage());
-                              setLabelOn(otherCitationComponents.listView(), "Error " + ex.getMessage());
+                              setLabelOn(citationComponents.listView(), Localization.lang("Error while looking up DOI."));
+                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Error while looking up DOI."));
                           }).executeWith(taskExecutor);
         });
 
@@ -891,17 +892,14 @@ public class CitationRelationsTab extends EntryEditorTab {
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
                 hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
-                String labelText;
-                if (citationComponents.searchType() == CitationFetcher.SearchType.CITES) {
-                    labelText = Localization.lang("Error while fetching cited entries: %0", exception.getLocalizedMessage());
-                } else {
-                    labelText = Localization.lang("Error while fetching citing entries: %0", exception.getLocalizedMessage());
-                }
+                String labelText = citationComponents.searchType() == CitationFetcher.SearchType.CITES
+                                   ? Localization.lang("Error while fetching cited entries.")
+                                   : Localization.lang("Error while fetching citing entries.");
                 Label placeholder = new Label(labelText);
                 placeholder.setWrapText(true);
                 citationComponents.listView().setPlaceholder(placeholder);
                 citationComponents.refreshButton().setVisible(true);
-                dialogService.notify(exception.getLocalizedMessage());
+                dialogService.notify(labelText);
             })
             .executeWith(taskExecutor);
     }
