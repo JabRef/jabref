@@ -244,6 +244,7 @@ public class CSLCitationOOAdapter {
 
         List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
         if (isNumericStyle) {
+            // Sort entries based on their order of appearance in the document
             bibliographyEntries.sort(
                     Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
         }
@@ -253,6 +254,10 @@ public class CSLCitationOOAdapter {
         writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
     }
 
+    /// Writes bibliography entries using JabRef's standard CSL bibliography rendering.
+    ///
+    /// For numeric styles, callers are expected to provide entries already sorted in order of appearance
+    /// in the document. For non-numeric styles, ordering is left to the citeproc item data provider.
     private void writeBibliographyEntries(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> bibliographyEntries)
             throws com.sun.star.uno.Exception, CreationException {
         BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(bibliographyEntries));
@@ -276,6 +281,7 @@ public class CSLCitationOOAdapter {
                 OOTextIntoOO.write(document, cursor, ooText);
             }
         } else {
+            // Ordering will be according to citeproc item data provider (default)
             List<String> bibliographyEntriesText = CitationStyleGenerator.generateBibliography(
                     bibliographyEntries,
                     style,
