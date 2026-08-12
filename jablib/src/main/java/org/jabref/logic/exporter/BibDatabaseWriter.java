@@ -27,10 +27,15 @@ import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
+import org.jabref.logic.cleanup.SaveActionsConverter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.importer.util.SaveActionsDTOConverter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -43,11 +48,16 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveActionsDTO;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +81,9 @@ public class BibDatabaseWriter {
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
+
+    @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
+    private boolean useFJournalField;
 
     public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
@@ -168,6 +181,12 @@ public class BibDatabaseWriter {
         return Collections.unmodifiableList(saveActionsFieldChanges);
     }
 
+    public BibDatabaseWriter withJournalAbbreviationRepository(@NonNull JournalAbbreviationRepository repository, boolean useFJournalField) {
+        this.journalAbbreviationRepository = repository;
+        this.useFJournalField = useFJournalField;
+        return this;
+    }
+
     /// Saves the complete database.
     public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
@@ -205,6 +224,17 @@ public class BibDatabaseWriter {
         //        The cleanup should be done before the write operation
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
         saveActionsFieldChanges.addAll(saveActionChanges);
+
+        if (journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
+            bibDatabaseContext.getMetaData().getLibraryAbbreviationType().ifPresent(abbreviationType -> {
+                AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
+                        bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournalField);
+                for (BibEntry entry : sortedEntries) {
+                    saveActionsFieldChanges.addAll(cleanup.cleanup(entry));
+                }
+            });
+        }
+
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
@@ -274,6 +304,29 @@ public class BibDatabaseWriter {
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
         }
+
+        writeMetaDataJson(metaData);
+    }
+
+    protected void writeMetaDataJson(MetaData metaData) throws IOException {
+        JsonObject metaDataJson = new JsonObject();
+
+        if (metaData.getSaveActions().isPresent()) {
+            FieldFormatterCleanupActions saveActions = metaData.getSaveActions().get();
+            SaveActionsDTO saveActionsDTO = SaveActionsConverter.toDTO(saveActions);
+            JsonObject saveActionsJson = SaveActionsDTOConverter.toJson(saveActionsDTO);
+            metaDataJson.add(MetaData.SAVE_ACTIONS, saveActionsJson);
+        }
+
+        if (metaDataJson.isEmpty()) {
+            return;
+        }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        bibWriter.write(COMMENT_PREFIX + "{" + MetaData.META_FLAG_V1 + OS.NEWLINE);
+        bibWriter.write(gson.toJson(metaDataJson));
+        bibWriter.writeLine(OS.NEWLINE + "}");
+        bibWriter.finishBlock();
     }
 
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {

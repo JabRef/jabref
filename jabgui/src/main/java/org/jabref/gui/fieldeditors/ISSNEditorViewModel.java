@@ -41,7 +41,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void showJournalInfo(Button journalInfoButton) {
-        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor);
+        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor, preferences.getImporterPreferences());
     }
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {

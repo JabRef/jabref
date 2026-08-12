@@ -157,6 +157,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.summarization.util;
     exports org.jabref.logic.msc;
     exports org.jabref.logic.ai.models;
+    exports org.jabref.logic.ocr.docling;
+    exports org.jabref.model.ocr.docling;
     // endregion
 
     requires java.base;
@@ -200,7 +202,7 @@ open module org.jabref.jablib {
 
     // region: data mapping
     requires jdk.xml.dom;
-    requires com.google.gson;
+    requires transitive com.google.gson;
     requires tools.jackson.databind;
     requires tools.jackson.dataformat.yaml;
     requires tools.jackson.core;

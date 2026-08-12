@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -11,10 +13,12 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.BibEntryAssert;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MarcXmlParserTest {
 
@@ -39,5 +43,17 @@ class MarcXmlParserTest {
     void importEntries(String fileName) throws IOException, ParseException {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
+    }
+
+    @Test
+    void rejectsDocumentTypeDeclarations() {
+        String xmlWithDoctype = """
+                <!DOCTYPE response [<!ENTITY entity SYSTEM "file:///not-accessed">]>
+                <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/"/>
+                """;
+
+        MarcXmlParser parser = new MarcXmlParser();
+
+        assertThrows(ParseException.class, () -> parser.parseEntries(new ByteArrayInputStream(xmlWithDoctype.getBytes(StandardCharsets.UTF_8))));
     }
 }

@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.openoffice.ReferenceMark;
+import org.jabref.logic.openoffice.JabRefReferenceMark;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.rangesort.RangeSort;
+import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
+import org.jabref.model.openoffice.uno.UnoTextRange;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -31,6 +36,7 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +50,7 @@ public class BSTReferenceMarkManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTReferenceMarkManager.class);
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
     private final Map<String, BSTReferenceMark> marksByName = new HashMap<>();
@@ -54,7 +61,8 @@ public class BSTReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public BSTReferenceMarkManager(XTextDocument document) {
+    public BSTReferenceMarkManager(XTextDocument document, XComponentContext componentContext) {
+        this.componentContext = componentContext;
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
@@ -127,45 +135,59 @@ public class BSTReferenceMarkManager {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
+
+        if (!insertSpaceAfter) {
+            UnoDispatch.resetAttributesAtRangeEnd(doc, componentContext, endRange);
+        }
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         identifierToNumber.clear();
+        highestCitationNumber = 0;
         citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
 
         for (String name : marks.getElementNames()) {
-            String[] parts = name.split(" ");
-            if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
-                XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+            if (!JabRefReferenceMark.isJabRefReferenceMarkName(name)) {
+                continue;
+            }
 
-                ReferenceMark referenceMark = new ReferenceMark(name);
-                List<String> identifiers = referenceMark.getCitationKeys();
-                List<Integer> citationNumbers = referenceMark.getCitationNumbers();
+            XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+            Optional<JabRefReferenceMark> referenceMark = JabRefReferenceMark.parse(name);
+            if (referenceMark.isEmpty()) {
+                LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
+                continue;
+            }
 
-                if (!identifiers.isEmpty() && !citationNumbers.isEmpty()) {
-                    BSTReferenceMark mark = new BSTReferenceMark(named, referenceMark);
-                    marksByName.put(name, mark);
-                    marksInOrder.add(mark);
-                    citationType = referenceMark.getCitationType();
+            List<String> identifiers = referenceMark.orElseThrow().getCitationKeys();
+            List<Integer> citationNumbers = referenceMark.orElseThrow().getCitationNumbers();
 
-                    for (int i = 0; i < identifiers.size(); i++) {
-                        String id = identifiers.get(i);
-                        int number = citationNumbers.get(i);
-                        identifierToNumber.put(id, number);
-                        highestCitationNumber = Math.max(highestCitationNumber, number);
-                    }
-                } else {
-                    LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
+            if (!identifiers.isEmpty() && !citationNumbers.isEmpty()) {
+                BSTReferenceMark mark = new BSTReferenceMark(named, referenceMark.orElseThrow());
+                marksByName.put(name, mark);
+                marksInOrder.add(mark);
+                citationType = referenceMark.orElseThrow().getCitationType();
+
+                for (int i = 0; i < identifiers.size(); i++) {
+                    String id = identifiers.get(i);
+                    int number = citationNumbers.get(i);
+                    identifierToNumber.put(id, number);
+                    highestCitationNumber = Math.max(highestCitationNumber, number);
                 }
+            } else {
+                LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
             }
         }
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
 
         if (isNumberUpdateRequired) {
             try {
@@ -177,30 +199,13 @@ public class BSTReferenceMarkManager {
     }
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
-        String[] parts = oldName.split(" ");
-
-        /*
-         * e.g. "JABREF_Smith_2020 CID_1 abcd1234 EMPTY" is separated into 4 parts
-         * The last part is the citation type
-         * The second to last part is the uniqueId
-         */
-        String citationType = parts[parts.length - 1];
-        int uniqueIdIndex = parts.length - 2;
-
-        if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
-            StringBuilder newName = new StringBuilder();
-            for (int i = 0; i < uniqueIdIndex; i += 2) {
-                // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
-                if (i > 0) {
-                    newName.append(", ");
-                }
-                newName.append(parts[i]).append(" ");
-                newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
-            }
-            newName.append(" ").append(parts[uniqueIdIndex]).append(" ").append(citationType);
-            return newName.toString();
-        }
-        return oldName;
+        return JabRefReferenceMark.parse(oldName)
+                                  .map(referenceMark -> JabRefReferenceMark.buildReferenceMarkName(
+                                          referenceMark.getCitationKeys(),
+                                          newNumbers,
+                                          referenceMark.getUniqueId(),
+                                          referenceMark.getCitationType()))
+                                  .orElse(oldName);
     }
 
     private void updateAllCitationNumbers() throws Exception, CreationException {
@@ -230,26 +235,6 @@ public class BSTReferenceMarkManager {
 
         identifierToNumber = newIdentifierToNumber;
         highestCitationNumber = newIdentifierToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0);
-    }
-
-    public void applyNumberingOverride(Map<String, Integer> numbering) throws Exception, CreationException {
-        sortMarksInOrder();
-        for (BSTReferenceMark mark : marksInOrder) {
-            List<String> identifiers = mark.getCitationKeys();
-            List<Integer> assignedNumbers = new ArrayList<>(identifiers.size());
-            for (String identifier : identifiers) {
-                Integer numberOverride = numbering.get(identifier);
-                if (numberOverride == null) {
-                    // fallback to existing mapping to avoid breaking text
-                    numberOverride = identifierToNumber.getOrDefault(identifier, 0);
-                }
-                assignedNumbers.add(numberOverride);
-            }
-            mark.setCitationNumbers(assignedNumbers);
-            updateMarkAndTextWithNewNumbers(mark, assignedNumbers);
-        }
-        identifierToNumber = new HashMap<>(numbering);
-        highestCitationNumber = numbering.values().stream().mapToInt(Integer::intValue).max().orElse(0);
     }
 
     private String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
@@ -288,30 +273,8 @@ public class BSTReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
-    }
-
-    public void updateMarkAndTextWithNewStyle(BSTReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
-        String updatedName = mark.getName();
-        // Remove citation marker first
-        if (updatedName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.EMPTY_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
-        } else if (updatedName.endsWith(ReferenceMark.NORMAL_MARKER)) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
-        }
-
-        // Then add the new marker
-        String marker = switch (citationType) {
-            case IN_TEXT ->
-                    ReferenceMark.IN_TEXT_MARKER;
-            case EMPTY ->
-                    ReferenceMark.EMPTY_MARKER;
-            case NORMAL ->
-                    ReferenceMark.NORMAL_MARKER;
-        };
-
-        updateMarkAndText(mark, newText, updatedName + " " + marker);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
     }
 
     private void updateMarkAndText(BSTReferenceMark mark, String newText, String markName) throws Exception, CreationException {
@@ -349,17 +312,17 @@ public class BSTReferenceMarkManager {
         }
     }
 
+    public List<BSTReferenceMark> getMarksInOrder() {
+        sortMarksInOrder();
+        return marksInOrder;
+    }
+
     public int getCitationNumber(String identifier) {
         Integer override = identifierToNumber.get(identifier);
         if (override != null) {
             return override;
         }
         return identifierToNumber.computeIfAbsent(identifier, _ -> ++highestCitationNumber);
-    }
-
-    public List<BSTReferenceMark> getMarksInOrder() {
-        sortMarksInOrder();
-        return marksInOrder;
     }
 
     public boolean hasCitationForIdentifier(String identifier) {
@@ -380,15 +343,52 @@ public class BSTReferenceMarkManager {
         // Editing a mark removes and recreates the content, which shifts subsequent
         // anchors. Operating from the bottom avoids temporarily inverted sequences
         // like [3] above [2] above [1] during refresh.
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<RangeSortEntry<BSTReferenceMark>> sortEntries = new ArrayList<>();
+
+        for (BSTReferenceMark mark : marksInOrder) {
+            XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling BST reference mark without anchor: {}", mark.getName());
+                continue;
+            }
+            sortEntries.add(new RangeSortEntry<>(range, 0, mark));
+        }
+
+        RangeSort.RangePartitions<RangeSortEntry<BSTReferenceMark>> partitions =
+                RangeSort.partitionAndSortRanges(sortEntries);
+
+        for (List<RangeSortEntry<BSTReferenceMark>> partition : partitions.getPartitions()) {
+            int indexInPartition = 0;
+            for (RangeSortEntry<BSTReferenceMark> sortEntry : partition) {
+                sortEntry.setIndexInPosition(indexInPartition++);
+
+                Optional<XTextRange> footnoteMarkRange =
+                        UnoTextRange.getFootnoteMarkRange(sortEntry.getRange());
+                footnoteMarkRange.ifPresent(sortEntry::setRange);
+            }
+        }
+
+        sortEntries.sort(this::compareTextRanges);
+
+        marksInOrder.clear();
+        sortEntries.stream()
+                   .map(RangeSortEntry::getContent)
+                   .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(XTextRange range1, XTextRange range2) {
+    private int compareTextRanges(RangeSortEntry<BSTReferenceMark> first, RangeSortEntry<BSTReferenceMark> second) {
+        int rangeComparison;
         try {
-            return range1 != null && range2 != null ? textRangeCompare.compareRegionStarts(range1, range2) : 0;
+            rangeComparison = textRangeCompare.compareRegionStarts(second.getRange(), first.getRange());
         } catch (IllegalArgumentException exception) {
             LOGGER.warn("Error comparing text ranges: {}", exception.getMessage(), exception);
-            return 0;
+            rangeComparison = 0;
         }
+
+        if (rangeComparison != 0) {
+            return rangeComparison;
+        }
+
+        return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
     }
 }

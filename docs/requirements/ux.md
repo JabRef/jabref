@@ -47,6 +47,34 @@ When the merge entries dialog shows a field that is missing in one of the source
 
 Needs: impl
 
+## GitHub personal access token verification
+`req~ux.git-share.personal-access-token-verification~1`
+
+The GitHub sharing dialog must allow users to verify that their personal access token has push access to the configured GitHub repository before sharing a library.
+
+Needs: impl
+
+## Git pull with unrelated histories
+`req~ux.git-pull.unrelated-histories~1`
+
+Git pull must support a local library and its configured remote when their commit histories have no common ancestor.
+
+Needs: impl
+
+## Git push to an empty remote
+`req~ux.git-push.empty-remote~1`
+
+Git push must publish the current branch and configure its upstream when the configured remote has no branches.
+
+Needs: impl
+
+## Git push rejection reporting
+`req~ux.git-push.rejected-update-reporting~1`
+
+Git push must report a rejected remote update to the user.
+
+Needs: impl
+
 ### Activating large libraries keeps entry previews responsive
 `req~ux.active-library.preview-responsiveness~1`
 
