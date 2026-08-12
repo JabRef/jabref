@@ -81,6 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
 - We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
 - CSL citations and bibliography in the LibreOffice integration now respect the "Look up BibTeX entries in the currently selected library only" preference. [#16484](https://github.com/JabRef/jabref/pull/16484)
 - We fixed journal information retrieval by getting journal metadata and metrics directly from Crossref and OpenAlex instead of Scimago. [#16504](https://github.com/JabRef/jabref/pull/16504)
