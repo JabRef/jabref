@@ -11,6 +11,8 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.strings.StringUtil;
+
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -306,25 +308,27 @@ public class CSLCitationOOAdapter {
         XNameAccess paragraphStyles = UnoRuntime.queryInterface(
                 XNameAccess.class,
                 styleFamilyNames.getByName(PARAGRAPH_STYLES));
+        XStyle bibliographyParagraphStyle;
         XPropertySet styleProperties;
 
         try {
-            styleProperties = UnoRuntime.queryInterface(
-                    XPropertySet.class,
+            bibliographyParagraphStyle = UnoRuntime.queryInterface(
+                    XStyle.class,
                     paragraphStyles.getByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
+            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, bibliographyParagraphStyle);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Bibliography paragraph style not found. Creating it.", e);
             XMultiServiceFactory documentFactory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
-            XStyle style = UnoRuntime.queryInterface(
+            bibliographyParagraphStyle = UnoRuntime.queryInterface(
                     XStyle.class,
                     documentFactory.createInstance("com.sun.star.style.ParagraphStyle"));
             XNameContainer paragraphStyleNames = UnoRuntime.queryInterface(
                     XNameContainer.class,
                     paragraphStyles);
-            paragraphStyleNames.insertByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE, style);
-            style.setParentStyle("Default");
-            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, style);
+            paragraphStyleNames.insertByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE, bibliographyParagraphStyle);
+            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, bibliographyParagraphStyle);
         }
+        bibliographyParagraphStyle.setParentStyle(openOfficePreferences.getCslBibliographyBodyFormat());
 
         int firstLineIndent = 0;
         int indent = 0;
