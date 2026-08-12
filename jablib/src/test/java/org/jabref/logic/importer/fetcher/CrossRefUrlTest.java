@@ -44,7 +44,7 @@ class CrossRefUrlTest {
     }
 
     @Test
-    void testUrlIncludesApiKey() {
+    void urlIncludesApiKey() {
         CrossRef fetcher = new CrossRef(mock(ImporterPreferences.class));
 
         assertEquals("https://api.crossref.org/works?query=test&rows=1&mailto=user%40example.org", fetcher.getTestUrl("user@example.org"));
