@@ -122,8 +122,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         viewModel.mergedEntryProperty().get().getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
             if (change.wasAdded() && !fieldRows.containsKey(change.getKey())) {
                 Field newField = change.getKey();
-                int lastRowIndex = viewModel.mergedEntryProperty().get().getFields().size() - 1;
-                FieldRow fieldRow = new FieldRow(newField, lastRowIndex);
+                // UI rows are never removed even if a merged field gets cleared again. Therefore the next row index
+                // must be based on the current UI row count instead of the current merged-entry field count.
+                int nextRowIndex = fieldEditor.getChildren().size();
+                FieldRow fieldRow = new FieldRow(newField, nextRowIndex);
                 fieldRows.put(change.getKey(), fieldRow);
                 addEmptyCellsForMissingSources(newField);
             }
