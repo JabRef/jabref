@@ -78,7 +78,7 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.5.0")
+    api("de.undercouch:citeproc-java:3.5.1")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
