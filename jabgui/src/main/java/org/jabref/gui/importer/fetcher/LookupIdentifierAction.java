@@ -85,7 +85,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
             }
             if (identifier.isPresent()) {
-                T foundIdentifier = identifier.orElseThrow();
+                T foundIdentifier = identifier.get();
                 // BibEntry uses an ObservableMap which notifies JavaFX listeners.
                 Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
                     if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
