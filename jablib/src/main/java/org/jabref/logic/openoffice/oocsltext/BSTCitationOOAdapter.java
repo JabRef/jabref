@@ -35,6 +35,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +51,18 @@ public class BSTCitationOOAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BSTCitationOOAdapter(XTextDocument document, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XTextDocument document, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = document;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new BSTReferenceMarkManager(document);
+        this.markManager = new BSTReferenceMarkManager(document, componentContext);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }
@@ -82,7 +85,7 @@ public class BSTCitationOOAdapter {
         markManager.insertReferenceIntoOO(
                 entries, document, cursor, ooText,
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                !succeedingSpaceExists,
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 CSLCitationType.NORMAL);
         markManager.setRealTimeNumberUpdateRequired(
                 openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);
@@ -163,10 +166,14 @@ public class BSTCitationOOAdapter {
         }
     }
 
+    public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
+    }
+
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
         // Use a transient manager here so export only inspects marks. Reusing the adapter's live manager would
         // disturb its cached numbering state for subsequent BST operations before the next full refresh.
-        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document);
+        BSTReferenceMarkManager exportMarkManager = new BSTReferenceMarkManager(document, componentContext);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> identifiers = new LinkedHashSet<>();
