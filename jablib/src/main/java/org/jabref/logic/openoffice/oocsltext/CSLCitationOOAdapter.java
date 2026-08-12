@@ -11,8 +11,6 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.util.strings.StringUtil;
-
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -34,23 +32,12 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.container.XNameAccess;
-import com.sun.star.container.XNameContainer;
 import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.lang.XMultiServiceFactory;
-import com.sun.star.style.LineSpacing;
-import com.sun.star.style.LineSpacingMode;
-import com.sun.star.style.TabAlign;
-import com.sun.star.style.TabStop;
-import com.sun.star.style.XStyle;
-import com.sun.star.style.XStyleFamiliesSupplier;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import de.undercouch.citeproc.output.Bibliography;
-import de.undercouch.citeproc.output.SecondFieldAlign;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,16 +56,8 @@ public class CSLCitationOOAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLCitationOOAdapter.class);
 
     private static final String CITATION_DELIMITER = ", ";
-    private static final String ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE = "Bibliography 1";
-    private static final String PARAGRAPH_STYLES = "ParagraphStyles";
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
-    private static final Pattern CSL_LEFT_RIGHT_MARGIN_PATTERN = Pattern.compile(
-            "<div class=\"csl-left-margin\">(.*?)</div>\\s*<div class=\"csl-right-inline\">(.*?)</div>");
-    private static final Pattern LEADING_RIGHT_INLINE_WHITESPACE_PATTERN = Pattern.compile("^(?:\\s|&nbsp;|&#160;)+");
-    private static final Pattern EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN = Pattern.compile(
-            "^(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*|(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*$");
-    private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
 
     private final XComponentContext componentContext;
     private final XTextDocument document;
@@ -242,34 +221,12 @@ public class CSLCitationOOAdapter {
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, ooBreak);
 
-        BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(entries));
-        String style = selectedStyle.getSource();
-
         if (isNumericStyle) {
             // Sort entries based on their order of appearance in the document
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-
-            for (BibEntry entry : entries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, currentEntryContext, bibEntryTypesManager).getFirst();
-                String citationKey = entry.getCitationKey().orElse("");
-                int currentNumber = markManager.getCitationNumber(citationKey);
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
-                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
-
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
-        } else {
-            // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, currentEntryContext, bibEntryTypesManager);
-
-            for (String bibliographyEntry : bibliographyEntries) {
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
-
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
         }
+
+        writeBibliographyEntries(cursor, selectedStyle, entries);
     }
 
     public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
@@ -285,118 +242,54 @@ public class CSLCitationOOAdapter {
         updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
         markManager.readAndUpdateExistingMarks();
 
-        BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(entries));
         List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
         if (isNumericStyle) {
             bibliographyEntries.sort(
                     Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
         }
 
-        Optional<Bibliography> bibliography = CitationStyleGenerator.generateBibliographyObject(
-                bibliographyEntries,
-                selectedStyle.getSource(),
-                HTML_OUTPUT_FORMAT,
-                currentEntryContext,
-                bibEntryTypesManager);
-        if (bibliography.isEmpty()) {
-            return;
-        }
-        Bibliography generatedBibliography = bibliography.orElseThrow();
+        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        cursorProperties.setPropertyValue("ParaStyleName", openOfficePreferences.getCslBibliographyBodyFormat());
+        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
+    }
 
-        XStyleFamiliesSupplier styleFamilies = UnoRuntime.queryInterface(XStyleFamiliesSupplier.class, document);
-        XNameAccess styleFamilyNames = styleFamilies.getStyleFamilies();
-        XNameAccess paragraphStyles = UnoRuntime.queryInterface(
-                XNameAccess.class,
-                styleFamilyNames.getByName(PARAGRAPH_STYLES));
-        XStyle bibliographyParagraphStyle;
-        XPropertySet styleProperties;
+    private void writeBibliographyEntries(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> bibliographyEntries)
+            throws com.sun.star.uno.Exception, CreationException {
+        BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(bibliographyEntries));
+        String style = selectedStyle.getSource();
 
-        try {
-            bibliographyParagraphStyle = UnoRuntime.queryInterface(
-                    XStyle.class,
-                    paragraphStyles.getByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
-            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, bibliographyParagraphStyle);
-        } catch (NoSuchElementException e) {
-            LOGGER.debug("Bibliography paragraph style not found. Creating it.", e);
-            XMultiServiceFactory documentFactory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
-            bibliographyParagraphStyle = UnoRuntime.queryInterface(
-                    XStyle.class,
-                    documentFactory.createInstance("com.sun.star.style.ParagraphStyle"));
-            XNameContainer paragraphStyleNames = UnoRuntime.queryInterface(
-                    XNameContainer.class,
-                    paragraphStyles);
-            paragraphStyleNames.insertByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE, bibliographyParagraphStyle);
-            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, bibliographyParagraphStyle);
-        }
-        bibliographyParagraphStyle.setParentStyle(openOfficePreferences.getCslBibliographyBodyFormat());
+        if (selectedStyle.isNumericStyle()) {
+            for (BibEntry entry : bibliographyEntries) {
+                String bibliographyEntry = CitationStyleGenerator.generateBibliography(
+                        List.of(entry),
+                        style,
+                        HTML_OUTPUT_FORMAT,
+                        currentEntryContext,
+                        bibEntryTypesManager)
+                                                              .getFirst();
+                String citationKey = entry.getCitationKey().orElse("");
+                int currentNumber = markManager.getCitationNumber(citationKey);
+                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
 
-        int firstLineIndent = 0;
-        int indent = 0;
-        int maxOffset = Optional.ofNullable(generatedBibliography.getMaxOffset()).orElse(0);
-        TabStop[] tabStops = new TabStop[0];
-        SecondFieldAlign secondFieldAlign = Optional.ofNullable(generatedBibliography.getSecondFieldAlign())
-                                                    .orElse(SecondFieldAlign.FALSE);
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
+                OOTextIntoOO.write(document, cursor, ooText);
+            }
+        } else {
+            List<String> bibliographyEntriesText = CitationStyleGenerator.generateBibliography(
+                    bibliographyEntries,
+                    style,
+                    HTML_OUTPUT_FORMAT,
+                    currentEntryContext,
+                    bibEntryTypesManager);
 
-        if (Boolean.TRUE.equals(generatedBibliography.getHangingIndent())) {
-            indent = 720;
-            firstLineIndent = -720;
-        } else if (secondFieldAlign != SecondFieldAlign.FALSE) {
-            int alignAt = 24 + maxOffset * 120;
-            firstLineIndent = -alignAt;
-            if (secondFieldAlign == SecondFieldAlign.MARGIN) {
-                tabStops = createTabStops(0);
-            } else {
-                indent = alignAt;
-                tabStops = createTabStops(alignAt);
+            for (String bibliographyEntry : bibliographyEntriesText) {
+                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
+                OOTextIntoOO.write(document, cursor, ooText);
             }
         }
-
-        LineSpacing lineSpacing = new LineSpacing();
-        lineSpacing.Mode = LineSpacingMode.MINIMUM;
-        lineSpacing.Height = (short) (240
-                * Optional.ofNullable(generatedBibliography.getLineSpacing()).orElse(1)
-                * MM_PER_100_TWIP);
-
-        styleProperties.setPropertyValue("ParaFirstLineIndent", (int) (firstLineIndent * MM_PER_100_TWIP));
-        styleProperties.setPropertyValue("ParaLeftMargin", (int) (indent * MM_PER_100_TWIP));
-        styleProperties.setPropertyValue("ParaLineSpacing", lineSpacing);
-        styleProperties.setPropertyValue("ParaTopMargin", 0);
-        styleProperties.setPropertyValue("ParaBottomMargin", 0);
-        styleProperties.setPropertyValue("ParaTabStops", tabStops);
-
-        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
-        cursorProperties.setPropertyValue("ParaStyleName", ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE);
-        OOTextIntoOO.write(document, cursor, createZoteroBibliographyText(generatedBibliography));
-    }
-
-    static OOText createZoteroBibliographyText(Bibliography bibliography) {
-        StringJoiner bibliographyText = new StringJoiner(
-                "<p oo:ParaStyleName=\"%s\">".formatted(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
-        for (String bibliographyEntry : bibliography.getEntries()) {
-            String formattedBibliographyEntry = replaceLeftRightMarginBlocksWithSpace(bibliographyEntry);
-            formattedBibliographyEntry = CSLFormatUtils.transformHTML(formattedBibliographyEntry);
-            formattedBibliographyEntry = EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN.matcher(formattedBibliographyEntry)
-                                                                                             .replaceAll("");
-            bibliographyText.add(formattedBibliographyEntry);
-        }
-        return OOFormat.setLocaleNone(OOText.fromString(bibliographyText.toString()));
-    }
-
-    static String replaceLeftRightMarginBlocksWithSpace(String bibliographyEntry) {
-        return CSL_LEFT_RIGHT_MARGIN_PATTERN.matcher(bibliographyEntry)
-                                            .replaceAll(matchResult -> matchResult.group(1)
-                                                    + " "
-                                                    + LEADING_RIGHT_INLINE_WHITESPACE_PATTERN.matcher(matchResult.group(2)).replaceFirst(""));
-    }
-
-    private static TabStop[] createTabStops(int... positions) {
-        TabStop[] tabStops = new TabStop[positions.length];
-        for (int i = 0; i < positions.length; i++) {
-            tabStops[i] = new TabStop();
-            tabStops[i].Position = (int) (positions[i] * MM_PER_100_TWIP);
-            tabStops[i].Alignment = TabAlign.LEFT;
-        }
-        return tabStops;
     }
 
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
