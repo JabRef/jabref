@@ -1368,6 +1368,33 @@ class BibtexParserTest {
     }
 
     @Test
+    void saveActionsJsonMissingFieldFormatterCleanupsDoesNotAbortParsingButIsIgnored() throws IOException {
+        ParserResult parserResult = parser.parse(
+                Reader.of("""
+                        @Comment{jabref-meta-0.1.0
+                        {
+                          "saveActions": {
+                            "state": true,
+                            "title": ["lower_case"]
+                          }
+                        }
+                        }
+                        @Article{test,
+                          title = {Title},
+                        }
+                        """));
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Title");
+
+        assertEquals(List.of(expectedEntry), parserResult.getDatabase().getEntries());
+        assertEquals(Optional.empty(), parserResult.getMetaData().getSaveActions());
+        assertEquals(1, parserResult.warnings().size());
+        assertTrue(parserResult.getErrorMessage().contains("Missing or invalid 'fieldFormatterCleanups' in save actions JSON metadata"));
+    }
+
+    @Test
     void integrationTestBibEntryType() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));

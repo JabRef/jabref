@@ -122,6 +122,7 @@ public class BibtexParser implements Parser {
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
     private Optional<JsonObject> parsedJsonMetaData = Optional.empty();
+    private ParserResult.Range parsedJsonMetaDataRange = ParserResult.Range.NULL_RANGE;
     private final Map<String, String> parsedBibDeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
@@ -219,6 +220,8 @@ public class BibtexParser implements Parser {
         database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
+        parsedJsonMetaData = Optional.empty();
+        parsedJsonMetaDataRange = ParserResult.Range.NULL_RANGE;
     }
 
     private void parseDatabaseID() throws IOException {
@@ -307,9 +310,14 @@ public class BibtexParser implements Parser {
 
             parsedJsonMetaData.ifPresent(json -> {
                 if (json.has(MetaData.SAVE_ACTIONS)) {
-                    SaveActionsDTO saveActionsDTO = SaveActionsDTOConverter.fromJson(json.getAsJsonObject(MetaData.SAVE_ACTIONS));
-                    FieldFormatterCleanupActions saveActions = SaveActionsConverter.fromDTO(saveActionsDTO);
-                    metaData.setSaveActions(saveActions);
+                    try {
+                        SaveActionsDTO saveActionsDTO = SaveActionsDTOConverter.fromJson(json.getAsJsonObject(MetaData.SAVE_ACTIONS));
+                        FieldFormatterCleanupActions saveActions = SaveActionsConverter.fromDTO(saveActionsDTO);
+                        metaData.setSaveActions(saveActions);
+                    } catch (ParseException exception) {
+                        LOGGER.debug("Could not parse save actions JSON metadata", exception);
+                        parserResult.addException(parsedJsonMetaDataRange, exception);
+                    }
                 }
             });
         } catch (ParseException exception) {
@@ -423,7 +431,8 @@ public class BibtexParser implements Parser {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
         } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
-            parsedJsonMetaData = parseCommentToJson(comment, new ParserResult.Range(startLine, startColumn, line, column));
+            parsedJsonMetaDataRange = new ParserResult.Range(startLine, startColumn, line, column);
+            parsedJsonMetaData = parseCommentToJson(comment, parsedJsonMetaDataRange);
 
             // JSON metadata comments are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
