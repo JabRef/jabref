@@ -7,32 +7,27 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class JournalInfoView extends VBox {
     @FXML private Label title;
-    @FXML private Label categories;
     @FXML private Label publisher;
     @FXML private Label hIndex;
     @FXML private Label issn;
-    @FXML private LineChart<String, Double> sjrChart;
-    @FXML private LineChart<String, Double> citableDocsPrevious3YearsChart;
-    @FXML private LineChart<String, Double> citesOutgoingChart;
-    @FXML private LineChart<String, Double> citesOutgoingPerDocChart;
-    @FXML private LineChart<String, Double> citesIncomingByRecentlyPublishedChart;
-    @FXML private LineChart<String, Double> docsThisYearChart;
+    @FXML private LineChart<String, Double> worksCountChart;
+    @FXML private LineChart<String, Double> citedByCountChart;
     private final JournalInfoViewModel viewModel;
 
-    public JournalInfoView() {
-        this.viewModel = new JournalInfoViewModel();
+    public JournalInfoView(ImporterPreferences importerPreferences) {
+        this.viewModel = new JournalInfoViewModel(importerPreferences);
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         title.textProperty().bind(viewModel.titleProperty());
-        categories.textProperty().bind(viewModel.categoriesProperty());
         publisher.textProperty().bind(viewModel.publisherProperty());
         hIndex.textProperty().bind(viewModel.hIndexProperty());
         this.issn.textProperty().bind(viewModel.issnProperty());
@@ -49,11 +44,7 @@ public class JournalInfoView extends VBox {
     }
 
     private void bindChartProperties() {
-        sjrChart.setData(viewModel.getSjrData());
-        citableDocsPrevious3YearsChart.setData(viewModel.getCitableDocsPrevious3YearsData());
-        citesOutgoingChart.setData(viewModel.getCitesOutgoingData());
-        citesOutgoingPerDocChart.setData(viewModel.getCitesOutgoingPerDocData());
-        citesIncomingByRecentlyPublishedChart.setData(viewModel.getCitesIncomingByRecentlyPublishedData());
-        docsThisYearChart.setData(viewModel.getDocsThisYearData());
+        worksCountChart.setData(viewModel.getWorksCountData());
+        citedByCountChart.setData(viewModel.getCitedByCountData());
     }
 }
