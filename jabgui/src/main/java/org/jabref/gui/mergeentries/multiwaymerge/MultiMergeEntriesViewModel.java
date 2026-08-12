@@ -22,6 +22,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import org.jspecify.annotations.Nullable;
+
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private final ListProperty<EntrySource> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -68,6 +70,16 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
                         });
             }
         }
+    }
+
+    // [impl->req~ux.merge-entries.select-empty-field~1]
+    public void setMergedFieldValue(Field field, @Nullable String value) {
+        if ((value == null) || value.isEmpty()) {
+            mergedEntry.get().clearField(field);
+            return;
+        }
+
+        mergedEntry.get().setField(field, value);
     }
 
     public BibEntry resultConverter(ButtonType button) {

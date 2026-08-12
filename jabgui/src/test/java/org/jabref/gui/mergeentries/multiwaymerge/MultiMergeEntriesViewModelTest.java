@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MultiMergeEntriesViewModelTest {
 
@@ -65,5 +66,21 @@ class MultiMergeEntriesViewModelTest {
         viewModel.updateFields(rightEntry);
 
         assertEquals(expected, viewModel.mergedEntryProperty().get().getField(field).orElse(""));
+    }
+
+    @Test
+    void setMergedFieldValueClearsFieldWhenSelectingEmptyValue() {
+        viewModel.mergedEntryProperty().get().setField(StandardField.YEAR, "2015");
+
+        viewModel.setMergedFieldValue(StandardField.YEAR, "");
+
+        assertTrue(viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).isEmpty());
+    }
+
+    @Test
+    void setMergedFieldValueSetsNonEmptyValue() {
+        viewModel.setMergedFieldValue(StandardField.YEAR, "2015");
+
+        assertEquals("2015", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
     }
 }

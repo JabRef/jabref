@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import javafx.collections.FXCollections;
@@ -120,15 +121,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 int lastRowIndex = viewModel.mergedEntryProperty().get().getFields().size() - 1;
                 FieldRow fieldRow = new FieldRow(newField, lastRowIndex);
                 fieldRows.put(change.getKey(), fieldRow);
-
-                MultiMergeEntriesViewModel.EntrySource originalSource = viewModel.entriesProperty().get().getFirst();
-                BibEntry originalEntry = originalSource.entryProperty().get();
-                if (originalEntry.getField(newField).isEmpty()) {
-                    UiTaskExecutor.runInJavaFXThread(() -> {
-                        Cell emptyCell = new Cell("", newField, 0);
-                        optionsGrid.add(emptyCell, 0, fieldRow.rowIndex);
-                    });
-                }
+                addEmptyCellsForMissingSources(newField);
             }
         });
     }
@@ -228,12 +221,51 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// @param entrySourceColumn the entry to write
     /// @param columnIndex       the index of the column to write this entry to
     private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
-        for (Map.Entry<Field, String> entry : entrySourceColumn.entryProperty().get().getFieldsObservable().entrySet()) {
-            Field key = entry.getKey();
-            String value = entry.getValue();
-            Cell cell = new Cell(value, key, columnIndex);
-            optionsGrid.add(cell, columnIndex, fieldRows.get(key).rowIndex);
+        BibEntry entry = entrySourceColumn.entryProperty().get();
+        for (Map.Entry<Field, String> fieldEntry : entry.getFieldsObservable().entrySet()) {
+            Field field = fieldEntry.getKey();
+            String value = fieldEntry.getValue();
+            Cell cell = new Cell(value, field, columnIndex);
+            optionsGrid.add(cell, columnIndex, fieldRows.get(field).rowIndex);
         }
+
+        addEmptyCellsForMissingFields(entry, columnIndex);
+    }
+
+    private void addEmptyCellsForMissingSources(Field field) {
+        List<MultiMergeEntriesViewModel.EntrySource> sources = viewModel.entriesProperty().get();
+        for (int columnIndex = 0; columnIndex < sources.size(); columnIndex++) {
+            BibEntry sourceEntry = sources.get(columnIndex).entryProperty().get();
+            if ((sourceEntry != null) && sourceEntry.getField(field).isEmpty()) {
+                addEmptyCellIfMissing(field, columnIndex);
+            }
+        }
+    }
+
+    private void addEmptyCellsForMissingFields(BibEntry entry, int columnIndex) {
+        for (Field field : fieldRows.keySet()) {
+            if (entry.getField(field).isEmpty()) {
+                addEmptyCellIfMissing(field, columnIndex);
+            }
+        }
+    }
+
+    // [impl->req~ux.merge-entries.select-empty-field~1]
+    private void addEmptyCellIfMissing(Field field, int columnIndex) {
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
+            FieldRow fieldRow = fieldRows.get(field);
+            if ((fieldRow == null) || (columnIndex >= supplierHeader.getChildren().size())) {
+                return;
+            }
+
+            boolean cellAlreadyExists = optionsGrid.getChildrenUnmodifiable().stream()
+                                                   .filter(HBox.class::isInstance)
+                                                   .anyMatch(node -> Objects.equals(GridPane.getColumnIndex(node), columnIndex)
+                                                           && Objects.equals(GridPane.getRowIndex(node), fieldRow.rowIndex));
+            if (!cellAlreadyExists) {
+                optionsGrid.add(new Cell("", field, columnIndex), columnIndex, fieldRow.rowIndex);
+            }
+        });
     }
 
     /// Set up the button that displays the name of the source so that if it is clicked, all toggles in that column are
@@ -385,9 +417,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             toggleGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
                 if (newValue == null) {
-                    viewModel.mergedEntryProperty().get().setField(field, "");
+                    viewModel.setMergedFieldValue(field, null);
                 } else {
-                    viewModel.mergedEntryProperty().get().setField(field, ((DiffHighlightingEllipsingTextFlow) ((ToggleButton) newValue).getGraphic()).getFullText());
+                    viewModel.setMergedFieldValue(field, ((DiffHighlightingEllipsingTextFlow) ((ToggleButton) newValue).getGraphic()).getFullText());
                     headerToggleGroup.selectToggle(null);
                 }
             });
@@ -403,16 +435,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             BindingsHelper.bindBidirectional(
                     fieldEditorCell.textProperty(),
                     fieldBinding,
-                    text -> {
-                        if (text != null) {
-                            fieldEditorCell.setText(text);
-                        }
-                    },
-                    binding -> {
-                        if (binding != null) {
-                            viewModel.mergedEntryProperty().get().setField(field, binding);
-                        }
-                    });
+                    text -> fieldEditorCell.setText(text == null ? "" : text),
+                    binding -> viewModel.setMergedFieldValue(field, binding));
 
             fieldEditorCell.setMaxHeight(Double.MAX_VALUE);
             VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);
