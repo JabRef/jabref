@@ -43,7 +43,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
-import org.jabref.logic.preview.CustomizedPreviewStyle;
+import org.jabref.logic.preview.CustomizedTextPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
@@ -324,12 +324,19 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         cslListProperty.clear();
         customizedListProperty.clear();
-        for (CustomizedPreviewStyle stored : previewPreferences.getCustomizedPreviewLayouts()) {
+        for (CustomizedTextPreviewLayout stored : previewPreferences.getCustomizedPreviewLayouts()) {
             TextBasedPreviewLayout textBasedPreviewLayout = new TextBasedPreviewLayout(stored.id(), stored.name(), stored.text(), layoutFormatterPreferences, abbreviationRepository);
             if (chosenListProperty.stream().noneMatch(currLayout -> currLayout instanceof TextBasedPreviewLayout textLayout && textLayout.getId().equals(stored.id()))) {
                 customizedListProperty.getValue().add(textBasedPreviewLayout);
             }
         }
+        // cslListProperty.clear();
+        //        if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
+        //            cslListProperty.getValue().add(TextBasedPreviewLayout.of(
+        //                    previewPreferences.getCustomPreviewLayout(),
+        //                    layoutFormatterPreferences,
+        //                    abbreviationRepository));
+        //        }
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
@@ -339,6 +346,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))
+                                                 //                                                 .forEach(cslListProperty::add))
                                                  .forEach(style -> {
                                                      cslListProperty.add(style);
                                                  }))
@@ -434,8 +442,18 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// Store the changes of preference-preview settings.
     @Override
     public void storeSettings() {
-        // if 'Selected' chosen list is empty, fill it the first custom layout the user created in the 'customized' list
-        // otherwise, if 'customized' is empty, then populate with a default value
+        //        if (chosenListProperty.isEmpty()) {
+        //            PreviewLayout textBasedPreviewLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
+        //            //            PreviewLayout textBasedPreviewLayout = findLayoutById(TextBasedPreviewLayout.NAME);
+        //            if (textBasedPreviewLayout != null) {
+        //                chosenListProperty.add(textBasedPreviewLayout);
+        //            } else {
+        //                chosenListProperty.add(TextBasedPreviewLayout.of(
+        //                        TextBasedPreviewLayout.DEFAULT,
+        //                        layoutFormatterPreferences,
+        //                        abbreviationRepository));
+        //            }
+        //        }
         if (chosenListProperty.isEmpty()) {
             PreviewLayout defaultLayout = customizedListProperty.stream()
                                                                 .filter(TextBasedPreviewLayout.class::isInstance)
@@ -448,14 +466,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                                         abbreviationRepository));
             chosenListProperty.add(defaultLayout);
         }
-        // store the list values from chosen and customized
-        List<CustomizedPreviewStyle> customStylesToStore = Stream.concat(customizedListProperty.stream(),
-                                                                         chosenListProperty.stream().filter(TextBasedPreviewLayout.class::isInstance))
-                                                                 .map(TextBasedPreviewLayout.class::cast)
-                                                                 .distinct()
-                                                                 .map(layout -> new CustomizedPreviewStyle(layout.getId(), layout.getDisplayName(), layout.getText()))
-                                                                 .toList();
-        previewPreferences.getCustomizedPreviewLayouts().setAll(customStylesToStore);
+
+        List<CustomizedTextPreviewLayout> toStore = java.util.stream.Stream.concat(
+                                                                customizedListProperty.stream(),
+                                                                chosenListProperty.stream().filter(TextBasedPreviewLayout.class::isInstance))
+                                                                           .map(TextBasedPreviewLayout.class::cast)
+                                                                           .distinct()
+                                                                           .map(layout -> new CustomizedTextPreviewLayout(layout.getId(), layout.getDisplayName(), layout.getText()))
+                                                                           .toList();
+        previewPreferences.getCustomizedPreviewLayouts().setAll(toStore);
+
+        //        if (findLayoutByName(TextBasedPreviewLayout.NAME) instanceof TextBasedPreviewLayout customLayout) {
+        //            previewPreferences.setCustomPreviewLayout(customLayout.getText());
+        //        }
+
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());

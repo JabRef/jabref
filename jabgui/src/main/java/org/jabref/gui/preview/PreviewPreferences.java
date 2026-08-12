@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.preview.CustomizedPreviewStyle;
+import org.jabref.logic.preview.CustomizedTextPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -23,7 +23,7 @@ public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;
     private final IntegerProperty layoutCyclePosition;
     //    private final StringProperty customPreviewLayout;
-    private final ObservableList<CustomizedPreviewStyle> customizedPreviewLayouts;
+    private final ObservableList<CustomizedTextPreviewLayout> customizedPreviewLayouts;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
@@ -32,7 +32,7 @@ public class PreviewPreferences {
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
-                              List<CustomizedPreviewStyle> customizedPreviewLayouts,
+                              List<CustomizedTextPreviewLayout> customizedPreviewLayouts,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
                               List<Path> bstPreviewLayoutPaths,
@@ -65,7 +65,7 @@ public class PreviewPreferences {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                List.of(new CustomizedPreviewStyle(java.util.UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),
+                List.of(new CustomizedTextPreviewLayout(java.util.UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths
@@ -168,7 +168,7 @@ public class PreviewPreferences {
     //    public void setCustomPreviewLayout(String customPreviewLayout) {
     //        this.customPreviewLayout.set(customPreviewLayout);
     //    }
-    public ObservableList<CustomizedPreviewStyle> getCustomizedPreviewLayouts() {
+    public ObservableList<CustomizedTextPreviewLayout> getCustomizedPreviewLayouts() {
         return customizedPreviewLayouts;
     }
 
