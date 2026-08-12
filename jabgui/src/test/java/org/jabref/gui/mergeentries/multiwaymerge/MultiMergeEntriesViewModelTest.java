@@ -86,6 +86,20 @@ class MultiMergeEntriesViewModelTest {
     }
 
     @Test
+    void explicitlyClearedFieldIsNotRepopulatedByLaterUpdateFieldsCall() {
+        viewModel.mergedEntryProperty().get().setField(StandardField.YEAR, "2015");
+        viewModel.setMergedFieldValue(StandardField.YEAR, "");
+
+        BibEntry laterSource = new BibEntry().withField(StandardField.YEAR, "2024");
+        viewModel.updateFields(laterSource);
+
+        assertTrue(viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).isEmpty());
+
+        viewModel.setMergedFieldValue(StandardField.YEAR, "2024");
+        assertEquals("2024", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
+    }
+
+    @Test
     void findNewFetchableIdentifiersReturnsDoiOnce() {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/182");
         assertEquals(Map.of(StandardField.DOI, "10.1000/182"), viewModel.findNewFetchableIdentifiers(entry));
