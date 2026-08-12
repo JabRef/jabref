@@ -165,6 +165,12 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
+    public void replaceActiveDatabase(BibDatabaseContext database) {
+        activeDatabaseProperty().set(Optional.empty());
+        activeDatabaseProperty().set(Optional.of(database));
+    }
+
+    @Override
     public OptionalObjectProperty<Node> focusOwnerProperty() {
         return focusOwner;
     }

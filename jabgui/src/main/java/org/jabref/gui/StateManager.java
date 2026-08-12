@@ -64,6 +64,8 @@ public interface StateManager extends SrvStateManager {
 
     void setActiveDatabase(BibDatabaseContext database);
 
+    void replaceActiveDatabase(BibDatabaseContext database);
+
     OptionalObjectProperty<Node> focusOwnerProperty();
 
     Optional<Node> getFocusOwner();

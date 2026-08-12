@@ -373,12 +373,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getOpenDatabases().add(bibDatabaseContext);
-
         initializeComponentsAndListeners(false);
 
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
+
         if (isSelectedTab) {
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.replaceActiveDatabase(bibDatabaseContext);
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
