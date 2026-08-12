@@ -41,6 +41,7 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -165,7 +166,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
-    public void replaceActiveDatabase(BibDatabaseContext database) {
+    public void replaceActiveDatabase(@NonNull BibDatabaseContext database) {
         activeDatabaseProperty().set(Optional.empty());
         activeDatabaseProperty().set(Optional.of(database));
     }

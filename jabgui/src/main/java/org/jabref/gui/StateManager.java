@@ -26,6 +26,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBinding;
+import org.jspecify.annotations.NonNull;
 
 /// This class manages the GUI-state of JabRef, including:
 ///
@@ -64,7 +65,7 @@ public interface StateManager extends SrvStateManager {
 
     void setActiveDatabase(BibDatabaseContext database);
 
-    void replaceActiveDatabase(BibDatabaseContext database);
+    void replaceActiveDatabase(@NonNull BibDatabaseContext database);
 
     OptionalObjectProperty<Node> focusOwnerProperty();
 

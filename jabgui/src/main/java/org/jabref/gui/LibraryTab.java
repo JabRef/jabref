@@ -357,6 +357,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
         boolean isSelectedTab = false;
+        BibDatabaseContext previousDatabaseContext = this.bibDatabaseContext;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -367,9 +368,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             isSelectedTab = true;
         }
 
-        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
-        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
-        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+        stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -378,7 +377,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
         if (isSelectedTab) {
-            stateManager.replaceActiveDatabase(bibDatabaseContext);
+            if (stateManager.getActiveDatabase().filter(databaseContext -> databaseContext == previousDatabaseContext).isPresent()) {
+                stateManager.replaceActiveDatabase(bibDatabaseContext);
+            } else {
+                stateManager.setActiveDatabase(bibDatabaseContext);
+            }
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
