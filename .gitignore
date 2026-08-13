@@ -2,6 +2,7 @@
 
 .agents
 
+.codegraph/
 .code-review-graph/
 
 CLAUDE.md
