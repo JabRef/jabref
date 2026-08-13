@@ -26,8 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.cleanup.SaveActionsConverter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.GroupsFactory;
@@ -37,7 +35,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.importer.util.SaveActionsDTOConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabase;
@@ -56,7 +53,6 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.metadata.SaveActionsDTO;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -64,9 +60,6 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -99,7 +92,6 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// FIXME: This class relies on `char`, but should use [java.lang.Character] to be fully Unicode compliant.
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
-    private static final Gson GSON = new Gson();
     private static final int LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
@@ -121,7 +113,6 @@ public class BibtexParser implements Parser {
 
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
-    private Optional<JsonObject> parsedJsonMetaData = Optional.empty();
     private final Map<String, String> parsedBibDeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
@@ -304,14 +295,6 @@ public class BibtexParser implements Parser {
                 );
             }
             parserResult.setMetaData(metaData);
-
-            parsedJsonMetaData.ifPresent(json -> {
-                if (json.has(MetaData.SAVE_ACTIONS)) {
-                    SaveActionsDTO saveActionsDTO = SaveActionsDTOConverter.fromJson(json.getAsJsonObject(MetaData.SAVE_ACTIONS));
-                    FieldFormatterCleanupActions saveActions = SaveActionsConverter.fromDTO(saveActionsDTO);
-                    metaData.setSaveActions(saveActions);
-                }
-            });
         } catch (ParseException exception) {
             parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
         }
@@ -422,28 +405,6 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
-        } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
-            parsedJsonMetaData = parseCommentToJson(comment, new ParserResult.Range(startLine, startColumn, line, column));
-
-            // JSON metadata comments are always re-written by JabRef and not stored in the file
-            dumpTextReadSoFarToString();
-        }
-    }
-
-    Optional<JsonObject> parseCommentToJson(String comment) {
-        return parseCommentToJson(comment, null);
-    }
-
-    private Optional<JsonObject> parseCommentToJson(String comment, ParserResult.Range range) {
-        String content = comment.substring(MetaData.META_FLAG_V1.length());
-        try {
-            return Optional.ofNullable(GSON.fromJson(content, JsonObject.class));
-        } catch (JsonParseException exception) {
-            LOGGER.debug("Could not parse JabRef JSON metadata comment", exception);
-            if (range != null) {
-                parserResult.addException(range, new ParseException("Ill-formed JSON metadata comment in BIB file", exception));
-            }
-            return Optional.empty();
         }
     }
 
