@@ -1,0 +1,113 @@
+name: JabSrv Native Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths:
+      - 'jabsrv/**'
+      - 'jabsrv-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
+  pull_request:
+    paths:
+      - 'jabsrv/**'
+      - 'jabsrv-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
+  merge_group:
+  workflow_dispatch:
+    inputs:
+      upload-as-artifact:
+        description: "Upload the native binary as a workflow artifact"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  native-smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            runOnPullRequest: true
+          - os: macos-15
+            runOnPullRequest: false
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} JabSrv native smoke test
+    timeout-minutes: 60
+
+    steps:
+      - name: Skip native build (not needed for this event)
+        if: github.event_name == 'pull_request' && matrix.runOnPullRequest != true
+        run: echo "Skipping macOS native build on pull_request; it runs in the merge queue."
+
+      - name: Checkout
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+
+      - name: Set up GraalVM
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabSrv native binary
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        run: gradle :jabsrv-cli:nativeCompile
+
+      - name: Run JabSrv native smoke test
+        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
+        run: |
+          # The native binary is an external Jersey test container: start it
+          # serving the union of the test .bib files, then run the reused
+          # *ResourceTest classes against it. Absolute paths are required so the
+          # library ids match TestBibFile (id = hash of the path). headless is
+          # baked into the image, so no -Djava.awt.headless flag is needed.
+          "$GITHUB_WORKSPACE/jabsrv-cli/build/native/nativeCompile/jabsrv" -p 9998 \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/general-server-test.bib" \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/groups-server-test.bib" \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/xss-server-test.bib" \
+            "$GITHUB_WORKSPACE/jablib/src/main/resources/Chocolate.bib" &
+          server_pid=$!
+          trap "kill $server_pid 2>/dev/null || true" EXIT
+
+          # Wait for the server to accept requests (up to ~30s).
+          for _ in $(seq 1 30); do
+            if curl -sf http://localhost:9998/libraries >/dev/null; then
+              echo "jabsrv is serving"
+              break
+            fi
+            sleep 1
+          done
+
+          gradle :jabsrv:nativeSmokeTest -Pjabsrv.native.smoke=9998
+
+      - name: Upload JabSrv native binary
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabsrv-native-${{ matrix.os }}
+          path: jabsrv-cli/build/native/nativeCompile/
+          if-no-files-found: error

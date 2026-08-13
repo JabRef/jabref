@@ -19,6 +19,10 @@ testModuleInfo {
     runtimeOnly("org.tinylog.api")
     runtimeOnly("org.tinylog.impl")
     runtimeOnly("org.apache.logging.log4j.to.slf4j")
+    // Add Jersey's external test container for the native jabsrv smoke test.
+    if (project.hasProperty("jabsrv.native.smoke")) {
+        runtimeOnly("org.glassfish.jersey.tests.framework.provider.external")
+    }
 }
 
 tasks.test {
@@ -28,4 +32,37 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
+}
+
+// Reuses the *ResourceTest classes as a native smoke gate: run them against an already-running native jabsrv binary
+val testSourceSet = sourceSets.test.get()
+
+tasks.register<Test>("nativeSmokeTest") {
+    group = "verification"
+    description = "Runs *ResourceTest against a running native jabsrv binary (external Jersey container)."
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    maxParallelForks = 1
+
+    useJUnitPlatform()
+
+    testLogging {
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+
+    val smokePort = (project.findProperty("jabsrv.native.smoke") as String?)?.toIntOrNull() ?: 9998
+    systemProperty(
+        "jersey.config.test.container.factory",
+        "org.glassfish.jersey.test.external.ExternalTestContainerFactory"
+    )
+    systemProperty("jersey.config.test.container.port", smokePort.toString())
+
+    // Skip the tests that cannot pass against a GUI-less standalone binary.
+    val excludeFile = layout.projectDirectory.file("src/test/nativeimage/smoke-excluded-tests.txt")
+    providers.fileContents(excludeFile).asText.orNull
+        ?.lines()
+        ?.map { it.substringBefore('#').trim() }
+        ?.filter { it.isNotEmpty() }
+        ?.forEach { filter.excludeTestsMatching(it) }
 }
