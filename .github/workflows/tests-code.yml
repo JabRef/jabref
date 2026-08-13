@@ -238,7 +238,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-madrlint-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-madrlint-${{ runner.os }}-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Cache JBang
         # Combined cache action: restores at start and saves ~/.jbang on a
         # cache miss in the post-job step. A madrlint-specific key keeps this
@@ -295,7 +295,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-heylogs-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-heylogs-${{ runner.os }}-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache/restore@v6
         with:

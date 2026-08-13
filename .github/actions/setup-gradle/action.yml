@@ -30,7 +30,7 @@ runs:
       id: cache-key
       shell: bash
       run: |
-        echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+        echo "cache_key=jbang-${{ runner.os }}-$(date +%Y-%m)" >> $GITHUB_OUTPUT
     - name: Cache JBang
       uses: actions/cache@v6
       with:
