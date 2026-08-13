@@ -34,6 +34,8 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.ISSN;
 
+import org.jspecify.annotations.Nullable;
+
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private final ListProperty<EntrySource> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -42,6 +44,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(FXCollections.observableArrayList());
 
+    private final Set<Field> explicitlyClearedFields = new HashSet<>();
     private final Map<Field, Set<String>> autoFetchedIdentifiers = new HashMap<>();
 
     public void addSource(EntrySource entrySource) {
@@ -69,7 +72,9 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
             String newValue = fieldEntry.getValue();
 
             if (!mergedEntry.get().getFieldsObservable().containsKey(field)) {
-                mergedEntry.get().setField(field, newValue);
+                if (!explicitlyClearedFields.contains(field)) {
+                    mergedEntry.get().setField(field, newValue);
+                }
             } else {
                 String currentValue = mergedEntry.get().getField(field).orElse("");
                 PlausibilityComparatorFactory.INSTANCE
@@ -82,6 +87,18 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
                         });
             }
         }
+    }
+
+    // [impl->req~ux.merge-entries.select-empty-field~1]
+    public void setMergedFieldValue(Field field, @Nullable String value) {
+        if ((value == null) || value.isEmpty()) {
+            explicitlyClearedFields.add(field);
+            mergedEntry.get().clearField(field);
+            return;
+        }
+
+        explicitlyClearedFields.remove(field);
+        mergedEntry.get().setField(field, value);
     }
 
     public Map<Field, String> findNewFetchableIdentifiers(BibEntry entry) {
