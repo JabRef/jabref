@@ -1,5 +1,7 @@
 package org.jabref.logic.database;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.util.strings.StringSimilarity;
@@ -626,5 +628,23 @@ public class DuplicateCheckTest {
                 .withField(StandardField.ISBN, "978-1-4684-8585-1");
 
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void containsDuplicateFindsDuplicateInCollection() {
+        assertEquals(Optional.of(simpleArticle),
+                duplicateChecker.containsDuplicate(List.of(unrelatedArticle, simpleArticle), getSimpleArticle(), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void containsDuplicateReturnsEmptyWhenCollectionHasNoDuplicate() {
+        assertEquals(Optional.empty(),
+                duplicateChecker.containsDuplicate(List.of(unrelatedArticle), simpleArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void containsDuplicateReturnsEmptyForEmptyCollection() {
+        assertEquals(Optional.empty(),
+                duplicateChecker.containsDuplicate(List.of(), simpleArticle, BibDatabaseMode.BIBTEX));
     }
 }

@@ -6,16 +6,30 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class OcrPreferences {
+    private final ObjectProperty<EngineSelection> engineSelection;
     private final StringProperty ocrEnginePath;
     private final ObjectProperty<PagesWithTextHandling> pagesWithTextHandling;
 
     private OcrPreferences() {
-        this("ocrmypdf", PagesWithTextHandling.SKIP);
+        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF);
     }
 
-    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling) {
+    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection) {
         this.ocrEnginePath = new SimpleStringProperty(ocrEnginePath);
         this.pagesWithTextHandling = new SimpleObjectProperty<>(pagesWithTextHandling);
+        this.engineSelection = new SimpleObjectProperty<>(engineSelection);
+    }
+
+    public EngineSelection getEngineSelection() {
+        return engineSelection.get();
+    }
+
+    public ObjectProperty<EngineSelection> engineSelectionProperty() {
+        return engineSelection;
+    }
+
+    public void setEngineSelection(EngineSelection engineSelection) {
+        this.engineSelection.set(engineSelection);
     }
 
     public String getOcrEnginePath() {

@@ -17,6 +17,7 @@ import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -69,6 +70,8 @@ import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
+import org.controlsfx.control.decoration.Decorator;
+import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,6 +380,7 @@ public class JabRefGUI extends Application {
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
 
         Scene scene = new Scene(powerpane);
+        installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
         themeManager.installCssOnScene(scene);
@@ -403,6 +407,20 @@ public class JabRefGUI extends Application {
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
 
         // Lifecycle note: after this method, #onShowing will be called
+    }
+
+    // [impl->req~entry-editor.validation-decoration.startup~1]
+
+    /// Installs ControlsFX's decoration root before validation is first used.
+    ///
+    /// ControlsFX injects its internal `DecorationPane` as the scene root on the first
+    /// decoration. Doing that during startup avoids replacing the root while opening the entry
+    /// editor, which would otherwise trigger a large CSS reapplication on the critical path.
+    private static void installControlsFxDecorationPane(PowerPane powerpane) {
+        Region probeNode = new Region();
+        GraphicDecoration probeDecoration = new GraphicDecoration(probeNode);
+        Decorator.addDecoration(powerpane, probeDecoration);
+        Decorator.removeDecoration(powerpane, probeDecoration);
     }
 
     public void onShowing(WindowEvent event) {

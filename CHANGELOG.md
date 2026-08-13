@@ -11,6 +11,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added some missing tooltips to buttons such as "Export Cited" and "Bibliography properties" in the OpenOffice/LibreOffice panel. [#16492](https://github.com/JabRef/jabref/pull/16492)
+- We added support for the `Export cited` functionality with CSL and BST styles in the OpenOffice/LibreOffice integration. [#16491](https://github.com/JabRef/jabref/issues/16491)
+- We added a per-library journal abbreviation preference to Library Properties, allowing automatic LTWA abbreviation on save. [#15495](https://github.com/JabRef/jabref/issues/15495)
 - The LibreOffice integration's "Cite special" mode for JStyles can now cite author-year (without parenthesis), author-only and year-only entries. [forum#670](https://discourse.jabref.org/t/cite-special-openoffice-libreoffice-connection-tool/670). [#7861](https://github.com/JabRef/jabref/issues/7861)
 - The LibreOffice/OpenOffice integration now works with Track Changes enabled in the document. [#9403](https://github.com/JabRef/jabref/issues/9403). [#14018](https://github.com/JabRef/jabref/issues/14018)
 - We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
@@ -46,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 - We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
+- We added OCR engine selection to the OCR preferences, allowing users to choose the engine they want to use. [#16455](https://github.com/JabRef/jabref/pull/16455)
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 
 ### Changed
@@ -77,6 +81,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
+- We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
+- CSL citations and bibliography in the LibreOffice integration now respect the "Look up BibTeX entries in the currently selected library only" preference. [#16484](https://github.com/JabRef/jabref/pull/16484)
+- We fixed journal information retrieval by getting journal metadata and metrics directly from Crossref and OpenAlex instead of Scimago. [#16504](https://github.com/JabRef/jabref/pull/16504)
+- We fixed an issue where the main table showed empty-library actions while a recent library was still loading. [#16468](https://github.com/JabRef/jabref/pull/16468)
 - We fixed an issue where JabRef was unable to save the changed `.bib` file if it was open in TeXstudio on Windows. [#11916](https://github.com/JabRef/jabref/issues/11916)
 - We fixed alignment of Journal/JournalTitle info icon in entry editor. [#16425](https://github.com/JabRef/jabref/issues/16425)
 - We fixed an issue in the LibreOffice integration where citations generated via CSL styles were not properly formatted. [#16379](https://github.com/JabRef/jabref/issues/16379)
@@ -128,6 +137,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed the redundant "Look up BibTeX entries in all open libraries" setting from the LibreOffice panel, which is now the toggle of "Look up BibTeX entries in the currently selected library only". [#16484](https://github.com/JabRef/jabref/pull/16484)
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We removed the ability to define custom entry editor tabs (including the default "General" and "Abstract" tabs); the entry editor tab preferences now only toggle the visibility of the built-in tabs. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
