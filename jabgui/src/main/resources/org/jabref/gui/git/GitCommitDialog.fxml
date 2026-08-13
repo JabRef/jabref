@@ -26,6 +26,7 @@
     </content>
     <buttonTypes>
         <ButtonType fx:id="commitButton" text="%Commit" buttonData="OK_DONE"/>
+        <ButtonType fx:id="commitAndPushButton" text="%Commit and push" buttonData="APPLY"/>
         <ButtonType fx:constant="CANCEL"/>
     </buttonTypes>
 </DialogPane>
