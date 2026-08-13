@@ -2,10 +2,12 @@ package org.jabref.gui.groups;
 
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -284,21 +286,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
-        SequencedSet<GroupIconPickerItem> pickerItems = Arrays.stream(IconTheme.JabRefIcons.values())
-                                                              .map(ikon -> new GroupIconPickerItem(
-                                                                      ikon,
-                                                                      ikon.name(),
-                                                                      ikon.name()))
-                                                              .collect(java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new));
-        IkonliIcon.allIcons().stream()
-                  .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
-                  .map(ikon -> new GroupIconPickerItem(
-                          new IkonliIcon(ikon),
-                          ikon.getDescription(),
-                          "%s %s".formatted(ikon, ikon.getDescription())))
-                  .forEach(pickerItems::add);
-
-        ObservableList<GroupIconPickerItem> ikonList = FXCollections.observableArrayList(pickerItems);
+        ObservableList<GroupIconPickerItem> ikonList = FXCollections.observableArrayList(GroupIconPickerItems.ALL);
         FilteredList<GroupIconPickerItem> filteredList = new FilteredList<>(ikonList);
 
         CustomTextField searchBox = new CustomTextField();
@@ -335,6 +323,27 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private record GroupIconPickerItem(JabRefIcon icon, String persistedIdentifier, String searchText) {
         private GroupIconPickerItem {
             searchText = searchText.toLowerCase(Locale.ENGLISH);
+        }
+    }
+
+    private static final class GroupIconPickerItems {
+        private static final List<GroupIconPickerItem> ALL = load();
+
+        private static List<GroupIconPickerItem> load() {
+            SequencedSet<GroupIconPickerItem> pickerItems = Arrays.stream(IconTheme.JabRefIcons.values())
+                                                                  .map(ikon -> new GroupIconPickerItem(
+                                                                          ikon,
+                                                                          ikon.name(),
+                                                                          ikon.name()))
+                                                                  .collect(Collectors.toCollection(LinkedHashSet::new));
+            IkonliIcon.allIcons().stream()
+                      .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
+                      .map(ikon -> new GroupIconPickerItem(
+                              new IkonliIcon(ikon),
+                              ikon.getDescription(),
+                              "%s %s".formatted(ikon, ikon.getDescription())))
+                      .forEach(pickerItems::add);
+            return List.copyOf(pickerItems);
         }
     }
 
