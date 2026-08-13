@@ -238,17 +238,20 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-madrlint-${{ runner.os }}-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-madrlint-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Cache JBang
         # Combined cache action: restores at start and saves ~/.jbang on a
         # cache miss in the post-job step. A madrlint-specific key keeps this
-        # cache separate from the shared "jbang-" cache used by setup-gradle.
+        # cache separate from the other JBang-using jobs.
         uses: actions/cache@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-madrlint-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
       - uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
@@ -295,14 +298,18 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-heylogs-${{ runner.os }}-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v6
+          echo "cache_key=jbang-heylogs-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Cache JBang
+        # Combined cache action: the restore-only variant never wrote the key.
+        uses: actions/cache@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-heylogs-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
