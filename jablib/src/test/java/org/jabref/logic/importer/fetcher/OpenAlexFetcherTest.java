@@ -39,13 +39,6 @@ class OpenAlexFetcherTest {
 
     private OpenAlex fetcher;
 
-    private final BibEntry NERF = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Haithem Turki and Deva Ramanan and Mahadev Satyanarayanan")
-            .withField(StandardField.YEAR, "2022")
-            .withField(StandardField.DOI, "10.1109/cvpr52688.2022.01258")
-            .withField(StandardField.TITLE, "Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs")
-            .withField(StandardField.URL, "https://openalex.org/W4313031684");
-
     @BeforeEach
     void setUp() {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
@@ -168,13 +161,12 @@ class OpenAlexFetcherTest {
                 .withField(StandardField.AUTHOR, "Matthew Tancik and Vincent Casser and Xinchen Yan and Sabeek Pradhan and Ben Mildenhall and Pratul P. Srinivasan and Jonathan T. Barron and Henrik Kretzschmar")
                 .withField(StandardField.TITLE, "Block-NeRF: Scalable Large Scene Neural View Synthesis")
                 .withField(StandardField.DOI, "10.1109/cvpr52688.2022.00807")
+                .withField(StandardField.DATE, "2022-06-01")
                 .withField(StandardField.URL, "https://openalex.org/W4312280420");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Block-NeRF: Scalable Large Scene Neural View Synthesis");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.PAGES));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.KEYWORDS));
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.YEAR));
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.DATE));
         assertEquals(master, fetchedEntries.getFirst());
     }
 
@@ -185,10 +177,17 @@ class OpenAlexFetcherTest {
 
     @Test
     void searchByQuotedQueryFindsEntry() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Haithem Turki and Deva Ramanan and Mahadev Satyanarayanan")
+                .withField(StandardField.DATE, "2022-06-01")
+                .withField(StandardField.DOI, "10.1109/cvpr52688.2022.01258")
+                .withField(StandardField.TITLE, "Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs")
+                .withField(StandardField.URL, "https://openalex.org/W4313031684");
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs\"");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.PAGES));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.KEYWORDS));
-        assertEquals(NERF, fetchedEntries.getFirst());
+        assertEquals(expected, fetchedEntries.getFirst());
     }
 }
