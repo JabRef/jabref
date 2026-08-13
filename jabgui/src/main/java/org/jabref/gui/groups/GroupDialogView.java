@@ -3,6 +3,7 @@ package org.jabref.gui.groups;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -296,8 +297,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         CustomTextField searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-        searchBox.textProperty().addListener((_, _, newValue) ->
-                filteredList.setPredicate(ikon -> newValue.isEmpty() || ikon.getDescription().toLowerCase().contains(newValue.toLowerCase())));
+        searchBox.textProperty().addListener((_, _, newValue) -> {
+            String normalizedQuery = newValue.toLowerCase(Locale.ENGLISH);
+            filteredList.setPredicate(ikon -> normalizedQuery.isEmpty()
+                    || ikon.toString().toLowerCase(Locale.ENGLISH).contains(normalizedQuery)
+                    || ikon.getDescription().toLowerCase(Locale.ENGLISH).contains(normalizedQuery));
+        });
 
         GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
