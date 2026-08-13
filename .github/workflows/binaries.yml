@@ -632,6 +632,8 @@ jobs:
           javac -version
           which jlink
           jlink --version
+          jbang --version
+          where jbang.cmd || whereis jbang.cmd || echo "jbang.cmd not found"
 
       - name: Setup macOS key chain
         if: needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
