@@ -54,10 +54,10 @@ public final class IkonliIcon implements JabRefIcon {
         this.size = size;
     }
 
-    /// Finds the Ikonli icon whose name matches {@code code} (case-insensitive), tinted with {@code color}.
-    public static Optional<JabRefIcon> findIcon(String code, Color color) {
+    /// Finds the Ikonli icon whose name matches {@code code} (case-insensitive).
+    public static Optional<JabRefIcon> findIcon(String code) {
         return Optional.ofNullable(IkonliIcons.BY_NAME.get(code.toUpperCase(Locale.ENGLISH)))
-                       .map(ikon -> new IkonliIcon(ikon).withColor(color));
+                       .map(IkonliIcon::new);
     }
 
     /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first

@@ -91,6 +91,11 @@ public class IconTheme {
         }
     }
 
+    public static Optional<JabRefIcon> findGroupIcon(String iconCode) {
+        return findJabRefIcon(iconCode)
+                .or(() -> IkonliIcon.findIcon(iconCode));
+    }
+
     private static URL getIconUrl(String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
