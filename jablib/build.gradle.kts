@@ -100,8 +100,8 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-// Set in gradle.properties, which also explains why the version is pinned
-val jbangVersion = providers.gradleProperty("jbangVersion").get()
+evaluationDependsOn(":versions")
+val jbangVersion = project(":versions").extra["jbangVersion"] as String
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")

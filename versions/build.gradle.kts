@@ -21,6 +21,11 @@ val lucene = "10.5.0"
 
 val pdfbox = "3.0.8"
 
+// Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
+// https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
+val jbang = "0.141.0"
+extra["jbangVersion"] = jbang
+
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
