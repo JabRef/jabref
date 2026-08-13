@@ -184,6 +184,10 @@
     -fx-padding: 0.333em 1em;
 }
 
+.citation-key-editor {
+    -fx-spacing: 0.333em;
+}
+
 #journalInfoButton,
 #toggleAbbreviationButton{
     -fx-padding: 0.4em 0.5em 0.3em 0.5em;
