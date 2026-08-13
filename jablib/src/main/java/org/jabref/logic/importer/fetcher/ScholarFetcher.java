@@ -23,6 +23,7 @@ import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -49,7 +50,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
 
     private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
 
-    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,\s]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern JOURNAL_VOLUME = Pattern.compile("Volume\\s+([^,\\s]+)", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern JOURNAL_ISSUE_NUMBER = Pattern.compile("Issue\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
 
@@ -76,7 +77,9 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                     authorsList.add(authors.getString(i));
                 }
                 if (!authorsList.isEmpty()) {
-                    entry.withField(StandardField.AUTHOR, String.join(" and ", authorsList));
+                    String rawAuthors = String.join(" and ", authorsList);
+                    AuthorList parsedAuthors = AuthorList.parse(rawAuthors);
+                    entry.withField(StandardField.AUTHOR, parsedAuthors.getAsFirstLastNamesWithAnd());
                 } else {
                     LOGGER.debug("Empty authors array.");
                 }
@@ -187,14 +190,11 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             boolean isLastPage = resultCount < getPageSize();
 
             if (!isLastPage) {
-                Optional<String> cursor = Optional.ofNullable(response.optString("next_indexed_after", null))
-                                                  .filter(StringUtil::isNotBlank);
-                if (cursor.isEmpty()) {
-                    throw new FetcherException(url, "More results are available but returned no pagination cursor", null);
-                }
-                cursorCacheMap.put(
-                        new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
-                        cursor.get());
+                Optional.ofNullable(response.optString("next_indexed_after", null))
+                        .filter(StringUtil::isNotBlank)
+                        .ifPresent(cursor -> cursorCacheMap.put(
+                                new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
+                                cursor));
             }
 
             List<BibEntry> entries = new ArrayList<>();

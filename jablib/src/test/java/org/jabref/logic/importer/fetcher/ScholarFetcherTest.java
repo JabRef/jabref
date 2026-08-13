@@ -125,11 +125,11 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of();
+        return List.of("unsupported");
     }
 
     @Override
     public String getTestJournal() {
-        return "";
+        return "unsupported";
     }
 }
