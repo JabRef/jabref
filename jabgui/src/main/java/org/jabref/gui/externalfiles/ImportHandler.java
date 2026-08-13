@@ -349,7 +349,7 @@ public class ImportHandler {
                                               tracker.markSkipped();
                                               return;
                                           }
-                                          continueImportAfterDuplicateHandling(transferInformation, entry, tracker);
+                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
                                       })
                                       .exceptionally(exception -> {
                                           tracker.markSkipped();
