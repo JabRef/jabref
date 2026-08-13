@@ -113,6 +113,30 @@ jobs:
               continue
             fi
 
+            # Real activity after the label: a push or a comment by a human. Nothing removes the
+            # stale label in that case (pr-comment.yml only does so for pull requests from forks),
+            # so it is checked here - and the label is dropped, which lets the marking step above
+            # start a new round if the pull request falls idle again.
+            last_commit="$(gh pr view "$pr" --repo "$REPO" --json commits --jq '.commits[-1].committedDate')"
+            human_comments="$(gh api "repos/$REPO/issues/$pr/comments?per_page=100" --paginate \
+              --jq "[.[] | select(.created_at > \"$labeled_at\" and .user.type != \"Bot\" and .user.login != \"jabref-machine\") | .user.login] | .[]" \
+              | wc -l)"
+
+            if [ -n "$last_commit" ] && [ "$last_commit" \> "$labeled_at" ]; then
+              activity="pushed at $last_commit"
+            elif [ "$human_comments" -gt 0 ]; then
+              activity="$human_comments comment(s) by a human"
+            else
+              activity=""
+            fi
+            if [ -n "$activity" ]; then
+              echo "#$pr: $activity after the stale label, removing the label"
+              if [ "$DRY_RUN" != "true" ]; then
+                gh issue edit "$pr" --repo "$REPO" --remove-label "$STALE_LABEL"
+              fi
+              continue
+            fi
+
             if [ "$DRY_RUN" = "true" ]; then
               echo "#$pr: labeled stale at $labeled_at, would be closed (dry run)"
               continue
