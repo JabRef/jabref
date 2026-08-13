@@ -37,6 +37,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.icon.JabRefMaterialDesignIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
