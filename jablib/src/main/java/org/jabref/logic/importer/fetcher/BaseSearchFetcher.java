@@ -87,7 +87,7 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
             List<BibEntry> entries = new ArrayList<>();
             JSONObject result = jsonObject.optJSONObject("response").optJSONObject("result");
             if (result != null) {
-                JSONArray docs = result.optJSONArray("docs"); // TODO: confirm actual key name in real JSON response
+                JSONArray docs = result.optJSONArray("docs");
                 for (int i = 0; i < docs.length(); i++) {
                     entries.add(parseEntry(docs.getJSONObject(i)));
                 }
@@ -150,6 +150,21 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
 
     @Override
     public boolean isValidKey(String apiKey) {
-        return false;
+        try {
+            URIBuilder uriBuilder = new URIBuilder(API_URL);
+            uriBuilder.addParameter("func", "PerformSearch");
+            uriBuilder.addParameter("format", "json");
+            uriBuilder.addParameter("query", "test");
+            uriBuilder.addParameter("hits", "0");
+            uriBuilder.addParameter("apikey", apiKey);
+            URL testUrl = uriBuilder.build().toURL();
+
+            org.jabref.logic.net.URLDownload urlDownload = new org.jabref.logic.net.URLDownload(testUrl);
+            String response = urlDownload.asString();
+            JSONObject jsonObject = new JSONObject(response);
+            return !jsonObject.has("error");
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
