@@ -103,7 +103,11 @@ import static java.util.function.Predicate.not;
 public class BibEntry {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+
+    public static final String ENTRY_LINK_SEPARATOR = ",";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
+
     private final SharedBibEntryData sharedBibEntryData;
 
     /// Map to store the words in every field
@@ -373,9 +377,7 @@ public class BibEntry {
     /// @param id The ID to be used
     @VisibleForTesting
     public void setId(@NonNull String id) {
-        String oldId = this.id;
-
-        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
+        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, this.id, id));
         this.id = id;
         changed = true;
     }
@@ -435,7 +437,7 @@ public class BibEntry {
         this.type.setValue(newType);
 
         FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldChangedEvent(eventSource, change));
         return Optional.of(change);
     }
 
@@ -607,7 +609,7 @@ public class BibEntry {
         if (isNewField) {
             eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
         } else {
-            eventBus.post(new FieldChangedEvent(change, eventSource));
+            eventBus.post(new FieldChangedEvent(eventSource, change));
         }
         return Optional.of(change);
     }
@@ -886,6 +888,7 @@ public class BibEntry {
     public SharedBibEntryData getSharedBibEntryData() {
         return sharedBibEntryData;
     }
+
 
     @Override
     public boolean equals(Object o) {

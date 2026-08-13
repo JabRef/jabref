@@ -56,7 +56,7 @@ public class LibraryResource {
     public String getJson(@PathParam("id") String id) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
-                                                .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
+                                                .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedId(Objects.hash(bibEntry)))
                                                 .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                                 .toList();
         return gson.toJson(list);

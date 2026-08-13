@@ -6,13 +6,13 @@ public interface DatabaseSynchronizer {
 
     String getDBName();
 
-    void pullChanges();
+    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
 
     void closeSharedDatabase();
 
-    void registerListener(Object listener);
+    void pullChanges();
 
-    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
+    void registerListener(Object listener);
 
     void synchronizeSharedEntry(BibEntry bibEntry);
 

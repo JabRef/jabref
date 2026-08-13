@@ -474,17 +474,6 @@ jobs:
     if: github.repository_owner == 'JabRef' && needs.changes.outputs.run-gradle-ci-full == 'true'
     name: Database tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
@@ -498,7 +487,6 @@ jobs:
         run: gradle :jablib:databaseTest --rerun-tasks
         env:
           CI: "true"
-          DBMS: "postgresql"
 
   publish:
     needs: changes

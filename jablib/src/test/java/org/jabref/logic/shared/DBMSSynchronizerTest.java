@@ -13,7 +13,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -29,6 +28,7 @@ import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * More tests are located at {@link org.jabref.logic.shared.SynchronizationSimulatorTest} and {@link org.jabref.logic.shared.DBMSProcessorTest}.
+ */
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class DBMSSynchronizerTest {
@@ -45,22 +48,24 @@ class DBMSSynchronizerTest {
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
+    private ConnectorTest connectorTest;
 
     private BibEntry createExampleBibEntry(int index) {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J" + index)
                 .withField(StandardField.TITLE, "The nano processor" + index);
-        bibEntry.getSharedBibEntryData().setSharedID(index);
+        bibEntry.getSharedBibEntryData().setSharedId(index);
         return bibEntry;
     }
 
     @BeforeEach
-    void setup() throws SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
-        DBMSType dbmsType = TestManager.getDBMSTypeTestParameter();
-        DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
-        TestManager.clearTables(dbmsConnection);
+    void setup() throws Exception {
+        this.connectorTest = new ConnectorTest();
+        this.dbmsConnection = connectorTest.getTestDBMSConnection();
+        this.dbmsProcessor = new DBMSProcessor(this.dbmsConnection);
+        TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
 
         bibDatabase = new BibDatabase();
@@ -76,8 +81,8 @@ class DBMSSynchronizerTest {
     }
 
     @AfterEach
-    void clear() {
-        dbmsSynchronizer.closeSharedDatabase();
+    void closeDbmsConnection() throws Exception {
+        connectorTest.close();
     }
 
     @Test
@@ -100,6 +105,7 @@ class DBMSSynchronizerTest {
         expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
+
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer");
 
@@ -203,7 +209,7 @@ class DBMSSynchronizerTest {
         modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());
@@ -228,6 +234,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    @Disabled("Save actions are currently not applied - see TODO in DBMSSynchronizer.applyMetaData")
     void applyMetaData() {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);

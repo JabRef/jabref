@@ -1,13 +1,11 @@
 package org.jabref.logic.shared;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -38,6 +36,7 @@ class SynchronizationSimulatorTest {
     private BibDatabaseContext clientContextB;
     private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+    private ConnectorTest connectorTest;
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)
@@ -49,8 +48,9 @@ class SynchronizationSimulatorTest {
     }
 
     @BeforeEach
-    void setup() throws SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
-        DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
+    void setup() throws Exception {
+        this.connectorTest = new ConnectorTest();
+        DBMSConnection dbmsConnection = connectorTest.getTestDBMSConnection();
         TestManager.clearTables(dbmsConnection);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
@@ -65,15 +65,16 @@ class SynchronizationSimulatorTest {
         DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
-        clientContextB.getDBMSSynchronizer().openSharedDatabase(ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter()));
+        clientContextB.getDBMSSynchronizer().openSharedDatabase(connectorTest.getTestDBMSConnection());
         eventListenerB = new SynchronizationEventListenerTest();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
     }
 
     @AfterEach
-    void clear() {
+    void clear() throws Exception {
         clientContextA.getDBMSSynchronizer().closeSharedDatabase();
         clientContextB.getDBMSSynchronizer().closeSharedDatabase();
+        connectorTest.close();
     }
 
     @Test

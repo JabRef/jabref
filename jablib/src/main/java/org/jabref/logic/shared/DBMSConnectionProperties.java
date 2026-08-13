@@ -24,10 +24,10 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String user;
     private String password;
     private boolean allowPublicKeyRetrieval;
-    private final boolean useSSL;
+    private boolean useSSL;
     private String serverTimezone = "";
     private String jdbcUrl = "";
-    private final boolean expertMode;
+    private boolean expertMode;
 
     // Not needed for connection, but stored for future login
     private String keyStore;
