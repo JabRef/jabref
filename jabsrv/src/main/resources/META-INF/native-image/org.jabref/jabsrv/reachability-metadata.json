@@ -998,20 +998,6 @@
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.cli.ServerCli",
-      "fields": [
-        {
-          "name": "files"
-        },
-        {
-          "name": "host"
-        },
-        {
-          "name": "port"
-        }
-      ]
-    },
-    {
       "type": "org.jabref.http.server.command.CommandResource",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
@@ -1234,17 +1220,6 @@
           "parameterTypes": [
             "java.util.Map"
           ]
-        }
-      ]
-    },
-    {
-      "type": "picocli.CommandLine$AutoHelpMixin",
-      "fields": [
-        {
-          "name": "helpRequested"
-        },
-        {
-          "name": "versionRequested"
         }
       ]
     },
