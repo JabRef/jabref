@@ -63,7 +63,6 @@ import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.jspecify.annotations.Nullable;
-import org.kordamp.ikonli.Ikon;
 
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
@@ -292,12 +291,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                                                                       ikon.name()))
                                                               .collect(java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new));
         IkonliIcon.allIcons().stream()
-                 .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
-                 .map(ikon -> new GroupIconPickerItem(
-                         new IkonliIcon(ikon),
-                         ikon.getDescription(),
-                         "%s %s".formatted(ikon, ikon.getDescription())))
-                 .forEach(pickerItems::add);
+                  .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
+                  .map(ikon -> new GroupIconPickerItem(
+                          new IkonliIcon(ikon),
+                          ikon.getDescription(),
+                          "%s %s".formatted(ikon, ikon.getDescription())))
+                  .forEach(pickerItems::add);
 
         ObservableList<GroupIconPickerItem> ikonList = FXCollections.observableArrayList(pickerItems);
         FilteredList<GroupIconPickerItem> filteredList = new FilteredList<>(ikonList);
