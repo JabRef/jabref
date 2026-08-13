@@ -93,6 +93,7 @@ public class IconTheme {
 
     public static Optional<JabRefIcon> findGroupIcon(String iconCode) {
         return findJabRefIcon(iconCode)
+                .or(() -> IkonliIcon.findIconByDescription(iconCode))
                 .or(() -> IkonliIcon.findIcon(iconCode));
     }
 
