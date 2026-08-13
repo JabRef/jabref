@@ -3,6 +3,8 @@ description: 'Builds all JBang scripts and verifies the launchers support --help
 runs:
   using: 'composite'
   steps:
+    - name: Setup JBang
+      uses: jbangdev/setup-jbang@main
     - name: Build .jbang scripts
       shell: bash
       run: |
