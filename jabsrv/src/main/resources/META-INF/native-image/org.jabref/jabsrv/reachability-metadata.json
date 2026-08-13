@@ -1018,6 +1018,30 @@
       "allDeclaredMethods": true
     },
     {
+      "type": "org.jabref.http.server.command.Command",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "org.jabref.http.server.command.FocusCommand",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "org.jabref.http.server.command.OpenLibrariesCommand",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "org.jabref.http.server.command.SelectEntriesCommand",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
       "type": "org.jabref.http.server.resources.CitationsResource",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
@@ -1058,6 +1082,25 @@
         },
         {
           "name": "OTHER"
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.http.server.resources.CitationsResource$BatchLookupRequest",
+      "allDeclaredConstructors": true,
+      "methods": [
+        {
+          "name": "citations",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.http.server.resources.CitationsResource$BatchLookupResponse",
+      "methods": [
+        {
+          "name": "results",
+          "parameterTypes": []
         }
       ]
     },
