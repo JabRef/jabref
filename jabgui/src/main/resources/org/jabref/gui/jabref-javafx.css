@@ -62,12 +62,15 @@
         -jr-light-text-color: #ffffff;
         -jr-outer-border: derive(-fx-color, -5%);
 
+        -jr-blue: #1703fc;
         -jr-purple: #7559C2;
         -jr-green: #10ac84;
         -jr-light-green: #1dd1a1;
         -jr-red: #ee5253;
         -jr-light-red: #ff6b6b;
-        -jr-orange: #ff9f43;
+        -jr-orange: #b55f21;
+        -jr-light-orange: #ff9f43;
+        -jr-turquoise: #07ada2;
     }
 }
 
@@ -123,12 +126,15 @@
         -jr-light-text-color: #e5e7ea;
         -jr-outer-border: #424758;
 
+        -jr-blue: #5345ff;
         -jr-purple: #b72486;
         -jr-green: #1cb631;
         -jr-light-green: #28d93c;
         -jr-red: #b71c1f;
         -jr-light-red: #db1d2b;
         -jr-orange: #b77620;
+        -jr-light-orange: #b77620;
+        -jr-turquoise: #07ada2;
     }
 }
 

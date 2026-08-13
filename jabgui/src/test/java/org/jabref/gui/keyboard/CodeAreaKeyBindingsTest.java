@@ -3,8 +3,7 @@ package org.jabref.gui.keyboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.NavigationActions;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -36,7 +35,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).lineStart(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveLineStart();
         assertTrue(event.isConsumed());
     }
 
@@ -47,7 +46,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).lineEnd(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveLineEnd();
         assertTrue(event.isConsumed());
     }
 
@@ -58,7 +57,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).wordBreaksBackwards(2, NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveWordLeft();
         assertTrue(event.isConsumed());
     }
 
@@ -69,7 +68,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).wordBreaksForwards(2, NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveWordRight();
         assertTrue(event.isConsumed());
     }
 
@@ -80,7 +79,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).lineStart(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectToLineStart();
         assertTrue(event.isConsumed());
     }
 
@@ -91,7 +90,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).lineEnd(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectToLineEnd();
         assertTrue(event.isConsumed());
     }
 
@@ -102,7 +101,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).start(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveDocumentStart();
         assertTrue(event.isConsumed());
     }
 
@@ -113,7 +112,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).end(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveDocumentEnd();
         assertTrue(event.isConsumed());
     }
 
@@ -124,7 +123,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).paragraphStart(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveParagraphStart();
         assertTrue(event.isConsumed());
     }
 
@@ -135,7 +134,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).paragraphEnd(NavigationActions.SelectionPolicy.CLEAR);
+        verify(codeArea).moveParagraphEnd();
         assertTrue(event.isConsumed());
     }
 
@@ -146,7 +145,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).paragraphStart(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectParagraphStart();
         assertTrue(event.isConsumed());
     }
 
@@ -157,7 +156,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).paragraphEnd(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectParagraphEnd();
         assertTrue(event.isConsumed());
     }
 
@@ -168,7 +167,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).start(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectToDocumentStart();
         assertTrue(event.isConsumed());
     }
 
@@ -179,7 +178,7 @@ class CodeAreaKeyBindingsTest {
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
-        verify(codeArea).end(NavigationActions.SelectionPolicy.EXTEND);
+        verify(codeArea).selectToDocumentEnd();
         assertTrue(event.isConsumed());
     }
 

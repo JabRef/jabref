@@ -42,6 +42,7 @@ public class FulltextFetchers {
     private static final int FETCHER_TIMEOUT = 120;
 
     private final Set<FulltextFetcher> fetchers;
+    private final ImporterPreferences importerPreferences;
 
     private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
         // Local file:// URLs (returned e.g. by a browser-extension companion
@@ -79,12 +80,17 @@ public class FulltextFetchers {
     };
 
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences), importerPreferences);
     }
 
     @VisibleForTesting
     FulltextFetchers(Set<FulltextFetcher> fetchers) {
+        this(fetchers, ImporterPreferences.getDefault());
+    }
+
+    private FulltextFetchers(Set<FulltextFetcher> fetchers, ImporterPreferences importerPreferences) {
         this.fetchers = new HashSet<>(fetchers);
+        this.importerPreferences = importerPreferences;
     }
 
     public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
@@ -103,13 +109,12 @@ public class FulltextFetchers {
                      .filter(Optional::isPresent)
                      .map(Optional::get)
                      .filter(res -> (res.source()) != null)
-                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()).reversed())
-                     .findFirst();
+                     .max(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()));
     }
 
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            WebFetchers.getIdFetcherForIdentifier(DOI.class)
+            WebFetchers.getIdFetcherForIdentifier(DOI.class, importerPreferences)
                        .findIdentifier(clonedEntry)
                        .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {

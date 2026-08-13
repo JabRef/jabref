@@ -54,6 +54,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 fieldCheckers,
                 taskExecutor,
                 dialogService,
+                preferences,
                 undoManager);
 
         textField.setId(field.getName());

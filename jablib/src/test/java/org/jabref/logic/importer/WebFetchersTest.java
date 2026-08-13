@@ -1,10 +1,14 @@
 package org.jabref.logic.importer;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -12,6 +16,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
@@ -23,6 +28,8 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -35,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class WebFetchersTest {
 
@@ -186,6 +194,17 @@ class WebFetchersTest {
 
             assertEquals(expected, getClasses(idFetchers));
         }
+    }
+
+    @Test
+    void getIdFetcherForFieldPassesImporterPreferencesToCrossref() throws URISyntaxException, MalformedURLException {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKey(CrossRef.FETCHER_NAME)).thenReturn(Optional.of("user@example.org"));
+
+        CrossRef fetcher = (CrossRef) WebFetchers.getIdFetcherForField(StandardField.DOI, importerPreferences).orElseThrow();
+        URL url = fetcher.getURLForEntry(new BibEntry().withField(StandardField.TITLE, "A title"));
+
+        assertEquals("query.bibliographic=A%20title&rows=20&offset=0&mailto=user%40example.org", url.getQuery());
     }
 
     private Set<? extends Class<?>> getClasses(Collection<?> objects) {

@@ -84,9 +84,16 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             } catch (FetcherException e) {
                 LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
             }
-            if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
-                Optional<FieldChange> fieldChange = bibEntry.setField(identifier.get().getDefaultField(), identifier.get().asString());
-                if (fieldChange.isPresent()) {
+            if (identifier.isPresent()) {
+                T foundIdentifier = identifier.get();
+                // BibEntry uses an ObservableMap which notifies JavaFX listeners.
+                Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
+                    if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
+                        return Optional.empty();
+                    }
+                    return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
+                });
+                if (fieldChange != null && fieldChange.isPresent()) {
                     namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
