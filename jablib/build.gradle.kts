@@ -196,6 +196,7 @@ val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 val wileyTdmApiKey = providers.environmentVariable("WileyTdmApiKey").orElse("")
+val crossRefEmail = providers.environmentVariable("CROSSREF_EMAIL").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -219,6 +220,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
     inputs.property("wileyTdmApiKey", wileyTdmApiKey)
+    inputs.property("crossRefEmail", crossRefEmail)
 
     filesMatching("build.properties") {
         expand(
@@ -238,6 +240,7 @@ tasks.named<ProcessResources>("processResources") {
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],
                 "wileyTdmApiKey" to inputs.properties["wileyTdmApiKey"],
+                "crossRefEmail" to inputs.properties["crossRefEmail"],
             )
         )
     }

@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We now identify Crossref requests with a configured email address, allowing them to use Crossref's polite pool. [#16535](https://github.com/JabRef/jabref/pull/16535)
 - We improved user experience by making the welcome tab visible when no libraries are open. [#16451](https://github.com/JabRef/jabref/issues/16451)
 - We made it possible to reopen the `Share this library to GitHub` dialog for saved local libraries with an existing Git remote, check a personal access token's push access, and pull from remotes with unrelated histories or no branches. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We hardened the fetchers and importers against [XML Entity Expansion attacks](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html). [#16359](https://github.com/JabRef/jabref/pull/16359)
@@ -82,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed the vertical alignment, button height, and spacing between the citation key field and the Generate button in the entry editor. [#16485](https://github.com/JabRef/jabref/issues/16485)
+- We fixed an issue where empty values in the merge entries dialog could not be selected to clear the merged entry field. [#15014](https://github.com/JabRef/jabref/issues/15014)
 - We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
 - We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
 - CSL citations and bibliography in the LibreOffice integration now respect the "Look up BibTeX entries in the currently selected library only" preference. [#16484](https://github.com/JabRef/jabref/pull/16484)
