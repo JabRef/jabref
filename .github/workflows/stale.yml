@@ -69,7 +69,8 @@ jobs:
           closed=""
           # Both labels are required, mirroring the only-pr-labels of the marking step above:
           # a PR whose requested changes were addressed is no longer a candidate.
-          candidates="$(gh pr list --repo "$REPO" --state open --limit 100 \
+          # gh paginates internally up to --limit, so this is not a page size.
+          candidates="$(gh pr list --repo "$REPO" --state open --limit 1000 \
             --label "$STALE_LABEL" --label "$CHANGES_REQUIRED_LABEL" \
             --json number --jq '.[].number')"
 
