@@ -77,7 +77,15 @@ jobs:
           IFS=',' read -ra exempt_labels <<< "$EXEMPT_LABELS"
 
           for pr in $candidates; do
+            # Re-read the labels: they can have been removed since the candidate list was built.
             labels="$(gh pr view "$pr" --repo "$REPO" --json labels --jq '.labels[].name')"
+            for required in "$STALE_LABEL" "$CHANGES_REQUIRED_LABEL"; do
+              if ! printf '%s\n' "$labels" | grep -Fxq "$required"; then
+                echo "#$pr: label '$required' is gone, skipping"
+                continue 2
+              fi
+            done
+
             exempt=""
             for label in "${exempt_labels[@]}"; do
               if printf '%s\n' "$labels" | grep -Fxq "$label"; then
