@@ -125,7 +125,7 @@ class CitationStyleGeneratorTest {
                 ENTRY_TYPES_MANAGER);
 
         assertEquals(List.of(
-                "[1]S. Harrer, J. Lenhard, and L. Dietz, Java by Comparison. Raleigh, NC: Pragmatic Bookshelf, Mar. 2018.\n",
+                "[1]S. Harrer, J. Lenhard, and L. Dietz, Java by Comparison. Raleigh, NC: Pragmatic Bookshelf, 2018.\n",
                 "[2]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n"
         ), citations);
     }
