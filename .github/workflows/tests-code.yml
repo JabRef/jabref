@@ -549,9 +549,9 @@ jobs:
       # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
       # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
       - name: Publish jablib to the local Maven repository
-        # -Dmaven.repo.local: JBANG_REPO (set in setup-gradle) moves JBang's local Maven
-        # repository out of ~/.m2, so the snapshot has to be published there instead.
-        run: gradle -Dmaven.repo.local="$JBANG_REPO" -PprojVersion=6.0 :jablib:publishToMavenLocal
+        # -Dmaven.repo.local: the jbang-check action points JBANG_REPO at ~/.jbang/repository,
+        # so the snapshot has to be published there instead of into ~/.m2.
+        run: gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
