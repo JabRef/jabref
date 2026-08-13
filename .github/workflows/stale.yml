@@ -22,7 +22,9 @@ jobs:
       DAYS_BEFORE_PR_CLOSE: 7
       STALE_LABEL: "status: stale"
       CHANGES_REQUIRED_LABEL: "status: changes-required"
-      EXEMPT_LABELS: "📌 Pinned,dev: no-bot-comments"
+      # "dev: no-bot-comments" is deliberately not exempt: it usually stays on a PR even after
+      # "status: changes-required" was set, so exempting it would take most PRs out of the process.
+      EXEMPT_LABELS: "📌 Pinned"
     steps:
       # Marking only. Closing is done below, because actions/stale measures
       # days-before-close against the GitHub field `updated_at`, which is bumped by any
