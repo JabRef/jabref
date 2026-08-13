@@ -119,6 +119,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  CROSSREF_EMAIL: ${{ secrets.CROSSREF_EMAIL }}
 
 
 concurrency:
