@@ -29,6 +29,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 
 public class EditInsert {
 
@@ -51,6 +52,7 @@ public class EditInsert {
     /// @param cursor   Where to insert.
     /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
     public static OOVoidResult<JabRefException> insertCitationGroup(XTextDocument doc,
+                                                                    XComponentContext context,
                                                                     OOFrontend frontend,
                                                                     XTextCursor cursor,
                                                                     List<BibEntry> entries,
@@ -58,7 +60,8 @@ public class EditInsert {
                                                                     JStyle style,
                                                                     CitationType citationType,
                                                                     String pageInfo,
-                                                                    boolean insertSpaceBefore) {
+                                                                    boolean insertSpaceBefore,
+                                                                    boolean insertSpaceAfter) {
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
@@ -90,6 +93,7 @@ public class EditInsert {
             UnoScreenRefresh.lockControllers(doc);
             UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                     doc,
+                    context,
                     citationKeys,
                     pageInfos,
                     citationType,
@@ -97,7 +101,7 @@ public class EditInsert {
                     cursor,
                     style,
                     insertSpaceBefore,
-                    true /* insertSpaceAfter */);
+                    insertSpaceAfter);
             return OOVoidResult.ok();
         } catch (NoDocumentException | NotRemoveableException | WrappedTargetException | PropertyVetoException | CreationException | IllegalTypeException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));

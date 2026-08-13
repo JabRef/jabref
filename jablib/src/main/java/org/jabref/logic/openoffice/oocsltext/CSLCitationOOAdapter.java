@@ -46,6 +46,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.SecondFieldAlign;
 import org.jspecify.annotations.NonNull;
@@ -76,6 +77,7 @@ public class CSLCitationOOAdapter {
             "^(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*|(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*$");
     private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
     private final BibEntryTypesManager bibEntryTypesManager;
@@ -86,10 +88,11 @@ public class CSLCitationOOAdapter {
     private boolean needsCSLReferenceMarkConversion = true;
     private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
 
-    public CSLCitationOOAdapter(XTextDocument doc, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+    public CSLCitationOOAdapter(XTextDocument doc, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = doc;
-        this.markManager = new CSLReferenceMarkManager(doc);
+        this.markManager = new CSLReferenceMarkManager(doc, componentContext);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
         this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
@@ -136,6 +139,7 @@ public class CSLCitationOOAdapter {
     public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> selectedDatabases)
             throws CreationException, Exception {
         linkZoteroCitations(currentEntryContext);
+        refreshCitationState();
         setCitationStyleParameters(newStyle, newCitationType, selectedDatabases);
     }
 
@@ -400,7 +404,7 @@ public class CSLCitationOOAdapter {
                 cursor,
                 ooText,
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
-                !succeedingSpaceExists,
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 citationType,
                 currentEntryContext,
                 bibEntryTypesManager,
@@ -421,7 +425,6 @@ public class CSLCitationOOAdapter {
                     currentEntryContext,
                     bibEntryTypesManager);
             LOGGER.debug("Linked {} Zotero citations to JabRef entries", linkedCitations);
-            markManager.readAndUpdateExistingMarks();
         } catch (NoDocumentException | CreationException | Exception e) {
             LOGGER.warn("Could not link Zotero citations to JabRef entries", e);
         }
@@ -562,11 +565,16 @@ public class CSLCitationOOAdapter {
         return citation;
     }
 
+    public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
+        this.citationType = markManager.getCitationType();
+    }
+
     public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
         // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
         // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
         // full readAndUpdateExistingMarks() refresh.
-        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document);
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document, componentContext);
         exportMarkManager.readExistingMarks();
 
         SequencedSet<String> citationKeys = new LinkedHashSet<>();
