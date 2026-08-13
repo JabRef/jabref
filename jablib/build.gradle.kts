@@ -100,11 +100,8 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-// Pinned instead of the default "latest": with "latest", the dev.jbang plugin fetches
-// https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries) on every
-// PATH miss, which already made CI fail. A pinned version skips that request entirely.
-// See https://github.com/jbangdev/jbang-gradle-plugin/blob/main/plugin/src/main/java/dev/jbang/gradle/tasks/JBangTask.java
-val jbangVersion = "0.141.0"
+// Set in gradle.properties, which also explains why the version is pinned
+val jbangVersion = providers.gradleProperty("jbangVersion").get()
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")

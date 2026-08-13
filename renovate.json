@@ -19,8 +19,8 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["jablib/build.gradle.kts"],
-      "matchStrings": ["val jbangVersion = \"(?<currentValue>[^\"]+)\""],
+      "managerFilePatterns": ["gradle.properties"],
+      "matchStrings": ["jbangVersion=(?<currentValue>.+)"],
       "depNameTemplate": "jbangdev/jbang",
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v(?<version>.+)$"
