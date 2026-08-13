@@ -209,24 +209,14 @@ public class CSLCitationOOAdapter {
             return;
         }
 
-        boolean isNumericStyle = selectedStyle.isNumericStyle();
-
-        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
-        markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
-        markManager.readAndUpdateExistingMarks();
+        List<BibEntry> bibliographyEntries = prepareBibliographyEntries(selectedStyle, entries, selectedDatabases);
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, ooBreak);
 
-        if (isNumericStyle) {
-            // Sort entries based on their order of appearance in the document
-            entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-        }
-
-        writeBibliographyEntries(cursor, selectedStyle, entries);
+        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
     }
 
     public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
@@ -235,6 +225,15 @@ public class CSLCitationOOAdapter {
             return;
         }
 
+        List<BibEntry> bibliographyEntries = prepareBibliographyEntries(selectedStyle, entries, selectedDatabases);
+
+        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        cursorProperties.setPropertyValue("ParaStyleName", openOfficePreferences.getCslBibliographyBodyFormat());
+        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
+    }
+
+    private List<BibEntry> prepareBibliographyEntries(CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
+            throws com.sun.star.uno.Exception, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
@@ -244,14 +243,13 @@ public class CSLCitationOOAdapter {
 
         List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
         if (isNumericStyle) {
-            // Sort entries based on their order of appearance in the document
-            bibliographyEntries.sort(
-                    Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+            sortBibliographyEntriesByCitationNumber(bibliographyEntries);
         }
+        return bibliographyEntries;
+    }
 
-        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
-        cursorProperties.setPropertyValue("ParaStyleName", openOfficePreferences.getCslBibliographyBodyFormat());
-        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
+    private void sortBibliographyEntriesByCitationNumber(List<BibEntry> bibliographyEntries) {
+        bibliographyEntries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
     }
 
     /// Writes bibliography entries using JabRef's standard CSL bibliography rendering.
