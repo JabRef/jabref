@@ -1,13 +1,13 @@
 package org.jabref.gui.icon;
 
 import java.util.EnumSet;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -54,30 +54,41 @@ public final class IkonliIcon implements JabRefIcon {
         this.size = size;
     }
 
-    /// Finds the Ikonli icon whose name matches {@code code} (case-insensitive).
+    /// Finds the Ikonli icon whose name matches `code` (case-insensitive).
     public static Optional<JabRefIcon> findIcon(String code) {
         return Optional.ofNullable(IkonliIcons.BY_NAME.get(code.toUpperCase(Locale.ENGLISH)))
                        .map(IkonliIcon::new);
     }
 
+    /// Finds the Ikonli icon whose pack-qualified description matches `description` (case-insensitive).
+    public static Optional<JabRefIcon> findIconByDescription(String description) {
+        return Optional.ofNullable(IkonliIcons.BY_DESCRIPTION.get(description.toUpperCase(Locale.ENGLISH)))
+                       .map(IkonliIcon::new);
+    }
+
+    public static List<Ikon> allIcons() {
+        return IkonliIcons.ALL;
+    }
+
     /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first
     /// access guaranteed by JVM.
     private static final class IkonliIcons {
-        private static final Set<Ikon> ALL = load();
-        private static final Map<String, Ikon> BY_NAME = loadMap();
+        private static final List<Ikon> ALL = load();
+        private static final Map<String, Ikon> BY_NAME = loadMap(Ikon::toString);
+        private static final Map<String, Ikon> BY_DESCRIPTION = loadMap(Ikon::getDescription);
 
-        private static Set<Ikon> load() {
-            Set<Ikon> all = new HashSet<>();
+        private static List<Ikon> load() {
+            SequencedSet<Ikon> all = new LinkedHashSet<>();
             for (IkonProvider provider : ServiceLoader.load(IkonProvider.class)) {
                 all.addAll(EnumSet.allOf(provider.getIkon()));
             }
-            return Set.copyOf(all);
+            return List.copyOf(all);
         }
 
-        private static Map<String, Ikon> loadMap() {
+        private static Map<String, Ikon> loadMap(java.util.function.Function<Ikon, String> keyMapper) {
             return ALL.stream()
                       .collect(Collectors.toUnmodifiableMap(
-                              Ikon::toString,
+                              ikon -> keyMapper.apply(ikon).toUpperCase(Locale.ENGLISH),
                               ikon -> ikon,
                               (existing, duplicate) -> existing
                       ));

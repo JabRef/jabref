@@ -1,11 +1,11 @@
 package org.jabref.gui.groups;
 
+import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.SequencedSet;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -37,7 +37,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
-import org.jabref.gui.icon.JabRefIconProvider;
+import org.jabref.gui.icon.JabRefMaterialDesignIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -63,7 +63,6 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.IkonProvider;
 
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
@@ -285,26 +284,32 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
-        ObservableList<Ikon> ikonList = FXCollections.observableArrayList();
-        FilteredList<Ikon> filteredList = new FilteredList<>(ikonList);
+        SequencedSet<GroupIconPickerItem> pickerItems = Arrays.stream(IconTheme.JabRefIcons.values())
+                                                              .map(ikon -> new GroupIconPickerItem(
+                                                                      ikon,
+                                                                      ikon.name(),
+                                                                      ikon.name()))
+                                                              .collect(java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new));
+        IkonliIcon.allIcons().stream()
+                 .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
+                 .map(ikon -> new GroupIconPickerItem(
+                         new IkonliIcon(ikon),
+                         ikon.getDescription(),
+                         "%s %s".formatted(ikon, ikon.getDescription())))
+                 .forEach(pickerItems::add);
 
-        for (IkonProvider provider : ServiceLoader.load(IkonProvider.class.getModule().getLayer(), IkonProvider.class)) {
-            if (provider.getClass() != JabRefIconProvider.class) {
-                ikonList.addAll(EnumSet.allOf(provider.getIkon()));
-            }
-        }
+        ObservableList<GroupIconPickerItem> ikonList = FXCollections.observableArrayList(pickerItems);
+        FilteredList<GroupIconPickerItem> filteredList = new FilteredList<>(ikonList);
 
         CustomTextField searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         searchBox.textProperty().addListener((_, _, newValue) -> {
             String normalizedQuery = newValue.toLowerCase(Locale.ENGLISH);
-            filteredList.setPredicate(ikon -> normalizedQuery.isEmpty()
-                    || ikon.toString().toLowerCase(Locale.ENGLISH).contains(normalizedQuery)
-                    || ikon.getDescription().toLowerCase(Locale.ENGLISH).contains(normalizedQuery));
+            filteredList.setPredicate(ikon -> normalizedQuery.isEmpty() || ikon.searchText().contains(normalizedQuery));
         });
 
-        GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
+        GridView<GroupIconPickerItem> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
         ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
@@ -327,21 +332,27 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         popOver.show(iconPickerButton);
     }
 
-    public class IkonliCell extends GridCell<Ikon> {
+    private record GroupIconPickerItem(JabRefIcon icon, String persistedIdentifier, String searchText) {
+        private GroupIconPickerItem {
+            searchText = searchText.toLowerCase(Locale.ENGLISH);
+        }
+    }
+
+    public class IkonliCell extends GridCell<GroupIconPickerItem> {
         @Override
-        protected void updateItem(Ikon ikon, boolean empty) {
+        protected void updateItem(GroupIconPickerItem ikon, boolean empty) {
             super.updateItem(ikon, empty);
             if (empty || (ikon == null)) {
                 setText(null);
                 setGraphic(null);
             } else {
-                setGraphic(new IkonliIcon(ikon).withSize(22).getGraphicNode());
+                setGraphic(ikon.icon().withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
                 setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(event -> {
-                    iconField.textProperty().setValue(ikon.toString());
+                    iconField.textProperty().setValue(ikon.persistedIdentifier());
                     PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
                     stage.hide();
                 });
