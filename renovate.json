@@ -16,6 +16,14 @@
         "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?"
       ],
       "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["jablib/build.gradle.kts"],
+      "matchStrings": ["val jbangVersion = \"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "jbangdev/jbang",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
     }
   ],
   "packageRules": [
