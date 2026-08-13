@@ -257,44 +257,23 @@ public class CSLCitationOOAdapter {
     /// Writes bibliography entries using JabRef's standard CSL bibliography rendering.
     ///
     /// For numeric styles, callers are expected to provide entries already sorted in order of appearance
-    /// in the document. For non-numeric styles, ordering is left to the citeproc item data provider.
+    /// in the document so citeproc-java emits matching bibliography numbers. For non-numeric styles,
+    /// ordering is left to the citeproc item data provider.
     private void writeBibliographyEntries(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> bibliographyEntries)
             throws com.sun.star.uno.Exception, CreationException {
         BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(bibliographyEntries));
-        String style = selectedStyle.getSource();
+        List<String> bibliographyEntriesText = CitationStyleGenerator.generateBibliography(
+                bibliographyEntries,
+                selectedStyle.getSource(),
+                HTML_OUTPUT_FORMAT,
+                currentEntryContext,
+                bibEntryTypesManager);
 
-        if (selectedStyle.isNumericStyle()) {
-            for (BibEntry entry : bibliographyEntries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(
-                                                                         List.of(entry),
-                                                                         style,
-                                                                         HTML_OUTPUT_FORMAT,
-                                                                         currentEntryContext,
-                                                                         bibEntryTypesManager)
-                                                                 .getFirst();
-                String citationKey = entry.getCitationKey().orElse("");
-                int currentNumber = markManager.getCitationNumber(citationKey);
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
-                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
+        for (String bibliographyEntry : bibliographyEntriesText) {
+            String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
 
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
-        } else {
-            // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntriesText = CitationStyleGenerator.generateBibliography(
-                    bibliographyEntries,
-                    style,
-                    HTML_OUTPUT_FORMAT,
-                    currentEntryContext,
-                    bibEntryTypesManager);
-
-            for (String bibliographyEntry : bibliographyEntriesText) {
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
-
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
+            OOTextIntoOO.write(document, cursor, ooText);
         }
     }
 

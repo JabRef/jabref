@@ -113,6 +113,24 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
+    void defaultBibliographyMultipleEntriesKeepsInputOrderForNumericStyle() {
+        BibDatabaseContext testEntryContextMultipleEntries = new BibDatabaseContext(new BibDatabase(List.of(testEntry2, testEntry)));
+        testEntryContextMultipleEntries.setMode(BibDatabaseMode.BIBLATEX);
+
+        List<String> citations = CitationStyleGenerator.generateBibliography(
+                List.of(testEntry2, testEntry),
+                DEFAULT_STYLE,
+                TEXT_OUTPUT_FORMAT,
+                testEntryContextMultipleEntries,
+                ENTRY_TYPES_MANAGER);
+
+        assertEquals(List.of(
+                "[1]S. Harrer, J. Lenhard, and L. Dietz, Java by Comparison. Raleigh, NC: Pragmatic Bookshelf, Mar. 2018.\n",
+                "[2]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n"
+        ), citations);
+    }
+
+    @Test
     void aCMBibliography() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
