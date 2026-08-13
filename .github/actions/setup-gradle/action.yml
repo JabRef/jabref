@@ -26,6 +26,21 @@ runs:
         gradle-version: current
       env:
         GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: false
+    # JBang resolves the //DEPS of a script into the local Maven repository (~/.m2 by default),
+    # which nothing in this repository caches. Point it into the Gradle user home's "caches"
+    # directory instead - gradle/actions/setup-gradle caches that one out of the box.
+    # Two steps because JBang is a Java program: on Windows it needs a native path
+    # (C:\Users\runneradmin\...), not the Git Bash form (/c/Users/...).
+    - name: Set JBANG_REPO
+      if: runner.os != 'Windows'
+      shell: bash
+      run: echo "JBANG_REPO=${GRADLE_USER_HOME:-$HOME/.gradle}/caches/jbang-repo" >> "$GITHUB_ENV"
+    - name: Set JBANG_REPO (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $gradleUserHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path $env:USERPROFILE '.gradle' }
+        "JBANG_REPO=$(Join-Path $gradleUserHome 'caches\jbang-repo')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
     - name: Generate JBang cache key
       id: cache-key
       shell: bash
