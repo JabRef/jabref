@@ -19,7 +19,10 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [".github/workflows/*.yml"],
+      "managerFilePatterns": [
+        ".github/workflows/*.yml",
+        ".github/workflows/*.yaml"
+      ],
       "matchStrings": [
         "jbang (?<depName>[\\w.-]+:[\\w.-]+):(?<currentValue>\\d[^:\\s]*)(:\\S+)?"
       ],
