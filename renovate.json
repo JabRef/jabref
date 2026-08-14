@@ -24,7 +24,7 @@
         ".github/workflows/*.yaml"
       ],
       "matchStrings": [
-        "jbang (?<depName>[\\w.-]+:[\\w.-]+):(?<currentValue>\\d[^:\\s]*)(:\\S+)?"
+        "jbang (?<depName>[\\w.-]+:[\\w.-]+):(?<currentValue>[^:\\s]+)(:\\S+)?"
       ],
       "datasourceTemplate": "maven"
     },
