@@ -13,15 +13,15 @@ import org.jabref.testutils.category.FetcherTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FetcherTest
 class GenericUrlBasedFetcherTest {
 
     private final GenericUrlBasedFetcher fetcher = new GenericUrlBasedFetcher();
 
     @Test
+    @FetcherTest
     void performSearchWithValidUrlReturnsMiscEntryWithTitleAndUrldate() throws FetcherException {
         String url = "https://gi-radar.de/397-coding-unterstuetzung-im-lauf-der-zeit/";
         // Captured before performSearch, which internally calls LocalDate.now() itself during its (real, network-
@@ -35,10 +35,13 @@ class GenericUrlBasedFetcherTest {
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertEquals(url, entry.getField(StandardField.URL).orElse(null));
         assertEquals(expectedUrlDate, entry.getField(StandardField.URLDATE).orElse(null));
-        assertTrue(entry.getField(StandardField.TITLE).map(title -> !title.isBlank()).orElse(false));
+        // The title must be the one scraped from the page -- if the fetch failed, the fetcher falls back to using
+        // the URL itself as the title, which this test must not accept as a pass.
+        assertNotEquals(url, entry.getField(StandardField.TITLE).orElseThrow());
     }
 
     @Test
+    @FetcherTest
     void performSearchWithUnreachableUrlStillCreatesEntryWithUrlAsTitleFallback() throws FetcherException {
         String url = "https://this-host-should-not-resolve.jabref-test.invalid/some-page";
         String expectedUrlDate = new Date(LocalDate.now()).getNormalized();
@@ -53,6 +56,7 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
+    @FetcherTest
     void performSearchWithSurroundingWhitespaceStripsItFromStoredUrl() throws FetcherException {
         String url = "https://this-host-should-not-resolve.jabref-test.invalid/some-page";
 
@@ -64,10 +68,10 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
-    void performSearchWithNonHttpUrlSkipsTitleFetchAndStillCreatesEntry() throws FetcherException {
-        // URLUtil.isURL accepts ftp:// (its regex allows https?|ftp), but Jsoup.connect only supports http/https
-        // and throws IllegalArgumentException for other schemes. fetchTitle must skip the fetch entirely for such
-        // URLs rather than let that exception escape and abort entry creation.
+    void performSearchWithNonHttpUrlFallsBackToUrlAsTitle() throws FetcherException {
+        // URLUtil.isURL accepts ftp:// (its regex allows https?|ftp), but jsoup only supports http/https: its
+        // protocol check throws MalformedURLException (an IOException) before opening any connection, which
+        // fetchTitle must treat like any other fetch failure instead of aborting entry creation.
         String url = "ftp://example.com/some-file";
 
         List<BibEntry> result = fetcher.performSearch(url);

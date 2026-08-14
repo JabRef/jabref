@@ -1,7 +1,5 @@
 package org.jabref.gui.newentry;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +88,7 @@ public class NewEntryViewModel {
     private final UrlBasedFetcher urlFetcher;
     private final StringProperty urlText;
     private final Validator urlTextValidator;
-    private Task<Optional<List<BibEntry>>> urlWorker;
+    private Task<List<BibEntry>> urlWorker;
 
     private final StringProperty interpretText;
     private final Validator interpretTextValidator;
@@ -149,7 +147,9 @@ public class NewEntryViewModel {
         urlTextValidator = new FunctionBasedValidator<>(
                 urlText,
                 input -> input != null && URLUtil.isURL(input.trim()),
-                ValidationMessage.error(Localization.lang("You must specify a valid URL.")));
+                // Same string as the error label in NewEntry.fxml -- this message itself is currently not rendered
+                // anywhere, but FunctionBasedValidator requires one.
+                ValidationMessage.error(Localization.lang("You must provide a valid URL.")));
         urlWorker = null;
 
         interpretText = new SimpleStringProperty();
@@ -392,36 +392,12 @@ public class NewEntryViewModel {
         taskExecutor.execute(idLookupWorker);
     }
 
-    private class WorkerEnterUrl extends Task<Optional<List<BibEntry>>> {
+    private class WorkerEnterUrl extends Task<List<BibEntry>> {
         @Override
-        protected Optional<List<BibEntry>> call() throws FetcherException {
-            final String url = urlText.getValue();
-            final boolean urlValid = urlTextValidator.getValidationStatus().isValid();
-
-            if (StringUtil.isBlank(url) || !urlValid) {
-                return Optional.empty();
-            }
-
-            final List<BibEntry> entries = urlFetcher.performSearch(url);
-
-            if (entries.isEmpty()) {
-                return Optional.empty();
-            }
-            return Optional.of(entries);
-        }
-    }
-
-    /// Reduces a user-provided URL to its scheme and host for logging, since the rest of the URL (userinfo, path,
-    /// query, fragment) commonly carries credentials or access tokens that must not end up in application logs.
-    private static String sanitizeUrlForLogging(String url) {
-        try {
-            URI uri = new URI(url.trim());
-            if (uri.getScheme() == null || uri.getHost() == null) {
-                return "<invalid url>";
-            }
-            return uri.getScheme() + "://" + uri.getHost();
-        } catch (URISyntaxException | NullPointerException e) {
-            return "<invalid url>";
+        protected List<BibEntry> call() throws FetcherException {
+            // No validation needed here: the Create button is disabled while urlTextValidator reports the text as
+            // invalid, and the fetcher validates the URL itself anyway (throwing a FetcherException).
+            return urlFetcher.performSearch(urlText.getValue());
         }
     }
 
@@ -433,8 +409,10 @@ public class NewEntryViewModel {
 
         urlWorker.setOnFailed(_ -> {
             final Throwable exception = urlWorker.getException();
-            final String exceptionMessage = exception.getMessage();
-            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", sanitizeUrlForLogging(urlText.getValue()), exception);
+            // URLs can embed credentials or access tokens, so neither the log nor the dialog may contain the raw
+            // URL. FetcherException redacts these in getLocalizedMessage; the same helper redacts the URL for the log.
+            final String exceptionMessage = exception.getLocalizedMessage();
+            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", FetcherException.getRedactedUrl(urlText.getValue()), exception);
 
             final String dialogTitle = Localization.lang("Failed to create entry from URL");
             dialogService.showInformationDialogAndWait(
@@ -445,7 +423,9 @@ public class NewEntryViewModel {
         });
 
         urlWorker.setOnSucceeded(_ -> {
-            final Optional<List<BibEntry>> result = urlWorker.getValue();
+            // The generic fetcher always returns exactly one entry, but the UrlBasedFetcher contract allows an
+            // implementation to find nothing at the given URL.
+            final List<BibEntry> result = urlWorker.getValue();
 
             if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
@@ -465,7 +445,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            handler.importEntriesWithDuplicateCheck(null, result);
 
             executedSuccessfully.set(true);
             executing.set(false);

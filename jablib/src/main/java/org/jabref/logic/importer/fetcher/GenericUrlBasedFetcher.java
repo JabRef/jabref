@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -25,8 +24,8 @@ import org.slf4j.LoggerFactory;
 /// This is the fallback for any URL that no more specific [UrlBasedFetcher] recognizes — it does not try to
 /// interpret the URL's shape (e.g. a DOI or Semantic Scholar link), it only records the link itself, when it was
 /// added, and (best-effort) the target page's title.
-@NullMarked
 // [impl->req~fetchers.generic-url~1]
+@NullMarked
 public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 
     public static final String NAME = "URL";
@@ -38,7 +37,8 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
     public List<BibEntry> performSearch(String url) throws FetcherException {
         String trimmedUrl = url.trim();
         if (!URLUtil.isURL(trimmedUrl)) {
-            throw new FetcherException("Invalid URL: " + url);
+            // Redact although the URL did not validate: even a malformed URL can carry credentials or tokens.
+            throw new FetcherException("Invalid URL: " + FetcherException.getRedactedUrl(url));
         }
 
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
@@ -54,18 +54,10 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
         return NAME;
     }
 
-    /// Best-effort fetch of the target page's `<title>`. A failure here (unreachable host, timeout, no
-    /// title tag, ...) should never prevent the entry from being created, so this swallows the error and lets the
-    /// caller fall back to using the URL itself as the title.
-    ///
-    /// Only attempted for `http`/`https` URLs — [Jsoup.connect] only supports those schemes and throws
-    /// `IllegalArgumentException` for anything else (e.g. `ftp://`, which [URLUtil.isURL] otherwise accepts).
+    /// Best-effort fetch of the target page's `<title>`. A failure here (unreachable host, timeout, no title tag,
+    /// a scheme unsupported by jsoup such as `ftp://`, ...) should never prevent the entry from being created, so
+    /// this swallows the error and lets the caller fall back to using the URL itself as the title.
     private Optional<String> fetchTitle(String url) {
-        String scheme = url.toLowerCase(Locale.ROOT);
-        if (!scheme.startsWith("http://") && !scheme.startsWith("https://")) {
-            return Optional.empty();
-        }
-
         try {
             String title = Jsoup.connect(url)
                                 .userAgent(URLDownload.USER_AGENT)
@@ -74,7 +66,7 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
                                 .title();
             return title.isBlank() ? Optional.empty() : Optional.of(title);
         } catch (IOException e) {
-            LOGGER.debug("Could not fetch title for '{}', falling back to the URL as title.", url, e);
+            LOGGER.debug("Could not fetch title for '{}', falling back to the URL as title.", FetcherException.getRedactedUrl(url), e);
             return Optional.empty();
         }
     }

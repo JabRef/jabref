@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -383,9 +384,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         urlText.setPromptText(Localization.lang("Enter the URL to create an entry for."));
         urlText.textProperty().bindBidirectional(viewModel.urlTextProperty());
 
+        // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
+        // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
         // [impl->req~textinput.clipboard.autofocus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
-        if (!StringUtil.isBlank(clipboardText)) {
+        if (URLUtil.isURL(clipboardText)) {
             urlText.setText(clipboardText);
             urlText.selectAll();
         }
