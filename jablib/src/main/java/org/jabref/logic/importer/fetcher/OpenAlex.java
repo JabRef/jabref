@@ -173,8 +173,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         try {
             URIBuilder uriBuilder = new URIBuilder(URL_PATTERN + tail);
             importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
-            String fieldList = fieldsToSelect.stream()
-                                             .collect(Collectors.joining(","));
+            String fieldList = String.join(",", fieldsToSelect);
             if (!fieldList.isEmpty()) {
                 uriBuilder.addParameter("select", fieldList);
             }
@@ -222,8 +221,8 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             DoiCleanup DoiCleanup = new DoiCleanup();
             BibEntry entry = new BibEntry();
 
-            String openAlexType = item.optString("type", null);
-            if (openAlexType != null) {
+            String openAlexType = item.optString("type");
+            if (StringUtil.isNotBlank(openAlexType)) {
                 entry.setType(mapOpenAlexTypeToEntryType(openAlexType));
             }
 
@@ -246,8 +245,8 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             }
 
             String url = item.optString("id");
-            if (url != null && !url.isBlank()) {
-                entry.setField(StandardField.URL, item.optString("id"));
+            if (StringUtil.isNotBlank(url)) {
+                entry.setField(StandardField.URL, url);
             }
 
             // Authors
@@ -468,8 +467,8 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         // Instead, we perform a search for works that cite the given work's ID
         try {
             return getWorkObject(entry, List.of("id"))
-                    .map(work -> work.optString("id", null))
-                    .filter(Objects::nonNull)
+                    .map(work -> work.optString("id"))
+                    .filter(StringUtil::isNotBlank)
                     .map(Unchecked.function(id ->
                             getUriBuilder("", List.of())
                                     .addParameter("filter", "cites:" + id)
