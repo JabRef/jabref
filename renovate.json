@@ -19,6 +19,14 @@
     },
     {
       "customType": "regex",
+      "managerFilePatterns": [".github/workflows/*.yml"],
+      "matchStrings": [
+        "jbang (?<depName>[\\w.-]+:[\\w.-]+):(?<currentValue>\\d[^:\\s]*)(:\\S+)?"
+      ],
+      "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["versions/build.gradle.kts"],
       "matchStrings": ["val jbang = \"(?<currentValue>.+)\""],
       "depNameTemplate": "jbangdev/jbang",
