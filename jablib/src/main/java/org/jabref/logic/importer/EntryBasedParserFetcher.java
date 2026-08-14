@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -38,7 +37,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
+        try (InputStream stream = getUrlDownload(urlForEntry).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
@@ -46,8 +45,10 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
 
             return fetchedEntries;
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            //       Same TODO as in org.jabref.logic.net.URLDownload.openConnection. Code should be reused.
+            if (e.getCause() instanceof FetcherException fetcherException) {
+                // URLDownload reports HTTP errors such as 401 as FetcherException; preserve that user-facing detail.
+                throw fetcherException;
+            }
             LoggerFactory.getLogger(EntryBasedParserFetcher.class).error("Could not fetch from URL {}", urlForEntry, e);
             throw new FetcherException(urlForEntry, "A network error occurred", e);
         } catch (ParseException e) {

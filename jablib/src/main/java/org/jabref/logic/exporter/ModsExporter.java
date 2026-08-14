@@ -121,7 +121,7 @@ class ModsExporter extends Exporter {
                 }
                 writeOriginInformation(writer, originItems, fieldMap);
                 // Write related items
-                writeRelatedInformation(writer, parts, fieldMap);
+                writeRelatedInformation(writer, parts, fieldMap, bibEntry.getType());
                 writer.writeEndElement(); // end mods
             }
             writer.writeEndDocument();
@@ -178,14 +178,15 @@ class ModsExporter extends Exporter {
         }
     }
 
-    private void writeRelatedInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {
+    private void writeRelatedInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap, EntryType entryType) throws XMLStreamException {
         writer.writeStartElement("mods", "relatedItem", MODS_NAMESPACE_URI);
         writer.writeAttribute("type", "host");
 
+        Field hostTitleField = getHostTitleField(entryType);
         for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
             Field field = entry.getKey();
             String value = entry.getValue();
-            if (StandardField.JOURNAL == field) {
+            if (hostTitleField == field) {
                 addJournal(writer, value);
             }
         }
@@ -196,6 +197,15 @@ class ModsExporter extends Exporter {
         writer.writeStartElement("mods", "typeOfResource", MODS_NAMESPACE_URI);
         writer.writeCharacters("text");
         writer.writeEndElement(); // end typeOfResource
+    }
+
+    private Field getHostTitleField(EntryType entryType) {
+        String typeName = entryType.getName();
+        if ("inbook".equals(typeName) || "incollection".equals(typeName) || "inproceedings".equals(typeName)) {
+            return StandardField.BOOKTITLE;
+        }
+
+        return StandardField.JOURNAL;
     }
 
     private void writePartInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {

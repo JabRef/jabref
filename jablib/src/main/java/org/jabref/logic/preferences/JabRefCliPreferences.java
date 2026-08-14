@@ -78,8 +78,12 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
@@ -112,6 +116,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
@@ -171,6 +176,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
+    public static final String IMPORT_KEYWORD_DELIMITERS = "importKeywordDelimiters";
+    public static final String IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY = "importKeywordDelimiterParsingStrategy";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
 
@@ -271,7 +278,14 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
+    public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
+    public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
+    public static final String OO_INFER_CSL_STYLE_FROM_DOCUMENT = "ooInferCslStyleFromDocument";
+    public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
+    public static final String OO_PANDOC_PATH = "ooPandocPath";
+    public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
+    public static final String OO_CITE_SPECIAL_CITATION_TYPE = "ooCiteSpecialCitationType";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -400,7 +414,9 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region OCR preferences
+    private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
 
     // region Push to application preferences
@@ -1631,10 +1647,20 @@ public class JabRefCliPreferences implements CliPreferences {
         BibEntryPreferences defaultValues = BibEntryPreferences.getDefault();
 
         bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0));
+                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0),
+                get(IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters()),
+                BibEntryPreferences.ImportDelimiterParsingStrategy.valueOf(get(
+                        IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                        defaultValues.getImportDelimiterParsingStrategy().name())));
 
         bindObject(bibEntryPreferences.keywordSeparatorProperty(), KEYWORD_SEPARATOR, defaultValues.getKeywordSeparator(),
                 String::valueOf, separator -> separator.charAt(0));
+        bindString(bibEntryPreferences.importKeywordDelimitersProperty(), IMPORT_KEYWORD_DELIMITERS, defaultValues.getImportKeywordDelimiters());
+        bindObject(bibEntryPreferences.importDelimiterParsingStrategyProperty(),
+                IMPORT_KEYWORD_DELIMITER_PARSING_STRATEGY,
+                defaultValues.getImportDelimiterParsingStrategy(),
+                BibEntryPreferences.ImportDelimiterParsingStrategy::name,
+                BibEntryPreferences.ImportDelimiterParsingStrategy::valueOf);
 
         return bibEntryPreferences;
     }
@@ -2147,9 +2173,13 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         ocrPreferences = new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
+        bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
+        bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2497,18 +2527,41 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat()),
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()));
+                getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
+                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
+                getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
+                getBoolean(OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument()),
+                getStringList(OO_EXTERNAL_BST_STYLES),
+                get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
+                getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()),
+                getCitationTypeFromPrefs(defaultValues.getCiteSpecialCitationType()));
 
         bindString(openOfficePreferences.executablePathProperty(), OO_EXECUTABLE_PATH, defaultValues.getExecutablePath());
         bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
         bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
         bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
+        bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
         bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
+        bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
+        bindBoolean(openOfficePreferences.inferCslStyleFromDocumentProperty(), OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindCustomList(openOfficePreferences.getExternalCslStyles(), OO_EXTERNAL_CSL_STYLES, defaultValues.getExternalCslStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(openOfficePreferences.getExternalBstStyles(), OO_EXTERNAL_BST_STYLES, defaultValues.getExternalBstStyles(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindString(openOfficePreferences.pandocPathProperty(), OO_PANDOC_PATH, defaultValues.getPandocPath());
+        bindCustom(openOfficePreferences.bstCitationFormatProperty(), OO_BST_CITATION_FORMAT,
+                defaultValues.getBstCitationFormat(),
+                (_, _, newValue) -> put(OO_BST_CITATION_FORMAT, newValue.name()),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat())),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(defaultValues.getBstCitationFormat()));
+        bindCustom(openOfficePreferences.citeSpecialCitationTypeProperty(), OO_CITE_SPECIAL_CITATION_TYPE,
+                defaultValues.getCiteSpecialCitationType(),
+                (_, _, newValue) -> put(OO_CITE_SPECIAL_CITATION_TYPE, newValue.name()),
+                () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(getCitationTypeFromPrefs(defaultValues.getCiteSpecialCitationType())),
+                () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(defaultValues.getCiteSpecialCitationType()));
         bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
         // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
         bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
@@ -2524,16 +2577,26 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [org.jabref.logic.citationstyle.CitationStyle], otherwise
-    /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
-    /// path is absent, the repository is missing, or the JStyle cannot be created.
+    /// Handles CSL (`.csl`), BST (`.bst`), and JStyle (`.jstyle`) files.
+    /// Falls back to `defaultStyle` when the path is absent or the style cannot be created.
     private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {
         String currentStylePath = get(OO_CURRENT_STYLE, defaultStyle.getPath());
 
         if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
             return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                 .orElse(CSLStyleLoader.getDefaultStyle());
+        } else if (currentStylePath.endsWith(".bst")) {
+            // Internal BST style (classpath resource path starting with /resource/openoffice/)
+            if (currentStylePath.startsWith("/")) {
+                return BstStyle.createInternal(currentStylePath);
+            }
+            // External BST style (absolute filesystem path)
+            java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
+            if (java.nio.file.Files.exists(bstPath)) {
+                return new BstStyle(bstPath);
+            }
+            LOGGER.warn("BST style file not found: {}", currentStylePath);
         } else if (journalAbbreviationRepository != null) {
-            // For now, must be a JStyle. In the future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
                 return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
             } catch (IOException ex) {
@@ -2541,6 +2604,24 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         return defaultStyle;
+    }
+
+    private BstCitationFormat getBstCitationFormatFromPrefs(BstCitationFormat defaultFormat) {
+        String stored = get(OO_BST_CITATION_FORMAT, defaultFormat.name());
+        try {
+            return BstCitationFormat.valueOf(stored);
+        } catch (IllegalArgumentException e) {
+            return defaultFormat;
+        }
+    }
+
+    private CitationType getCitationTypeFromPrefs(CitationType defaultType) {
+        String stored = get(OO_CITE_SPECIAL_CITATION_TYPE, defaultType.name());
+        try {
+            return CitationType.valueOf(stored);
+        } catch (IllegalArgumentException e) {
+            return defaultType;
+        }
     }
     // endregion
 

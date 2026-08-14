@@ -5,7 +5,8 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.*
+import org.jabref.gradle.EmbeddedPostgresBinaries
+import java.util.Calendar
 
 plugins {
     id("org.jabref.gradle.module")
@@ -23,9 +24,15 @@ plugins {
     id("net.ltgt.nullaway") version "3.1.0"
 }
 
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
+
 testModuleInfo {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     runtimeOnly("org.jabref")
+    embeddedPostgresHostBinary?.let { runtimeOnly(it.moduleName) }
 
     requires("org.jabref.testsupport")
 
@@ -63,6 +70,8 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
+
+    embeddedPostgresHostBinary?.let { testRuntimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
 var version = providers.gradleProperty("projVersion")
@@ -91,6 +100,9 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
+evaluationDependsOn(":versions")
+val jbangVersion = project(":versions").extra["jbangVersion"] as String
+
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
@@ -98,6 +110,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
 
@@ -112,6 +125,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     description = "Generates a catalog of all available citation styles"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
@@ -127,6 +141,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     description = "Converts the LTWA CSV file to a H2 MVStore"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
@@ -187,6 +202,7 @@ val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 val wileyTdmApiKey = providers.environmentVariable("WileyTdmApiKey").orElse("")
+val crossRefEmail = providers.environmentVariable("CROSSREF_EMAIL").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -210,6 +226,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
     inputs.property("wileyTdmApiKey", wileyTdmApiKey)
+    inputs.property("crossRefEmail", crossRefEmail)
 
     filesMatching("build.properties") {
         expand(
@@ -229,6 +246,7 @@ tasks.named<ProcessResources>("processResources") {
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],
                 "wileyTdmApiKey" to inputs.properties["wileyTdmApiKey"],
+                "crossRefEmail" to inputs.properties["crossRefEmail"],
             )
         )
     }

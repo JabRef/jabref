@@ -176,7 +176,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void lookUpDoi(BibEntry entry) {
-        CrossRef doiFetcher = new CrossRef();
+        CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
                       .onRunning(() -> {
