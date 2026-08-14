@@ -1,5 +1,6 @@
 package org.jabref.gui.icon;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -66,26 +68,26 @@ public final class IkonliIcon implements JabRefIcon {
                        .map(IkonliIcon::new);
     }
 
-    public static List<Ikon> allIcons() {
+    public static SequencedSet<Ikon> allIcons() {
         return IkonliIcons.ALL;
     }
 
     /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first
     /// access guaranteed by JVM.
     private static final class IkonliIcons {
-        private static final List<Ikon> ALL = load();
+        private static final SequencedSet<Ikon> ALL = load();
         private static final Map<String, Ikon> BY_NAME = loadMap(Ikon::toString);
         private static final Map<String, Ikon> BY_DESCRIPTION = loadMap(Ikon::getDescription);
 
-        private static List<Ikon> load() {
+        private static SequencedSet<Ikon> load() {
             SequencedSet<Ikon> all = new LinkedHashSet<>();
             for (IkonProvider provider : ServiceLoader.load(IkonProvider.class)) {
                 all.addAll(EnumSet.allOf(provider.getIkon()));
             }
-            return List.copyOf(all);
+            return Collections.unmodifiableSequencedSet(all);
         }
 
-        private static Map<String, Ikon> loadMap(java.util.function.Function<Ikon, String> keyMapper) {
+        private static Map<String, Ikon> loadMap(Function<Ikon, String> keyMapper) {
             return ALL.stream()
                       .collect(Collectors.toUnmodifiableMap(
                               ikon -> keyMapper.apply(ikon).toUpperCase(Locale.ENGLISH),
