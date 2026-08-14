@@ -156,6 +156,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.summarization.util;
     exports org.jabref.logic.msc;
     exports org.jabref.logic.ai.models;
+    exports org.jabref.logic.git.diff;
     // endregion
 
     requires java.base;
@@ -304,6 +305,6 @@ open module org.jabref.jablib {
     requires transitive org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires transitive org.libreoffice.uno;
-    requires transitive org.jspecify;
+    requires transitive org.jspecify; requires io.github.javadiffutils;
     // endregion
 }
