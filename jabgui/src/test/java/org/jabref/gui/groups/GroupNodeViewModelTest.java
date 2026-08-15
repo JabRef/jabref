@@ -211,6 +211,26 @@ class GroupNodeViewModelTest {
         assertEquals("CLOSE_CIRCLE", model.getIcon().name());
     }
 
+    @Test
+    void getIconResolvesPersistedProviderIkonliName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("TRENDING_UP");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("TRENDING_UP", model.getIcon().name());
+    }
+
+    @Test
+    void getIconResolvesPersistedProviderIkonliDescription() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("mdi2m-math-integral-box");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("MATH_INTEGRAL_BOX", model.getIcon().name());
+    }
+
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }

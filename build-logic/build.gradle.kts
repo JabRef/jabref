@@ -3,6 +3,12 @@ plugins {
 }
 
 repositories {
+    // Workaround for Maven Central rate limiting (HTTP 429).
+    // gradlePluginPortal() redirects non-portal artifacts (kotlin-stdlib, ...)
+    // to repo.maven.apache.org, which enforces consumption limits since 2026.
+    // See https://central.sonatype.org/faq/429-error/ and gradle/gradle#37880.
+    maven { url = uri("https://maven-central.storage-download.googleapis.com/maven2/") }
+
     gradlePluginPortal()
     maven { url = uri("https://jitpack.io") }
 }
