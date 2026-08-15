@@ -135,7 +135,7 @@ public class FileSelectionPage extends WizardPane {
         enablePreviewCheckBox = new CheckBox(Localization.lang("Enable preview"));
         enablePreviewCheckBox.setSelected(false);
 
-        pdfPreview = new PdfDocumentViewer(taskExecutor);
+        pdfPreview = new PdfDocumentViewer();
         VBox.setVgrow(pdfPreview, Priority.ALWAYS);
 
         Label metadataLabel = new Label(Localization.lang("Extracted metadata"));
@@ -271,7 +271,6 @@ public class FileSelectionPage extends WizardPane {
 
     private void showPreviewDisabledState(String metadataText) {
         cancelCurrentMetadataTask();
-        pdfPreview.cancelCurrent();
         pdfPreview.show(null);
         metadataPreview.setText(metadataText);
     }
@@ -314,7 +313,6 @@ public class FileSelectionPage extends WizardPane {
     /// Cancels any in-flight preview work.
     public void cancelPreviewTasks() {
         cancelCurrentMetadataTask();
-        pdfPreview.cancelCurrent();
     }
 
     private String formatParserResult(ParserResult result) {

@@ -15,7 +15,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -32,9 +31,8 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @Inject private StateManager stateManager;
     @Inject private CliPreferences preferences;
-    @Inject private TaskExecutor taskExecutor;
 
-    private PdfDocumentViewer viewer;
+    private final PdfDocumentViewer viewer = new PdfDocumentViewer();
     private DocumentViewerViewModel viewModel;
 
     public DocumentViewerView() {
@@ -54,7 +52,6 @@ public class DocumentViewerView extends BaseDialog<Void> {
     private void initialize() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         viewModel = new DocumentViewerViewModel(stateManager, preferences, dialogService);
-        viewer = new PdfDocumentViewer(taskExecutor);
 
         setupViewer();
         setupFileChoice();
