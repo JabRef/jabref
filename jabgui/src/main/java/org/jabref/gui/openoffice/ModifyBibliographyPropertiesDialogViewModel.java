@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,9 +21,11 @@ public class ModifyBibliographyPropertiesDialogViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_BODY_FORMATS));
 
     private final OpenOfficePreferences openOfficePreferences;
+    private final BooleanProperty shouldDisableHeadingControls;
 
     public ModifyBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = openOfficePreferences;
+        this.shouldDisableHeadingControls = openOfficePreferences.zoteroCompatibilityModeProperty();
 
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
         this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());
@@ -53,5 +56,9 @@ public class ModifyBibliographyPropertiesDialogViewModel {
 
     public ReadOnlyListProperty<String> bodyFormatListProperty() {
         return bodyFormatListProperty;
+    }
+
+    public BooleanProperty shouldDisableHeadingControlsProperty() {
+        return shouldDisableHeadingControls;
     }
 }

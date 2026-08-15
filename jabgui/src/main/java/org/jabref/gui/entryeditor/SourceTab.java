@@ -50,6 +50,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
@@ -65,6 +66,10 @@ public class SourceTab extends EntryEditorTab {
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
+    private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
+    private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
+    private final Subscription activeTabSubscription;
+    private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -97,7 +102,7 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
+        activeTabSubscription = EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
             if (library.isEmpty()) {
                 this.setText(Localization.lang("Source"));
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
@@ -108,7 +113,7 @@ public class SourceTab extends EntryEditorTab {
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
             }
         });
-        EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
@@ -198,15 +203,33 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if ((previousEntry != null) && (codeArea != null)) {
-            storeSource(previousEntry, codeArea.getText());
+        if (previousEntry != null) {
+            removeEntryListeners(previousEntry);
+            if (codeArea != null) {
+                storeSource(previousEntry, codeArea.getText());
+            }
         }
         this.previousEntry = entry;
 
         updateCodeArea();
 
-        entry.typeProperty().addListener(_ -> updateCodeArea());
-        entry.getFieldsObservable().addListener((InvalidationListener) _ -> updateCodeArea());
+        entry.typeProperty().addListener(entryTypeListener);
+        entry.getFieldsObservable().addListener(entryFieldsListener);
+    }
+
+    @Override
+    protected void dispose() {
+        if (previousEntry != null) {
+            removeEntryListeners(previousEntry);
+            previousEntry = null;
+        }
+        activeTabSubscription.unsubscribe();
+        searchQuerySubscription.unsubscribe();
+    }
+
+    private void removeEntryListeners(BibEntry entry) {
+        entry.typeProperty().removeListener(entryTypeListener);
+        entry.getFieldsObservable().removeListener(entryFieldsListener);
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -348,4 +371,3 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 }
-

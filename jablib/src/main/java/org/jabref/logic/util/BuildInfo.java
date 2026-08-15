@@ -47,6 +47,7 @@ public final class BuildInfo {
     public final String springerNatureAPIKey;
     public final String unpaywallEmail;
     public final String wileyTdmApiKey;
+    public final String crossRefEmail;
 
     public BuildInfo() {
         this("/build.properties");
@@ -79,6 +80,7 @@ public final class BuildInfo {
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
         wileyTdmApiKey = BuildInfo.getValue(properties, "wileyTdmApiKey", "");
+        crossRefEmail = BuildInfo.getValue(properties, "crossRefEmail", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {
