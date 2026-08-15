@@ -164,6 +164,7 @@ open module org.jabref.jablib {
     requires java.base;
 
     requires transitive javafx.base;
+    requires transitive javafx.graphics;
     requires afterburner.fx;
     requires transitive com.tobiasdiez.easybind;
 
