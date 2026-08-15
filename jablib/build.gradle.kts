@@ -37,7 +37,6 @@ testModuleInfo {
     requires("org.jabref.testsupport")
 
     requires("javafx.fxml")
-    requires("javafx.graphics")
 
     requires("io.github.classgraph")
 
