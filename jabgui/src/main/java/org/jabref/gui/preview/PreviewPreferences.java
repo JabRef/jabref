@@ -23,7 +23,7 @@ public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;
     private final IntegerProperty layoutCyclePosition;
     //    private final StringProperty customPreviewLayout;
-    private final ObservableList<CustomizedPreviewStyle> customizedPreviewLayouts;
+    private final ObservableList<CustomizedPreviewStyle> customizedPreviewStyles;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
@@ -32,14 +32,14 @@ public class PreviewPreferences {
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
-                              List<CustomizedPreviewStyle> customizedPreviewLayouts,
+                              List<CustomizedPreviewStyle> customizedPreviewStyles,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
                               List<Path> bstPreviewLayoutPaths,
                               boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
-        this.customizedPreviewLayouts = FXCollections.observableArrayList(customizedPreviewLayouts);
+        this.customizedPreviewStyles = FXCollections.observableArrayList(customizedPreviewStyles);
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
@@ -65,25 +65,13 @@ public class PreviewPreferences {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                List.of(new CustomizedPreviewStyle(java.util.UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),
+                List.of(new CustomizedPreviewStyle(java.util.UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths
                 false       // Download cover images disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
         );
     }
-
-    //    private PreviewPreferences() {
-    //        this(
-    //                List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
-    //                0,          // Layout cycle position
-    //                TextBasedPreviewLayout.DEFAULT,
-    //                false,      // Show preview as an extra tab
-    //                false,      // Show the preview entry table tooltip
-    //                List.of(),  // BST-Paths
-    //                false       // Download cover images disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
-    //        );
-    //    }
 
     /// Provides default values WITHOUT default styles
     public static PreviewPreferences getDefault() {
@@ -131,10 +119,9 @@ public class PreviewPreferences {
         if (layoutCycle.isEmpty()
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
-            // Fallback dummy layout
-            String fallbackText = customizedPreviewLayouts.isEmpty()
+            String fallbackText = customizedPreviewStyles.isEmpty()
                                   ? TextBasedPreviewLayout.DEFAULT
-                                  : customizedPreviewLayouts.getFirst().text();
+                                  : customizedPreviewStyles.getFirst().text();
             return new TextBasedPreviewLayout(
                     fallbackText,
                     LayoutFormatterPreferences.getDefault(),
@@ -143,33 +130,9 @@ public class PreviewPreferences {
             return layoutCycle.get(layoutCyclePosition.getValue());
         }
     }
-    //    public PreviewLayout getSelectedPreviewLayout() {
-    //        if (layoutCycle.isEmpty()
-    //                || layoutCyclePosition.getValue() < 0
-    //                || layoutCyclePosition.getValue() >= layoutCycle.size()) {
-    //            // Fallback dummy layout
-    //            return new TextBasedPreviewLayout(
-    //                    getCustomPreviewLayout(),
-    //                    LayoutFormatterPreferences.getDefault(),
-    //                    new JournalAbbreviationRepository());
-    //        } else {
-    //            return layoutCycle.get(layoutCyclePosition.getValue());
-    //        }
-    //    }
 
-    //    public String getCustomPreviewLayout() {
-    //        return customPreviewLayout.getValue();
-    //    }
-    //
-    //    public StringProperty customPreviewLayoutProperty() {
-    //        return customPreviewLayout;
-    //    }
-    //
-    //    public void setCustomPreviewLayout(String customPreviewLayout) {
-    //        this.customPreviewLayout.set(customPreviewLayout);
-    //    }
-    public ObservableList<CustomizedPreviewStyle> getCustomizedPreviewLayouts() {
-        return customizedPreviewLayouts;
+    public ObservableList<CustomizedPreviewStyle> getCustomizedPreviewStyles() {
+        return customizedPreviewStyles;
     }
 
     public boolean shouldShowPreviewAsExtraTab() {

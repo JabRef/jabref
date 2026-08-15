@@ -60,7 +60,7 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
     @Nullable
     static PreviewLayout of(String layoutIdentifier,
-                            List<CustomizedPreviewStyle> customizedPreviewLayouts,
+                            List<CustomizedPreviewStyle> customizedPreviewStyles,
                             List<Path> bstLayoutPaths,
                             LayoutFormatterPreferences preferences,
                             JournalAbbreviationRepository abbreviationRepository,
@@ -78,12 +78,11 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
                                  .orElse(null);
         }
 
-        // Text-based (customized) styles are resolved by stable id, not display name — names are user-editable.
-        return customizedPreviewLayouts.stream()
-                                       .filter(c -> c.id().equals(layoutIdentifier))
-                                       .findFirst()
-                                       .<PreviewLayout>map(c -> TextBasedPreviewLayout.of(
-                                               c.id(), c.name(), c.text(), preferences, abbreviationRepository))
-                                       .orElse(null);
+        return customizedPreviewStyles.stream()
+                                      .filter(c -> c.id().equals(layoutIdentifier))
+                                      .findFirst()
+                                      .map(c -> (PreviewLayout) TextBasedPreviewLayout.of(
+                                              c.id(), c.name(), c.text(), preferences, abbreviationRepository))
+                                      .orElse(null);
     }
 }

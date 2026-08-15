@@ -2,6 +2,7 @@ package org.jabref.logic.preview;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.UUID;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -54,7 +55,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.abbreviationRepository = abbreviationRepository;
         this.name = NAME;
-        this.id = java.util.UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString();
         setText(text);
     }
 
@@ -65,7 +66,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         this.name = name;
         this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        this.id = java.util.UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString();
         setText(text);
     }
 
@@ -84,7 +85,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     public TextBasedPreviewLayout(Layout layout) {
         this.layout = layout;
         this.text = layout.getText();
-        this.id = null;
+        this.id = UUID.randomUUID().toString();
     }
 
     public void setText(String text) {
@@ -114,7 +115,6 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     @Override
     public String getName() {
         return this.name == null ? NAME : this.name;
-        //        return NAME;
     }
 
     public void setName(String name) {
@@ -122,7 +122,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public String getId() {
-        return this.id == null ? java.util.UUID.randomUUID().toString() : this.id;
+        return this.id == null ? UUID.randomUUID().toString() : this.id;
     }
 
     public String getShortTitle() {
@@ -132,8 +132,6 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     @Override
     public String getDisplayName() {
         return this.name == null ? Localization.lang("Customized preview style") : this.name;
-        //        return this.name;
-        //        return Localization.lang("Customized preview style");
     }
 
     public static TextBasedPreviewLayout of(@NonNull String style,

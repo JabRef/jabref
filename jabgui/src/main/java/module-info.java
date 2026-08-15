@@ -17,6 +17,7 @@ open module org.jabref {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+    requires javafx.swing;
     requires org.jabref.htmltonode;
     requires jfx.incubator.richtext;
 

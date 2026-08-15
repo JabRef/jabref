@@ -129,18 +129,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Filter"));
 
-        //        availableListView = layoutListView();
-        //        VBox availableBox = new VBox(4.0, sectionLabel(Localization.lang("Available")), searchBox, availableListView);
-        //        HBox.setHgrow(availableBox, Priority.ALWAYS);
-        //        VBox.setVgrow(availableListView, Priority.ALWAYS);
-
         cslListView = layoutListView();
         customizedListView = layoutListView();
         this.cslTab = new Tab(Localization.lang("CSL"), cslListView);
         cslTab.setClosable(false);
         previousTab = cslTab;
 
-        //        this.customizedTab = new Tab(Localization.lang("Customized"), customizedListView);
         addCustomStyleButton = new Button();
         removeCustomStyleButton = new Button();
 
@@ -209,14 +203,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         EasyBind.subscribe(viewModel.styleNameProperty(), styleNameField::setText);
         styleNameField.editableProperty().bind(viewModel.selectedIsEditableProperty());
         styleNameField.setOnAction(_ -> commitStyleNameEdit()); // Commit on Enter
-        //        styleNameField.focusedProperty().addListener((_, wasFocused, isFocused) -> {  // unfocus commit
-        //            // Commit on focus-lost from the styleNameField
-        //            if (wasFocused && !isFocused) {
-        //                commitStyleNameEdit(true);
-        //            }
-        //        });
-        //        styleNameField.setOnKeyPressed(this::cancelRenameOnEscapeKeyPress); // allow to cancel rename with esc key
-
         readOnlyLabel = new Label(Localization.lang("Read only"));
         resetDefaultButton = new Button();
         resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
@@ -224,7 +210,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         resetDefaultButton.setPrefSize(20.0, 20.0);
         resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
         resetDefaultButton.setOnAction(_ -> resetDefaultButtonAction());
-        //        HBox topRight = new HBox(5.0, readOnlyLabel, resetDefaultButton);
         HBox topRight = new HBox(10, readOnlyLabel,
                 resetDefaultButton,
                 new Label(Localization.lang("Name")),
@@ -303,23 +288,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> viewModel.addBstStyle(bstFile));
     }
 
-    /*
-    TODO: fix duplicate adding into selected
-    fix arrow buttons, cannot add from customized into selected
-    swapping csl->customized, cannot drag and drop
-
-    csl into selected, I can add, but the csl does not lose it's value
-    but when I move selected back into csl, it creates duplicate values. - fix
-
-    when using arrow button, it remembers the last click, not whats highlighted on respective side
-    and then it moves the same entry into the selected
-    this only applies to when we move entries into Selected, from customized.
-    click right, click left, click right, then click right button, it moves the last right clicked
-    into the right, instead of left highlighted into the right.
-
-    double clicking left side allows for duplicates on right/selected side
-
-     */
     private void wireControls() {
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
@@ -334,7 +302,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
 
-        //        cslListView.setItems(viewModel.getFilteredAvailableLayouts());
         cslListView.setItems(viewModel.getFilteredCslLayouts());
         customizedListView.setItems(viewModel.getFilteredCustomizedLayouts());
 
@@ -342,13 +309,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         availableTabPane.getSelectionModel()
                         .selectedItemProperty()
                         .addListener((obs, oldTab, newTab) -> {
-
                             if (newTab == cslTab) {
-                                viewModel.availableSelectionModelProperty()
-                                         .setValue(cslListView.getSelectionModel());
+                                viewModel.availableSelectionModelProperty().setValue(cslListView.getSelectionModel());
                             } else {
-                                viewModel.availableSelectionModelProperty()
-                                         .setValue(customizedListView.getSelectionModel());
+                                viewModel.availableSelectionModelProperty().setValue(customizedListView.getSelectionModel());
                             }
                             previousTab = newTab;
                             focusRightButtonBinding();
@@ -367,10 +331,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         cslListView.setOnDragDetected(this::dragDetectedInAvailable);
         cslListView.setOnDragDropped(event -> dragDropped(viewModel.cslListProperty(), event));
         cslListView.setOnKeyTyped(event -> jumpToSearchKey(cslListView, event));
-        //        cslListView.setOnMouseClicked(this::mouseClickedAvailable);
         cslListView.setOnMouseClicked(event -> {
-            viewModel.availableSelectionModelProperty()
-                     .setValue(cslListView.getSelectionModel());
+            viewModel.availableSelectionModelProperty().setValue(cslListView.getSelectionModel());
             mouseClickedAvailable(event);
         });
         cslListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -381,7 +343,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         customizedListView.setOnDragDetected(this::dragDetectedInAvailable);
         customizedListView.setOnDragDropped(event -> dragDropped(viewModel.customizedListProperty(), event));
         customizedListView.setOnKeyTyped(event -> jumpToSearchKey(customizedListView, event));
-        //        customizedListView.setOnMouseClicked(this::mouseClickedAvailable);
         customizedListView.setOnMouseClicked(event -> {
             viewModel.availableSelectionModelProperty().setValue(customizedListView.getSelectionModel());
             mouseClickedAvailable(event);
@@ -401,7 +362,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
         chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
-        //        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.setOnMouseClicked(event -> {
             viewModel.chosenSelectionModelProperty()
                      .setValue(chosenListView.getSelectionModel());
@@ -413,12 +373,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
         addCustomStyleButton.setOnAction(event -> {
             viewModel.addCustomizedStyle();
-            customizedListView.refresh();   // TODO: remove this if not needed
+            customizedListView.refresh();
         });
 
         removeCustomStyleButton.setOnAction(event -> {
             viewModel.removeCustomizedStyle();
-            customizedListView.refresh();   // TODO: remove this if not needed
+            customizedListView.refresh();
         });
 
         removeCustomStyleButton.disableProperty().bind(customizedListView.getSelectionModel().selectedItemProperty().isNull());
@@ -431,8 +391,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         previewViewer.setDatabaseContext(new BibDatabaseContext());
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
-        //        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-        //                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
         previewViewer.visibleProperty().bind(viewModel.selectedLayoutProperty().isNotNull());
 
         previewTab.setContent(previewViewer);
@@ -440,8 +398,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        //        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-        //                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
         editArea.visibleProperty().bind(viewModel.selectedLayoutProperty().isNotNull());
         BindingsHelper.bindBidirectional(
                 editArea.textProperty(),
@@ -496,15 +452,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         viewModel.dragOver(event);
     }
 
-    //    private void dragDetectedInAvailable(MouseEvent event) {
-    //        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
-    //        if (!selectedLayouts.isEmpty()) {
-    //            Dragboard dragboard = cslListView.startDragAndDrop(TransferMode.MOVE);
-    //            viewModel.dragDetected(viewModel.cslListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
-    //        }
-    //        event.consume();
-    //    }
-
     private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
         ListView<PreviewLayout> sourceListView;
@@ -536,7 +483,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
-        // Only switch tabs when routing OUT of Selected INTO Available
+        // Only switch tabs when dragging OUT of Selected INTO Available
         // dropping in Selected has no need to refocus the Available tabs.
         if (success && targetList != viewModel.chosenListProperty()) {
             focusTabOnLastRoutedLayout();
@@ -547,15 +494,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
         boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
-        //        if (success) {
-        //            focusTabOnLastRoutedLayout();
-        //        }
         event.consume();
     }
 
-    //    public void toRightButtonAction() {
-    //        viewModel.addToChosen();
-    //    }
     public void toRightButtonAction() {
         //        if (availableTabPane.getSelectionModel().getSelectedItem() == cslTab) {
         if (previousTab == cslTab) {
@@ -565,19 +506,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         }
     }
 
-    //    public void toLeftButtonAction() {
-    //        viewModel.removeFromChosen();
-    //    }
     public void toLeftButtonAction() {
         viewModel.removeFromChosen();
         focusTabOnLastRoutedLayout();
-        //        if (previousTab == cslTab) {
-        //            viewModel.removeFromChosen();
-        //            //            viewModel.removeFromChosen(viewModel.cslListProperty());
-        //        } else {
-        //            viewModel.removeFromChosen();
-        //            //            viewModel.removeFromChosen(viewModel.customizedListProperty());
-        //        }
     }
 
     public void sortUpButtonAction() {
@@ -592,13 +523,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         viewModel.resetDefaultLayout();
     }
 
-    //    private void mouseClickedAvailable(MouseEvent event) {
-    //        if (event.getClickCount() == 2) {
-    //            viewModel.addToChosen();
-    //            event.consume();
-    //        }
-    //    }
-
     private void mouseClickedAvailable(MouseEvent event) {
         if (event.getClickCount() == 2) {
             if (previousTab == cslTab) {
@@ -610,23 +534,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         }
     }
 
-    //    private void mouseClickedChosen(MouseEvent event) {
-    //        if (event.getClickCount() == 2) {
-    //            viewModel.removeFromChosen();
-    //            event.consume();
-    //        }
-    //    }
-
     private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
             focusTabOnLastRoutedLayout();
-            //            if (previousTab == cslTab) {
-            //                viewModel.removeFromChosen(viewModel.cslListProperty());
-            //            } else {
-            //                viewModel.removeFromChosen(viewModel.customizedListProperty());
-            //            }
-            //            viewModel.removeFromChosen(viewModel.cslListProperty());
             event.consume();
         }
     }
@@ -647,7 +558,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         if (moved != null) {
             availableTabPane.getSelectionModel()
                             .select((moved instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
-            //            availableTabPane.getSelectionModel().select(customizedTab);
         }
     }
 
@@ -671,19 +581,5 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         } finally {
             isCommittingStyleName = false;
         }
-
-        //        viewModel.renameSelectedStyle(styleNameField.getText());
-        //        customizedListView.refresh();   // refresh view to display rename in 'customized'
     }
-
-    //    private void cancelRenameOnEscapeKeyPress(KeyEvent event) {
-    //        if (event.getCode() == KeyCode.ESCAPE) {
-    //            styleNameField.setText(viewModel.selectedLayoutProperty().getValue() != null
-    //                                   ? viewModel.selectedLayoutProperty().getValue().getDisplayName()
-    //                                   : "");
-    //            chosenListView.requestFocus();
-    //            //            editArea.requestFocus();
-    //            event.consume();
-    //        }
-    //    }
 }
