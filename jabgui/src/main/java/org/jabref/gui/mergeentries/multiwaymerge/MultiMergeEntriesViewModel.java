@@ -69,8 +69,8 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
             return;
         }
 
-        if (StandardEntryType.Misc.equals(mergedEntry.get().getType())
-                && !StandardEntryType.Misc.equals(entry.getType())) {
+        if (StandardEntryType.Misc == mergedEntry.get().getType()
+                && StandardEntryType.Misc != entry.getType()) {
             mergedEntry.get().setType(entry.getType());
         }
 
