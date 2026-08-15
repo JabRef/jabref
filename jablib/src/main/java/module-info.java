@@ -87,6 +87,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.util.strings;
     exports org.jabref.model.openoffice;
     exports org.jabref.logic.openoffice;
+    exports org.jabref.logic.openoffice.bst;
     exports org.jabref.logic.openoffice.action;
     exports org.jabref.logic.openoffice.frontend;
     exports org.jabref.logic.openoffice.oocsltext;
@@ -156,6 +157,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.summarization.util;
     exports org.jabref.logic.msc;
     exports org.jabref.logic.ai.models;
+    exports org.jabref.logic.ocr.docling;
+    exports org.jabref.model.ocr.docling;
     // endregion
 
     requires java.base;

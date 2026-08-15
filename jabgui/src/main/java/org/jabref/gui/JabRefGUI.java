@@ -1,5 +1,7 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +17,8 @@ import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -64,7 +68,11 @@ import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
+import org.controlsfx.control.decoration.Decorator;
+import org.controlsfx.control.decoration.GraphicDecoration;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +95,13 @@ public class JabRefGUI extends Application {
     private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
+
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
     private static JournalAbbreviationRepository journalAbbreviationRepository;
+    private static BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -106,6 +117,11 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Installed before the try block below (not after) so background threads started during
+        // initialize() are also covered, not just ones started once the main window is up.
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() ->
+                showCriticalErrorDialog(Localization.lang("Uncaught exception occurred in %0", thread.toString()), exception)));
+
         try {
             this.mainStage = stage;
             Injector.setModelOrService(Stage.class, mainStage);
@@ -152,13 +168,31 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            showCriticalErrorDialog(Localization.lang("Unhandled exception occurred."), throwable);
             throw throwable;
         }
+    }
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-        }));
+    /// [impl->req~ux.startup.critical-error-dialog~1]
+    ///
+    /// Used both for startup failures (from [#start(Stage)]'s catch block) and for uncaught
+    /// exceptions on other threads ([FallbackExceptionHandler], installed before [#initialize()]
+    /// so it also covers background threads started during startup). In both cases, [DialogService]
+    /// or [Scene] may not exist yet: [DialogService] is only set up in [#initialize()], and `Scene`
+    /// is only set in [#openWindow()]. Calling [DialogService] or `Dialog.initOwner` before then
+    /// throws a NullPointerException, so this falls back to an ownerless [ExceptionDialog] instead.
+    private void showCriticalErrorDialog(String header, Throwable throwable) {
+        try {
+            if (mainStage != null && mainStage.getScene() != null) {
+                Injector.instantiateModelOrService(DialogService.class).showErrorDialogAndWait(header, throwable);
+                return;
+            }
+            ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+            exceptionDialog.setHeaderText(header);
+            exceptionDialog.showAndWait();
+        } catch (Throwable dialogFailure) {
+            LOGGER.error("Could not show critical error dialog", dialogFailure);
+        }
     }
 
     public void initialize() {
@@ -247,6 +281,28 @@ public class JabRefGUI extends Application {
                 dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
+
+        loadBundledFonts();
+
+        JabRefGUI.bibTeXSyntaxHighlighter = new BibTeXSyntaxHighlighter();
+        Injector.setModelOrService(BibTeXSyntaxHighlighter.class, bibTeXSyntaxHighlighter);
+    }
+
+    /// Registers bundled fonts so they can be referenced by family name in CSS.
+    private void loadBundledFonts() {
+        try (InputStream stream = JabRefGUI.class.getClassLoader().getResourceAsStream(BIBTEX_EDITOR_FONT_RESOURCE)) {
+            if (stream == null) {
+                LOGGER.warn("Could not find bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE);
+                return;
+            }
+
+            Font font = Font.loadFont(stream, -1);
+            if (font == null) {
+                LOGGER.warn("Could not load bundled font {}, falling back to the platform default", BIBTEX_EDITOR_FONT_RESOURCE);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not load bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE, e);
+        }
     }
 
     private void setupProxy() {
@@ -324,6 +380,7 @@ public class JabRefGUI extends Application {
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
 
         Scene scene = new Scene(powerpane);
+        installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
         themeManager.installCssOnScene(scene);
@@ -350,6 +407,20 @@ public class JabRefGUI extends Application {
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
 
         // Lifecycle note: after this method, #onShowing will be called
+    }
+
+    // [impl->req~entry-editor.validation-decoration.startup~1]
+
+    /// Installs ControlsFX's decoration root before validation is first used.
+    ///
+    /// ControlsFX injects its internal `DecorationPane` as the scene root on the first
+    /// decoration. Doing that during startup avoids replacing the root while opening the entry
+    /// editor, which would otherwise trigger a large CSS reapplication on the critical path.
+    private static void installControlsFxDecorationPane(PowerPane powerpane) {
+        Region probeNode = new Region();
+        GraphicDecoration probeDecoration = new GraphicDecoration(probeNode);
+        Decorator.addDecoration(powerpane, probeDecoration);
+        Decorator.removeDecoration(powerpane, probeDecoration);
     }
 
     public void onShowing(WindowEvent event) {

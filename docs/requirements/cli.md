@@ -47,6 +47,15 @@ Field-level findings additionally carry the affected field name.
 
 Needs: impl
 
+## Standard output conversion format
+`req~jabkit.cli.convert-stdout-format~1`
+
+When `jabkit convert` writes to standard output, it uses the exporter selected by
+`--output-format`. Progress messages are written to standard error so standard output
+contains only the exported data.
+
+Needs: impl
+
 ## GitHub Actions output of the `check` commands
 `req~jabkit.cli.check-github-actions-output~1`
 

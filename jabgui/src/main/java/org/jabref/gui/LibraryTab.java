@@ -20,15 +20,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -312,19 +309,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.dataLoadingTask = dataLoadingTask;
     }
 
-    /// The layout to display in the tab when it is loading
-    private Node createLoadingAnimationLayout() {
-        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-        BorderPane pane = new BorderPane();
-        pane.setCenter(progressIndicator);
-        return pane;
-    }
-
-    private void onDatabaseLoadingStarted() {
-        Node loadingLayout = createLoadingAnimationLayout();
-        getMainTable().placeholderProperty().setValue(loadingLayout);
-    }
-
     private void onDatabaseLoadingSucceed(ParserResult result) {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         if (result.getChangedOnMigration()) {
@@ -404,7 +388,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext, coarseChangeFilter);
-            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
@@ -694,7 +678,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -917,8 +901,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager.getJabRefClipboardTransferData(),
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Pasted %0 entry(s) to %1"),
-                Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+                params -> Localization.lang("Pasted %0 entry(s) to %1", params),
+                params -> Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -943,22 +927,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
-        String successMessage;
-        String partialMessage;
-        if (mode == TransferMode.COPY) {
-            successMessage = Localization.lang("Copied %0 entry(s) to %1");
-            partialMessage = Localization.lang("Copied %0 entry(s) to %1. %2 were skipped");
-        } else {
-            successMessage = Localization.lang("Moved %0 entry(s) to %1");
-            partialMessage = Localization.lang("Moved %0 entry(s) to %1. %2 were skipped");
-        }
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext,
+                          List<BibEntry> originalEntries,
+                          List<BibEntry> entriesToAdd,
+                          TransferMode mode) {
         addEntriesWithFeedback(
                 new TransferInformation(sourceBibDatabaseContext, mode, originalEntries),
                 entriesToAdd,
                 bibDatabaseContext,
-                successMessage,
-                partialMessage,
+                params -> Localization.lang("Moved %0 entry(s) to %1", params),
+                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -1120,8 +1098,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
-        dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
-                       .onSuccess(newTab::onDatabaseLoadingSucceed)
+        dataLoadingTask.onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
                        .executeWith(taskExecutor);
 

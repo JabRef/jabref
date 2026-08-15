@@ -5,7 +5,8 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.*
+import org.jabref.gradle.EmbeddedPostgresBinaries
+import java.util.Calendar
 
 plugins {
     id("org.jabref.gradle.module")
@@ -23,30 +24,15 @@ plugins {
     id("net.ltgt.nullaway") version "3.1.0"
 }
 
-val embeddedPostgresHostBinary: Pair<String, String>? = run {
-    val osName = System.getProperty("os.name").lowercase(Locale.ROOT)
-    val architectureName = System.getProperty("os.arch").lowercase(Locale.ROOT)
-    val isArm64 = architectureName in setOf("aarch64", "arm64")
-
-    when {
-        osName.contains("linux") && isArm64 ->
-            "embedded.postgres.binaries.linux.arm64v8" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8"
-        osName.contains("linux") ->
-            "embedded.postgres.binaries.linux.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64"
-        osName.contains("mac") && isArm64 ->
-            "embedded.postgres.binaries.darwin.arm64v8" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8"
-        osName.contains("mac") ->
-            "embedded.postgres.binaries.darwin.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64"
-        osName.contains("windows") ->
-            "embedded.postgres.binaries.windows.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64"
-        else -> null
-    }
-}
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
 
 testModuleInfo {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     runtimeOnly("org.jabref")
-    embeddedPostgresHostBinary?.let { runtimeOnly(it.first) }
+    embeddedPostgresHostBinary?.let { runtimeOnly(it.moduleName) }
 
     requires("org.jabref.testsupport")
 
@@ -85,7 +71,7 @@ dependencies {
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
 
-    embeddedPostgresHostBinary?.let { testRuntimeOnly(it.second) }
+    embeddedPostgresHostBinary?.let { testRuntimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
 var version = providers.gradleProperty("projVersion")
@@ -210,6 +196,7 @@ val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 val wileyTdmApiKey = providers.environmentVariable("WileyTdmApiKey").orElse("")
+val crossRefEmail = providers.environmentVariable("CROSSREF_EMAIL").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -233,6 +220,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
     inputs.property("wileyTdmApiKey", wileyTdmApiKey)
+    inputs.property("crossRefEmail", crossRefEmail)
 
     filesMatching("build.properties") {
         expand(
@@ -252,6 +240,7 @@ tasks.named<ProcessResources>("processResources") {
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],
                 "wileyTdmApiKey" to inputs.properties["wileyTdmApiKey"],
+                "crossRefEmail" to inputs.properties["crossRefEmail"],
             )
         )
     }

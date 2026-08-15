@@ -22,9 +22,13 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,6 +138,23 @@ class JStyleTest {
                 uniquefiers,
                 isFirstAppearanceOfSource,
                 pageInfo);
+    }
+
+    static String getCitationMarkerForType(JStyle style,
+                                           List<BibEntry> entries,
+                                           Map<BibEntry, BibDatabase> entryDBMap,
+                                           CitationType citationType,
+                                           String[] uniquefiers,
+                                           Boolean[] isFirstAppearanceOfSource,
+                                           String[] pageInfo) {
+        return OOBibStyleTestHelper.getCitationMarkerForType(style,
+                entries,
+                entryDBMap,
+                citationType,
+                uniquefiers,
+                isFirstAppearanceOfSource,
+                pageInfo
+        );
     }
 
     // endregion
@@ -925,5 +946,58 @@ class JStyleTest {
                             true,
                             NonUniqueCitationMarker.THROWS).toString());
         }
+    }
+
+    static Stream<Arguments> createCitationMarkerSupportsCitationTypesFromCiteSpecial() {
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Jane Doe")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.TITLE, "Title 1")
+                .withCitationKey("a1");
+        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Jane Doe")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.TITLE, "Title 2")
+                .withCitationKey("a2");
+        BibDatabase database = new BibDatabase(List.of(entry1, entry2));
+        Map<BibEntry, BibDatabase> entryDBMap = Map.of(entry1, database, entry2, database);
+
+        return Stream.of(
+                Arguments.of("Doe 2003; p1", List.of(entry1), entryDBMap,
+                        CitationType.AUTHORYEAR_NOPAR,
+                        new String[] {null}, new Boolean[] {false}, new String[] {"p1"}),
+                Arguments.of("Doe", List.of(entry1), entryDBMap,
+                        CitationType.AUTHOR_ONLY,
+                        new String[] {"a"}, new Boolean[] {false}, new String[] {"p1"}),
+                Arguments.of("Doe; Doe", List.of(entry1, entry2), entryDBMap,
+                        CitationType.AUTHOR_ONLY,
+                        new String[] {"a", "b"}, new Boolean[] {false, false}, new String[] {null, null}),
+                Arguments.of("2003a; p1", List.of(entry1), entryDBMap,
+                        CitationType.YEAR_ONLY,
+                        new String[] {"a"}, new Boolean[] {false}, new String[] {"p1"}));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void createCitationMarkerSupportsCitationTypesFromCiteSpecial(String expected,
+                                                                  List<BibEntry> entries,
+                                                                  Map<BibEntry, BibDatabase> entryDBMap,
+                                                                  CitationType citationType,
+                                                                  String[] uniquefiers,
+                                                                  Boolean[] isFirstAppearanceOfSource,
+                                                                  String[] pageInfos) throws IOException {
+        JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
+
+        String actual = getCitationMarkerForType(
+                style,
+                entries,
+                entryDBMap,
+                citationType,
+                uniquefiers,
+                isFirstAppearanceOfSource,
+                pageInfos
+        );
+
+        assertEquals(expected, actual);
     }
 }

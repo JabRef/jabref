@@ -22,6 +22,11 @@ import org.jspecify.annotations.NonNull;
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class KeywordList implements Iterable<Keyword> {
 
+    private static final Character DEFAULT_KEYWORD_DELIMITER = ',';
+    private static final Character NO_KEYWORD_DELIMITER = '\0';
+    private static final char OPENING_BRACE = '{';
+    private static final char CLOSING_BRACE = '}';
+
     private final List<Keyword> keywordChains;
 
     public KeywordList() {
@@ -88,7 +93,91 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
+    /// Parses the keyword list using multiple candidate delimiters.
+    /// Delimiters are recognized only at top level, not when escaped or inside braces.
+    ///
+    /// @param keywordString a String of keywordChains
+    /// @param delimiters    a List of delimiters used for separating the keywords
+    /// @return a parsed list containing the keywordChains
+    public static KeywordList parseWithMultipleDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(DEFAULT_KEYWORD_DELIMITER) : delimiters;
+        List<String> keywordTokens = splitByDelimiters(keywordString, effectiveDelimiters);
+        KeywordList keywordList = new KeywordList();
+        for (String keywordToken : keywordTokens) {
+            parse(keywordToken, NO_KEYWORD_DELIMITER).forEach(keywordList::add);
+        }
+        return keywordList;
+    }
+
+    /// Parses the keyword list by inferring a single delimiter using the given priority order.
+    public static KeywordList parseWithPrioritizedDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        List<Character> effectiveDelimiters = delimiters.isEmpty() ? List.of(DEFAULT_KEYWORD_DELIMITER) : delimiters;
+        for (Character delimiter : effectiveDelimiters) {
+            KeywordList keywordList = parseWithMultipleDelimiters(keywordString, List.of(delimiter));
+            if (keywordList.size() > 1) {
+                return keywordList;
+            }
+        }
+        return parseWithMultipleDelimiters(keywordString, List.of(DEFAULT_KEYWORD_DELIMITER));
+    }
+
+    private static List<String> splitByDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
+        List<String> keywordTokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        AtomicBoolean isEscaping = new AtomicBoolean(false);
+        int braceDepth = 0;
+
+        for (char currentChar : keywordString.toCharArray()) {
+            if (isEscaping.get()) {
+                currentToken.append(currentChar);
+                isEscaping.set(false);
+            } else if (currentChar == Keyword.DEFAULT_ESCAPE_SYMBOL) {
+                currentToken.append(currentChar);
+                isEscaping.set(true);
+            } else if (currentChar == OPENING_BRACE) {
+                currentToken.append(currentChar);
+                braceDepth++;
+            } else if (currentChar == CLOSING_BRACE) {
+                currentToken.append(currentChar);
+                if (braceDepth > 0) {
+                    braceDepth--;
+                }
+            } else if ((braceDepth == 0) && delimiters.contains(currentChar)) {
+                addTokenIfNotBlank(keywordTokens, currentToken);
+            } else {
+                currentToken.append(currentChar);
+            }
+        }
+
+        addTokenIfNotBlank(keywordTokens, currentToken);
+        return keywordTokens;
+    }
+
+    private static void addTokenIfNotBlank(List<String> keywordTokens, StringBuilder currentToken) {
+        String keywordToken = currentToken.toString().trim();
+        if (!keywordToken.isEmpty()) {
+            keywordTokens.add(keywordToken);
+        }
+        currentToken.setLength(0);
+    }
+
     public static String serialize(List<Keyword> keywords, Character delimiter) {
+        return serialize(keywords, delimiter, delimiter.toString());
+    }
+
+    public static String serializeWithSpaces(List<Keyword> keywords, Character delimiter) {
+        return serialize(keywords, delimiter, delimiter + " ");
+    }
+
+    private static String serialize(List<Keyword> keywords, Character delimiter, String keywordSeparator) {
         String delimiterStr = delimiter.toString();
         String escapeSequenceStr = Keyword.DEFAULT_ESCAPE_SYMBOL.toString();
         String escapedDelimiter = escapeSequenceStr + delimiterStr;
@@ -103,7 +192,7 @@ public class KeywordList implements Iterable<Keyword> {
                                               .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
                                               .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
                                               .collect(Collectors.joining(hierarchicalSeparator)))
-                       .collect(Collectors.joining(delimiterStr));
+                       .collect(Collectors.joining(keywordSeparator));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
