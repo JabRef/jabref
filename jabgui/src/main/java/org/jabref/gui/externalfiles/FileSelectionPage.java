@@ -2,7 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.Comparator;
 import java.util.StringJoiner;
 
 import javafx.application.Platform;
@@ -42,10 +42,11 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckTreeView;
@@ -59,11 +60,14 @@ public class FileSelectionPage extends WizardPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSelectionPage.class);
 
+    private static final int PREVIEW_REFRESH_DELAY = 300;
+
     private final UnlinkedFilesDialogViewModel viewModel;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final ImportFormatPreferences importFormatPreferences;
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
+    private final DelayTaskThrottler previewThrottler;
 
     private @Nullable BackgroundTask<?> currentMetadataTask;
 
@@ -92,6 +96,7 @@ public class FileSelectionPage extends WizardPane {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.importFormatPreferences = importFormatPreferences;
+        this.previewThrottler = taskExecutor.createThrottler(PREVIEW_REFRESH_DELAY);
 
         setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
@@ -200,7 +205,8 @@ public class FileSelectionPage extends WizardPane {
             }
         });
 
-        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> refreshPreviewForCurrentSelection());
+        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                previewThrottler.schedule(() -> UiTaskExecutor.runNowOrInJavaFXThread(this::refreshPreviewForCurrentSelection)));
         enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> updatePreviewVisibility());
         previewPane.expandedProperty().addListener((observable, oldValue, expanded) -> updatePreviewVisibility());
 
@@ -244,19 +250,20 @@ public class FileSelectionPage extends WizardPane {
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(selectedPath));
         currentMetadataTask = task;
-        task.onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+        task.onSuccess(result -> {
             if (currentMetadataTask != task) {
                 return;
             }
             metadataPreview.setText(formatParserResult(result));
-        }));
-        task.onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+        });
+        // importDatabase converts expected exceptions into a ParserResult; this only catches unexpected runtime errors
+        task.onFailure(exception -> {
             if (currentMetadataTask != task) {
                 return;
             }
             LOGGER.warn("Could not extract PDF metadata for {}", selectedPath, exception);
             metadataPreview.setText(Localization.lang("Could not extract Metadata from: %0", selectedPath.getFileName().toString()));
-        }));
+        });
         task.executeWith(taskExecutor);
     }
 
@@ -270,6 +277,7 @@ public class FileSelectionPage extends WizardPane {
     }
 
     private void showPreviewDisabledState(String metadataText) {
+        previewThrottler.cancel();
         cancelCurrentMetadataTask();
         pdfPreview.show(null);
         metadataPreview.setText(metadataText);
@@ -312,27 +320,37 @@ public class FileSelectionPage extends WizardPane {
 
     /// Cancels any in-flight preview work.
     public void cancelPreviewTasks() {
+        previewThrottler.cancel();
         cancelCurrentMetadataTask();
     }
 
+    /// Stops the preview throttler so that no further preview refresh is scheduled.
+    public void shutdown() {
+        previewThrottler.shutdown();
+    }
+
     private String formatParserResult(ParserResult result) {
-        if (result.isInvalid() || result.hasWarnings()) {
+        if (result.getDatabase().hasEntries()) {
+            return formatBibEntry(result.getDatabase().getEntries().getFirst());
+        }
+        if (result.isInvalid()) {
             return result.getErrorMessage();
         }
-        if (!result.getDatabase().hasEntries()) {
-            return Localization.lang("No extracted metadata available.");
-        }
-        return formatBibEntry(result.getDatabase().getEntries().getFirst());
+        return Localization.lang("No extracted metadata available.");
     }
 
     private String formatBibEntry(BibEntry entry) {
         StringJoiner joiner = new StringJoiner(System.lineSeparator());
-        for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            String value = field.getValue();
-            if (value != null && !value.isBlank()) {
-                joiner.add(field.getKey().getName() + ": " + value);
-            }
-        }
+        joiner.add(Localization.lang("Type: %0", entry.getType().getDisplayName()));
+        entry.getFieldMap().entrySet().stream()
+             .filter(field -> !field.getKey().equals(StandardField.FILE))
+             .sorted(Comparator.comparing(field -> field.getKey().getName()))
+             .forEach(field -> {
+                 String value = field.getValue();
+                 if (value != null && !value.isBlank()) {
+                     joiner.add(field.getKey().getName() + ": " + value);
+                 }
+             });
         return joiner.toString();
     }
 
