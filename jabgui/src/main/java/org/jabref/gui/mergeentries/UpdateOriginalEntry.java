@@ -20,6 +20,7 @@ import org.jabref.model.entry.types.EntryType;
 
 import org.jspecify.annotations.NullMarked;
 
+/// A class that is desired to update the original entry with the merged entry in the multi-way merge dialog.
 @NullMarked
 class UpdateOriginalEntry {
 
@@ -49,6 +50,7 @@ class UpdateOriginalEntry {
         mergedEntry.ifPresentOrElse(this::updateOriginalEntry, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
     }
 
+    /// If any differences are found between the original entry and the merged entry, the original entry will be updated with the merged entry's information.
     private void updateOriginalEntry(BibEntry mergedEntry) {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
         boolean edited = updateEntryType(mergedEntry, compoundEdit);
@@ -88,6 +90,7 @@ class UpdateOriginalEntry {
 
         boolean edited = false;
 
+        // This loop is for setting fields
         for (Field field : mergedFields) {
             Optional<String> originalString = originalEntry.getField(field);
             Optional<String> mergedString = mergedEntry.getField(field);
@@ -97,6 +100,7 @@ class UpdateOriginalEntry {
             }
         }
 
+        // This one is for clearing fields
         for (Field field : originalFields) {
             if (!mergedFields.contains(field) && !FieldFactory.isInternalField(field)) {
                 edited = applyFieldChange(originalEntry.clearField(field), compoundEdit) || edited;
