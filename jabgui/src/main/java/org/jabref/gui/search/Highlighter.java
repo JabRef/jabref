@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.search.query.SearchQueryConversion;
@@ -66,12 +68,17 @@ public class Highlighter {
     }
 
     private static String highlightNode(String text, String searchPattern) {
-        if (!shouldUsePostgresSearch()) {
+            if (!shouldUsePostgresSearch()) {
+        try {
             return text.replaceAll(
                     "(?i)(" + searchPattern + ")",
                     "<mark style=\"background: orange\">$1</mark>"
             );
+        } catch (PatternSyntaxException e) {
+            LOGGER.debug("Invalid regex: {}", searchPattern, e);
+            return text;
         }
+    }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgresServer.class).getConnection();
         }
@@ -149,9 +156,15 @@ public class Highlighter {
         return searchQuery.isValid() ? SearchQueryConversion.extractSearchTerms(searchQuery) : List.of();
     }
 
-    public static Optional<String> buildSearchPattern(List<String> terms) {
-        return terms.isEmpty() ? Optional.empty() : Optional.of(String.join("|", terms));
-    }
+public static Optional<String> buildSearchPattern(List<String> terms) {
+    return terms.isEmpty()
+            ? Optional.empty()
+            : Optional.of(
+                    terms.stream()
+                         .map(Pattern::quote)
+                         .collect(Collectors.joining("|"))
+            );
+}
 
     private static boolean shouldUsePostgresSearch() {
         if (guiPreferences == null) {
