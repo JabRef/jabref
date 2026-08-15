@@ -113,7 +113,7 @@ public class FrameDndHandler {
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 TransferMode mode = tabDragEvent.getTransferMode();
-                org.jabref.model.TransferMode modelTransferMode= org.jabref.model.TransferMode.from(mode);
+                org.jabref.model.TransferMode modelTransferMode = org.jabref.model.TransferMode.from(mode);
                 destinationLibraryTab.dropEntry(sourceBibDatabaseContext, originalEntries, entryCopies, modelTransferMode);
                 success = true;
             } else if (hasGroups(dragboard)) {
