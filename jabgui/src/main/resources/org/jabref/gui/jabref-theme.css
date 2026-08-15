@@ -237,7 +237,7 @@
 }
 
 .lib-change-legend {
-    -fx-font-size: 11px;
+    -fx-font-size: 0.85em;
     -fx-text-fill: #555;
     -fx-padding: 4 0 0 5;
 }

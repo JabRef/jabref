@@ -64,11 +64,6 @@ public class BaseDialog<T> extends Dialog<T> {
 
     /// Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
     public static void applyButtonFix(DialogPane pane) {
-        // Force the window to fit the new font content bounds
-        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
-            pane.getScene().getWindow().sizeToScene();
-        }
-
         for (ButtonType type : pane.getButtonTypes()) {
             Node node = pane.lookupButton(type);
             if (node instanceof Button button) {
@@ -82,6 +77,11 @@ public class BaseDialog<T> extends Dialog<T> {
                 // Re-trigger CSS to ensure prefWidth is calculated using the new font metrics
                 button.applyCss();
             }
+        }
+
+        // Force the window to fit the new font content bounds
+        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
+            pane.getScene().getWindow().sizeToScene();
         }
     }
 
