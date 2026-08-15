@@ -3,6 +3,7 @@ package org.jabref.gui.groups;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import javafx.beans.binding.IntegerBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -298,5 +299,40 @@ class GroupNodeViewModelTest {
         preferences.getGroupsPreferences().setDisplayGroupCount(true);
         vm.ensureMatchedEntriesLoaded();
         assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreUpdatedWhenMatchingEntryIsRemoved() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(firstEntry, secondEntry);
+
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(2, vm.getHits().getValue().intValue());
+
+        databaseContext.getDatabase().removeEntry(firstEntry);
+
+        assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void refreshingMatchedEntriesHandlesReentrantDatabaseChange() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(firstEntry, secondEntry);
+
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        IntegerBinding hits = vm.getHits();
+        assertEquals(2, hits.getValue().intValue());
+
+        hits.addListener(_ -> databaseContext.getDatabase().removeEntry(secondEntry));
+
+        vm.updateMatchedEntries();
+
+        assertEquals(2, hits.getValue().intValue());
     }
 }

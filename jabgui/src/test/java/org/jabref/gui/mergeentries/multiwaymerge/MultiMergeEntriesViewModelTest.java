@@ -1,11 +1,13 @@
 package org.jabref.gui.mergeentries.multiwaymerge;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +37,7 @@ class MultiMergeEntriesViewModelTest {
     void updateFieldsSetsFieldWhenNotYetPresent() {
         BibEntry source = new BibEntry().withField(StandardField.YEAR, "2015");
         viewModel.updateFields(source);
-        assertEquals("2015", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
+        assertEquals(Optional.of("2015"), viewModel.mergedEntryProperty().get().getField(StandardField.YEAR));
     }
 
     static Stream<Arguments> updateFieldsMergesWithPlausibility() {
@@ -66,7 +68,7 @@ class MultiMergeEntriesViewModelTest {
         viewModel.updateFields(leftEntry);
         viewModel.updateFields(rightEntry);
 
-        assertEquals(expected, viewModel.mergedEntryProperty().get().getField(field).orElse(""));
+        assertEquals(Optional.of(expected), viewModel.mergedEntryProperty().get().getField(field));
     }
 
     @Test
@@ -82,7 +84,7 @@ class MultiMergeEntriesViewModelTest {
     void setMergedFieldValueSetsNonEmptyValue() {
         viewModel.setMergedFieldValue(StandardField.YEAR, "2015");
 
-        assertEquals("2015", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
+        assertEquals(Optional.of("2015"), viewModel.mergedEntryProperty().get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -96,7 +98,18 @@ class MultiMergeEntriesViewModelTest {
         assertTrue(viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).isEmpty());
 
         viewModel.setMergedFieldValue(StandardField.YEAR, "2024");
-        assertEquals("2024", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
+        assertEquals(Optional.of("2024"), viewModel.mergedEntryProperty().get().getField(StandardField.YEAR));
+    }
+
+    @Test
+    void addSourceWithImmediateEntryInitializesMergedEntryFieldsAndType() {
+        BibEntry source = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.YEAR, "2015");
+
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource("Original entry", source));
+
+        assertEquals(Optional.of("2015"), viewModel.mergedEntryProperty().get().getField(StandardField.YEAR));
+        assertEquals(StandardEntryType.Article, viewModel.mergedEntryProperty().get().getType());
     }
 
     @Test
