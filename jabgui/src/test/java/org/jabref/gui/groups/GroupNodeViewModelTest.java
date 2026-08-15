@@ -299,4 +299,20 @@ class GroupNodeViewModelTest {
         vm.ensureMatchedEntriesLoaded();
         assertEquals(1, vm.getHits().getValue().intValue());
     }
+
+    @Test
+    void hitsAreUpdatedWhenMatchingEntryIsRemoved() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(firstEntry, secondEntry);
+
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(2, vm.getHits().getValue().intValue());
+
+        databaseContext.getDatabase().removeEntry(firstEntry);
+
+        assertEquals(1, vm.getHits().getValue().intValue());
+    }
 }

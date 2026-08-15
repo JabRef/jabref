@@ -1,7 +1,9 @@
 package org.jabref.gui.groups;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -10,12 +12,12 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
@@ -77,7 +79,9 @@ public class GroupNodeViewModel {
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
     @ADR(38)
-    private final ObservableSet<String> matchedEntries = FXCollections.observableSet();
+    private final Set<String> matchedEntries = new HashSet<>();
+    private final Object matchedEntriesLock = new Object();
+    private final ReadOnlyIntegerWrapper matchedEntriesCount = new ReadOnlyIntegerWrapper(0);
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -208,7 +212,7 @@ public class GroupNodeViewModel {
     }
 
     public IntegerBinding getHits() {
-        return Bindings.size(matchedEntries);
+        return Bindings.createIntegerBinding(matchedEntriesCount::get, matchedEntriesCount.getReadOnlyProperty());
     }
 
     void ensureMatchedEntriesLoaded() {
@@ -289,21 +293,21 @@ public class GroupNodeViewModel {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (isMatchEffective(this, changedEntry)) {
                         // ADR-0038
-                        matchedEntries.add(changedEntry.getId());
+                        addMatchedEntry(changedEntry.getId());
                     } else {
                         // ADR-0038
-                        matchedEntries.remove(changedEntry.getId());
+                        removeMatchedEntry(changedEntry.getId());
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
                     // ADR-0038
-                    matchedEntries.remove(removedEntry.getId());
+                    removeMatchedEntry(removedEntry.getId());
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (isMatchEffective(this, addedEntry)) {
                         // ADR-0038
-                        matchedEntries.add(addedEntry.getId());
+                        addMatchedEntry(addedEntry.getId());
                     }
                 }
             }
@@ -327,7 +331,7 @@ public class GroupNodeViewModel {
             // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
             // and clear now so rebinding never briefly shows the outdated number
             matchedEntriesInitialized = false;
-            matchedEntries.clear();
+            clearMatchedEntries();
             return;
         }
 
@@ -342,9 +346,7 @@ public class GroupNodeViewModel {
                                            .filter(e -> isMatchEffective(this, e))
                                            .toList())
                 .onSuccess(entries -> {
-                    matchedEntries.clear();
-                    // ADR-0038
-                    entries.forEach(entry -> matchedEntries.add(entry.getId()));
+                    replaceMatchedEntries(entries);
                     matchedEntriesInitialized = true;
                     completeMatchedEntriesUpdate();
                 })
@@ -362,6 +364,41 @@ public class GroupNodeViewModel {
         if (matchedEntriesUpdatePending) {
             matchedEntriesUpdatePending = false;
             updateMatchedEntries();
+        }
+    }
+
+    private void addMatchedEntry(String entryId) {
+        synchronized (matchedEntriesLock) {
+            if (matchedEntries.add(entryId)) {
+                matchedEntriesCount.set(matchedEntries.size());
+            }
+        }
+    }
+
+    private void removeMatchedEntry(String entryId) {
+        synchronized (matchedEntriesLock) {
+            if (matchedEntries.remove(entryId)) {
+                matchedEntriesCount.set(matchedEntries.size());
+            }
+        }
+    }
+
+    private void clearMatchedEntries() {
+        synchronized (matchedEntriesLock) {
+            if (!matchedEntries.isEmpty()) {
+                matchedEntries.clear();
+                matchedEntriesCount.set(0);
+            }
+        }
+    }
+
+    private void replaceMatchedEntries(List<BibEntry> entries) {
+        synchronized (matchedEntriesLock) {
+            matchedEntries.clear();
+            entries.stream()
+                   .map(BibEntry::getId)
+                   .forEach(matchedEntries::add);
+            matchedEntriesCount.set(matchedEntries.size());
         }
     }
 
@@ -692,9 +729,9 @@ public class GroupNodeViewModel {
                 }).onFinished(() -> {
                     for (BibEntry entry : event.entries()) {
                         if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
-                            matchedEntries.add(entry.getId());
+                            addMatchedEntry(entry.getId());
                         } else {
-                            matchedEntries.remove(entry.getId());
+                            removeMatchedEntry(entry.getId());
                         }
                     }
                     databaseContext.getMetaData().groupsBinding().invalidate();
@@ -707,7 +744,7 @@ public class GroupNodeViewModel {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 for (BibEntry entry : event.entries()) {
                     searchGroup.updateMatches(entry, false);
-                    matchedEntries.remove(entry.getId());
+                    removeMatchedEntry(entry.getId());
                 }
                 databaseContext.getMetaData().groupsBinding().invalidate();
             }
