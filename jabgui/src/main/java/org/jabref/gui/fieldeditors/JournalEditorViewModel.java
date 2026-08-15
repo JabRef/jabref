@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
@@ -16,6 +17,7 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final GuiPreferences preferences;
 
     public JournalEditorViewModel(
             Field field,
@@ -24,11 +26,13 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             FieldCheckers fieldCheckers,
             TaskExecutor taskExecutor,
             DialogService dialogService,
+            GuiPreferences preferences,
             UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.preferences = preferences;
     }
 
     public void toggleAbbreviation() {
@@ -47,6 +51,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void showJournalInfo(Button journalInfoButton) {
-        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor);
+        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor, preferences.getImporterPreferences());
     }
 }

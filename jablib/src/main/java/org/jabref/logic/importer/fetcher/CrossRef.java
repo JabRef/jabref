@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -18,11 +20,13 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.IdParserFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
@@ -35,6 +39,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.util.OptionalUtil;
 
+import com.google.common.annotations.VisibleForTesting;
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -44,9 +50,12 @@ import org.jspecify.annotations.NonNull;
 /// A class for fetching DOIs from CrossRef
 ///
 /// See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
-public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
+public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher, CustomizableKeyFetcher {
+
+    public static final String FETCHER_NAME = "Crossref";
 
     private static final String API_URL = "https://api.crossref.org/works";
+    private static final String MAILTO_PARAMETER = "mailto";
 
     /// Rate limit for the CrossRef REST API public pool.
     /// CrossRef's public pool defaults to 50 req/s, as measured via X-Rate-Limit-Interval/X-Rate-Limit-Limit
@@ -55,14 +64,40 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
+    private final ImporterPreferences importerPreferences;
+
+    public CrossRef() {
+        this(ImporterPreferences.getDefault());
+    }
+
+    public CrossRef(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
+
     @Override
     public String getName() {
-        return "Crossref";
+        return FETCHER_NAME;
     }
 
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_CROSSREF);
+    }
+
+    @VisibleForTesting
+    String getTestUrl(String apiKey) {
+        return API_URL + "?query=test&rows=1&" + MAILTO_PARAMETER + "=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public boolean isValidKey(@NonNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
     }
 
     @Override
@@ -102,6 +137,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         );
         uriBuilder.addParameter("rows", "20");  // = API default
         uriBuilder.addParameter("offset", "0"); // start at the beginning
+        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
@@ -109,12 +145,14 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + URLEncoder.encode(identifier, StandardCharsets.UTF_8));
+        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
@@ -237,6 +275,11 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public String getIdentifierName() {
         return "DOI";
+    }
+
+    // [impl->req~fetchers.crossref-polite-pool~1]
+    private void addMailtoParameter(URIBuilder uriBuilder) {
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(email -> uriBuilder.addParameter(MAILTO_PARAMETER, email));
     }
 
     private String getKeywords(JSONArray jsonArray) {

@@ -357,6 +357,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
         boolean isSelectedTab = false;
+        BibDatabaseContext previousDatabaseContext = this.bibDatabaseContext;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -367,18 +368,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             isSelectedTab = true;
         }
 
-        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
-        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
-        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+        stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getOpenDatabases().add(bibDatabaseContext);
-
         initializeComponentsAndListeners(false);
 
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
+
         if (isSelectedTab) {
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            if (stateManager.getActiveDatabase().filter(databaseContext -> databaseContext == previousDatabaseContext).isPresent()) {
+                stateManager.replaceActiveDatabase(bibDatabaseContext);
+            } else {
+                stateManager.setActiveDatabase(bibDatabaseContext);
+            }
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
@@ -388,7 +391,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext, coarseChangeFilter);
-            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
@@ -678,7 +681,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
                 if (saveAction.save()) {
                     return true;
                 }

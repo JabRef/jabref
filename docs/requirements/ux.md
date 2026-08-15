@@ -40,6 +40,20 @@ The user needs a visible error dialog, in addition to the log entry, since [digg
 
 Needs: impl
 
+## Merge entries dialog allows selecting empty field values
+`req~ux.merge-entries.select-empty-field~1`
+
+When the merge entries dialog shows a field that is missing in one of the source entries, the user must be able to explicitly select that empty value so the merged entry is cleared for that field.
+
+Needs: impl
+
+## Updating an entry via entry data applies the confirmed merge result
+`req~ux.update-entry-web-info.apply-merge-result~1`
+
+When a user chooses `Update with bibliographic information via entry data` and confirms the merge dialog, the selected merged values must be written back to the original entry as one undoable update.
+
+Needs: impl
+
 ## GitHub personal access token verification
 `req~ux.git-share.personal-access-token-verification~1`
 

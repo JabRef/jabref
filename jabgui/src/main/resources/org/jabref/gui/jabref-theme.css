@@ -2468,31 +2468,31 @@ journalInfo .grid-cell-b {
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
-    -fx-text-fill: -fx-dark-text-color;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
-    -fx-text-fill: -fx-dark-text-color;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .text-container > .description-label {
-    -fx-text-fill: -fx-dark-text-color;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .info-center-view .notification-view .default-icon {
-    -fx-icon-color: -fx-dark-text-color;
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
+    -fx-icon-color: -fx-text-background-color;
 }
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
