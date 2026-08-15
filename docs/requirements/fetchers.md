@@ -10,6 +10,20 @@ Fetchers with a documented request limit throttle requests across all fetcher in
 
 Needs: impl
 
+## Use Crossref's polite pool
+`req~fetchers.crossref-polite-pool~1`
+
+When an email address is configured for Crossref, requests include it in the `mailto` parameter to use Crossref's polite pool.
+
+Needs: impl
+
+## Retry identifier lookups after rate limiting
+`req~fetchers.identifier-rate-limit-retries~1`
+
+Identifier fetchers retry a request rejected with HTTP 429 using bounded exponential backoff, while preserving all other client errors.
+
+Needs: impl
+
 ## Retrieve journal information from public sources
 `req~fetchers.journal-information~1`
 
