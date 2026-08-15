@@ -48,7 +48,6 @@ public final class CSLFormatUtils {
     private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
-    private static final Pattern BIBLIOGRAPHY_NUMBER_PATTERN = Pattern.compile("([\\[(])?(\\d+)([])])?(\\.)?\\s*");
 
     private CSLFormatUtils() {
         // prevent instantiation
@@ -155,41 +154,6 @@ public final class CSLFormatUtils {
                                  .orElse("");
 
         return authorName + " " + inTextCitation;
-    }
-
-    /// Method to update citation number of a bibliographic entry (to be inserted in the list of references).
-    /// By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, org.jabref.logic.citationstyle.CitationStyleOutputFormat, BibDatabaseContext, org.jabref.model.entry.BibEntryTypesManager) generateBibliography}) always starts the numbering of a list of references with "1".
-    /// If a citation doesn't correspond to the first cited entry, the number should be changed to the appropriate current citation number.
-    /// The numbers should be globally unique. If an entry has been cited before, the older citation number corresponding to it should be reused.
-    /// The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
-    ///
-    /// **Precondition:** Use ONLY with numeric citation styles.
-    ///
-    /// @param citation      the numeric citation with an unresolved number.
-    /// @param currentNumber the correct number to update the citation with.
-    /// @return the bibliographic citation with resolved number.
-    public static String updateSingleBibliographyNumber(String citation, int currentNumber) {
-        Matcher matcher = BIBLIOGRAPHY_NUMBER_PATTERN.matcher(citation);
-        StringBuilder sb = new StringBuilder();
-        boolean numberReplaced = false;
-
-        while (matcher.find()) {
-            if (!numberReplaced) {
-                String prefix = matcher.group(1) != null ? matcher.group(1) : "";
-                String suffix = matcher.group(3) != null ? matcher.group(3) : "";
-                String dot = matcher.group(4) != null ? "." : "";
-                String space = matcher.group().endsWith(" ") ? " " : "";
-
-                String replacement = prefix + currentNumber + suffix + dot + space;
-
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-                numberReplaced = true;
-            } else {
-                matcher.appendReplacement(sb, matcher.group());
-            }
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
     }
 
     /// Extracts year from a citation having single or multiple entries, for the purpose of using in in-text citations.

@@ -17,9 +17,14 @@ val javafxDefault = "26.0.2"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
-val lucene = "10.5.0"
+val lucene = "10.5.1"
 
 val pdfbox = "3.0.8"
+
+// Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
+// https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
+val jbang = "0.141.0"
+extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
@@ -44,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.3.2")
+    api("com.dlsc.gemsfx:gemsfx:4.4.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -78,13 +83,13 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.5.0")
+    api("de.undercouch:citeproc-java:3.5.1")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.189")
+    api("io.github.classgraph:classgraph:4.8.191")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -108,7 +113,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.3")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.4")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
