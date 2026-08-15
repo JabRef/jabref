@@ -88,7 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where adding JabRef suggested groups immediately after a library loads caused an error. [#16552](https://github.com/JabRef/jabref/pull/16552)
 - We fixed an issue where only a reduced set of icons was available for groups. The broader group icon set is available again. [#16557](https://github.com/JabRef/jabref/issues/16557)
 - We fixed an issue where empty values in the merge entries dialog could not be selected to clear the merged entry field. [#15014](https://github.com/JabRef/jabref/issues/15014)
-- We fixed an issue where `Update with bibliographic information via entry data` could fail with an exception while the merge dialog was open.
+- We fixed an issue where `Update with bibliographic information via entry data` could fail with an exception while the merge dialog was open. [#16583](https://github.com/JabRef/jabref/pull/16583)
 - We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
 - We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
 - We fixed an issue where the exception message would show in the notification. [#14886](https://github.com/JabRef/jabref/issues/14886)
