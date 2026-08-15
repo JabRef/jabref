@@ -100,6 +100,9 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
+evaluationDependsOn(":versions")
+val jbangVersion = project(":versions").extra["jbangVersion"] as String
+
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
@@ -107,6 +110,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
 
@@ -121,6 +125,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     description = "Generates a catalog of all available citation styles"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
@@ -136,6 +141,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     description = "Converts the LTWA CSV file to a H2 MVStore"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
+    version = jbangVersion
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
