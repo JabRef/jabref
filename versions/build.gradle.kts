@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.3.2")
+    api("com.dlsc.gemsfx:gemsfx:4.4.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -89,7 +89,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.190")
+    api("io.github.classgraph:classgraph:4.8.191")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")

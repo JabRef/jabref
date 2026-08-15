@@ -263,7 +263,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return IconTheme.findJabRefIcon(iconCode)
+        return IconTheme.findGroupIcon(iconCode)
                         .map(icon -> icon.withColor(getColor()));
     }
 
