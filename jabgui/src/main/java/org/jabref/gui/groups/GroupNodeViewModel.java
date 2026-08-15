@@ -78,9 +78,16 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
+    /// Internal cache of matched entry IDs.
+    ///
+    /// Kept as a plain `Set` instead of an `ObservableSet`, because group refreshes and search-index updates can
+    /// overlap while the UI stays responsive (for example inside modal dialogs). Exposing collection change events
+    /// for this cache made bulk refreshes re-entrant and could trigger `ConcurrentModificationException`.
     @ADR(38)
     private final Set<String> matchedEntries = new HashSet<>();
+    /// Guards both the matched-entry cache and the derived hit-count property so readers observe a consistent pair.
     private final Object matchedEntriesLock = new Object();
+    /// UI-facing count derived from [#matchedEntries]. The sidebar binds to this property instead of the cache itself.
     private final ReadOnlyIntegerWrapper matchedEntriesCount = new ReadOnlyIntegerWrapper(0);
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
@@ -239,6 +246,12 @@ public class GroupNodeViewModel {
 
     @Override
     public String toString() {
+        Set<String> matchedEntriesSnapshot;
+        // Snapshot under the same lock used by writers so debug output never iterates the live set mid-mutation.
+        synchronized (matchedEntriesLock) {
+            matchedEntriesSnapshot = Set.copyOf(matchedEntries);
+        }
+
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
@@ -246,7 +259,7 @@ public class GroupNodeViewModel {
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
-                ", matchedEntries=" + matchedEntries +
+                ", matchedEntries=" + matchedEntriesSnapshot +
                 '}';
     }
 
