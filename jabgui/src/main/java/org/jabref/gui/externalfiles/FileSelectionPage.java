@@ -164,8 +164,8 @@ public class FileSelectionPage extends WizardPane {
         VBox previewContent = new VBox(8, enablePreviewCheckBox, pdfPreview, metadataLabel, metadataPreview);
         previewContent.setPadding(new Insets(8));
         previewPane = new TitledPane(Localization.lang("Entry preview"), previewContent);
-        previewPane.setExpanded(false);
-        previewPane.setCollapsible(true);
+        previewPane.setExpanded(true);
+        previewPane.setCollapsible(false);
 
         SplitPane splitPane = new SplitPane(treePane, previewPane);
         splitPane.setDividerPositions(0.58);
@@ -219,7 +219,6 @@ public class FileSelectionPage extends WizardPane {
         unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 previewThrottler.schedule(() -> UiTaskExecutor.runNowOrInJavaFXThread(this::refreshPreviewForCurrentSelection)));
         enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> refreshPreviewForCurrentSelection());
-        previewPane.expandedProperty().addListener((observable, oldValue, expanded) -> refreshPreviewForCurrentSelection());
 
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 
@@ -272,7 +271,7 @@ public class FileSelectionPage extends WizardPane {
     }
 
     private boolean isPreviewActive() {
-        return enablePreviewCheckBox.isSelected() && previewPane.isExpanded();
+        return enablePreviewCheckBox.isSelected();
     }
 
     private void showPreviewDisabledState(String metadataText) {
