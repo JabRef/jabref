@@ -3,6 +3,8 @@ package org.jabref.logic.search.sqlbased.indexing;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
+
 import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -17,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyLinkedFilesIndexer.class);
-    private Directory indexDirectory;
-    private SearcherManager searcherManager;
+    private @Nullable Directory indexDirectory;
+    private @Nullable SearcherManager searcherManager;
 
     public ReadOnlyLinkedFilesIndexer(BibDatabaseContext databaseContext) {
         try {
@@ -70,8 +72,12 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     private void closeIndex() {
         try {
-            searcherManager.close();
-            indexDirectory.close();
+            if (searcherManager != null) {
+                searcherManager.close();
+            }
+            if (indexDirectory != null) {
+                indexDirectory.close();
+            }
         } catch (IOException e) {
             LOGGER.error("Error closing index", e);
         }

@@ -25,6 +25,7 @@ import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,8 +126,8 @@ public class LinkedFilesIndexManager {
         String entryId = entry.getId();
         pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
             return Optional.ofNullable(existing)
-                           .map(fileDelta -> new FileDelta(fileDelta.oldValue(), event.getNewValue()))
-                           .orElseGet(() -> new FileDelta(event.getOldValue(), event.getNewValue()));
+                           .map(fileDelta -> new FileDelta(fileDelta.oldValue(), normalizeNullToEmpty(event.getNewValue())))
+                           .orElseGet(() -> new FileDelta(normalizeNullToEmpty(event.getOldValue()), normalizeNullToEmpty(event.getNewValue())));
         });
 
         indexUpdateThrottler.schedule(() -> {
@@ -144,6 +145,10 @@ public class LinkedFilesIndexManager {
                 }.executeWith(taskExecutor);
             });
         });
+    }
+
+    private static String normalizeNullToEmpty(@Nullable String value) {
+        return Optional.ofNullable(value).orElse("");
     }
 
     public void rebuildIndex() {
