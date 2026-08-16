@@ -218,8 +218,8 @@ public class FileSelectionPage extends WizardPane {
 
         unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 previewThrottler.schedule(() -> UiTaskExecutor.runNowOrInJavaFXThread(this::refreshPreviewForCurrentSelection)));
-        enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> updatePreviewVisibility());
-        previewPane.expandedProperty().addListener((observable, oldValue, expanded) -> updatePreviewVisibility());
+        enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> refreshPreviewForCurrentSelection());
+        previewPane.expandedProperty().addListener((observable, oldValue, expanded) -> refreshPreviewForCurrentSelection());
 
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 
@@ -229,16 +229,9 @@ public class FileSelectionPage extends WizardPane {
         collapseAllButton.disableProperty().bind(viewModel.taskActiveProperty());
     }
 
-    private void updatePreviewVisibility() {
-        if (enablePreviewCheckBox.isSelected() && previewPane.isExpanded()) {
-            refreshPreviewForCurrentSelection();
-        } else {
-            showPreviewDisabledState(Localization.lang("Preview disabled"));
-        }
-    }
-
     private void refreshPreviewForCurrentSelection() {
         if (!isPreviewActive()) {
+            showPreviewDisabledState(Localization.lang("Preview disabled"));
             return;
         }
 
@@ -279,12 +272,7 @@ public class FileSelectionPage extends WizardPane {
     }
 
     private boolean isPreviewActive() {
-        if (!enablePreviewCheckBox.isSelected() || !previewPane.isExpanded()) {
-            showPreviewDisabledState(Localization.lang("Preview disabled"));
-            return false;
-        }
-
-        return true;
+        return enablePreviewCheckBox.isSelected() && previewPane.isExpanded();
     }
 
     private void showPreviewDisabledState(String metadataText) {
