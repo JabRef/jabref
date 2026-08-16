@@ -1,4 +1,4 @@
-package org.jabref.logic.search.sqlbased;
+package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,6 +10,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.search.sqlbased.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.sqlbased.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.sqlbased.retrieval.LinkedFilesSearcher;

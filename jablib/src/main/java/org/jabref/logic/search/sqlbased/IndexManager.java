@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.LinkedFilesIndexManager;
 import org.jabref.logic.search.sqlbased.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.sqlbased.retrieval.BibFieldsSearcher;
 import org.jabref.logic.util.BackgroundTask;
