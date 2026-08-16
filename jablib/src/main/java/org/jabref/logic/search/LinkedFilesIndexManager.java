@@ -55,7 +55,7 @@ public class LinkedFilesIndexManager {
         try {
             indexer = new DefaultLinkedFilesIndexer(databaseContext, filePreferences);
         } catch (IOException e) {
-            LOGGER.debug("Error initializing linked files index - using read only index");
+            LOGGER.debug("Error initializing linked files index - using read only index", e);
             indexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
         }
         linkedFilesIndexer = indexer;
@@ -74,6 +74,8 @@ public class LinkedFilesIndexManager {
                 }
             }.executeWith(taskExecutor);
         } else {
+            indexUpdateThrottler.cancel();
+            pendingFileValuesByEntry.clear();
             linkedFilesIndexer.removeAllFromIndex();
         }
     }
@@ -128,7 +130,7 @@ public class LinkedFilesIndexManager {
         });
 
         indexUpdateThrottler.schedule(() -> {
-            if (closed.get()) {
+            if (closed.get() || !shouldIndexLinkedFiles.get()) {
                 return;
             }
 

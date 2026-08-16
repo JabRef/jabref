@@ -84,7 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where full-text search in linked files was not workikng when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
+- We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
 - We fixed an issue where removing filtered entries from a group could cause JabRef to throw an exception. [#16541](https://github.com/JabRef/jabref/issues/16541)
 - We fixed an issue where adding JabRef suggested groups immediately after a library loads caused an error. [#16552](https://github.com/JabRef/jabref/pull/16552)

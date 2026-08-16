@@ -12,7 +12,9 @@ import org.jabref.model.search.query.SearchResults;
 ///
 /// Concrete implementors plug into [SearchContext] (the Abstraction) and provide
 /// the actual search + indexing behavior. Today: [org.jabref.logic.search.sqlbased.SqlSearchBackend]
-/// (Postgres metadata index + Lucene linked-file index) and
+/// (Postgres metadata index + Lucene linked-file index),
+/// [org.jabref.logic.search.inmemory.InMemorySearchBackend] (grammar walk
+/// against in-memory entries, no fulltext), and
 /// [org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend] (grammar walk
 /// against in-memory entries plus a Lucene linked-file index).
 public interface SearchBackend {
