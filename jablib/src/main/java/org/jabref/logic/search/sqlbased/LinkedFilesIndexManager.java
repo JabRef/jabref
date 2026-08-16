@@ -2,6 +2,7 @@ package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -120,10 +121,9 @@ public class LinkedFilesIndexManager {
         BibEntry entry = event.getBibEntry();
         String entryId = entry.getId();
         pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
-            if (existing == null) {
-                return new FileDelta(event.getOldValue(), event.getNewValue());
-            }
-            return new FileDelta(existing.oldValue(), event.getNewValue());
+            return Optional.ofNullable(existing)
+                           .map(fileDelta -> new FileDelta(fileDelta.oldValue(), event.getNewValue()))
+                           .orElseGet(() -> new FileDelta(event.getOldValue(), event.getNewValue()));
         });
 
         indexUpdateThrottler.schedule(() -> {
@@ -131,8 +131,7 @@ public class LinkedFilesIndexManager {
                 return;
             }
 
-            FileDelta fileValues = pendingFileValuesByEntry.remove(entryId);
-            if (fileValues != null) {
+            Optional.ofNullable(pendingFileValuesByEntry.remove(entryId)).ifPresent(fileValues -> {
                 new BackgroundTask<>() {
                     @Override
                     public Void call() {
@@ -140,7 +139,7 @@ public class LinkedFilesIndexManager {
                         return null;
                     }
                 }.executeWith(taskExecutor);
-            }
+            });
         });
     }
 

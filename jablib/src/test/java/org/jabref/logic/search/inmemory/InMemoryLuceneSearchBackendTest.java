@@ -2,9 +2,10 @@ package org.jabref.logic.search.inmemory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,9 +46,7 @@ class InMemoryLuceneSearchBackendTest {
 
     @AfterEach
     void tearDown() {
-        if (searchBackend != null) {
-            searchBackend.close();
-        }
+        Optional.ofNullable(searchBackend).ifPresent(InMemoryLuceneSearchBackend::close);
     }
 
     @Test
@@ -72,8 +71,10 @@ class InMemoryLuceneSearchBackendTest {
     }
 
     private BibDatabaseContext initializeDatabaseContext(String testFile) throws URISyntaxException, IOException {
-        Path bibFile = Path.of(Objects.requireNonNull(
-                InMemoryLuceneSearchBackendTest.class.getResource("/org/jabref/logic/search/" + testFile)).toURI());
+        URL bibResource = Optional.ofNullable(
+                InMemoryLuceneSearchBackendTest.class.getResource("/org/jabref/logic/search/" + testFile))
+                                  .orElseThrow();
+        Path bibFile = Path.of(bibResource.toURI());
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(bibFile);
         BibDatabaseContext databaseContext = spy(result.getDatabaseContext());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDirectory);
