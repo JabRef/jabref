@@ -14,7 +14,10 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
+import org.jspecify.annotations.NullMarked;
+
 /// A search backend that evaluates metadata in memory and searches linked files with Lucene.
+@NullMarked
 public class InMemoryLuceneSearchBackend implements SearchBackend {
 
     private final InMemorySearchBackend inMemorySearchBackend;

@@ -22,10 +22,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Maintains the Lucene index for linked files independently of the metadata search backend.
+@NullMarked
 public class LinkedFilesIndexManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesIndexManager.class);
 
