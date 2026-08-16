@@ -4,8 +4,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.LinkedFilesIndexManager;
+import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
