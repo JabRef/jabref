@@ -146,6 +146,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
+- We fixed several UX issues in the "Search for unlinked local files" dialog: it now uses JabRef's theme, no longer shows an unrelated default icon, hides the header text while scanning, and the sort dropdown label was corrected. [#16158](https://github.com/JabRef/jabref/issues/16158)
 
 ### Removed
 
