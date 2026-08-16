@@ -55,7 +55,6 @@ public class FileSelectionPage extends WizardPane {
         this.viewModel = viewModel;
         this.stateManager = stateManager;
 
-        setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
         setupUI();
         setupBindings();
@@ -115,6 +114,14 @@ public class FileSelectionPage extends WizardPane {
     private void setupBindings() {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
+
+        EasyBind.subscribe(viewModel.taskActiveProperty(), active -> {
+            if (active) {
+                setHeaderText(null);
+            } else {
+                setHeaderText(Localization.lang("Select files to import"));
+            }
+        });
 
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(), fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren)).orElse(null)));
 
