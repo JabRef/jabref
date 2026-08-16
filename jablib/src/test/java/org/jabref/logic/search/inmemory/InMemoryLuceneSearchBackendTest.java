@@ -34,7 +34,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-// [utest->req~jabgui.search.fulltext.lucene-without-postgres~1]
+        // [utest->req~jabgui.search.fulltext.lucene-without-postgres~1]
 class InMemoryLuceneSearchBackendTest {
 
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
@@ -61,18 +61,18 @@ class InMemoryLuceneSearchBackendTest {
         SearchQuery searchQuery = new SearchQuery("comma", EnumSet.of(SearchFlags.FULLTEXT));
 
         Set<String> matchedCitationKeys = searchBackend.search(searchQuery)
-                                                      .getMatchedEntries()
-                                                      .stream()
-                                                      .map(entryId -> databaseContext.getDatabase().getEntryById(entryId).orElseThrow())
-                                                      .map(entry -> entry.getCitationKey().orElseThrow())
-                                                      .collect(Collectors.toUnmodifiableSet());
+                                                       .getMatchedEntries()
+                                                       .stream()
+                                                       .map(entryId -> databaseContext.getDatabase().getEntryById(entryId).orElseThrow())
+                                                       .map(entry -> entry.getCitationKey().orElseThrow())
+                                                       .collect(Collectors.toUnmodifiableSet());
 
         assertEquals(Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"), matchedCitationKeys);
     }
 
     private BibDatabaseContext initializeDatabaseContext(String testFile) throws URISyntaxException, IOException {
         URL bibResource = Optional.ofNullable(
-                InMemoryLuceneSearchBackendTest.class.getResource("/org/jabref/logic/search/" + testFile))
+                                          InMemoryLuceneSearchBackendTest.class.getResource("/org/jabref/logic/search/" + testFile))
                                   .orElseThrow();
         Path bibFile = Path.of(bibResource.toURI());
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(bibFile);
