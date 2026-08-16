@@ -28,6 +28,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -149,7 +150,7 @@ class GroupDialogViewModelTest {
 
         AbstractGroup resultingGroup = viewModel.resultConverter(ButtonType.OK);
 
-        assertTrue(resultingGroup instanceof ExplicitGroup);
+        assertInstanceOf(ExplicitGroup.class, resultingGroup);
         assertTrue(resultingGroup.containsAll(List.of(firstEntry, secondEntry)));
     }
 }
