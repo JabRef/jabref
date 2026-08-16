@@ -52,4 +52,11 @@ Enable to quickly search for a citation key.
 > Currently, no implementation is linked
 {: .prompt-note}
 
+## Full-text search without Postgres
+`req~jabgui.search.fulltext.lucene-without-postgres~1`
+
+When linked-file full-text indexing is enabled, users must be able to search the contents of linked files without enabling the experimental Postgres search backend.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
