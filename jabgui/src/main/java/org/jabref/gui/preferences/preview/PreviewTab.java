@@ -57,7 +57,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     // Controls of the custom available/chosen region, built in code and wired in wireControls().
     private ListView<PreviewLayout> cslListView;
-    //    private ListView<PreviewLayout> cslListView;
     private ListView<PreviewLayout> customizedListView;
     private ListView<PreviewLayout> chosenListView;
     private TabPane availableTabPane;   // TODO: see if needs to be refactored
@@ -76,7 +75,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private CodeArea editArea;
     private CustomTextField searchBox;
     private TextField styleNameField;
-    private boolean isCommittingStyleName = false;
 
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -157,6 +155,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         customizedTab = new Tab(Localization.lang("Customized"), customizedPane);
         customizedTab.setClosable(false);
 
+        // [impl->req~entry-preview.tabs~1]
         availableTabPane = new TabPane(cslTab, customizedTab);
         availableTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -371,6 +370,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
+        // [impl->req~entry-preview.create-custom-style~1]
         addCustomStyleButton.setOnAction(event -> {
             viewModel.addCustomizedStyle();
             customizedListView.refresh();
@@ -498,7 +498,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     }
 
     public void toRightButtonAction() {
-        //        if (availableTabPane.getSelectionModel().getSelectedItem() == cslTab) {
         if (previousTab == cslTab) {
             viewModel.addToChosen(viewModel.cslListProperty());
         } else {
@@ -554,10 +553,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     }
 
     private void focusTabOnLastRoutedLayout() {
-        PreviewLayout moved = viewModel.lastRoutedLayoutProperty().getValue();
-        if (moved != null) {
+        PreviewLayout lastLayout = viewModel.lastRoutedLayoutProperty().getValue();
+        if (lastLayout != null) {
             availableTabPane.getSelectionModel()
-                            .select((moved instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
+                            .select((lastLayout instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
         }
     }
 
@@ -570,16 +569,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     }
 
     private void commitStyleNameEdit() {
-        if (isCommittingStyleName) {
-            return;
-        }
-        try {
-            isCommittingStyleName = true;
-            viewModel.renameSelectedStyle(styleNameField.getText());
-            customizedListView.refresh();   // refresh view to display rename in 'customized'
-            chosenListView.refresh();       // refresh view to display rename in 'selected'
-        } finally {
-            isCommittingStyleName = false;
-        }
+        viewModel.renameSelectedStyle(styleNameField.getText());
+        customizedListView.refresh();   // refresh view to display rename in 'customized'
+        chosenListView.refresh();       // refresh view to display rename in 'selected'
     }
 }

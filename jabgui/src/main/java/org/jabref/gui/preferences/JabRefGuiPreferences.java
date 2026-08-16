@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -883,7 +883,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         //   does not decode __NEWLINE__ -> \n. The property therefore holds the encoded form after a load but the raw
         //   \n form once the preview editor sets it, so PreferencesFilter reports a false deviation from the default.
         //   Followup: pick one canonical in-memory form (decode on load, encode on persist, default in the same form).
-        // customizedPreviewStyle is stored with __NEWLINE__ instead of \n so that migration correctly triggers
         bindCustomList(previewPreferences.getCustomizedPreviewStyles(), PREVIEW_STYLE_CUSTOMIZED_ID, defaultValues.getCustomizedPreviewStyles(),
                 this::storeCustomizedPreviewStyle,
                 () -> getCustomizedPreviewStyle(defaultValues.getCustomizedPreviewStyles()));
@@ -912,14 +911,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         return cycle.stream()
-                    .map(layout -> PreviewLayout.of(
-                            layout,
-                            customizedLayouts,
+                    .map(layout -> PreviewLayout.of(layout, customizedLayouts,
                             getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList(),
                             getLayoutFormatterPreferences(),
                             Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class))
-                    ).filter(Objects::nonNull)
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)))
+                    .flatMap(Optional::stream)
                     .collect(Collectors.toList());
     }
 
@@ -949,12 +946,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return migrateLegacyCustomLayout(defaults);
         }
         // reads a numbered series independently, one key prefix at a time
-        // fetches through concurrent existing keys until miss
-        // for whatever case, if a write failed mid-process, the data might not be consistent
+        // fetches through concurrent existing keys until it misses,
         List<String> ids = getSeries(PREVIEW_STYLE_CUSTOMIZED_ID);
         List<String> names = getSeries(PREVIEW_STYLE_CUSTOMIZED_NAME);
         List<String> texts = getSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT);
-        // taking the min is precautionary, helps to not be indexOutOfBounds
+        // min is precautionary, helps to not be indexOutOfBounds in the case storing these keys failed midway
         int count = Math.min(ids.size(), Math.min(names.size(), texts.size()));
 
         List<CustomizedPreviewStyle> result = new ArrayList<>();

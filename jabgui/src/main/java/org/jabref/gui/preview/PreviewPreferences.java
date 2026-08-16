@@ -2,6 +2,8 @@ package org.jabref.gui.preview;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
@@ -22,7 +24,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;
     private final IntegerProperty layoutCyclePosition;
-    //    private final StringProperty customPreviewLayout;
     private final ObservableList<CustomizedPreviewStyle> customizedPreviewStyles;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
@@ -45,27 +46,12 @@ public class PreviewPreferences {
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
         this.shouldDownloadCovers = new SimpleBooleanProperty(shouldDownloadCovers);
     }
-    //    public PreviewPreferences(List<PreviewLayout> layoutCycle,
-    //                              int layoutCyclePosition,
-    //                              String customPreviewLayout,
-    //                              boolean showPreviewAsExtraTab,
-    //                              boolean showPreviewEntryTableTooltip,
-    //                              List<Path> bstPreviewLayoutPaths,
-    //                              boolean shouldDownloadCovers) {
-    //        this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
-    //        this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
-    //        this.customPreviewLayout = new SimpleStringProperty(customPreviewLayout);
-    //        this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
-    //        this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
-    //        this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
-    //        this.shouldDownloadCovers = new SimpleBooleanProperty(shouldDownloadCovers);
-    //    }
 
     private PreviewPreferences() {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                List.of(new CustomizedPreviewStyle(java.util.UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
+                List.of(new CustomizedPreviewStyle(UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths
@@ -85,12 +71,12 @@ public class PreviewPreferences {
         defaults.getLayoutCycle().addAll(Stream.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE).map(layout ->
                                                        PreviewLayout.of(
                                                                layout,
-                                                               TextBasedPreviewLayout.DEFAULT,
+                                                               defaults.getCustomizedPreviewStyles(),
                                                                List.of(),
                                                                layoutFormatterPreferences,
                                                                abbreviationRepository,
                                                                entryTypesManager))
-                                               .toList());
+                                               .flatMap(Optional::stream).toList());
         return defaults;
     }
 
@@ -122,7 +108,7 @@ public class PreviewPreferences {
             String fallbackText = customizedPreviewStyles.isEmpty()
                                   ? TextBasedPreviewLayout.DEFAULT
                                   : customizedPreviewStyles.getFirst().text();
-            return new TextBasedPreviewLayout(
+            return TextBasedPreviewLayout.of(
                     fallbackText,
                     LayoutFormatterPreferences.getDefault(),
                     new JournalAbbreviationRepository());

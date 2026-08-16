@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javafx.scene.input.ClipboardContent;
 
@@ -16,6 +17,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -136,12 +138,10 @@ public record ClipboardContentGenerator(
                                                                        .filter(TextBasedPreviewLayout.class::isInstance)
                                                                        .map(TextBasedPreviewLayout.class::cast)
                                                                        .findFirst();
-        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse((TextBasedPreviewLayout.of(
-                TextBasedPreviewLayout.NAME,
-                TextBasedPreviewLayout.DEFAULT,
-                layoutFormatterPreferences,
-                abbreviationRepository
-        )));
+        CustomizedPreviewStyle storedLayout = previewPreferences.getCustomizedPreviewStyles().isEmpty()
+                                              ? new CustomizedPreviewStyle(UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
+                                              : previewPreferences.getCustomizedPreviewStyles().getFirst();
+        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(storedLayout.name(), storedLayout.text(), layoutFormatterPreferences, abbreviationRepository));
 
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();

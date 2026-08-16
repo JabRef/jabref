@@ -56,6 +56,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,6 +212,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /// Store the changes of preference-preview settings.
+    // [impl->req~entry-preview.persist-custom-style~1]
     @Override
     public void storeSettings() {
         if (chosenListProperty.isEmpty()) {
@@ -333,15 +335,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetDefaultLayout() {
-        PreviewLayout previewLayout = selectedLayoutProperty.getValue();
-        if (previewLayout != null) {
-            if (previewLayout instanceof TextBasedPreviewLayout layout) {
-                layout.setText(TextBasedPreviewLayout.of(
-                        TextBasedPreviewLayout.DEFAULT,
-                        layoutFormatterPreferences,
-                        abbreviationRepository).getText());
-                refreshPreview();
-            }
+        if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
+            layout.setText(TextBasedPreviewLayout.of(
+                    TextBasedPreviewLayout.DEFAULT,
+                    layoutFormatterPreferences,
+                    abbreviationRepository).getText());
+            refreshPreview();
         }
     }
 
@@ -437,8 +436,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 dragSourceList.getValue().removeAll(draggedLayouts);
 
                 if (dragSourceList == chosenListProperty) {     // drag from 'Selected' list
-                    // Allows for citations to drop into the list that they belong in from 'Selected'
-                    // regardless of which available ListView physically received the drop.
+                    // Allows for citations to drop into the list that they belong in from 'Selected', regardless of which available ListView physically received the drop.
                     for (PreviewLayout layout : draggedLayouts) {
                         ListProperty<PreviewLayout> destination = destinationFor(layout);   // get list based on type
                         if (!destination.getValue().contains(layout)) { // check for duplicate
@@ -500,10 +498,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 dragSourceList.getValue().removeAll(draggedSelectedLayouts);
 
                 if (targetLayout != null) {
-                    //                    targetId = chosenListProperty.getValue().indexOf(targetLayout) + onSelectedDelta;
                     targetId = chosenListProperty.getValue().indexOf(targetLayout);
-                    // Guard again: the target may have become stale as a side effect of the removal above.
-                    targetId = (targetId < 0) ? chosenListProperty.getValue().size() : targetId + onSelectedDelta;
                 } else if (targetId != 0) {
                     targetId = chosenListProperty.getValue().size();
                 }
@@ -640,9 +635,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     // Commits an edit made in the style-name field to the currently selected TextBasedPreviewLayout.
     // No-ops for non-customized (CSL/BST) selections. Reverts the field on blank/duplicate input.
-    public void renameSelectedStyle(String newName) {
+    // [impl->req~entry-preview.rename-custom-style~1]
+    public void renameSelectedStyle(@NonNull String newName) {
         if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
-            if (newName != null && !newName.isBlank()) {
+            if (!newName.isBlank()) {
                 String trimmed = newName.trim();
                 if (trimmed.equals(layout.getDisplayName())) {
                     return;
@@ -664,6 +660,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     styleNameProperty.setValue(trimmed);
                     customizedListProperty.getValue().sort(Comparator.comparing(PreviewLayout::getDisplayName, String.CASE_INSENSITIVE_ORDER));
                 }
+            } else {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Error"),
+                        Localization.lang("A blank space cannot be used to rename your style."));
             }
         }
     }

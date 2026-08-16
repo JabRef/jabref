@@ -1,6 +1,7 @@
 package org.jabref.logic.preview;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -11,7 +12,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PreviewLayoutTest {
 
@@ -26,9 +27,10 @@ class PreviewLayoutTest {
     void ofFactoryCustomizedPreviewStyleReturnsTextBasedPreviewLayout() {
         CustomizedPreviewStyle customizedPreviewStyle = new CustomizedPreviewStyle(TEST_ID, NAME1, TEXT1);
 
-        PreviewLayout previewLayout = PreviewLayout.of(TEST_ID, List.of(customizedPreviewStyle), List.of(),
+        Optional<PreviewLayout> optionalPreviewLayout = PreviewLayout.of(TEST_ID, List.of(customizedPreviewStyle), List.of(),
                 layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
 
+        PreviewLayout previewLayout = optionalPreviewLayout.orElseThrow();
         assertInstanceOf(TextBasedPreviewLayout.class, previewLayout);
         assertEquals(TEST_ID, ((TextBasedPreviewLayout) previewLayout).getId());
         assertEquals(NAME1, previewLayout.getDisplayName());
@@ -36,13 +38,28 @@ class PreviewLayoutTest {
     }
 
     @Test
-    void unknownIdentifierResolvesToNull() {
-        // No customizedPreviewStyle/TextBasedPreviewLayout is being added to
-        // List<CustomizedPreviewStyle> customizedPreviewLayouts and is empty.
-        // Nothing found by the given layoutIdentifier and returns null
-        PreviewLayout previewLayout = PreviewLayout.of("nothingIsFound", List.of(), List.of(),
+    void ofFactoryUnknownIdentifierReturnsEmptyOptional() {
+        Optional<PreviewLayout> result = PreviewLayout.of("dummyId", List.of(), List.of(),
                 layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
 
-        assertNull(previewLayout);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void ofFactoryEmptyCustomizedListReturnsEmptyOptional() {
+        Optional<PreviewLayout> result = PreviewLayout.of(TEST_ID, List.of(), List.of(),
+                layoutFormatterPreferences, abbreviationRepository, entryTypesManager);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void ofFactoryResolvesStyleByIdRegardlessOfDisplayName() {
+        CustomizedPreviewStyle renamed = new CustomizedPreviewStyle(TEST_ID, "newName", TEXT1);
+
+        PreviewLayout resolved = PreviewLayout.of(TEST_ID, List.of(renamed), List.of(),
+                layoutFormatterPreferences, abbreviationRepository, entryTypesManager).orElseThrow();
+
+        assertEquals("newName", resolved.getDisplayName());
     }
 }

@@ -22,8 +22,8 @@ class TextBasedPreviewLayoutTest {
     private final String TEXT2 = "<b>text2</b>";
 
     @Test
-    void testFourArgConstructorGeneratesId() {
-        TextBasedPreviewLayout layout = new TextBasedPreviewLayout(
+    void fourArgConstructorGeneratesId() {
+        TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(
                 NAME1, TEXT1, layoutFormatterPreferences, abbreviationRepository);
         assertNotNull(layout.getId());
         assertEquals(NAME1, layout.getName());
@@ -31,9 +31,9 @@ class TextBasedPreviewLayoutTest {
     }
 
     @Test
-    void testUniqueIDsFourArgConstructor() {
-        TextBasedPreviewLayout first = new TextBasedPreviewLayout(NAME1, TEXT1, layoutFormatterPreferences, abbreviationRepository);
-        TextBasedPreviewLayout second = new TextBasedPreviewLayout(NAME2, TEXT2, layoutFormatterPreferences, abbreviationRepository);
+    void uniqueIDsFourArgConstructor() {
+        TextBasedPreviewLayout first = TextBasedPreviewLayout.of(NAME1, TEXT1, layoutFormatterPreferences, abbreviationRepository);
+        TextBasedPreviewLayout second = TextBasedPreviewLayout.of(NAME2, TEXT2, layoutFormatterPreferences, abbreviationRepository);
         assertNotEquals(first.getId(), second.getId());
         assertEquals(NAME1, first.getName());
         assertEquals(NAME2, second.getName());
@@ -42,8 +42,8 @@ class TextBasedPreviewLayoutTest {
     }
 
     @Test
-    void testFiveArgConstructorAssignsGivenId() {
-        TextBasedPreviewLayout layout = new TextBasedPreviewLayout(TEST_ID, NAME1, TEXT1,
+    void fiveArgConstructorAssignsGivenId() {
+        TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(TEST_ID, NAME1, TEXT1,
                 layoutFormatterPreferences, abbreviationRepository);
         assertEquals(TEST_ID, layout.getId());
     }

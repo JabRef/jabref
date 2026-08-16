@@ -118,8 +118,8 @@ class PreviewTabViewModelTest {
         // check contents of customizedListProperty
         ListProperty<PreviewLayout> customizedListProperty = viewModel.customizedListProperty();
         assertEquals(3, viewModel.customizedListProperty().size());
-        assertInstanceOf(TextBasedPreviewLayout.class, customizedListProperty.getValue().get(0));
-        TextBasedPreviewLayout customizedPreviewStyle = (TextBasedPreviewLayout) customizedListProperty.getValue().get(0);
+        assertInstanceOf(TextBasedPreviewLayout.class, customizedListProperty.getValue().getFirst());
+        TextBasedPreviewLayout customizedPreviewStyle = (TextBasedPreviewLayout) customizedListProperty.getValue().getFirst();
         assertEquals(ID1, customizedPreviewStyle.getId());
         customizedPreviewStyle = (TextBasedPreviewLayout) customizedListProperty.getValue().get(1);
         assertEquals(NAME2, customizedPreviewStyle.getName());
@@ -189,7 +189,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void testRenameAndEditUnderSameId() {
+    void renameAndEditUnderSameId() {
         PreviewPreferences previewPreferences = new PreviewPreferences(
                 List.of(),
                 0,

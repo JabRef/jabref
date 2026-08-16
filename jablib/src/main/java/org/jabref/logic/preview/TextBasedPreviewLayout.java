@@ -49,7 +49,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     private LayoutFormatterPreferences layoutFormatterPreferences;
     private JournalAbbreviationRepository abbreviationRepository;
 
-    public TextBasedPreviewLayout(String text,
+    public TextBasedPreviewLayout(@NonNull String text,
                                   @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
                                   @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this.layoutFormatterPreferences = layoutFormatterPreferences;
@@ -59,8 +59,8 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         setText(text);
     }
 
-    public TextBasedPreviewLayout(String name,
-                                  String text,
+    public TextBasedPreviewLayout(@NonNull String name,
+                                  @NonNull String text,
                                   @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
                                   @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this.name = name;
@@ -70,9 +70,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         setText(text);
     }
 
-    public TextBasedPreviewLayout(String id,
-                                  String name,
-                                  String text,
+    public TextBasedPreviewLayout(@NonNull String id,
+                                  @NonNull String name,
+                                  @NonNull String text,
                                   @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
                                   @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this.id = id;
@@ -88,7 +88,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         this.id = UUID.randomUUID().toString();
     }
 
-    public void setText(String text) {
+    public void setText(@NonNull String text) {
         this.text = text;
         Reader reader = Reader.of(text.replace("__NEWLINE__", "\n"));
         try {
@@ -114,15 +114,15 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
-        return this.name == null ? NAME : this.name;
+        return this.name.isBlank() ? NAME : this.name;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
     public String getId() {
-        return this.id == null ? UUID.randomUUID().toString() : this.id;
+        return this.id.isBlank() ? UUID.randomUUID().toString() : this.id;
     }
 
     public String getShortTitle() {
@@ -131,7 +131,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     @Override
     public String getDisplayName() {
-        return this.name == null ? Localization.lang("Customized preview style") : this.name;
+        return this.name.isBlank() ? Localization.lang("Customized preview style") : this.name;
     }
 
     public static TextBasedPreviewLayout of(@NonNull String style,
@@ -143,8 +143,8 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
                 abbreviationRepository);
     }
 
-    public static TextBasedPreviewLayout of(String name,
-                                            String style,
+    public static TextBasedPreviewLayout of(@NonNull String name,
+                                            @NonNull String style,
                                             @NonNull LayoutFormatterPreferences preferences,
                                             @NonNull JournalAbbreviationRepository repository) {
         return new TextBasedPreviewLayout(
@@ -154,9 +154,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
                 repository);
     }
 
-    public static TextBasedPreviewLayout of(String id,
-                                            String name,
-                                            String style,
+    public static TextBasedPreviewLayout of(@NonNull String id,
+                                            @NonNull String name,
+                                            @NonNull String style,
                                             @NonNull LayoutFormatterPreferences preferences,
                                             @NonNull JournalAbbreviationRepository repository) {
         return new TextBasedPreviewLayout(
