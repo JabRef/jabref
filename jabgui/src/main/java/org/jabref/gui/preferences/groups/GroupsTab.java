@@ -23,6 +23,7 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> {
                                 .radio(Localization.lang("Display only entries belonging to all selected groups"), viewModel.groupViewModeIntersectionProperty())
                                 .radio(Localization.lang("Display all entries belonging to one or more of the selected groups"), viewModel.groupViewModeUnionProperty()))
                         .checkbox(Localization.lang("Automatically assign new entry to selected groups"), viewModel.autoAssignGroupProperty())
+                        .checkbox(Localization.lang("Automatically include selected entries when a new group is created"), viewModel.autoIncludeSelectedEntriesProperty())
                         .checkbox(Localization.lang("Display count of items in group"), viewModel.displayGroupCount())
                         .checkbox(Localization.lang("Show 'AI chat' in the context menu"), viewModel.showAiChatButtonProperty()))
 
