@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import javafx.application.Platform;
@@ -47,6 +48,7 @@ import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -63,15 +65,15 @@ public class FileSelectionPage extends WizardPane {
 
     private static final int PREVIEW_REFRESH_DELAY = 300;
 
-    private static final List<String> METADATA_PRIORITIZED_FIELDS = List.of(
-            StandardField.AUTHOR.getName(),
-            StandardField.TITLE.getName(),
-            StandardField.YEAR.getName(),
-            StandardField.JOURNAL.getName(),
-            StandardField.JOURNALTITLE.getName(),
-            StandardField.BOOKTITLE.getName(),
-            StandardField.DOI.getName(),
-            StandardField.URL.getName());
+    private static final List<Field> METADATA_PRIORITIZED_FIELDS = List.of(
+            StandardField.AUTHOR,
+            StandardField.TITLE,
+            StandardField.YEAR,
+            StandardField.JOURNAL,
+            StandardField.JOURNALTITLE,
+            StandardField.BOOKTITLE,
+            StandardField.DOI,
+            StandardField.URL);
 
     private final UnlinkedFilesDialogViewModel viewModel;
     private final StateManager stateManager;
@@ -338,19 +340,19 @@ public class FileSelectionPage extends WizardPane {
         return Localization.lang("No extracted metadata available.");
     }
 
-    private static int priorityIndex(String fieldName) {
-        int index = METADATA_PRIORITIZED_FIELDS.indexOf(fieldName);
+    private static int priorityIndex(Field field) {
+        int index = METADATA_PRIORITIZED_FIELDS.indexOf(field);
         return index >= 0 ? index : METADATA_PRIORITIZED_FIELDS.size();
     }
 
     private String formatBibEntry(BibEntry entry) {
         StringJoiner joiner = new StringJoiner(System.lineSeparator());
         joiner.add(Localization.lang("Type: %0", entry.getType().getDisplayName()));
-        Comparator<String> byDisplayOrder = Comparator.comparingInt(FileSelectionPage::priorityIndex)
-                                                      .thenComparing(Comparator.naturalOrder());
+        Comparator<Field> byDisplayOrder = Comparator.comparingInt(FileSelectionPage::priorityIndex)
+                                                    .thenComparing(Field::getName);
         entry.getFieldMap().entrySet().stream()
              .filter(field -> !field.getKey().equals(StandardField.FILE))
-             .sorted(Comparator.comparing(field -> field.getKey().getName(), byDisplayOrder))
+             .sorted(Map.Entry.comparingByKey(byDisplayOrder))
              .forEach(field -> {
                  String value = field.getValue();
                  if (value != null && !value.isBlank()) {
