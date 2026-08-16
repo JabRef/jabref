@@ -90,7 +90,6 @@ public class FileSelectionPage extends WizardPane {
     private Label fileCountLabel;
     private VBox progressPane;
     private VBox contentPane;
-    private TitledPane previewPane;
     private CheckBox enablePreviewCheckBox;
     private TextArea metadataPreview;
     private PdfDocumentViewer pdfPreview;
@@ -148,7 +147,6 @@ public class FileSelectionPage extends WizardPane {
         VBox.setVgrow(unlinkedFilesList, Priority.ALWAYS);
 
         VBox treePane = new VBox(unlinkedFilesList);
-        VBox.setVgrow(treePane, Priority.ALWAYS);
 
         enablePreviewCheckBox = new CheckBox(Localization.lang("Enable preview"));
         enablePreviewCheckBox.setSelected(false);
@@ -165,7 +163,7 @@ public class FileSelectionPage extends WizardPane {
 
         VBox previewContent = new VBox(8, enablePreviewCheckBox, pdfPreview, metadataLabel, metadataPreview);
         previewContent.setPadding(new Insets(8));
-        previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
+        TitledPane previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
         previewPane.setExpanded(true);
         previewPane.setCollapsible(false);
 
@@ -349,7 +347,7 @@ public class FileSelectionPage extends WizardPane {
         StringJoiner joiner = new StringJoiner(System.lineSeparator());
         joiner.add(Localization.lang("Type: %0", entry.getType().getDisplayName()));
         Comparator<Field> byDisplayOrder = Comparator.comparingInt(FileSelectionPage::priorityIndex)
-                                                    .thenComparing(Field::getName);
+                                                     .thenComparing(Field::getName);
         entry.getFieldMap().entrySet().stream()
              .filter(field -> !field.getKey().equals(StandardField.FILE))
              .sorted(Map.Entry.comparingByKey(byDisplayOrder))
