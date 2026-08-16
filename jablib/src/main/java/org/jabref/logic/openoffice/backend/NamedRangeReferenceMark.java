@@ -7,14 +7,20 @@ import org.jabref.model.openoffice.backend.NamedRange;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCursor;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +77,10 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     private static void createReprInDocument(XTextDocument doc,
+                                             Optional<XComponentContext> context,
                                              String refMarkName,
                                              XTextCursor position,
+                                             boolean insertSpaceBefore,
                                              boolean insertSpaceAfter,
                                              boolean withoutBrackets)
             throws
@@ -98,28 +106,58 @@ public class NamedRangeReferenceMark implements NamedRange {
                                   : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
+        XTextRange endRange = cursor.getEnd();
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
         UnoReferenceMark.create(documentAnnotation);
 
-        // eat the first inserted space
-        cursorBefore.goRight((short) 1, true);
-        cursorBefore.setString("");
+        if (!insertSpaceBefore) {
+            // eat the first inserted space
+            cursorBefore.goRight((short) 1, true);
+            cursorBefore.setString("");
+        }
         if (!insertSpaceAfter) {
             // eat the second inserted space
             cursorAfter.goLeft((short) 1, true);
             cursorAfter.setString("");
         }
+
+        position.gotoRange(cursorAfter.getEnd(), false);
+
+        if (!insertSpaceAfter && context.isPresent()) {
+            UnoDispatch.resetAttributesAtRangeEnd(doc, context.orElseThrow(), endRange);
+        }
+    }
+
+    private static Optional<XComponentContext> findComponentContext(XTextDocument doc) {
+        XMultiServiceFactory factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, doc);
+        if (factory == null) {
+            return Optional.empty();
+        }
+
+        XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, factory);
+        if (propertySet == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.ofNullable(UnoRuntime.queryInterface(XComponentContext.class, propertySet.getPropertyValue("DefaultContext")));
+        } catch (UnknownPropertyException | WrappedTargetException exception) {
+            LOGGER.debug("Could not resolve LibreOffice component context from document", exception);
+            return Optional.empty();
+        }
     }
 
     static NamedRangeReferenceMark create(XTextDocument doc,
+                                          XComponentContext context,
                                           String refMarkName,
                                           XTextCursor position,
+                                          boolean insertSpaceBefore,
                                           boolean insertSpaceAfter,
                                           boolean withoutBrackets)
             throws
             CreationException {
 
-        createReprInDocument(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
+        createReprInDocument(doc, Optional.of(context), refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
         return new NamedRangeReferenceMark(refMarkName);
     }
 
@@ -129,7 +167,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                               .map(e -> new NamedRangeReferenceMark(refMarkName));
+                               .map(entry -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /// Remove it from the document.
@@ -230,9 +268,10 @@ public class NamedRangeReferenceMark implements NamedRange {
                 full.setString("");
                 UnoReferenceMark.removeIfExists(doc, name);
 
+                final boolean insertSpaceBefore = false;
                 final boolean insertSpaceAfter = false;
                 final boolean withoutBrackets = false;
-                createReprInDocument(doc, name, full, insertSpaceAfter, withoutBrackets);
+                createReprInDocument(doc, findComponentContext(doc), name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
             }
         }
 

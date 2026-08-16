@@ -84,12 +84,13 @@ class GroupTreeViewModelTest {
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT,
                 false));
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
-        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(DialogService.class), mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
     }
 
     @Test

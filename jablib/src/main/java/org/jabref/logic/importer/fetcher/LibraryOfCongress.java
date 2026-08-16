@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -12,17 +13,13 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.util.strings.StringUtil;
 
-import com.google.common.util.concurrent.RateLimiter;
 import org.apache.hc.core5.net.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Fetcher for the Library of Congress Control Number (LCCN) using https://lccn.loc.gov/
 public class LibraryOfCongress implements IdBasedParserFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryOfCongress.class);
     // The Library of Congress asks clients to stay at or below 10 requests per minute.
-    private static final RateLimiter RATE_LIMITER = RateLimiter.create(10.0 / 60.0);
+    private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("Library of Congress", 10, Duration.ofMinutes(1));
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -47,9 +44,7 @@ public class LibraryOfCongress implements IdBasedParserFetcher {
             return Optional.empty();
         }
 
-        double waitingTime = RATE_LIMITER.acquire();
-        LOGGER.trace("Thread {}, searching Library of Congress identifier '{}', waited {} because of API rate limiter",
-                Thread.currentThread().threadId(), identifier, waitingTime);
+        RATE_LIMITER.acquire(identifier);
 
         return IdBasedParserFetcher.super.performSearchById(identifier);
     }

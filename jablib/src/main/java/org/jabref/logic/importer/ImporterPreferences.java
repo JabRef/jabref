@@ -21,6 +21,7 @@ import javafx.collections.ObservableSet;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.Scopus;
@@ -108,6 +109,7 @@ public class ImporterPreferences {
         return Map.of(
                 AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey,
                 BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey,
+                CrossRef.FETCHER_NAME, buildInfo.crossRefEmail,
                 Scopus.FETCHER_NAME, buildInfo.scopusApiKey,
                 SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey,
                 // SpringerLink uses the same key and fetcher name as SpringerFetcher

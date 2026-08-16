@@ -25,6 +25,9 @@ jobs:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
   upload-pr-nnumber:
+    # "status: to-be-merged" is set when the PR is added to the merge queue.
+    # The PR is then merged (and thus closed) before the follow-up workflow runs, which would make "gh pr ready" fail.
+    if: "github.event.label.name != 'status: to-be-merged'"
     runs-on: ubuntu-slim
     permissions:
       contents: read
