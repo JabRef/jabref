@@ -1,5 +1,6 @@
 package org.jabref.logic.search.inmemory;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.jabref.logic.FilePreferences;
@@ -34,12 +35,18 @@ public class InMemoryLuceneSearchBackend implements SearchBackend {
 
     @Override
     public SearchResults search(SearchQuery query) {
-        SearchResults searchResults = inMemorySearchBackend.search(query);
+        SearchResults searchResults = inMemorySearchBackend.search(createMetadataQuery(query));
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             searchResults.mergeSearchResults(linkedFilesIndexManager.search(query));
         }
         query.setSearchResults(searchResults);
         return searchResults;
+    }
+
+    private static SearchQuery createMetadataQuery(SearchQuery query) {
+        EnumSet<SearchFlags> metadataFlags = EnumSet.copyOf(query.getSearchFlags());
+        metadataFlags.remove(SearchFlags.FULLTEXT);
+        return new SearchQuery(query.getSearchExpression(), metadataFlags);
     }
 
     @Override
