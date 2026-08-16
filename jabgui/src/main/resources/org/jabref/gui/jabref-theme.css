@@ -2573,3 +2573,7 @@ journalInfo .grid-cell-b {
     -fx-fill: black !important;
     -fx-text-fill: black !important;
 }
+
+.wizard-pane {
+    -fx-graphic: none !important;
+}
