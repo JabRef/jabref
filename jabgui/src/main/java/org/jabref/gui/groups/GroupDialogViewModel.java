@@ -311,6 +311,7 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             if (Boolean.TRUE.equals(typeExplicitProperty.getValue())) {
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
                 ExplicitGroup explicitGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
