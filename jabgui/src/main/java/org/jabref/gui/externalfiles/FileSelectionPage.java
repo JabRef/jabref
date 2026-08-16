@@ -163,7 +163,7 @@ public class FileSelectionPage extends WizardPane {
 
         VBox previewContent = new VBox(8, enablePreviewCheckBox, pdfPreview, metadataLabel, metadataPreview);
         previewContent.setPadding(new Insets(8));
-        previewPane = new TitledPane(Localization.lang("Entry preview"), previewContent);
+        previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
         previewPane.setExpanded(true);
         previewPane.setCollapsible(false);
 
