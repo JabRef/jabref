@@ -324,8 +324,9 @@ public class FileSelectionPage extends WizardPane {
         cancelCurrentMetadataTask();
     }
 
-    /// Stops the preview throttler so that no further preview refresh is scheduled.
+    /// Cancels in-flight preview work and stops the preview throttler.
     public void shutdown() {
+        cancelPreviewTasks();
         previewThrottler.shutdown();
     }
 

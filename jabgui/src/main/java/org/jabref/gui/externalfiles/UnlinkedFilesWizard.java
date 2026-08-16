@@ -54,7 +54,6 @@ public class UnlinkedFilesWizard {
 
         Optional<ButtonType> result = wizard.showAndWait();
         page2.shutdown();
-        page2.cancelPreviewTasks();
 
         if (result.isPresent()) {
             if (result.get() == ButtonType.FINISH) {
