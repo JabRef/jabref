@@ -3,15 +3,21 @@ package org.jabref.gui.groups;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+
+import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -51,6 +57,8 @@ class GroupDialogViewModelTest {
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferences.getFilePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
         when(preferences.getGroupsPreferences()).thenReturn(groupsPreferences);
+        when(groupsPreferences.getDefaultHierarchicalContext()).thenReturn(GroupHierarchyType.INDEPENDENT);
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
 
         bibDatabaseContext.setMetaData(metaData);
 
@@ -103,5 +111,45 @@ class GroupDialogViewModelTest {
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, null, null, new DummyFileUpdateMonitor(), stateManager);
 
         assertEquals(defaultHierarchicalContext, viewModel.groupHierarchySelectedProperty().getValue());
+    }
+
+    @Test
+    void includeSelectedEntriesDefaultsToPreferenceWhenEntriesAreSelected() {
+        BibEntry entry = new BibEntry();
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entry));
+        when(groupsPreferences.shouldAutoIncludeSelectedEntries()).thenReturn(true);
+
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, null, null, new DummyFileUpdateMonitor(), stateManager);
+
+        assertTrue(viewModel.explicitIncludeSelectedProperty().get());
+        assertTrue(viewModel.selectedEntriesAvailableProperty().get());
+    }
+
+    @Test
+    void includeSelectedEntriesIsDisabledWhenEditingAGroup() {
+        BibEntry entry = new BibEntry();
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entry));
+        when(groupsPreferences.shouldAutoIncludeSelectedEntries()).thenReturn(true);
+
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, group, null, new DummyFileUpdateMonitor(), stateManager);
+
+        assertTrue(viewModel.editingGroupProperty().get());
+        assertFalse(viewModel.explicitIncludeSelectedProperty().get());
+    }
+
+    @Test
+    void explicitGroupCanIncludeSelectedEntries() {
+        BibEntry firstEntry = new BibEntry();
+        BibEntry secondEntry = new BibEntry();
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(firstEntry, secondEntry));
+
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, null, null, new DummyFileUpdateMonitor(), stateManager);
+        viewModel.nameProperty().set("Selected entries group");
+        viewModel.explicitIncludeSelectedProperty().set(true);
+
+        AbstractGroup resultingGroup = viewModel.resultConverter(ButtonType.OK);
+
+        assertTrue(resultingGroup instanceof ExplicitGroup);
+        assertTrue(resultingGroup.containsAll(List.of(firstEntry, secondEntry)));
     }
 }
