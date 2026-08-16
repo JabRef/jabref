@@ -33,6 +33,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @NullMarked
+// [utest->req~jabgui.search.fulltext.lucene-without-postgres~1]
 class InMemoryLuceneSearchBackendTest {
 
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();

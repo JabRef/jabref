@@ -17,6 +17,7 @@ import org.jabref.model.search.query.SearchResults;
 import org.jspecify.annotations.NullMarked;
 
 /// A search backend that evaluates metadata in memory and searches linked files with Lucene.
+// [impl->req~jabgui.search.fulltext.lucene-without-postgres~1]
 @NullMarked
 public class InMemoryLuceneSearchBackend implements SearchBackend {
 
