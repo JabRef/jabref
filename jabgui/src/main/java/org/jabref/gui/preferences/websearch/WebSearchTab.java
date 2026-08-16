@@ -21,6 +21,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
@@ -43,12 +45,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     // Fixed width of the "API key saved" indicator column.
     private static final double KEY_INDICATOR_WIDTH = 24.0;
-
-    // Shown when a fetcher has a user-configured key that will actually survive a restart
-    private static final String KEY_SAVED_GLYPH = "\uD83D\uDCBE"; // 💾
-
-    // Shown when a fetcher has a user-configured key that only lives for the current run
-    private static final String KEY_SESSION_ONLY_GLYPH = "\uD83D\uDD53"; // 🕓
 
     private final VBox fetchersContainer = new VBox();
 
@@ -243,18 +239,20 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         if (!hasSavedKey) {
             indicator.setText("");
+            indicator.setGraphic(null);
             indicator.setTooltip(null);
             return;
         }
 
         boolean willPersist = viewModel.apiKeyPersistAvailable().get() && viewModel.getApikeyPersistProperty().get();
         if (willPersist) {
-            indicator.setText(KEY_SAVED_GLYPH);
+            indicator.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SAVE));
             indicator.setTooltip(new Tooltip(Localization.lang("API key is saved")));
         } else {
-            indicator.setText(KEY_SESSION_ONLY_GLYPH);
+            indicator.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.CLOCK));
             indicator.setTooltip(new Tooltip(Localization.lang("API key is set for this session only")));
         }
+        indicator.setText("");
     }
 
     private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
