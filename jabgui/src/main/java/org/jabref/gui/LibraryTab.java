@@ -65,7 +65,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
-import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
@@ -329,7 +329,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgresServer.class)));
         Supplier<SearchBackend> inMemoryFactory = () ->
-                new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
+                new InMemoryLuceneSearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences(), preferences.getFilePreferences(), taskExecutor);
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
                 sqlFactory,
