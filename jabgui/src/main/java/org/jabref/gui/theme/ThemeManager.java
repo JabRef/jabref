@@ -124,8 +124,9 @@ public class ThemeManager {
             Node dialogPaneNode = scene.getRoot().lookup(".dialog-pane");
             if (dialogPaneNode instanceof DialogPane dialogPane) {
                 BaseDialog.applyButtonFix(dialogPane);
-            } else if (scene.getWindow() != null) {
-                scene.getWindow().sizeToScene();
+            } else {
+                scene.getRoot().applyCss();
+                scene.getRoot().requestLayout();
             }
         }
     }
