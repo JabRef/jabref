@@ -671,7 +671,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private String nextCustomStyleDefaultName() {
         while (true) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
-            String candidate = Localization.lang("Customized preview style") + " " + LocalDateTime.now().format(formatter);
+            String candidate = Localization.lang("Customized preview style %0", LocalDateTime.now().format(formatter));
             boolean exists = customizedListProperty.stream()
                                                    .map(PreviewLayout::getDisplayName)
                                                    .anyMatch(candidate::equals);

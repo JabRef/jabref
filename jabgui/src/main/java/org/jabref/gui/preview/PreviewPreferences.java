@@ -68,7 +68,8 @@ public class PreviewPreferences {
                                                           JournalAbbreviationRepository abbreviationRepository,
                                                           BibEntryTypesManager entryTypesManager) {
         PreviewPreferences defaults = getDefault();
-        defaults.getLayoutCycle().addAll(Stream.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE).map(layout ->
+        String defaultCustomizedStyleId = defaults.getCustomizedPreviewStyles().getFirst().id();
+        defaults.getLayoutCycle().addAll(Stream.of(defaultCustomizedStyleId, CSLStyleLoader.DEFAULT_STYLE).map(layout ->
                                                        PreviewLayout.of(
                                                                layout,
                                                                defaults.getCustomizedPreviewStyles(),

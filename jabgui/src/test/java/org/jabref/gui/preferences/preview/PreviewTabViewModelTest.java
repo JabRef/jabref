@@ -1,10 +1,12 @@
 package org.jabref.gui.preferences.preview;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.Dragboard;
@@ -72,12 +74,21 @@ class PreviewTabViewModelTest {
     }
 
     /*
-    constructing a ListView just to borrow its selection model needs the JavaFX toolkit initialized.
-    If not init, tests throw IllegalStateException: Toolkit not initialized
+    constructing a ListView to borrow its selection model
+    If not init, tests throw IllegalStateException: Toolkit not initialized.
+    Platform.startup throws IllegalStateException if the toolkit is already running in another test class
      */
     @BeforeAll
-    static void initToolkit() {
-        new JFXPanel();
+    static void initToolkit() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
+            Platform.startup(latch::countDown);
+        } catch (IllegalStateException alreadyStarted) {
+            latch.countDown();
+        }
+        if (!latch.await(5, TimeUnit.SECONDS)) {
+            throw new IllegalStateException("Timed out waiting for JavaFX toolkit to initialize");
+        }
     }
 
     private PreviewTabViewModel viewModelWith(PreviewPreferences previewPreferences) {

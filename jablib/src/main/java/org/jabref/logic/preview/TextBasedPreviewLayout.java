@@ -2,7 +2,6 @@ package org.jabref.logic.preview;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.UUID;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -12,6 +11,7 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +42,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
             "</font>__NEWLINE__";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
+    private static final int CUID_LENGTH = 12;
     private Layout layout;
     private String name;
     private String text;
@@ -55,7 +56,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.abbreviationRepository = abbreviationRepository;
         this.name = NAME;
-        this.id = UUID.randomUUID().toString();
+        this.id = CUID.randomCUID2(CUID_LENGTH).toString();
         setText(text);
     }
 
@@ -66,7 +67,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         this.name = name;
         this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        this.id = UUID.randomUUID().toString();
+        this.id = CUID.randomCUID2(CUID_LENGTH).toString();
         setText(text);
     }
 
@@ -85,7 +86,8 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     public TextBasedPreviewLayout(Layout layout) {
         this.layout = layout;
         this.text = layout.getText();
-        this.id = UUID.randomUUID().toString();
+        this.id = CUID.randomCUID2(CUID_LENGTH).toString();
+        this.name = NAME;
     }
 
     public void setText(@NonNull String text) {
@@ -122,7 +124,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public String getId() {
-        return this.id.isBlank() ? UUID.randomUUID().toString() : this.id;
+        return this.id.isBlank() ? CUID.randomCUID2(CUID_LENGTH).toString() : this.id;
     }
 
     public String getShortTitle() {
