@@ -19,13 +19,13 @@ public class StyleSheetDataUrl extends StyleSheet {
     }
 
     @Override
-    public String getWebEngineStylesheet() {
+    String getSceneStylesheetLocation() {
         return dataUrl;
     }
 
     @Override
     void reload() {
-        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = EMPTY_WEBENGINE_CSS);
+        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = DATA_URL_PREFIX);
     }
 
     @Override

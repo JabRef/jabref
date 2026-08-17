@@ -28,14 +28,14 @@ class DoiToBibtex implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @CommandLine.Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Parameters(paramLabel = "DOI", description = "one or more DOIs to fetch", arity = "1..*")
     private String[] dois;
 
     @Override
     public Integer call() throws ExportServiceException {
-        CrossRef fetcher = new CrossRef();
+        CrossRef fetcher = new CrossRef(argumentProcessor.cliPreferences.getImporterPreferences());
         List<BibEntry> entries = new ArrayList<>(dois.length);
 
         for (String doiString : dois) {

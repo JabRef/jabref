@@ -45,13 +45,6 @@ public class TimestampPreferences {
         return new TimestampPreferences();
     }
 
-    public TimestampPreferences setAll(TimestampPreferences preferences) {
-        setAddCreationDate(preferences.shouldAddCreationDate());
-        setAddModificationDate(preferences.shouldAddModificationDate());
-        // legacy prefs should not be modified
-        return this;
-    }
-
     public String now() {
         // Milli-, Micro-, and Nanoseconds are not relevant to us, so we remove them
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));

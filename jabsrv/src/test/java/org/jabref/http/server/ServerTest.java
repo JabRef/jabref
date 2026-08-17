@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.UserHostInfo;
 
 import com.google.gson.Gson;
@@ -101,6 +102,15 @@ public abstract class ServerTest extends JerseyTest {
             @Override
             protected void configure() {
                 bind(preferences).to(CliPreferences.class).ranked(2);
+            }
+        });
+    }
+
+    protected void addEntryTypesManagerToResourceConfig(ResourceConfig resourceConfig) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(new BibEntryTypesManager()).to(BibEntryTypesManager.class);
             }
         });
     }

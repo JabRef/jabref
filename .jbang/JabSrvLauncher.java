@@ -61,8 +61,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GroupDTO.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
@@ -70,6 +70,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResult.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/UncheckedFetcherException.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java

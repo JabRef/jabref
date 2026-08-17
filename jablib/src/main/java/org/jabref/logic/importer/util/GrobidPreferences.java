@@ -31,12 +31,6 @@ public class GrobidPreferences {
         return new GrobidPreferences();
     }
 
-    public void setAll(GrobidPreferences preferences) {
-        this.grobidEnabled.set(preferences.isGrobidEnabled());
-        this.grobidUseAsked.set(preferences.isGrobidUseAsked());
-        this.grobidURL.set(preferences.getGrobidURL());
-    }
-
     public boolean isGrobidEnabled() {
         return grobidEnabled.get();
     }

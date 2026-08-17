@@ -1,17 +1,16 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.List;
 import java.util.Set;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.Field;
 
-/// Discriminated union of the kinds of tabs that appear in the entry editor.
+/// Model of the tabs that appear in the entry editor.
 ///
-/// {@link BuiltInTab}         — a fixed tab identified by a {@link BuiltIn} constant.
-/// {@link CustomizedFieldsTab} — user-customizable tab backed by an explicit, named set of fields.
+/// Since the single scroll-list "Main" tab (issue #12711) replaced the classic category
+/// tabs and the user-customizable field-set tabs, every tab is a fixed [BuiltInTab]
+/// identified by a [BuiltIn] constant; users only toggle visibility.
 public sealed interface EntryEditorTabModel
-        permits EntryEditorTabModel.BuiltInTab, EntryEditorTabModel.CustomizedFieldsTab {
+        permits EntryEditorTabModel.BuiltInTab {
 
     boolean isVisible();
 
@@ -24,34 +23,13 @@ public sealed interface EntryEditorTabModel
         ) && type == BuiltIn.PREVIEW;
     }
 
-    static int indexAfterLeadingPreview(List<? extends EntryEditorTabModel> models) {
-        return !models.isEmpty() && models.getFirst().isPreview() ? 1 : 0;
-    }
-
-    static int indexAfterBuiltInFieldSets(List<? extends EntryEditorTabModel> models) {
-        int lastFieldSet = -1;
-        for (int i = 0; i < models.size(); i++) {
-            if (models.get(i) instanceof BuiltInTab(
-                    BuiltIn type,
-                    boolean _
-            ) && type.isFieldSet()) {
-                lastFieldSet = i;
-            }
-        }
-        return lastFieldSet >= 0 ? lastFieldSet + 1 : indexAfterLeadingPreview(models);
-    }
-
     /// Every fixed tab in the entry editor, in display order.
     enum BuiltIn {
         // Preview tab visibility controlled by preference option
         PREVIEW,
 
-        // Built-in field-set tabs: fields computed dynamically from the entry type
-        REQUIRED_FIELDS,
-        IMPORTANT_OPTIONAL_FIELDS,
-        DETAIL_OPTIONAL_FIELDS,
-        DEPRECATED_FIELDS,
-        OTHER_FIELDS,
+        // The single scroll-list tab showing all fields (issue #12711)
+        ALL_FIELDS,
 
         // Feature tabs: fixed implementations
         RELATED_ARTICLES,
@@ -60,29 +38,18 @@ public sealed interface EntryEditorTabModel
         FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
-        COMMENTS,
-        MATH_SCI_NET,
         SOURCE,
         FULLTEXT_SEARCH_RESULTS;
 
-        private static final Set<BuiltIn> FIELD_SETS = Set.of(
-                REQUIRED_FIELDS, IMPORTANT_OPTIONAL_FIELDS, DETAIL_OPTIONAL_FIELDS, DEPRECATED_FIELDS, OTHER_FIELDS);
+        private static final Set<BuiltIn> FIELD_SETS = Set.of(ALL_FIELDS);
 
         // Create displayName dynamically for language preference change
         public String displayName() {
             return switch (this) {
                 case PREVIEW ->
                         Localization.lang("Preview");
-                case REQUIRED_FIELDS ->
-                        Localization.lang("Required fields");
-                case IMPORTANT_OPTIONAL_FIELDS ->
-                        Localization.lang("Optional fields");
-                case DETAIL_OPTIONAL_FIELDS ->
-                        Localization.lang("Optional fields 2");
-                case DEPRECATED_FIELDS ->
-                        Localization.lang("Deprecated fields");
-                case OTHER_FIELDS ->
-                        Localization.lang("Other fields");
+                case ALL_FIELDS ->
+                        Localization.lang("Main");
                 case RELATED_ARTICLES ->
                         Localization.lang("Related articles");
                 case AI_SUMMARY ->
@@ -95,10 +62,6 @@ public sealed interface EntryEditorTabModel
                         Localization.lang("LaTeX citations");
                 case CITATION_INFORMATION ->
                         Localization.lang("Citations");
-                case COMMENTS ->
-                        Localization.lang("Comments");
-                case MATH_SCI_NET ->
-                        Localization.lang("MathSciNet Review");
                 case SOURCE ->
                         Localization.lang("Source");
                 case FULLTEXT_SEARCH_RESULTS ->
@@ -121,21 +84,6 @@ public sealed interface EntryEditorTabModel
         @Override
         public EntryEditorTabModel withVisible(boolean visible) {
             return new BuiltInTab(type, visible);
-        }
-    }
-
-    /// Always shown; toggled only by being added to or removed from the tab list, so it carries no
-    /// visibility flag (unlike {@link BuiltInTab}).
-    record CustomizedFieldsTab(String name, Set<Field> fields)
-            implements EntryEditorTabModel {
-        @Override
-        public boolean isVisible() {
-            return true;
-        }
-
-        @Override
-        public EntryEditorTabModel withVisible(boolean visible) {
-            return this;
         }
     }
 }

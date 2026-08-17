@@ -75,7 +75,7 @@ public abstract class AbstractJabKitTest {
         when(preferences.getAiPreferences()).thenReturn(aiPreferences);
 
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
-        commandLine = new CapturingCommandLine(jabKit);
+        commandLine = new CapturingCommandLine(jabKit, JabKit.createFactory());
     }
 
     /// Gets class resource as fully qualified string.

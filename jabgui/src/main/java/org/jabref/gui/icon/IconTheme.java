@@ -91,6 +91,12 @@ public class IconTheme {
         }
     }
 
+    public static Optional<JabRefIcon> findGroupIcon(String iconCode) {
+        return findJabRefIcon(iconCode)
+                .or(() -> IkonliIcon.findIconByDescription(iconCode))
+                .or(() -> IkonliIcon.findIcon(iconCode));
+    }
+
     private static URL getIconUrl(String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
@@ -193,6 +199,7 @@ public class IconTheme {
         COPY_TO_FOLDER(MaterialDesignC.CONTENT_COPY),
         RENAME(MaterialDesignR.RENAME_BOX),
         DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
+        OCR(MaterialDesignT.TEXT_RECOGNITION),
         REMOVE_LINK(MaterialDesignL.LINK_OFF),
         AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),

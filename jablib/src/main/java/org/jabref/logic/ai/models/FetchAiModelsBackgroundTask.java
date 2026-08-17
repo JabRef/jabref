@@ -17,8 +17,7 @@ public class FetchAiModelsBackgroundTask extends BackgroundTask<List<String>> {
     private final AiModelService aiModelService;
     private final AiProvider aiProvider;
     private final String apiBaseUrl;
-    @Nullable
-    private final String apiKey;
+    private final @Nullable String apiKey;
 
     public FetchAiModelsBackgroundTask(AiModelService aiModelService, AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         this.aiModelService = aiModelService;
@@ -37,7 +36,7 @@ public class FetchAiModelsBackgroundTask extends BackgroundTask<List<String>> {
 
     @Override
     public List<String> call() {
-        return aiModelService.fetchModelsSynchronously(
+        return aiModelService.getAvailableModels(
                 aiProvider,
                 apiBaseUrl,
                 apiKey

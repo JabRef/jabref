@@ -81,20 +81,6 @@ public class SearchPreferences {
         return new SearchPreferences();
     }
 
-    public void setAll(SearchPreferences preferences) {
-        this.searchDisplayMode.set(preferences.getSearchDisplayMode());
-        this.searchFlags.clear();
-        setSearchFlag(SearchFlags.REGULAR_EXPRESSION, preferences.isRegularExpression());
-        setSearchFlag(SearchFlags.CASE_SENSITIVE, preferences.isCaseSensitive());
-        setSearchFlag(SearchFlags.FULLTEXT, preferences.isFulltext());
-        this.usePostgresSearch.set(preferences.shouldUsePostgresSearch());
-        this.keepSearchString.set(preferences.shouldKeepSearchString());
-        this.keepWindowOnTop.set(preferences.shouldKeepWindowOnTop());
-        this.searchWindowHeight.set(preferences.getSearchWindowHeight());
-        this.searchWindowWidth.set(preferences.getSearchWindowWidth());
-        this.searchWindowDividerPosition.set(preferences.getSearchWindowDividerPosition());
-    }
-
     public EnumSet<SearchFlags> getSearchFlags() {
         // copy of returns an exception when the EnumSet is empty
         if (searchFlags.isEmpty()) {

@@ -61,6 +61,22 @@ class JabKitTest extends AbstractJabKitTest {
     }
 
     @Test
+    void globalPorcelainBeforeSubcommandAppliesToNestedSubcommand() {
+        Path testBib = getClassResourceAsPath("origin.bib");
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        // "--porcelain" is placed before the "check"/"consistency" subcommands, at the root
+        // command level, instead of after them at the level where "consistency" reads it.
+        List<String> args = List.of("--porcelain", "check", "consistency", "--input", testBibFile);
+
+        int executionResult = commandLine.executeToLog(args.toArray(String[]::new));
+
+        String output = commandLine.getStandardOutput();
+        assertEquals("", output);
+        assertEquals(0, executionResult);
+    }
+
+    @Test
     void checkConsistencyGitHubActionsFormat() {
         Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();

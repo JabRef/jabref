@@ -15,6 +15,17 @@ Needs: impl
 
 <!-- markdownlint-disable-file MD022 -->
 
+## Input file argument accepts an http(s)/ftp URL
+`req~jabkit.cli.input-url~1`
+
+The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
+`https://`, or `ftp://` URL wherever a `jabkit` command reads a single file.
+The URL is downloaded to a local temporary file before use; a download failure is reported
+as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
+
+Needs: impl
+
 ## Banner shown only at `--help`
 `req~jabkit.cli.banner-shown~1`
 
@@ -33,6 +44,15 @@ The `jabkit check` subcommands emit their findings in a line-oriented
 
 Entry-level findings (for example, on the citation key itself) carry only the citation key.
 Field-level findings additionally carry the affected field name.
+
+Needs: impl
+
+## Standard output conversion format
+`req~jabkit.cli.convert-stdout-format~1`
+
+When `jabkit convert` writes to standard output, it uses the exporter selected by
+`--output-format`. Progress messages are written to standard error so standard output
+contains only the exported data.
 
 Needs: impl
 

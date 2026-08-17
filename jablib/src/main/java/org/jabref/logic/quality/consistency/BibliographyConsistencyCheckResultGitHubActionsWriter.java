@@ -38,16 +38,19 @@ public class BibliographyConsistencyCheckResultGitHubActionsWriter extends Bibli
     @Override
     protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
         String citationKey = bibEntry.getCitationKey().orElse("");
+        // The citation key and field name go into the message itself (not just the annotation
+        // title), so the plain GitHub Actions log line is self-describing.
+        String keyPrefix = citationKey.isEmpty() ? "" : citationKey + ": ";
         for (Field field : allReportedFields) {
             Optional<String> value = bibEntry.getField(field);
             if (value.isPresent()) {
                 if (!requiredFields.contains(field) && !optionalFields.contains(field)) {
                     write(parserResult.getFieldRange(bibEntry, field), citationKey, field,
-                            "unknown field for entry type %s".formatted(entryType));
+                            "%sunknown field '%s' for entry type %s".formatted(keyPrefix, field.getName(), entryType));
                 }
             } else {
                 write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, field,
-                        "field is absent but used by other entries of entry type %s".formatted(entryType));
+                        "%sfield '%s' is absent but used by other entries of entry type %s".formatted(keyPrefix, field.getName(), entryType));
             }
         }
     }

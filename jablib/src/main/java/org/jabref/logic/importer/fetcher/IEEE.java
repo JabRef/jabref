@@ -20,7 +20,6 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
@@ -32,7 +31,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.UnirestException;
@@ -310,24 +308,12 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         return uriBuilder.build().toURL();
     }
 
+    /// Builds the IEEE search URL for a raw, catalog-native query, sent verbatim as the `querytext` parameter.
+    /// Resets `transformer` so [#getParser()] applies no year filtering to raw results.
     @Override
-    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
-        if (rawQuery.isBlank()) {
-            return new Page<>(rawQuery, pageNumber, List.of());
-        }
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         transformer = new IEEEQueryTransformer();
-        try {
-            URL url = buildSearchURL(rawQuery, pageNumber);
-            try (var stream = getUrlDownload(url).asInputStream()) {
-                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
-            }
-        } catch (URISyntaxException e) {
-            throw new FetcherException("IEEE raw search URL is malformed for query: " + rawQuery, e);
-        } catch (IOException e) {
-            throw new FetcherException(rawQuery, e);
-        } catch (ParseException e) {
-            throw new FetcherException("IEEE raw search parse error for query: " + rawQuery, e);
-        }
+        return buildSearchURL(rawQuery, pageNumber);
     }
 
     /// Builds the IEEE search API URL for the given raw query string and page number.

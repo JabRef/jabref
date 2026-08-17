@@ -47,16 +47,6 @@ public class MergeDialogPreferences {
         return new MergeDialogPreferences();
     }
 
-    public void setAll(MergeDialogPreferences preferences) {
-        this.setMergeDiffMode(preferences.getMergeDiffMode());
-        this.setMergeShouldShowDiff(preferences.getMergeShouldShowDiff());
-        this.setMergeShouldShowUnifiedDiff(preferences.getMergeShouldShowUnifiedDiff());
-        this.setMergeHighlightWords(preferences.getMergeHighlightWords());
-        this.setMergeShowChangedFieldsOnly(preferences.shouldMergeShowChangedFieldsOnly());
-        this.setIsMergeApplyToAllEntries(preferences.shouldMergeApplyToAllEntries());
-        this.setAllEntriesDuplicateResolverDecision(preferences.getAllEntriesDuplicateResolverDecision());
-    }
-
     public DiffMode getMergeDiffMode() {
         return mergeDiffMode.get();
     }

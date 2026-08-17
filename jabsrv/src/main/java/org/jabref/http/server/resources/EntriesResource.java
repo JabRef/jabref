@@ -15,15 +15,12 @@ import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.MediaTypes;
+import org.jabref.logic.openoffice.ZoteroCitationMarkParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -65,6 +62,9 @@ public class EntriesResource {
     @Inject
     UiMessageHandler uiMessageHandler;
 
+    @Inject
+    BibEntryTypesManager entryTypesManager;
+
     /// Appends BibTeX entries to the currently selected library.
     ///
     /// [impl->req~jabsrv.import.group~1]
@@ -83,6 +83,48 @@ public class EntriesResource {
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
                 .map(library -> new UiCommand.AppendBibTeXToLibrary(library, bibtex, group))
                 .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(bibtex, group))));
+    }
+
+    /// Parses CSL-JSON (a single CSL item or an array of them, as produced by a Zotero /
+    /// citation-js CSL-JSON export) into BibTeX entries and appends them to the selected library.
+    ///
+    /// The CSL item type and fields are mapped to Bib(La)TeX via the citation-js-based mapping
+    /// selected in [ADR 0064](docs/decisions/0064-use-citation-js-mapping.md), so a conference paper,
+    /// book chapter, thesis, report, etc. yields the correct entry type instead of a flat @article.
+    /// The produced entries carry no citation key; JabRef generates keys on import.
+    ///
+    /// The optional `group` query parameter additionally files the imported entries under a
+    /// top-level group of that name, creating it if it does not exist.
+    @POST
+    @Consumes(MediaTypes.CITATIONSTYLES_JSON)
+    public void addCslJson(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String cslJson) throws IOException {
+        if (StringUtil.isBlank(cslJson)) {
+            throw new BadRequestException("CSL-JSON data must not be empty.");
+        }
+        if (!uiMessageHandler.isGuiConnected()) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
+
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems(cslJson);
+        if (entries.isEmpty()) {
+            throw new BadRequestException("Could not parse any CSL-JSON item from the given data.");
+        }
+
+        StringWriter rawEntries = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntries, "\n");
+        BibEntryWriter entryWriter = new BibEntryWriter(
+                new FieldWriter(preferences.getFieldPreferences()),
+                entryTypesManager);
+        for (BibEntry entry : entries) {
+            // Freshly built entries have no meaningful parsed serialization, so force a reformat
+            // instead of writing the (empty) original source back out.
+            entryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX, true);
+        }
+
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntries.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntries.toString(), group))));
     }
 
     /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
@@ -104,39 +146,19 @@ public class EntriesResource {
         }
         Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
-        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
-        BibEntry parsed = parsePlainCitation(choice, citationText)
-                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+        BibEntry parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                                     .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
 
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
                 new FieldWriter(preferences.getFieldPreferences()),
-                new BibEntryTypesManager());
+                entryTypesManager);
         entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
 
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
                 .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
                 .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
-    }
-
-    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
-        if (choice == PlainCitationParserChoice.LLM) {
-            // The LLM parser needs a ChatModel; build one for this request and
-            // close it afterwards so the underlying HTTP client is released.
-            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
-                return PlainCitationParserFactory.getLlmPlainCitationParser(
-                                                         preferences.getImportFormatPreferences(),
-                                                         preferences.getAiPreferences(),
-                                                         chatModel)
-                                                 .parsePlainCitation(citationText);
-            }
-        }
-        return PlainCitationParserFactory.getPlainCitationParser(
-                choice,
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getGrobidPreferences(),
-                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
     }
 
     @POST

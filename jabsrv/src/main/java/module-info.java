@@ -22,7 +22,6 @@ module org.jabref.jabsrv {
     // For CAYW feature
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
-    requires afterburner.fx;
     requires java.desktop;
 
     requires transitive org.jabref.jablib;

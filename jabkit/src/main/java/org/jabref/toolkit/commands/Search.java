@@ -34,7 +34,7 @@ class Search implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;

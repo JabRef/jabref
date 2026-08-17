@@ -26,3 +26,9 @@ $ grep -c "Darwin1888" build/tmp/generated.bib
 1
 $ grep -c "Einstein1920" build/tmp/generated.bib
 1
+$ "$JABKIT" search --porcelain --query='author =~ Einstein' --input=src/test/resources/org/jabref/toolkit/commands/origin.bib > build/tmp/search.out 2>/dev/null; echo $?
+0
+$ grep -c "^@Book{Einstein1920," build/tmp/search.out
+1
+$ grep -c "^@Book{" build/tmp/search.out
+1

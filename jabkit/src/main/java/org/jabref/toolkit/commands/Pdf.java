@@ -20,7 +20,7 @@ class Pdf implements Callable<Integer> {
     protected JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Override
     public Integer call() {

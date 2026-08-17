@@ -10,11 +10,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.common.html.HtmlEscapers;
@@ -77,5 +84,29 @@ public class ServerUtils {
                               })
                               .findFirst()
                               .orElseThrow(() -> new NotFoundException("No library with id " + HtmlEscapers.htmlEscaper().escape(id) + " found"));
+    }
+
+    /// Parses a single plain-text bibliography reference into a {@link BibEntry} using the
+    /// plain-citation parser the user selected in preferences (including the LLM parser).
+    ///
+    /// Shared by the `entries` and `citations` resources so the parser wiring stays in one place.
+    public static Optional<BibEntry> parsePlainCitation(CliPreferences preferences, String citationText) throws FetcherException {
+        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
+        if (choice == PlainCitationParserChoice.LLM) {
+            // The LLM parser needs a ChatModel; build one for this request and
+            // close it afterwards so the underlying HTTP client is released.
+            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
+                return PlainCitationParserFactory.getLlmPlainCitationParser(
+                                                         preferences.getImportFormatPreferences(),
+                                                         preferences.getAiPreferences(),
+                                                         chatModel)
+                                                 .parsePlainCitation(citationText);
+            }
+        }
+        return PlainCitationParserFactory.getPlainCitationParser(
+                choice,
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
     }
 }

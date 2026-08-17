@@ -305,4 +305,35 @@ class ImportHandlerTest {
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
+
+    @Test
+    void canImportAsBibEntryReturnsTrueForBibFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.bib")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.BIB")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForPdfFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.pdf")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.PDF")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsTrueForRisFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.ris")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.RIS")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForGenericExtensions() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("notes.txt")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("data.xml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yaml")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForUnknownFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
+    }
 }

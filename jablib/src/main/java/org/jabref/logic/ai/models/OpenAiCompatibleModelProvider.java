@@ -1,15 +1,17 @@
 package org.jabref.logic.ai.models;
 
+import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
-import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +26,8 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
     @Override
     public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
@@ -33,20 +37,19 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         List<String> models = List.of();
 
-        try {
-            String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
-            HttpResponse<JsonNode> response = Unirest.get(modelsEndpoint)
-                                                     .header("Authorization", "Bearer " + apiKey)
-                                                     .header("accept", "application/json")
-                                                     .asJson();
+        String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
 
-            if (response.getStatus() == 200) {
-                models = parseModelsFromResponse(response.getBody());
-                LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.name());
-            } else {
-                LOGGER.info("Failed to fetch models from {} (status: {})", aiProvider.name(), response.getStatus());
-            }
-        } catch (UnirestException e) {
+        try {
+            URLDownload urlDownload = new URLDownload(modelsEndpoint);
+            urlDownload.setConnectTimeout(CONNECT_TIMEOUT);
+            urlDownload.addHeader("Authorization", "Bearer " + apiKey);
+            urlDownload.addHeader("accept", "application/json");
+
+            String response = urlDownload.asString();
+            models = parseModelsFromResponse(new JsonNode(response));
+
+            LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
+        } catch (FetcherException | MalformedURLException | JSONException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
 
@@ -55,8 +58,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     @Override
     public boolean supports(AiProvider aiProvider) {
-        return aiProvider == AiProvider.OPEN_AI
-                || aiProvider == AiProvider.MISTRAL_AI;
+        return aiProvider == AiProvider.OPEN_AI || aiProvider == AiProvider.MISTRAL_AI;
     }
 
     /// Builds the URL for the models endpoint from the given API base URL.

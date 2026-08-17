@@ -28,6 +28,15 @@ public enum GroupHierarchyType {
         }
     }
 
+    /// Parses a constant by name, falling back to {@link #INDEPENDENT} for unknown/corrupted values.
+    public static GroupHierarchyType safeValueOf(String name) {
+        try {
+            return GroupHierarchyType.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return INDEPENDENT;
+        }
+    }
+
     public String getDisplayName() {
         return displayName;
     }

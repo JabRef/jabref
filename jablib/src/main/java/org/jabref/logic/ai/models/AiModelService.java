@@ -30,11 +30,11 @@ public class AiModelService {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
-            LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
+            LOGGER.debug("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
             return dynamicModels;
         }
 
-        List<String> staticModels = PredefinedChatModelUtil.getAvailableModels(aiProvider);
+        List<String> staticModels = getStaticModels(aiProvider);
         LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.name());
         return staticModels;
     }
@@ -58,7 +58,7 @@ public class AiModelService {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
                 List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
-                if (models.isEmpty()) {
+                if (!models.isEmpty()) {
                     return models;
                 }
             }

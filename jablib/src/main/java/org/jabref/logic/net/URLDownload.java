@@ -23,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +66,9 @@ import org.slf4j.LoggerFactory;
 /// which uses an already opened connection).
 ///
 /// Nothing is cached.
+///
+/// Implentation note: This relies on <https://kong.github.io/unirest-java/configuration/> setting `followRedirects` to `true`
+/// and enabling cookie management.
 public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0";
@@ -83,14 +84,8 @@ public class URLDownload {
 
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-    private SSLContext sslContext;
-
-    static {
-        Unirest.config()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
-    }
+    // Can be null if SSL is not supported. If null, then ignore.
+    private @Nullable SSLContext sslContext;
 
     /// @param source the URL to download from
     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
@@ -104,10 +99,12 @@ public class URLDownload {
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
 
         try {
-            sslContext = SSLContext.getInstance("TLSv1.2");
-            sslContext.init(null, null, new SecureRandom());
-            // Note: SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            // Use the JVM-wide default context, which reflects the merged JRE + JabRef
+            // trust managers installed by TrustStoreManager#configureTrustStore(Path).
+            // Building a fresh context with init(null, null, ...) here would silently
+            // fall back to the plain JRE cacerts and ignore that configuration.
+            sslContext = SSLContext.getDefault();
+        } catch (NoSuchAlgorithmException e) {
             LOGGER.error("Could not initialize SSL context", e);
             sslContext = null;
         }
@@ -180,8 +177,7 @@ public class URLDownload {
     ///
     /// @return the status code of the response
     public boolean canBeReached() throws UnirestException {
-
-        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        int statusCode = Unirest.head(source.toString()).headers(parameters).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
     }
 

@@ -16,7 +16,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -44,6 +43,9 @@ public class LibraryResource {
     @Inject
     Gson gson;
 
+    @Inject
+    BibEntryTypesManager entryTypesManager;
+
     /// At http://localhost:23119/libraries/{id}
     ///
     /// @param id The specified library
@@ -53,7 +55,6 @@ public class LibraryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
                                                 .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
                                                 .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
@@ -66,7 +67,7 @@ public class LibraryResource {
     public String getClsItemJson(@PathParam("id") String id) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());
+        jabRefItemDataProvider.setData(databaseContext, entryTypesManager);
         return jabRefItemDataProvider.toJson();
     }
 

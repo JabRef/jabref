@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.chatting.util.ChatHistoryUtils;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
 import org.jabref.logic.ai.templates.AiTemplateRenderer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -18,12 +18,12 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// The task responsible for generating a RAG (retrieval-augmented generation) response. Before sending a user message to the LLM, the [AnswerEngine] is called which finds the relevant context for the message.
+/// The task responsible for generating a RAG (retrieval-augmented generation) response. Before sending a user message to the LLM, the [ResponseEngine] is called which finds the relevant context for the message.
 public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateRagResponseTask.class);
 
     private final ChatModel chatModel;
-    private final AnswerEngine answerEngine;
+    private final ResponseEngine responseEngine;
     private final List<ChatMessage> chatHistory;
     private final List<FullBibEntry> entries;
     private final String systemMessageTemplate;
@@ -31,14 +31,14 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
 
     public GenerateRagResponseTask(
             ChatModel chatModel,
-            AnswerEngine answerEngine,
+            ResponseEngine responseEngine,
             List<ChatMessage> chatHistory,
             List<FullBibEntry> entries,
             String systemMessageTemplate,
             String injectionTemplate
     ) {
         this.chatModel = chatModel;
-        this.answerEngine = answerEngine;
+        this.responseEngine = responseEngine;
         this.chatHistory = chatHistory;
         this.entries = entries;
         this.systemMessageTemplate = systemMessageTemplate;
@@ -59,7 +59,7 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
             return ChatMessage.aiMessage("", List.of());
         }
 
-        List<RelevantInformation> relevantInformation = answerEngine.process(
+        List<RelevantInformation> relevantInformation = responseEngine.process(
                 userMessage.get().content(),
                 entries
         );
@@ -85,7 +85,7 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
         if (chatHistoryForLlm.getLast().role() != ChatMessage.Role.SYSTEM) {
             chatHistoryForLlm.removeLast();
         }
-        // [impl->req~ai.chat.uses-answer-engine~1]
+        // [impl->req~ai.chat.uses-response-engine~1]
         chatHistoryForLlm.add(injectedMessage);
 
         List<dev.langchain4j.data.message.ChatMessage> chatMessages = chatHistoryForLlm
