@@ -100,6 +100,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BINDINGS = "bindings";
     // endregion
 
+    // All custom entry editor tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in
+    // display order. Public because needed for pref migration (the numbered-series format of versions up
+    // to v6.0-alpha.6 is converted to this key).
+    public static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
+
     // region column names
     // public because of migration
     // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
@@ -243,12 +248,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
     // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
-    // All custom tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in display order.
-    private static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
-    // Storage format of versions before the "Main" tab rework (#12711): tab names and field lists in two
-    // parallel numbered series. Read only as a migration fallback and purged on the next store.
-    private static final String OLD_CUSTOM_TAB_NAME = "customTabName_";
-    private static final String OLD_CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String ENTRY_EDITOR_TAB_ORDER = "entryEditorTabOrder";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
@@ -452,13 +451,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         ));
 
         String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
-        if (StringUtil.isBlank(storedCustomTabs)) {
-            // Migration: custom tabs stored by versions before the "Main" tab rework (#12711).
-            List<String> oldTabNames = getSeries(OLD_CUSTOM_TAB_NAME);
-            for (int i = 0; i < oldTabNames.size(); i++) {
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(oldTabNames.get(i), getStringList(OLD_CUSTOM_TAB_FIELDS + i)));
-            }
-        } else {
+        if (StringUtil.isNotBlank(storedCustomTabs)) {
             try {
                 OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
                         tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
@@ -530,9 +523,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         SequencedMap<String, List<String>> customTabsByName = new LinkedHashMap<>();
         customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns()));
         put(ENTRY_EDITOR_CUSTOM_TABS, OBJECT_MAPPER.writeValueAsString(customTabsByName));
-        // The migrated-from format must not resurrect after the user changes or deletes tabs.
-        purgeSeries(OLD_CUSTOM_TAB_NAME, 0);
-        purgeSeries(OLD_CUSTOM_TAB_FIELDS, 0);
 
         putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
                                                      .filter(config -> !config.isPreview())
