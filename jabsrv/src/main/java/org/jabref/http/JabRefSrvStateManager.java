@@ -62,8 +62,8 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
         this.importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         for (Path file : files) {
             parseLibrary(file).ifPresent(context -> {
-                openDatabases.add(context);
                 registerSearchContext(context);
+                openDatabases.add(context);
             });
         }
     }
