@@ -80,6 +80,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private final FileMoveOperation fileMoveOperation;
 
+    private final FileCopyOperation backupFileCopyOperation;
+
     private boolean errorDuringWrite = false;
 
     @FunctionalInterface
@@ -87,31 +89,38 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         void move(Path source, Path target) throws IOException;
     }
 
+    @FunctionalInterface
+    interface FileCopyOperation {
+        void copy(Path source, Path target) throws IOException;
+    }
+
     /// Creates a new output stream to write to or replace the file at the specified path.
     ///
     /// @param path       the path of the file to write to or replace
     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically);
+        this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// The temporary file is opened as a [FileChannel], because the channel is needed for [FileChannel#force(boolean)].
     /// `Files.newOutputStream(...)` returns a `sun.nio.ch.ChannelOutputStream`, which does not offer it.
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, FileMoveOperation fileMoveOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
         this(path,
                 pathOfTemporaryFile,
                 FileChannel.open(pathOfTemporaryFile, StandardOpenOption.WRITE),
                 keepBackup,
-                fileMoveOperation);
+                fileMoveOperation,
+                backupFileCopyOperation);
     }
 
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, FileMoveOperation fileMoveOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
         this(path,
                 pathOfTemporaryFile,
                 Channels.newOutputStream(temporaryFileChannel),
                 temporaryFileChannel,
                 keepBackup,
-                fileMoveOperation);
+                fileMoveOperation,
+                backupFileCopyOperation);
     }
 
     /// Creates a new output stream to write to or replace the file at the specified path.
@@ -124,12 +133,17 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Required for proper testing
     AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
-        this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, AtomicFileOutputStream::moveAtomically);
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// Required for proper testing
     AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation) throws IOException {
-        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, fileMoveOperation);
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, fileMoveOperation, AtomicFileOutputStream::copyReplacingExisting);
+    }
+
+    /// Required for proper testing
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, fileMoveOperation, backupFileCopyOperation);
     }
 
     private AtomicFileOutputStream(Path path,
@@ -137,7 +151,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                                    OutputStream temporaryFileOutputStream,
                                    @Nullable FileChannel temporaryFileChannel,
                                    boolean keepBackup,
-                                   FileMoveOperation fileMoveOperation) throws IOException {
+                                   FileMoveOperation fileMoveOperation,
+                                   FileCopyOperation backupFileCopyOperation) throws IOException {
         super(temporaryFileOutputStream);
         this.targetFile = path;
         this.temporaryFile = pathOfTemporaryFile;
@@ -145,6 +160,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this.keepBackup = keepBackup;
         this.temporaryFileChannel = temporaryFileChannel;
         this.fileMoveOperation = fileMoveOperation;
+        this.backupFileCopyOperation = backupFileCopyOperation;
     }
 
     private static Path createTemporaryFile(Path targetFile) throws IOException {
@@ -247,9 +263,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {
-                    throw new IOException("Could not create a backup before overwriting linked file " + targetFile);
+                    LOGGER.warn("Could not create a backup for linked file {}. Replacing the file without preserving its links.", targetFile);
+                    moveTemporaryFileToTargetFile(backupCreated);
+                } else {
+                    overwriteTargetFile(backupCreated);
                 }
-                overwriteTargetFile(backupCreated);
             } else {
                 // Move temporary file (replace original if it exists)
                 moveTemporaryFileToTargetFile(backupCreated);
@@ -280,7 +298,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
 
         try {
-            Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+            backupFileCopyOperation.copy(targetFile, backupFile);
             return true;
         } catch (IOException exception) {
             LOGGER.warn("Could not create backup file {}", backupFile, exception);
@@ -345,13 +363,23 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 fileMoveOperation.move(temporaryFile, targetFile);
                 return;
             } catch (AtomicMoveNotSupportedException exception) {
-                LOGGER.debug("Atomic move is not supported for {}. Falling back to an in-place save.", targetFile, exception);
-                fallBackToInPlaceSave(backupCreated, exception);
+                if (backupCreated) {
+                    LOGGER.debug("Atomic move is not supported for {}. Falling back to an in-place save.", targetFile, exception);
+                    fallBackToInPlaceSave(exception);
+                } else {
+                    LOGGER.debug("Atomic move is not supported for {}. Falling back to a non-atomic move.", targetFile, exception);
+                    moveTemporaryFileWithoutAtomicity(exception);
+                }
                 return;
             } catch (FileSystemException exception) {
                 if (attempt == MOVE_ATTEMPTS) {
-                    LOGGER.debug("Could not move temporary file. Falling back to an in-place save.", exception);
-                    fallBackToInPlaceSave(backupCreated, exception);
+                    if (backupCreated) {
+                        LOGGER.debug("Could not move temporary file. Falling back to an in-place save.", exception);
+                        fallBackToInPlaceSave(exception);
+                    } else {
+                        LOGGER.debug("Could not move temporary file. Falling back to a non-atomic move.", exception);
+                        moveTemporaryFileWithoutAtomicity(exception);
+                    }
                     return;
                 }
                 LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, MOVE_ATTEMPTS, temporaryFile, targetFile, exception);
@@ -369,21 +397,30 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 
-    private void fallBackToInPlaceSave(boolean backupCreated, IOException moveException) throws IOException {
-        if (Files.exists(targetFile) && !backupCreated) {
-            throw new IOException("Could not create a backup before falling back to an in-place save for " + targetFile, moveException);
-        }
-
+    private void fallBackToInPlaceSave(IOException moveException) throws IOException {
         try {
-            overwriteTargetFile(backupCreated);
+            overwriteTargetFile(true);
         } catch (IOException fallbackException) {
             fallbackException.addSuppressed(moveException);
             throw fallbackException;
         }
     }
 
+    private void moveTemporaryFileWithoutAtomicity(IOException atomicMoveException) throws IOException {
+        try {
+            Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException moveException) {
+            moveException.addSuppressed(atomicMoveException);
+            throw moveException;
+        }
+    }
+
     private static void moveAtomically(Path source, Path target) throws IOException {
         Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private static void copyReplacingExisting(Path source, Path target) throws IOException {
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override

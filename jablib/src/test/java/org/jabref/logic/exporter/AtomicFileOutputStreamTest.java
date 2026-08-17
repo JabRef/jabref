@@ -20,6 +20,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
@@ -195,6 +196,35 @@ class AtomicFileOutputStreamTest {
 
         assertEquals(targetFile, Files.readSymbolicLink(symbolicLink));
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(targetFile));
+    }
+
+    @Test
+    @EnabledOnOs({OS.LINUX, OS.MAC})
+    void saveReplacesSymbolicLinkWhenBackupAndAtomicMoveAreUnavailable(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("symbolic-link-target.txt");
+        Path symbolicLink = tempDir.resolve("symbolic-link.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+        Files.createSymbolicLink(symbolicLink, targetFile);
+
+        Path temporaryFile = tempDir.resolve("symbolic-link.txt.tmp");
+        try (OutputStream temporaryFileOutputStream = Files.newOutputStream(temporaryFile);
+             AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(
+                     symbolicLink,
+                     temporaryFile,
+                     temporaryFileOutputStream,
+                     true,
+                     (source, target) -> {
+                         throw new AtomicMoveNotSupportedException(source.toString(), target.toString(), "test");
+                     },
+                     (source, target) -> {
+                         throw new IOException("test");
+                     })) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertFalse(Files.isSymbolicLink(symbolicLink));
+        assertEquals(FIVE_THOUSAND_CHARS, Files.readString(symbolicLink));
+        assertEquals(FIFTY_CHARS, Files.readString(targetFile));
     }
 
     private void assertSavePreservesHardLinks(Path tempDir) throws IOException {
