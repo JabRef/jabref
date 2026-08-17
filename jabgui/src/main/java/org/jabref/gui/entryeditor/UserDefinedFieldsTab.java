@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
 
@@ -39,6 +40,10 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
 
     /// The entry whose event bus this tab is subscribed to, for live refresh of regex-captured fields.
     private Optional<BibEntry> subscribedEntry = Optional.empty();
+
+    /// Set while a refresh is queued on the FX thread (events may arrive from background threads,
+    /// e.g. fetchers), so bursts of field changes coalesce into one refresh instead of one each.
+    private final AtomicBoolean refreshQueued = new AtomicBoolean();
 
     public UserDefinedFieldsTab(EntryEditorTabModel.CustomizedFieldsTab model,
                                 UndoManager undoManager,
@@ -93,13 +98,21 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     /// Refreshes the tab when a field is set or cleared from outside (Main tab, Source tab, fetchers,
-    /// undo, …), since that can change which fields a regex pattern captures. Rebuilds only when the
-    /// resolved field set actually changes, so typing inside this tab's editors never steals focus.
+    /// undo, …), since that can change which fields a regex pattern captures. Event bursts coalesce
+    /// into a single deferred refresh, and the refresh reads the entry's state at callback time (the
+    /// event's payload is deliberately ignored), so a queued callback can never apply stale state.
+    /// Rebuilds only when the resolved field set actually changes, so typing inside this tab's
+    /// editors never steals focus.
     @Subscribe
     public void listen(FieldChangedEvent event) {
+        if (refreshQueued.getAndSet(true)) {
+            return;
+        }
         Platform.runLater(() -> {
-            BibEntry entry = event.getBibEntry();
-            if (getCurrentEntry() != entry) {
+            // Cleared before refreshing: an event arriving while we refresh must queue a new callback.
+            refreshQueued.set(false);
+            BibEntry entry = getCurrentEntry();
+            if (entry == null) {
                 return;
             }
             SequencedSet<Field> target = determineFieldsToShow(entry);
