@@ -342,8 +342,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private void copyFileToTarget(Path source) throws IOException {
         try (InputStream inputStream = Files.newInputStream(source);
              FileChannel targetFileChannel = Files.exists(targetFile)
-                     ? FileChannel.open(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
-                     : FileChannel.open(targetFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+                                             ? FileChannel.open(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+                                             : FileChannel.open(targetFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
             inputStream.transferTo(Channels.newOutputStream(targetFileChannel));
             targetFileChannel.force(true);
         }
