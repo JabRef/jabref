@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.undo.CompoundEdit;
@@ -82,6 +84,7 @@ public class ImportHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
 
     private static final String FILENAME_FALLBACK = "downloaded.pdf";
+    private static final Set<String> EXCLUDED_CENTER_DROP_EXTENSIONS = Set.of("pdf", "txt", "xml", "yml", "yaml");
 
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
@@ -137,6 +140,16 @@ public class ImportHandler {
 
     public ExternalFilesEntryLinker getFileLinker() {
         return fileLinker;
+    }
+
+    /// Checks whether the given file should be imported as bibliographic entries rather than attached as a file to an existing entry.
+    /// Excludes PDFs and generic document/data file extensions (.txt, .xml, .yml, .yaml) which are intended to be attached as files.
+    public boolean canImportAsBibEntry(Path file) {
+        String extension = FileUtil.getFileExtension(file).orElse("").toLowerCase(Locale.ROOT);
+        if (EXCLUDED_CENTER_DROP_EXTENSIONS.contains(extension)) {
+            return false;
+        }
+        return FileUtil.isBibFile(file) || importFormatReader.hasImporterForFile(file);
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, TransferMode transferMode) {
