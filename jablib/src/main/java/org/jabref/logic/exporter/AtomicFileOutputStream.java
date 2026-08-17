@@ -263,7 +263,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {
-                    LOGGER.warn("Could not create a backup for linked file {}. Replacing the file without preserving its links.", targetFile);
+                    LOGGER.warn("Could not create a backup for linked file {} (backup created: {}). Replacing the file without preserving its links.", targetFile, backupCreated);
                     moveTemporaryFileToTargetFile(backupCreated);
                 } else {
                     overwriteTargetFile(backupCreated);
@@ -301,7 +301,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             backupFileCopyOperation.copy(targetFile, backupFile);
             return true;
         } catch (IOException exception) {
-            LOGGER.warn("Could not create backup file {}", backupFile, exception);
+            LOGGER.warn("Could not create backup file {} (backup created: false)", backupFile, exception);
             return false;
         }
     }
@@ -364,20 +364,20 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 return;
             } catch (AtomicMoveNotSupportedException exception) {
                 if (backupCreated) {
-                    LOGGER.debug("Atomic move is not supported for {}. Falling back to an in-place save.", targetFile, exception);
+                    LOGGER.debug("Atomic move is not supported for {} (backup created: {}). Falling back to an in-place save.", targetFile, backupCreated, exception);
                     fallBackToInPlaceSave(exception);
                 } else {
-                    LOGGER.debug("Atomic move is not supported for {}. Falling back to a non-atomic move.", targetFile, exception);
+                    LOGGER.debug("Atomic move is not supported for {} (backup created: {}). Falling back to a non-atomic move.", targetFile, backupCreated, exception);
                     moveTemporaryFileWithoutAtomicity(exception);
                 }
                 return;
             } catch (FileSystemException exception) {
                 if (attempt == MOVE_ATTEMPTS) {
                     if (backupCreated) {
-                        LOGGER.debug("Could not move temporary file. Falling back to an in-place save.", exception);
+                        LOGGER.debug("Could not move temporary file (backup created: {}). Falling back to an in-place save.", backupCreated, exception);
                         fallBackToInPlaceSave(exception);
                     } else {
-                        LOGGER.debug("Could not move temporary file. Falling back to a non-atomic move.", exception);
+                        LOGGER.debug("Could not move temporary file (backup created: {}). Falling back to a non-atomic move.", backupCreated, exception);
                         moveTemporaryFileWithoutAtomicity(exception);
                     }
                     return;
