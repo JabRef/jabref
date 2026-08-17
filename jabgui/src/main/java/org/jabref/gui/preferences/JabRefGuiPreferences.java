@@ -62,6 +62,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
@@ -75,6 +76,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
@@ -110,6 +114,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    /// JSON shape of [#ENTRY_EDITOR_CUSTOM_TABS]; Jackson reads JSON objects into insertion-ordered maps,
+    /// so the tabs' display order survives the round-trip.
+    private static final TypeReference<LinkedHashMap<String, List<String>>> CUSTOM_TABS_TYPE = new TypeReference<>() {
+    };
 
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -232,10 +243,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
     // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
-    // Deliberately the same keys as before the "Main" tab rework (#12711), so custom tabs configured
-    // in older versions are picked up again without migration code.
-    private static final String CUSTOM_TAB_NAME = "customTabName_";
-    private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
+    // All custom tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in display order.
+    private static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
+    // Storage format of versions before the "Main" tab rework (#12711): tab names and field lists in two
+    // parallel numbered series. Read only as a migration fallback and purged on the next store.
+    private static final String OLD_CUSTOM_TAB_NAME = "customTabName_";
+    private static final String OLD_CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String ENTRY_EDITOR_TAB_ORDER = "entryEditorTabOrder";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
@@ -438,9 +451,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
         ));
 
-        List<String> customTabNames = getSeries(CUSTOM_TAB_NAME);
-        for (int i = 0; i < customTabNames.size(); i++) {
-            tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(customTabNames.get(i), getStringList(CUSTOM_TAB_FIELDS + i)));
+        String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
+        if (StringUtil.isBlank(storedCustomTabs)) {
+            // Migration: custom tabs stored by versions before the "Main" tab rework (#12711).
+            List<String> oldTabNames = getSeries(OLD_CUSTOM_TAB_NAME);
+            for (int i = 0; i < oldTabNames.size(); i++) {
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(oldTabNames.get(i), getStringList(OLD_CUSTOM_TAB_FIELDS + i)));
+            }
+        } else {
+            try {
+                OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
+                        tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
+            } catch (JacksonException e) {
+                LOGGER.warn("Could not read the custom entry editor tabs, dropping them", e);
+            }
         }
 
         return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
@@ -501,12 +525,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                                                                           .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
                                                                           .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
                                                                           .toList();
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, customTabs.get(i).name());
-            putStringList(CUSTOM_TAB_FIELDS + i, customTabs.get(i).fieldPatterns());
-        }
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
+        // Keyed by name, so a duplicate tab name cannot exist in the stored format (the preferences UI
+        // prevents creating duplicates; legacy duplicates merge here, last one wins).
+        SequencedMap<String, List<String>> customTabsByName = new LinkedHashMap<>();
+        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns()));
+        put(ENTRY_EDITOR_CUSTOM_TABS, OBJECT_MAPPER.writeValueAsString(customTabsByName));
+        // The migrated-from format must not resurrect after the user changes or deletes tabs.
+        purgeSeries(OLD_CUSTOM_TAB_NAME, 0);
+        purgeSeries(OLD_CUSTOM_TAB_FIELDS, 0);
 
         putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
                                                      .filter(config -> !config.isPreview())
