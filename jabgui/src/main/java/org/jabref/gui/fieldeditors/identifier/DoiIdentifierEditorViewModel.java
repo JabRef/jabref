@@ -41,7 +41,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     @Override
     public void lookupIdentifier(BibEntry bibEntry) {
-        CrossRef doiFetcher = new CrossRef();
+        CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
                       .onRunning(() -> identifierLookupInProgress.setValue(true))

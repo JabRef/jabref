@@ -35,7 +35,7 @@ class DoiToBibtex implements Callable<Integer> {
 
     @Override
     public Integer call() throws ExportServiceException {
-        CrossRef fetcher = new CrossRef();
+        CrossRef fetcher = new CrossRef(argumentProcessor.cliPreferences.getImporterPreferences());
         List<BibEntry> entries = new ArrayList<>(dois.length);
 
         for (String doiString : dois) {
