@@ -33,6 +33,7 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.ISSN;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.Nullable;
 
@@ -67,6 +68,12 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
+
+        if (StandardEntryType.Misc == mergedEntry.get().getType()
+                && StandardEntryType.Misc != entry.getType()) {
+            mergedEntry.get().setType(entry.getType());
+        }
+
         for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
             Field field = fieldEntry.getKey();
             String newValue = fieldEntry.getValue();

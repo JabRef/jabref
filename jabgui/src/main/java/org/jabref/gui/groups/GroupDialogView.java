@@ -89,6 +89,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton entryTypeRadioButton;
 
     // Option Groups
+    @FXML private CheckBox explicitIncludeSelected;
+
     @FXML private TextField keywordGroupSearchTerm;
     @FXML private TextField keywordGroupSearchField;
     @FXML private CheckBox keywordGroupCaseSensitive;
@@ -213,6 +215,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
         entryTypeRadioButton.selectedProperty().bindBidirectional(viewModel.typeEntryTypeProperty());
+
+        explicitIncludeSelected.selectedProperty().bindBidirectional(viewModel.explicitIncludeSelectedProperty());
+        explicitIncludeSelected.disableProperty().bind(viewModel.editingGroupProperty().or(viewModel.selectedEntriesAvailableProperty().not()));
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());

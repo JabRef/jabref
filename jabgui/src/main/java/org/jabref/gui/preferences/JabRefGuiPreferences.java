@@ -185,6 +185,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region GroupsPreferences
     private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
+    private static final String AUTO_INCLUDE_SELECTED_ENTRIES = "autoIncludeSelectedEntries";
     // The view mode spans the three GROUP_VIEW_* flags above; this synthetic key is never written to the backing store
     // and only serves as the binding's reporting key in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
     private static final String GROUP_VIEW_MODE = "groupViewMode";
@@ -769,6 +770,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(GROUP_VIEW_INVERT, defaultValues.groupViewModeProperty().contains(GroupViewMode.INVERT)),
                 getBoolean(AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup()),
                 getBoolean(DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount()),
+                getBoolean(AUTO_INCLUDE_SELECTED_ENTRIES, defaultValues.shouldAutoIncludeSelectedEntries()),
                 GroupHierarchyType.safeValueOf(get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())),
                 getBoolean(GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton())
         );
@@ -778,6 +780,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> getGroupViewModes(defaultValues));
         bindBoolean(groupsPreferences.autoAssignGroupProperty(), AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup());
         bindBoolean(groupsPreferences.displayGroupCountProperty(), DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount());
+        bindBoolean(groupsPreferences.autoIncludeSelectedEntriesProperty(), AUTO_INCLUDE_SELECTED_ENTRIES, defaultValues.shouldAutoIncludeSelectedEntries());
         bindObject(groupsPreferences.defaultHierarchicalContextProperty(), DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext(),
                 GroupHierarchyType::name, GroupHierarchyType::safeValueOf);
         bindBoolean(groupsPreferences.showAiChatButtonProperty(), GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton());
