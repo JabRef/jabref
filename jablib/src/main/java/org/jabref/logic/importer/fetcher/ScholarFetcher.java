@@ -79,7 +79,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                 if (!authorsList.isEmpty()) {
                     String rawAuthors = String.join(" and ", authorsList);
                     AuthorList parsedAuthors = AuthorList.parse(rawAuthors);
-                    entry.withField(StandardField.AUTHOR, parsedAuthors.getAsFirstLastNamesWithAnd());
+                    entry.setField(StandardField.AUTHOR, parsedAuthors.getAsFirstLastNamesWithAnd());
                 } else {
                     LOGGER.debug("Empty authors array.");
                 }
@@ -87,32 +87,32 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                 LOGGER.debug("No authors found.");
             }
 
-            entry.withField(StandardField.TITLE, scholarJsonEntry.getString("title"));
+            entry.setField(StandardField.TITLE, scholarJsonEntry.getString("title"));
             String publishedDate = scholarJsonEntry.getString("published_date");
             String publishedDateOnly = publishedDate.split("T")[0];
-            entry.withField(StandardField.DATE, publishedDateOnly);
-            entry.withField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
+            entry.setField(StandardField.DATE, publishedDateOnly);
+            entry.setField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
 
             // ScholarAPI's has_text/has_pdf flags for future fulltext-fetcher integration without needing to re fetch metadata to check availability first
-            entry.withField(new UnknownField("scholarApiHasText"), String.valueOf(scholarJsonEntry.getBoolean("has_text")));
-            entry.withField(new UnknownField("scholarApiHasPdf"), String.valueOf(scholarJsonEntry.getBoolean("has_pdf")));
+            entry.setField(new UnknownField("scholarApiHasText"), String.valueOf(scholarJsonEntry.getBoolean("has_text")));
+            entry.setField(new UnknownField("scholarApiHasPdf"), String.valueOf(scholarJsonEntry.getBoolean("has_pdf")));
 
             if (scholarJsonEntry.has("id")) {
-                entry.withField(new UnknownField("scholarapi"), scholarJsonEntry.getString("id"));
+                entry.setField(new UnknownField("scholarapi"), scholarJsonEntry.getString("id"));
             }
 
             if (scholarJsonEntry.has("doi")) {
-                entry.withField(StandardField.DOI, scholarJsonEntry.getString("doi"));
+                entry.setField(StandardField.DOI, scholarJsonEntry.getString("doi"));
             }
 
             if (scholarJsonEntry.has("journal_pages")) {
-                entry.withField(StandardField.PAGES, scholarJsonEntry.getString("journal_pages"));
+                entry.setField(StandardField.PAGES, scholarJsonEntry.getString("journal_pages"));
             }
 
-            Optional.ofNullable(scholarJsonEntry.optJSONArray("journal_issn")).filter(arr -> !arr.isEmpty()).ifPresent(arr -> entry.withField(StandardField.ISSN, arr.getString(0)));
+            Optional.ofNullable(scholarJsonEntry.optJSONArray("journal_issn")).filter(arr -> !arr.isEmpty()).ifPresent(arr -> entry.setField(StandardField.ISSN, arr.getString(0)));
             // Journal
             if (scholarJsonEntry.has("journal")) {
-                entry.withField(StandardField.JOURNAL, scholarJsonEntry.getString("journal"));
+                entry.setField(StandardField.JOURNAL, scholarJsonEntry.getString("journal"));
             }
 
             if (scholarJsonEntry.has("journal_issue")) {
@@ -123,26 +123,26 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                 boolean matchedIssue = issue.find();
 
                 if (matchedVolume) {
-                    entry.withField(StandardField.VOLUME, volume.group(1).trim());
+                    entry.setField(StandardField.VOLUME, volume.group(1).trim());
                 }
                 if (matchedIssue) {
-                    entry.withField(StandardField.NUMBER, issue.group(1).trim());
+                    entry.setField(StandardField.NUMBER, issue.group(1).trim());
                 }
                 if (!matchedVolume && !matchedIssue) {
-                    entry.withField(StandardField.NUMBER, journalIssue);
+                    entry.setField(StandardField.NUMBER, journalIssue);
                 }
             }
 
             if (scholarJsonEntry.has("url")) {
-                entry.withField(StandardField.URL, scholarJsonEntry.getString("url"));
+                entry.setField(StandardField.URL, scholarJsonEntry.getString("url"));
             }
 
             if (scholarJsonEntry.has("abstract")) {
-                entry.withField(StandardField.ABSTRACT, scholarJsonEntry.getString("abstract"));
+                entry.setField(StandardField.ABSTRACT, scholarJsonEntry.getString("abstract"));
             }
 
             if (scholarJsonEntry.has("journal_publisher")) {
-                entry.withField(StandardField.PUBLISHER, scholarJsonEntry.getString("journal_publisher"));
+                entry.setField(StandardField.PUBLISHER, scholarJsonEntry.getString("journal_publisher"));
             }
             return entry;
         } catch (JSONException exception) {

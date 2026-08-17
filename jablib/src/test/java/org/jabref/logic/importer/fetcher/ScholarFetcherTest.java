@@ -15,6 +15,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -53,7 +54,6 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
                          "Praneet Opanasopit",
                          "Tanasait Ngawhiranpat"
                        ],
-                       "abstract": "The aim of this study was to investigate the effect of methylated N-(4-N,N-dimethylaminobenzyl) chitosan, TM-Bz-CS, on the paracellular permeability of Caco-2 cell monolayers and its toxicity towards the cell lines. The factors affecting epithelial permeability, e.g., degree of quaternization (DQ) and extent of dimethylaminobenzyl substitution (ES), were evaluated in intestinal cell monolayers of Caco-2 cells using the transepithelial electrical resistance and permeability of Caco-2 cell monolayers, with fluorescein isothiocyanate dextran 4,400 (FD-4) as a model compound for paracellular tight-junction transport. Cytotoxicity was evaluated with the 3-(4,5-dimethylthiazol-2-yl)-2,5-diphenyl tetrazolium bromide viability assay. The results revealed that, at pH 7.4, TM-Bz-CS appeared to increase cell permeability in a concentration-dependent manner, and this effect was relatively reversible at lower doses of 0.05–0.5 mM. Higher DQ and the ES caused the permeability of FD-4 to be higher. The cytotoxicity of TM-Bz-CS depended on concentration, %DQ, and %ES. These studies demonstrated that this novel modified chitosan has potential as an absorption enhancer.",
                        "journal": "AAPS PharmSciTech",
                        "journal_publisher": "Springer International Publishing",
                        "journal_issn": [
@@ -70,24 +70,24 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
                        "has_pdf": true
                      }""";
 
-        JSONObject jsonObject = new JSONObject(jsonString);
-        BibEntry bibEntry = ScholarFetcher.jsonItemToBibEntry(jsonObject);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Jariya Kowapradit and Praneet Opanasopit and Tanasait Ngawhiranpat")
+                .withField(StandardField.TITLE, "Methylated N-(4-N,N-Dimethylaminobenzyl) Chitosan, a Novel Chitosan Derivative, Enhances Paracellular Permeability Across Intestinal Epithelial Cells (Caco-2)")
+                .withField(StandardField.DATE, "2008-12-01")
+                .withField(StandardField.YEAR, "2008")
+                .withField(StandardField.JOURNAL, "AAPS PharmSciTech")
+                .withField(StandardField.PUBLISHER, "Springer International Publishing")
+                .withField(StandardField.ISSN, "1530-9932")
+                .withField(StandardField.VOLUME, "9")
+                .withField(StandardField.NUMBER, "4")
+                .withField(StandardField.PAGES, "1143-1152")
+                .withField(StandardField.DOI, "10.1208/s12249-008-9160-7")
+                .withField(StandardField.URL, "https://link.springer.com/article/10.1208/s12249-008-9160-7")
+                .withField(new UnknownField("scholarapi"), "7184")
+                .withField(new UnknownField("scholarApiHasText"), "true")
+                .withField(new UnknownField("scholarApiHasPdf"), "true");
 
-        assertEquals(Optional.of("7184"), bibEntry.getField(new UnknownField("scholarapi")));
-        assertEquals(Optional.of("2008-12-01"), bibEntry.getField(StandardField.DATE));
-        assertEquals(Optional.of("2008"), bibEntry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("Methylated N-(4-N,N-Dimethylaminobenzyl) Chitosan, a Novel Chitosan Derivative, Enhances Paracellular Permeability Across Intestinal Epithelial Cells (Caco-2)"), bibEntry.getField(StandardField.TITLE));
-        assertEquals(Optional.of("Jariya Kowapradit and Praneet Opanasopit and Tanasait Ngawhiranpat"), bibEntry.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("AAPS PharmSciTech"), bibEntry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.of("1530-9932"), bibEntry.getField(StandardField.ISSN));
-        assertEquals(Optional.of("9"), bibEntry.getField(StandardField.VOLUME));
-        assertEquals(Optional.of("4"), bibEntry.getField(StandardField.NUMBER));
-        assertEquals(Optional.of("1143-1152"), bibEntry.getField(StandardField.PAGES));
-        assertEquals(Optional.of("10.1208/s12249-008-9160-7"), bibEntry.getField(StandardField.DOI));
-        assertEquals(Optional.of("https://link.springer.com/article/10.1208/s12249-008-9160-7"), bibEntry.getField(StandardField.URL));
-        assertEquals(Optional.of("Springer International Publishing"), bibEntry.getField(StandardField.PUBLISHER));
-        assertEquals(Optional.of("true"), bibEntry.getField(new UnknownField("scholarApiHasText")));
-        assertEquals(Optional.of("true"), bibEntry.getField(new UnknownField("scholarApiHasPdf")));
+        assertEquals(expected, ScholarFetcher.jsonItemToBibEntry(new JSONObject(jsonString)));
     }
 
     @Test
