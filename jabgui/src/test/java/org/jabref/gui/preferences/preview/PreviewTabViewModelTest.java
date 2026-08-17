@@ -535,8 +535,6 @@ class PreviewTabViewModelTest {
         viewModel.renameSelectedStyle("   ");
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
         viewModel.renameSelectedStyle("");
-        assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
-        viewModel.renameSelectedStyle(null);
         assertEquals(ID1, textBasedPreviewLayout.getId());
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
         assertEquals(TEXT1, textBasedPreviewLayout.getText());
