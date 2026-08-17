@@ -445,6 +445,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String IMPORTER_GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
     private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
+    private static final String IMPORTER_WARN_ABOUT_BIB_FILE = "warnAboutBibFileImport";
     private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
