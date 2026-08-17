@@ -47,7 +47,7 @@ dependencies.constraints {
     api("org.openjfx:jfx-incubator-input:$javafx")
     api("org.openjfx:jfx-incubator-richtext:$javafx")
 
-    api("cc.jilt:jilt:1.9.1")
+    api("cc.jilt:jilt:1.9.2")
 
     api("com.dlsc.gemsfx:gemsfx:4.4.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
