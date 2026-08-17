@@ -76,6 +76,13 @@ jobs:
 
           IFS=',' read -ra exempt_labels <<< "$EXEMPT_LABELS"
 
+          # Events by a human after $labeled_at, one line each. $1: API path, $2: timestamp field
+          # ($2 is null for pending reviews; jq sorts null before strings, so they never count).
+          human_events() {
+            gh api "repos/$REPO/$1?per_page=100" --paginate \
+              --jq "[.[] | select(.$2 > \"$labeled_at\" and .user.type != \"Bot\" and .user.login != \"jabref-machine\") | .user.login] | .[]"
+          }
+
           for pr in $candidates; do
             # Re-read the labels: they can have been removed since the candidate list was built.
             labels="$(gh pr view "$pr" --repo "$REPO" --json labels --jq '.labels[].name')"
@@ -113,19 +120,20 @@ jobs:
               continue
             fi
 
-            # Real activity after the label: a push or a comment by a human. Nothing removes the
-            # stale label in that case (pr-comment.yml only does so for pull requests from forks),
-            # so it is checked here - and the label is dropped, which lets the marking step above
-            # start a new round if the pull request falls idle again.
-            last_commit="$(gh pr view "$pr" --repo "$REPO" --json commits --jq '.commits[-1].committedDate')"
-            human_comments="$(gh api "repos/$REPO/issues/$pr/comments?per_page=100" --paginate \
-              --jq "[.[] | select(.created_at > \"$labeled_at\" and .user.type != \"Bot\" and .user.login != \"jabref-machine\") | .user.login] | .[]" \
-              | wc -l)"
+            # Real activity after the label: a push, or a comment/review by a human. Nothing
+            # removes the stale label in that case (pr-comment.yml only does so for pull requests
+            # from forks), so it is checked here - and the label is dropped, which lets the marking
+            # step above start a new round if the pull request falls idle again.
+            last_commit="$(gh pr view "$pr" --repo "$REPO" --json commits --jq '.commits[-1].committedDate' \
+              | grep -v '^null$' || true)"
+            human_comments="$( { human_events "issues/$pr/comments" created_at
+                human_events "pulls/$pr/comments" created_at
+                human_events "pulls/$pr/reviews" submitted_at; } | wc -l)"
 
             if [ -n "$last_commit" ] && [ "$last_commit" \> "$labeled_at" ]; then
               activity="pushed at $last_commit"
             elif [ "$human_comments" -gt 0 ]; then
-              activity="$human_comments comment(s) by a human"
+              activity="$human_comments comment(s)/review(s) by a human"
             else
               activity=""
             fi
