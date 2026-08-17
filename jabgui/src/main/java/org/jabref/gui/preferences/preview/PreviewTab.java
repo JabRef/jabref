@@ -59,10 +59,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private ListView<PreviewLayout> cslListView;
     private ListView<PreviewLayout> customizedListView;
     private ListView<PreviewLayout> chosenListView;
-    private TabPane availableTabPane;   // TODO: see if needs to be refactored
+    private TabPane availableTabPane;
     private Tab cslTab;
     private Tab customizedTab;
-    private Tab previousTab;    // used to remember the context of last focused tab
+    private Tab previousTab;
     private Button toRightButton;
     private Button toLeftButton;
     private Button sortUpButton;
@@ -201,7 +201,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         styleNameField.setPromptText(Localization.lang("Style name"));
         EasyBind.subscribe(viewModel.styleNameProperty(), styleNameField::setText);
         styleNameField.editableProperty().bind(viewModel.selectedIsEditableProperty());
-        styleNameField.setOnAction(_ -> commitStyleNameEdit()); // Commit on Enter
+        styleNameField.setOnAction(_ -> commitStyleNameEdit());
         readOnlyLabel = new Label(Localization.lang("Read only"));
         resetDefaultButton = new Button();
         resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
@@ -483,8 +483,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
-        // Only switch tabs when dragging OUT of Selected INTO Available
-        // dropping in Selected has no need to refocus the Available tabs.
+        // switch tabs dragging OUT of Selected INTO Available. Drop into Selected has no need to refocus the Available tabs.
         if (success && targetList != viewModel.chosenListProperty()) {
             focusTabOnLastRoutedLayout();
         }
