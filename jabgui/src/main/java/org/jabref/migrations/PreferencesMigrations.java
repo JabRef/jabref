@@ -73,14 +73,15 @@ public class PreferencesMigrations {
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
     /// series (`customTabName_0`/`customTabFields_0`, ...). Since [#16598](https://github.com/JabRef/jabref/pull/16598)
-    /// they are stored as one JSON object (`{"tab name": ["field pattern",...], ...}`, see
-    /// [JabRefGuiPreferences#ENTRY_EDITOR_CUSTOM_TABS]). The old keys are kept in case an old version of
-    /// JabRef is used with these preferences; they are only read when the new key does not exist yet.
+    /// they are stored as one JSON object, `{"tab name": ["field pattern", ...], ...}`. The old keys are
+    /// kept in case an old version of JabRef is used with these preferences; they are only read when the
+    /// new key does not exist yet.
     static void upgradeEntryEditorCustomTabs(JabRefGuiPreferences prefs) {
         final String V6_0_ALPHA_CUSTOM_TAB_NAME = "customTabName_";
         final String V6_0_ALPHA_CUSTOM_TAB_FIELDS = "customTabFields_";
+        final String V6_0_ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
 
-        if (prefs.get(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS, null) != null) {
+        if (prefs.get(V6_0_ENTRY_EDITOR_CUSTOM_TABS, null) != null) {
             return;
         }
 
@@ -94,7 +95,7 @@ public class PreferencesMigrations {
         }
 
         LOGGER.info("Migrating {} custom entry editor tab(s) to the JSON preference format.", customTabs.size());
-        prefs.put(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS, new ObjectMapper().writeValueAsString(customTabs));
+        prefs.put(V6_0_ENTRY_EDITOR_CUSTOM_TABS, new ObjectMapper().writeValueAsString(customTabs));
     }
 
     /// The legacy key `smartFileAnnotations` toggled a "smart visibility" mode. Mode was adapted for all tabs in

@@ -100,11 +100,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BINDINGS = "bindings";
     // endregion
 
-    // All custom entry editor tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in
-    // display order. Public because needed for pref migration (the numbered-series format of versions up
-    // to v6.0-alpha.6 is converted to this key).
-    public static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
-
     // region column names
     // public because of migration
     // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
@@ -248,6 +243,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
     // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
+    // All custom tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in display order.
+    // The numbered-series format of versions up to v6.0-alpha.6 is converted to this key by
+    // org.jabref.migrations.PreferencesMigrations#upgradeEntryEditorCustomTabs (key name duplicated there).
+    private static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
     private static final String ENTRY_EDITOR_TAB_ORDER = "entryEditorTabOrder";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";

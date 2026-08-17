@@ -306,7 +306,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void upgradeEntryEditorCustomTabsConvertsSeriesToJson() {
-        when(preferences.get(eq(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS), any())).thenReturn(null);
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
         when(preferences.get(eq("customTabName_0"), any())).thenReturn("General");
         when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("keywords", "doi"));
         when(preferences.get(eq("customTabName_1"), any())).thenReturn("Abstract");
@@ -315,16 +315,16 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
 
-        verify(preferences).put(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS,
+        verify(preferences).put("entryEditorCustomTabs",
                 "{\"General\":[\"keywords\",\"doi\"],\"Abstract\":[\"abstract\"]}");
     }
 
     @Test
     void upgradeEntryEditorCustomTabsKeepsExistingJson() {
-        when(preferences.get(eq(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS), any())).thenReturn("{\"General\":[\"keywords\"]}");
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn("{\"General\":[\"keywords\"]}");
 
         PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
 
-        verify(preferences, never()).put(eq(JabRefGuiPreferences.ENTRY_EDITOR_CUSTOM_TABS), anyString());
+        verify(preferences, never()).put(eq("entryEditorCustomTabs"), anyString());
     }
 }
