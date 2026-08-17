@@ -70,8 +70,12 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     private void closeIndex() {
         try {
-            searcherManager.close();
-            indexDirectory.close();
+            if (searcherManager != null) {
+                searcherManager.close();
+            }
+            if (indexDirectory != null) {
+                indexDirectory.close();
+            }
         } catch (IOException e) {
             LOGGER.error("Error closing index", e);
         }
