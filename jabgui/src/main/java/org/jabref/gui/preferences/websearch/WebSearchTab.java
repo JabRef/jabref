@@ -211,10 +211,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         Button configureButton = new Button(Localization.lang("Configure API key"));
         configureButton.getStyleClass().add("configure-button");
-        configureButton.setOnAction(_ -> {
-            showApiKeyDialog(item);
-            updateApiKeyIndicator(apiKeyIndicator, item);
-        });
+        configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
         container.getChildren().addAll(enabledCheckBox, nameLabel, apiKeyIndicator, spacer, helpButton, configureButton);
@@ -228,8 +225,19 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         indicator.setPrefWidth(KEY_INDICATOR_WIDTH);
         indicator.setMaxWidth(KEY_INDICATOR_WIDTH);
         indicator.setAlignment(Pos.CENTER);
-        updateApiKeyIndicator(indicator, item);
+        bindApiKeyIndicator(indicator, item);
         return indicator;
+    }
+
+    private void bindApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
+        Runnable refresh = () -> updateApiKeyIndicator(indicator, item);
+        refresh.run();
+
+        item.apiKeyProperty().addListener((_, _, _) -> refresh.run());
+        item.useCustomApiKeyProperty().addListener((_, _, _) -> refresh.run());
+        item.customizableProperty().addListener((_, _, _) -> refresh.run());
+        viewModel.getApikeyPersistProperty().addListener((_, _, _) -> refresh.run());
+        viewModel.apiKeyPersistAvailable().addListener((_, _, _) -> refresh.run());
     }
 
     private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
