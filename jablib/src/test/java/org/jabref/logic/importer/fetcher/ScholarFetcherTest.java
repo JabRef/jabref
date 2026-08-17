@@ -45,29 +45,29 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
     @Test
     void scholarApiJsonToBibtex() throws ParseException {
         String jsonString = """
-                {\r
-                       "id": "7184",\r
-                       "title": "Methylated N-(4-N,N-Dimethylaminobenzyl) Chitosan, a Novel Chitosan Derivative, Enhances Paracellular Permeability Across Intestinal Epithelial Cells (Caco-2)",\r
+                {
+                       "id": "7184",
+                       "title": "Methylated N-(4-N,N-Dimethylaminobenzyl) Chitosan, a Novel Chitosan Derivative, Enhances Paracellular Permeability Across Intestinal Epithelial Cells (Caco-2)",
                        "authors": [
                          "Jariya Kowapradit",
                          "Praneet Opanasopit",
                          "Tanasait Ngawhiranpat"
-                       ],\r
-                       "abstract": "The aim of this study was to investigate the effect of methylated N-(4-N,N-dimethylaminobenzyl) chitosan, TM-Bz-CS, on the paracellular permeability of Caco-2 cell monolayers and its toxicity towards the cell lines. The factors affecting epithelial permeability, e.g., degree of quaternization (DQ) and extent of dimethylaminobenzyl substitution (ES), were evaluated in intestinal cell monolayers of Caco-2 cells using the transepithelial electrical resistance and permeability of Caco-2 cell monolayers, with fluorescein isothiocyanate dextran 4,400 (FD-4) as a model compound for paracellular tight-junction transport. Cytotoxicity was evaluated with the 3-(4,5-dimethylthiazol-2-yl)-2,5-diphenyl tetrazolium bromide viability assay. The results revealed that, at pH 7.4, TM-Bz-CS appeared to increase cell permeability in a concentration-dependent manner, and this effect was relatively reversible at lower doses of 0.05–0.5 mM. Higher DQ and the ES caused the permeability of FD-4 to be higher. The cytotoxicity of TM-Bz-CS depended on concentration, %DQ, and %ES. These studies demonstrated that this novel modified chitosan has potential as an absorption enhancer.",\r
-                       "journal": "AAPS PharmSciTech",\r
-                       "journal_publisher": "Springer International Publishing",\r
+                       ],
+                       "abstract": "The aim of this study was to investigate the effect of methylated N-(4-N,N-dimethylaminobenzyl) chitosan, TM-Bz-CS, on the paracellular permeability of Caco-2 cell monolayers and its toxicity towards the cell lines. The factors affecting epithelial permeability, e.g., degree of quaternization (DQ) and extent of dimethylaminobenzyl substitution (ES), were evaluated in intestinal cell monolayers of Caco-2 cells using the transepithelial electrical resistance and permeability of Caco-2 cell monolayers, with fluorescein isothiocyanate dextran 4,400 (FD-4) as a model compound for paracellular tight-junction transport. Cytotoxicity was evaluated with the 3-(4,5-dimethylthiazol-2-yl)-2,5-diphenyl tetrazolium bromide viability assay. The results revealed that, at pH 7.4, TM-Bz-CS appeared to increase cell permeability in a concentration-dependent manner, and this effect was relatively reversible at lower doses of 0.05–0.5 mM. Higher DQ and the ES caused the permeability of FD-4 to be higher. The cytotoxicity of TM-Bz-CS depended on concentration, %DQ, and %ES. These studies demonstrated that this novel modified chitosan has potential as an absorption enhancer.",
+                       "journal": "AAPS PharmSciTech",
+                       "journal_publisher": "Springer International Publishing",
                        "journal_issn": [
                          "1530-9932"
-                       ],\r
-                       "journal_issue": "Volume 9, Issue 4",\r
-                       "journal_pages": "1143-1152",\r
-                       "doi": "10.1208/s12249-008-9160-7"\r,
-                       "published_date": "2008-12-01T00:00:00Z"\r,
-                       "published_date_raw": "2008-12-01T00:00:00Z",\r
-                       "indexed_at": "2012-10-01T18:58:11.184Z",\r
-                       "url": "https://link.springer.com/article/10.1208/s12249-008-9160-7",\r
-                       "has_text": true,\r
-                       "has_pdf": true\r
+                       ],
+                       "journal_issue": "Volume 9, Issue 4",
+                       "journal_pages": "1143-1152",
+                       "doi": "10.1208/s12249-008-9160-7",
+                       "published_date": "2008-12-01T00:00:00Z",
+                       "published_date_raw": "2008-12-01T00:00:00Z",
+                       "indexed_at": "2012-10-01T18:58:11.184Z",
+                       "url": "https://link.springer.com/article/10.1208/s12249-008-9160-7",
+                       "has_text": true,
+                       "has_pdf": true
                      }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
