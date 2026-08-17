@@ -21,6 +21,7 @@ import javafx.concurrent.Task;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -248,6 +249,20 @@ public class NewEntryViewModel {
         return entry;
     }
 
+    /// Selects and scrolls to the entries that were just imported into the library, mirroring the
+    /// behavior of {@link LibraryTab#insertEntries(List)}. Only single-entry imports are focused, since
+    /// selecting every entry of a bulk import would pollute the entry-editor navigation history.
+    private void selectAndFocusImportedEntries(List<BibEntry> importedEntries) {
+        if (importedEntries.size() != 1) {
+            return;
+        }
+        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+            libraryTab.showAndEdit(importedEntries.getFirst());
+        } else {
+            libraryTab.clearAndSelect(importedEntries.getFirst());
+        }
+    }
+
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
@@ -357,7 +372,9 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
+            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager);
+            tracker.setOnFinish(() -> selectAndFocusImportedEntries(tracker.getImportedEntries()));
+            handler.importEntriesWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), List.of(result.get()), tracker);
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -455,7 +472,9 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, result.get().size());
+            tracker.setOnFinish(() -> selectAndFocusImportedEntries(tracker.getImportedEntries()));
+            handler.importEntriesWithDuplicateCheck(null, result.get(), tracker);
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -540,7 +559,9 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, result.get().size());
+            tracker.setOnFinish(() -> selectAndFocusImportedEntries(tracker.getImportedEntries()));
+            handler.importEntriesWithDuplicateCheck(null, result.get(), tracker);
 
             executedSuccessfully.set(true);
             executing.set(false);
