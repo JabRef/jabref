@@ -60,6 +60,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class OOBibBase {
     private final DialogService dialogService;
 
     private final OOBibBaseConnect connection;
+    private final XComponentContext componentContext;
 
     private final OpenOfficePreferences openOfficePreferences;
     private final BibEntryTypesManager bibEntryTypesManager;
@@ -85,6 +87,7 @@ public class OOBibBase {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
+        this.componentContext = connection.getComponentContext();
         this.openOfficePreferences = openOfficePreferences;
         this.bibEntryTypesManager = bibEntryTypesManager;
     }
@@ -97,9 +100,9 @@ public class OOBibBase {
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
         clearCitationAdapters();
-        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, openOfficePreferences, bibEntryTypesManager);
+        cslCitationOOAdapter = new CSLCitationOOAdapter(doc, componentContext, openOfficePreferences, bibEntryTypesManager);
         cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
-        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
+        bstCitationOOAdapter = new BSTCitationOOAdapter(doc, componentContext, openOfficePreferences);
         bstUpdateBibliography = new BstUpdateBibliography();
     }
 
@@ -173,7 +176,7 @@ public class OOBibBase {
     }
 
     private OOVoidResult<OOError> readStyleInPreference(XTextDocument doc) {
-        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
+        if (!shouldReadStyleInPreference(openOfficePreferences)) {
             return OOVoidResult.ok();
         }
 
@@ -185,6 +188,12 @@ public class OOBibBase {
             LOGGER.warn("Could not read Zotero document preferences", e);
             return OOVoidResult.error(OOError.fromMisc(e));
         }
+    }
+
+    static boolean shouldReadStyleInPreference(OpenOfficePreferences openOfficePreferences) {
+        return openOfficePreferences.getCurrentStyle() instanceof CitationStyle
+                && openOfficePreferences.getZoteroCompatibilityMode()
+                && openOfficePreferences.shouldInferCslStyleFromDocument();
     }
 
     OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {
@@ -766,13 +775,16 @@ public class OOBibBase {
                                                       String pageInfo,
                                                       OOResult<FunctionalTextViewCursor, OOError> fcursor) {
         OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
+                componentContext,
                 frontend.get(),
                 cursor.get(),
                 entries,
                 bibDatabaseContext.getDatabase(),
                 jStyle,
                 citationType,
-                pageInfo).mapError(OOError::from);
+                pageInfo,
+                openOfficePreferences.getAddSpaceBefore(),
+                openOfficePreferences.getAddSpaceAfter()).mapError(OOError::from);
 
         if (insertResult.isError()) {
             return insertResult;
@@ -842,7 +854,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> mergeResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditMerge.mergeCitationGroups(doc, frontend, jStyle));
+                        () -> EditMerge.mergeCitationGroups(doc, componentContext, frontend, jStyle));
                 if (testDialog(errorTitle, mergeResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
@@ -900,7 +912,7 @@ public class OOBibBase {
                 }
 
                 OOResult<Boolean, JabRefException> separateResult = supplyWithTrackChangesSuspended(doc,
-                        () -> EditSeparate.separateCitations(doc, frontend, databases, jStyle));
+                        () -> EditSeparate.separateCitations(doc, componentContext, frontend, databases, jStyle));
                 if (testDialog(errorTitle, separateResult.asVoidResult().mapError(OOError::from))) {
                     return;
                 }
@@ -1124,6 +1136,13 @@ public class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Create BST bibliography");
 
+            try {
+                bstCitationOOAdapter.refreshCitationState();
+            } catch (WrappedTargetException | NoSuchElementException exception) {
+                LOGGER.error("Could not refresh BST citation state", exception);
+                return OOVoidResult.error(OOError.fromMisc(exception).setTitle(errorTitle));
+            }
+
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(db -> db.getEntries().stream())
                                                    .filter(bstCitationOOAdapter::isCitedEntry)
@@ -1193,6 +1212,12 @@ public class OOBibBase {
                                               .toList();
 
             cslCitationOOAdapter.linkZoteroCitations(new BibDatabaseContext(new BibDatabase(entries)));
+            try {
+                cslCitationOOAdapter.refreshCitationState();
+            } catch (WrappedTargetException | NoSuchElementException exception) {
+                LOGGER.error("Could not refresh CSL citation state", exception);
+                return OOVoidResult.error(OOError.fromMisc(exception).setTitle(errorTitle));
+            }
 
             List<BibEntry> citedEntries = entries.stream()
                                                  .filter(cslCitationOOAdapter::isCitedEntry)

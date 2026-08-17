@@ -281,6 +281,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
+    public static final String OO_INFER_CSL_STYLE_FROM_DOCUMENT = "ooInferCslStyleFromDocument";
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
     public static final String OO_PANDOC_PATH = "ooPandocPath";
     public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
@@ -2529,6 +2530,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
                 getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
+                getBoolean(OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
                 get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
                 getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()),
@@ -2541,6 +2543,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
         bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
         bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
+        bindBoolean(openOfficePreferences.inferCslStyleFromDocumentProperty(), OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);

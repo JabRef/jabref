@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -82,11 +83,11 @@ public class OpenOfficePanel {
     private final Button manualConnect;
     private final Button selectDocument;
     private final Button setStyleFile = new Button(Localization.lang("Select style"));
-    private final Button pushEntries = new Button(Localization.lang("Cite"));
-    private final Button pushEntriesInt = new Button(Localization.lang("Cite in-text"));
-    private final Button pushEntriesEmpty = new Button(Localization.lang("Insert empty citation"));
-    private final Button pushEntriesAdvanced = new Button(Localization.lang("Cite special"));
-    private final Button update;
+    private final Button cite = new Button(Localization.lang("Cite"));
+    private final Button citeInText = new Button(Localization.lang("Cite in-text"));
+    private final Button citeEmpty = new Button(Localization.lang("Insert empty citation"));
+    private final Button citeSpecial = new Button(Localization.lang("Cite special"));
+    private final Button updateBibliography;
     private final Button merge = new Button(Localization.lang("Merge citations"));
     private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
@@ -174,10 +175,10 @@ public class OpenOfficePanel {
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select Writer document")));
         selectDocument.setMaxWidth(Double.MAX_VALUE);
 
-        update = new Button();
-        update.setGraphic(IconTheme.JabRefIcons.ADD_OR_MAKE_BIBLIOGRAPHY.getGraphicNode());
-        update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
-        update.setMaxWidth(Double.MAX_VALUE);
+        updateBibliography = new Button();
+        updateBibliography.setGraphic(IconTheme.JabRefIcons.ADD_OR_MAKE_BIBLIOGRAPHY.getGraphicNode());
+        updateBibliography.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
+        updateBibliography.setMaxWidth(Double.MAX_VALUE);
 
         initPanel();
     }
@@ -267,23 +268,23 @@ public class OpenOfficePanel {
                          });
         });
 
-        pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
-        pushEntries.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
-        pushEntries.setMaxWidth(Double.MAX_VALUE);
-        pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
-        pushEntriesInt.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_INTEXT, false));
-        pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
-        pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
-        pushEntriesEmpty.setOnAction(_ -> pushEntries(CitationType.INVISIBLE_CIT, false));
-        pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
+        cite.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
+        cite.setOnAction(_ -> cite(CitationType.AUTHORYEAR_PAR, false));
+        cite.setMaxWidth(Double.MAX_VALUE);
+        citeInText.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
+        citeInText.setOnAction(_ -> cite(CitationType.AUTHORYEAR_INTEXT, false));
+        citeInText.setMaxWidth(Double.MAX_VALUE);
+        citeEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
+        citeEmpty.setOnAction(_ -> cite(CitationType.INVISIBLE_CIT, false));
+        citeEmpty.setMaxWidth(Double.MAX_VALUE);
         openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> updateButtonAvailability());
-        pushEntriesAdvanced.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
-        pushEntriesAdvanced.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
-        pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
+        citeSpecial.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
+        citeSpecial.setOnAction(_ -> cite(CitationType.AUTHORYEAR_INTEXT, true));
+        citeSpecial.setMaxWidth(Double.MAX_VALUE);
 
-        update.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
+        updateBibliography.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
-        update.setOnAction(_ -> {
+        updateBibliography.setOnAction(_ -> {
             String title = Localization.lang("Could not update bibliography");
             if (getOrUpdateTheStyle(title)) {
                 return;
@@ -323,7 +324,7 @@ public class OpenOfficePanel {
         updateButtonAvailability();
 
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
+        hbox.getChildren().addAll(connect, manualConnect, selectDocument, updateBibliography, help);
         hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
 
         FlowPane flow = new FlowPane();
@@ -331,8 +332,8 @@ public class OpenOfficePanel {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
-        flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
-        flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge, unmerge);
+        flow.getChildren().addAll(setStyleFile, cite, citeInText);
+        flow.getChildren().addAll(citeSpecial, citeEmpty, merge, unmerge);
         flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
 
         vbox.setFillWidth(true);
@@ -442,31 +443,30 @@ public class OpenOfficePanel {
         boolean hasStyle = currentStyle != null;
         boolean hasDatabase = !getDatabaseList().isEmpty();
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
-        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
+        boolean jstyleSelected = currentStyle instanceof JStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
-        boolean emptyCitationSupported = currentStyle instanceof JStyle || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
+        boolean emptyCitationSupported = jstyleSelected || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
         boolean bstStyleSelected = currentStyle instanceof BstStyle;
         boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
                 && !jStyle.isNumberEntries()
                 && !jStyle.isCitationKeyCiteMarkers();
-        boolean canGenerateBibliography = (currentStyle instanceof JStyle)
-                || (currentStyle instanceof BstStyle)
-                || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
+        boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
+                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
 
-        pushEntries.setDisable(!canCite);
-        pushEntriesInt.setDisable(!canCite);
-        pushEntriesEmpty.setDisable(!canCite || !emptyCitationSupported);
-        pushEntriesAdvanced.setDisable(!canCite || !specialCitationSupported);
+        cite.setDisable(!canCite);
+        citeInText.setDisable(!canCite);
+        citeEmpty.setDisable(!canCite || !emptyCitationSupported);
+        citeSpecial.setDisable(!canCite || !specialCitationSupported);
 
-        update.setDisable(!canRefreshDocument || !canGenerateBibliography);
-        merge.setDisable(!canRefreshDocument || cslStyleSelected);
-        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
-        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
+        updateBibliography.setDisable(!canGenerateBibliography);
+        merge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
+        manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
-        modifyBibliographyProperties.setDisable(!(cslStyleSelected || bstStyleSelected));
+        modifyBibliographyProperties.setDisable(!canGenerateBibliography);
     }
 
     private void connect() {
@@ -543,7 +543,7 @@ public class OpenOfficePanel {
         return new OOBibBase(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 
-    private void pushEntries(CitationType citationType, boolean addPageInfo) {
+    private void cite(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
         final Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
@@ -670,26 +670,20 @@ public class OpenOfficePanel {
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+        alwaysAddCitedOnPagesText.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof JStyle)));
 
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
-        zoteroCompatibilityMode.setDisable(currentStyle instanceof JStyle);
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
+        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof CitationStyle)));
 
-        EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
-            zoteroCompatibilityMode.setDisable(newValue instanceof JStyle);
-            switch (newValue) {
-                case JStyle _ -> {
-                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
-                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
-                    }
-                }
-                case CitationStyle _ ->
-                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> {
-                }
-            }
-        });
+        CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
+        inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
+        inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
+        inferCslStyleFromDocument.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !zoteroCompatibilityMode.isSelected() || !(currentStyleProperty.get() instanceof CitationStyle),
+                zoteroCompatibilityMode.selectedProperty(),
+                currentStyleProperty));
 
         CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the currently selected library only"));
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
@@ -705,17 +699,36 @@ public class OpenOfficePanel {
 
         contextMenu.getItems().addAll(
                 autoSync,
+                alwaysAddCitedOnPagesText,
                 addSpaceBefore,
                 addSpaceAfter,
                 zoteroCompatibilityMode,
+                inferCslStyleFromDocument,
                 new SeparatorMenuItem(),
                 onlyUseActiveTab,
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
-        if (currentStyle instanceof JStyle) {
-            contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
-        }
+        EasyBind.subscribe(currentStyleProperty, newValue -> {
+            updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
+        });
+
+        EasyBind.subscribe(zoteroCompatibilityMode.selectedProperty(), isSelected -> {
+            if (!isSelected) {
+                inferCslStyleFromDocument.setSelected(false);
+                openOfficePreferences.setInferCslStyleFromDocument(false);
+            }
+        });
+
         return contextMenu;
+    }
+
+    private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
+        boolean shouldSwitchOffZoteroMode = !(currentStyle instanceof CitationStyle);
+
+        if (shouldSwitchOffZoteroMode) {
+            zoteroCompatibilityMode.setSelected(false);
+            openOfficePreferences.setZoteroCompatibilityMode(false);
+        }
     }
 }

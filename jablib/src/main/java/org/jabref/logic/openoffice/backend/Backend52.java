@@ -32,6 +32,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,15 +145,18 @@ public class Backend52 {
     ///
     /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
     ///
-    /// @param citationKeys     Keys to be cited.
-    /// @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
-    /// @param position         Collapsed to its end.
-    /// @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
+    /// @param citationKeys      Keys to be cited.
+    /// @param pageInfos         An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
+    /// @param position          Collapsed to its end.
+    /// @param insertSpaceBefore We insert a space before the mark.
+    /// @param insertSpaceAfter  We insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
+                                             XComponentContext context,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
+                                             boolean insertSpaceBefore,
                                              boolean insertSpaceAfter)
             throws
             CreationException,
@@ -210,8 +214,10 @@ public class Backend52 {
          */
         boolean withoutBrackets = citationType == CitationType.INVISIBLE_CIT;
         NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
+                context,
                 markName,
                 position,
+                insertSpaceBefore,
                 insertSpaceAfter,
                 withoutBrackets);
 
@@ -399,4 +405,3 @@ public class Backend52 {
         }
     }
 }
-
