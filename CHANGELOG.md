@@ -75,7 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We extended the per-fetcher timeout for fulltext PDF lookups from 10 to 120 seconds so fetchers that bounce through an institutional sign-in or a slow publisher CDN have a chance to complete. [#15877](https://github.com/JabRef/jabref/pull/15877)
 - When an imported entry has an empty citation key, it is generated. [#15624](https://github.com/JabRef/jabref/pull/15624)
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
-- We reworked the entry editor tab preferences into a single "Editor tabs" list where you can show, hide, add, and remove both built-in and custom tabs. [#15998](https://github.com/JabRef/jabref/pull/15998)
+- We reworked the entry editor tab preferences into a two-column "Tabs"/"Fields" editor supporting reordering, custom tabs, and regular expressions as field names. [#15998](https://github.com/JabRef/jabref/pull/15998) [#16594](https://github.com/JabRef/jabref/issues/16594)
 - We extended library pseudonymization to also pseudonymize group names, not just the entries. [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We moved arXiv handling out of the DOI cleanup into the dedicated "arXiv DOI" cleanup. [#16033](https://github.com/JabRef/jabref/pull/16033)
@@ -153,7 +153,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the redundant "Look up BibTeX entries in all open libraries" setting from the LibreOffice panel, which is now the toggle of "Look up BibTeX entries in the currently selected library only". [#16484](https://github.com/JabRef/jabref/pull/16484)
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
-- We removed the ability to define custom entry editor tabs (including the default "General" and "Abstract" tabs); the entry editor tab preferences now only toggle the visibility of the built-in tabs. [#12711](https://github.com/JabRef/jabref/issues/12711)
+- We removed the default custom entry editor tabs "General" and "Abstract"; their content is part of the new "Main" tab. User-defined custom tabs are kept. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
 - We removed the [CiteSeerX](https://en.wikipedia.org/wiki/CiteSeerX) fetcher, because the service is defunct and its links now redirect to the Wayback Machine. [#16299](https://github.com/JabRef/jabref/issues/16299)
 

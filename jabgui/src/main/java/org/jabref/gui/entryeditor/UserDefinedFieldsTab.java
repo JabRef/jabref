@@ -1,0 +1,103 @@
+package org.jabref.gui.entryeditor;
+
+import java.util.Optional;
+import java.util.SequencedSet;
+
+import javax.swing.undo.UndoManager;
+
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+
+import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
+
+/// A user-defined tab showing the fields resolved from a [EntryEditorTabModel.CustomizedFieldsTab]
+/// (configured in the entry editor preferences).
+@NullMarked
+public class UserDefinedFieldsTab extends FieldsEditorTab {
+
+    private final EntryEditorTabModel.CustomizedFieldsTab model;
+
+    /// Replaces the base class's content-driven visibility: a regex pattern's matches change when fields
+    /// are set or cleared on the *same* entry (e.g. from the Main or Source tab), which the base class's
+    /// entry-switch-only evaluation would miss.
+    private final BooleanProperty hasResolvedFields = new SimpleBooleanProperty();
+
+    /// The entry whose event bus this tab is subscribed to, for live refresh of regex-captured fields.
+    private Optional<BibEntry> subscribedEntry = Optional.empty();
+
+    public UserDefinedFieldsTab(EntryEditorTabModel.CustomizedFieldsTab model,
+                                UndoManager undoManager,
+                                UndoAction undoAction,
+                                RedoAction redoAction,
+                                GuiPreferences preferences,
+                                JournalAbbreviationRepository journalAbbreviationRepository,
+                                StateManager stateManager,
+                                PreviewPanel previewPanel) {
+        super(
+                false,
+                undoManager,
+                undoAction,
+                redoAction,
+                preferences,
+                journalAbbreviationRepository,
+                stateManager,
+                previewPanel);
+
+        this.model = model;
+
+        setContentDrivenVisibility(hasResolvedFields);
+        EasyBind.subscribe(currentEntryProperty(), entry ->
+                hasResolvedFields.set((entry != null) && !model.resolveFields(entry).isEmpty()));
+
+        setText(model.name());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
+    }
+
+    @Override
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
+        return model.resolveFields(entry);
+    }
+
+    @Override
+    protected void bindToEntry(BibEntry entry) {
+        if (subscribedEntry.filter(current -> current == entry).isEmpty()) {
+            subscribedEntry.ifPresent(previous -> previous.unregisterListener(this));
+            entry.registerListener(this);
+            subscribedEntry = Optional.of(entry);
+        }
+        super.bindToEntry(entry);
+    }
+
+    /// Refreshes the tab when a field is set or cleared from outside (Main tab, Source tab, fetchers,
+    /// undo, …), since that can change which fields a regex pattern captures. Rebuilds only when the
+    /// resolved field set actually changes, so typing inside this tab's editors never steals focus.
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
+        Platform.runLater(() -> {
+            BibEntry entry = event.getBibEntry();
+            if (getCurrentEntry() != entry) {
+                return;
+            }
+            SequencedSet<Field> target = determineFieldsToShow(entry);
+            hasResolvedFields.set(!target.isEmpty());
+            if ((gridPane != null) && !target.equals(editors.keySet())) {
+                setupPanel(stateManager.getActiveDatabase().orElse(new BibDatabaseContext()), entry, false);
+            }
+        });
+    }
+}

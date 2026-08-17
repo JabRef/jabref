@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -228,6 +229,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
     // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
+    // Deliberately the same keys as before the "Main" tab rework (#12711), so custom tabs configured
+    // in older versions are picked up again without migration code.
+    private static final String CUSTOM_TAB_NAME = "customTabName_";
+    private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
+    private static final String ENTRY_EDITOR_TAB_ORDER = "entryEditorTabOrder";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
@@ -285,8 +291,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private MathSciNetPreferences mathSciNetPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
-    /// All other usages should get the preferences passed (or injected).
-    /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
+     /// All other usages should get the preferences passed (or injected).
+     /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
@@ -397,8 +403,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
-    /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
-    /// followed by every static (built-in) tab's visibility flag, in [EntryEditorTabModel.BuiltIn] order.
+    /// The single source of truth for the entry editor's tab list: every built-in tab's visibility flag
+    /// plus the user-defined custom tabs, ordered by [#ENTRY_EDITOR_TAB_ORDER] (falling back to
+    /// [EntryEditorTabModel.BuiltIn] order followed by the custom tabs).
     private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
@@ -428,10 +435,76 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
         ));
 
-        return tabModels;
+        List<String> customTabNames = getSeries(CUSTOM_TAB_NAME);
+        for (int i = 0; i < customTabNames.size(); i++) {
+            tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(customTabNames.get(i), getStringList(CUSTOM_TAB_FIELDS + i)));
+        }
+
+        return applyStoredTabOrder(tabModels);
+    }
+
+    /// Reorders `tabModels` to match [#ENTRY_EDITOR_TAB_ORDER]. The Preview tab stays first; tabs unknown
+    /// to the stored order (e.g. built-ins introduced after the order was written) keep their default
+    /// relative position at the end.
+    private List<EntryEditorTabModel> applyStoredTabOrder(List<EntryEditorTabModel> tabModels) {
+        List<String> storedOrder = getStringList(ENTRY_EDITOR_TAB_ORDER);
+        if (storedOrder.isEmpty()) {
+            return tabModels;
+        }
+
+        Map<String, EntryEditorTabModel> remaining = new LinkedHashMap<>();
+        List<EntryEditorTabModel> ordered = new ArrayList<>();
+        for (EntryEditorTabModel model : tabModels) {
+            if (model.isPreview()) {
+                ordered.add(model);
+            } else {
+                remaining.put(tabOrderId(model), model);
+            }
+        }
+        for (String id : storedOrder) {
+            EntryEditorTabModel model = remaining.remove(id);
+            if (model != null) {
+                ordered.add(model);
+            }
+        }
+        ordered.addAll(remaining.values());
+        return ordered;
+    }
+
+    /// Stable identifier of a tab in [#ENTRY_EDITOR_TAB_ORDER]. Custom tabs are prefixed so a custom tab
+    /// named like a [EntryEditorTabModel.BuiltIn] constant cannot collide with it.
+    private static String tabOrderId(EntryEditorTabModel model) {
+        return switch (model) {
+            case EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
+                    boolean _
+            ) ->
+                    type.name();
+            case EntryEditorTabModel.CustomizedFieldsTab(
+                    String name,
+                    List<String> _
+            ) ->
+                    "custom:" + name;
+        };
     }
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
+        List<EntryEditorTabModel.CustomizedFieldsTab> customTabs = configs.stream()
+                                                                          .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                                                                          .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                                                                          .toList();
+        for (int i = 0; i < customTabs.size(); i++) {
+            put(CUSTOM_TAB_NAME + i, customTabs.get(i).name());
+            putStringList(CUSTOM_TAB_FIELDS + i, customTabs.get(i).fieldPatterns());
+        }
+        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
+        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
+
+        putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
+                                                     .filter(config -> !config.isPreview())
+                                                     .map(JabRefGuiPreferences::tabOrderId)
+                                                     .toList());
+
         for (EntryEditorTabModel config : configs) {
             if (config instanceof EntryEditorTabModel.BuiltInTab(
                     EntryEditorTabModel.BuiltIn type,
