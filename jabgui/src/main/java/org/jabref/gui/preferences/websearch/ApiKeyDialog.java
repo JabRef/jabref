@@ -63,7 +63,7 @@ public class ApiKeyDialog extends FXDialog {
             testButton.getStyleClass().removeAll("success", "error");
         });
 
-        persistApiKeysCheckBox.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
+        persistApiKeysCheckBox.selectedProperty().bindBidirectional(fetcherViewModel.persistApiKeyProperty());
         persistApiKeysCheckBox.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
 
         rotation = new RotateTransition(Duration.seconds(1), IconTheme.JabRefIcons.REFRESH.getGraphicNode());
