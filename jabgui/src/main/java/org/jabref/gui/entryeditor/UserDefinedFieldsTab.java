@@ -83,6 +83,15 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
         super.bindToEntry(entry);
     }
 
+    @Override
+    protected void dispose() {
+        // The entry's event bus holds listeners strongly; without unregistering, a discarded tab
+        // instance would be retained (and keep reacting) for as long as the entry lives.
+        subscribedEntry.ifPresent(entry -> entry.unregisterListener(this));
+        subscribedEntry = Optional.empty();
+        super.dispose();
+    }
+
     /// Refreshes the tab when a field is set or cleared from outside (Main tab, Source tab, fetchers,
     /// undo, …), since that can change which fields a regex pattern captures. Rebuilds only when the
     /// resolved field set actually changes, so typing inside this tab's editors never steals focus.
