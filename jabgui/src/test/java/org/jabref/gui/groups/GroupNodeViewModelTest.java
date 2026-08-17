@@ -52,6 +52,7 @@ class GroupNodeViewModelTest {
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT,
                 false
         ));
