@@ -240,11 +240,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
-        boolean hasSavedKey = item.isCustomizable()
-                && !StringUtil.isBlank(item.getApiKey())
-                && item.shouldUseCustomApiKey();
-
-        if (!hasSavedKey) {
+        if (!item.hasConfiguredApiKey()) {
             indicator.setText("");
             indicator.setGraphic(null);
             indicator.setTooltip(null);
