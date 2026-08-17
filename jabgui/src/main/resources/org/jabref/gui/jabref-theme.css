@@ -177,27 +177,26 @@
 .icon-button {
     -fx-border-width: 0;
     -fx-background-color: -jr-icon-background;
-    -fx-padding: 0.333em 1em;
+    -fx-padding: 0.5em;
 }
 
-#generateCitationKeyButton {
-    -fx-padding: 0.333em 1em;
-}
-
-.citation-key-editor {
+.citation-key-editor,
+.journal-editor,
+.identifier-editor,
+.issn-editor {
     -fx-spacing: 0.333em;
 }
 
-#journalInfoButton,
-#toggleAbbreviationButton{
+.citation-key-editor-button {
+    -fx-padding: 0.333em 1em;
+}
+
+.journal-editor-button{
     -fx-padding: 0.4em 0.5em 0.3em 0.5em;
 }
 
-#journalInfoButtonISSN,
-#fetchInformationByIdentifierButton,
-#shortenDOIButton,
-#lookupIdentifierButton,
-#OpenDOIButton{
+.identifier-editor-button,
+.issn-editor-button{
     -fx-padding: 0.3em 0.5em 0.4em 0.5em;
 }
 

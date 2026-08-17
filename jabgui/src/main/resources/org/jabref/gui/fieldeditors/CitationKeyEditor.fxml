@@ -7,5 +7,5 @@
          fx:controller="org.jabref.gui.fieldeditors.CitationKeyEditor"
          styleClass="citation-key-editor">
     <EditorTextField fx:id="textField"/>
-    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button"/>
+    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button,citation-key-editor-button"/>
 </fx:root>
