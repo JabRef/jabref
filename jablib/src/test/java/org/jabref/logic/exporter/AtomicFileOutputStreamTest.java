@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jabref.logic.util.io.FileUtil;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -45,6 +47,19 @@ class AtomicFileOutputStreamTest {
 
         // Written file still has the contents as before the error
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
+    }
+
+    @Test
+    @EnabledOnOs({OS.LINUX, OS.MAC})
+    void saveWorksForTargetAtMaximumFileNameLength(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("a".repeat(FileUtil.MAXIMUM_FILE_NAME_LENGTH));
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(FIVE_THOUSAND_CHARS, Files.readString(targetFile));
     }
 
     @Test

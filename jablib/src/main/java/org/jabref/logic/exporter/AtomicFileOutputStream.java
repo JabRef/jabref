@@ -55,6 +55,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
+    private static final String TEMPORARY_FILE_PREFIX = "jabref-";
     private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
     /// Number of attempts to move the temporary file onto the target file. See [#moveTemporaryFileToTargetFile()].
@@ -165,12 +166,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private static Path createTemporaryFile(Path targetFile) throws IOException {
         Path parentDirectory = targetFile.toAbsolutePath().getParent();
-        String prefix = "jabref-" + targetFile.getFileName() + "-";
-        return Files.createTempFile(parentDirectory, prefix, TEMPORARY_EXTENSION);
+        return Files.createTempFile(parentDirectory, TEMPORARY_FILE_PREFIX, TEMPORARY_EXTENSION);
     }
 
     private static Path getPathOfSaveBackupFile(Path targetFile) {
-        return FileUtil.addExtension(targetFile, SAVE_EXTENSION);
+        Path backupFile = FileUtil.addExtension(targetFile, SAVE_EXTENSION);
+        return backupFile.resolveSibling(FileUtil.getValidFileName(backupFile.getFileName().toString()));
     }
 
     /// Returns the path of the backup copy of the original file (may not exist)
