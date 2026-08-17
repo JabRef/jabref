@@ -526,7 +526,6 @@ class PreviewTabViewModelTest {
     void renameSelectedStyleFailsOnBlank() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
-        // add new custom layout
         TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
                 layoutFormatterPreferences, abbreviationRepository);
         viewModel.customizedListProperty().add(textBasedPreviewLayout);
