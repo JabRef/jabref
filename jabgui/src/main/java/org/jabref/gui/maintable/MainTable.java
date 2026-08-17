@@ -62,7 +62,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -424,7 +424,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
-        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {

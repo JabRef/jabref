@@ -1,9 +1,8 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -47,7 +46,21 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URL is malformed", e);
         }
-        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
+
+        try {
+            return FetcherRetry.executeWithRateLimitRetry(() -> fetchIdentifier(entry, urlForEntry));
+        } catch (FetcherClientException exception) {
+            if (exception.getHttpResponse()
+                         .map(response -> response.statusCode() == HttpURLConnection.HTTP_NOT_FOUND)
+                         .orElse(false)) {
+                return Optional.empty();
+            }
+            throw exception;
+        }
+    }
+
+    private Optional<T> fetchIdentifier(BibEntry entry, URL urlForEntry) throws FetcherException {
+        try (InputStream stream = getUrlDownload(urlForEntry).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {
@@ -58,14 +71,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
             fetchedEntries.forEach(this::doPostCleanup);
 
             return extractIdentifier(entry, fetchedEntries);
-        } catch (FileNotFoundException e) {
-            LOGGER.debug("Id not found");
-            return Optional.empty();
         } catch (IOException e) {
-            // check for the case where we already have a FetcherException from UrlDownload
-            if (e.getCause() instanceof FetcherException fe) {
-                throw fe;
-            }
             throw new FetcherException(urlForEntry, "An I/O exception occurred", e);
         } catch (ParseException e) {
             throw new FetcherException(urlForEntry, "An internal parser error occurred", e);

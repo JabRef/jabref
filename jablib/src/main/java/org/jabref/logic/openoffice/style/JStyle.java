@@ -677,7 +677,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// @return The text for the citation.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
@@ -685,14 +685,14 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// For some tests we need to override minGroupingCount.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
                                         int minGroupingCount) {
-        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
 
     /// Format a number-based bibliography label for the given number.
     public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
-        return JStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
+        return JStyleGetNumericCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
