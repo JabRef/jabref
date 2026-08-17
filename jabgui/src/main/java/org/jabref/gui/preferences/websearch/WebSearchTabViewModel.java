@@ -323,6 +323,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         return warnAboutDuplicatesOnImportProperty;
     }
 
+    public BooleanProperty warnAboutBibFileImportProperty() {
+        return warnAboutBibFileImportProperty;
+    }
+
     public BooleanProperty shouldDownloadLinkedOnlineFiles() {
         return shouldDownloadLinkedOnlineFiles;
     }
