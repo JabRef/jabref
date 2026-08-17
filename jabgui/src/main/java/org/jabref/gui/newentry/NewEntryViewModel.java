@@ -250,7 +250,7 @@ public class NewEntryViewModel {
     }
 
     /// Selects and scrolls to the entries that were just imported into the library, mirroring the
-    /// behavior of {@link LibraryTab#insertEntries(List)}. Only single-entry imports are focused, since
+    /// behavior of [LibraryTab#insertEntries(List)]. Only single-entry imports are focused, since
     /// selecting every entry of a bulk import would pollute the entry-editor navigation history.
     private void selectAndFocusImportedEntries(List<BibEntry> importedEntries) {
         if (importedEntries.size() != 1) {
@@ -472,9 +472,10 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, result.get().size());
+            final List<BibEntry> entries = result.get();
+            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entries.size());
             tracker.setOnFinish(() -> selectAndFocusImportedEntries(tracker.getImportedEntries()));
-            handler.importEntriesWithDuplicateCheck(null, result.get(), tracker);
+            handler.importEntriesWithDuplicateCheck(null, entries, tracker);
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -559,9 +560,10 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, result.get().size());
+            final List<BibEntry> entries = result.get();
+            final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entries.size());
             tracker.setOnFinish(() -> selectAndFocusImportedEntries(tracker.getImportedEntries()));
-            handler.importEntriesWithDuplicateCheck(null, result.get(), tracker);
+            handler.importEntriesWithDuplicateCheck(null, entries, tracker);
 
             executedSuccessfully.set(true);
             executing.set(false);

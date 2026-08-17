@@ -148,6 +148,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
+- We fixed an issue where a newly added entry (e.g. via the New Entry dialog) was not automatically selected and scrolled into view in the main table. [#16035](https://github.com/JabRef/jabref/issues/16035)
 
 ### Removed
 
