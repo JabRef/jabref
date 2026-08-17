@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -69,6 +71,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -440,34 +443,39 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(customTabNames.get(i), getStringList(CUSTOM_TAB_FIELDS + i)));
         }
 
-        return applyStoredTabOrder(tabModels);
+        return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
     }
 
-    /// Reorders `tabModels` to match [#ENTRY_EDITOR_TAB_ORDER]. The Preview tab stays first; tabs unknown
-    /// to the stored order (e.g. built-ins introduced after the order was written) keep their default
-    /// relative position at the end.
-    private List<EntryEditorTabModel> applyStoredTabOrder(List<EntryEditorTabModel> tabModels) {
-        List<String> storedOrder = getStringList(ENTRY_EDITOR_TAB_ORDER);
+    /// Reorders `tabModels` to match `storedOrder` (see [#ENTRY_EDITOR_TAB_ORDER]). The Preview tab stays
+    /// first; tabs unknown to the stored order (e.g. built-ins introduced after the order was written) keep
+    /// their default relative position at the end. Tabs sharing an ID (duplicate custom-tab names in
+    /// persisted data — the preferences UI prevents them, but older versions and hand-edited stores may
+    /// not) are kept, consumed one per matching stored-order entry.
+    @VisibleForTesting
+    static List<EntryEditorTabModel> applyStoredTabOrder(List<EntryEditorTabModel> tabModels, List<String> storedOrder) {
         if (storedOrder.isEmpty()) {
             return tabModels;
         }
 
-        Map<String, EntryEditorTabModel> remaining = new LinkedHashMap<>();
+        SequencedMap<String, ArrayDeque<EntryEditorTabModel>> remaining = new LinkedHashMap<>();
         List<EntryEditorTabModel> ordered = new ArrayList<>();
         for (EntryEditorTabModel model : tabModels) {
             if (model.isPreview()) {
                 ordered.add(model);
             } else {
-                remaining.put(tabOrderId(model), model);
+                remaining.computeIfAbsent(tabOrderId(model), _ -> new ArrayDeque<>()).add(model);
             }
         }
         for (String id : storedOrder) {
-            EntryEditorTabModel model = remaining.remove(id);
-            if (model != null) {
-                ordered.add(model);
+            ArrayDeque<EntryEditorTabModel> models = remaining.get(id);
+            if (models != null) {
+                ordered.add(models.removeFirst());
+                if (models.isEmpty()) {
+                    remaining.remove(id);
+                }
             }
         }
-        ordered.addAll(remaining.values());
+        remaining.values().forEach(ordered::addAll);
         return ordered;
     }
 
