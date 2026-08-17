@@ -17,6 +17,10 @@
 #
 "preserve_hierarchy": true
 
+"commit_message": "New translations {fileName} ({languageName})"
+# prevent ci-skip beeing added
+"append_commit_message": false
+
 #
 # Files configuration.
 # See https://support.crowdin.com/developer/configuration-file/ for all available options

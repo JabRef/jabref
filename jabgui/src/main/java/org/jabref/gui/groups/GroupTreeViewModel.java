@@ -196,6 +196,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
                 selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo

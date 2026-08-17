@@ -511,8 +511,9 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
+    // [impl->req~ux.groups.create-explicit-from-selection~1]
     private void selectNode(GroupNodeViewModel value) {
-        selectNode(value, false);
+        selectNode(value, true);
     }
 
     private void selectNode(GroupNodeViewModel value, boolean expandParents) {

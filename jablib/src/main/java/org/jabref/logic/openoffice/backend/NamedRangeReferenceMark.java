@@ -7,14 +7,20 @@ import org.jabref.model.openoffice.backend.NamedRange;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCursor;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +77,7 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     private static void createReprInDocument(XTextDocument doc,
+                                             Optional<XComponentContext> context,
                                              String refMarkName,
                                              XTextCursor position,
                                              boolean insertSpaceBefore,
@@ -99,6 +106,7 @@ public class NamedRangeReferenceMark implements NamedRange {
                                   : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
+        XTextRange endRange = cursor.getEnd();
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
         UnoReferenceMark.create(documentAnnotation);
 
@@ -112,9 +120,35 @@ public class NamedRangeReferenceMark implements NamedRange {
             cursorAfter.goLeft((short) 1, true);
             cursorAfter.setString("");
         }
+
+        position.gotoRange(cursorAfter.getEnd(), false);
+
+        if (!insertSpaceAfter && context.isPresent()) {
+            UnoDispatch.resetAttributesAtRangeEnd(doc, context.orElseThrow(), endRange);
+        }
+    }
+
+    private static Optional<XComponentContext> findComponentContext(XTextDocument doc) {
+        XMultiServiceFactory factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, doc);
+        if (factory == null) {
+            return Optional.empty();
+        }
+
+        XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, factory);
+        if (propertySet == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.ofNullable(UnoRuntime.queryInterface(XComponentContext.class, propertySet.getPropertyValue("DefaultContext")));
+        } catch (UnknownPropertyException | WrappedTargetException exception) {
+            LOGGER.debug("Could not resolve LibreOffice component context from document", exception);
+            return Optional.empty();
+        }
     }
 
     static NamedRangeReferenceMark create(XTextDocument doc,
+                                          XComponentContext context,
                                           String refMarkName,
                                           XTextCursor position,
                                           boolean insertSpaceBefore,
@@ -123,7 +157,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             throws
             CreationException {
 
-        createReprInDocument(doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+        createReprInDocument(doc, Optional.of(context), refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
         return new NamedRangeReferenceMark(refMarkName);
     }
 
@@ -237,7 +271,7 @@ public class NamedRangeReferenceMark implements NamedRange {
                 final boolean insertSpaceBefore = false;
                 final boolean insertSpaceAfter = false;
                 final boolean withoutBrackets = false;
-                createReprInDocument(doc, name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+                createReprInDocument(doc, findComponentContext(doc), name, full, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
             }
         }
 
