@@ -64,7 +64,7 @@ jobs:
 
           # The moment the stale label was applied is a fixed point in time, unlike `updated_at`.
           cutoff="$(date -u -d "-${DAYS_BEFORE_PR_CLOSE} days" +%Y-%m-%dT%H:%M:%SZ)"
-          echo "Closing PRs labeled '$STALE_LABEL' before $cutoff"
+          echo "Assessing PRs labeled '$STALE_LABEL' on or before $cutoff"
 
           closed=""
           # Both labels are required, mirroring the only-pr-labels of the marking step above:
