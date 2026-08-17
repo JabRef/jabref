@@ -220,7 +220,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     private Label buildApiKeyIndicator(WebSearchTabViewModel.FetcherViewModel item) {
         Label indicator = new Label();
-        indicator.getStyleClass().add("api-key-indicator");
         indicator.setMinWidth(KEY_INDICATOR_WIDTH);
         indicator.setPrefWidth(KEY_INDICATOR_WIDTH);
         indicator.setMaxWidth(KEY_INDICATOR_WIDTH);
