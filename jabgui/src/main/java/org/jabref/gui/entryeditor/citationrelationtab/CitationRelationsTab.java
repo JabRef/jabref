@@ -65,7 +65,6 @@ import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
@@ -1048,11 +1047,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             libraryTab.get().getMainTable().setCitationMergeMode(true);
             database.insertEntry(mergedEntry);
 
-            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
-
-            undoManager.addEdit(compoundEdit.toChangeSet());
+            undoManager.record(Localization.lang("Merge entries"), recorder -> {
+                recorder.record(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                recorder.record(new UndoableInsertEntries(database, mergedEntry));
+            });
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

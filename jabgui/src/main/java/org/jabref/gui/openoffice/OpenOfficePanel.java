@@ -34,7 +34,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -55,7 +54,6 @@ import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -632,17 +630,15 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            NamedCompoundEdit undoCompound = new NamedCompoundEdit(Localization.lang("Cite"));
-            for (BibEntry entry : entries) {
-                if (entry.getCitationKey().isEmpty()) {
-                    // Generate key
-                    new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
-                            .generateAndSetKey(entry)
-                            .ifPresent(change -> undoCompound.addEdit(new UndoableFieldChange(change)));
+            undoManager.record(Localization.lang("Cite"), recorder -> {
+                for (BibEntry entry : entries) {
+                    if (entry.getCitationKey().isEmpty()) {
+                        // Generate key
+                        recorder.record(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
+                                .generateAndSetKey(entry));
+                    }
                 }
-            }
-            // Add all undos
-            undoManager.addEdit(undoCompound.toChangeSet());
+            });
             // Now every entry has a key
             return true;
         } else {
