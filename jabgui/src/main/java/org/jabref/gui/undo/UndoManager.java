@@ -62,7 +62,9 @@ public class UndoManager {
     ///
     /// A nested call becomes a nested [ChangeSet] inside its caller's set rather than a second
     /// undo step, so one user action stays one undo step even when a command delegates.
-    public void record(String name, Consumer<ChangeRecorder> mutations) {
+    ///
+    /// @return whether anything was recorded, for callers that report the outcome to the user
+    public boolean record(String name, Consumer<ChangeRecorder> mutations) {
         ChangeRecorder enclosing = active;
         ChangeRecorder recorder = new ChangeRecorder(name);
 
@@ -75,13 +77,14 @@ public class UndoManager {
 
         ChangeSet changeSet = recorder.toChangeSet();
         if (changeSet.isEmpty()) {
-            return;
+            return false;
         }
         if (enclosing == null) {
             addEdit(changeSet);
         } else {
             enclosing.record(changeSet);
         }
+        return true;
     }
 
     public boolean canUndo() {

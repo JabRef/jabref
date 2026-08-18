@@ -2,7 +2,6 @@ package org.jabref.gui.specialfields;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -10,13 +9,10 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.UpdateField;
-import org.jabref.model.FieldChange;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 
@@ -67,16 +63,14 @@ public class SpecialFieldAction extends SimpleCommand {
             if ((bes == null) || bes.isEmpty()) {
                 return;
             }
-            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(undoText);
             List<BibEntry> besCopy = new ArrayList<>(bes);
-            for (BibEntry bibEntry : besCopy) {
-                // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
-
-                change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
-            }
-            if (compoundEdit.hasEdits()) {
-                undoManager.addEdit(compoundEdit.toChangeSet());
+            boolean anyChange = undoManager.record(undoText, recorder -> {
+                for (BibEntry bibEntry : besCopy) {
+                    // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
+                    recorder.record(UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame));
+                }
+            });
+            if (anyChange) {
                 tabSupplier.get().markBaseChanged();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {

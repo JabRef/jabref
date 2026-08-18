@@ -3,7 +3,6 @@ package org.jabref.gui.menus;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.UndoableChangeType;
@@ -24,13 +23,12 @@ public class ChangeEntryTypeAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Change entry type"));
-        entries.forEach(entry -> {
-            EntryType oldType = entry.getType();
-            if (entry.setType(type).isPresent()) {
-                compound.addEdit(new UndoableChangeType(entry, oldType, type));
-            }
-        });
-        undoManager.addEdit(compound.toChangeSet());
+        undoManager.record(Localization.lang("Change entry type"), recorder ->
+                entries.forEach(entry -> {
+                    EntryType oldType = entry.getType();
+                    if (entry.setType(type).isPresent()) {
+                        recorder.record(new UndoableChangeType(entry, oldType, type));
+                    }
+                }));
     }
 }

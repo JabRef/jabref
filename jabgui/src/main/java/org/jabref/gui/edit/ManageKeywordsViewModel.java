@@ -1,18 +1,15 @@
 package org.jabref.gui.edit;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
@@ -107,17 +104,14 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit.toChangeSet());
-        }
+        undoManager.record(Localization.lang("Update keywords"), recorder ->
+                updateKeywords(recorder, entries, keywordsToAdd, keywordsToRemove));
     }
 
-    private NamedCompoundEdit updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
-                                             KeywordList keywordsToRemove) {
+    private void updateKeywords(ChangeRecorder recorder, List<BibEntry> entries, KeywordList keywordsToAdd,
+                                KeywordList keywordsToRemove) {
         Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
             KeywordList keywords = entry.getKeywords(keywordSeparator);
 
@@ -126,9 +120,7 @@ public class ManageKeywordsViewModel {
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
+            recorder.record(entry.putKeywords(keywords, keywordSeparator));
         }
-        return compoundEdit;
     }
 }
