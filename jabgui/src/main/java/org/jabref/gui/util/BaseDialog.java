@@ -37,7 +37,6 @@ public class BaseDialog<T> extends Dialog<T> {
             }
         });
 
-
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
