@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
-    public static final String FETCHER_NAME = "BASE";
+    public static final String FETCHER_NAME = "Bielefeld Academic Search Engine";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSearchFetcher.class);
 
