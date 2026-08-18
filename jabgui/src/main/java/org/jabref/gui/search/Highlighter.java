@@ -43,6 +43,22 @@ public class Highlighter {
         // prevent instantiation
     }
 
+    /// Returns whether the search query's terms compile to a valid regex, so the UI can warn the user
+    /// about a malformed explicit regex search (e.g. `field=~broken[`) instead of just silently
+    /// skipping highlighting. See [issue #16539](https://github.com/JabRef/jabref/issues/16539).
+    public static boolean isValidRegexPattern(SearchQuery searchQuery) {
+        Optional<String> pattern = buildSearchPattern(searchQuery);
+        if (pattern.isEmpty()) {
+            return true;
+        }
+        try {
+            Pattern.compile(pattern.get());
+        } catch (PatternSyntaxException e) {
+            return false;
+        }
+        return true;
+    }
+
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
         Optional<String> searchTermsPattern = buildSearchPattern(searchQuery);
         if (searchTermsPattern.isEmpty()) {

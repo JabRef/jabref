@@ -59,4 +59,15 @@ When linked-file full-text indexing is enabled, users must be able to search the
 
 Needs: impl, utest
 
+## Safe handling of regex metacharacters when highlighting search results
+`req~jabgui.search.highlighting.safe-regex-handling~1`
+
+Issue: [#16539](https://github.com/JabRef/jabref/issues/16539)
+
+A plain-text (non-regex) search term containing regex metacharacters (e.g. `*`, `{`, `[`) must never crash the entry preview. Such terms are highlighted as literal text, never interpreted as regex.
+
+If the user explicitly opts into regex search (the `=~` operator, or the regex toggle) and the given pattern is not a valid regex, the search bar shows its existing "Illegal search expression" indicator instead of silently failing to highlight with no feedback.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

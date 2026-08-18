@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -17,6 +16,12 @@ import org.jabref.search.SearchParser;
 
 /// Tests are located in `org.jabref.logic.search.query.SearchQueryExtractorConversionTest`.
 public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQueryNode>> {
+
+    /// Regex metacharacters shared by both Java's regex engine and PostgreSQL's regex engine
+    /// (used for search-result highlighting), so a single backslash-per-character escape is enough
+    /// to make a literal term safe for either backend - unlike `Pattern.quote`, whose `\Q...\E`
+    /// syntax is Java-specific and not understood by PostgreSQL.
+    private static final String REGEX_METACHARACTERS = "\\.^$|?*+()[]{}";
 
     private final boolean searchBarRegex;
     private boolean isNegated = false;
@@ -89,12 +94,12 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
         }
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
 
-        // if not regex, quote the term as a regex literal, because the highlighter uses regex
+        // if not regex, escape regex metacharacters, because the highlighter uses regex
 
         // unfielded terms, check the search bar flags
         if (ctx.FIELD() == null) {
             if (!searchBarRegex) {
-                term = Pattern.quote(term);
+                term = escapeRegexLiteral(term);
             }
             return List.of(new SearchQueryNode(Optional.empty(), term));
         }
@@ -117,7 +122,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
         if (ctx.operator() != null) {
             int operator = ctx.operator().getStart().getType();
             if (operator != SearchParser.REQUAL && operator != SearchParser.CREEQUAL) {
-                term = Pattern.quote(term);
+                term = escapeRegexLiteral(term);
             }
         }
 
@@ -125,5 +130,17 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
             return List.of(new SearchQueryNode(Optional.empty(), term));
         }
         return List.of(new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term));
+    }
+
+    private static String escapeRegexLiteral(String term) {
+        StringBuilder escaped = new StringBuilder(term.length());
+        for (int i = 0; i < term.length(); i++) {
+            char character = term.charAt(i);
+            if (REGEX_METACHARACTERS.indexOf(character) >= 0) {
+                escaped.append('\\');
+            }
+            escaped.append(character);
+        }
+        return escaped.toString();
     }
 }

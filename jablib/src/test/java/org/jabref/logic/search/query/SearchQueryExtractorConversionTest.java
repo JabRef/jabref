@@ -15,23 +15,24 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class SearchQueryExtractorConversionTest {
     public static Stream<Arguments> searchConversion() {
         return Stream.of(
-                Arguments.of(List.of(Pattern.quote("term")), "term"),
-                Arguments.of(List.of(Pattern.quote("regex.*term")), "regex.*term"),
-                Arguments.of(List.of(Pattern.quote("term")), "any = term"),
-                Arguments.of(List.of(Pattern.quote("term")), "any CONTAINS term"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a AND b"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b"), Pattern.quote("c")), "a OR b AND c"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a OR b AND NOT c"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "author = a AND title = b"),
+                Arguments.of(List.of("term"), "term"),
+                Arguments.of(List.of("regex\\.\\*term"), "regex.*term"),
+                Arguments.of(List.of("term"), "any = term"),
+                Arguments.of(List.of("term"), "any CONTAINS term"),
+                Arguments.of(List.of("a", "b"), "a AND b"),
+                Arguments.of(List.of("a", "b", "c"), "a OR b AND c"),
+                Arguments.of(List.of("a", "b"), "a OR b AND NOT c"),
+                Arguments.of(List.of("a", "b"), "author = a AND title = b"),
                 Arguments.of(List.of(), "NOT a"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b"), Pattern.quote("c")), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
-                Arguments.of(List.of(Pattern.quote("b"), Pattern.quote("c")), "title != a OR b OR c"),
-                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a b"),
-                Arguments.of(List.of(Pattern.quote("term1 term2")), "\"term1 term2\""),
+                Arguments.of(List.of("a", "b", "c"), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
+                Arguments.of(List.of("b", "c"), "title != a OR b OR c"),
+                Arguments.of(List.of("a", "b"), "a b"),
+                Arguments.of(List.of("term1 term2"), "\"term1 term2\""),
                 // regex mode is left untouched, since the user explicitly opted into it
                 Arguments.of(List.of("regex.*term"), "any =~ regex.*term")
         );
@@ -63,6 +64,20 @@ public class SearchQueryExtractorConversionTest {
         for (SearchQueryNode node : terms) {
             assertDoesNotThrow(() -> Pattern.compile("(?i)(" + node.term() + ")"),
                     () -> "Term produced an invalid regex: " + node.term());
+        }
+    }
+
+    /// Literal terms must not use Java's `Pattern.quote` (`\Q...\E`), because the same pattern string
+    /// is also sent to PostgreSQL's `regexp_mark`/`regexp_positions` functions for highlighting when
+    /// the experimental Postgres search backend is enabled, and PostgreSQL's regex engine does not
+    /// understand `\Q`/`\E`. Per-character backslash escaping is valid in both engines.
+    @ParameterizedTest
+    @MethodSource("literalTermsWithRegexMetacharactersProduceValidRegex")
+    void literalTermsAreEscapedInAPostgresCompatibleWay(String searchExpression) {
+        List<SearchQueryNode> terms = SearchQueryConversion.extractSearchTerms(new SearchQuery(searchExpression, EnumSet.noneOf(SearchFlags.class)));
+        for (SearchQueryNode node : terms) {
+            assertFalse(node.term().contains("\\Q") || node.term().contains("\\E"),
+                    "Term used Java-only \\Q...\\E quoting, which PostgreSQL's regex engine cannot parse: " + node.term());
         }
     }
 }

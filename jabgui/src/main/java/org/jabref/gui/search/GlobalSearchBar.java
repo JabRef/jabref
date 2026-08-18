@@ -387,7 +387,7 @@ public class GlobalSearchBar extends HBox {
         }
 
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
-        illegalSearch.set(!searchQuery.isValid());
+        illegalSearch.set(!searchQuery.isValid() || !Highlighter.isValidRegexPattern(searchQuery));
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
     }
 

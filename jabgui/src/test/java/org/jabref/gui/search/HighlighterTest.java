@@ -14,6 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,5 +62,24 @@ class HighlighterTest {
     @ValueSource(strings = {"*", "{", "["})
     void findMatchPositionsDoesNotThrowForBrokenRegexPattern(String pattern) {
         assertDoesNotThrow(() -> Highlighter.findMatchPositions("Sample text", pattern));
+    }
+
+    /// The search bar's "Illegal search expression" indicator relies on this to flag a deliberately
+    /// malformed explicit regex search - previously the query was silently accepted and only the
+    /// highlighter quietly gave up, leaving the user with no feedback at all.
+    @ParameterizedTest
+    @ValueSource(strings = {"anything=~^\\", "anything=~["})
+    void isValidRegexPatternIsFalseForBrokenExplicitRegex(String searchExpression) {
+        SearchQuery searchQuery = new SearchQuery(searchExpression, EnumSet.noneOf(SearchFlags.class));
+
+        assertFalse(Highlighter.isValidRegexPattern(searchQuery));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"*", "fieldname=*", "anything{", "anything[", "anything=~valid.*regex"})
+    void isValidRegexPatternIsTrueForLiteralAndValidRegexTerms(String searchExpression) {
+        SearchQuery searchQuery = new SearchQuery(searchExpression, EnumSet.noneOf(SearchFlags.class));
+
+        assertTrue(Highlighter.isValidRegexPattern(searchQuery));
     }
 }
