@@ -108,7 +108,6 @@ public class ApiKeyDialog extends FXDialog {
             String apiKey = apiKeyField.getText().trim();
             fetcherViewModel.apiKeyProperty().set(apiKey);
             fetcherViewModel.useCustomApiKeyProperty().set(!apiKey.isEmpty());
-            // Apply the persist setting from the local property
             fetcherViewModel.setPersistApiKey(persistLocal.get());
         }
         return button;
