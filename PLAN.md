@@ -1,21 +1,26 @@
 # Undo/Redo modernization — implementation plan
 
-Status: proposal for review. Nothing implemented. Branch `fix-undoredo`.
+Status: workstream A implemented on branch `fix-undoredo`. `javax.swing.undo` is gone from
+jabgui. Remaining work is in "Postponed".
 
 ## Sequencing at a glance
 
-| | Scope | Behaviour change | Blocked by |
+| | Scope | Behaviour change | State |
 | --- | --- | --- | --- |
-| **PR 0** | Fix dropped keyword edit (defect 3) | yes — keyword edits become undoable | nothing |
-| **A1** | New change model + manager + bridge, ~12 new files | no | D4, D5, D6, D8 |
-| **A2** | Migrate commands to `UndoScope`, one PR each | no | A1 |
-| **A3** | Fold recording into the manager, delete `javax.swing.undo` | no | A2 complete |
-| **C** | `progressProperty()` null, misc | no | nothing |
-| **P1–P12** | Behaviour changes and follow-ups, one PR each | yes | mostly A2/A3 |
+| **PR 0** | Fix dropped keyword edit (defect 3) | yes — keyword edits become undoable | done |
+| **A1** | Change model, manager, bridge | no | done |
+| **A2** | Replace every `Undoable*` class with change records | no | done |
+| **A3** | Fold recording into the manager, delete `javax.swing.undo` | no | done, except `java.desktop` (see below) |
+| **C** | `progressProperty()` null, misc | no | not started |
+| **P1–P13** | Behaviour changes and follow-ups, one PR each | yes | not started |
 
-PR 0 goes first and is the first commit on this branch. Everything in workstream A is a pure
-refactor; everything user-visible lives in "Postponed". Where a decision is open, the answer
-is whatever the code does today — see the tie-breaker below.
+Two behaviour changes shipped deliberately and separately: PR 0, and the file-import undo fix
+that the `ImportHandler` review turned up. Everything else in workstream A is a pure refactor.
+
+**Test baseline.** `:jabgui:test` 961 tests / 1 failure, `:jablib:test` 11005 / 0 after this
+work. The jabgui failure is `KeyBindingViewModelTest.verifyStoreSettingsWritesChanges`
+(`expected shortcut+shift+L but was shift+L`); it fails identically with this branch's changes
+stashed, so it predates the work and is untouched by it.
 
 ## Problem statement
 
@@ -452,66 +457,78 @@ where the Swing removal forces the question anyway.
 `FieldRowViewModel` also extends `AbstractUndoableEdit` directly, via an inner
 `MergeFieldsUndo` class, and needs its own look at A3.
 
-### The seam today
+### The seam, and where it went
 
-Three layers, with Swing confined to the middle one:
+While the migration was in progress the layering was:
 
-- **Values** — `org.jabref.model.change` in jablib. Nine records behind a sealed `BibChange`.
+- **Values** — `org.jabref.model.change` in jablib. Ten records behind a sealed `BibChange`.
   No Swing, no JavaFX, no `Localization`. `apply()` plus `inverted()`; undo is
   `inverted().apply()`.
-- **Adapters** — `org.jabref.gui.undo`, and this *is* the seam. Exactly two classes extend
-  `AbstractUndoableJabRefEdit` (which extends `javax.swing.undo.AbstractUndoableEdit`):
-  `BibChangeEdit`, wrapping one change, and `NamedCompoundEdit`, holding a `List<BibChange>`
-  that it folds into a `ChangeSet` on undo/redo. Nothing else extends it.
-- **Swing** — `CountingUndoManager extends javax.swing.undo.UndoManager`, plus `UndoAction`
-  and `RedoAction`.
+- **Adapters** — the seam proper: exactly two classes extended
+  `AbstractUndoableJabRefEdit`, itself a `javax.swing.undo.AbstractUndoableEdit`.
+  `BibChangeEdit` wrapped one change; `NamedCompoundEdit` held a list and folded it into a
+  `ChangeSet`.
+- **Swing** — `CountingUndoManager extends javax.swing.undo.UndoManager`.
 
-`UndoScope` sits above the seam: `push` wraps a change in `BibChangeEdit` and hands it to the
-manager.
+Knowing the seam was exactly two classes is what made A3 tractable: replacing the manager left
+nothing else to adapt. All three of those classes are now deleted. `NamedCompoundEdit` remains
+but extends nothing — it is a plain builder that produces a `ChangeSet`.
 
 **Why the change model stays in jablib.** Moving it into `org.jabref.gui.undo` would save one
-import line in ~40 files and nothing else — the cost of this work is constructor threading,
+import line in ~40 files and nothing else — the cost of this work was constructor threading,
 not imports. It would also give up the placement that lets jabkit and jabsrv reuse the model
-(defect 6, P8) and would put pure model values back inside a GUI package. The seam is in the
-right place; it was the *handle* that was threaded badly.
+(defect 6, P8) and would put pure model values back inside a GUI package.
 
-### Phase A3 — remove Swing
+**Why the new manager is called `UndoManager`.** It occupies `org.jabref.gui.undo.UndoManager`,
+the same simple name the Swing type had. Every one of the ~160 references that pass the journal
+around therefore reads unchanged, and for most files the entire A3 diff is a single import line
+moving from `javax.swing.undo` to `org.jabref.gui.undo`. Naming it `UndoRedoManager` — the
+first attempt — would have rewritten every declaration, parameter and field in those files for
+no gain. There is no ambiguity left to protect against, because the Swing type is gone.
+
+### Phase A3 — remove Swing — done
 
 **Superseded approach.** A3 originally assumed commands would be migrated to `UndoScope`
-first, and an attempt at that was reverted. `UndoScope` is a *second* handle threaded
+first, and an attempt at that was reverted. `UndoScope` was a *second* handle threaded
 alongside `UndoManager`, which is already passed down roughly six constructor layers and
-appears in ~160 references. Adding a parallel type doubles the plumbing: a mechanical sweep
-converted 95 files and still left 47 errors in three distinct shapes — converted callers
-handing `UndoScope` to classes that legitimately still need the manager (`UndoAction`,
-`RedoAction`, anything calling `canUndo`/`hasChanged`), unconverted callers handing a manager
-to converted classes, and rewrite-rule leftovers. Nothing of it was kept.
+appears in ~160 references. A mechanical sweep converted 95 files and still left 47 errors in
+three distinct shapes — converted callers handing `UndoScope` to classes that legitimately
+still needed the manager, unconverted callers handing a manager to converted classes, and
+rewrite-rule leftovers. Nothing of it was kept.
 
-**Current approach: fold the recording API into the manager.** `UndoRedoManager` gains
-`push(BibChange)` and `record(name, recorder -> ...)` as methods, and `UndoScope` disappears
-into it. There is then one handle, threaded exactly where `UndoManager` already goes, and the
-type swap that removes Swing is the same edit that introduces the recording API — one
-mechanical rename rather than two.
+**What was done instead: fold the recording API into the manager.** `push(BibChange)` and
+`record(name, recorder -> ...)` are methods on `UndoManager`, so there is one handle, travelling
+exactly where the Swing one already did, and the type swap that removed Swing is the same edit
+that introduced the recording API.
 
-Steps, in order:
+As shipped:
 
-1. Add `push`/`record` to a new `UndoRedoManager` (JavaFX properties, `Deque<BibChange>`, no
-   Swing), keeping `CountingUndoManager` in place.
-2. Replace the declared type at its ~160 references, `javax.swing.undo.UndoManager` →
-   `UndoRedoManager`. Mechanical, one type, compiler-verified.
-3. Rebind `UndoAction` and `RedoAction` to the new properties. `CountingUndoManager` already
-   maintains `undoableProperty`/`redoableProperty`, so this is a swap, not new behaviour.
-4. Delete `AbstractUndoableJabRefEdit`, `BibChangeEdit`, `NamedCompoundEdit` and `UndoScope`.
-   The first three are the whole seam; the fourth is absorbed by step 1.
-5. Drop `java.desktop` from jabgui's module graph.
+1. `org.jabref.gui.undo.UndoManager` — `Deque<BibChange>`, undo by applying the inverse,
+   JavaFX properties for menu enablement. `hasChanged()` compares stack depth against the last
+   saved position, reproducing the balance arithmetic of `CountingUndoManager` including its
+   quirk that undo-then-new-edit returns to the same number. Property updates still go through
+   `UiTaskExecutor.runInJavaFXThread`, because commands push from background tasks; the boolean
+   values are computed before the hand-off so the queued lambda never reads the stacks from
+   another thread.
+2. The declared type swapped at ~160 references, and `addEdit(new BibChangeEdit(x))` became
+   `push(x)`, `addEdit(compound)` became `push(compound.toChangeSet())`.
+3. `UndoAction` and `RedoAction` bind to `undoableProperty()`/`redoableProperty()` and test
+   `canUndo()`/`canRedo()` instead of throwing `CannotUndoException` at themselves in order to
+   catch it a line later.
+4. Deleted: `AbstractUndoableJabRefEdit`, `BibChangeEdit`, `CountingUndoManager`, `UndoScope`.
+   `AutomaticFieldEditorUndoableEdit` was renamed to `AutomaticFieldEditorChanges`, the last
+   name in jabgui referring to the Swing concept.
+5. **`java.desktop` could not be dropped** — see **P13**. `jabgui` no longer references
+   `javax.swing` at all, but `ClipBoardManager` uses `java.awt.datatransfer`, which is
+   unrelated to undo.
 
-Only after that does adopting `record(...)` inside individual commands become worthwhile — see
-**P11**, which is where the "cannot forget to push" benefit actually lands.
+The presentation-name mechanism (defect 11) went with the `Undoable*` classes during A2, and
+the 19 l10n keys they used were retired as each step made them unreferenced.
+`LocalizationConsistencyTest` catches these, though only a full run catches them all: three
+keys from the group-edit deletions survived the per-step checks and were removed later.
 
-The presentation-name mechanism (defect 11) is already gone: every `getPresentationName()`
-implementation was deleted with its `Undoable*` class during A2, and the 16 l10n keys they
-used were retired as each step made them unreferenced. `LocalizationConsistencyTest` catches
-these one step at a time, so no separate l10n sweep is needed — but Crowdin still has to see
-the removals.
+**What A3 did not do:** `NamedCompoundEdit` still has ~50 call sites that build a compound by
+hand. Removing it is **P11**, which is now cheap — the manager already carries `record`.
 
 Workstream A ends at A3. Extending the change model to jabkit and jabsrv was formerly phase
 A4 and is now **P8** under "Postponed" — a capability addition rather than a refactor. Nothing
@@ -639,11 +656,24 @@ it.
 this area and covers whole-subtree replacement from external-file changes. Whoever implements
 P10 should look at it first, since a `GroupSubtreeReplaced` record would likely subsume it.
 
-### P11 — Adopt `record(...)` inside commands
+### P11 — Adopt `record(...)` inside commands, and delete `NamedCompoundEdit`
 
-The point of a recording block is that a command cannot collect changes and then forget to
-push them, which is the bug class PR 0 fixed by hand. That benefit only arrives when command
-bodies actually use it:
+Unblocked: `UndoManager` already carries `record`, so adopting it threads nothing new. This is
+the last piece of the original goal.
+
+Roughly 50 sites still build a compound by hand:
+
+```java
+NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Manage keywords"));
+for (BibEntry entry : entries) {
+    entry.putKeywords(keywords, separator).ifPresent(compound::addEdit);
+}
+if (compound.hasEdits()) {
+    undoManager.push(compound.toChangeSet());
+}
+```
+
+becomes
 
 ```java
 undoManager.record(Localization.lang("Manage keywords"), recorder -> {
@@ -653,13 +683,13 @@ undoManager.record(Localization.lang("Manage keywords"), recorder -> {
 });
 ```
 
-Blocked on A3, and deliberately so: after A3 the manager already carries `record`, so adopting
-it threads nothing new. Attempting it before A3 means threading a second handle through the
-whole GUI construction tree, which is what failed.
+The point is not brevity: it is that the build/check/push sequence stops being something a
+command can get wrong. That is the bug PR 0 fixed by hand, and the `ImportHandler` fix was a
+second instance of the same shape. When no call sites remain, `NamedCompoundEdit` and
+`AutomaticFieldEditorChanges` are deleted.
 
-Roughly 28 commands build a compound by hand today. Each is a small, individually reviewable
-rewrite, and each should keep its current grouping and granularity — the point is to make the
-push unforgettable, not to change what lands on the stack.
+Do it per command, keeping each one's current grouping and granularity — the goal is to make
+the push unforgettable, not to change what lands on the stack.
 
 ### P12 — The undo handle is threaded through the whole GUI tree
 
@@ -672,6 +702,16 @@ A `LibraryTab`-scoped context object, or letting afterburner `@Inject` reach the
 undo handle is already registered with the injector), would collapse most of it. That is a
 change to how jabgui wires dependencies and is far outside undo — recorded because this work
 is what made the cost measurable.
+
+### P13 — Drop `java.desktop` from jabgui
+
+A3 removed every `javax.swing` reference from jabgui, but the module still declares
+`requires java.desktop` because `ClipBoardManager` uses `java.awt.Toolkit` and
+`java.awt.datatransfer`. Nothing to do with undo; recorded because A3 set out to remove the
+dependency and got only as far as removing the undo half of it.
+
+JavaFX has `javafx.scene.input.Clipboard`, so the replacement is plausible, but the AWT path
+exists to handle flavours JavaFX does not expose. Check that before assuming it is a swap.
 
 ## Workstream C — independent micro-fixes
 
@@ -778,19 +818,29 @@ recommendation is a starting position for that discussion, not a decision taken 
 
 ## Risks
 
-- **A2 is long.** ~28 undo-aware commands and 113 `addEdit` sites. It is incremental and each
-  step is independently shippable, but it will not finish in one pass. The A1 bridge means an
-  abandoned migration leaves the codebase working, merely mixed.
-- **Group edits (A2 step 6) are the hardest.** `UndoableModifySubtree` and
-  `UndoableChangeEntriesOfGroup` mutate tree structure; the record representation for those is
-  not yet designed and may need a different shape.
-- **A3 touches translated strings.** Coordinate with Crowdin.
-- **"Behaviour-preserving" needs proving, not asserting.** A2 has no characterization tests to
-  lean on. Before migrating a command, capture its current undo behaviour in a test, then
-  migrate — otherwise the governing constraint is an intention rather than a check.
+Kept as written where still live; annotated where the work settled them.
+
+- **A2 is long.** ~28 undo-aware commands and 113 `addEdit` sites. *Settled:* it took thirteen
+  commits and finished. The bridge did its job — the tree compiled and passed at every step.
+- **Group edits are the hardest.** *Settled differently than expected:* two of the three were
+  unreachable and were deleted rather than modelled (**P10**), and the third,
+  `UndoableModifySubtree`, was a stateful memento whose redo depended on undo having run first.
+- **A3 touches translated strings.** *Live.* 19 keys retired; Crowdin still has to see it.
+- **"Behaviour-preserving" needs proving, not asserting.** *Live, and the weakest point of this
+  work.* No characterization tests were written before migrating. The evidence that behaviour
+  held is that the suites pass and that each step was read carefully — which caught the
+  `EntriesEventSource.UNDO` group-assignment difference and the `EntryTypeFactory.parse`
+  round trip, but is not the same as a test that would have failed.
+- **Sweeping scripts are a hazard.** Two self-inflicted problems came from them: a replacement
+  string interpreted as an octal escape wrote `` over three closing braces, and a blanket
+  import sort put `ImportFormatReader.ImportResult` ahead of `ImportFormatReader`. Both were
+  caught by compile and checkstyle, but only because those ran after every step. Run
+  `checkstyleMain`/`checkstyleTest` per step, not just `compileJava`.
+- **Per-step checks miss cross-step drift.** Three obsolete l10n keys survived every per-step
+  `LocalizationConsistencyTest` run and only showed up in a full `:jablib:test`. Run the full
+  suites before calling a phase finished.
 - **Accelerator-versus-focus-owner ordering** (relevant to P1/P6) differs across JavaFX
-  versions and platforms. Verify current behaviour on the real target before building on any
-  assumption about it.
+  versions and platforms. *Live.* Verify on the real target before building on any assumption.
 
 ## Teaching notes
 
@@ -806,3 +856,11 @@ and should survive review:
 - Command (invocation) and Memento (journal) deliberately kept distinct, with one named seam.
 - Chain of Responsibility via JavaFX event bubbling — using a framework mechanism where it
   fits, and refusing it where it does not.
+- Naming as a refactoring tool: keeping the simple name `UndoManager` for the replacement type
+  turned a ~160-reference rewrite into a one-import-line change per file.
+- Reading before replacing. Half of what this work removed was unreachable — two group edit
+  classes, a whole presentation-name mechanism, 19 translated strings for text nobody rendered.
+  The migration was mostly an excavation.
+- Knowing when to stop. The `UndoScope` threading attempt was reverted after it converted 95
+  files and failed to converge; the approach that replaced it was smaller and landed cleanly.
+  The reverted attempt is documented above rather than quietly dropped.
