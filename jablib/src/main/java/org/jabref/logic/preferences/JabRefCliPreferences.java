@@ -2482,11 +2482,9 @@ public class JabRefCliPreferences implements CliPreferences {
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
         putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
 
-        // Clear keys that should not be persisted
         if (!keysToClear.isEmpty()) {
             writeKeyring(keysToClear);
         }
-        // Write keys that should be persisted
         if (!keysToPersist.isEmpty()) {
             writeKeyring(keysToPersist);
         }
