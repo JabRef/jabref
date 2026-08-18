@@ -1,5 +1,7 @@
 package org.jabref.model.change;
 
+import java.util.Objects;
+
 import org.jabref.model.database.BibDatabase;
 
 import org.jspecify.annotations.NullMarked;
@@ -17,5 +19,18 @@ public record PreambleEdit(BibDatabase database, @Nullable String before, @Nulla
     @Override
     public void apply() {
         database.setPreamble(after);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return (object instanceof PreambleEdit other)
+                && ChangeIdentity.same(database, other.database)
+                && Objects.equals(before, other.before)
+                && Objects.equals(after, other.after);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ChangeIdentity.hash(database), before, after);
     }
 }

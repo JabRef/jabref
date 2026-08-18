@@ -1,6 +1,7 @@
 package org.jabref.model.change;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -50,6 +51,6 @@ public record EntriesRemoved(BibDatabase database, List<BibEntry> entries, Entri
 
     @Override
     public int hashCode() {
-        return (31 * ChangeIdentity.hashAll(entries)) + reinsertSource.hashCode();
+        return Objects.hash(ChangeIdentity.hash(database), ChangeIdentity.hashAll(entries), reinsertSource);
     }
 }

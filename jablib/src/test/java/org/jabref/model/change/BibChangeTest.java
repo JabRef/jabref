@@ -129,6 +129,20 @@ class BibChangeTest {
         assertEquals(EntriesEventSource.LOCAL, ((EntriesInserted) insertion.inverted().inverted()).source());
     }
 
+    /// A record in the undo stack must keep the hash it was created with. BibDatabase hashes
+    /// its entry list, so content-based hashing would move the record's hash whenever the
+    /// library changes.
+    @Test
+    void hashIsStableWhileTheDatabaseChanges() {
+        BibDatabase database = new BibDatabase();
+        PreambleEdit change = new PreambleEdit(database, null, "preamble");
+        int before = change.hashCode();
+
+        database.insertEntries(List.of(entry()));
+
+        assertEquals(before, change.hashCode());
+    }
+
     @Test
     void changesAgainstDistinctEntriesWithEqualContentAreNotEqual() {
         FieldEdit onFirst = new FieldEdit(entry(), StandardField.AUTHOR, "Einstein", "Bohr");

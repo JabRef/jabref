@@ -1,5 +1,7 @@
 package org.jabref.model.change;
 
+import java.util.Objects;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
@@ -21,11 +23,13 @@ public record StringInserted(BibDatabase database, BibtexString string) implemen
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof StringInserted other) && ChangeIdentity.same(string, other.string);
+        return (object instanceof StringInserted other)
+                && ChangeIdentity.same(database, other.database)
+                && ChangeIdentity.same(string, other.string);
     }
 
     @Override
     public int hashCode() {
-        return ChangeIdentity.hash(string);
+        return Objects.hash(ChangeIdentity.hash(database), ChangeIdentity.hash(string));
     }
 }
