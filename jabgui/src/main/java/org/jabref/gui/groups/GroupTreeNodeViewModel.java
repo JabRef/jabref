@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -173,17 +172,6 @@ public class GroupTreeNodeViewModel {
 
     public boolean isAllEntriesGroup() {
         return getNode().getGroup() instanceof AllEntriesGroup;
-    }
-
-    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
-        GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
-        this.getNode().addChild(newNode);
-
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                this,
-                new GroupTreeNodeViewModel(newNode),
-                UndoableAddOrRemoveGroup.ADD_NODE);
-        undoManager.addEdit(undo);
     }
 
     /// Adds the given entries to this node's group.
