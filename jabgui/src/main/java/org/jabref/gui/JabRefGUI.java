@@ -36,6 +36,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoScope;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -243,6 +244,9 @@ public class JabRefGUI extends Application {
         JabRefGUI.countingUndoManager = new CountingUndoManager();
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
+        // One scope per undo stack: nesting is what keeps a command that delegates to another
+        // from producing two undo steps, and that only works if both share this instance.
+        Injector.setModelOrService(UndoScope.class, new UndoScope(countingUndoManager));
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);

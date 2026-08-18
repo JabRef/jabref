@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import javax.swing.undo.UndoManager;
 
+import org.jabref.model.change.BibChange;
 import org.jabref.model.change.ChangeSet;
 
 import org.jspecify.annotations.NullMarked;
@@ -30,6 +31,19 @@ public class UndoScope {
 
     public UndoScope(UndoManager undoManager) {
         this.undoManager = undoManager;
+    }
+
+    /// Records a single change as its own undo step, or as part of the enclosing step when
+    /// called inside [#record].
+    ///
+    /// A lone change needs no group and therefore no name: [ChangeSet] exists to hold several
+    /// changes together, and a name describes that grouping to the user.
+    public void push(BibChange change) {
+        if (active == null) {
+            undoManager.addEdit(new BibChangeEdit(change));
+        } else {
+            active.record(change);
+        }
     }
 
     /// Runs `mutations`, recording whatever it reports, and pushes the result as one undo step
