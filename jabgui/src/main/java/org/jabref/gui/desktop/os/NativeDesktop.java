@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -258,16 +260,24 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
-
-        // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
+        // Replace placeholders (%DIR% first to avoid leaving a trailing %)
+        command = command.replace("%DIR%", absolutePath).replace("%DIR", absolutePath);
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        String[] subcommands = command.split(" ");
+        // Parse CLI arguments while preserving quoted segments
+        List<String> subcommands = new ArrayList<>();
+        Matcher matcher = Pattern.compile("([^\\s\"']+|\"[^\"]*\"|'[^']*')+").matcher(command);
+        while (matcher.find()) {
+            String token = matcher.group();
+            // Strip outer quotes because ProcessBuilder handles raw string arguments directly
+            if ((token.startsWith("\"") && token.endsWith("\"")) || (token.startsWith("'") && token.endsWith("'"))) {
+                token = token.substring(1, token.length() - 1);
+            }
+            subcommands.add(token);
+        }
+
         try {
             new ProcessBuilder(subcommands).start();
         } catch (IOException exception) {
