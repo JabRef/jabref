@@ -85,8 +85,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We added backward compatibility for API key persistence: legacy installations with a single global persist flag are automatically migrated to per-fetcher persistence settings, preventing loss of previously saved keys. [#16519](https://github.com/JabRef/jabref/issues/16519)
-- We fixed an issue where the last edited fetcher’s persistence choice was applied to all fetchers. [#16609](https://github.com/JabRef/jabref/issues/16609)
 - We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
 - We fixed an issue where removing filtered entries from a group could cause JabRef to throw an exception. [#16541](https://github.com/JabRef/jabref/issues/16541)
