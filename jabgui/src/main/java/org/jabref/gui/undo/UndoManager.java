@@ -10,7 +10,6 @@ import org.jabref.model.change.BibChange;
 import org.jabref.model.change.ChangeSet;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// The undo journal: a stack of changes, and the API for putting changes on it.
 ///
@@ -28,6 +27,10 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class UndoManager {
 
+    /// Same depth javax.swing.undo.UndoManager defaulted to. The stack retains the BibEntry
+    /// objects of removed entries, so an unbounded one keeps every deletion of a session alive.
+    private static final int LIMIT = 100;
+
     private final Deque<BibChange> undoStack = new ArrayDeque<>();
     private final Deque<BibChange> redoStack = new ArrayDeque<>();
 
@@ -39,8 +42,11 @@ public class UndoManager {
     /// reports the library as unchanged again.
     private int savedDepth;
 
-    /// Non-null exactly while a [#record] block is in progress.
-    private @Nullable ChangeRecorder active;
+    /// Set exactly while a [#record] block is in progress *on this thread*. Per-thread because
+    /// there is one manager for the application and long commands record from background tasks:
+    /// a shared field would fold edits the user makes meanwhile into the background command's
+    /// step, and would have two threads appending to one recorder's list.
+    private final ThreadLocal<ChangeRecorder> active = new ThreadLocal<>();
 
     /// Records a single change as its own undo step, or as part of the enclosing step when
     /// called inside [#record].
@@ -48,11 +54,21 @@ public class UndoManager {
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
     public synchronized void addEdit(BibChange change) {
-        if (active != null) {
-            active.record(change);
+        ChangeRecorder recorder = active.get();
+        if (recorder != null) {
+            recorder.record(change);
+            return;
+        }
+        // A set that collected nothing is not an undo step. Pushing one would enable Undo and
+        // let the next Ctrl+Z consume a no-op instead of the user's previous edit.
+        if ((change instanceof ChangeSet changeSet) && changeSet.isEmpty()) {
             return;
         }
         undoStack.push(change);
+        while (undoStack.size() > LIMIT) {
+            undoStack.removeLast();
+            savedDepth = Math.min(savedDepth, undoStack.size());
+        }
         redoStack.clear();
         notifyListeners();
     }
@@ -68,14 +84,18 @@ public class UndoManager {
     ///
     /// @return whether anything was recorded, for callers that report the outcome to the user
     public boolean record(String name, Consumer<ChangeRecorder> mutations) {
-        ChangeRecorder enclosing = active;
+        ChangeRecorder enclosing = active.get();
         ChangeRecorder recorder = new ChangeRecorder(name);
 
-        active = recorder;
+        active.set(recorder);
         try {
             mutations.accept(recorder);
         } finally {
-            active = enclosing;
+            if (enclosing == null) {
+                active.remove();
+            } else {
+                active.set(enclosing);
+            }
         }
 
         ChangeSet changeSet = recorder.toChangeSet();
@@ -98,22 +118,26 @@ public class UndoManager {
         return !redoStack.isEmpty();
     }
 
+    /// Applies the inverse before moving the change across, so a change that throws stays
+    /// undoable instead of vanishing from both stacks.
     public synchronized void undo() {
-        if (undoStack.isEmpty()) {
+        BibChange change = undoStack.peek();
+        if (change == null) {
             return;
         }
-        BibChange change = undoStack.pop();
         change.inverted().apply();
+        undoStack.pop();
         redoStack.push(change);
         notifyListeners();
     }
 
     public synchronized void redo() {
-        if (redoStack.isEmpty()) {
+        BibChange change = redoStack.peek();
+        if (change == null) {
             return;
         }
-        BibChange change = redoStack.pop();
         change.apply();
+        redoStack.pop();
         undoStack.push(change);
         notifyListeners();
     }
