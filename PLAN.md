@@ -12,10 +12,14 @@ jabgui. Remaining work is in "Postponed".
 | **A2** | Replace every `Undoable*` class with change records | no | done |
 | **A3** | Fold recording into the manager, delete `javax.swing.undo` | no | done, except `java.desktop` (see below) |
 | **C** | `progressProperty()` null, misc | no | not started |
-| **P1–P13** | Behaviour changes and follow-ups, one PR each | yes | not started |
+| **P11** | Adopt `record(...)` in commands | no | done |
+| **P1–P10, P12, P13** | Behaviour changes and follow-ups, one PR each | yes | not started |
 
-Two behaviour changes shipped deliberately and separately: PR 0, and the file-import undo fix
-that the `ImportHandler` review turned up. Everything else in workstream A is a pure refactor.
+Three behaviour changes shipped deliberately and separately, each its own commit with a
+CHANGELOG entry: PR 0 (keyword management), the file-import undo fix that reviewing
+`ImportHandler` turned up, and "Replace string", which P11 revealed had no undo manager at
+all. All three are the same defect — changes collected and then not pushed — which is what
+`record(...)` exists to make unexpressible. Everything else is a pure refactor.
 
 **Test baseline.** `:jabgui:test` 961 tests / 1 failure, `:jablib:test` 11005 / 0 after this
 work. The jabgui failure is `KeyBindingViewModelTest.verifyStoreSettingsWritesChanges`
@@ -656,24 +660,9 @@ it.
 this area and covers whole-subtree replacement from external-file changes. Whoever implements
 P10 should look at it first, since a `UndoableModifySubtree` record would likely subsume it.
 
-### P11 — Adopt `record(...)` inside commands, and delete `NamedCompoundEdit`
+### P11 — Adopt `record(...)` inside commands — done
 
-Unblocked: `UndoManager` already carries `record`, so adopting it threads nothing new. This is
-the last piece of the original goal.
-
-Roughly 50 sites still build a compound by hand:
-
-```java
-NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Manage keywords"));
-for (BibEntry entry : entries) {
-    entry.putKeywords(keywords, separator).ifPresent(compound::addEdit);
-}
-if (compound.hasEdits()) {
-    undoManager.push(compound.toChangeSet());
-}
-```
-
-becomes
+Commands mutate inside a block and hand each change to a recorder:
 
 ```java
 undoManager.record(Localization.lang("Manage keywords"), recorder -> {
@@ -683,13 +672,34 @@ undoManager.record(Localization.lang("Manage keywords"), recorder -> {
 });
 ```
 
-The point is not brevity: it is that the build/check/push sequence stops being something a
-command can get wrong. That is the bug PR 0 fixed by hand, and the `ImportHandler` fix was a
-second instance of the same shape. When no call sites remain, `NamedCompoundEdit` and
-`AutomaticFieldEditorUndoableEdit` are deleted.
+The point was never brevity: the build/check/push sequence stops being something a command can
+get wrong. That defect was found **three** times during this work — keyword management (PR 0),
+file import, and "Replace string", the last of which had no undo manager at all. `record()`
+returns whether anything was recorded, which is what the call sites that previously branched on
+`hasEdits()` needed in order to report an outcome.
 
-Do it per command, keeping each one's current grouping and granularity — the goal is to make
-the push unforgettable, not to change what lands on the stack.
+`NamedCompoundEdit` is gone: it and `ChangeRecorder` had converged on the same body — a name, a
+`List<BibChange>`, and `toChangeSet()` — so they are one class now.
+
+**Two structural limits, and six sites that keep collecting by hand.** These are not
+unconverted leftovers; a block cannot express either shape:
+
+- **Collect on one thread, push on another.** `GenerateCitationKeyAction`,
+  `LookupIdentifierAction`, `AutoLinkFilesAction`, `ImportHandler` and `BatchEntryMergeTask`
+  gather on a background task and marshal only the push. A block would run the whole body —
+  network fetches included — wherever `record` was called.
+- **Abandon part-way through.** `SourceTab` returns from the middle of its mutation sequence
+  when a field fails to parse. Inside a block that `return` exits only the lambda, so the method
+  would carry on *and* the partial edits would be pushed.
+
+Those construct a `ChangeRecorder` directly and call `addEdit(recorder.toChangeSet())`
+themselves. The recorder's javadoc names both cases, so the manual form reads as a second
+supported mode rather than as work someone abandoned.
+
+**Follow-up:** `ChangeRecorder` lost its `final` so `AutomaticFieldEditorUndoableEdit` can
+extend it to carry an affected-entry count. That count is UI feedback, not undo state, so
+composition would be cleaner — deferred because it churns ~8 files in that package for no
+behavioural gain.
 
 ### P12 — The undo handle is threaded through the whole GUI tree
 
