@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
