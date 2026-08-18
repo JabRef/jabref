@@ -9,16 +9,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/// The manager updates its properties on the JavaFX thread, so the toolkit has to be up.
-@ExtendWith(ApplicationExtension.class)
 class UndoManagerTest {
 
     private final UndoManager undoRedoManager = new UndoManager();
@@ -115,23 +110,6 @@ class UndoManagerTest {
 
         assertEquals("Einstein", entry.getField(StandardField.AUTHOR).orElseThrow());
         assertFalse(undoRedoManager.canUndo());
-    }
-
-    /// The property updates are posted to the JavaFX thread rather than applied inline, so
-    /// each assertion has to let that queue drain first.
-    @Test
-    void propertiesFollowTheStacks() {
-        assertFalse(undoRedoManager.undoableProperty().get());
-
-        undoRedoManager.addEdit(setAuthor("Bohr"));
-        WaitForAsyncUtils.waitForFxEvents();
-        assertTrue(undoRedoManager.undoableProperty().get());
-        assertFalse(undoRedoManager.redoableProperty().get());
-
-        undoRedoManager.undo();
-        WaitForAsyncUtils.waitForFxEvents();
-        assertFalse(undoRedoManager.undoableProperty().get());
-        assertTrue(undoRedoManager.redoableProperty().get());
     }
 
     @Test

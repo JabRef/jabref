@@ -1,13 +1,11 @@
 package org.jabref.gui.undo;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.function.Consumer;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.change.BibChange;
 import org.jabref.model.change.ChangeSet;
 
@@ -20,17 +18,18 @@ import org.jspecify.annotations.Nullable;
 /// handed the journal in order to record anything, so giving the recording API its own type
 /// would mean threading a second handle everywhere the first one already goes.
 ///
-/// The stacks are mutated on the calling thread, but the properties that drive menu
-/// enablement are updated on the JavaFX application thread, because commands push from
-/// background tasks as well.
+/// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
+/// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
+/// subscribes through [UndoManagerProperties], which owns that hop.
 @NullMarked
 public class UndoManager {
 
     private final Deque<BibChange> undoStack = new ArrayDeque<>();
     private final Deque<BibChange> redoStack = new ArrayDeque<>();
 
-    private final ReadOnlyBooleanWrapper undoable = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyBooleanWrapper redoable = new ReadOnlyBooleanWrapper(false);
+    /// Notified after every change to either stack. Commands push from background tasks, so a
+    /// listener that touches the UI is responsible for getting itself onto the right thread.
+    private final List<Runnable> listeners = new ArrayList<>();
 
     /// Depth of the undo stack when the library was last saved, so that undoing back to it
     /// reports the library as unchanged again.
@@ -51,7 +50,7 @@ public class UndoManager {
         }
         undoStack.push(change);
         redoStack.clear();
-        updateProperties();
+        notifyListeners();
     }
 
     /// Runs `mutations`, recording whatever it reports, and pushes the result as one undo step
@@ -102,7 +101,7 @@ public class UndoManager {
         BibChange change = undoStack.pop();
         change.inverted().apply();
         redoStack.push(change);
-        updateProperties();
+        notifyListeners();
     }
 
     public void redo() {
@@ -112,15 +111,11 @@ public class UndoManager {
         BibChange change = redoStack.pop();
         change.apply();
         undoStack.push(change);
-        updateProperties();
+        notifyListeners();
     }
 
-    public ReadOnlyBooleanProperty undoableProperty() {
-        return undoable.getReadOnlyProperty();
-    }
-
-    public ReadOnlyBooleanProperty redoableProperty() {
-        return redoable.getReadOnlyProperty();
+    public void addListener(Runnable listener) {
+        listeners.add(listener);
     }
 
     /// Marks the current position as saved.
@@ -138,15 +133,10 @@ public class UndoManager {
         undoStack.clear();
         redoStack.clear();
         savedDepth = 0;
-        updateProperties();
+        notifyListeners();
     }
 
-    private void updateProperties() {
-        boolean canUndo = canUndo();
-        boolean canRedo = canRedo();
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            undoable.set(canUndo);
-            redoable.set(canRedo);
-        });
+    private void notifyListeners() {
+        listeners.forEach(Runnable::run);
     }
 }

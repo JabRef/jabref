@@ -10,8 +10,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/// Recording an undo step updates properties on the JavaFX thread, so the toolkit has to be up.
-@ExtendWith(ApplicationExtension.class)
 class UpdateOriginalEntryTest {
 
     private static final String EDIT_NAME = "Merge entry with information";
