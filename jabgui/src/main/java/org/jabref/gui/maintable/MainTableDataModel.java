@@ -173,34 +173,15 @@ public class MainTableDataModel {
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            reapplyGroupMatches();
+            applyGroupMatchesToAllEntries();
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
-    /// Re-applies the current {@link #groupsMatcher} to every entry in {@link #entriesViewModel}.
-    ///
-    /// Shared by {@link #updateGroupMatches(ObservableList)} and the {@link EntriesRemovedEvent} handler
-    /// in {@link SearchIndexListener}, both of which need to reassert group-match state for the
-    /// surviving entries against the *current*, unchanged matcher (removing entries does not
-    /// invalidate which of the remaining entries match the selected group).
-    private void reapplyGroupMatches() {
-        entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher));
-    }
-
-    private boolean isGroupInvertMode() {
-        return groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
-    }
-
-    private boolean isGroupFloatingMode() {
-        return !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
-    }
-
-    /// Computes the current invert/floating group-view-mode flags and applies them to a single entry.
-    ///
-    /// Used wherever a single entry's group match needs to be (re)computed against the *current*
-    /// preferences (e.g. on index update), so the flag computation itself lives in one place.
-    private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher) {
-        updateEntryGroupMatch(entry, groupsMatcher, isGroupInvertMode(), isGroupFloatingMode());
+    // Apply group matches to all entries
+    private void applyGroupMatchesToAllEntries() {
+        boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
+        boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
+        entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
     }
 
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
@@ -286,7 +267,7 @@ public class MainTableDataModel {
                     }
 
                     updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
-                    updateEntryGroupMatch(viewModel, groupsMatcher);
+                    updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
                 }
                 return index;
             }).onSuccess(index -> {
@@ -307,14 +288,25 @@ public class MainTableDataModel {
             // to ensure the filtered list is properly updated and doesn't show stale entries.
             // Re-apply the current group filter too, so it stays on the selected group
             // instead of falling back to "All entries".
+            boolean isSearchFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+
             BackgroundTask.wrap(() ->
                     searchQueryProperty.get().map(searchQuery -> searchContext.search(searchQuery))
             ).onSuccess(searchResultsOpt -> {
+                // Everything below runs on the FX thread (BackgroundTask#onSuccess callback).
                 searchResultsOpt.ifPresentOrElse(
-                        MainTableDataModel.this::setSearchMatches,
-                        MainTableDataModel.this::clearSearchMatches
+                        results -> entriesViewModel.forEach(entry -> {
+                            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+                            updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isSearchFloatingMode);
+                        }),
+                        () -> entriesViewModel.forEach(entry -> {
+                            entry.isMatchedBySearch().set(true);
+                            entry.hasFullTextResultsProperty().set(false);
+                            updateEntrySearchMatch(entry, true, isSearchFloatingMode);
+                        })
                 );
-                reapplyGroupMatches();
+                // Re-apply the group filter post deletion.
+                applyGroupMatchesToAllEntries();
                 FilteredListProxy.refilterListReflection(entriesFiltered);
             }).executeWith(taskExecutor);
         }
