@@ -16,7 +16,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
@@ -29,7 +29,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -159,7 +158,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
-                              NamedCompoundEdit compoundEdit,
+                              ChangeRecorder recorder,
                               List<JabRefException> failures,
                               Consumer<Runnable> mutationScheduler) {
         CleanupWorker cleaner = new CleanupWorker(
@@ -172,9 +171,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
-        for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
-        }
+        recorder.recordAll(changes);
 
         failures.addAll(cleaner.getFailures());
 
@@ -193,17 +190,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         String editName = Localization.lang("Clean up entry(s)");
         // undo granularity is on a set of all entries
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
-
-        for (BibEntry entry : entries) {
-            if (doCleanup(cleanupPreferences, entry, compoundEdit, failures, Runnable::run)) {
-                modifiedEntriesCount++;
+        undoManager.record(editName, recorder -> {
+            for (BibEntry entry : entries) {
+                if (doCleanup(cleanupPreferences, entry, recorder, failures, Runnable::run)) {
+                    modifiedEntriesCount++;
+                }
             }
-        }
-
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit.toChangeSet());
-        }
+        });
 
         if (!failures.isEmpty()) {
             showFailures(failures);
@@ -222,31 +215,27 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         List<JabRefException> failures = new ArrayList<>();
 
         String editName = Localization.lang("Clean up entry(s)");
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
+        undoManager.record(editName, recorder -> {
+            for (int i = 0; i < count; i++) {
+                if (task.isCancelled()) {
+                    break;
+                }
 
-        for (int i = 0; i < count; i++) {
-            if (task.isCancelled()) {
-                break;
+                // BibEntry uses ObservableMap which fires FX listeners on mutation.
+                // Heavy computation stays on this background thread; only field mutations are dispatched
+                // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
+                if (doCleanup(cleanupPreferences, entries.get(i), recorder, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
+                    modifiedEntriesCount++;
+                }
+
+                task.updateProgress(i, count);
+                task.updateMessage(Localization.lang("%0 of %1 entries cleaned up.",
+                        String.valueOf(i + 1),
+                        String.valueOf(count)));
             }
-
-            // BibEntry uses ObservableMap which fires FX listeners on mutation.
-            // Heavy computation stays on this background thread; only field mutations are dispatched
-            // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
-            if (doCleanup(cleanupPreferences, entries.get(i), compoundEdit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
-                modifiedEntriesCount++;
-            }
-
-            task.updateProgress(i, count);
-            task.updateMessage(Localization.lang("%0 of %1 entries cleaned up.",
-                    String.valueOf(i + 1),
-                    String.valueOf(count)));
-        }
+        });
 
         task.updateProgress(count, count);
-
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit.toChangeSet());
-        }
 
         if (!failures.isEmpty()) {
             showFailures(failures);

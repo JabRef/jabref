@@ -21,6 +21,10 @@ import org.jspecify.annotations.Nullable;
 /// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
 /// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
 /// subscribes through [UndoManagerProperties], which owns that hop.
+///
+/// Stack operations are synchronized because commands push from background tasks — cleanup and
+/// import both do. [#record] is not: it runs caller code, so holding the lock across it would
+/// invite deadlock, and one recording block at a time is what commands actually do.
 @NullMarked
 public class UndoManager {
 
@@ -43,7 +47,7 @@ public class UndoManager {
     ///
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
-    public void addEdit(BibChange change) {
+    public synchronized void addEdit(BibChange change) {
         if (active != null) {
             active.record(change);
             return;
@@ -86,15 +90,15 @@ public class UndoManager {
         return true;
     }
 
-    public boolean canUndo() {
+    public synchronized boolean canUndo() {
         return !undoStack.isEmpty();
     }
 
-    public boolean canRedo() {
+    public synchronized boolean canRedo() {
         return !redoStack.isEmpty();
     }
 
-    public void undo() {
+    public synchronized void undo() {
         if (undoStack.isEmpty()) {
             return;
         }
@@ -104,7 +108,7 @@ public class UndoManager {
         notifyListeners();
     }
 
-    public void redo() {
+    public synchronized void redo() {
         if (redoStack.isEmpty()) {
             return;
         }
@@ -119,17 +123,17 @@ public class UndoManager {
     }
 
     /// Marks the current position as saved.
-    public void markUnchanged() {
+    public synchronized void markUnchanged() {
         savedDepth = undoStack.size();
     }
 
     /// Whether the library differs from the last saved position. Undoing back to that position
     /// reports unchanged again, which is why this compares depth rather than counting edits.
-    public boolean hasChanged() {
+    public synchronized boolean hasChanged() {
         return undoStack.size() != savedDepth;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         undoStack.clear();
         redoStack.clear();
         savedDepth = 0;
