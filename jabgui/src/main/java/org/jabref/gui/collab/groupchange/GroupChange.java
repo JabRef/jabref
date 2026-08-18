@@ -2,12 +2,12 @@ package org.jabref.gui.collab.groupchange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.groups.GroupTreeNodeViewModel;
-import org.jabref.gui.groups.UndoableModifySubtree;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.change.GroupSubtreeReplaced;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -32,9 +32,9 @@ public final class GroupChange extends DatabaseChange {
             return groupTreeNode;
         });
 
-        final UndoableModifySubtree undo = new UndoableModifySubtree(
-                new GroupTreeNodeViewModel(databaseContext.getMetaData().getGroups().orElse(null)),
-                new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
+        // Snapshot before and after rather than letting the edit capture the "after" state
+        // lazily on its first undo, which made redo depend on undo having run first.
+        GroupTreeNode before = root.copySubtree();
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
@@ -47,7 +47,8 @@ public final class GroupChange extends DatabaseChange {
             }
         }
 
-        undoEdit.addEdit(undo);
+        undoEdit.addEdit(new BibChangeEdit(
+                new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree())));
     }
 
     public GroupDiff getGroupDiff() {

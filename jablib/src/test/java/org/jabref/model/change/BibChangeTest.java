@@ -10,6 +10,9 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -141,6 +144,45 @@ class BibChangeTest {
         database.insertEntries(List.of(entry()));
 
         assertEquals(before, change.hashCode());
+    }
+
+    private static GroupTreeNode group(String name) {
+        return GroupTreeNode.fromGroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
+    }
+
+    @Test
+    void replacingAGroupSubtreeCanBeUndoneAndRedone() {
+        GroupTreeNode root = group("root");
+        root.addChild(group("original"));
+
+        GroupTreeNode before = root.copySubtree();
+        root.removeAllChildren();
+        root.addChild(group("replacement"));
+        GroupSubtreeReplaced change = new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
+
+        change.inverted().apply();
+        assertEquals(List.of("original"), childNames(root));
+
+        change.apply();
+        assertEquals(List.of("replacement"), childNames(root));
+    }
+
+    /// The previous edit captured the "after" state lazily during undo, so redoing before
+    /// undoing cleared the subtree. A value knows both states from the start.
+    @Test
+    void redoingASubtreeReplacementWithoutUndoingFirstIsHarmless() {
+        GroupTreeNode root = group("root");
+        GroupTreeNode before = root.copySubtree();
+        root.addChild(group("replacement"));
+        GroupSubtreeReplaced change = new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
+
+        change.apply();
+
+        assertEquals(List.of("replacement"), childNames(root));
+    }
+
+    private static List<String> childNames(GroupTreeNode node) {
+        return node.getChildren().stream().map(child -> child.getGroup().getName()).toList();
     }
 
     @Test
