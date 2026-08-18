@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2405,18 +2406,34 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Set<FetcherApiKey> getFetcherKeys(Set<FetcherApiKey> defaults) {
-        if (!hasKey(FETCHER_CUSTOM_KEY_NAMES) || !hasKey(FETCHER_CUSTOM_KEY_USES) || !hasKey(FETCHER_CUSTOM_KEY_PERSIST)) {
-            return defaults;
-        }
-
         Set<FetcherApiKey> fetcherApiKeys = new HashSet<>();
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> persists = getStringList(FETCHER_CUSTOM_KEY_PERSIST);
         List<String> keys = getFetcherKeysFromKeyring(names);
 
-        if (names.size() != uses.size() || names.size() != persists.size() || names.size() != keys.size()) {
+        // Backward compatibility for persists: if the key exists as a single boolean (legacy), expand to match names
+        List<String> persists;
+        if (hasKey(FETCHER_CUSTOM_KEY_PERSIST)) {
+            List<String> rawPersists = getStringList(FETCHER_CUSTOM_KEY_PERSIST);
+            if (rawPersists.size() == 1 && names.size() > 1) {
+                boolean legacyPersist = Boolean.parseBoolean(rawPersists.getFirst());
+                persists = Collections.nCopies(names.size(), String.valueOf(legacyPersist));
+                // Normalize storage to list format
+                putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
+            } else if (rawPersists.size() == names.size()) {
+                persists = rawPersists;
+            } else {
+                // Size mismatch but not the legacy single case -> treat as missing/defaults
+                LOGGER.warn("Could not load fetcher keys from preferences (persist size mismatch). Will ignore.");
+                return defaults;
+            }
+        } else {
+            // No persist key at all -> assume all false
+            persists = Collections.nCopies(names.size(), "false");
+        }
+
+        if (names.size() != uses.size() || names.size() != keys.size()) {
             LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
             return defaults;
         }
