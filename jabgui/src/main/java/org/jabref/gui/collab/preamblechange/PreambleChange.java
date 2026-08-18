@@ -5,7 +5,7 @@ import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.PreambleEdit;
+import org.jabref.model.change.UndoablePreambleChange;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public final class PreambleChange extends DatabaseChange {
     @Override
     public void applyChange(NamedCompoundEdit undoEdit) {
         databaseContext.getDatabase().setPreamble(preambleDiff.getNewPreamble());
-        undoEdit.addEdit(new PreambleEdit(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
+        undoEdit.addEdit(new UndoablePreambleChange(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
     }
 
     public PreambleDiff getPreambleDiff() {

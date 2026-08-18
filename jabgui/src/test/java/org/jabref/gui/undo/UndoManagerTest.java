@@ -2,7 +2,7 @@ package org.jabref.gui.undo;
 
 import java.util.Optional;
 
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -29,15 +29,15 @@ class UndoManagerTest {
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 
-    private FieldEdit setAuthor(String value) {
+    private UndoableFieldChange setAuthor(String value) {
         String before = entry.getField(StandardField.AUTHOR).orElse(null);
         entry.setField(StandardField.AUTHOR, value);
-        return new FieldEdit(entry, StandardField.AUTHOR, before, value);
+        return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
     }
 
     @Test
     void aPushedChangeCanBeUndoneAndRedone() {
-        undoRedoManager.push(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Bohr"));
 
         assertTrue(undoRedoManager.canUndo());
         undoRedoManager.undo();
@@ -58,11 +58,11 @@ class UndoManagerTest {
 
     @Test
     void aNewChangeDiscardsTheRedoBranch() {
-        undoRedoManager.push(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Bohr"));
         undoRedoManager.undo();
         assertTrue(undoRedoManager.canRedo());
 
-        undoRedoManager.push(setAuthor("Planck"));
+        undoRedoManager.addEdit(setAuthor("Planck"));
 
         assertFalse(undoRedoManager.canRedo());
     }
@@ -108,7 +108,7 @@ class UndoManagerTest {
     void pushInsideABlockJoinsIt() {
         undoRedoManager.record("outer", outer -> {
             outer.record(entry.setField(StandardField.AUTHOR, "Bohr"));
-            undoRedoManager.push(setAuthor("Planck"));
+            undoRedoManager.addEdit(setAuthor("Planck"));
         });
 
         undoRedoManager.undo();
@@ -123,7 +123,7 @@ class UndoManagerTest {
     void propertiesFollowTheStacks() {
         assertFalse(undoRedoManager.undoableProperty().get());
 
-        undoRedoManager.push(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Bohr"));
         WaitForAsyncUtils.waitForFxEvents();
         assertTrue(undoRedoManager.undoableProperty().get());
         assertFalse(undoRedoManager.redoableProperty().get());
@@ -136,11 +136,11 @@ class UndoManagerTest {
 
     @Test
     void undoingBackToTheSavedPositionReportsUnchanged() {
-        undoRedoManager.push(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Bohr"));
         undoRedoManager.markUnchanged();
         assertFalse(undoRedoManager.hasChanged());
 
-        undoRedoManager.push(setAuthor("Planck"));
+        undoRedoManager.addEdit(setAuthor("Planck"));
         assertTrue(undoRedoManager.hasChanged());
 
         undoRedoManager.undo();

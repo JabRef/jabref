@@ -15,7 +15,7 @@ import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
@@ -99,7 +99,7 @@ public class SpecialFieldViewModel {
     public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
         Optional<FieldChange> change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());
 
-        change.ifPresent(fieldChange -> undoManager.push(new FieldEdit(fieldChange)));
+        change.ifPresent(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
     public void toggle(BibEntry entry) {

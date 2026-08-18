@@ -5,7 +5,7 @@ import java.util.List;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -43,8 +43,8 @@ public class MoveFieldValueAction extends SimpleCommand {
                     entry.setField(toField, fromFieldValue);
                     entry.setField(fromField, "");
 
-                    edits.addEdit(new FieldEdit(entry, fromField, fromFieldValue, null));
-                    edits.addEdit(new FieldEdit(entry, toField, toFieldValue, fromFieldValue));
+                    edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
+                    edits.addEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
                     affectedEntriesCount++;
                 }
             }

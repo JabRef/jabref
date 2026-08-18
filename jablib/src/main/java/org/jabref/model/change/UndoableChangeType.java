@@ -12,11 +12,11 @@ import org.jspecify.annotations.NullMarked;
 /// The types are held as [EntryType], not as the strings a [org.jabref.model.FieldChange]
 /// would carry, so that undo does not depend on re-parsing a display value.
 @NullMarked
-public record EntryTypeEdit(BibEntry entry, EntryType before, EntryType after) implements BibChange {
+public record UndoableChangeType(BibEntry entry, EntryType before, EntryType after) implements BibChange {
 
     @Override
-    public EntryTypeEdit inverted() {
-        return new EntryTypeEdit(entry, after, before);
+    public UndoableChangeType inverted() {
+        return new UndoableChangeType(entry, after, before);
     }
 
     @Override
@@ -26,7 +26,7 @@ public record EntryTypeEdit(BibEntry entry, EntryType before, EntryType after) i
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof EntryTypeEdit other)
+        return (object instanceof UndoableChangeType other)
                 && ChangeIdentity.same(entry, other.entry)
                 && before.equals(other.before)
                 && after.equals(other.after);

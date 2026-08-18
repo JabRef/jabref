@@ -17,7 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
@@ -93,7 +93,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
                 });
                 if (fieldChange != null && fieldChange.isPresent()) {
-                    namedCompoundEdit.addEdit(new FieldEdit(fieldChange.get()));
+                    namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
@@ -102,7 +102,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             }
         }
         if (foundCount > 0) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.push(namedCompoundEdit.toChangeSet()));
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompoundEdit.toChangeSet()));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

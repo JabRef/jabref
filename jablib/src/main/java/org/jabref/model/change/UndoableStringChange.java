@@ -8,13 +8,13 @@ import org.jspecify.annotations.NullMarked;
 
 /// A change of a BibTeX string's name or content.
 @NullMarked
-public record StringEdit(BibtexString string, Part part, String before, String after) implements BibChange {
+public record UndoableStringChange(BibtexString string, Part part, String before, String after) implements BibChange {
 
     public enum Part { NAME, CONTENT }
 
     @Override
-    public StringEdit inverted() {
-        return new StringEdit(string, part, after, before);
+    public UndoableStringChange inverted() {
+        return new UndoableStringChange(string, part, after, before);
     }
 
     @Override
@@ -29,7 +29,7 @@ public record StringEdit(BibtexString string, Part part, String before, String a
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof StringEdit other)
+        return (object instanceof UndoableStringChange other)
                 && ChangeIdentity.same(string, other.string)
                 && (part == other.part)
                 && before.equals(other.before)

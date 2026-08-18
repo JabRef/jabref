@@ -11,15 +11,15 @@ import org.jspecify.annotations.Nullable;
 
 /// A change of one field of one entry. A `null` value means the field is absent.
 @NullMarked
-public record FieldEdit(BibEntry entry, Field field, @Nullable String before, @Nullable String after) implements BibChange {
+public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String before, @Nullable String after) implements BibChange {
 
-    public FieldEdit(FieldChange change) {
+    public UndoableFieldChange(FieldChange change) {
         this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
     }
 
     @Override
-    public FieldEdit inverted() {
-        return new FieldEdit(entry, field, after, before);
+    public UndoableFieldChange inverted() {
+        return new UndoableFieldChange(entry, field, after, before);
     }
 
     @Override
@@ -33,7 +33,7 @@ public record FieldEdit(BibEntry entry, Field field, @Nullable String before, @N
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof FieldEdit other)
+        return (object instanceof UndoableFieldChange other)
                 && ChangeIdentity.same(entry, other.entry)
                 && field.equals(other.field)
                 && Objects.equals(before, other.before)

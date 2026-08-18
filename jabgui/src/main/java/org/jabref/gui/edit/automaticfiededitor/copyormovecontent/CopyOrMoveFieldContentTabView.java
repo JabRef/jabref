@@ -28,7 +28,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     public Button copyContentButton;
-    private final NamedCompoundEdit compoundEdit;
+    private final NamedCompoundEdit namedCompoundEdit;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -47,10 +47,10 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     private CopyOrMoveFieldContentTabViewModel viewModel;
 
     public CopyOrMoveFieldContentTabView(BibDatabase database,
-                                         NamedCompoundEdit compoundEdit,
+                                         NamedCompoundEdit namedCompoundEdit,
                                          DialogService dialogService,
                                          StateManager stateManager) {
-        this.compoundEdit = compoundEdit;
+        this.namedCompoundEdit = namedCompoundEdit;
         this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
@@ -62,7 +62,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     public void initialize() {
-        viewModel = new CopyOrMoveFieldContentTabViewModel(database, selectedEntries, compoundEdit, dialogService, stateManager);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(database, selectedEntries, namedCompoundEdit, dialogService, stateManager);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());

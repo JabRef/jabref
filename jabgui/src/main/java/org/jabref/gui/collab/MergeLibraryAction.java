@@ -98,7 +98,7 @@ public class MergeLibraryAction extends SimpleCommand {
                .forEach(change -> change.applyChange(compoundEdit));
 
         if (compoundEdit.hasEdits()) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
 
             libraryTabContainer.getLibraryTabs().stream()
                                .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))

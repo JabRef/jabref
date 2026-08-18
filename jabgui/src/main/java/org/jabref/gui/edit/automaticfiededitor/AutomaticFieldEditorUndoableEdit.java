@@ -2,10 +2,10 @@ package org.jabref.gui.edit.automaticfiededitor;
 
 import org.jabref.gui.undo.NamedCompoundEdit;
 
-public class AutomaticFieldEditorChanges extends NamedCompoundEdit {
+public class AutomaticFieldEditorUndoableEdit extends NamedCompoundEdit {
     int affectedEntries;
 
-    public AutomaticFieldEditorChanges(String name) {
+    public AutomaticFieldEditorUndoableEdit(String name) {
         super(name);
         affectedEntries = 0;
     }

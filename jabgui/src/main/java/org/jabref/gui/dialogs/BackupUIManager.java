@@ -99,9 +99,9 @@ public class BackupUIManager {
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
-                undoManager.push(CE.toChangeSet());
+                final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
+                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(compoundEdit));
+                undoManager.addEdit(compoundEdit.toChangeSet());
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same

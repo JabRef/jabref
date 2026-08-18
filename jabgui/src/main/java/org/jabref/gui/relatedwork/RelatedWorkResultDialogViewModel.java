@@ -15,7 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 
 public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
@@ -62,7 +62,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
             switch (insertionResult) {
                 case RelatedWorkInsertionResult.Inserted inserted -> {
                     insertedCount++;
-                    compoundEdit.addEdit(new FieldEdit(inserted.fieldChange()));
+                    compoundEdit.addEdit(new UndoableFieldChange(inserted.fieldChange()));
                 }
                 case RelatedWorkInsertionResult.Unchanged unchanged ->
                         unchangedCount++;
@@ -70,7 +70,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         }
 
         if (compoundEdit.hasEdits()) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
 
         dialogService.notify(Localization.lang(

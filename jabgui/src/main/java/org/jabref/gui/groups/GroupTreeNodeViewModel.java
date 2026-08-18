@@ -159,9 +159,9 @@ public class GroupTreeNodeViewModel {
                 // we removed and added entries
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
             }
-            undoManager.push(undoRemove.toChangeSet());
+            undoManager.addEdit(undoRemove.toChangeSet());
         } else if (!changesAdd.isEmpty()) {
-            undoManager.push(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd).toChangeSet());
+            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd).toChangeSet());
         }
     }
 

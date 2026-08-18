@@ -21,23 +21,23 @@ import org.jspecify.annotations.NullMarked;
 /// the group that happens to be selected, which the listener in `LibraryTab` decides by
 /// looking for [EntriesEventSource#UNDO].
 @NullMarked
-public record EntriesInserted(BibDatabase database, List<BibEntry> entries, EntriesEventSource source) implements BibChange {
+public record UndoableInsertEntries(BibDatabase database, List<BibEntry> entries, EntriesEventSource source) implements BibChange {
 
-    public EntriesInserted {
+    public UndoableInsertEntries {
         entries = List.copyOf(entries);
     }
 
-    public EntriesInserted(BibDatabase database, List<BibEntry> entries) {
+    public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries) {
         this(database, entries, EntriesEventSource.LOCAL);
     }
 
-    public EntriesInserted(BibDatabase database, BibEntry entry) {
+    public UndoableInsertEntries(BibDatabase database, BibEntry entry) {
         this(database, List.of(entry));
     }
 
     @Override
-    public EntriesRemoved inverted() {
-        return new EntriesRemoved(database, entries, source);
+    public UndoableRemoveEntries inverted() {
+        return new UndoableRemoveEntries(database, entries, source);
     }
 
     @Override
@@ -47,7 +47,7 @@ public record EntriesInserted(BibDatabase database, List<BibEntry> entries, Entr
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof EntriesInserted other)
+        return (object instanceof UndoableInsertEntries other)
                 && ChangeIdentity.same(database, other.database)
                 && ChangeIdentity.sameAll(entries, other.entries)
                 && (source == other.source);

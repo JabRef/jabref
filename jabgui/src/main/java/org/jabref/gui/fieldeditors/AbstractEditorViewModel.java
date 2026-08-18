@@ -11,7 +11,7 @@ import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -70,7 +70,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
                         if (!newValue.equals(oldValue)) {
                             entry.setField(field, newValue);
-                            undoManager.push(new FieldEdit(entry, field, oldValue, newValue));
+                            undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }
                     }
                 });

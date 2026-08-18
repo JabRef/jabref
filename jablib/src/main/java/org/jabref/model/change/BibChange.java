@@ -10,7 +10,7 @@ package org.jabref.model.change;
 /// Implementations carry no user-facing text. A description exists only at the granularity a
 /// user acts in, as the name of the enclosing [ChangeSet].
 public sealed interface BibChange
-        permits ChangeSet, EntriesInserted, EntriesRemoved, EntryTypeEdit, FieldEdit, GroupSubtreeReplaced, PreambleEdit, StringEdit, StringInserted, StringRemoved {
+        permits ChangeSet, UndoableInsertEntries, UndoableRemoveEntries, UndoableChangeType, UndoableFieldChange, UndoableModifySubtree, UndoablePreambleChange, UndoableStringChange, UndoableInsertString, UndoableRemoveString {
 
     /// The change that reverses this one.
     ///

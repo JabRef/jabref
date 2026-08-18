@@ -8,11 +8,11 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.change.BibChange;
 import org.jabref.model.change.ChangeSet;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Collects the changes made inside one [UndoScope#record] call.
+/// Collects the changes made inside one [UndoManager#record] call.
 ///
 /// The overloads taking [FieldChange] exist because that is what the model already returns
 /// from `setField`, `putKeywords`, `setCitationKey` and friends, so recording a change is a
@@ -38,7 +38,7 @@ public final class ChangeRecorder {
     }
 
     public void record(FieldChange change) {
-        changes.add(new FieldEdit(change));
+        changes.add(new UndoableFieldChange(change));
     }
 
     public void recordAll(Collection<FieldChange> fieldChanges) {

@@ -16,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 
@@ -73,10 +73,10 @@ public class SpecialFieldAction extends SimpleCommand {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
 
-                change.ifPresent(fieldChange -> compoundEdit.addEdit(new FieldEdit(fieldChange)));
+                change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
             }
             if (compoundEdit.hasEdits()) {
-                undoManager.push(compoundEdit.toChangeSet());
+                undoManager.addEdit(compoundEdit.toChangeSet());
                 tabSupplier.get().markBaseChanged();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {

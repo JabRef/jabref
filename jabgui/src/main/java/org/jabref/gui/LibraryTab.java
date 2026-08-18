@@ -73,9 +73,9 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
-import org.jabref.model.change.EntriesInserted;
-import org.jabref.model.change.EntriesRemoved;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
+import org.jabref.model.change.UndoableInsertEntries;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -486,10 +486,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new FieldEdit(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
         }
         if (compoundEdit.hasEdits()) {
-            getUndoManager().push(compoundEdit.toChangeSet());
+            getUndoManager().addEdit(compoundEdit.toChangeSet());
         }
     }
 
@@ -845,7 +845,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         importHandler.importCleanedEntries(null, entries);
-        getUndoManager().push(new EntriesInserted(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
 
@@ -977,7 +977,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().push(new EntriesRemoved(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
         bibDatabaseContext.getDatabase().removeEntries(entries);
 
         if (mode != StandardActions.CUT) {
@@ -1122,7 +1122,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                (UndoManager) undoManager,
+                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 false);

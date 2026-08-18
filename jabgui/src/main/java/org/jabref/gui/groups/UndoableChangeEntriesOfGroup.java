@@ -5,7 +5,7 @@ import java.util.List;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 
 public class UndoableChangeEntriesOfGroup {
 
@@ -17,7 +17,7 @@ public class UndoableChangeEntriesOfGroup {
         NamedCompoundEdit entryChangeCompound = new NamedCompoundEdit(Localization.lang("change entries of group"));
         for (FieldChange fieldChange : changes) {
             hasEntryChanges = true;
-            entryChangeCompound.addEdit(new FieldEdit(fieldChange));
+            entryChangeCompound.addEdit(new UndoableFieldChange(fieldChange));
         }
         if (hasEntryChanges) {
             return entryChangeCompound;

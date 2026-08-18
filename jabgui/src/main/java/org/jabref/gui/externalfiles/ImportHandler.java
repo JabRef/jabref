@@ -53,7 +53,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
-import org.jabref.model.change.EntriesInserted;
+import org.jabref.model.change.UndoableInsertEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -251,7 +251,7 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.addEdit(new EntriesInserted(targetBibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
 
                     counter++;
                 }
@@ -261,7 +261,7 @@ public class ImportHandler {
                 // entry per file and made the second undo throw.
                 if (compoundEdit.hasEdits()) {
                     // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.push(compoundEdit.toChangeSet()));
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
                 }
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry

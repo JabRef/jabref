@@ -17,7 +17,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -64,7 +64,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 // lambda for gui actions that are relevant when setting the linked file entry when ui is opened
                 String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
-                FieldEdit fieldChange = new FieldEdit(entry, StandardField.FILE, oldVal, newVal);
+                UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                 nc.addEdit(fieldChange); // push to undo manager is in succeeded
 
                 // Wait because there are several rounds in one auto-link operation
@@ -97,7 +97,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 }
 
                 if (nc.hasEdits()) {
-                    undoManager.push(nc.toChangeSet());
+                    undoManager.addEdit(nc.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

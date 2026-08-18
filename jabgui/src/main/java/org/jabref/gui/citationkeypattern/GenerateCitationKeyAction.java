@@ -19,7 +19,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
@@ -128,7 +128,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
                         Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
                         if (fieldChange != null) {
-                            fieldChange.ifPresent(change -> compound.addEdit(new FieldEdit(change)));
+                            fieldChange.ifPresent(change -> compound.addEdit(new UndoableFieldChange(change)));
                         }
                         entriesDone++;
                         int finalEntriesDone = entriesDone;
@@ -145,7 +145,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
                 // register the undo event only if new citation keys were generated
                 if (compound.hasEdits()) {
-                    undoManager.push(compound.toChangeSet());
+                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 tabSupplier.get().markBaseChanged();

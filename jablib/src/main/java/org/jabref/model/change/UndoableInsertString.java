@@ -9,11 +9,11 @@ import org.jspecify.annotations.NullMarked;
 
 /// Insertion of a BibTeX string definition.
 @NullMarked
-public record StringInserted(BibDatabase database, BibtexString string) implements BibChange {
+public record UndoableInsertString(BibDatabase database, BibtexString string) implements BibChange {
 
     @Override
-    public StringRemoved inverted() {
-        return new StringRemoved(database, string);
+    public UndoableRemoveString inverted() {
+        return new UndoableRemoveString(database, string);
     }
 
     @Override
@@ -23,7 +23,7 @@ public record StringInserted(BibDatabase database, BibtexString string) implemen
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof StringInserted other)
+        return (object instanceof UndoableInsertString other)
                 && ChangeIdentity.same(database, other.database)
                 && ChangeIdentity.same(string, other.string);
     }

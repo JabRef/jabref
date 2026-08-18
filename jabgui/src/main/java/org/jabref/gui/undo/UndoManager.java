@@ -44,7 +44,7 @@ public class UndoManager {
     ///
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
-    public void push(BibChange change) {
+    public void addEdit(BibChange change) {
         if (active != null) {
             active.record(change);
             return;
@@ -78,7 +78,7 @@ public class UndoManager {
             return;
         }
         if (enclosing == null) {
-            push(changeSet);
+            addEdit(changeSet);
         } else {
             enclosing.record(changeSet);
         }

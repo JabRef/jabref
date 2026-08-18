@@ -39,7 +39,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     }
 
     public void saveChanges() {
-        undoManager.push(dialogEdits.toChangeSet());
+        undoManager.addEdit(dialogEdits.toChangeSet());
     }
 
     /// The dialog applies its edits as the user works, so cancelling reverts what was

@@ -10,8 +10,8 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.EntryTypeEdit;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableChangeType;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -59,7 +59,7 @@ class UpdateOriginalEntry {
         }
 
         if (edited) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
             dialogService.notify(successMessage);
         } else {
             dialogService.notify(Localization.lang("No information added"));
@@ -75,7 +75,7 @@ class UpdateOriginalEntry {
         }
 
         originalEntry.setType(newType);
-        compoundEdit.addEdit(new EntryTypeEdit(originalEntry, oldType, newType));
+        compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
         return true;
     }
 
@@ -110,7 +110,7 @@ class UpdateOriginalEntry {
 
     private static boolean applyFieldChange(Optional<FieldChange> fieldChange, NamedCompoundEdit compoundEdit) {
         return fieldChange.map(change -> {
-            compoundEdit.addEdit(new FieldEdit(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
             return true;
         }).orElse(false);
     }

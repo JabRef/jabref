@@ -34,19 +34,19 @@ class BibChangeTest {
         BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString("name", "content");
         return Stream.of(
-                new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
-                new FieldEdit(entry, StandardField.YEAR, null, "1905"),
-                new FieldEdit(entry, StandardField.YEAR, "1905", null),
-                new EntryTypeEdit(entry, StandardEntryType.Article, StandardEntryType.Book),
-                new EntriesInserted(database, entry),
-                new EntriesRemoved(database, entry),
-                new PreambleEdit(database, null, "preamble"),
-                new StringInserted(database, string),
-                new StringRemoved(database, string),
-                new StringEdit(string, StringEdit.Part.CONTENT, "content", "other"),
+                new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
+                new UndoableFieldChange(entry, StandardField.YEAR, null, "1905"),
+                new UndoableFieldChange(entry, StandardField.YEAR, "1905", null),
+                new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book),
+                new UndoableInsertEntries(database, entry),
+                new UndoableRemoveEntries(database, entry),
+                new UndoablePreambleChange(database, null, "preamble"),
+                new UndoableInsertString(database, string),
+                new UndoableRemoveString(database, string),
+                new UndoableStringChange(string, UndoableStringChange.Part.CONTENT, "content", "other"),
                 new ChangeSet("group", List.of(
-                        new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
-                        new EntryTypeEdit(entry, StandardEntryType.Article, StandardEntryType.Book))));
+                        new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
+                        new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book))));
     }
 
     @ParameterizedTest
@@ -64,7 +64,7 @@ class BibChangeTest {
     @Test
     void applyingThenUndoingRestoresFieldValue() {
         BibEntry entry = entry();
-        FieldEdit change = new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr");
+        UndoableFieldChange change = new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr");
 
         change.apply();
         assertEquals("Bohr", entry.getField(StandardField.AUTHOR).orElseThrow());
@@ -77,7 +77,7 @@ class BibChangeTest {
     void undoingAnInsertRemovesTheEntryAgain() {
         BibEntry entry = entry();
         BibDatabase database = new BibDatabase();
-        EntriesInserted change = new EntriesInserted(database, entry);
+        UndoableInsertEntries change = new UndoableInsertEntries(database, entry);
 
         change.apply();
         assertEquals(List.of(entry), database.getEntries());
@@ -90,8 +90,8 @@ class BibChangeTest {
     void undoingAGroupRevertsItsChangesInReverseOrder() {
         BibEntry entry = entry();
         ChangeSet changeSet = new ChangeSet("edit", List.of(
-                new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
-                new FieldEdit(entry, StandardField.AUTHOR, "Bohr", "Planck")));
+                new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
+                new UndoableFieldChange(entry, StandardField.AUTHOR, "Bohr", "Planck")));
 
         changeSet.apply();
         assertEquals("Planck", entry.getField(StandardField.AUTHOR).orElseThrow());
@@ -103,7 +103,7 @@ class BibChangeTest {
     @Test
     void undoingATypeChangeRestoresTheExactPreviousType() {
         BibEntry entry = new BibEntry(new UnknownEntryType("customtype"));
-        EntryTypeEdit change = new EntryTypeEdit(entry, entry.getType(), StandardEntryType.Article);
+        UndoableChangeType change = new UndoableChangeType(entry, entry.getType(), StandardEntryType.Article);
 
         change.apply();
         assertEquals(StandardEntryType.Article, entry.getType());
@@ -117,19 +117,19 @@ class BibChangeTest {
     @Test
     void undoingARemovalReinsertsWithTheUndoEventSource() {
         BibDatabase database = new BibDatabase();
-        EntriesRemoved removal = new EntriesRemoved(database, entry());
+        UndoableRemoveEntries removal = new UndoableRemoveEntries(database, entry());
 
-        assertEquals(EntriesEventSource.UNDO, ((EntriesInserted) removal.inverted()).source());
+        assertEquals(EntriesEventSource.UNDO, ((UndoableInsertEntries) removal.inverted()).source());
     }
 
     /// Redoing an insertion is a normal local addition, as it was before the change model.
     @Test
     void redoingAnInsertionKeepsTheLocalEventSource() {
         BibDatabase database = new BibDatabase();
-        EntriesInserted insertion = new EntriesInserted(database, entry());
+        UndoableInsertEntries insertion = new UndoableInsertEntries(database, entry());
 
         assertEquals(EntriesEventSource.LOCAL, insertion.source());
-        assertEquals(EntriesEventSource.LOCAL, ((EntriesInserted) insertion.inverted().inverted()).source());
+        assertEquals(EntriesEventSource.LOCAL, ((UndoableInsertEntries) insertion.inverted().inverted()).source());
     }
 
     /// A record in the undo stack must keep the hash it was created with. BibDatabase hashes
@@ -138,7 +138,7 @@ class BibChangeTest {
     @Test
     void hashIsStableWhileTheDatabaseChanges() {
         BibDatabase database = new BibDatabase();
-        PreambleEdit change = new PreambleEdit(database, null, "preamble");
+        UndoablePreambleChange change = new UndoablePreambleChange(database, null, "preamble");
         int before = change.hashCode();
 
         database.insertEntries(List.of(entry()));
@@ -158,7 +158,7 @@ class BibChangeTest {
         GroupTreeNode before = root.copySubtree();
         root.removeAllChildren();
         root.addChild(group("replacement"));
-        GroupSubtreeReplaced change = new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
+        UndoableModifySubtree change = new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
 
         change.inverted().apply();
         assertEquals(List.of("original"), childNames(root));
@@ -174,7 +174,7 @@ class BibChangeTest {
         GroupTreeNode root = group("root");
         GroupTreeNode before = root.copySubtree();
         root.addChild(group("replacement"));
-        GroupSubtreeReplaced change = new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
+        UndoableModifySubtree change = new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
 
         change.apply();
 
@@ -187,8 +187,8 @@ class BibChangeTest {
 
     @Test
     void changesAgainstDistinctEntriesWithEqualContentAreNotEqual() {
-        FieldEdit onFirst = new FieldEdit(entry(), StandardField.AUTHOR, "Einstein", "Bohr");
-        FieldEdit onSecond = new FieldEdit(entry(), StandardField.AUTHOR, "Einstein", "Bohr");
+        UndoableFieldChange onFirst = new UndoableFieldChange(entry(), StandardField.AUTHOR, "Einstein", "Bohr");
+        UndoableFieldChange onSecond = new UndoableFieldChange(entry(), StandardField.AUTHOR, "Einstein", "Bohr");
 
         assertNotEquals(onFirst, onSecond);
     }

@@ -36,8 +36,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.EntryTypeEdit;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableChangeType;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -292,7 +292,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new FieldEdit(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                 outOfFocusEntry.clearField(fieldName);
             }
         }
@@ -311,17 +311,17 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new FieldEdit(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                 outOfFocusEntry.setField(fieldName, newValue);
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new EntryTypeEdit(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
             outOfFocusEntry.setType(newEntry.getType());
         }
-        undoManager.push(compound.toChangeSet());
+        undoManager.addEdit(compound.toChangeSet());
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {

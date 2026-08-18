@@ -6,7 +6,7 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.GroupSubtreeReplaced;
+import org.jabref.model.change.UndoableModifySubtree;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -22,7 +22,6 @@ public final class GroupChange extends DatabaseChange {
 
     @Override
     public void applyChange(NamedCompoundEdit undoEdit) {
-        GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
@@ -31,8 +30,6 @@ public final class GroupChange extends DatabaseChange {
             return groupTreeNode;
         });
 
-        // Snapshot before and after rather than letting the edit capture the "after" state
-        // lazily on its first undo, which made redo depend on undo having run first.
         GroupTreeNode before = root.copySubtree();
         root.removeAllChildren();
         if (newRoot == null) {
@@ -45,9 +42,9 @@ public final class GroupChange extends DatabaseChange {
                 child.copySubtree().moveTo(root);
             }
         }
+        GroupTreeNode after = root.copySubtree();
 
-        undoEdit.addEdit(
-                new GroupSubtreeReplaced(root, root.getIndexedPathFromRoot(), before, root.copySubtree()));
+        undoEdit.addEdit(new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, after));
     }
 
     public GroupDiff getGroupDiff() {

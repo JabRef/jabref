@@ -22,15 +22,15 @@ import org.jspecify.annotations.NullMarked;
 /// behaviour — `GroupChange` also reassigns the root group, and undoing that was never
 /// supported.
 @NullMarked
-public record GroupSubtreeReplaced(GroupTreeNode root, List<Integer> path, GroupTreeNode before, GroupTreeNode after) implements BibChange {
+public record UndoableModifySubtree(GroupTreeNode root, List<Integer> path, GroupTreeNode before, GroupTreeNode after) implements BibChange {
 
-    public GroupSubtreeReplaced {
+    public UndoableModifySubtree {
         path = List.copyOf(path);
     }
 
     @Override
-    public GroupSubtreeReplaced inverted() {
-        return new GroupSubtreeReplaced(root, path, after, before);
+    public UndoableModifySubtree inverted() {
+        return new UndoableModifySubtree(root, path, after, before);
     }
 
     @Override
@@ -47,7 +47,7 @@ public record GroupSubtreeReplaced(GroupTreeNode root, List<Integer> path, Group
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof GroupSubtreeReplaced other)
+        return (object instanceof UndoableModifySubtree other)
                 && ChangeIdentity.same(root, other.root)
                 && path.equals(other.path)
                 && ChangeIdentity.same(before, other.before)

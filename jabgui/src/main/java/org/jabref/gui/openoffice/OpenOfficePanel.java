@@ -55,7 +55,7 @@ import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -638,11 +638,11 @@ public class OpenOfficePanel {
                     // Generate key
                     new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
                             .generateAndSetKey(entry)
-                            .ifPresent(change -> undoCompound.addEdit(new FieldEdit(change)));
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableFieldChange(change)));
                 }
             }
             // Add all undos
-            undoManager.push(undoCompound.toChangeSet());
+            undoManager.addEdit(undoCompound.toChangeSet());
             // Now every entry has a key
             return true;
         } else {

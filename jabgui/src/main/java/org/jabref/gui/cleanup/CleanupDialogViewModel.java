@@ -29,7 +29,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -173,7 +173,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new FieldEdit(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
         }
 
         failures.addAll(cleaner.getFailures());
@@ -202,7 +202,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         }
 
         if (compoundEdit.hasEdits()) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
 
         if (!failures.isEmpty()) {
@@ -245,7 +245,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         task.updateProgress(count, count);
 
         if (compoundEdit.hasEdits()) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
 
         if (!failures.isEmpty()) {

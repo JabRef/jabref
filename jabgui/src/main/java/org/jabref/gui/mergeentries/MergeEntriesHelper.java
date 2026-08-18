@@ -8,8 +8,8 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.EntryTypeEdit;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableChangeType;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -61,7 +61,7 @@ public final class MergeEntriesHelper {
                                .map(key -> {
                                    LOGGER.debug("Adopting citation key from fetcher: {}", key);
                                    Optional<FieldChange> change = entryFromLibrary.setCitationKey(key);
-                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new FieldEdit(fieldChange)));
+                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
                                    return true;
                                })
                                .orElse(false);
@@ -74,7 +74,7 @@ public final class MergeEntriesHelper {
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
             entryFromLibrary.setType(fetcherType);
-            namedCompoundEdit.addEdit(new EntryTypeEdit(entryFromLibrary, libraryType, fetcherType));
+            namedCompoundEdit.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
             return true;
         }
         return false;
@@ -98,13 +98,13 @@ public final class MergeEntriesHelper {
                 if (!merged.equals(libraryValue.orElse(""))) {
                     LOGGER.debug("Union-merging groups: {} + {} -> {}", libraryValue.orElse(""), fetcherValue.get(), merged);
                     entryFromLibrary.setField(field, merged);
-                    namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), merged));
+                    namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), merged));
                     anyFieldsChanged = true;
                 }
             } else if (fetcherValue.isPresent() && shouldUpdateField(field, fetcherValue.get(), libraryValue)) {
                 LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), fetcherValue.get());
                 entryFromLibrary.setField(field, fetcherValue.get());
-                namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
+                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
                 anyFieldsChanged = true;
             }
         }
@@ -126,7 +126,7 @@ public final class MergeEntriesHelper {
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
                 entryFromLibrary.clearField(field);
-                namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, value.get(), null));
+                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
                 anyFieldsRemoved = true;
             }
         }

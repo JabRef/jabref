@@ -8,8 +8,8 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.EntriesInserted;
-import org.jabref.model.change.EntriesRemoved;
+import org.jabref.model.change.UndoableInsertEntries;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -37,9 +37,9 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         database.removeEntries(entriesToRemove);
 
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-        compoundEdit.addEdit(new EntriesInserted(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
-        compoundEdit.addEdit(new EntriesRemoved(database, entriesToRemove));
+        compoundEdit.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
+        compoundEdit.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
 
-        undoManager.push(compoundEdit.toChangeSet());
+        undoManager.addEdit(compoundEdit.toChangeSet());
     }
 }

@@ -86,8 +86,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.change.EntriesInserted;
-import org.jabref.model.change.EntriesRemoved;
+import org.jabref.model.change.UndoableInsertEntries;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -1049,10 +1049,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             database.insertEntry(mergedEntry);
 
             NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-            compoundEdit.addEdit(new EntriesRemoved(database, mergeResult.originalLeftEntry()));
-            compoundEdit.addEdit(new EntriesInserted(database, mergedEntry));
+            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
 
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

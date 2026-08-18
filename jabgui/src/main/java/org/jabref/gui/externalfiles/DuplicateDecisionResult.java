@@ -7,4 +7,3 @@ public record DuplicateDecisionResult(
         DuplicateResolverDialog.DuplicateResolverResult decision,
         BibEntry mergedEntry) {
 }
-

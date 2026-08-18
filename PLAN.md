@@ -50,7 +50,7 @@ The real defects are elsewhere:
    `undoManager.addEdit(...)`, then `markBaseChanged()`. Four steps, none compiler-enforced.
 3. **A live bug from (2).** `ManageKeywordsViewModel.java:108` builds the compound edit and
    then drops it:
-   `// TODO: bp.getUndoManager().addEdit(compoundEdit);`
+   `// TODO: bp.getUndoManager().addEdit(namedCompoundEdit);`
    Keyword management is silently un-undoable.
 4. **`markBaseChanged()` maintained by hand at 13 sites**, although `CountingUndoManager`
    already tracks `balanceProperty`/`unchangedPoint`/`hasChanged()`.
@@ -156,16 +156,16 @@ improvement rather than a fix. Postponed — see "Postponed" below.
 
 **Postponed, not rejected: converting `FieldChange` itself into a record.** The conversion is
 worth doing — value semantics, free `equals`/`hashCode`/`toString` (the class currently
-hand-writes all three, including a 25-line `equals`), and it would let `FieldEdit` wrap or
+hand-writes all three, including a 25-line `equals`), and it would let `UndoableFieldChange` wrap or
 even replace it rather than duplicate its shape. It is deferred purely on blast radius:
 records generate `entry()`, not `getEntry()`, and `FieldChange` is returned by logic APIs
 throughout jablib, so the rename touches hundreds of otherwise-unrelated call sites and would
 bury the undo change under mechanical noise.
 
 Do it as **its own later PR**, after workstream A2 has settled. It is then a pure mechanical
-rename with no design content, reviewable as such, and `FieldEdit` collapses to a thin
+rename with no design content, reviewable as such, and `UndoableFieldChange` collapses to a thin
 adapter — or disappears entirely if `FieldChange` grows `inverted()`/`applyTo()` directly.
-Until then `FieldEdit` is constructed *from* `FieldChange`. Tracked here so it is not lost.
+Until then `UndoableFieldChange` is constructed *from* `FieldChange`. Tracked here so it is not lost.
 
 ## Target design
 
@@ -240,9 +240,9 @@ element. That single line is the entire correctness argument for compound undo, 
 subsumes `NamedCompoundEdit` including its `hasEdits`/`end()` lifecycle: an empty
 `ChangeSet.changes()` is the `hasEdits` check, and there is no "ended" state to forget.
 
-Permitted members: `FieldEdit`, `EntryTypeEdit`, `EntriesInserted`, `EntriesRemoved`,
-`StringEdit`, `PreambleEdit`, `GroupEdit`, `ChangeSet`. `EntriesInserted.inverted()` returns
-`EntriesRemoved`, so the pairing is checked by the type system, and `sealed` makes a `switch`
+Permitted members: `UndoableFieldChange`, `UndoableChangeType`, `UndoableInsertEntries`, `UndoableRemoveEntries`,
+`UndoableStringChange`, `UndoablePreambleChange`, `GroupEdit`, `ChangeSet`. `EntriesInserted.inverted()` returns
+`UndoableRemoveEntries`, so the pairing is checked by the type system, and `sealed` makes a `switch`
 over changes exhaustive without a `default`.
 
 Failure policy is defined once, on `ChangeSet.applyTo`, instead of per subclass (defect 7).
@@ -354,7 +354,7 @@ undoScope.record(Localization.lang("Set publisher"), recorder -> {
 });
 ```
 
-One scope → one `ChangeSet` holding 500 `FieldEdit`s → one push. Ctrl+Z reverts all 500 in
+One scope → one `ChangeSet` holding 500 `UndoableFieldChange`s → one push. Ctrl+Z reverts all 500 in
 reverse order. Same guarantee `NamedCompoundEdit` gives today, minus its failure modes: no
 `end()` to forget, no `hasEdits()` to check, and no way to build the set and then drop it
 (defect 3).
@@ -384,8 +384,8 @@ today's classes.
 `ManageKeywordsViewModel.java:108` builds a `NamedCompoundEdit` and then discards it:
 
 ```java
-NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-// TODO: bp.getUndoManager().addEdit(compoundEdit);
+NamedCompoundEdit namedCompoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
+// TODO: bp.getUndoManager().addEdit(namedCompoundEdit);
 ```
 
 Push it — guarded by `hasEdits()` like every other call site — and mark the library changed.
@@ -429,8 +429,8 @@ isolation and carries no regression risk.
 
 Every step here is behaviour-preserving (see "Governing constraint"). Order, simplest first:
 
-1. `UndoableKeyChange` → `FieldEdit` with `InternalField.KEY_FIELD`; delete the class.
-2. `UndoableChangeType` → `EntryTypeEdit`; removes the `EntryTypeFactory.parse` string
+1. `UndoableKeyChange` → `UndoableFieldChange` with `InternalField.KEY_FIELD`; delete the class.
+2. `UndoableChangeType` → `UndoableChangeType`; removes the `EntryTypeFactory.parse` string
    round-trip.
 3. `UndoableFieldChange` call sites (the bulk). Includes `AbstractEditorViewModel:74` — which
    **keeps pushing one change per keystroke**, identical to today. Coalescing is postponed.
@@ -516,7 +516,7 @@ As shipped:
    `canUndo()`/`canRedo()` instead of throwing `CannotUndoException` at themselves in order to
    catch it a line later.
 4. Deleted: `AbstractUndoableJabRefEdit`, `BibChangeEdit`, `CountingUndoManager`, `UndoScope`.
-   `AutomaticFieldEditorUndoableEdit` was renamed to `AutomaticFieldEditorChanges`, the last
+   `AutomaticFieldEditorUndoableEdit` was renamed to `AutomaticFieldEditorUndoableEdit`, the last
    name in jabgui referring to the Swing concept.
 5. **`java.desktop` could not be dropped** — see **P13**. `jabgui` no longer references
    `javax.swing` at all, but `ClipBoardManager` uses `java.awt.datatransfer`, which is
@@ -559,7 +559,7 @@ lives on `ChangeSet`.
 ### P3 — Bounded undo stack depth
 
 Cap the stack at N `ChangeSet`s (not N individual changes, so one 500-entry batch costs one
-slot). Bounds the memory retained by `FieldEdit`'s hard `BibEntry` references. A constant, not
+slot). Bounds the memory retained by `UndoableFieldChange`'s hard `BibEntry` references. A constant, not
 a user preference.
 
 ### P4 — Warn when a command's file-system effects are not undoable
@@ -654,7 +654,7 @@ it.
 
 **Related.** `UndoableModifySubtree` (A2 step 6, carried into A3) is the surviving piece of
 this area and covers whole-subtree replacement from external-file changes. Whoever implements
-P10 should look at it first, since a `GroupSubtreeReplaced` record would likely subsume it.
+P10 should look at it first, since a `UndoableModifySubtree` record would likely subsume it.
 
 ### P11 — Adopt `record(...)` inside commands, and delete `NamedCompoundEdit`
 
@@ -686,7 +686,7 @@ undoManager.record(Localization.lang("Manage keywords"), recorder -> {
 The point is not brevity: it is that the build/check/push sequence stops being something a
 command can get wrong. That is the bug PR 0 fixed by hand, and the `ImportHandler` fix was a
 second instance of the same shape. When no call sites remain, `NamedCompoundEdit` and
-`AutomaticFieldEditorChanges` are deleted.
+`AutomaticFieldEditorUndoableEdit` are deleted.
 
 Do it per command, keeping each one's current grouping and granularity — the goal is to make
 the push unforgettable, not to change what lands on the stack.
@@ -776,7 +776,7 @@ the stack untouched, and another asserting an accepted collab change adds exactl
 a genuine product question, deliberately not answered here.
 
 **D8 — Nested scopes: flatten or nest?** Twice reframed. Nesting already happens
-(`EntryChange.applyChange` nests a raw `CompoundEdit` inside the passed `NamedCompoundEdit`),
+(`EntryChange.applyChange` nests a raw `NamedCompoundEdit` inside the passed `NamedCompoundEdit`),
 but the argument for *preserving* nesting was that flattening would lose the inner names shown
 to users — and defect 11 establishes that **no names are shown to anyone**. That constraint is
 gone.

@@ -9,7 +9,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Removal of entries from the library. See [EntriesInserted] on why the entry objects are
+/// Removal of entries from the library. See [UndoableInsertEntries] on why the entry objects are
 /// retained rather than looked up again on undo.
 ///
 /// `reinsertSource` is the event source the inverse change reports when it puts the entries
@@ -17,23 +17,23 @@ import org.jspecify.annotations.NullMarked;
 /// auto-assign them to the currently selected group. Removal itself is always reported as a
 /// local change.
 @NullMarked
-public record EntriesRemoved(BibDatabase database, List<BibEntry> entries, EntriesEventSource reinsertSource) implements BibChange {
+public record UndoableRemoveEntries(BibDatabase database, List<BibEntry> entries, EntriesEventSource reinsertSource) implements BibChange {
 
-    public EntriesRemoved {
+    public UndoableRemoveEntries {
         entries = List.copyOf(entries);
     }
 
-    public EntriesRemoved(BibDatabase database, List<BibEntry> entries) {
+    public UndoableRemoveEntries(BibDatabase database, List<BibEntry> entries) {
         this(database, entries, EntriesEventSource.UNDO);
     }
 
-    public EntriesRemoved(BibDatabase database, BibEntry entry) {
+    public UndoableRemoveEntries(BibDatabase database, BibEntry entry) {
         this(database, List.of(entry));
     }
 
     @Override
-    public EntriesInserted inverted() {
-        return new EntriesInserted(database, entries, reinsertSource);
+    public UndoableInsertEntries inverted() {
+        return new UndoableInsertEntries(database, entries, reinsertSource);
     }
 
     @Override
@@ -43,7 +43,7 @@ public record EntriesRemoved(BibDatabase database, List<BibEntry> entries, Entri
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof EntriesRemoved other)
+        return (object instanceof UndoableRemoveEntries other)
                 && ChangeIdentity.same(database, other.database)
                 && ChangeIdentity.sameAll(entries, other.entries)
                 && (reinsertSource == other.reinsertSource);

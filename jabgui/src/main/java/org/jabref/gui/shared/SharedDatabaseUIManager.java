@@ -33,7 +33,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.change.EntriesRemoved;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -142,7 +142,7 @@ public class SharedDatabaseUIManager {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
 
         if (libraryTab != null) {
-            undoManager.push(new EntriesRemoved(libraryTab.getDatabase(), event.bibEntries()));
+            undoManager.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")

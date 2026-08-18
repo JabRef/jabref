@@ -4,7 +4,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.StringInserted;
+import org.jabref.model.change.UndoableInsertString;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
@@ -27,7 +27,7 @@ public final class BibTexStringAdd extends DatabaseChange {
     public void applyChange(NamedCompoundEdit undoEdit) {
         try {
             databaseContext.getDatabase().addString(addedString);
-            undoEdit.addEdit(new StringInserted(databaseContext.getDatabase(), addedString));
+            undoEdit.addEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));
         } catch (KeyCollisionException ex) {
             LOGGER.warn("Error: could not add string '{}': {}", addedString.getName(), ex.getMessage(), ex);
         }

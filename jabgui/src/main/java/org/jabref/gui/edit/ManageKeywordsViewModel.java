@@ -12,7 +12,7 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.FieldEdit;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
@@ -109,7 +109,7 @@ public class ManageKeywordsViewModel {
 
         NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
         if (compoundEdit.hasEdits()) {
-            undoManager.push(compoundEdit.toChangeSet());
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
     }
 
@@ -127,7 +127,7 @@ public class ManageKeywordsViewModel {
 
             // put keywords back
             Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> compoundEdit.addEdit(new FieldEdit(fieldChange)));
+            change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
         }
         return compoundEdit;
     }

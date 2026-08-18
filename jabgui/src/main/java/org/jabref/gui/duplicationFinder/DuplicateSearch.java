@@ -31,8 +31,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.change.EntriesInserted;
-import org.jabref.model.change.EntriesRemoved;
+import org.jabref.model.change.UndoableInsertEntries;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -224,13 +224,13 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new EntriesRemoved(libraryTab.getDatabase(), result.getToRemove()));
+            compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
             libraryTab.getDatabase().removeEntries(result.getToRemove());
             libraryTab.markBaseChanged();
         }
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
-            compoundEdit.addEdit(new EntriesInserted(libraryTab.getDatabase(), result.getToAdd()));
+            compoundEdit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
             libraryTab.getDatabase().insertEntries(result.getToAdd());
             libraryTab.markBaseChanged();
         }
@@ -239,7 +239,7 @@ public class DuplicateSearch extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-        libraryTab.getUndoManager().push(compoundEdit.toChangeSet());
+        libraryTab.getUndoManager().addEdit(compoundEdit.toChangeSet());
     }
 
     /// Result of a duplicate search.

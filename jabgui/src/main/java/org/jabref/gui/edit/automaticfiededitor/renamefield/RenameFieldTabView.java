@@ -27,7 +27,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
-    private final NamedCompoundEdit compoundEdit;
+    private final NamedCompoundEdit namedCompoundEdit;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -42,10 +42,10 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     private RenameFieldViewModel viewModel;
 
     public RenameFieldTabView(BibDatabase database,
-                              NamedCompoundEdit compoundEdit,
+                              NamedCompoundEdit namedCompoundEdit,
                               DialogService dialogService,
                               StateManager stateManager) {
-        this.compoundEdit = compoundEdit;
+        this.namedCompoundEdit = namedCompoundEdit;
         this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
@@ -58,7 +58,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
     @FXML
     public void initialize() {
-        viewModel = new RenameFieldViewModel(selectedEntries, database, compoundEdit, dialogService, stateManager);
+        viewModel = new RenameFieldViewModel(selectedEntries, database, namedCompoundEdit, dialogService, stateManager);
 
         fieldComboBox.getItems().setAll(FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields()));
 
