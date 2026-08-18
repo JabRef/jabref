@@ -9,9 +9,9 @@ Status: proposal for review. Nothing implemented. Branch `fix-undoredo`.
 | **PR 0** | Fix dropped keyword edit (defect 3) | yes — keyword edits become undoable | nothing |
 | **A1** | New change model + manager + bridge, ~12 new files | no | D4, D5, D6, D8 |
 | **A2** | Migrate commands to `UndoScope`, one PR each | no | A1 |
-| **A3** | Delete `javax.swing.undo`, plain-text descriptions | no (l10n review needed) | A2 complete |
+| **A3** | Fold recording into the manager, delete `javax.swing.undo` | no | A2 complete |
 | **C** | `progressProperty()` null, misc | no | nothing |
-| **P1–P10** | Behaviour changes, one PR each | yes | mostly A2 |
+| **P1–P12** | Behaviour changes and follow-ups, one PR each | yes | mostly A2/A3 |
 
 PR 0 goes first and is the first commit on this branch. Everything in workstream A is a pure
 refactor; everything user-visible lives in "Postponed". Where a decision is open, the answer
@@ -452,26 +452,66 @@ where the Swing removal forces the question anyway.
 `FieldRowViewModel` also extends `AbstractUndoableEdit` directly, via an inner
 `MergeFieldsUndo` class, and needs its own look at A3.
 
+### The seam today
+
+Three layers, with Swing confined to the middle one:
+
+- **Values** — `org.jabref.model.change` in jablib. Nine records behind a sealed `BibChange`.
+  No Swing, no JavaFX, no `Localization`. `apply()` plus `inverted()`; undo is
+  `inverted().apply()`.
+- **Adapters** — `org.jabref.gui.undo`, and this *is* the seam. Exactly two classes extend
+  `AbstractUndoableJabRefEdit` (which extends `javax.swing.undo.AbstractUndoableEdit`):
+  `BibChangeEdit`, wrapping one change, and `NamedCompoundEdit`, holding a `List<BibChange>`
+  that it folds into a `ChangeSet` on undo/redo. Nothing else extends it.
+- **Swing** — `CountingUndoManager extends javax.swing.undo.UndoManager`, plus `UndoAction`
+  and `RedoAction`.
+
+`UndoScope` sits above the seam: `push` wraps a change in `BibChangeEdit` and hands it to the
+manager.
+
+**Why the change model stays in jablib.** Moving it into `org.jabref.gui.undo` would save one
+import line in ~40 files and nothing else — the cost of this work is constructor threading,
+not imports. It would also give up the placement that lets jabkit and jabsrv reuse the model
+(defect 6, P8) and would put pure model values back inside a GUI package. The seam is in the
+right place; it was the *handle* that was threaded badly.
+
 ### Phase A3 — remove Swing
 
-Once no `Undoable*` remain:
+**Superseded approach.** A3 originally assumed commands would be migrated to `UndoScope`
+first, and an attempt at that was reverted. `UndoScope` is a *second* handle threaded
+alongside `UndoManager`, which is already passed down roughly six constructor layers and
+appears in ~160 references. Adding a parallel type doubles the plumbing: a mechanical sweep
+converted 95 files and still left 47 errors in three distinct shapes — converted callers
+handing `UndoScope` to classes that legitimately still need the manager (`UndoAction`,
+`RedoAction`, anything calling `canUndo`/`hasChanged`), unconverted callers handing a manager
+to converted classes, and rewrite-rule leftovers. Nothing of it was kept.
 
-- Resolve `UndoableModifySubtree` (carried over from A2 step 6) and the `MergeFieldsUndo`
-  inner class in `FieldRowViewModel`. Both extend the Swing edit classes directly, so neither
-  can outlive this phase.
-- `UndoRedoManager` replaces `CountingUndoManager`.
-- `UndoAction` and `RedoAction` rebind to the new properties.
-- `AbstractUndoableJabRefEdit`, `NamedCompoundEdit`, `BibChangeEdit` are deleted.
-- `java.desktop` leaves jabgui's module graph.
-- The presentation-name mechanism goes away entirely (defect 11): 13 `getPresentationName()`
-  implementations, the `<html>`/`<ul><li>` wrappers and the `StringUtil.boldHTML` calls in
-  them. This is deletion of dead code, not a rewrite — the new design has no per-change text.
-- **Requires an l10n review.** The l10n keys those methods used ("change field %0 of entry %1
-  from %2 to %3", "insert entry %0", "change key from %0 to %1", …) become unreferenced and
-  should be retired in Crowdin. Verify key-by-key before removing: this plan checked four of
-  them and found no other users, not all of them.
+**Current approach: fold the recording API into the manager.** `UndoRedoManager` gains
+`push(BibChange)` and `record(name, recorder -> ...)` as methods, and `UndoScope` disappears
+into it. There is then one handle, threaded exactly where `UndoManager` already goes, and the
+type swap that removes Swing is the same edit that introduces the recording API — one
+mechanical rename rather than two.
 
-Two production files touched (`UndoAction`, `RedoAction`) plus deletions.
+Steps, in order:
+
+1. Add `push`/`record` to a new `UndoRedoManager` (JavaFX properties, `Deque<BibChange>`, no
+   Swing), keeping `CountingUndoManager` in place.
+2. Replace the declared type at its ~160 references, `javax.swing.undo.UndoManager` →
+   `UndoRedoManager`. Mechanical, one type, compiler-verified.
+3. Rebind `UndoAction` and `RedoAction` to the new properties. `CountingUndoManager` already
+   maintains `undoableProperty`/`redoableProperty`, so this is a swap, not new behaviour.
+4. Delete `AbstractUndoableJabRefEdit`, `BibChangeEdit`, `NamedCompoundEdit` and `UndoScope`.
+   The first three are the whole seam; the fourth is absorbed by step 1.
+5. Drop `java.desktop` from jabgui's module graph.
+
+Only after that does adopting `record(...)` inside individual commands become worthwhile — see
+**P11**, which is where the "cannot forget to push" benefit actually lands.
+
+The presentation-name mechanism (defect 11) is already gone: every `getPresentationName()`
+implementation was deleted with its `Undoable*` class during A2, and the 16 l10n keys they
+used were retired as each step made them unreferenced. `LocalizationConsistencyTest` catches
+these one step at a time, so no separate l10n sweep is needed — but Crowdin still has to see
+the removals.
 
 Workstream A ends at A3. Extending the change model to jabkit and jabsrv was formerly phase
 A4 and is now **P8** under "Postponed" — a capability addition rather than a refactor. Nothing
@@ -598,6 +638,40 @@ it.
 **Related.** `UndoableModifySubtree` (A2 step 6, carried into A3) is the surviving piece of
 this area and covers whole-subtree replacement from external-file changes. Whoever implements
 P10 should look at it first, since a `GroupSubtreeReplaced` record would likely subsume it.
+
+### P11 — Adopt `record(...)` inside commands
+
+The point of a recording block is that a command cannot collect changes and then forget to
+push them, which is the bug class PR 0 fixed by hand. That benefit only arrives when command
+bodies actually use it:
+
+```java
+undoManager.record(Localization.lang("Manage keywords"), recorder -> {
+    for (BibEntry entry : entries) {
+        recorder.record(entry.putKeywords(keywords, separator));
+    }
+});
+```
+
+Blocked on A3, and deliberately so: after A3 the manager already carries `record`, so adopting
+it threads nothing new. Attempting it before A3 means threading a second handle through the
+whole GUI construction tree, which is what failed.
+
+Roughly 28 commands build a compound by hand today. Each is a small, individually reviewable
+rewrite, and each should keep its current grouping and granularity — the point is to make the
+push unforgettable, not to change what lands on the stack.
+
+### P12 — The undo handle is threaded through the whole GUI tree
+
+Not an undo problem, but this work exposed it. `UndoManager` reaches leaf view models through
+roughly six layers of pass-through constructor parameters and appears in ~160 references;
+`FieldEditors` alone forwards it to every editor view model. Any future service that leaf
+components need will pay the same tax.
+
+A `LibraryTab`-scoped context object, or letting afterburner `@Inject` reach the leaves (the
+undo handle is already registered with the injector), would collapse most of it. That is a
+change to how jabgui wires dependencies and is far outside undo — recorded because this work
+is what made the cost measurable.
 
 ## Workstream C — independent micro-fixes
 
