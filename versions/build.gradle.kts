@@ -28,12 +28,12 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.19.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.1"))
+    api(platform("tools.jackson:jackson-bom:3.2.2"))
 }
 
 dependencies.constraints {
@@ -47,9 +47,9 @@ dependencies.constraints {
     api("org.openjfx:jfx-incubator-input:$javafx")
     api("org.openjfx:jfx-incubator-richtext:$javafx")
 
-    api("cc.jilt:jilt:1.9.1")
+    api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.0")
+    api("com.dlsc.gemsfx:gemsfx:4.4.1")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -89,7 +89,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.191")
+    api("io.github.classgraph:classgraph:4.8.192")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
