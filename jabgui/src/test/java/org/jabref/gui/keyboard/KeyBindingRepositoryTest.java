@@ -3,6 +3,7 @@ package org.jabref.gui.keyboard;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,5 +34,15 @@ class KeyBindingRepositoryTest {
 
         assertEquals(keyBindingRepository.get(bindNames.getFirst()), bindings.getFirst());
         assertEquals(keyBindingRepository.get(bindNames.get(1)), bindings.get(1));
+    }
+
+    @Test
+    void lookupDocIdentifierDefaultAvoidsBareAltF() {
+        assertEquals("shortcut+alt+F", KeyBinding.LOOKUP_DOC_IDENTIFIER.getDefaultKeyBinding());
+    }
+
+    @Test
+    void focusGroupListDefaultAvoidsBareAltS() {
+        assertEquals("shortcut+alt+G", KeyBinding.FOCUS_GROUP_LIST.getDefaultKeyBinding());
     }
 }
