@@ -25,7 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -279,7 +279,7 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
+        ChangeRecorder compound = new ChangeRecorder(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
         newEntry.getCitationKey()
                 .ifPresentOrElse(
@@ -292,7 +292,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.record(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                 outOfFocusEntry.clearField(fieldName);
             }
         }
@@ -311,14 +311,14 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.record(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                 outOfFocusEntry.setField(fieldName, newValue);
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.record(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
             outOfFocusEntry.setType(newEntry.getType());
         }
         undoManager.addEdit(compound.toChangeSet());

@@ -18,7 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -45,7 +45,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     public EditFieldContentViewModel(BibDatabase database,
                                      List<BibEntry> selectedEntries,
-                                     NamedCompoundEdit compoundEdit,
+                                     ChangeRecorder compoundEdit,
                                      DialogService dialogService,
                                      StateManager stateManager) {
         super(database, compoundEdit, dialogService, stateManager);
@@ -82,7 +82,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.record(new UndoableFieldChange(fieldChange)));
                 fieldValue.set("");
                 // TODO: increment affected entries only when the field change is present
                 affectedEntriesCount++;
@@ -104,7 +104,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.record(new UndoableFieldChange(fieldChange)));
 
                 fieldValue.set("");
                 affectedEntriesCount++;

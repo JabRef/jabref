@@ -1,8 +1,8 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 
-public class AutomaticFieldEditorUndoableEdit extends NamedCompoundEdit {
+public class AutomaticFieldEditorUndoableEdit extends ChangeRecorder {
     int affectedEntries;
 
     public AutomaticFieldEditorUndoableEdit(String name) {

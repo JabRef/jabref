@@ -14,7 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -29,7 +29,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
     public Button setValueButton;
-    private final NamedCompoundEdit namedCompoundEdit;
+    private final ChangeRecorder namedCompoundEdit;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -46,7 +46,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private EditFieldContentViewModel viewModel;
 
     public EditFieldContentTabView(BibDatabase database,
-                                   NamedCompoundEdit namedCompoundEdit,
+                                   ChangeRecorder namedCompoundEdit,
                                    DialogService dialogService,
                                    StateManager stateManager) {
         this.namedCompoundEdit = namedCompoundEdit;

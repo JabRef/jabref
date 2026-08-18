@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
@@ -23,7 +23,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEntryMergeTask.class);
 
-    private final NamedCompoundEdit compoundEdit;
+    private final ChangeRecorder compoundEdit;
     private final List<BibEntry> entries;
     private final MergingIdBasedFetcher fetcher;
     private final UndoManager undoManager;
@@ -44,7 +44,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         this.notificationService = notificationService;
         this.keywordSeparator = keywordSeparator;
 
-        this.compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
+        this.compoundEdit = new ChangeRecorder(Localization.lang("Merge entries"));
         this.processedEntries = 0;
         this.successfulUpdates = 0;
 

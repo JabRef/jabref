@@ -45,7 +45,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -484,11 +484,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
+        ChangeRecorder compoundEdit = new ChangeRecorder(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
+            compoundEdit.record(new UndoableFieldChange(change));
         }
-        if (compoundEdit.hasEdits()) {
+        if (compoundEdit.hasChanges()) {
             getUndoManager().addEdit(compoundEdit.toChangeSet());
         }
     }

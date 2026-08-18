@@ -11,7 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -57,7 +57,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
-        final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang("Automatically set file links"));
+        final ChangeRecorder nc = new ChangeRecorder(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -65,7 +65,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+                nc.record(fieldChange); // push to undo manager is in succeeded
 
                 // Wait because there are several rounds in one auto-link operation
                 // The later round depends on the updated bibEntry of the previous round
@@ -96,7 +96,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     return;
                 }
 
-                if (nc.hasEdits()) {
+                if (nc.hasChanges()) {
                     undoManager.addEdit(nc.toChangeSet());
                 }
 

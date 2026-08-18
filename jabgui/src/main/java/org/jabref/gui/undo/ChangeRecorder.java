@@ -12,18 +12,24 @@ import org.jabref.model.change.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Collects the changes made inside one [UndoManager#record] call.
+/// Collects the changes of one user action so they undo as one step.
+///
+/// Usually obtained from [UndoManager#record], which owns the recorder's lifetime and pushes
+/// what it collected. Constructing one directly is for the commands that cannot use a block:
+/// those that collect on a background thread and push on the JavaFX thread, or that abandon
+/// the operation part-way through. Those hand [UndoManager#addEdit] the result of
+/// [#toChangeSet] themselves.
 ///
 /// The overloads taking [FieldChange] exist because that is what the model already returns
 /// from `setField`, `putKeywords`, `setCitationKey` and friends, so recording a change is a
 /// matter of handing the return value over rather than restating it.
 @NullMarked
-public final class ChangeRecorder {
+public class ChangeRecorder {
 
     private final String name;
     private final List<BibChange> changes = new ArrayList<>();
 
-    ChangeRecorder(String name) {
+    public ChangeRecorder(String name) {
         this.name = name;
     }
 
@@ -41,11 +47,23 @@ public final class ChangeRecorder {
         changes.add(new UndoableFieldChange(change));
     }
 
+    /// Folds another recorder in as a nested change, so one user action stays one undo step
+    /// even when a command delegates its collecting.
+    public void record(ChangeRecorder nested) {
+        if (nested.hasChanges()) {
+            changes.add(nested.toChangeSet());
+        }
+    }
+
     public void recordAll(Collection<FieldChange> fieldChanges) {
         fieldChanges.forEach(this::record);
     }
 
-    ChangeSet toChangeSet() {
+    public boolean hasChanges() {
+        return !changes.isEmpty();
+    }
+
+    public ChangeSet toChangeSet() {
         return new ChangeSet(name, changes);
     }
 }

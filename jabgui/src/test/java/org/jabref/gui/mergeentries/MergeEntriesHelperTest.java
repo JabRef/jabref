@@ -1,6 +1,6 @@
 package org.jabref.gui.mergeentries;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -15,11 +15,11 @@ class MergeEntriesHelperTest {
 
     private static final char KEYWORD_SEPARATOR = ',';
 
-    private NamedCompoundEdit compoundEdit;
+    private ChangeRecorder compoundEdit;
 
     @BeforeEach
     void setup() {
-        compoundEdit = new NamedCompoundEdit("test");
+        compoundEdit = new ChangeRecorder("test");
     }
 
     @Test

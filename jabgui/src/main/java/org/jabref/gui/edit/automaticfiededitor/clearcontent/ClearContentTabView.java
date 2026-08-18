@@ -14,7 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -30,13 +30,13 @@ public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView imp
     private final List<BibEntry> selectedEntries;
     @NonNull private final StateManager stateManager;
     private final BibDatabase database;
-    private final NamedCompoundEdit namedCompoundEdit;
+    private final ChangeRecorder namedCompoundEdit;
     private final DialogService dialogService;
     @FXML private ComboBox<Field> fieldComboBox;
     @FXML private Button clearButton;
     private ClearContentViewModel viewModel;
 
-    public ClearContentTabView(BibDatabase database, NamedCompoundEdit namedCompoundEdit, DialogService dialogService, StateManager stateManager) {
+    public ClearContentTabView(BibDatabase database, ChangeRecorder namedCompoundEdit, DialogService dialogService, StateManager stateManager) {
         this.database = database;
         this.namedCompoundEdit = namedCompoundEdit;
         this.dialogService = dialogService;

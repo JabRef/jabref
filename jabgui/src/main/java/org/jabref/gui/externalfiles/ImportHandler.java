@@ -24,7 +24,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -160,7 +160,7 @@ public class ImportHandler {
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
-                NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Import entries"));
+                ChangeRecorder compoundEdit = new ChangeRecorder(Localization.lang("Import entries"));
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -251,7 +251,7 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.record(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
 
                     counter++;
                 }
@@ -259,7 +259,7 @@ public class ImportHandler {
                 // The whole import is one undo step, so this is pushed once, after the loop.
                 // Pushing inside it added the same compound once per file, which left one stack
                 // entry per file and made the second undo throw.
-                if (compoundEdit.hasEdits()) {
+                if (compoundEdit.hasChanges()) {
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
                 }
@@ -523,7 +523,7 @@ public class ImportHandler {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {
-                //    compoundEdit.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                //    compoundEdit.record(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
                 //            undo));
                 // }
             }
