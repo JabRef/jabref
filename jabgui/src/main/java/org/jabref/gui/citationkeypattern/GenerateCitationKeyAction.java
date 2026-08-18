@@ -12,7 +12,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -130,7 +129,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
                         Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
                         if (fieldChange != null) {
-                            fieldChange.ifPresent(change -> compound.addEdit(new BibChangeEdit(new FieldEdit(change))));
+                            fieldChange.ifPresent(change -> compound.addEdit(new FieldEdit(change)));
                         }
                         entriesDone++;
                         int finalEntriesDone = entriesDone;
@@ -139,7 +138,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
                         });
                     }
-                    compound.end();
                 });
                 return null;
             }

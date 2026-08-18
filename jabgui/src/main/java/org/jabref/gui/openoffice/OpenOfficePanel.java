@@ -36,7 +36,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -640,10 +639,9 @@ public class OpenOfficePanel {
                     // Generate key
                     new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
                             .generateAndSetKey(entry)
-                            .ifPresent(change -> undoCompound.addEdit(new BibChangeEdit(new FieldEdit(change))));
+                            .ifPresent(change -> undoCompound.addEdit(new FieldEdit(change)));
                 }
             }
-            undoCompound.end();
             // Add all undos
             undoManager.addEdit(undoCompound);
             // Now every entry has a key

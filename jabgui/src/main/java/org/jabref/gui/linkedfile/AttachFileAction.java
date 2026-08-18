@@ -86,8 +86,8 @@ public class AttachFileAction extends SimpleCommand {
                          .ifPresent(editedLinkedFile -> {
                              Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
                              fieldChange.ifPresent(change -> {
-                                 BibChangeEdit compoundEdit = new BibChangeEdit(new FieldEdit(change));
-                                 libraryTab.getUndoManager().addEdit(compoundEdit);
+                                 FieldEdit fieldEdit = new FieldEdit(change);
+                                 libraryTab.getUndoManager().addEdit(new BibChangeEdit(fieldEdit));
                                  libraryTab.markBaseChanged();
                              });
                          });

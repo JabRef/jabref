@@ -489,9 +489,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(change)));
+            compoundEdit.addEdit(new FieldEdit(change));
         }
-        compoundEdit.end();
         if (compoundEdit.hasEdits()) {
             getUndoManager().addEdit(compoundEdit);
         }

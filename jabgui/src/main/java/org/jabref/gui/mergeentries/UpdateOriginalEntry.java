@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -61,7 +60,6 @@ class UpdateOriginalEntry {
         }
 
         if (edited) {
-            compoundEdit.end();
             undoManager.addEdit(compoundEdit);
             dialogService.notify(successMessage);
         } else {
@@ -78,7 +76,7 @@ class UpdateOriginalEntry {
         }
 
         originalEntry.setType(newType);
-        compoundEdit.addEdit(new BibChangeEdit(new EntryTypeEdit(originalEntry, oldType, newType)));
+        compoundEdit.addEdit(new EntryTypeEdit(originalEntry, oldType, newType));
         return true;
     }
 
@@ -113,7 +111,7 @@ class UpdateOriginalEntry {
 
     private static boolean applyFieldChange(Optional<FieldChange> fieldChange, NamedCompoundEdit compoundEdit) {
         return fieldChange.map(change -> {
-            compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(change)));
+            compoundEdit.addEdit(new FieldEdit(change));
             return true;
         }).orElse(false);
     }

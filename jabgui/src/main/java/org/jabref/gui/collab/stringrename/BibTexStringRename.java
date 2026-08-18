@@ -2,7 +2,6 @@ package org.jabref.gui.collab.stringrename;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.StringEdit;
@@ -36,7 +35,7 @@ public final class BibTexStringRename extends DatabaseChange {
         String currentName = oldString.getName();
         String newName = newString.getName();
         oldString.setName(newName);
-        undoEdit.addEdit(new BibChangeEdit(new StringEdit(oldString, StringEdit.Part.NAME, currentName, newName)));
+        undoEdit.addEdit(new StringEdit(oldString, StringEdit.Part.NAME, currentName, newName));
     }
 
     public BibtexString getOldString() {

@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
@@ -64,7 +63,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
             switch (insertionResult) {
                 case RelatedWorkInsertionResult.Inserted inserted -> {
                     insertedCount++;
-                    compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(inserted.fieldChange())));
+                    compoundEdit.addEdit(new FieldEdit(inserted.fieldChange()));
                 }
                 case RelatedWorkInsertionResult.Unchanged unchanged ->
                         unchangedCount++;

@@ -112,10 +112,6 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
                     false).executeAndGetAffectedEntriesCount();
 
             edits.setAffectedEntries(affectedEntriesCount);
-
-            if (edits.hasEdits()) {
-                edits.end();
-            }
         }
 
         addEdit(edits);

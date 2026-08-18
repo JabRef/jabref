@@ -102,7 +102,6 @@ public class BackupUIManager {
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
                 final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
-                CE.end();
                 undoManager.addEdit(CE);
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {

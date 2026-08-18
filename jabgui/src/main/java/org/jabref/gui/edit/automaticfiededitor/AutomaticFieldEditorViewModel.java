@@ -40,12 +40,10 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     }
 
     public void saveChanges() {
-        dialogEdits.end();
         undoManager.addEdit(dialogEdits);
     }
 
     public void cancelChanges() {
-        dialogEdits.end();
         dialogEdits.undo();
     }
 }

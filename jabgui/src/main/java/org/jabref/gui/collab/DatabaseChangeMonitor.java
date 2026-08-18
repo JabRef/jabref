@@ -95,7 +95,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 changes.stream()
                        .filter(DatabaseChange::isAccepted)
                        .forEach(change -> change.applyChange(compoundEdit));
-                compoundEdit.end();
                 undoManager.addEdit(compoundEdit);
 
                 if (areAllChangesResolved.get()) {

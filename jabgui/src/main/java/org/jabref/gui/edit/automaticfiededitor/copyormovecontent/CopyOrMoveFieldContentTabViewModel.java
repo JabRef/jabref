@@ -15,7 +15,6 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.change.FieldEdit;
@@ -118,19 +117,15 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
-                    copyFieldValueEdit.addEdit(new BibChangeEdit(new FieldEdit(entry,
+                    copyFieldValueEdit.addEdit(new FieldEdit(entry,
                             toField.get(),
                             toFieldValue,
-                            fromFieldValue)));
+                            fromFieldValue));
                     affectedEntriesCount++;
                 }
             }
         }
         copyFieldValueEdit.setAffectedEntries(affectedEntriesCount);
-
-        if (copyFieldValueEdit.hasEdits()) {
-            copyFieldValueEdit.end();
-        }
 
         addEdit(copyFieldValueEdit);
     }
@@ -143,10 +138,6 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                     toField.get(),
                     selectedEntries,
                     moveEdit).executeAndGetAffectedEntriesCount();
-
-            if (moveEdit.hasEdits()) {
-                moveEdit.end();
-            }
         }
         moveEdit.setAffectedEntries(affectedEntriesCount);
 
@@ -164,27 +155,23 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 entry.setField(toField.get(), fromFieldValue);
                 entry.setField(fromField.get(), toFieldValue);
 
-                swapFieldValuesEdit.addEdit(new BibChangeEdit(new FieldEdit(
+                swapFieldValuesEdit.addEdit(new FieldEdit(
                         entry,
                         toField.get(),
                         toFieldValue,
                         fromFieldValue
-                )));
+                ));
 
-                swapFieldValuesEdit.addEdit(new BibChangeEdit(new FieldEdit(
+                swapFieldValuesEdit.addEdit(new FieldEdit(
                         entry,
                         fromField.get(),
                         fromFieldValue,
                         toFieldValue
-                )));
+                ));
                 affectedEntriesCount++;
             }
         }
         swapFieldValuesEdit.setAffectedEntries(affectedEntriesCount);
-
-        if (swapFieldValuesEdit.hasEdits()) {
-            swapFieldValuesEdit.end();
-        }
 
         addEdit(swapFieldValuesEdit);
     }

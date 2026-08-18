@@ -2,7 +2,6 @@ package org.jabref.gui.collab.entrydelete;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.EntriesRemoved;
@@ -23,7 +22,7 @@ public final class EntryDelete extends DatabaseChange {
     @Override
     public void applyChange(NamedCompoundEdit undoEdit) {
         databaseContext.getDatabase().removeEntry(deletedEntry);
-        undoEdit.addEdit(new BibChangeEdit(new EntriesRemoved(databaseContext.getDatabase(), deletedEntry)));
+        undoEdit.addEdit(new EntriesRemoved(databaseContext.getDatabase(), deletedEntry));
     }
 
     public BibEntry getDeletedEntry() {

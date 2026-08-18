@@ -11,7 +11,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
@@ -42,15 +41,11 @@ public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewMo
             Optional<String> oldFieldValue = entry.getField(field);
             if (oldFieldValue.isPresent()) {
                 entry.clearField(field)
-                     .ifPresent(change -> edits.addEdit(new BibChangeEdit(new FieldEdit(change))));
+                     .ifPresent(change -> edits.addEdit(new FieldEdit(change)));
                 affectedEntriesCount++;
             }
         }
         edits.setAffectedEntries(affectedEntriesCount);
-
-        if (edits.hasEdits()) {
-            edits.end();
-        }
 
         addEdit(edits);
     }

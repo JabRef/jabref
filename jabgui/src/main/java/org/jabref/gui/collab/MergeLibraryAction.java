@@ -96,7 +96,6 @@ public class MergeLibraryAction extends SimpleCommand {
         changes.stream()
                .filter(DatabaseChange::isAccepted)
                .forEach(change -> change.applyChange(compoundEdit));
-        compoundEdit.end();
 
         if (compoundEdit.hasEdits()) {
             undoManager.addEdit(compoundEdit);

@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
@@ -62,7 +61,7 @@ public final class MergeEntriesHelper {
                                .map(key -> {
                                    LOGGER.debug("Adopting citation key from fetcher: {}", key);
                                    Optional<FieldChange> change = entryFromLibrary.setCitationKey(key);
-                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
+                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new FieldEdit(fieldChange)));
                                    return true;
                                })
                                .orElse(false);
@@ -75,7 +74,7 @@ public final class MergeEntriesHelper {
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
             entryFromLibrary.setType(fetcherType);
-            namedCompoundEdit.addEdit(new BibChangeEdit(new EntryTypeEdit(entryFromLibrary, libraryType, fetcherType)));
+            namedCompoundEdit.addEdit(new EntryTypeEdit(entryFromLibrary, libraryType, fetcherType));
             return true;
         }
         return false;
@@ -99,13 +98,13 @@ public final class MergeEntriesHelper {
                 if (!merged.equals(libraryValue.orElse(""))) {
                     LOGGER.debug("Union-merging groups: {} + {} -> {}", libraryValue.orElse(""), fetcherValue.get(), merged);
                     entryFromLibrary.setField(field, merged);
-                    namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), merged)));
+                    namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), merged));
                     anyFieldsChanged = true;
                 }
             } else if (fetcherValue.isPresent() && shouldUpdateField(field, fetcherValue.get(), libraryValue)) {
                 LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), fetcherValue.get());
                 entryFromLibrary.setField(field, fetcherValue.get());
-                namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get())));
+                namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
                 anyFieldsChanged = true;
             }
         }
@@ -127,7 +126,7 @@ public final class MergeEntriesHelper {
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
                 entryFromLibrary.clearField(field);
-                namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, value.get(), null)));
+                namedCompoundEdit.addEdit(new FieldEdit(entryFromLibrary, field, value.get(), null));
                 anyFieldsRemoved = true;
             }
         }

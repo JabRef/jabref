@@ -2,7 +2,6 @@ package org.jabref.gui.collab.stringchange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.StringEdit;
@@ -31,7 +30,7 @@ public final class BibTexStringChange extends DatabaseChange {
         String oldContent = oldString.getContent();
         String newContent = newString.getContent();
         oldString.setContent(newContent);
-        undoEdit.addEdit(new BibChangeEdit(new StringEdit(oldString, StringEdit.Part.CONTENT, oldContent, newContent)));
+        undoEdit.addEdit(new StringEdit(oldString, StringEdit.Part.CONTENT, oldContent, newContent));
     }
 
     public BibtexString getOldString() {

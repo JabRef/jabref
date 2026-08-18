@@ -24,7 +24,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
@@ -225,13 +224,13 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new BibChangeEdit(new EntriesRemoved(libraryTab.getDatabase(), result.getToRemove())));
+            compoundEdit.addEdit(new EntriesRemoved(libraryTab.getDatabase(), result.getToRemove()));
             libraryTab.getDatabase().removeEntries(result.getToRemove());
             libraryTab.markBaseChanged();
         }
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
-            compoundEdit.addEdit(new BibChangeEdit(new EntriesInserted(libraryTab.getDatabase(), result.getToAdd())));
+            compoundEdit.addEdit(new EntriesInserted(libraryTab.getDatabase(), result.getToAdd()));
             libraryTab.getDatabase().insertEntries(result.getToAdd());
             libraryTab.markBaseChanged();
         }
@@ -240,7 +239,6 @@ public class DuplicateSearch extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-        compoundEdit.end();
         libraryTab.getUndoManager().addEdit(compoundEdit);
     }
 

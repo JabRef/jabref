@@ -27,7 +27,6 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -295,7 +294,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new BibChangeEdit(new FieldEdit(outOfFocusEntry, fieldName, fieldValue, null)));
+                compound.addEdit(new FieldEdit(outOfFocusEntry, fieldName, fieldValue, null));
                 outOfFocusEntry.clearField(fieldName);
             }
         }
@@ -314,17 +313,16 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new BibChangeEdit(new FieldEdit(outOfFocusEntry, fieldName, oldValue, newValue)));
+                compound.addEdit(new FieldEdit(outOfFocusEntry, fieldName, oldValue, newValue));
                 outOfFocusEntry.setField(fieldName, newValue);
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new BibChangeEdit(new EntryTypeEdit(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType())));
+            compound.addEdit(new EntryTypeEdit(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
             outOfFocusEntry.setType(newEntry.getType());
         }
-        compound.end();
         undoManager.addEdit(compound);
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();

@@ -121,7 +121,6 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private void updateUndoManager(List<String> updatedEntries) {
         if (!updatedEntries.isEmpty()) {
-            compoundEdit.end();
             UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
         }
     }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -20,10 +19,9 @@ public class UndoableChangeEntriesOfGroup {
         NamedCompoundEdit entryChangeCompound = new NamedCompoundEdit(Localization.lang("change entries of group"));
         for (FieldChange fieldChange : changes) {
             hasEntryChanges = true;
-            entryChangeCompound.addEdit(new BibChangeEdit(new FieldEdit(fieldChange)));
+            entryChangeCompound.addEdit(new FieldEdit(fieldChange));
         }
         if (hasEntryChanges) {
-            entryChangeCompound.end();
             return entryChangeCompound;
         }
         return null;

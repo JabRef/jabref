@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.EntryTypeEdit;
@@ -30,7 +29,7 @@ public class ChangeEntryTypeAction extends SimpleCommand {
         entries.forEach(entry -> {
             EntryType oldType = entry.getType();
             if (entry.setType(type).isPresent()) {
-                compound.addEdit(new BibChangeEdit(new EntryTypeEdit(entry, oldType, type)));
+                compound.addEdit(new EntryTypeEdit(entry, oldType, type));
             }
         });
         undoManager.addEdit(compound);

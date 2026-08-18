@@ -2,7 +2,6 @@ package org.jabref.gui.collab.stringdelete;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.StringRemoved;
@@ -27,7 +26,7 @@ public final class BibTexStringDelete extends DatabaseChange {
     public void applyChange(NamedCompoundEdit undoEdit) {
         try {
             databaseContext.getDatabase().removeString(deletedString.getId());
-            undoEdit.addEdit(new BibChangeEdit(new StringRemoved(databaseContext.getDatabase(), deletedString)));
+            undoEdit.addEdit(new StringRemoved(databaseContext.getDatabase(), deletedString));
         } catch (Exception ex) {
             LOGGER.warn("Error: could not remove string '{}': {}", deletedString.getName(), ex.getMessage(), ex);
         }

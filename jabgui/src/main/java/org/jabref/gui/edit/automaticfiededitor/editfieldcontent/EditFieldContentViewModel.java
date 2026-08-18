@@ -18,7 +18,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.change.FieldEdit;
@@ -83,17 +82,13 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
+                     .ifPresent(fieldChange -> edits.addEdit(new FieldEdit(fieldChange)));
                 fieldValue.set("");
                 // TODO: increment affected entries only when the field change is present
                 affectedEntriesCount++;
             }
         }
         edits.setAffectedEntries(affectedEntriesCount);
-
-        if (edits.hasEdits()) {
-            edits.end();
-        }
 
         addEdit(edits);
     }
@@ -109,17 +104,13 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
+                     .ifPresent(fieldChange -> edits.addEdit(new FieldEdit(fieldChange)));
 
                 fieldValue.set("");
                 affectedEntriesCount++;
             }
         }
         edits.setAffectedEntries(affectedEntriesCount);
-
-        if (edits.hasEdits()) {
-            edits.end();
-        }
 
         addEdit(edits);
     }

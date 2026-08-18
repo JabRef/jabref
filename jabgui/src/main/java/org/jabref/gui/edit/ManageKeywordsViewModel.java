@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -129,9 +128,8 @@ public class ManageKeywordsViewModel {
 
             // put keywords back
             Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
+            change.ifPresent(fieldChange -> compoundEdit.addEdit(new FieldEdit(fieldChange)));
         }
-        compoundEdit.end();
         return compoundEdit;
     }
 }
