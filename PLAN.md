@@ -11,7 +11,7 @@ Status: proposal for review. Nothing implemented. Branch `fix-undoredo`.
 | **A2** | Migrate commands to `UndoScope`, one PR each | no | A1 |
 | **A3** | Delete `javax.swing.undo`, plain-text descriptions | no (l10n review needed) | A2 complete |
 | **C** | `progressProperty()` null, misc | no | nothing |
-| **P1–P9** | Behaviour changes, one PR each | yes | mostly A2 |
+| **P1–P10** | Behaviour changes, one PR each | yes | mostly A2 |
 
 PR 0 goes first and is the first commit on this branch. Everything in workstream A is a pure
 refactor; everything user-visible lives in "Postponed". Where a decision is open, the answer
@@ -432,19 +432,36 @@ Every step here is behaviour-preserving (see "Governing constraint"). Order, sim
 4. `UndoableInsertEntries` / `UndoableRemoveEntries`.
 5. `UndoableInsertString` / `UndoableRemoveString` / `UndoableStringChange` /
    `UndoablePreambleChange`.
-6. `UndoableAddOrRemoveGroup` / `UndoableMoveGroup` / `UndoableModifySubtree` /
-   `UndoableChangeEntriesOfGroup` — the group edits are the most tangled; do them last.
+6. The group edits — done, but not as expected. `UndoableAddOrRemoveGroup` and
+   `UndoableMoveGroup` turned out to have **no live callers** and were deleted rather than
+   modelled; see **P10** for what that means. `UndoableChangeEntriesOfGroup` needed nothing:
+   it builds a compound of field changes and was carried along by step 3.
+   `UndoableModifySubtree` remains — see below.
 
-Each `Undoable*` class is deleted when its last caller migrates. `FieldRowViewModel` also
-extends `AbstractUndoableEdit` directly and needs its own look.
+Each `Undoable*` class is deleted when its last caller migrates.
+
+**Carried into A3:** `UndoableModifySubtree` is the last `AbstractUndoableJabRefEdit` user,
+with one live call site (`GroupChange:35`). It resists the value model because it is a
+*stateful* memento rather than a value: `m_modifiedSubtree` is populated during `undo()` and
+read by `redo()`, so a redo that has not been preceded by an undo would clear the subtree.
+Converting it means capturing both the before- and after-state at construction time, which
+restructures `GroupChange.applyChange` — the first change in this migration with real
+behavioural risk, in collab code that is awkward to test. It is deliberately deferred to A3,
+where the Swing removal forces the question anyway.
+
+`FieldRowViewModel` also extends `AbstractUndoableEdit` directly, via an inner
+`MergeFieldsUndo` class, and needs its own look at A3.
 
 ### Phase A3 — remove Swing
 
 Once no `Undoable*` remain:
 
+- Resolve `UndoableModifySubtree` (carried over from A2 step 6) and the `MergeFieldsUndo`
+  inner class in `FieldRowViewModel`. Both extend the Swing edit classes directly, so neither
+  can outlive this phase.
 - `UndoRedoManager` replaces `CountingUndoManager`.
 - `UndoAction` and `RedoAction` rebind to the new properties.
-- `AbstractUndoableJabRefEdit`, `NamedCompoundEdit`, `ChangeSetEdit` are deleted.
+- `AbstractUndoableJabRefEdit`, `NamedCompoundEdit`, `BibChangeEdit` are deleted.
 - `java.desktop` leaves jabgui's module graph.
 - The presentation-name mechanism goes away entirely (defect 11): 13 `getPresentationName()`
   implementations, the `<html>`/`<ul><li>` wrappers and the `StringUtil.boldHTML` calls in
@@ -525,6 +542,62 @@ Making it undoable is not simply "journal it": undoing a synced change locally w
 local copy out of step with the shared database until the next push, which is a
 synchronisation design question, not an undo one. Out of scope; recorded so the current
 behaviour is understood as a decision rather than an oversight.
+
+### P10 — Group operations are not undoable
+
+Discovered while migrating A2 step 6, not caused by it. Adding, removing, moving or
+restructuring groups leaves no undo entry, so Ctrl+Z after a group operation either does
+nothing or undoes whatever the user did before it.
+
+**Evidence.** The undo registrations are present in the source but commented out:
+
+- `GroupTreeViewModel.java:203` — add group
+- `GroupTreeViewModel.java:532` — remove subgroups
+- `GroupTreeViewModel.java:559` — remove group, keep subgroups
+- `GroupTreeViewModel.java:597` — remove group and subgroups
+- `GroupTreeViewModel.java:632` — remove group without children
+- `GroupTreeViewModel.java:421`, `:680`, `:708` — entry-assignment changes
+- `GroupNodeViewModel.java:186`, `:461` — assignment on drop, group move
+- `ImportHandler.java:523` — group assignment on import
+
+Entry *assignment* to a group is the exception: `GroupTreeNodeViewModel:159-166` still
+registers `UndoableChangeEntriesOfGroup`, which is a compound of field changes and works.
+It is the tree structure that has no undo.
+
+**What was deleted, and why it does not help to keep it.** `UndoableAddOrRemoveGroup` and
+`UndoableMoveGroup` were removed in this workstream because nothing constructed them. They
+are recoverable from git history, but reviving them as they stand would not work:
+
+- `UndoableAddOrRemoveGroup` records the edited node as its index path *from the tree root*
+  (`getIndexedPathFromRoot`) yet begins traversal at the handle passed to its constructor. Its
+  only ever caller, the likewise-dead `GroupTreeNodeViewModel#addNewGroup`, passed the
+  *parent* node, not the root. Correct only when the parent happens to be the root.
+- Its three modes were selected by `int` constants (`ADD_NODE`,
+  `REMOVE_NODE_KEEP_CHILDREN`, `REMOVE_NODE_AND_CHILDREN`), and the commented-out call at
+  `GroupTreeViewModel:632` names a fourth, `REMOVE_NODE_WITHOUT_CHILDREN`, that never existed.
+  The commented-out code does not compile against the class it references, so it is not a
+  reliable guide to intent.
+
+**What implementing this needs.** Group structure is the one part of the model that is not a
+before/after pair, so it needs records the current sealed hierarchy does not have:
+
+- `GroupSubtreeInserted(root, path, subtree)` / `GroupSubtreeRemoved(root, path, subtree)` —
+  an inverse pair, covering add and remove-with-children.
+- Removing a node while keeping its children is *not* the inverse of adding one: undo must
+  re-parent the orphaned children under a restored node. It needs its own pair, and the child
+  count at removal time.
+- `GroupMoved(root, fromParentPath, fromIndex, toParentPath, toIndex)` — a clean inverse pair,
+  the shape `UndoableMoveGroup` already had.
+
+Address nodes by index path from the root and resolve on apply, as the deleted classes
+intended: node references do not survive a subtree copy. Note that `GroupTreeNode.copySubtree`
+means undo restores *equal* nodes, not the same objects, so anything holding a node reference
+across an undo sees a stale one. That is pre-existing and is worth checking before building on
+it.
+
+**Related.** `UndoableModifySubtree` (A2 step 6, carried into A3) is the surviving piece of
+this area and covers whole-subtree replacement from external-file changes. Whoever implements
+P10 should look at it first, since a `GroupSubtreeReplaced` record would likely subsume it.
 
 ## Workstream C — independent micro-fixes
 
