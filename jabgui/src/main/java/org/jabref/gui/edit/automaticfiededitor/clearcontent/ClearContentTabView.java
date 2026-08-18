@@ -30,15 +30,15 @@ public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView imp
     private final List<BibEntry> selectedEntries;
     @NonNull private final StateManager stateManager;
     private final BibDatabase database;
-    private final ChangeRecorder namedCompoundEdit;
+    private final ChangeRecorder changeRecorder;
     private final DialogService dialogService;
     @FXML private ComboBox<Field> fieldComboBox;
     @FXML private Button clearButton;
     private ClearContentViewModel viewModel;
 
-    public ClearContentTabView(BibDatabase database, ChangeRecorder namedCompoundEdit, DialogService dialogService, StateManager stateManager) {
+    public ClearContentTabView(BibDatabase database, ChangeRecorder changeRecorder, DialogService dialogService, StateManager stateManager) {
         this.database = database;
-        this.namedCompoundEdit = namedCompoundEdit;
+        this.changeRecorder = changeRecorder;
         this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.stateManager = stateManager;
@@ -50,7 +50,7 @@ public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView imp
 
     @FXML
     public void initialize() {
-        viewModel = new ClearContentViewModel(database, selectedEntries, namedCompoundEdit, dialogService, stateManager);
+        viewModel = new ClearContentViewModel(database, selectedEntries, changeRecorder, dialogService, stateManager);
 
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 

@@ -42,8 +42,6 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
         undoManager.addEdit(dialogEdits.toChangeSet());
     }
 
-    /// The dialog applies its edits as the user works, so cancelling reverts what was
-    /// collected instead of dropping it.
     public void cancelChanges() {
         dialogEdits.toChangeSet().inverted().apply();
     }
