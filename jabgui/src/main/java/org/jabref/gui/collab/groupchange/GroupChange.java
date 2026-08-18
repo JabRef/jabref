@@ -2,7 +2,7 @@ package org.jabref.gui.collab.groupchange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
@@ -21,7 +21,7 @@ public final class GroupChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
+    public void applyChange(ChangeRecorder recorder) {
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
@@ -44,7 +44,7 @@ public final class GroupChange extends DatabaseChange {
         }
         GroupTreeNode after = root.copySubtree();
 
-        undoEdit.addEdit(new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, after));
+        recorder.record(new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, after));
     }
 
     public GroupDiff getGroupDiff() {

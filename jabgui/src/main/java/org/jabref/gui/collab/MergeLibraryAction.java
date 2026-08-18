@@ -11,7 +11,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -92,14 +91,12 @@ public class MergeLibraryAction extends SimpleCommand {
                 Localization.lang("External Changes Resolver"));
         dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
 
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-        changes.stream()
-               .filter(DatabaseChange::isAccepted)
-               .forEach(change -> change.applyChange(compoundEdit));
+        boolean anyChange = undoManager.record(Localization.lang("Merged external changes"), recorder ->
+                changes.stream()
+                       .filter(DatabaseChange::isAccepted)
+                       .forEach(change -> change.applyChange(recorder)));
 
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit.toChangeSet());
-
+        if (anyChange) {
             libraryTabContainer.getLibraryTabs().stream()
                                .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
                                .findFirst()

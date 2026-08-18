@@ -2,7 +2,7 @@ package org.jabref.gui.collab.entrychange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.UndoableInsertEntries;
 import org.jabref.model.change.UndoableRemoveEntries;
@@ -34,13 +34,10 @@ public final class EntryChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
+    public void applyChange(ChangeRecorder recorder) {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
-        NamedCompoundEdit changeEntryEdit = new NamedCompoundEdit(getName());
-        changeEntryEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
-        changeEntryEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
-
-        undoEdit.addEdit(changeEntryEdit);
+        recorder.record(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        recorder.record(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
     }
 }

@@ -18,7 +18,6 @@ import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -99,9 +98,8 @@ public class BackupUIManager {
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(compoundEdit));
-                undoManager.addEdit(compoundEdit.toChangeSet());
+                undoManager.record(Localization.lang("Merged external changes"), recorder ->
+                        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(recorder)));
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same

@@ -11,7 +11,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -90,11 +89,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 saveState = stateManager.activeTabProperty().get().get();
 
-                final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-                changes.stream()
-                       .filter(DatabaseChange::isAccepted)
-                       .forEach(change -> change.applyChange(compoundEdit));
-                undoManager.addEdit(compoundEdit.toChangeSet());
+                undoManager.record(Localization.lang("Merged external changes"), recorder ->
+                        changes.stream()
+                               .filter(DatabaseChange::isAccepted)
+                               .forEach(change -> change.applyChange(recorder)));
 
                 if (areAllChangesResolved.get()) {
                     if (databaseChangesResolverDialog.areAllChangesAccepted()) {
