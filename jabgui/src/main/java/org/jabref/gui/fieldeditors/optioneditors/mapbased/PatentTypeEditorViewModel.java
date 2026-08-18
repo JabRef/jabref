@@ -3,9 +3,8 @@ package org.jabref.gui.fieldeditors.optioneditors.mapbased;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;

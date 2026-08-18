@@ -3,8 +3,6 @@ package org.jabref.gui.cleanup;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -15,6 +13,7 @@ import javafx.scene.control.TabPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;

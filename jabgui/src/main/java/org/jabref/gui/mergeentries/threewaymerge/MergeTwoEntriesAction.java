@@ -3,11 +3,10 @@ package org.jabref.gui.mergeentries.threewaymerge;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.EntriesInserted;
 import org.jabref.model.change.EntriesRemoved;
@@ -41,6 +40,6 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         compoundEdit.addEdit(new EntriesInserted(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
         compoundEdit.addEdit(new EntriesRemoved(database, entriesToRemove));
 
-        undoManager.addEdit(compoundEdit);
+        undoManager.push(compoundEdit.toChangeSet());
     }
 }

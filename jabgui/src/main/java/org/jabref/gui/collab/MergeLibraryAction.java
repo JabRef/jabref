@@ -11,8 +11,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
@@ -31,14 +31,14 @@ public class MergeLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     public MergeLibraryAction(DialogService dialogService,
                               StateManager stateManager,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              CountingUndoManager undoManager,
+                              UndoManager undoManager,
                               LibraryTabContainer libraryTabContainer) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -98,7 +98,7 @@ public class MergeLibraryAction extends SimpleCommand {
                .forEach(change -> change.applyChange(compoundEdit));
 
         if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
 
             libraryTabContainer.getLibraryTabs().stream()
                                .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))

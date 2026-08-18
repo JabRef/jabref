@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -121,7 +120,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private void updateUndoManager(List<String> updatedEntries) {
         if (!updatedEntries.isEmpty()) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.push(compoundEdit.toChangeSet()));
         }
     }
 

@@ -10,12 +10,11 @@ import org.jspecify.annotations.NullMarked;
 
 /// Collects the changes of one user action so they undo as one step.
 ///
-/// Prefer [UndoScope#record]: it owns this object's whole lifecycle, so a command cannot
+/// Prefer [UndoManager#record]: it owns this object's whole lifecycle, so a command cannot
 /// forget to push what it collected. This class remains for the call sites that still build
-/// their compound by hand, and adapts the collected changes to the Swing undo stack that is
-/// still in place.
+/// their compound by hand.
 @NullMarked
-public class NamedCompoundEdit extends AbstractUndoableJabRefEdit {
+public class NamedCompoundEdit {
 
     private final String name;
     private final List<BibChange> changes = new ArrayList<>();
@@ -41,22 +40,5 @@ public class NamedCompoundEdit extends AbstractUndoableJabRefEdit {
 
     public ChangeSet toChangeSet() {
         return new ChangeSet(name, changes);
-    }
-
-    @Override
-    public void undo() {
-        super.undo();
-        toChangeSet().inverted().apply();
-    }
-
-    @Override
-    public void redo() {
-        super.redo();
-        toChangeSet().apply();
-    }
-
-    @Override
-    public String getPresentationName() {
-        return name;
     }
 }

@@ -458,7 +458,7 @@ public class GroupNodeViewModel {
         //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
 
         getGroupNode().moveTo(target.getGroupNode());
-        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        // panel.getUndoManager().push(new UndoableMoveGroup(this.groupsRoot, moveChange).toChangeSet());
         // panel.markBaseChanged();
         // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }

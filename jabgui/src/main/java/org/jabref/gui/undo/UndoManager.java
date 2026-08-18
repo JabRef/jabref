@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 /// enablement are updated on the JavaFX application thread, because commands push from
 /// background tasks as well.
 @NullMarked
-public class UndoRedoManager {
+public class UndoManager {
 
     private final Deque<BibChange> undoStack = new ArrayDeque<>();
     private final Deque<BibChange> redoStack = new ArrayDeque<>();

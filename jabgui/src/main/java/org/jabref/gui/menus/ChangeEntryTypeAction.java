@@ -2,10 +2,9 @@ package org.jabref.gui.menus;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.EntryTypeEdit;
 import org.jabref.model.entry.BibEntry;
@@ -32,6 +31,6 @@ public class ChangeEntryTypeAction extends SimpleCommand {
                 compound.addEdit(new EntryTypeEdit(entry, oldType, type));
             }
         });
-        undoManager.addEdit(compound);
+        undoManager.push(compound.toChangeSet());
     }
 }

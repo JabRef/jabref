@@ -5,15 +5,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.undo.BibChangeEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
@@ -101,7 +99,7 @@ public class SpecialFieldViewModel {
     public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
         Optional<FieldChange> change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());
 
-        change.ifPresent(fieldChange -> undoManager.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
+        change.ifPresent(fieldChange -> undoManager.push(new FieldEdit(fieldChange)));
     }
 
     public void toggle(BibEntry entry) {

@@ -17,7 +17,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -67,7 +67,7 @@ public class GlobalSearchBarTest {
                 mock(LibraryTabContainer.class),
                 stateManager,
                 preferences,
-                mock(CountingUndoManager.class),
+                mock(UndoManager.class),
                 mock(DialogService.class),
                 SearchType.NORMAL_SEARCH
         );

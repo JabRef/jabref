@@ -5,10 +5,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.change.EntryTypeEdit;
@@ -60,7 +59,7 @@ class UpdateOriginalEntry {
         }
 
         if (edited) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
             dialogService.notify(successMessage);
         } else {
             dialogService.notify(Localization.lang("No information added"));

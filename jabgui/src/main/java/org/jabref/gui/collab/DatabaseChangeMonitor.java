@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -95,7 +94,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 changes.stream()
                        .filter(DatabaseChange::isAccepted)
                        .forEach(change -> change.applyChange(compoundEdit));
-                undoManager.addEdit(compoundEdit);
+                undoManager.push(compoundEdit.toChangeSet());
 
                 if (areAllChangesResolved.get()) {
                     if (databaseChangesResolverDialog.areAllChangesAccepted()) {

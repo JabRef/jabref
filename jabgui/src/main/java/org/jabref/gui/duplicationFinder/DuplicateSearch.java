@@ -239,7 +239,7 @@ public class DuplicateSearch extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-        libraryTab.getUndoManager().addEdit(compoundEdit);
+        libraryTab.getUndoManager().push(compoundEdit.toChangeSet());
     }
 
     /// Result of a duplicate search.

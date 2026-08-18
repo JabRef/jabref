@@ -1,10 +1,8 @@
 package org.jabref.gui.citationkeypattern;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.BibChangeEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.change.FieldEdit;
@@ -36,7 +34,7 @@ public class GenerateCitationKeySingleAction extends SimpleCommand {
         if (!entry.hasCitationKey() || GenerateCitationKeyAction.confirmOverwriteKeys(dialogService, preferences)) {
             new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences())
                     .generateAndSetKey(entry)
-                    .ifPresent(change -> undoManager.addEdit(new BibChangeEdit(new FieldEdit(change))));
+                    .ifPresent(change -> undoManager.push(new FieldEdit(change)));
         }
     }
 }

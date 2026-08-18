@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// The manager updates its properties on the JavaFX thread, so the toolkit has to be up.
 @ExtendWith(ApplicationExtension.class)
-class UndoRedoManagerTest {
+class UndoManagerTest {
 
-    private final UndoRedoManager undoRedoManager = new UndoRedoManager();
+    private final UndoManager undoRedoManager = new UndoManager();
     private BibEntry entry;
 
     @BeforeEach

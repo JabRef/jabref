@@ -1,7 +1,5 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -13,6 +11,7 @@ import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveField
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
@@ -40,10 +39,12 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     }
 
     public void saveChanges() {
-        undoManager.addEdit(dialogEdits);
+        undoManager.push(dialogEdits.toChangeSet());
     }
 
+    /// The dialog applies its edits as the user works, so cancelling reverts what was
+    /// collected instead of dropping it.
     public void cancelChanges() {
-        dialogEdits.undo();
+        dialogEdits.toChangeSet().inverted().apply();
     }
 }

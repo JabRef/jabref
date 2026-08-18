@@ -8,8 +8,6 @@ import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -47,9 +45,8 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.BibChangeEdit;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -112,7 +109,7 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -184,7 +181,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       CountingUndoManager undoManager,
+                       UndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
@@ -492,7 +489,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             compoundEdit.addEdit(new FieldEdit(change));
         }
         if (compoundEdit.hasEdits()) {
-            getUndoManager().addEdit(compoundEdit);
+            getUndoManager().push(compoundEdit.toChangeSet());
         }
     }
 
@@ -781,7 +778,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public CountingUndoManager getUndoManager() {
+    public UndoManager getUndoManager() {
         return undoManager;
     }
 
@@ -848,7 +845,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new BibChangeEdit(new EntriesInserted(bibDatabaseContext.getDatabase(), entries)));
+        getUndoManager().push(new EntriesInserted(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
 
@@ -980,7 +977,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().addEdit(new BibChangeEdit(new EntriesRemoved(bibDatabaseContext.getDatabase(), entries)));
+        getUndoManager().push(new EntriesRemoved(bibDatabaseContext.getDatabase(), entries));
         bibDatabaseContext.getDatabase().removeEntries(entries);
 
         if (mode != StandardActions.CUT) {
@@ -1077,7 +1074,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              CountingUndoManager undoManager,
+                                              UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
@@ -1125,7 +1122,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                (CountingUndoManager) undoManager,
+                (UndoManager) undoManager,
                 clipBoardManager,
                 taskExecutor,
                 false);

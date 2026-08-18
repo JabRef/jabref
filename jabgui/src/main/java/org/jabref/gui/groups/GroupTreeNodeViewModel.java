@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoManager;
-
+import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -155,14 +154,14 @@ public class GroupTreeNodeViewModel {
 
         // Remember undo information
         if (!changesRemove.isEmpty()) {
-            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);
+            NamedCompoundEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);
             if (!changesAdd.isEmpty() && (undoRemove != null)) {
                 // we removed and added entries
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
             }
-            undoManager.addEdit(undoRemove);
+            undoManager.push(undoRemove.toChangeSet());
         } else if (!changesAdd.isEmpty()) {
-            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
+            undoManager.push(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd).toChangeSet());
         }
     }
 

@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
@@ -14,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -98,7 +97,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 }
 
                 if (nc.hasEdits()) {
-                    undoManager.addEdit(nc);
+                    undoManager.push(nc.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

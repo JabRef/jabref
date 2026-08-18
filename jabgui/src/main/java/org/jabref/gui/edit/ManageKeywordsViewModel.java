@@ -3,14 +3,13 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.change.FieldEdit;
@@ -110,7 +109,7 @@ public class ManageKeywordsViewModel {
 
         NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
         if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
         }
     }
 

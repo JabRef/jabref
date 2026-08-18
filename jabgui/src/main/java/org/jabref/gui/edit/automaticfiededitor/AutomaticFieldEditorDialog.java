@@ -1,8 +1,5 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Tab;
@@ -10,6 +7,7 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -72,10 +70,6 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     }
 
     private void cancelChanges() {
-        try {
-            viewModel.cancelChanges();
-        } catch (CannotUndoException e) {
-            LOGGER.info("Could not undo", e);
-        }
+        viewModel.cancelChanges();
     }
 }

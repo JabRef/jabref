@@ -14,8 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
 
@@ -27,6 +25,7 @@ import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
@@ -262,7 +261,7 @@ public class ImportHandler {
                 // entry per file and made the second undo throw.
                 if (compoundEdit.hasEdits()) {
                     // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.push(compoundEdit.toChangeSet()));
                 }
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry

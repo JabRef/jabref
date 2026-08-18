@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.concurrent.Future;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.SciteAiFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;

@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -35,8 +33,7 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.UndoScope;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -93,7 +90,7 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static CountingUndoManager countingUndoManager;
+    private static UndoManager undoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
@@ -136,7 +133,7 @@ public class JabRefGUI extends Application {
                     preferences,
                     aiService,
                     stateManager,
-                    countingUndoManager,
+                    undoManager,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
@@ -241,12 +238,8 @@ public class JabRefGUI extends Application {
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
-        JabRefGUI.countingUndoManager = new CountingUndoManager();
-        Injector.setModelOrService(UndoManager.class, countingUndoManager);
-        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
-        // One scope per undo stack: nesting is what keeps a command that delegates to another
-        // from producing two undo steps, and that only works if both share this instance.
-        Injector.setModelOrService(UndoScope.class, new UndoScope(countingUndoManager));
+        JabRefGUI.undoManager = new UndoManager();
+        Injector.setModelOrService(UndoManager.class, undoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);

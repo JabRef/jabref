@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -27,6 +25,7 @@ import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;

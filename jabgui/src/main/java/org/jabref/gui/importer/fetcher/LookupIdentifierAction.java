@@ -3,13 +3,12 @@ package org.jabref.gui.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
@@ -103,7 +102,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             }
         }
         if (foundCount > 0) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompoundEdit));
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.push(namedCompoundEdit.toChangeSet()));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

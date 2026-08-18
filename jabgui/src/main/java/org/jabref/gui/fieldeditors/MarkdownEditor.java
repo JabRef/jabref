@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -20,6 +18,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.integrity.FieldCheckers;

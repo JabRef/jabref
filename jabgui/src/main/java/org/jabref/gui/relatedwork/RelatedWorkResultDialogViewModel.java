@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
@@ -71,7 +70,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         }
 
         if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
         }
 
         dialogService.notify(Localization.lang(

@@ -2,14 +2,12 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.BibChangeEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
@@ -72,7 +70,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
                         if (!newValue.equals(oldValue)) {
                             entry.setField(field, newValue);
-                            undoManager.addEdit(new BibChangeEdit(new FieldEdit(entry, field, oldValue, newValue)));
+                            undoManager.push(new FieldEdit(entry, field, oldValue, newValue));
                         }
                     }
                 });

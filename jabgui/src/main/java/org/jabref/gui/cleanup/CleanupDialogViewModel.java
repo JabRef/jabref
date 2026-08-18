@@ -8,8 +8,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -203,7 +202,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         }
 
         if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
         }
 
         if (!failures.isEmpty()) {
@@ -246,7 +245,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         task.updateProgress(count, count);
 
         if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
+            undoManager.push(compoundEdit.toChangeSet());
         }
 
         if (!failures.isEmpty()) {
