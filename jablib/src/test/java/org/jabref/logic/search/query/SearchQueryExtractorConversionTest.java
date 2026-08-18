@@ -1,8 +1,11 @@
 package org.jabref.logic.search.query;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 
@@ -10,24 +13,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchQueryExtractorConversionTest {
     public static Stream<Arguments> searchConversion() {
         return Stream.of(
-                Arguments.of(List.of("term"), "term"),
-                Arguments.of(List.of("regex.*term"), "regex.*term"),
-                Arguments.of(List.of("term"), "any = term"),
-                Arguments.of(List.of("term"), "any CONTAINS term"),
-                Arguments.of(List.of("a", "b"), "a AND b"),
-                Arguments.of(List.of("a", "b", "c"), "a OR b AND c"),
-                Arguments.of(List.of("a", "b"), "a OR b AND NOT c"),
-                Arguments.of(List.of("a", "b"), "author = a AND title = b"),
+                Arguments.of(List.of(Pattern.quote("term")), "term"),
+                Arguments.of(List.of(Pattern.quote("regex.*term")), "regex.*term"),
+                Arguments.of(List.of(Pattern.quote("term")), "any = term"),
+                Arguments.of(List.of(Pattern.quote("term")), "any CONTAINS term"),
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a AND b"),
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b"), Pattern.quote("c")), "a OR b AND c"),
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a OR b AND NOT c"),
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "author = a AND title = b"),
                 Arguments.of(List.of(), "NOT a"),
-                Arguments.of(List.of("a", "b", "c"), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
-                Arguments.of(List.of("b", "c"), "title != a OR b OR c"),
-                Arguments.of(List.of("a", "b"), "a b"),
-                Arguments.of(List.of("term1 term2"), "\"term1 term2\"")
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b"), Pattern.quote("c")), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
+                Arguments.of(List.of(Pattern.quote("b"), Pattern.quote("c")), "title != a OR b OR c"),
+                Arguments.of(List.of(Pattern.quote("a"), Pattern.quote("b")), "a b"),
+                Arguments.of(List.of(Pattern.quote("term1 term2")), "\"term1 term2\""),
+                // regex mode is left untouched, since the user explicitly opted into it
+                Arguments.of(List.of("regex.*term"), "any =~ regex.*term")
         );
     }
 
@@ -36,5 +42,27 @@ public class SearchQueryExtractorConversionTest {
     void searchConversion(List<String> expected, String searchExpression) {
         List<String> result = SearchQueryConversion.extractSearchTerms(new SearchQuery(searchExpression)).stream().map(SearchQueryNode::term).toList();
         assertEquals(expected, result);
+    }
+
+    public static Stream<Arguments> literalTermsWithRegexMetacharactersProduceValidRegex() {
+        return Stream.of(
+                Arguments.of("*"),
+                Arguments.of("fieldname=*"),
+                Arguments.of("anything{"),
+                Arguments.of("anything[")
+        );
+    }
+
+    /// Non-regex search terms containing regex metacharacters (`*`, `{`, `[`, `\`, ...) must always
+    /// compile to a valid Java regex, since [org.jabref.gui.search.Highlighter] embeds them
+    /// directly into a `Pattern`. See <https://github.com/JabRef/jabref/issues/16539>.
+    @ParameterizedTest
+    @MethodSource
+    void literalTermsWithRegexMetacharactersProduceValidRegex(String searchExpression) {
+        List<SearchQueryNode> terms = SearchQueryConversion.extractSearchTerms(new SearchQuery(searchExpression, EnumSet.noneOf(SearchFlags.class)));
+        for (SearchQueryNode node : terms) {
+            assertDoesNotThrow(() -> Pattern.compile("(?i)(" + node.term() + ")"),
+                    () -> "Term produced an invalid regex: " + node.term());
+        }
     }
 }

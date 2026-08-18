@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -88,12 +89,12 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
         }
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
 
-        // if not regex, escape the backslashes, because the highlighter uses regex
+        // if not regex, quote the term as a regex literal, because the highlighter uses regex
 
         // unfielded terms, check the search bar flags
         if (ctx.FIELD() == null) {
             if (!searchBarRegex) {
-                term = term.replace("\\", "\\\\");
+                term = Pattern.quote(term);
             }
             return List.of(new SearchQueryNode(Optional.empty(), term));
         }
@@ -116,7 +117,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
         if (ctx.operator() != null) {
             int operator = ctx.operator().getStart().getType();
             if (operator != SearchParser.REQUAL && operator != SearchParser.CREEQUAL) {
-                term = term.replace("\\", "\\\\");
+                term = Pattern.quote(term);
             }
         }
 

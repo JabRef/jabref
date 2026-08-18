@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.search.query.SearchQueryConversion;
@@ -67,10 +68,15 @@ public class Highlighter {
 
     private static String highlightNode(String text, String searchPattern) {
         if (!shouldUsePostgresSearch()) {
-            return text.replaceAll(
-                    "(?i)(" + searchPattern + ")",
-                    "<mark style=\"background: orange\">$1</mark>"
-            );
+            try {
+                return text.replaceAll(
+                        "(?i)(" + searchPattern + ")",
+                        "<mark style=\"background: orange\">$1</mark>"
+                );
+            } catch (PatternSyntaxException e) {
+                LOGGER.debug("Invalid regular expression in search pattern: {}", searchPattern, e);
+                return text;
+            }
         }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgresServer.class).getConnection();
@@ -93,8 +99,15 @@ public class Highlighter {
 
     public static List<Range> findMatchPositions(String text, String pattern) {
         if (!shouldUsePostgresSearch()) {
+            Pattern compiledPattern;
+            try {
+                compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+            } catch (PatternSyntaxException e) {
+                LOGGER.debug("Invalid regular expression in search pattern: {}", pattern, e);
+                return List.of();
+            }
             List<Range> positions = new ArrayList<>();
-            Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(text);
+            Matcher matcher = compiledPattern.matcher(text);
             while (matcher.find()) {
                 positions.add(new Range(matcher.start() + 1, matcher.end())); // +1 for 1-based like Postgres
             }
