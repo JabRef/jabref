@@ -27,13 +27,16 @@ public class BaseDialog<T> extends Dialog<T> {
 
     private boolean popupWasShowingOnKeyPress;
 
+    // [impl->req~ux.combobox.escape-closes-popup-only~1]
     protected BaseDialog() {
         getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                popupWasShowingOnKeyPress = isPopupShowing();
+                Window window = getDialogPane().getScene() != null ? getDialogPane().getScene().getWindow() : null;
+                popupWasShowingOnKeyPress = isPopupShowing(window);
             }
         });
+
 
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
@@ -63,13 +66,16 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
-    public static boolean isPopupShowing() {
+    public static boolean isPopupShowing(Window owner) {
         return Window.getWindows().stream()
                      .filter(window -> window instanceof PopupWindow)
                      .map(window -> (PopupWindow) window)
-                     .anyMatch(popup -> popup.isShowing() && !(popup instanceof Tooltip));
+                     .anyMatch(popup -> popup.isShowing() && !(popup instanceof Tooltip) && (owner == null || popup.getOwnerWindow() == owner));
     }
 
+    public static boolean isPopupShowing() {
+        return isPopupShowing(null);
+    }
 
     private Optional<Button> getDefaultButton() {
         return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));

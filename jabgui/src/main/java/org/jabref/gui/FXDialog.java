@@ -61,7 +61,7 @@ public class FXDialog extends Alert {
         getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                popupWasShowingOnKeyPress = BaseDialog.isPopupShowing();
+                popupWasShowingOnKeyPress = BaseDialog.isPopupShowing(dialogWindow);
             }
         });
 
