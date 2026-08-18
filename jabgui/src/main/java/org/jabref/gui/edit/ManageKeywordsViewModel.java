@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -104,23 +103,19 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        undoManager.record(Localization.lang("Update keywords"), recorder ->
-                updateKeywords(recorder, entries, keywordsToAdd, keywordsToRemove));
-    }
+        undoManager.record(Localization.lang("Update keywords"), recorder -> {
+            Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
-    private void updateKeywords(ChangeRecorder recorder, List<BibEntry> entries, KeywordList keywordsToAdd,
-                                KeywordList keywordsToRemove) {
-        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
+            for (BibEntry entry : entries) {
+                KeywordList entryKeywords = entry.getKeywords(keywordSeparator);
 
-        for (BibEntry entry : entries) {
-            KeywordList keywords = entry.getKeywords(keywordSeparator);
+                // update keywords
+                entryKeywords.removeAll(keywordsToRemove);
+                entryKeywords.addAll(keywordsToAdd);
 
-            // update keywords
-            keywords.removeAll(keywordsToRemove);
-            keywords.addAll(keywordsToAdd);
-
-            // put keywords back
-            recorder.record(entry.putKeywords(keywords, keywordSeparator));
-        }
+                // put keywords back
+                recorder.record(entry.putKeywords(entryKeywords, keywordSeparator));
+            }
+        });
     }
 }

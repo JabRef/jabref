@@ -7,27 +7,37 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/// Recording an undo step updates properties on the JavaFX thread, so the toolkit has to be up.
+@ExtendWith(ApplicationExtension.class)
 class ReplaceStringViewModelTest {
 
     private final LibraryTab libraryTab = mock(LibraryTab.class);
+    private final UndoManager undoManager = new UndoManager();
+    private BibEntry entry;
     private ReplaceStringViewModel viewModel;
 
     @BeforeEach
     void setUp() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
+        entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Shatakshi Sharma and Bhim Singh and Sukumar Mishra")
                 .withField(StandardField.DATE, "April 2020")
                 .withField(StandardField.YEAR, "2020")
@@ -46,6 +56,7 @@ class ReplaceStringViewModelTest {
         entries.add(entry);
         when(libraryTab.getSelectedEntries()).thenReturn(entries);
         when(libraryTab.getDatabase()).thenReturn(new BibDatabase(entries));
+        when(libraryTab.getUndoManager()).thenReturn(undoManager);
         viewModel = new ReplaceStringViewModel(libraryTab);
     }
 
@@ -75,5 +86,33 @@ class ReplaceStringViewModelTest {
         viewModel.selectOnlyProperty().bind(new SimpleBooleanProperty(selectOnly));
         viewModel.allFieldReplaceProperty().bind(new SimpleBooleanProperty(allFieldReplace));
         assertEquals(expectedResult, viewModel.replace());
+    }
+
+    @Test
+    void replacementsCanBeUndone() {
+        String before = entry.getField(StandardField.JOURNALTITLE).orElseThrow();
+
+        viewModel.findStringProperty().bind(new SimpleStringProperty("Informatics"));
+        viewModel.replaceStringProperty().bind(new SimpleStringProperty("replaceText"));
+        viewModel.fieldStringProperty().bind(new SimpleStringProperty("journaltitle"));
+        viewModel.selectOnlyProperty().bind(new SimpleBooleanProperty(true));
+        viewModel.allFieldReplaceProperty().bind(new SimpleBooleanProperty(false));
+        viewModel.replace();
+
+        assertTrue(undoManager.canUndo());
+        undoManager.undo();
+        assertEquals(before, entry.getField(StandardField.JOURNALTITLE).orElseThrow());
+    }
+
+    @Test
+    void replacingNothingLeavesTheUndoStackAlone() {
+        viewModel.findStringProperty().bind(new SimpleStringProperty("randomText"));
+        viewModel.replaceStringProperty().bind(new SimpleStringProperty("replaceText"));
+        viewModel.fieldStringProperty().bind(new SimpleStringProperty("author"));
+        viewModel.selectOnlyProperty().bind(new SimpleBooleanProperty(true));
+        viewModel.allFieldReplaceProperty().bind(new SimpleBooleanProperty(false));
+        viewModel.replace();
+
+        assertFalse(undoManager.canUndo());
     }
 }
