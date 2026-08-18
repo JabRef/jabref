@@ -8,11 +8,12 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.EntryTypeEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -77,7 +78,7 @@ class UpdateOriginalEntry {
         }
 
         originalEntry.setType(newType);
-        compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
+        compoundEdit.addEdit(new BibChangeEdit(new EntryTypeEdit(originalEntry, oldType, newType)));
         return true;
     }
 

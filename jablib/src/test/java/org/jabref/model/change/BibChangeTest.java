@@ -8,6 +8,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -93,6 +94,18 @@ class BibChangeTest {
 
         changeSet.inverted().apply();
         assertEquals("Einstein", entry.getField(StandardField.AUTHOR).orElseThrow());
+    }
+
+    @Test
+    void undoingATypeChangeRestoresTheExactPreviousType() {
+        BibEntry entry = new BibEntry(new UnknownEntryType("customtype"));
+        EntryTypeEdit change = new EntryTypeEdit(entry, entry.getType(), StandardEntryType.Article);
+
+        change.apply();
+        assertEquals(StandardEntryType.Article, entry.getType());
+
+        change.inverted().apply();
+        assertEquals(new UnknownEntryType("customtype"), entry.getType());
     }
 
     @Test

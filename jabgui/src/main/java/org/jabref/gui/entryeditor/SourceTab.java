@@ -27,9 +27,9 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -40,6 +40,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.change.EntryTypeEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -320,7 +321,7 @@ public class SourceTab extends EntryEditorTab {
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.addEdit(new BibChangeEdit(new EntryTypeEdit(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType())));
             outOfFocusEntry.setType(newEntry.getType());
         }
         compound.end();

@@ -4,13 +4,13 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.BibChangeEdit;
+import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.EntryTypeEdit;
 import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
@@ -76,7 +76,7 @@ public final class MergeEntriesHelper {
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
             entryFromLibrary.setType(fetcherType);
-            namedCompoundEdit.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
+            namedCompoundEdit.addEdit(new BibChangeEdit(new EntryTypeEdit(entryFromLibrary, libraryType, fetcherType)));
             return true;
         }
         return false;
