@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -27,7 +25,7 @@ class UndoScopeTest {
     @BeforeEach
     void setUp() {
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
-        undoScope = new UndoScope(undoManager, new BibDatabaseContext(new BibDatabase(List.of(entry))));
+        undoScope = new UndoScope(undoManager);
     }
 
     @Test

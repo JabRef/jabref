@@ -2,7 +2,6 @@ package org.jabref.model.change;
 
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
@@ -21,7 +20,7 @@ public record EntryTypeEdit(BibEntry entry, EntryType before, EntryType after) i
     }
 
     @Override
-    public void applyTo(BibDatabaseContext context) {
+    public void apply() {
         entry.setType(after);
     }
 

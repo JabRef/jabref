@@ -2,7 +2,6 @@ package org.jabref.model.change;
 
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 
 import org.jspecify.annotations.NullMarked;
@@ -19,7 +18,7 @@ public record StringEdit(BibtexString string, Part part, String before, String a
     }
 
     @Override
-    public void applyTo(BibDatabaseContext context) {
+    public void apply() {
         switch (part) {
             case NAME ->
                     string.setName(after);

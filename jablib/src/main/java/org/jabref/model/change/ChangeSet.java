@@ -2,7 +2,6 @@ package org.jabref.model.change;
 
 import java.util.List;
 
-import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -40,10 +39,10 @@ public record ChangeSet(String name, List<BibChange> changes) implements BibChan
     /// over a partially reverted one. Failures are logged rather than propagated because
     /// callers have no meaningful recovery.
     @Override
-    public void applyTo(BibDatabaseContext context) {
+    public void apply() {
         for (BibChange change : changes) {
             try {
-                change.applyTo(context);
+                change.apply();
             } catch (RuntimeException e) {
                 LOGGER.warn("Could not apply {} as part of '{}'", change, name, e);
             }

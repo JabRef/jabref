@@ -2,7 +2,7 @@ package org.jabref.model.change;
 
 import java.util.List;
 
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
@@ -14,29 +14,31 @@ import org.jspecify.annotations.NullMarked;
 /// references to them. A move to id-based lookup would break that silently, so it would have
 /// to revisit this record.
 @NullMarked
-public record EntriesInserted(List<BibEntry> entries) implements BibChange {
+public record EntriesInserted(BibDatabase database, List<BibEntry> entries) implements BibChange {
 
     public EntriesInserted {
         entries = List.copyOf(entries);
     }
 
-    public EntriesInserted(BibEntry entry) {
-        this(List.of(entry));
+    public EntriesInserted(BibDatabase database, BibEntry entry) {
+        this(database, List.of(entry));
     }
 
     @Override
     public EntriesRemoved inverted() {
-        return new EntriesRemoved(entries);
+        return new EntriesRemoved(database, entries);
     }
 
     @Override
-    public void applyTo(BibDatabaseContext context) {
-        context.getDatabase().insertEntries(entries);
+    public void apply() {
+        database.insertEntries(entries);
     }
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof EntriesInserted other) && ChangeIdentity.sameAll(entries, other.entries);
+        return (object instanceof EntriesInserted other)
+                && ChangeIdentity.same(database, other.database)
+                && ChangeIdentity.sameAll(entries, other.entries);
     }
 
     @Override

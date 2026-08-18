@@ -1,22 +1,22 @@
 package org.jabref.model.change;
 
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
 import org.jspecify.annotations.NullMarked;
 
 /// Insertion of a BibTeX string definition.
 @NullMarked
-public record StringInserted(BibtexString string) implements BibChange {
+public record StringInserted(BibDatabase database, BibtexString string) implements BibChange {
 
     @Override
     public StringRemoved inverted() {
-        return new StringRemoved(string);
+        return new StringRemoved(database, string);
     }
 
     @Override
-    public void applyTo(BibDatabaseContext context) {
-        context.getDatabase().addString(string);
+    public void apply() {
+        database.addString(string);
     }
 
     @Override

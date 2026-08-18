@@ -7,10 +7,11 @@ import java.util.Set;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -62,7 +63,7 @@ public final class MergeEntriesHelper {
                                .map(key -> {
                                    LOGGER.debug("Adopting citation key from fetcher: {}", key);
                                    Optional<FieldChange> change = entryFromLibrary.setCitationKey(key);
-                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new UndoableKeyChange(fieldChange)));
+                                   change.ifPresent(fieldChange -> namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
                                    return true;
                                })
                                .orElse(false);

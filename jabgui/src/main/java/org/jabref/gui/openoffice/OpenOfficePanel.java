@@ -37,7 +37,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -57,6 +57,7 @@ import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -639,7 +640,7 @@ public class OpenOfficePanel {
                     // Generate key
                     new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
                             .generateAndSetKey(entry)
-                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
+                            .ifPresent(change -> undoCompound.addEdit(new BibChangeEdit(new FieldEdit(change))));
                 }
             }
             undoCompound.end();

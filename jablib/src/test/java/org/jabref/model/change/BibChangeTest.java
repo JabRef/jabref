@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
@@ -27,17 +26,18 @@ class BibChangeTest {
 
     static Stream<BibChange> changes() {
         BibEntry entry = entry();
+        BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString("name", "content");
         return Stream.of(
                 new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
                 new FieldEdit(entry, StandardField.YEAR, null, "1905"),
                 new FieldEdit(entry, StandardField.YEAR, "1905", null),
                 new EntryTypeEdit(entry, StandardEntryType.Article, StandardEntryType.Book),
-                new EntriesInserted(entry),
-                new EntriesRemoved(entry),
-                new PreambleEdit(null, "preamble"),
-                new StringInserted(string),
-                new StringRemoved(string),
+                new EntriesInserted(database, entry),
+                new EntriesRemoved(database, entry),
+                new PreambleEdit(database, null, "preamble"),
+                new StringInserted(database, string),
+                new StringRemoved(database, string),
                 new StringEdit(string, StringEdit.Part.CONTENT, "content", "other"),
                 new ChangeSet("group", List.of(
                         new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
@@ -59,41 +59,39 @@ class BibChangeTest {
     @Test
     void applyingThenUndoingRestoresFieldValue() {
         BibEntry entry = entry();
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         FieldEdit change = new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr");
 
-        change.applyTo(context);
+        change.apply();
         assertEquals("Bohr", entry.getField(StandardField.AUTHOR).orElseThrow());
 
-        change.inverted().applyTo(context);
+        change.inverted().apply();
         assertEquals("Einstein", entry.getField(StandardField.AUTHOR).orElseThrow());
     }
 
     @Test
     void undoingAnInsertRemovesTheEntryAgain() {
         BibEntry entry = entry();
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
-        EntriesInserted change = new EntriesInserted(entry);
+        BibDatabase database = new BibDatabase();
+        EntriesInserted change = new EntriesInserted(database, entry);
 
-        change.applyTo(context);
-        assertEquals(List.of(entry), context.getDatabase().getEntries());
+        change.apply();
+        assertEquals(List.of(entry), database.getEntries());
 
-        change.inverted().applyTo(context);
-        assertEquals(List.of(), context.getDatabase().getEntries());
+        change.inverted().apply();
+        assertEquals(List.of(), database.getEntries());
     }
 
     @Test
     void undoingAGroupRevertsItsChangesInReverseOrder() {
         BibEntry entry = entry();
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         ChangeSet changeSet = new ChangeSet("edit", List.of(
                 new FieldEdit(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
                 new FieldEdit(entry, StandardField.AUTHOR, "Bohr", "Planck")));
 
-        changeSet.applyTo(context);
+        changeSet.apply();
         assertEquals("Planck", entry.getField(StandardField.AUTHOR).orElseThrow());
 
-        changeSet.inverted().applyTo(context);
+        changeSet.inverted().apply();
         assertEquals("Einstein", entry.getField(StandardField.AUTHOR).orElseThrow());
     }
 

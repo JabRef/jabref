@@ -1,7 +1,5 @@
 package org.jabref.model.change;
 
-import org.jabref.model.database.BibDatabaseContext;
-
 /// A single reversible modification of a library.
 ///
 /// Implementations are value objects: they hold the data needed to perform the change and the
@@ -19,10 +17,13 @@ public sealed interface BibChange
     /// Must be an involution: `change.inverted().inverted()` equals `change`.
     BibChange inverted();
 
-    /// Performs this change on `context`.
+    /// Performs this change.
     ///
-    /// Implementations apply their change unconditionally rather than checking whether the
-    /// library still holds the expected prior state; the undo stack is discarded whenever the
-    /// library is reloaded, so that state is an invariant rather than something to verify.
-    void applyTo(BibDatabaseContext context);
+    /// Implementations hold whatever they need to act on — an entry, a string, the database —
+    /// so that recording a change never requires plumbing a context to the call site.
+    ///
+    /// The change is applied unconditionally rather than checking whether the library still
+    /// holds the expected prior state; the undo stack is discarded whenever the library is
+    /// reloaded, so that state is an invariant rather than something to verify.
+    void apply();
 }

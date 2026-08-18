@@ -3,7 +3,6 @@ package org.jabref.model.change;
 import java.util.Objects;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -24,7 +23,7 @@ public record FieldEdit(BibEntry entry, Field field, @Nullable String before, @N
     }
 
     @Override
-    public void applyTo(BibDatabaseContext context) {
+    public void apply() {
         if (after == null) {
             entry.clearField(field);
         } else {

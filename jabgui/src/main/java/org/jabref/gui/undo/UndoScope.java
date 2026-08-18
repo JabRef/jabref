@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.model.change.ChangeSet;
-import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -25,14 +24,12 @@ import org.jspecify.annotations.Nullable;
 public class UndoScope {
 
     private final UndoManager undoManager;
-    private final BibDatabaseContext context;
 
     /// Non-null exactly while a `record` call is in progress.
     private @Nullable ChangeRecorder active;
 
-    public UndoScope(UndoManager undoManager, BibDatabaseContext context) {
+    public UndoScope(UndoManager undoManager) {
         this.undoManager = undoManager;
-        this.context = context;
     }
 
     /// Runs `mutations`, recording whatever it reports, and pushes the result as one undo step
@@ -58,7 +55,7 @@ public class UndoScope {
             return;
         }
         if (enclosing == null) {
-            undoManager.addEdit(new ChangeSetEdit(changeSet, context));
+            undoManager.addEdit(new BibChangeEdit(changeSet));
         } else {
             enclosing.record(changeSet);
         }
