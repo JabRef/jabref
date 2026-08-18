@@ -31,12 +31,14 @@ public class ApiKeyDialog extends FXDialog {
     private final WebSearchTabViewModel viewModel;
     private final FetcherViewModel fetcherViewModel;
     private final BooleanProperty apiKeyValid = new SimpleBooleanProperty();
+    private final BooleanProperty persistLocal;
     private RotateTransition rotation;
 
     public ApiKeyDialog(WebSearchTabViewModel viewModel, FetcherViewModel fetcherViewModel) {
         super(AlertType.NONE, Localization.lang("API Key for %0", fetcherViewModel.getName()));
         this.viewModel = viewModel;
         this.fetcherViewModel = fetcherViewModel;
+        this.persistLocal = new SimpleBooleanProperty(fetcherViewModel.shouldPersistApiKey());
 
         ViewLoader.view(this)
                   .load()
@@ -63,7 +65,9 @@ public class ApiKeyDialog extends FXDialog {
             testButton.getStyleClass().removeAll("success", "error");
         });
 
-        persistApiKeysCheckBox.selectedProperty().bindBidirectional(fetcherViewModel.persistApiKeyProperty());
+        // Use a local property to make persist checkbox transactional
+        persistLocal.set(fetcherViewModel.shouldPersistApiKey());
+        persistApiKeysCheckBox.selectedProperty().bindBidirectional(persistLocal);
         persistApiKeysCheckBox.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
 
         rotation = new RotateTransition(Duration.seconds(1), IconTheme.JabRefIcons.REFRESH.getGraphicNode());
@@ -104,6 +108,8 @@ public class ApiKeyDialog extends FXDialog {
             String apiKey = apiKeyField.getText().trim();
             fetcherViewModel.apiKeyProperty().set(apiKey);
             fetcherViewModel.useCustomApiKeyProperty().set(!apiKey.isEmpty());
+            // Apply the persist setting from the local property
+            fetcherViewModel.setPersistApiKey(persistLocal.get());
         }
         return button;
     }
