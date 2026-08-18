@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -42,6 +44,39 @@ public final class OcrUtils {
             Thread.currentThread().interrupt();
             LOGGER.error("Checking OCR engine availability was interrupted", e);
             return false;
+        }
+    }
+
+    public static int performOcr(ArrayList<String> command, String engineName) {
+        Process process = null;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectErrorStream(true);
+            process = processBuilder.start();
+
+            // Get the output and the errors of the process
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+
+            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
+            if (!finished) {
+                process.destroyForcibly();
+                return OcrFailureReason.TIMEOUT.getErrorCode();
+            }
+
+            if (process.exitValue() == 0) {
+                return 0;
+            } else {
+                return OcrFailureReason.NON_ZERO_EXIT.getErrorCode();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while running {}.", engineName, e);
+            return OcrFailureReason.IO_ERROR.getErrorCode();
+        } catch (InterruptedException e) {
+            process.destroyForcibly();
+            Thread.currentThread().interrupt();
+            LOGGER.error("{} process was interrupted.", engineName, e);
+            return OcrFailureReason.INTERRUPTED.getErrorCode();
         }
     }
 
