@@ -26,7 +26,6 @@ class ImporterPreferencesTest {
                 false,
                 Set.of(),
                 Set.of(new FetcherApiKey(FETCHER, true, key)),
-                false,
                 List.of(),
                 PlainCitationParserChoice.RULE_BASED_GENERAL,
                 30,
