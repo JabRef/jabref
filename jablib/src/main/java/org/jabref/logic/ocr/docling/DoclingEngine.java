@@ -15,6 +15,7 @@ import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ocr.docling.DoclingBBox;
 import org.jabref.model.ocr.docling.DoclingDocument;
 import org.jabref.model.ocr.docling.DoclingText;
@@ -56,8 +57,7 @@ public class DoclingEngine implements OcrEngine {
         }
         Path outputDir = pdfPath.getParent();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = new ArrayList<>();
-        command.add("docling");
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
         command.add("--to");
         command.add("json");
         command.add("--no-tables");

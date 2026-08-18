@@ -3,6 +3,7 @@ package org.jabref.gui.openoffice;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 
@@ -15,7 +16,9 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class ModifyBibliographyPropertiesDialogView extends BaseDialog<Void> {
 
+    @FXML private Label titleLabel;
     @FXML private TextField titleField;
+    @FXML private Label headerFormatLabel;
     @FXML private ComboBox<String> headerFormats;
     @FXML private ComboBox<String> bodyFormats;
 
@@ -55,5 +58,10 @@ public class ModifyBibliographyPropertiesDialogView extends BaseDialog<Void> {
                 .install(bodyFormats);
         bodyFormats.itemsProperty().bind(viewModel.bodyFormatListProperty());
         bodyFormats.valueProperty().bindBidirectional(viewModel.cslBibliographySelectedBodyFormatProperty());
+
+        titleLabel.disableProperty().bind(viewModel.shouldDisableHeadingControlsProperty());
+        titleField.disableProperty().bind(viewModel.shouldDisableHeadingControlsProperty());
+        headerFormatLabel.disableProperty().bind(viewModel.shouldDisableHeadingControlsProperty());
+        headerFormats.disableProperty().bind(viewModel.shouldDisableHeadingControlsProperty());
     }
 }

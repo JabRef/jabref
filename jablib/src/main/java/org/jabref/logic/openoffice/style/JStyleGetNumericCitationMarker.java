@@ -8,14 +8,13 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.PageInfo;
-import org.jabref.model.openoffice.util.OOListUtil;
 
-class JStyleGetNumCitationMarker {
+class JStyleGetNumericCitationMarker {
 
     // The number encoding "this entry is unresolved"
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
-    private JStyleGetNumCitationMarker() {
+    private JStyleGetNumericCitationMarker() {
     }
 
     /// Defines sort order for CitationMarkerNumericEntry.
@@ -183,8 +182,8 @@ class JStyleGetNumCitationMarker {
         final String bracketAfter = style.getBracketAfter();
 
         // Sort a copy of entries
-        List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
-        sorted.sort(JStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
+        List<CitationMarkerNumericEntry> sorted = new ArrayList<>(entries);
+        sorted.sort(JStyleGetNumericCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
         StringBuilder stringBuilder = new StringBuilder(bracketBefore);
