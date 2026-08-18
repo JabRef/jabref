@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -21,6 +22,8 @@ import com.airhacks.afterburner.injection.Injector;
 /// The layout of the pane should be defined in an external fxml file and loaded it via the
 /// {@link javafx.fxml.FXMLLoader}.
 public class FXDialog extends Alert {
+
+    private boolean popupWasShowingOnKeyPress;
 
     public FXDialog(AlertType type, String title, Image image, boolean isModal) {
         this(type, title, isModal);
@@ -55,10 +58,22 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
+        getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                popupWasShowingOnKeyPress = BaseDialog.isPopupShowing();
+            }
+        });
+
         dialogWindow.getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                dialogWindow.close();
+                if (popupWasShowingOnKeyPress) {
+                    popupWasShowingOnKeyPress = false;
+                    event.consume();
+                } else {
+                    dialogWindow.close();
+                }
             }
         });
         this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));

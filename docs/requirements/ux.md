@@ -75,4 +75,19 @@ When a user activates a large library, automatic group construction and group-co
 
 Needs: impl
 
+### Creating a new explicit group can reuse the current selection
+`req~ux.groups.create-explicit-from-selection~1`
+
+When a user creates a new explicit group, JabRef should allow reusing the currently selected entries for that group and should keep the newly created group selected afterwards.
+
+Needs: impl
+
+### Pressing Escape when a combo box popup is open closes only the combo box
+`req~ux.combobox.escape-closes-popup-only~1`
+
+When a combo box or drop-down list (such as a CheckComboBox, ComboBox, or ChoiceBox) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
+The enclosing dialog must remain open.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

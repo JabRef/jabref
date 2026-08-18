@@ -77,6 +77,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where pressing <kbd>Esc</kbd> while a combo box or drop-down list was open closed the entire dialog instead of closing only the drop-down popup. [#16596](https://github.com/JabRef/jabref/issues/16596)
 - We fixed an issue where the main table showed empty-library actions while a recent library was still loading. [#16468](https://github.com/JabRef/jabref/pull/16468)
 - We fixed an issue where JabRef was unable to save the changed `.bib` file if it was open in TeXstudio on Windows. [#11916](https://github.com/JabRef/jabref/issues/11916)
 - We fixed alignment of Journal/JournalTitle info icon in entry editor. [#16425](https://github.com/JabRef/jabref/issues/16425)

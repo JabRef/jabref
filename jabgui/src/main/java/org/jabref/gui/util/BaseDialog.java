@@ -8,9 +8,12 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
+import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -22,11 +25,25 @@ import com.airhacks.afterburner.injection.Injector;
 
 public class BaseDialog<T> extends Dialog<T> {
 
+    private boolean popupWasShowingOnKeyPress;
+
     protected BaseDialog() {
+        getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                popupWasShowingOnKeyPress = isPopupShowing();
+            }
+        });
+
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                close();
+                if (popupWasShowingOnKeyPress) {
+                    popupWasShowingOnKeyPress = false;
+                    event.consume();
+                } else {
+                    close();
+                }
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
                 getDefaultButton().ifPresent(Button::fire);
             }
@@ -45,6 +62,14 @@ public class BaseDialog<T> extends Dialog<T> {
         setDialogIcon(IconTheme.getJabRefIcon());
         setResizable(true);
     }
+
+    public static boolean isPopupShowing() {
+        return Window.getWindows().stream()
+                     .filter(window -> window instanceof PopupWindow)
+                     .map(window -> (PopupWindow) window)
+                     .anyMatch(popup -> popup.isShowing() && !(popup instanceof Tooltip));
+    }
+
 
     private Optional<Button> getDefaultButton() {
         return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));

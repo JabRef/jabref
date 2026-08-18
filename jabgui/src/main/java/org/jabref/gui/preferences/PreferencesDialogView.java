@@ -81,7 +81,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         // The list view does not respect the listener for the dialog and needs its own
         preferenceTabList.setOnKeyReleased(key -> {
             if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
-                this.closeDialog();
+                if (!BaseDialog.isPopupShowing()) {
+                    this.closeDialog();
+                }
             }
         });
 
@@ -97,6 +99,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                if (BaseDialog.isPopupShowing()) {
+                    return;
+                }
                 if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
                     this.closeDialog();
                     event.consume();
