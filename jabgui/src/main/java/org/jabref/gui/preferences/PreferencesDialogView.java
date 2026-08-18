@@ -49,7 +49,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
-    private boolean popupWasShowingOnKeyPressForTabList;
 
     public PreferencesDialogView(Class<? extends PreferencesTab> preferencesTabToSelectClass) {
         this.setTitle(DIALOG_TITLE);
@@ -82,8 +81,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         // The list view does not respect the listener for the dialog and needs its own
         preferenceTabList.setOnKeyReleased(key -> {
             if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
-                if (popupWasShowingOnKeyPressForTabList) {
-                    popupWasShowingOnKeyPressForTabList = false;
+                if (popupWasShowingOnKeyPress) {
+                    popupWasShowingOnKeyPress = false;
                 } else {
                     this.closeDialog();
                 }
@@ -102,8 +101,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                popupWasShowingOnKeyPressForTabList = BaseDialog.isPopupShowing(getDialogPane().getScene() != null ? getDialogPane().getScene().getWindow() : null);
-                if (popupWasShowingOnKeyPressForTabList) {
+                if (popupWasShowingOnKeyPress) {
                     return;
                 }
                 if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {

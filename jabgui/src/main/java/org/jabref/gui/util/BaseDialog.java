@@ -22,12 +22,12 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.Nullable;
 
 public class BaseDialog<T> extends Dialog<T> {
 
-    private boolean popupWasShowingOnKeyPress;
+    protected boolean popupWasShowingOnKeyPress;
 
-    // [impl->req~ux.combobox.escape-closes-popup-only~1]
     protected BaseDialog() {
         getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
@@ -37,6 +37,7 @@ public class BaseDialog<T> extends Dialog<T> {
             }
         });
 
+        // [impl->req~ux.combobox.escape-closes-popup-only~1]
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
@@ -65,15 +66,11 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
-    public static boolean isPopupShowing(Window owner) {
+    public static boolean isPopupShowing(@Nullable Window owner) {
         return Window.getWindows().stream()
                      .filter(window -> window instanceof PopupWindow)
                      .map(window -> (PopupWindow) window)
                      .anyMatch(popup -> popup.isShowing() && !(popup instanceof Tooltip) && (owner == null || popup.getOwnerWindow() == owner));
-    }
-
-    public static boolean isPopupShowing() {
-        return isPopupShowing(null);
     }
 
     private Optional<Button> getDefaultButton() {
