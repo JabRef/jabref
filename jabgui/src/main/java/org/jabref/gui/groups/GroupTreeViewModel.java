@@ -283,7 +283,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
-            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) newGroup;
 
             return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
                     && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
