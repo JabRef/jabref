@@ -50,8 +50,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -78,6 +76,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
+import org.jabref.model.change.EntriesInserted;
+import org.jabref.model.change.EntriesRemoved;
 import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -849,7 +849,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().addEdit(new BibChangeEdit(new EntriesInserted(bibDatabaseContext.getDatabase(), entries)));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
 
@@ -981,7 +981,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
+        getUndoManager().addEdit(new BibChangeEdit(new EntriesRemoved(bibDatabaseContext.getDatabase(), entries)));
         bibDatabaseContext.getDatabase().removeEntries(entries);
 
         if (mode != StandardActions.CUT) {

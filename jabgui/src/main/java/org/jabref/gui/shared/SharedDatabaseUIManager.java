@@ -19,7 +19,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -35,6 +35,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.change.EntriesRemoved;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -143,7 +144,7 @@ public class SharedDatabaseUIManager {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
 
         if (libraryTab != null) {
-            undoManager.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
+            undoManager.addEdit(new BibChangeEdit(new EntriesRemoved(libraryTab.getDatabase(), event.bibEntries())));
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")

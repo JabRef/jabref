@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -106,6 +107,26 @@ class BibChangeTest {
 
         change.inverted().apply();
         assertEquals(new UnknownEntryType("customtype"), entry.getType());
+    }
+
+    /// Restoring removed entries must not look like adding them: the group listener in
+    /// `LibraryTab` skips auto-assignment only for `UNDO`.
+    @Test
+    void undoingARemovalReinsertsWithTheUndoEventSource() {
+        BibDatabase database = new BibDatabase();
+        EntriesRemoved removal = new EntriesRemoved(database, entry());
+
+        assertEquals(EntriesEventSource.UNDO, ((EntriesInserted) removal.inverted()).source());
+    }
+
+    /// Redoing an insertion is a normal local addition, as it was before the change model.
+    @Test
+    void redoingAnInsertionKeepsTheLocalEventSource() {
+        BibDatabase database = new BibDatabase();
+        EntriesInserted insertion = new EntriesInserted(database, entry());
+
+        assertEquals(EntriesEventSource.LOCAL, insertion.source());
+        assertEquals(EntriesEventSource.LOCAL, ((EntriesInserted) insertion.inverted().inverted()).source());
     }
 
     @Test

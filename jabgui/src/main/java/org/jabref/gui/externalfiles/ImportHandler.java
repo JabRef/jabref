@@ -27,7 +27,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
@@ -55,6 +55,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
+import org.jabref.model.change.EntriesInserted;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -252,7 +253,7 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.addEdit(new BibChangeEdit(new EntriesInserted(targetBibDatabaseContext.getDatabase(), entriesToAdd)));
                     compoundEdit.end();
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));

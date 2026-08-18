@@ -67,9 +67,8 @@ import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.URLs;
@@ -89,6 +88,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.EntriesInserted;
+import org.jabref.model.change.EntriesRemoved;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -1050,8 +1051,8 @@ public class CitationRelationsTab extends EntryEditorTab {
             database.insertEntry(mergedEntry);
 
             NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
+            compoundEdit.addEdit(new BibChangeEdit(new EntriesRemoved(database, mergeResult.originalLeftEntry())));
+            compoundEdit.addEdit(new BibChangeEdit(new EntriesInserted(database, mergedEntry)));
             compoundEdit.end();
 
             undoManager.addEdit(compoundEdit);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntriesEventSource;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -13,11 +14,20 @@ import org.jspecify.annotations.NullMarked;
 /// removal and redoing it must put back *the same* objects, because other parts of the UI hold
 /// references to them. A move to id-based lookup would break that silently, so it would have
 /// to revisit this record.
+///
+/// `source` is reported to the model listeners. It matters because restoring entries is not
+/// the same event as adding them: entries re-inserted by an undo must not be auto-assigned to
+/// the group that happens to be selected, which the listener in `LibraryTab` decides by
+/// looking for [EntriesEventSource#UNDO].
 @NullMarked
-public record EntriesInserted(BibDatabase database, List<BibEntry> entries) implements BibChange {
+public record EntriesInserted(BibDatabase database, List<BibEntry> entries, EntriesEventSource source) implements BibChange {
 
     public EntriesInserted {
         entries = List.copyOf(entries);
+    }
+
+    public EntriesInserted(BibDatabase database, List<BibEntry> entries) {
+        this(database, entries, EntriesEventSource.LOCAL);
     }
 
     public EntriesInserted(BibDatabase database, BibEntry entry) {
@@ -26,23 +36,24 @@ public record EntriesInserted(BibDatabase database, List<BibEntry> entries) impl
 
     @Override
     public EntriesRemoved inverted() {
-        return new EntriesRemoved(database, entries);
+        return new EntriesRemoved(database, entries, source);
     }
 
     @Override
     public void apply() {
-        database.insertEntries(entries);
+        database.insertEntries(entries, source);
     }
 
     @Override
     public boolean equals(Object object) {
         return (object instanceof EntriesInserted other)
                 && ChangeIdentity.same(database, other.database)
-                && ChangeIdentity.sameAll(entries, other.entries);
+                && ChangeIdentity.sameAll(entries, other.entries)
+                && (source == other.source);
     }
 
     @Override
     public int hashCode() {
-        return ChangeIdentity.hashAll(entries);
+        return (31 * ChangeIdentity.hashAll(entries)) + source.hashCode();
     }
 }
