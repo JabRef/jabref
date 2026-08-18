@@ -9,9 +9,10 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -91,7 +92,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
         entry.setField(field, newStr);
-        compound.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
+        compound.addEdit(new BibChangeEdit(new FieldEdit(entry, field, txt, newStr)));
         return counter;
     }
 

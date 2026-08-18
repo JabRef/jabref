@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.model.FieldChange;
@@ -100,13 +99,13 @@ public final class MergeEntriesHelper {
                 if (!merged.equals(libraryValue.orElse(""))) {
                     LOGGER.debug("Union-merging groups: {} + {} -> {}", libraryValue.orElse(""), fetcherValue.get(), merged);
                     entryFromLibrary.setField(field, merged);
-                    namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), merged));
+                    namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), merged)));
                     anyFieldsChanged = true;
                 }
             } else if (fetcherValue.isPresent() && shouldUpdateField(field, fetcherValue.get(), libraryValue)) {
                 LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), fetcherValue.get());
                 entryFromLibrary.setField(field, fetcherValue.get());
-                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
+                namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get())));
                 anyFieldsChanged = true;
             }
         }
@@ -128,7 +127,7 @@ public final class MergeEntriesHelper {
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
                 entryFromLibrary.clearField(field);
-                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
+                namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(entryFromLibrary, field, value.get(), null)));
                 anyFieldsRemoved = true;
             }
         }

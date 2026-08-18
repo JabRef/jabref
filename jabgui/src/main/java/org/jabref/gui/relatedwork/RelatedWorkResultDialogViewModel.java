@@ -11,12 +11,13 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 
 public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
@@ -63,7 +64,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
             switch (insertionResult) {
                 case RelatedWorkInsertionResult.Inserted inserted -> {
                     insertedCount++;
-                    compoundEdit.addEdit(new UndoableFieldChange(inserted.fieldChange()));
+                    compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(inserted.fieldChange())));
                 }
                 case RelatedWorkInsertionResult.Unchanged unchanged ->
                         unchangedCount++;

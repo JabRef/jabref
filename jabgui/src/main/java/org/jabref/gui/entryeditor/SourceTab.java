@@ -30,7 +30,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -41,6 +40,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.change.EntryTypeEdit;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -295,7 +295,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.addEdit(new BibChangeEdit(new FieldEdit(outOfFocusEntry, fieldName, fieldValue, null)));
                 outOfFocusEntry.clearField(fieldName);
             }
         }
@@ -314,7 +314,7 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.addEdit(new BibChangeEdit(new FieldEdit(outOfFocusEntry, fieldName, oldValue, newValue)));
                 outOfFocusEntry.setField(fieldName, newValue);
             }
         }

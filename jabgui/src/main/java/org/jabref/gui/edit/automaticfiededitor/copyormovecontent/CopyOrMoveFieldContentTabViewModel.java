@@ -15,9 +15,10 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -117,10 +118,10 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
-                    copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
+                    copyFieldValueEdit.addEdit(new BibChangeEdit(new FieldEdit(entry,
                             toField.get(),
                             toFieldValue,
-                            fromFieldValue));
+                            fromFieldValue)));
                     affectedEntriesCount++;
                 }
             }
@@ -163,19 +164,19 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 entry.setField(toField.get(), fromFieldValue);
                 entry.setField(fromField.get(), toFieldValue);
 
-                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
+                swapFieldValuesEdit.addEdit(new BibChangeEdit(new FieldEdit(
                         entry,
                         toField.get(),
                         toFieldValue,
                         fromFieldValue
-                ));
+                )));
 
-                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
+                swapFieldValuesEdit.addEdit(new BibChangeEdit(new FieldEdit(
                         entry,
                         fromField.get(),
                         fromFieldValue,
                         toFieldValue
-                ));
+                )));
                 affectedEntriesCount++;
             }
         }

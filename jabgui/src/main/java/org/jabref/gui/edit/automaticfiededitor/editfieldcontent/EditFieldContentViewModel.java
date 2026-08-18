@@ -18,9 +18,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -82,9 +83,9 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
                 fieldValue.set("");
-                // TODO: increment affected entries only when UndoableFieldChange.isPresent()
+                // TODO: increment affected entries only when the field change is present
                 affectedEntriesCount++;
             }
         }
@@ -108,7 +109,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue)
-                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.addEdit(new BibChangeEdit(new FieldEdit(fieldChange))));
 
                 fieldValue.set("");
                 affectedEntriesCount++;

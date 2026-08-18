@@ -9,8 +9,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
@@ -94,7 +95,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
                 });
                 if (fieldChange != null && fieldChange.isPresent()) {
-                    namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+                    namedCompoundEdit.addEdit(new BibChangeEdit(new FieldEdit(fieldChange.get())));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));

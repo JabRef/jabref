@@ -3,9 +3,10 @@ package org.jabref.gui.edit.automaticfiededitor;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -43,8 +44,8 @@ public class MoveFieldValueAction extends SimpleCommand {
                     entry.setField(toField, fromFieldValue);
                     entry.setField(fromField, "");
 
-                    edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
-                    edits.addEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
+                    edits.addEdit(new BibChangeEdit(new FieldEdit(entry, fromField, fromFieldValue, null)));
+                    edits.addEdit(new BibChangeEdit(new FieldEdit(entry, toField, toFieldValue, fromFieldValue)));
                     affectedEntriesCount++;
                 }
             }

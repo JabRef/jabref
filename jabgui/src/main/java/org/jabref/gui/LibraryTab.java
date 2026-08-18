@@ -47,9 +47,9 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -78,6 +78,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -488,7 +489,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
+            compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(change)));
         }
         compoundEdit.end();
         if (compoundEdit.hasEdits()) {

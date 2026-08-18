@@ -18,8 +18,8 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -31,6 +31,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -174,7 +175,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
         for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
+            compoundEdit.addEdit(new BibChangeEdit(new FieldEdit(change)));
         }
 
         failures.addAll(cleaner.getFailures());

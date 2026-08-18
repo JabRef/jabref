@@ -7,10 +7,12 @@ import javafx.scene.control.Button;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.field.Field;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
@@ -46,7 +48,7 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         journalAbbreviationRepository.getNextAbbreviation(name).ifPresent(nextAbbreviation -> {
             text.set(nextAbbreviation);
             // TODO: Add undo
-            // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
+            // panel.getUndoManager().addEdit(new BibChangeEdit(new FieldEdit(entry, editor.getName(), text, nextAbbreviation)));
         });
     }
 

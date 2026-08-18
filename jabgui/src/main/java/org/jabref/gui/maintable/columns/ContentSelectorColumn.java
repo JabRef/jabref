@@ -10,9 +10,10 @@ import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.BibChangeEdit;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.FieldEdit;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -55,7 +56,7 @@ public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
                 String oldValue = entry.getField(field).orElse(null);
                 entry.setField(field, item);
                 if (undoManager != null) {
-                    undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, item));
+                    undoManager.addEdit(new BibChangeEdit(new FieldEdit(entry, field, oldValue, item)));
                 }
             });
             menu.getItems().add(menuItem);
