@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorChanges;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.change.FieldEdit;
 import org.jabref.model.database.BibDatabase;
@@ -35,7 +35,7 @@ public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewMo
     }
 
     public void clearField(Field field) {
-        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("CLEAR_SELECTED_FIELD");
+        AutomaticFieldEditorChanges edits = new AutomaticFieldEditorChanges("CLEAR_SELECTED_FIELD");
         int affectedEntriesCount = 0;
         for (BibEntry entry : this.selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(field);

@@ -52,7 +52,7 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractV
         allFields.setAll(fieldsSet);
     }
 
-    protected void addEdit(AutomaticFieldEditorUndoableEdit edits) {
+    protected void addEdit(AutomaticFieldEditorChanges edits) {
         compoundEdit.addEdit(edits);
         dialogService.notify(new Notifications.UiNotification(
                 Localization.lang("Automatic field editor"),
