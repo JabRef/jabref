@@ -2,6 +2,8 @@ package org.jabref.gui.edit;
 
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -29,6 +31,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
     @Inject private CliPreferences preferences;
+    @Inject private UndoManager undoManager;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -49,7 +52,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries);
+        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries, undoManager);
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {

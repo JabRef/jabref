@@ -3,6 +3,8 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -24,12 +26,14 @@ public class ManageKeywordsViewModel {
     private final List<BibEntry> entries;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
     private final BibEntryPreferences bibEntryPreferences;
+    private final UndoManager undoManager;
     private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries) {
+    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries, UndoManager undoManager) {
         this.bibEntryPreferences = bibEntryPreferences;
         this.entries = entries;
+        this.undoManager = undoManager;
         this.keywords = FXCollections.observableArrayList();
 
         EasyBind.subscribe(displayType, this::fillKeywordsList);
@@ -105,7 +109,9 @@ public class ManageKeywordsViewModel {
         }
 
         NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        // TODO: bp.getUndoManager().addEdit(compoundEdit);
+        if (compoundEdit.hasEdits()) {
+            undoManager.addEdit(compoundEdit);
+        }
     }
 
     private NamedCompoundEdit updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
