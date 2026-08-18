@@ -2343,7 +2343,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport()),
                 getCustomImportFormats(defaultValues.getCustomImporters()),
                 getFetcherKeys(defaultValues.getApiKeys()),
-                getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys()),
                 hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaultValues.getCatalogs(),
                 getDefaultPlainCitationParser(defaultValues.getDefaultPlainCitationParser()),
                 getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaultValues.getCitationsRelationsStoreTTL()),
@@ -2354,9 +2353,6 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
-        // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
-        // decide whether to write the keyring, so the flag has to be in place first.
-        bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),
                 () -> getFetcherKeys(defaultValues.getApiKeys()));
@@ -2409,7 +2405,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Set<FetcherApiKey> getFetcherKeys(Set<FetcherApiKey> defaults) {
-        if (!hasKey(FETCHER_CUSTOM_KEY_NAMES) || !hasKey(FETCHER_CUSTOM_KEY_USES)) {
+        if (!hasKey(FETCHER_CUSTOM_KEY_NAMES) || !hasKey(FETCHER_CUSTOM_KEY_USES) || !hasKey(FETCHER_CUSTOM_KEY_PERSIST)) {
             return defaults;
         }
 
@@ -2417,9 +2413,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
+        List<String> persists = getStringList(FETCHER_CUSTOM_KEY_PERSIST);
         List<String> keys = getFetcherKeysFromKeyring(names);
 
-        if (names.size() != uses.size() || names.size() != keys.size()) {
+        if (names.size() != uses.size() || names.size() != persists.size() || names.size() != keys.size()) {
             LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
             return defaults;
         }
@@ -2427,9 +2424,9 @@ public class JabRefCliPreferences implements CliPreferences {
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
-                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
                     (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
-                    i < keys.size() ? keys.get(i) : ""));
+                    i < keys.size() ? keys.get(i) : "",
+                    (i < persists.size()) && Boolean.parseBoolean(persists.get(i))));
         }
 
         return fetcherApiKeys;
@@ -2449,30 +2446,48 @@ public class JabRefCliPreferences implements CliPreferences {
     private void storeFetcherKeys(ImporterPreferences defaults) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        Map<KeyringSlot, String> keys = new HashMap<>();
+        List<String> persists = new ArrayList<>();
+        Map<KeyringSlot, String> keysToPersist = new HashMap<>();
+        Map<KeyringSlot, String> keysToClear = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
             names.add(apiKey.getName());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            persists.add(String.valueOf(apiKey.shouldPersist()));
+            if (apiKey.shouldPersist()) {
+                keysToPersist.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            } else {
+                keysToClear.put(KeyringSlot.customApiKey(apiKey.getName()), "");
+            }
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+        putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
 
-        if (defaults.shouldPersistCustomKeys()) {
-            writeKeyring(keys);
-        } else {
-            clearCustomFetcherKeys();
+        // Clear keys that should not be persisted
+        if (!keysToClear.isEmpty()) {
+            writeKeyring(keysToClear);
+        }
+        // Write keys that should be persisted
+        if (!keysToPersist.isEmpty()) {
+            writeKeyring(keysToPersist);
         }
     }
 
     private void clearCustomFetcherKeys() {
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
         Map<KeyringSlot, String> cleared = new HashMap<>();
-        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
-            cleared.put(KeyringSlot.customApiKey(name), "");
+        for (KeyringSlot slot : slots) {
+            cleared.put(slot, "");
         }
         writeKeyring(cleared);
+
+        // Remove the preference keys
+        remove(FETCHER_CUSTOM_KEY_NAMES);
+        remove(FETCHER_CUSTOM_KEY_USES);
+        remove(FETCHER_CUSTOM_KEY_PERSIST);
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {

@@ -42,7 +42,6 @@ public class ImporterPreferences {
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
-    private final BooleanProperty persistCustomKeys;
     private final ObservableList<String> catalogs;
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser;
     private final IntegerProperty citationsRelationsStoreTTL;
@@ -56,7 +55,6 @@ public class ImporterPreferences {
                 true,                                          // Warn about duplicates on import
                 Set.of(),                                      // Custom importers
                 Set.of(),                                      // API keys
-                false,                                         // Persist custom keys
                 List.of(ACMPortalFetcher.FETCHER_NAME,         // Alphabetically sorted list of Catalogs
                         DBLPFetcher.FETCHER_NAME,
                         IEEE.FETCHER_NAME,
@@ -73,7 +71,6 @@ public class ImporterPreferences {
                                boolean warnAboutDuplicatesOnImport,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
-                               boolean persistCustomKeys,
                                List<String> catalogs,
                                PlainCitationParserChoice defaultPlainCitationParser,
                                int citationsRelationsStoreTTL,
@@ -85,7 +82,6 @@ public class ImporterPreferences {
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
         this.customImporters = FXCollections.observableSet(new HashSet<>(customImporters));
         this.apiKeys = FXCollections.observableSet(new HashSet<>(apiKeys));
-        this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
         this.catalogs = FXCollections.observableArrayList(catalogs);
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
         this.citationsRelationsStoreTTL = new SimpleIntegerProperty(citationsRelationsStoreTTL);
@@ -96,7 +92,7 @@ public class ImporterPreferences {
         ImporterPreferences preferences = new ImporterPreferences();
         preferences.setApiKeys(new HashSet<>(getDefaultFetcherKeys()
                 .entrySet().stream()
-                .map(entry -> new FetcherApiKey(entry.getKey(), false, entry.getValue()))
+                .map(entry -> new FetcherApiKey(entry.getKey(), false, entry.getValue(), false))
                 .toList()));
         return preferences;
     }
@@ -182,18 +178,6 @@ public class ImporterPreferences {
     public void setCustomImporters(Set<CustomImporter> importers) {
         customImporters.clear();
         customImporters.addAll(importers);
-    }
-
-    public boolean shouldPersistCustomKeys() {
-        return persistCustomKeys.get();
-    }
-
-    public BooleanProperty persistCustomKeysProperty() {
-        return persistCustomKeys;
-    }
-
-    public void setPersistCustomKeys(boolean persistCustomKeys) {
-        this.persistCustomKeys.set(persistCustomKeys);
     }
 
     /// @param name of the fetcher
