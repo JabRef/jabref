@@ -28,12 +28,12 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.18.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.19.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.1"))
+    api(platform("tools.jackson:jackson-bom:3.2.2"))
 }
 
 dependencies.constraints {
@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.0")
+    api("com.dlsc.gemsfx:gemsfx:4.4.1")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -62,14 +62,14 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.50.0")
-    api("com.google.guava:guava:33.6.0-jre")
+    api("com.google.guava:guava:33.7.1-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.1")
     api("com.konghq:unirest-modules-gson:4.10.1")
-    api("com.squareup.okhttp3:mockwebserver3:5.4.0")
-    api("com.squareup.okhttp3:okhttp:5.4.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.5.0")
+    api("com.squareup.okhttp3:okhttp:5.5.0")
     api("com.squareup.okio:okio-jvm:3.18.1")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.5.0")
@@ -89,7 +89,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.191")
+    api("io.github.classgraph:classgraph:4.8.192")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -101,7 +101,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.11")
+    api("net.bytebuddy:byte-buddy:1.18.12")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
@@ -129,9 +129,9 @@ dependencies.constraints {
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
-    api("org.glassfish.hk2:hk2-api:4.0.1")
-    api("org.glassfish.hk2:hk2-locator:4.0.1")
-    api("org.glassfish.hk2:hk2-utils:4.0.1")
+    api("org.glassfish.hk2:hk2-api:4.0.2")
+    api("org.glassfish.hk2:hk2-locator:4.0.2")
+    api("org.glassfish.hk2:hk2-utils:4.0.2")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.3.Final")
