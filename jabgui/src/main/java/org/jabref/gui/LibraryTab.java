@@ -866,6 +866,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
+
     public void copyEntry() {
         int entriesCopied = doCopyEntry(TransferMode.COPY, getSelectedEntries());
         if (entriesCopied >= 0) {
@@ -930,6 +931,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return List.of(fallBack);
         }
     }
+
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
         InsertUtil.FeedbackMessage successMessage;
