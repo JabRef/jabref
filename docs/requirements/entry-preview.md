@@ -8,10 +8,7 @@ parent: Requirements
 ### Entry Preview shows the Available Panel split into CSL and Customized tabs
 `req~entry-preview.tabs~1`
 
-The Entry Preview should display two distinct views under the 'Available' Panel. Each view displays the styles corresponding to its respective tab:
-
-- CSL: displays available CSL styles.
-- Customized: displays available custom preview layouts.
+The Entry Preview should display two distinct views under the 'Available' Panel. Each view displays the styles corresponding to its respective tab. The CSL tab displays available CSL styles. The Customized tab displays available custom preview layouts.
 
 Needs: impl
 
