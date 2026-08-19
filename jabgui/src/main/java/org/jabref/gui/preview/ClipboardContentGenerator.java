@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javafx.scene.input.ClipboardContent;
 
@@ -139,7 +138,7 @@ public record ClipboardContentGenerator(
                                                                        .map(TextBasedPreviewLayout.class::cast)
                                                                        .findFirst();
         CustomizedPreviewStyle storedLayout = previewPreferences.getCustomizedPreviewStyles().isEmpty()
-                                              ? new CustomizedPreviewStyle(UUID.randomUUID().toString(), TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
+                                              ? new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
                                               : previewPreferences.getCustomizedPreviewStyles().getFirst();
         TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(storedLayout.name(), storedLayout.text(), layoutFormatterPreferences, abbreviationRepository));
 

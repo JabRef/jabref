@@ -1,10 +1,7 @@
 package org.jabref.gui.preferences.preview;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -16,6 +13,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.JavaFxThreadingUtil;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -80,15 +78,7 @@ class PreviewTabViewModelTest {
      */
     @BeforeAll
     static void initToolkit() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        try {
-            Platform.startup(latch::countDown);
-        } catch (IllegalStateException alreadyStarted) {
-            latch.countDown();
-        }
-        if (!latch.await(5, TimeUnit.SECONDS)) {
-            throw new IllegalStateException("Timed out waiting for JavaFX toolkit to initialize");
-        }
+        JavaFxThreadingUtil.initializeJavaFxToolkit();
     }
 
     private PreviewTabViewModel viewModelWith(PreviewPreferences previewPreferences) {
@@ -515,7 +505,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnDuplicateName() {
+    void renameSelectedStyleFailsOnDuplicateNameInCustomizedList() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // add new custom layout
@@ -534,17 +524,63 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnBlank() {
+    void renameSelectedStyleFailsOnDuplicateNameInChosenList() {
+        PreviewTabViewModel viewModel = setUpViewModel();
+
+        TextBasedPreviewLayout chosenLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
+                layoutFormatterPreferences, abbreviationRepository);
+        viewModel.chosenListProperty().add(chosenLayout);
+
+        TextBasedPreviewLayout layoutBeingRenamed = TextBasedPreviewLayout.of(ID2, NAME2, TEXT2,
+                layoutFormatterPreferences, abbreviationRepository);
+        viewModel.customizedListProperty().add(layoutBeingRenamed);
+        viewModel.setPreviewLayout(layoutBeingRenamed);
+
+        viewModel.renameSelectedStyle(NAME1);
+
+        assertEquals(ID2, layoutBeingRenamed.getId());
+        assertEquals(NAME2, layoutBeingRenamed.getDisplayName());
+        assertEquals(TEXT2, layoutBeingRenamed.getText());
+    }
+
+    @Test
+    void renameSelectedStyleFailsOnDuplicateNameInCslList() {
+        PreviewTabViewModel viewModel = setUpViewModel();
+
+        // adds layout to CSL List
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, TEST_SOURCE);
+        CitationStylePreviewLayout cslLayout =
+                new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
+        viewModel.cslListProperty().add(cslLayout);
+        assertTrue(viewModel.cslListProperty().contains(cslLayout));
+
+        TextBasedPreviewLayout layoutBeingRenamed = TextBasedPreviewLayout.of(ID2, NAME2, TEXT2,
+                layoutFormatterPreferences, abbreviationRepository);
+        viewModel.customizedListProperty().add(layoutBeingRenamed);
+        viewModel.setPreviewLayout(layoutBeingRenamed);
+
+        viewModel.renameSelectedStyle(TEST_TITLE);
+
+        assertEquals(ID2, layoutBeingRenamed.getId());
+        assertEquals(NAME2, layoutBeingRenamed.getDisplayName());
+        assertEquals(TEXT2, layoutBeingRenamed.getText());
+    }
+
+    @Test
+    void renameSelectedStyleFailsOnBlankLayoutNameAndTextFiledUnchanged() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
                 layoutFormatterPreferences, abbreviationRepository);
         viewModel.customizedListProperty().add(textBasedPreviewLayout);
         viewModel.setPreviewLayout(textBasedPreviewLayout);
+        viewModel.styleNameProperty().set(NAME1);
 
         viewModel.renameSelectedStyle("   ");
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
         viewModel.renameSelectedStyle("");
+        assertEquals(NAME1, viewModel.styleNameProperty().getValue());
         assertEquals(ID1, textBasedPreviewLayout.getId());
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
         assertEquals(TEXT1, textBasedPreviewLayout.getText());

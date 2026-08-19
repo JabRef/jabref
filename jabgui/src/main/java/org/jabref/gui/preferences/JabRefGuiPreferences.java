@@ -909,7 +909,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
             if (customizedLayouts.isEmpty()) {
-                CustomizedPreviewStyle defaultStyle = new CustomizedPreviewStyle(
+                CustomizedPreviewStyle defaultStyle = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
                         TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT);
                 customizedLayouts.add(defaultStyle);
                 cycle.add(defaultStyle.id());
@@ -951,8 +951,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private List<CustomizedPreviewStyle> getCustomizedPreviewStyle(List<CustomizedPreviewStyle> defaults) {
-        // hasKey() can't distinguish "never migrated" from "user deleted all customized styles"
-        // storeCustomizedPreviewStyle purges the numbered series when the list is emptied.
+        // hasKey() can't distinguish "never migrated" from "empty customized styles". storeCustomizedPreviewStyle purges the numbered series when the list is emptied.
         // The PREVIEW_STYLE_CUSTOMIZED_MIGRATED key is written once by migrateLegacyCustomLayout and is never purged, so it survives
         // an emptied list and prevents the legacy PREVIEW_STYLE key from being re-migrated on a later startup.
         if (!hasKey(PREVIEW_STYLE_CUSTOMIZED_ID + "0") && !getBoolean(PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
@@ -963,7 +962,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         List<String> ids = getSeries(PREVIEW_STYLE_CUSTOMIZED_ID);
         List<String> names = getSeries(PREVIEW_STYLE_CUSTOMIZED_NAME);
         List<String> texts = getSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT);
-        // min is precautionary, helps to not be indexOutOfBounds in the case storing these keys failed midway
+        // min is precautionary, helps to not be indexOutOfBounds in the case storing these keys failed mid run
         int count = Math.min(ids.size(), Math.min(names.size(), texts.size()));
 
         List<CustomizedPreviewStyle> result = new ArrayList<>();
@@ -996,14 +995,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
     }
 
-    // Intended to migrate the old PREVIEW_STYLE value into CustomizedPreviewStyle list
-    // Then stores the new key immediately so this only runs once
+    // Intended to migrate the old PREVIEW_STYLE value into CustomizedPreviewStyle list. Then stores the new key immediately so this only runs once
     private List<CustomizedPreviewStyle> migrateLegacyCustomLayout(List<CustomizedPreviewStyle> defaults) {
         putBoolean(PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);    // key is marked so we don't attempt to migrate legacy layout again (i.e. if the list is empty again)
         if (hasKey(PREVIEW_STYLE)) {
             String legacyText = get(PREVIEW_STYLE, "").replace("__NEWLINE__", "\n");
             if (StringUtil.isNotBlank(legacyText)) {
-                CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(
+                // Legacy PREVIEW_CYCLE reference TextBasedPreviewLayout.NAME (reference PreferencesMigrations.upgradeBuiltinPreviewName)
+                // set migrated id to this default value, else cycle inherited from before this change silently drops the customized layout on load
+                CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
                         TextBasedPreviewLayout.NAME, legacyText);
                 storeCustomizedPreviewStyle(List.of(migrated));
                 return List.of(migrated);
