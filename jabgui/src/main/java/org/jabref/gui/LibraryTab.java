@@ -866,7 +866,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-
     public void copyEntry() {
         int entriesCopied = doCopyEntry(TransferMode.COPY, getSelectedEntries());
         if (entriesCopied >= 0) {
@@ -936,9 +935,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                           List<BibEntry> originalEntries,
                           List<BibEntry> entriesToAdd,
                           TransferMode mode) {
-
         InsertUtil.FeedbackMessage successMessage;
-        InsertUtil.FeedbackMessage  partialMessage;
+        InsertUtil.FeedbackMessage partialMessage;
         if (mode == TransferMode.MOVE) {
             successMessage = params -> Localization.lang("Moved %0 entry(s) to %1", params);
             partialMessage = params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params);
