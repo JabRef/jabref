@@ -14,5 +14,6 @@ public class DragAndDropDataFormats {
     public static final DataFormat LINKED_FILE = new DataFormat("dnd/org.jabref.model.entry.LinkedFile");
     public static final DataFormat ENTRIES = new DataFormat("dnd/org.jabref.model.entry.BibEntries");
     public static final DataFormat PREVIEWLAYOUTS = new DataFormat("dnd/org.jabref.logic.citationstyle.PreviewLayouts");
+    public static final DataFormat ENTRY_EDITOR_TAB = new DataFormat("dnd/org.jabref.gui.preferences.entryeditor.EditorTabViewModel");
     @SuppressWarnings("unchecked") public static final Class<List<PreviewLayout>> PREVIEWLAYOUT_LIST_CLASS = (Class<List<PreviewLayout>>) (Class<?>) List.class;
 }
