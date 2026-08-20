@@ -148,6 +148,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
+- We fixed an issue where the "Jump to field" dialog only searched fields already shown in the entry editor. It now searches all known fields and adds the selected field if it is not yet visible. [#16593](https://github.com/JabRef/jabref/issues/16593)
 
 ### Removed
 
@@ -2135,7 +2136,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified. [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception. [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
-- We fixed an issue where the "Jump to field" dialog only searched fields already shown in the entry editor. It now searches all known fields and adds the selected field if it is not yet visible. [#16593](https://github.com/JabRef/jabref/issues/16593)
 
 ### Removed
 
