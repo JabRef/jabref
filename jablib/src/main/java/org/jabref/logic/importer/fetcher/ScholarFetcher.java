@@ -272,11 +272,11 @@ public class ScholarFetcher implements FulltextFetcher, PagedSearchBasedFetcher,
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Optional<String> id = entry.getField(new UnknownField("scholarapi"));
-        if(id.isEmpty()) {
+        if (id.isEmpty()) {
             return Optional.empty();
         }
         Optional<String> hasPdf = entry.getField(new UnknownField("scholarApiHasPdf"));
-        if(hasPdf.filter(value -> !Boolean.parseBoolean(value)).isPresent()) {
+        if (hasPdf.filter(value -> !Boolean.parseBoolean(value)).isPresent()) {
             return Optional.empty();
         }
         return Optional.of(URLUtil.create(PDF_URL + "/" + id.get()));
