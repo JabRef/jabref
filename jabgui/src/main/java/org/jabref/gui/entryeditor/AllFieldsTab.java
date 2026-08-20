@@ -586,9 +586,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
         Platform.runLater(() -> {
-            // Wait for the next pulse so the editors rebuilt by setupPanel are laid out and
-            // requestFocus/findEditor will work reliably. Re-check the staleness guard inside
-            // this inner block because the entry may have changed between the two pulses.
+            // Re-check the staleness guard inside this inner block because the entry may have changed between the two pulses.
             Platform.runLater(() -> {
                 if (getCurrentEntry() != entry) {
                     return;
