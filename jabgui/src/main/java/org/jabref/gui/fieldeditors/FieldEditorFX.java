@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
@@ -159,20 +160,26 @@ public interface FieldEditorFX {
     }
 
     private static void scrollToVisible(Node node) {
-        double offsetY = 0;
-        Node current = node;
-        while (current instanceof Node currentNode) {
-            if (currentNode instanceof ScrollPane scrollPane) {
-                double contentHeight = scrollPane.getContent().getLayoutBounds().getHeight();
-                double viewportHeight = scrollPane.getViewportBounds().getHeight();
-                if (contentHeight > viewportHeight) {
-                    double target = (offsetY - viewportHeight / 2) / (contentHeight - viewportHeight);
-                    scrollPane.setVvalue(Math.clamp(target, 0, 1));
+        Node current = node.getParent();
+        while (current != null) {
+            if (current instanceof ScrollPane scrollPane) {
+                Node content = scrollPane.getContent();
+                if (content == null) {
+                    return;
                 }
+                double viewportHeight = scrollPane.getViewportBounds().getHeight();
+                double contentHeight = content.getBoundsInLocal().getHeight();
+                if (contentHeight <= viewportHeight) {
+                    return;
+                }
+                Bounds targetInContent = content.sceneToLocal(node.localToScene(node.getBoundsInLocal()));
+                double targetCenterY = targetInContent.getCenterY();
+                double maxScrollY = contentHeight - viewportHeight;
+                double desiredScrollY = targetCenterY - (viewportHeight / 2);
+                scrollPane.setVvalue(Math.clamp(desiredScrollY / maxScrollY, 0, 1));
                 return;
             }
-            offsetY += currentNode.getLayoutY();
-            current = currentNode.getParent();
+            current = current.getParent();
         }
     }
 

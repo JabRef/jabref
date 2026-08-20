@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -32,6 +31,6 @@ public class JumpToFieldViewModel extends AbstractViewModel {
                            .map(Field::getName)
                            .distinct()
                            .sorted()
-                           .collect(Collectors.toList());
+                           .toList();
     }
 }

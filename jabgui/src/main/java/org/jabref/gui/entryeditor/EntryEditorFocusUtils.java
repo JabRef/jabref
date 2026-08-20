@@ -74,7 +74,7 @@ class EntryEditorFocusUtils {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
                     getTabContainingField(aliasField).ifPresentOrElse(
                             tab -> selectTabAndField(tab, aliasField),
-                            () -> addFieldViaAllFieldsTab(field));
+                            () -> addFieldViaAllFieldsTab(Optional.ofNullable(aliasField).orElse(field)));
                 }
         ));
     }
