@@ -142,7 +142,7 @@ public interface FieldEditorFX {
     default void focus() {
         Node target = findTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
         target.requestFocus();
-        Platform.runLater(() -> scrollToVisible(target));
+        Platform.runLater(() -> Optional.ofNullable(target.getScene()).ifPresent(_ -> scrollToVisible(target)));
     }
 
     private static Optional<TextInputControl> findTextInput(Node node) {
