@@ -593,13 +593,24 @@ public class AllFieldsTab extends FieldsEditorTab {
             if (getCurrentEntry() != entry) {
                 return;
             }
-            requestFocus(field);
-            // Adding the File field via its "+" chip should immediately open the add-file dialog,
-            // since an empty File editor has no other purpose than to receive a file.
-            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                linkedFilesEditor.addNewFile();
-            }
+            Platform.runLater(() -> {
+                requestFocus(field);
+                // Adding the File field via its "+" chip should immediately open the add-file dialog,
+                // since an empty File editor has no other purpose than to receive a file.
+                if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                    linkedFilesEditor.addNewFile();
+                }
+            });
         });
+    }
+
+    /// Adds `field` to the entry's field list (if not already shown) and focuses it.
+    public void addFieldAndFocus(Field field) {
+        BibEntry entry = getCurrentEntry();
+        if (entry == null) {
+            return;
+        }
+        showFieldEditor(activeDatabaseContext(), entry, field);
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
