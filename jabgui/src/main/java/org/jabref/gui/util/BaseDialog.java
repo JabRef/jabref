@@ -26,21 +26,22 @@ import org.jspecify.annotations.Nullable;
 
 public class BaseDialog<T> extends Dialog<T> {
 
+    /// Tracks if a popup (e.g., ComboBox dropdown) was open on key press,
+    /// preventing the dialog from closing when Escape is pressed to dismiss the popup.
     protected boolean popupWasShowingOnKeyPress;
 
     protected BaseDialog() {
         getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                Window window = getDialogPane().getScene() != null ? getDialogPane().getScene().getWindow() : null;
-                popupWasShowingOnKeyPress = isPopupShowing(window);
+                popupWasShowingOnKeyPress = isPopupShowing(getDialogPane().getScene().getWindow());
             }
         });
 
-        // [impl->req~ux.combobox.escape-closes-popup-only~1]
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                // [impl->req~ux.combobox.escape-closes-popup-only~1]
                 if (popupWasShowingOnKeyPress) {
                     popupWasShowingOnKeyPress = false;
                     event.consume();
@@ -66,6 +67,9 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
+    /// Checks whether any popup (excluding tooltips) is currently showing.
+    /// If `owner` is non-null, checks for popups belonging to that specific window.
+    /// If `owner` is `null`, checks for popups across all windows.
     public static boolean isPopupShowing(@Nullable Window owner) {
         return Window.getWindows().stream()
                      .filter(window -> window instanceof PopupWindow)
