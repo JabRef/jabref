@@ -9,17 +9,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
