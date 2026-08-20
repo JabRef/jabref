@@ -1553,6 +1553,11 @@
           "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "com.sun.prism.sw.SWPipeline",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
     }
   ],
   "resources": [
