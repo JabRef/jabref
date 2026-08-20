@@ -57,7 +57,8 @@ public abstract class NativeDesktop {
     // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog's properties are frozen
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
+    private static final Pattern DIR_PLACEHOLDER_PATTERN = Pattern.compile("%DIR%?");
+    private static final Pattern COMMAND_ARGUMENT_PATTERN = Pattern.compile("([^\\s\"']+|\"[^\"]*\"|'[^']*')+");
     /// Open a http/pdf/ps viewer for the given link string.
     ///
     /// Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
@@ -260,21 +261,17 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // Replace placeholders (%DIR% first to avoid leaving a trailing %)
-        command = command.replace("%DIR%", absolutePath).replace("%DIR", absolutePath);
+        command = DIR_PLACEHOLDER_PATTERN.matcher(command).replaceAll(Matcher.quoteReplacement(absolutePath));
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        // Parse CLI arguments while preserving quoted segments
         List<String> subcommands = new ArrayList<>();
-        Matcher matcher = Pattern.compile("([^\\s\"']+|\"[^\"]*\"|'[^']*')+").matcher(command);
+        Matcher matcher = COMMAND_ARGUMENT_PATTERN.matcher(command);
         while (matcher.find()) {
             String token = matcher.group();
-            // Strip outer quotes because ProcessBuilder handles raw string arguments directly
-            if ((token.startsWith("\"") && token.endsWith("\"")) || (token.startsWith("'") && token.endsWith("'"))) {
-                token = token.substring(1, token.length() - 1);
-            }
+            // Remove syntactic quote delimiters while preserving the argument text
+            token = token.replace("\"", "").replace("'", "");
             subcommands.add(token);
         }
 
