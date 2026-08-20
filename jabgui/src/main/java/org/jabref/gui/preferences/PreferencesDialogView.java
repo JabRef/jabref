@@ -78,17 +78,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
-        // The list view does not respect the listener for the dialog and needs its own
-        preferenceTabList.setOnKeyReleased(key -> {
-            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
-                if (popupWasShowingOnKeyPress) {
-                    popupWasShowingOnKeyPress = false;
-                } else {
-                    this.closeDialog();
-                }
-            }
-        });
-
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
@@ -98,18 +87,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-
-        this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                if (popupWasShowingOnKeyPress) {
-                    return;
-                }
-                if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
-                    this.closeDialog();
-                    event.consume();
-                }
-            }
-        });
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {

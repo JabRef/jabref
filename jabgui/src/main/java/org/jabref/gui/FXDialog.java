@@ -23,10 +23,6 @@ import com.airhacks.afterburner.injection.Injector;
 /// {@link javafx.fxml.FXMLLoader}.
 public class FXDialog extends Alert {
 
-    /// Tracks if a popup (e.g., ComboBox dropdown) was open on key press,
-    /// preventing the dialog from closing when Escape is pressed to dismiss the popup.
-    private boolean popupWasShowingOnKeyPress;
-
     public FXDialog(AlertType type, String title, Image image, boolean isModal) {
         this(type, title, isModal);
         setDialogIcon(image);
@@ -60,23 +56,12 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        // [impl->req~ux.combobox.escape-closes-popup-only~1]
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                popupWasShowingOnKeyPress = BaseDialog.isPopupShowing(dialogWindow);
-            }
-        });
-
-        dialogWindow.getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                // [impl->req~ux.combobox.escape-closes-popup-only~1]
-                if (popupWasShowingOnKeyPress) {
-                    popupWasShowingOnKeyPress = false;
-                    event.consume();
-                } else {
-                    dialogWindow.close();
-                }
+                dialogWindow.close();
+                event.consume();
             }
         });
         this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));

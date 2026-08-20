@@ -26,36 +26,22 @@ import org.jspecify.annotations.Nullable;
 
 public class BaseDialog<T> extends Dialog<T> {
 
-    /// Tracks if a popup (e.g., ComboBox dropdown) was open on key press,
-    /// preventing the dialog from closing when Escape is pressed to dismiss the popup.
-    protected boolean popupWasShowingOnKeyPress;
-
     protected BaseDialog() {
-        getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        // [impl->req~ux.combobox.escape-closes-popup-only~1]
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                popupWasShowingOnKeyPress = isPopupShowing(getDialogPane().getScene().getWindow());
-            }
-        });
-
-        getDialogPane().getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                // [impl->req~ux.combobox.escape-closes-popup-only~1]
-                if (popupWasShowingOnKeyPress) {
-                    popupWasShowingOnKeyPress = false;
-                    event.consume();
-                } else {
-                    close();
-                }
+                close();
+                event.consume();
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
                 getDefaultButton().ifPresent(Button::fire);
+                event.consume();
             }
 
             // all buttons in base dialogs react on enter
             if (event.getCode() == KeyCode.ENTER) {
-                if (event.getTarget() instanceof Button) {
-                    ((Button) event.getTarget()).fire();
+                if (event.getTarget() instanceof Button button) {
+                    button.fire();
                     event.consume();
                 }
             }
