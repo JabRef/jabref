@@ -260,10 +260,9 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     @Override
     public void requestFocus(Field fieldName) {
-        TitledPane pane = sectionPanes.get(FieldListSections.sectionOf(fieldName));
-        if (pane != null && !pane.isExpanded()) {
-            pane.setExpanded(true);
-        }
+        Optional.ofNullable(sectionPanes.get(FieldListSections.sectionOf(fieldName)))
+                .filter(pane -> !pane.isExpanded())
+                .ifPresent(pane -> pane.setExpanded(true));
         super.requestFocus(fieldName);
     }
 
@@ -606,11 +605,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Adds `field` to the entry's field list (if not already shown) and focuses it.
     public void addFieldAndFocus(Field field) {
-        BibEntry entry = getCurrentEntry();
-        if (entry == null) {
-            return;
-        }
-        showFieldEditor(activeDatabaseContext(), entry, field);
+        Optional.ofNullable(getCurrentEntry())
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {

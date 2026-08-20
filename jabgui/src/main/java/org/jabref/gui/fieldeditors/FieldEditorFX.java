@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
@@ -139,32 +140,29 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        TextInputControl input = findTextInput(getNode());
-        Node target = (input != null) ? input : getNode();
+        Node target = findTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
         target.requestFocus();
         Platform.runLater(() -> scrollToVisible(target));
     }
 
-    private static TextInputControl findTextInput(Node node) {
+    private static Optional<TextInputControl> findTextInput(Node node) {
         if (node instanceof TextInputControl textInput) {
-            return textInput;
+            return Optional.of(textInput);
         }
         if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                TextInputControl found = findTextInput(child);
-                if (found != null) {
-                    return found;
-                }
-            }
+            return parent.getChildrenUnmodifiable().stream()
+                         .map(FieldEditorFX::findTextInput)
+                         .flatMap(Optional::stream)
+                         .findFirst();
         }
-        return null;
+        return Optional.empty();
     }
 
     private static void scrollToVisible(Node node) {
         double offsetY = 0;
         Node current = node;
-        while (current != null) {
-            if (current instanceof ScrollPane scrollPane) {
+        while (current instanceof Node currentNode) {
+            if (currentNode instanceof ScrollPane scrollPane) {
                 double contentHeight = scrollPane.getContent().getLayoutBounds().getHeight();
                 double viewportHeight = scrollPane.getViewportBounds().getHeight();
                 if (contentHeight > viewportHeight) {
@@ -173,8 +171,8 @@ public interface FieldEditorFX {
                 }
                 return;
             }
-            offsetY += current.getLayoutY();
-            current = current.getParent();
+            offsetY += currentNode.getLayoutY();
+            current = currentNode.getParent();
         }
     }
 
