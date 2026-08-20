@@ -115,6 +115,11 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
             new EnumMap<>(FieldListSections.SectionType.class);
 
+    /// Tracks the [TitledPane] created for each section type, so we can expand a collapsed
+    /// section on demand (e.g. when jump-to-field targets a field inside it).
+    private final Map<FieldListSections.SectionType, TitledPane> sectionPanes =
+            new EnumMap<>(FieldListSections.SectionType.class);
+
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
 
@@ -253,6 +258,15 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
     }
 
+    @Override
+    public void requestFocus(Field fieldName) {
+        TitledPane pane = sectionPanes.get(FieldListSections.sectionOf(fieldName));
+        if (pane != null && !pane.isExpanded()) {
+            pane.setExpanded(true);
+        }
+        super.requestFocus(fieldName);
+    }
+
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
     /// then the always-present collapsible sections (identifiers / files & links /
     /// bibliometrics / comments / meta, collapsed when empty) each with its own add-chips,
@@ -260,6 +274,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
+        sectionPanes.clear();
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
         int labelIndex = 0;
@@ -444,6 +459,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (pane.isExpanded()) {
             populateContent.run();
         }
+        sectionPanes.put(type, pane);
         return pane;
     }
 

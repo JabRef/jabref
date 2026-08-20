@@ -5,7 +5,9 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -137,11 +139,43 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        getNode().getChildrenUnmodifiable()
-                 .stream()
-                 .findFirst()
-                 .orElse(getNode())
-                 .requestFocus();
+        TextInputControl input = findTextInput(getNode());
+        Node target = (input != null) ? input : getNode();
+        target.requestFocus();
+        Platform.runLater(() -> scrollToVisible(target));
+    }
+
+    private static TextInputControl findTextInput(Node node) {
+        if (node instanceof TextInputControl textInput) {
+            return textInput;
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                TextInputControl found = findTextInput(child);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void scrollToVisible(Node node) {
+        double offsetY = 0;
+        Node current = node;
+        while (current != null) {
+            if (current instanceof ScrollPane scrollPane) {
+                double contentHeight = scrollPane.getContent().getLayoutBounds().getHeight();
+                double viewportHeight = scrollPane.getViewportBounds().getHeight();
+                if (contentHeight > viewportHeight) {
+                    double target = (offsetY - viewportHeight / 2) / (contentHeight - viewportHeight);
+                    scrollPane.setVvalue(Math.clamp(target, 0, 1));
+                }
+                return;
+            }
+            offsetY += current.getLayoutY();
+            current = current.getParent();
+        }
     }
 
     /// Returns relative size of the field editor in terms of display space.
