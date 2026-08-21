@@ -27,10 +27,27 @@ import org.jspecify.annotations.Nullable;
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupKeyBindings(newPane);
+            }
+        });
+        setupKeyBindings(getDialogPane());
+
+        this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
+
+        setDialogIcon(IconTheme.getJabRefIcon());
+        setResizable(true);
+    }
+
+    private void setupKeyBindings(DialogPane dialogPane) {
         // [impl->req~ux.combobox.escape-closes-popup-only~1]
-        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        dialogPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                if (isPopupShowing(getDialogPane().getScene() != null ? getDialogPane().getScene().getWindow() : null)) {
+                    return;
+                }
                 close();
                 event.consume();
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
@@ -46,11 +63,6 @@ public class BaseDialog<T> extends Dialog<T> {
                 }
             }
         });
-
-        this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
-
-        setDialogIcon(IconTheme.getJabRefIcon());
-        setResizable(true);
     }
 
     /// Checks whether any popup (excluding tooltips) is currently showing.
