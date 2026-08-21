@@ -63,14 +63,14 @@ public class DoclingEngine implements OcrEngine {
         command.add("--output");
         command.add(outputDir.toString());
         command.add(pdfPath.toString());
-        int exitCode = OcrUtils.performOcr(command, getName());
-        if (exitCode == 0) {
+        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        if (ocrResult.isSuccess()) {
             String fileName = pdfPath.getFileName().toString();
             String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
             Path jsonOutputPath = outputDir.resolve(baseName + ".json");
             return embedText(jsonOutputPath, pdfPath);
         } else {
-            return OcrResult.failure(OcrFailureReason.values()[exitCode - 1]);
+            return ocrResult;
         }
     }
 

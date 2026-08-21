@@ -47,7 +47,7 @@ public final class OcrUtils {
         }
     }
 
-    public static int performOcr(ArrayList<String> command, String engineName) {
+    public static OcrResult performOcr(ArrayList<String> command, String engineName) {
         Process process = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -61,22 +61,22 @@ public final class OcrUtils {
             boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
-                return OcrFailureReason.TIMEOUT.getErrorCode();
+                return OcrResult.failure(OcrFailureReason.TIMEOUT);
             }
 
             if (process.exitValue() == 0) {
-                return 0;
+                return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
             } else {
-                return OcrFailureReason.NON_ZERO_EXIT.getErrorCode();
+                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
             }
         } catch (IOException e) {
             LOGGER.error("Error while running {}.", engineName, e);
-            return OcrFailureReason.IO_ERROR.getErrorCode();
+            return OcrResult.failure(OcrFailureReason.IO_ERROR);
         } catch (InterruptedException e) {
             process.destroyForcibly();
             Thread.currentThread().interrupt();
             LOGGER.error("{} process was interrupted.", engineName, e);
-            return OcrFailureReason.INTERRUPTED.getErrorCode();
+            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
         }
     }
 

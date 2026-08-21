@@ -50,11 +50,11 @@ public class OcrMyPdfEngine implements OcrEngine {
         command.add(ocrCommand);
         command.add(pdfPath.toString());
         command.add(outputFile);
-        int exitCode = OcrUtils.performOcr(command, getName());
-        if (exitCode == 0) {
+        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        if (ocrResult.isSuccess()) {
             return OcrResult.success(outputPath);
         } else {
-            return OcrResult.failure(OcrFailureReason.values()[exitCode - 1]);
+            return ocrResult;
         }
     }
 }
