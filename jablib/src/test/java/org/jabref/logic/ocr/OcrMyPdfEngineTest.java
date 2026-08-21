@@ -3,8 +3,6 @@ package org.jabref.logic.ocr;
 import java.nio.file.Path;
 import java.util.List;
 
-import javafx.collections.FXCollections;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
