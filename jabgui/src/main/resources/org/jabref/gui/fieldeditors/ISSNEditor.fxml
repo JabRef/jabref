@@ -6,11 +6,12 @@
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.ISSNEditor">
+         fx:controller="org.jabref.gui.fieldeditors.ISSNEditor"
+         styleClass="issn-editor">
     <EditorTextField fx:id="textField"/>
-        <Button fx:id="journalInfoButton"
+        <Button fx:id="journalInfoButtonISSN"
                 onAction="#showJournalInfo"
-                styleClass="icon-button">
+                styleClass="icon-button,issn-editor-button">
             <graphic>
                 <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
             </graphic>
@@ -20,7 +21,7 @@
         </Button>
         <Button fx:id="fetchInformationByIdentifierButton"
                 onAction="#fetchInformationByIdentifier"
-                styleClass="icon-button">
+                styleClass="icon-button,issn-editor-button">
             <graphic>
                 <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
             </graphic>

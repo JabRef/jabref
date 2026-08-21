@@ -4,7 +4,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.CitationKeyEditor">
+         fx:controller="org.jabref.gui.fieldeditors.CitationKeyEditor"
+         styleClass="citation-key-editor">
     <EditorTextField fx:id="textField"/>
-    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button"/>
+    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button,citation-key-editor-button"/>
 </fx:root>
