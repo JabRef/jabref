@@ -57,12 +57,9 @@ public class FXDialog extends Alert {
         }
 
         // [impl->req~ux.combobox.escape-closes-popup-only~1]
-        getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                if (BaseDialog.isPopupShowing(dialogWindow)) {
-                    return;
-                }
                 dialogWindow.close();
                 event.consume();
             }

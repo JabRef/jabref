@@ -8,12 +8,10 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
-import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -22,7 +20,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.Nullable;
 
 public class BaseDialog<T> extends Dialog<T> {
 
@@ -42,12 +39,9 @@ public class BaseDialog<T> extends Dialog<T> {
 
     private void setupKeyBindings(DialogPane dialogPane) {
         // [impl->req~ux.combobox.escape-closes-popup-only~1]
-        dialogPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                if (isPopupShowing(getDialogPane().getScene() != null ? getDialogPane().getScene().getWindow() : null)) {
-                    return;
-                }
                 close();
                 event.consume();
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
@@ -63,16 +57,6 @@ public class BaseDialog<T> extends Dialog<T> {
                 }
             }
         });
-    }
-
-    /// Checks whether any popup (excluding tooltips) is currently showing.
-    /// If `owner` is non-null, checks for popups belonging to that specific window.
-    /// If `owner` is `null`, checks for popups across all windows.
-    public static boolean isPopupShowing(@Nullable Window owner) {
-        return Window.getWindows().stream()
-                     .filter(window -> window instanceof PopupWindow)
-                     .map(window -> (PopupWindow) window)
-                     .anyMatch(popup -> popup.isShowing() && !(popup instanceof Tooltip) && (owner == null || popup.getOwnerWindow() == owner));
     }
 
     private Optional<Button> getDefaultButton() {
