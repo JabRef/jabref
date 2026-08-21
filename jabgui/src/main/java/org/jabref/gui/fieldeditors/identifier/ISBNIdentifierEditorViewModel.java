@@ -1,11 +1,10 @@
 package org.jabref.gui.fieldeditors.identifier;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.StandardField;

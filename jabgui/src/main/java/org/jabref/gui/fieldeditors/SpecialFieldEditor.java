@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -20,6 +18,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;

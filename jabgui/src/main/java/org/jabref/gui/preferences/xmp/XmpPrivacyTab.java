@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.xmp;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -17,6 +15,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;

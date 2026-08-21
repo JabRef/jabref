@@ -1,7 +1,5 @@
 package org.jabref.gui.sidepane;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
@@ -12,6 +10,7 @@ import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;

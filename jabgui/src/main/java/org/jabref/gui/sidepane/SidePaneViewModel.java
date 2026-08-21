@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -21,6 +19,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;

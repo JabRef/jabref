@@ -2,8 +2,6 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -21,6 +19,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;

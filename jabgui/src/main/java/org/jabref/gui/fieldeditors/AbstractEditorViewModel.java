@@ -2,17 +2,16 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 

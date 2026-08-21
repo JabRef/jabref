@@ -3,14 +3,13 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntryPreferences;

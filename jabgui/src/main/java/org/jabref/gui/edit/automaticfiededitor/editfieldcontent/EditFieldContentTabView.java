@@ -14,7 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -29,7 +29,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
     public Button setValueButton;
-    private final NamedCompoundEdit compoundEdit;
+    private final ChangeRecorder changeRecorder;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -46,10 +46,10 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private EditFieldContentViewModel viewModel;
 
     public EditFieldContentTabView(BibDatabase database,
-                                   NamedCompoundEdit compoundEdit,
+                                   ChangeRecorder changeRecorder,
                                    DialogService dialogService,
                                    StateManager stateManager) {
-        this.compoundEdit = compoundEdit;
+        this.changeRecorder = changeRecorder;
         this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
@@ -62,7 +62,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     @FXML
     public void initialize() {
-        viewModel = new EditFieldContentViewModel(database, selectedEntries, compoundEdit, dialogService, stateManager);
+        viewModel = new EditFieldContentViewModel(database, selectedEntries, changeRecorder, dialogService, stateManager);
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         showOnlySetFieldsCheckBox.setSelected(true);

@@ -4,8 +4,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -23,6 +21,7 @@ import org.jabref.gui.fieldeditors.optioneditors.mapbased.YesNoEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;

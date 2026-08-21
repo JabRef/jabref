@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -19,7 +17,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -35,6 +33,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;

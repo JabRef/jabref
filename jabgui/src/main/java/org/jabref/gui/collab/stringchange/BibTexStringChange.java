@@ -2,9 +2,9 @@ package org.jabref.gui.collab.stringchange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableStringChange;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.change.UndoableStringChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 
@@ -26,11 +26,11 @@ public final class BibTexStringChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
+    public void applyChange(ChangeRecorder recorder) {
         String oldContent = oldString.getContent();
         String newContent = newString.getContent();
         oldString.setContent(newContent);
-        undoEdit.addEdit(new UndoableStringChange(oldString, false, oldContent, newContent));
+        recorder.record(new UndoableStringChange(oldString, UndoableStringChange.Part.CONTENT, oldContent, newContent));
     }
 
     public BibtexString getOldString() {

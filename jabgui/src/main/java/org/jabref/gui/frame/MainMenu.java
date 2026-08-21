@@ -78,9 +78,9 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -110,7 +110,7 @@ public class MainMenu extends MenuBar {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
@@ -129,7 +129,7 @@ public class MainMenu extends MenuBar {
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
-                    CountingUndoManager undoManager,
+                    UndoManager undoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,

@@ -16,7 +16,7 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +42,7 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     public RenameFieldViewModel(List<BibEntry> selectedEntries,
                                 BibDatabase database,
-                                NamedCompoundEdit compoundEdit,
+                                ChangeRecorder compoundEdit,
                                 DialogService dialogService,
                                 StateManager stateManager) {
         super(database, compoundEdit, dialogService, stateManager);
@@ -112,10 +112,6 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
                     false).executeAndGetAffectedEntriesCount();
 
             edits.setAffectedEntries(affectedEntriesCount);
-
-            if (edits.hasEdits()) {
-                edits.end();
-            }
         }
 
         addEdit(edits);

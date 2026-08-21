@@ -10,7 +10,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.OpenDatabase;
@@ -79,7 +79,7 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     stateManager,
                     Injector.instantiateModelOrService(FileUpdateMonitor.class),
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                    Injector.instantiateModelOrService(CountingUndoManager.class),
+                    Injector.instantiateModelOrService(UndoManager.class),
                     Injector.instantiateModelOrService(ClipBoardManager.class),
                     Injector.instantiateModelOrService(TaskExecutor.class)
             );

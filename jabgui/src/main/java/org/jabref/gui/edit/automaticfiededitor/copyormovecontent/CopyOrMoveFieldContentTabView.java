@@ -14,7 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +28,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     public Button copyContentButton;
-    private final NamedCompoundEdit compoundEdit;
+    private final ChangeRecorder changeRecorder;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -47,10 +47,10 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     private CopyOrMoveFieldContentTabViewModel viewModel;
 
     public CopyOrMoveFieldContentTabView(BibDatabase database,
-                                         NamedCompoundEdit compoundEdit,
+                                         ChangeRecorder changeRecorder,
                                          DialogService dialogService,
                                          StateManager stateManager) {
-        this.compoundEdit = compoundEdit;
+        this.changeRecorder = changeRecorder;
         this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
@@ -62,7 +62,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     public void initialize() {
-        viewModel = new CopyOrMoveFieldContentTabViewModel(database, selectedEntries, compoundEdit, dialogService, stateManager);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(database, selectedEntries, changeRecorder, dialogService, stateManager);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());

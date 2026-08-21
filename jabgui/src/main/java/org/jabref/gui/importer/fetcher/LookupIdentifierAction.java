@@ -3,14 +3,12 @@ package org.jabref.gui.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
@@ -19,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
@@ -70,7 +69,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private String lookupIdentifiers(List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
-        NamedCompoundEdit namedCompoundEdit = new NamedCompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
+        ChangeRecorder changeRecorder = new ChangeRecorder(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;
         int foundCount = 0;
         for (BibEntry bibEntry : bibEntries) {
@@ -94,7 +93,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
                 });
                 if (fieldChange != null && fieldChange.isPresent()) {
-                    namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+                    changeRecorder.record(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
@@ -102,9 +101,8 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 }
             }
         }
-        namedCompoundEdit.end();
         if (foundCount > 0) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompoundEdit));
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(changeRecorder.toChangeSet()));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

@@ -5,14 +5,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
+import org.jabref.model.change.UndoableChangeType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -52,43 +49,38 @@ class UpdateOriginalEntry {
 
     /// If any differences are found between the original entry and the merged entry, the original entry will be updated with the merged entry's information.
     private void updateOriginalEntry(BibEntry mergedEntry) {
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
-        boolean edited = updateEntryType(mergedEntry, compoundEdit);
-
-        if (!mergedEntry.getFields().isEmpty()) {
-            edited = updateFields(mergedEntry, compoundEdit) || edited;
-        }
+        boolean edited = undoManager.record(editName, recorder -> {
+            updateEntryType(mergedEntry, recorder);
+            if (!mergedEntry.getFields().isEmpty()) {
+                updateFields(mergedEntry, recorder);
+            }
+        });
 
         if (edited) {
-            compoundEdit.end();
-            undoManager.addEdit(compoundEdit);
             dialogService.notify(successMessage);
         } else {
             dialogService.notify(Localization.lang("No information added"));
         }
     }
 
-    private boolean updateEntryType(BibEntry mergedEntry, NamedCompoundEdit compoundEdit) {
+    private void updateEntryType(BibEntry mergedEntry, ChangeRecorder recorder) {
         EntryType oldType = originalEntry.getType();
         EntryType newType = mergedEntry.getType();
 
         if (oldType.equals(newType)) {
-            return false;
+            return;
         }
 
         originalEntry.setType(newType);
-        compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
-        return true;
+        recorder.record(new UndoableChangeType(originalEntry, oldType, newType));
     }
 
-    private boolean updateFields(BibEntry mergedEntry, NamedCompoundEdit compoundEdit) {
+    private void updateFields(BibEntry mergedEntry, ChangeRecorder recorder) {
         Set<Field> mergedFields = new TreeSet<>(Comparator.comparing(Field::getName));
         mergedFields.addAll(mergedEntry.getFields());
 
         Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
         originalFields.addAll(originalEntry.getFields());
-
-        boolean edited = false;
 
         // This loop is for setting fields
         for (Field field : mergedFields) {
@@ -96,24 +88,15 @@ class UpdateOriginalEntry {
             Optional<String> mergedString = mergedEntry.getField(field);
 
             if (originalString.isEmpty() || !originalString.equals(mergedString)) {
-                edited = applyFieldChange(originalEntry.setField(field, mergedString.orElseThrow()), compoundEdit) || edited;
+                recorder.record(originalEntry.setField(field, mergedString.orElseThrow()));
             }
         }
 
         // This one is for clearing fields
         for (Field field : originalFields) {
             if (!mergedFields.contains(field) && !FieldFactory.isInternalField(field)) {
-                edited = applyFieldChange(originalEntry.clearField(field), compoundEdit) || edited;
+                recorder.record(originalEntry.clearField(field));
             }
         }
-
-        return edited;
-    }
-
-    private static boolean applyFieldChange(Optional<FieldChange> fieldChange, NamedCompoundEdit compoundEdit) {
-        return fieldChange.map(change -> {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
-            return true;
-        }).orElse(false);
     }
 }

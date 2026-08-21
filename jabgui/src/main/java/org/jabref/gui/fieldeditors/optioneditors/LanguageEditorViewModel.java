@@ -3,11 +3,10 @@ package org.jabref.gui.fieldeditors.optioneditors;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;

@@ -2,8 +2,6 @@ package org.jabref.gui.search;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -19,6 +17,7 @@ import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 

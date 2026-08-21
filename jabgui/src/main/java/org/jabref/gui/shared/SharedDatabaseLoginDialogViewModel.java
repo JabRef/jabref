@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -31,6 +29,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;

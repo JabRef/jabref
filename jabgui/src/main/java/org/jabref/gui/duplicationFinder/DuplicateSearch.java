@@ -24,15 +24,14 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.change.UndoableInsertEntries;
+import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -221,26 +220,25 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
-        final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
-        // Now, do the actual removal:
-        if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
-            libraryTab.getDatabase().removeEntries(result.getToRemove());
-            libraryTab.markBaseChanged();
-        }
-        // and adding merged entries:
-        if (!result.getToAdd().isEmpty()) {
-            compoundEdit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
-            libraryTab.getDatabase().insertEntries(result.getToAdd());
-            libraryTab.markBaseChanged();
-        }
+        libraryTab.getUndoManager().record(Localization.lang("duplicate removal"), recorder -> {
+            // Now, do the actual removal:
+            if (!result.getToRemove().isEmpty()) {
+                recorder.record(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
+                libraryTab.getDatabase().removeEntries(result.getToRemove());
+                libraryTab.markBaseChanged();
+            }
+            // and adding merged entries:
+            if (!result.getToAdd().isEmpty()) {
+                recorder.record(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
+                libraryTab.getDatabase().insertEntries(result.getToAdd());
+                libraryTab.markBaseChanged();
+            }
+        });
 
         duplicateProgress.set(0);
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-        compoundEdit.end();
-        libraryTab.getUndoManager().addEdit(compoundEdit);
     }
 
     /// Result of a duplicate search.

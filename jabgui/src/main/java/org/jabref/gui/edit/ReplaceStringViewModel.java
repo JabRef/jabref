@@ -1,6 +1,8 @@
 package org.jabref.gui.edit;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,9 +11,9 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.ChangeRecorder;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -42,37 +44,30 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
-        final NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Replace string"));
-        int counter = 0;
-        if (selOnly) {
-            for (BibEntry bibEntry : this.panel.getSelectedEntries()) {
-                counter += replaceItem(bibEntry, compound);
-            }
-        } else {
-            for (BibEntry bibEntry : this.panel.getDatabase().getEntries()) {
-                counter += replaceItem(bibEntry, compound);
-            }
-        }
-        return counter;
+        List<BibEntry> entries = selOnly ? this.panel.getSelectedEntries() : this.panel.getDatabase().getEntries();
+        AtomicInteger replacements = new AtomicInteger();
+        this.panel.getUndoManager().record(Localization.lang("Replace string"), recorder ->
+                entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, recorder))));
+        return replacements.get();
     }
 
     /// Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
     /// number of occurrences replaced.
-    private int replaceItem(BibEntry entry, NamedCompoundEdit compound) {
+    private int replaceItem(BibEntry entry, ChangeRecorder recorder) {
         int counter = 0;
         if (this.allFieldReplace) {
             for (Field field : entry.getFields()) {
-                counter += replaceField(entry, field, compound);
+                counter += replaceField(entry, field, recorder);
             }
         } else {
             for (Field espField : fields) {
-                counter += replaceField(entry, espField, compound);
+                counter += replaceField(entry, espField, recorder);
             }
         }
         return counter;
     }
 
-    private int replaceField(BibEntry entry, Field field, NamedCompoundEdit compound) {
+    private int replaceField(BibEntry entry, Field field, ChangeRecorder recorder) {
         if (!entry.hasField(field)) {
             return 0;
         }
@@ -88,10 +83,14 @@ public class ReplaceStringViewModel extends AbstractViewModel {
             stringBuilder.append(this.replaceString); // Insert s2
             piv = ind + len1;
         }
+        if (counter == 0) {
+            return 0;
+        }
+
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
         entry.setField(field, newStr);
-        compound.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
+        recorder.record(new UndoableFieldChange(entry, field, txt, newStr));
         return counter;
     }
 

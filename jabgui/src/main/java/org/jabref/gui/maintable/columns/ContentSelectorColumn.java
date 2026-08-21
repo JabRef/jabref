@@ -3,16 +3,15 @@ package org.jabref.gui.maintable.columns;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;

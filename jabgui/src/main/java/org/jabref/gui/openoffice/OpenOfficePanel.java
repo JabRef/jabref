@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
@@ -36,8 +34,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -633,18 +630,15 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            NamedCompoundEdit undoCompound = new NamedCompoundEdit(Localization.lang("Cite"));
-            for (BibEntry entry : entries) {
-                if (entry.getCitationKey().isEmpty()) {
-                    // Generate key
-                    new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
-                            .generateAndSetKey(entry)
-                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
+            undoManager.record(Localization.lang("Cite"), recorder -> {
+                for (BibEntry entry : entries) {
+                    if (entry.getCitationKey().isEmpty()) {
+                        // Generate key
+                        recorder.record(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
+                                .generateAndSetKey(entry));
+                    }
                 }
-            }
-            undoCompound.end();
-            // Add all undos
-            undoManager.addEdit(undoCompound);
+            });
             // Now every entry has a key
             return true;
         } else {

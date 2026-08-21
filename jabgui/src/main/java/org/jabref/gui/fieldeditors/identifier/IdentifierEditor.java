@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -19,6 +17,7 @@ import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;

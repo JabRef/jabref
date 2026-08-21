@@ -35,7 +35,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
@@ -67,7 +67,7 @@ public class WelcomeTab extends Tab {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
@@ -88,7 +88,7 @@ public class WelcomeTab extends Tab {
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
-                      CountingUndoManager undoManager,
+                      UndoManager undoManager,
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,

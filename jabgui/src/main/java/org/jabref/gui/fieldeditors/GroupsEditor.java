@@ -3,13 +3,12 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;

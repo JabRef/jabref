@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
@@ -14,6 +12,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrMyPdfEngine;

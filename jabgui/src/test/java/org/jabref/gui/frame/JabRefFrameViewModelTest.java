@@ -3,8 +3,6 @@ package org.jabref.gui.frame;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -14,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.TaskExecutor;

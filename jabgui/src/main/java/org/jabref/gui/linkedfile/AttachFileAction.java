@@ -10,11 +10,11 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
+import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -85,8 +85,8 @@ public class AttachFileAction extends SimpleCommand {
                          .ifPresent(editedLinkedFile -> {
                              Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
                              fieldChange.ifPresent(change -> {
-                                 UndoableFieldChange compoundEdit = new UndoableFieldChange(change);
-                                 libraryTab.getUndoManager().addEdit(compoundEdit);
+                                 UndoableFieldChange fieldEdit = new UndoableFieldChange(change);
+                                 libraryTab.getUndoManager().addEdit(fieldEdit);
                                  libraryTab.markBaseChanged();
                              });
                          });

@@ -4,9 +4,8 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
