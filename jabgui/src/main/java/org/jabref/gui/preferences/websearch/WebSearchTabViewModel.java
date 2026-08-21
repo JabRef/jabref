@@ -64,7 +64,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
     private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
@@ -194,6 +193,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                             .ifPresent(apiKey -> {
                                 fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
                                 fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
+                                fetcherViewModel.setPersistApiKey(apiKey.shouldPersist());
                             });
             }
             fetchers.add(fetcherViewModel);
@@ -213,12 +213,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                         .ifPresent(apiKey -> {
                             fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
                             fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
+                            fetcherViewModel.setPersistApiKey(apiKey.shouldPersist());
                         });
             fetchers.add(fetcherViewModel);
         }
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
-        apikeyPersistProperty.setValue(importerPreferences.shouldPersistCustomKeys());
 
         // Load custom URL templates from preferences if they exist
         Map<String, String> savedTemplates = importerPreferences.getSearchEngineUrlTemplates();
@@ -257,11 +257,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         List<FetcherApiKey> apiKeysToStore = fetchers.stream()
                                                      .filter(FetcherViewModel::isCustomizable)
-                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
+                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey(), fetcherViewModel.shouldPersistApiKey()))
                                                      .toList();
 
-        // Must be set before keys are set
-        importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         importerPreferences.getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
             importerPreferences.getApiKeys().addAll(apiKeysToStore);
@@ -332,10 +330,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         return apikeyPersistAvailableProperty;
     }
 
-    public BooleanProperty getApikeyPersistProperty() {
-        return apikeyPersistProperty;
-    }
-
     public IntegerProperty citationsRelationsStoreTTLProperty() {
         return citationsRelationStoreTTL;
     }
@@ -370,6 +364,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         private final BooleanProperty customizable = new SimpleBooleanProperty();
         private final StringProperty apiKey = new SimpleStringProperty("");
         private final BooleanProperty useCustomApiKey = new SimpleBooleanProperty(false);
+        private final BooleanProperty persistApiKey = new SimpleBooleanProperty(false);
         private final WebFetcher fetcher;
 
         public FetcherViewModel(WebFetcher fetcher, boolean enabled, boolean customizable) {
@@ -417,6 +412,18 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         public BooleanProperty useCustomApiKeyProperty() {
             return useCustomApiKey;
+        }
+
+        public boolean shouldPersistApiKey() {
+            return persistApiKey.get();
+        }
+
+        public BooleanProperty persistApiKeyProperty() {
+            return persistApiKey;
+        }
+
+        public void setPersistApiKey(boolean persist) {
+            this.persistApiKey.set(persist);
         }
 
         public WebFetcher getFetcher() {
