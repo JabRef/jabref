@@ -52,6 +52,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
+    private final ListProperty<org.jabref.logic.ocr.OcrLanguage> selectedOcrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -83,6 +84,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         selectedEngine.setValue(ocrPreferences.getEngineSelection());
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
         selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
+        selectedOcrLanguages.setAll(ocrPreferences.getOcrLanguages());
         isInitializing = false;
     }
 
@@ -91,6 +93,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         ocrPreferences.setEngineSelection(selectedEngine.getValue());
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
         ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
+        ocrPreferences.setOcrLanguages(new ArrayList<>(selectedOcrLanguages));
     }
 
     public StringProperty ocrEnginePathProperty() {
@@ -111,6 +114,34 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     public ReadOnlyListProperty<PagesWithTextHandling> pagesHaveTextOptions() {
         return pagesHaveTextOptions;
+    }
+
+    public ListProperty<org.jabref.logic.ocr.OcrLanguage> selectedOcrLanguagesProperty() {
+        return selectedOcrLanguages;
+    }
+
+    public javafx.util.StringConverter<org.jabref.logic.ocr.OcrLanguage> getOcrLanguageStringConverter() {
+        return new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(org.jabref.logic.ocr.OcrLanguage language) {
+                return language != null ? language.getDisplayName() : "";
+            }
+
+            @Override
+            public org.jabref.logic.ocr.OcrLanguage fromString(String string) {
+                return java.util.Arrays.stream(org.jabref.logic.ocr.OcrLanguage.values())
+                                       .filter(lang -> lang.getDisplayName().equalsIgnoreCase(string))
+                                       .findFirst()
+                                       .orElse(null);
+            }
+        };
+    }
+
+    public List<org.jabref.logic.ocr.OcrLanguage> getOcrLanguageSuggestions(String request) {
+        String requestLower = request.toLowerCase();
+        return java.util.Arrays.stream(org.jabref.logic.ocr.OcrLanguage.values())
+                               .filter(lang -> lang.getDisplayName().toLowerCase().contains(requestLower))
+                               .toList();
     }
 
     public void browseEnginePath() {

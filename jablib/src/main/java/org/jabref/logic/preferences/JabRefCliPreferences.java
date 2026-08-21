@@ -79,6 +79,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.EngineSelection;
+import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -417,6 +418,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
+    private static final String OCR_LANGUAGES = "ocrLanguages";
     // endregion
 
     // region Push to application preferences
@@ -2180,6 +2182,13 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+        bindCustomList(ocrPreferences.getOcrLanguages(), OCR_LANGUAGES, List.copyOf(defaultValues.getOcrLanguages()),
+                languages -> convertListToString(languages.stream().map(OcrLanguage::getTesseractCode).toList()),
+                stored -> convertStringToList(stored).stream()
+                                                     .map(OcrLanguage::fromTesseractCode)
+                                                     .filter(Optional::isPresent)
+                                                     .map(Optional::get)
+                                                     .toList());
 
         return ocrPreferences;
     }

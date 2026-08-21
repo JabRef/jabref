@@ -14,6 +14,9 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.PagesWithTextHandling;
+import com.dlsc.gemsfx.TagsField;
+import org.jabref.gui.preferences.forms.TagsFieldEditor;
+import org.jabref.logic.ocr.OcrLanguage;
 
 public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 
@@ -28,12 +31,19 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     }
 
     private void buildView() {
+        TagsField<OcrLanguage> languageTagsField = TagsFieldEditor.create(
+                OcrLanguage::getDisplayName,
+                viewModel::getOcrLanguageSuggestions,
+                viewModel.getOcrLanguageStringConverter(),
+                viewModel.selectedOcrLanguagesProperty());
+
         setContent(form()
 
                 .section(Localization.lang("OCR engine"), engine -> engine
                         .combo(Localization.lang("Engine selection"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName)
-                        .custom(buildEnginePathRow()))
+                        .custom(buildEnginePathRow())
+                        .tagsField(Localization.lang("OCR languages"), languageTagsField))
 
                 .section(Localization.lang("Handling of pre-existing text"), scanned -> scanned
                         .combo(Localization.lang("OCR for pre-existing text"),

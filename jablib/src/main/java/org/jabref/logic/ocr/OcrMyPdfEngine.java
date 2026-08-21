@@ -40,20 +40,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
         Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
-        String outputFile = outputPath.toString();
-        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
-            case SKIP ->
-                    "--skip-text";
-            case FORCE ->
-                    "--force-ocr";
-            case REDO ->
-                    "--redo-ocr";
-        };
-        // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add(ocrCommand);
-        command.add(pdfPath.toString());
-        command.add(outputFile);
+        ArrayList<String> command = buildCommand(pdfPath, outputPath);
         Process process = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -84,5 +71,31 @@ public class OcrMyPdfEngine implements OcrEngine {
             LOGGER.error("OCRmyPDF process was interrupted.", e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED);
         }
+    }
+
+    /// Builds the OCRmyPDF command list for the given input/output paths.
+    ///
+    /// Package-private for testing.
+    ArrayList<String> buildCommand(Path inputPath, Path outputPath) {
+        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
+            case SKIP -> "--skip-text";
+            case FORCE -> "--force-ocr";
+            case REDO -> "--redo-ocr";
+        };
+
+        String languageArg = ocrPreferences.getOcrLanguages()
+                                           .stream()
+                                           .map(OcrLanguage::getTesseractCode)
+                                           .reduce((a, b) -> a + "+" + b)
+                                           .orElse(OcrLanguage.ENGLISH.getTesseractCode());
+
+        // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        command.add(ocrCommand);
+        command.add("--language");
+        command.add(languageArg);
+        command.add(inputPath.toString());
+        command.add(outputPath.toString());
+        return command;
     }
 }
