@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -141,7 +142,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         String requestLower = request.toLowerCase();
         return java.util.Arrays.stream(org.jabref.logic.ocr.OcrLanguage.values())
                                .filter(lang -> lang.getDisplayName().toLowerCase().contains(requestLower))
-                               .toList();
+                               .collect(Collectors.toList());
     }
 
     public void browseEnginePath() {
