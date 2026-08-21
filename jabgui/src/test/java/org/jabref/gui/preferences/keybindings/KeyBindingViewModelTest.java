@@ -9,6 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.support.DisabledOnCIServer;
 
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,5 +86,75 @@ class KeyBindingViewModelTest {
 
         Optional<String> saved = liveRepo.get(binding);
         assertEquals(Optional.of("shortcut+shift+L"), saved);
+    }
+
+    @Test
+    @DisabledOnCIServer("locally runs fine")
+    void controlKeyIsRecordedAsBindingOnMacOs() {
+        assumeTrue(OS.OS_X);
+
+        KeyBindingRepository liveRepo = new KeyBindingRepository();
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        // Control (distinct from Shortcut/Cmd on macOS) held with 'A', no other modifiers
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "A",
+                "A",
+                KeyCode.A,
+                false,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = liveRepo.get(binding);
+        assertEquals(Optional.of("ctrl+A"), saved);
+    }
+
+    @Test
+    @DisabledOnCIServer("locally runs fine")
+    void controlKeyCombinedWithShiftIsRecordedAsBindingOnMacOs() {
+        assumeTrue(OS.OS_X);
+
+        KeyBindingRepository liveRepo = new KeyBindingRepository();
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        // Control and Shift held together with 'A'
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "A",
+                "A",
+                KeyCode.A,
+                true,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = liveRepo.get(binding);
+        assertEquals(Optional.of("shift+ctrl+A"), saved);
     }
 }
