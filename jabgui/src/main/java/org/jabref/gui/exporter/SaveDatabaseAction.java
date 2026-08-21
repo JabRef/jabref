@@ -222,7 +222,7 @@ public class SaveDatabaseAction {
             libraryTab.setSaving(true);
         }
 
-        libraryTab.suspendChangeMonitor();
+        libraryTab.suspendChangeDetection();
 
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
@@ -246,7 +246,7 @@ public class SaveDatabaseAction {
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {
-            libraryTab.resumeChangeMonitor();
+            libraryTab.resumeChangeDetection();
             // release panel from save status
             libraryTab.setSaving(false);
         }

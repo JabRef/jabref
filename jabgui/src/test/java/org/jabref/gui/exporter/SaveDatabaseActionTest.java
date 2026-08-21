@@ -166,17 +166,17 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveSuspendsAndResumesChangeMonitorAroundSuccessfulSave() throws Exception {
+    void saveSuspendsAndResumesChangeDetectionAroundSuccessfulSave() throws Exception {
         BibDatabase database = new BibDatabase(List.of(new BibEntry().withField(StandardField.AUTHOR, "first")));
         saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
         when(libraryTab.isSaving()).thenReturn(false);
 
         saveDatabaseAction.save();
 
-        verify(libraryTab).suspendChangeMonitor();
-        verify(libraryTab).resumeChangeMonitor();
+        verify(libraryTab).suspendChangeDetection();
+        verify(libraryTab).resumeChangeDetection();
         var inOrder = inOrder(libraryTab);
-        inOrder.verify(libraryTab).suspendChangeMonitor();
-        inOrder.verify(libraryTab).resumeChangeMonitor();
+        inOrder.verify(libraryTab).suspendChangeDetection();
+        inOrder.verify(libraryTab).resumeChangeDetection();
     }
 }

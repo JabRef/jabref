@@ -39,6 +39,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final StateManager stateManager;
     private final Optional<Path> monitoredPath;
     private LibraryTab saveState;
+    private boolean changeDetectionSuspended;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
@@ -118,17 +119,38 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         synchronized (database) {
-            // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
-            BackgroundTask.wrap(scanner::scanForChanges)
-                          .onSuccess(changes -> {
-                              if (!changes.isEmpty()) {
-                                  listeners.forEach(listener -> listener.databaseChanged(changes));
-                              }
-                          })
-                          .onFailure(e -> LOGGER.error("Error while watching for changes", e))
-                          .executeWith(taskExecutor);
+            if (!changeDetectionSuspended) {
+                scanForChanges();
+            }
         }
+    }
+
+    public void suspendChangeDetection() {
+        synchronized (database) {
+            changeDetectionSuspended = true;
+        }
+    }
+
+    public void resumeChangeDetection() {
+        synchronized (database) {
+            changeDetectionSuspended = false;
+            scanForChanges();
+        }
+    }
+
+    // [impl->req~ux.external-library-changes.after-save~1]
+    private void scanForChanges() {
+        // File watchers can report JabRef's own write or an external change while saving. Scanning once after the
+        // save finishes avoids reacting to an incomplete file and still detects an external write that occurred then.
+        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
+        BackgroundTask.wrap(scanner::scanForChanges)
+                      .onSuccess(changes -> {
+                          if (!changes.isEmpty()) {
+                              listeners.forEach(listener -> listener.databaseChanged(changes));
+                          }
+                      })
+                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
+                      .executeWith(taskExecutor);
     }
 
     public void addListener(DatabaseChangeListener listener) {

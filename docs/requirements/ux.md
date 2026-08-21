@@ -96,4 +96,11 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+### Saving keeps external change detection active
+`req~ux.external-library-changes.after-save~1`
+
+When JabRef saves a library, it must keep observing filesystem changes, defer change detection until the save has finished, and then inspect the resulting file for external changes that require conflict resolution.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
