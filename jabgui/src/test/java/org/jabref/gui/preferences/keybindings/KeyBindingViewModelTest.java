@@ -89,7 +89,6 @@ class KeyBindingViewModelTest {
     }
 
     @Test
-    @DisabledOnCIServer("locally runs fine")
     void controlKeyIsRecordedAsBindingOnMacOs() {
         assumeTrue(OS.OS_X);
 
@@ -124,7 +123,6 @@ class KeyBindingViewModelTest {
     }
 
     @Test
-    @DisabledOnCIServer("locally runs fine")
     void controlKeyCombinedWithShiftIsRecordedAsBindingOnMacOs() {
         assumeTrue(OS.OS_X);
 
