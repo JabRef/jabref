@@ -85,6 +85,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing a PDF could set the author to the person stored in the PDF's document properties (typically the account name of whoever exported the file, e.g. from Microsoft Word) instead of the authors of the work: author candidates are now cross-checked against the text of the PDF's first pages. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF could extract an implausible year (e.g. from a postal code or a link printed on the first page). [#16247](https://github.com/JabRef/jabref/pull/16247)
 - We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
 - We fixed an issue where removing filtered entries from a group could cause JabRef to throw an exception. [#16541](https://github.com/JabRef/jabref/issues/16541)

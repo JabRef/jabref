@@ -3,14 +3,19 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.text.Normalizer;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +25,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -34,6 +41,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
@@ -45,11 +54,25 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 /// please see {@link RuleBasedBibliographyPdfImporter}.
 ///
 /// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
+@NullMarked
 public class PdfContentImporter extends PdfImporter {
 
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfContentImporter.class);
+
+    // Lookarounds keep the pattern from matching inside longer digit runs such as postal codes or URL path segments
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<!\\d)\\d{4}(?!\\d)");
+    private static final int MINIMUM_PLAUSIBLE_YEAR = 1500;
 
     private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
+
+    // Author cross-check against the leading-page text (used by PdfMergeMetadataImporter, see crossCheckAuthor)
+    private static final Pattern LEADING_AND_TRAILING_NON_LETTERS = Pattern.compile("^\\P{L}+|\\P{L}+$");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    private static final Pattern NON_LETTERS = Pattern.compile("\\P{L}+");
+    private static final Pattern SOFT_LINE_BREAK_HYPHEN = Pattern.compile("-\\r?\\n\\s*");
+    private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
+    private static final Set<String> NAME_LIST_LOWERCASE_WORDS = Set.of(
+            "and", "van", "von", "der", "den", "de", "del", "dos", "da", "di", "la", "le", "ten", "ter", "y", "e");
 
     // input lines into several lines
     private String[] lines;
@@ -642,8 +665,13 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         Matcher m = YEAR_EXTRACT_PATTERN.matcher(curString);
-        if (m.find()) {
-            year = curString.substring(m.start(), m.end());
+        while (m.find()) {
+            int extractedYear = Integer.parseInt(m.group());
+            // The upper bound tolerates in-press works dated slightly ahead of the current year
+            if ((extractedYear >= MINIMUM_PLAUSIBLE_YEAR) && (extractedYear <= Year.now().getValue() + 2)) {
+                year = m.group();
+                return;
+            }
         }
     }
 
@@ -709,6 +737,130 @@ public class PdfContentImporter extends PdfImporter {
                 curString = curString.concat(" ");
             }
         }
+    }
+
+    /// Extracts the plain text of a PDF's leading pages. Used by [PdfMergeMetadataImporter] to cross-check
+    /// author candidates against what the document itself prints. Returns an empty string on failure.
+    static String extractLeadingPagesText(PDDocument document) {
+        try {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setEndPage(Math.min(2, document.getNumberOfPages()));
+            return stripper.getText(document);
+        } catch (IOException e) {
+            LOGGER.debug("Could not extract text for the author plausibility check", e);
+            return "";
+        }
+    }
+
+    /// Office suites store the account name of whoever produced the file as "Author" in the document
+    /// information dictionary. Via the XMP/docinfo candidate, this person — usually not an author of the
+    /// work at all — would win the merge in [PdfMergeMetadataImporter] against author lists extracted from
+    /// the document itself.
+    ///
+    /// Since scholarly works print their authors on the leading pages, an author list is trusted only if at
+    /// least one of its family names occurs in the text of those pages. An unconfirmed merged value is
+    /// replaced by the best-confirmed candidate value. If no candidate is confirmed, a single person coming
+    /// from a non-bibliographic candidate (no citation key, no explicit entry type) is dropped entirely: a
+    /// wrong author is worse than none. Entries with a citation key or explicit type are left untouched so
+    /// that metadata previously written by JabRef survives re-import even when the PDF text does not
+    /// contain the author (e.g. slides or reports).
+    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
+        String normalizedText = normalizeForComparison(Objects.requireNonNullElse(leadingPagesText, ""));
+        if (normalizedText.isBlank()) {
+            return;
+        }
+        entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
+            if (isAuthorConfirmedByText(mergedAuthor, normalizedText)) {
+                return;
+            }
+
+            candidates.stream()
+                      .flatMap(candidate -> candidate.getField(StandardField.AUTHOR).stream())
+                      .filter(PdfContentImporter::looksLikeAuthorList)
+                      .map(author -> new ScoredAuthor(author, countFamilyNamesInText(author, normalizedText)))
+                      .filter(scored -> scored.confirmedNames() > 0)
+                      // keeps the earlier (= higher-priority) candidate unless a later one is strictly better
+                      .reduce((first, second) -> second.confirmedNames() > first.confirmedNames() ? second : first)
+                      .ifPresentOrElse(
+                              scored -> entry.setField(StandardField.AUTHOR, scored.value()),
+                              () -> dropCreatorOnlyAuthor(entry, candidates, mergedAuthor));
+        });
+    }
+
+    private static void dropCreatorOnlyAuthor(BibEntry entry, List<BibEntry> candidates, String mergedAuthor) {
+        // The merge is first-wins, thus the merged value stems from the first candidate carrying an author
+        boolean sourceLooksBibliographic = candidates.stream()
+                                                     .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
+                                                     .findFirst()
+                                                     .map(source -> source.getCitationKey().isPresent()
+                                                             || !BibEntry.DEFAULT_TYPE.equals(source.getType()))
+                                                     .orElse(true);
+        if (!sourceLooksBibliographic && (AuthorList.parse(mergedAuthor).getNumberOfAuthors() == 1)) {
+            entry.clearField(StandardField.AUTHOR);
+        }
+    }
+
+    private record ScoredAuthor(String value, int confirmedNames) {
+    }
+
+    /// Keeps sentence fragments mis-parsed as author lists (e.g. by this importer's first-page parsing) from
+    /// being promoted by the cross-check: their words trivially occur in the document text. Real name lists
+    /// consist of capitalized words plus name particles and the "and" separator, while prose contains
+    /// other lowercase words and non-letter tokens such as URLs.
+    private static boolean looksLikeAuthorList(String authorField) {
+        for (String word : WHITESPACE.split(authorField)) {
+            String stripped = LEADING_AND_TRAILING_NON_LETTERS.matcher(word).replaceAll("");
+            if (stripped.isEmpty()
+                    || (!Character.isUpperCase(stripped.codePointAt(0)) && !NAME_LIST_LOWERCASE_WORDS.contains(stripped))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isAuthorConfirmedByText(String authorField, String normalizedText) {
+        if (countFamilyNamesInText(authorField, normalizedText) > 0) {
+            return true;
+        }
+        // Fallback for author values AuthorList cannot split into proper persons (e.g. exotic separator
+        // characters from broken XMP decoding): any word of the raw value found in the text confirms it.
+        return Arrays.stream(NON_LETTERS.split(authorField))
+                     .filter(word -> word.length() >= 2)
+                     .map(PdfContentImporter::normalizeForComparison)
+                     .anyMatch(word -> !word.isBlank() && containsWord(normalizedText, word));
+    }
+
+    private static int countFamilyNamesInText(String authorField, String normalizedText) {
+        return (int) AuthorList.parse(authorField).getAuthors().stream()
+                               .map(Author::getFamilyName)
+                               .flatMap(Optional::stream)
+                               .map(PdfContentImporter::normalizeForComparison)
+                               .filter(familyName -> !familyName.isBlank() && containsWord(normalizedText, familyName))
+                               .count();
+    }
+
+    /// Whole-word check: the occurrence must not be preceded or followed by another letter
+    private static boolean containsWord(String normalizedText, String word) {
+        int index = normalizedText.indexOf(word);
+        while (index >= 0) {
+            int end = index + word.length();
+            if ((index == 0 || !Character.isLetter(normalizedText.codePointBefore(index)))
+                    && (end >= normalizedText.length() || !Character.isLetter(normalizedText.codePointAt(end)))) {
+                return true;
+            }
+            index = normalizedText.indexOf(word, index + 1);
+        }
+        return false;
+    }
+
+    /// Case-, diacritic- and hyphen-insensitive comparison form. Hyphens are removed on both sides because
+    /// text extraction may break a name at the end of a justified line ("Breitenbü-\ncher"), where the
+    /// hyphen is a soft line-break hyphen for one name but a genuine part of another (e.g. "Kylo-Ren").
+    private static String normalizeForComparison(String text) {
+        String dehyphenated = SOFT_LINE_BREAK_HYPHEN.matcher(text).replaceAll("").replace("-", "");
+        return COMBINING_MARKS.matcher(Normalizer.normalize(dehyphenated, Normalizer.Form.NFKD))
+                              .replaceAll("")
+                              .toLowerCase(Locale.ROOT);
     }
 
     @Override
