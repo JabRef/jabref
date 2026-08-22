@@ -10,13 +10,14 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.EngineSelection;
-import org.jabref.logic.ocr.PagesWithTextHandling;
-import com.dlsc.gemsfx.TagsField;
-import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.logic.ocr.OcrLanguage;
+import org.jabref.logic.ocr.PagesWithTextHandling;
+
+import com.dlsc.gemsfx.TagsField;
 
 public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 

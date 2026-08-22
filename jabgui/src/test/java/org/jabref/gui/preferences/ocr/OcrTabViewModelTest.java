@@ -2,8 +2,6 @@ package org.jabref.gui.preferences.ocr;
 
 import java.util.List;
 
-import javafx.beans.property.ListProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ocr.OcrLanguage;
