@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -55,7 +57,8 @@ public abstract class NativeDesktop {
     // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog's properties are frozen
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
+    private static final Pattern DIR_PLACEHOLDER_PATTERN = Pattern.compile("%DIR%?");
+    private static final Pattern COMMAND_ARGUMENT_PATTERN = Pattern.compile("([^\\s\"']+|\"[^\"]*\"|'[^']*')+");
     /// Open a http/pdf/ps viewer for the given link string.
     ///
     /// Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
@@ -258,16 +261,20 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
-
-        // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
+        command = DIR_PLACEHOLDER_PATTERN.matcher(command).replaceAll(Matcher.quoteReplacement(absolutePath));
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        String[] subcommands = command.split(" ");
+        List<String> subcommands = new ArrayList<>();
+        Matcher matcher = COMMAND_ARGUMENT_PATTERN.matcher(command);
+        while (matcher.find()) {
+            String token = matcher.group();
+            // Remove syntactic quote delimiters while preserving the argument text
+            token = token.replace("\"", "").replace("'", "");
+            subcommands.add(token);
+        }
+
         try {
             new ProcessBuilder(subcommands).start();
         } catch (IOException exception) {
