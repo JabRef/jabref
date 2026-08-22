@@ -311,7 +311,21 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
             // Re-check right before the commit: creating the backup of a large file can take a while, so the first
             // check may be long in the past by now
-            ensureTargetFileUnchanged();
+            try {
+                ensureTargetFileUnchanged();
+            } catch (FileChangedException exception) {
+                // The target is untouched, so the backup written by this aborted attempt has no recovery value (unlike
+                // on commit failures, where the backup is deliberately kept). With keepBackup, a backup file is
+                // expected to persist across saves, so the (overwritten) one is left in place.
+                if (backupCreated && !keepBackup) {
+                    try {
+                        Files.deleteIfExists(backupFile);
+                    } catch (IOException deleteException) {
+                        exception.addSuppressed(deleteException);
+                    }
+                }
+                throw exception;
+            }
 
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {

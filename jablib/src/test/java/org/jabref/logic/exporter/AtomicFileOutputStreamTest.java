@@ -113,6 +113,33 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
+    void externalChangeDuringBackupCreationLeavesNoBackupBehind(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("changed-during-backup.txt");
+        Path temporaryFile = tempDir.resolve("changed-during-backup.txt.tmp");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(
+                targetFile,
+                temporaryFile,
+                Files.newOutputStream(temporaryFile),
+                false,
+                (source, target) -> {
+                    throw new AssertionError("The aborted save must not commit");
+                },
+                (source, target) -> {
+                    Files.copy(source, target);
+                    // Simulate a concurrent writer hitting the target while the backup copy is running
+                    Files.writeString(source, "changed during backup");
+                });
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+
+        assertEquals("changed during backup", Files.readString(targetFile));
+        assertFalse(Files.exists(atomicFileOutputStream.getBackup()));
+    }
+
+    @Test
     void externalDeletionOfTargetAbortsSave(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("externally-deleted.txt");
         Files.writeString(targetFile, FIFTY_CHARS);
