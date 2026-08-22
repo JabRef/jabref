@@ -146,7 +146,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-        setId("citationRelationsTab");
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
