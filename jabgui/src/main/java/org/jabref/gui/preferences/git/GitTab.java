@@ -11,7 +11,9 @@ import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
     private static final String GITHUB_PAT_DOCS_URL =
             "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens";

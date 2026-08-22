@@ -398,7 +398,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
 
-        GitPullScheduler.start(bibDatabaseContext, dialogService, preferences, stateManager, taskExecutor);
+        GitPullScheduler.start(bibDatabaseContext, dialogService, preferences, stateManager, taskExecutor, this::isModified);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {

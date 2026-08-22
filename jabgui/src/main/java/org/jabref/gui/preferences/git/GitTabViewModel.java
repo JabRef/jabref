@@ -22,9 +22,11 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GitTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitTabViewModel.class);
 

@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -16,6 +17,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 /// A scheduler is only started for a library stored inside a Git repository. The "Regularly pull
 /// remote changes" setting is read on every run, so switching it takes effect without reopening
 /// the library, the interval is read once, when the scheduler starts.
+@NullMarked
 public class GitPullScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitPullScheduler.class);
@@ -32,9 +35,11 @@ public class GitPullScheduler {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final ScheduledThreadPoolExecutor executor;
+    private final BooleanSupplier hasUnsavedChanges;
 
-    private GitPullScheduler(BibDatabaseContext bibDatabaseContext, GitAutoSync gitAutoSync, int intervalInMinutes) {
+    private GitPullScheduler(BibDatabaseContext bibDatabaseContext, GitAutoSync gitAutoSync, BooleanSupplier hasUnsavedChanges, int intervalInMinutes) {
         this.bibDatabaseContext = bibDatabaseContext;
+        this.hasUnsavedChanges = hasUnsavedChanges;
         this.executor = new ScheduledThreadPoolExecutor(1);
         this.executor.scheduleAtFixedRate(
                 () -> pull(gitAutoSync),
@@ -43,13 +48,15 @@ public class GitPullScheduler {
                 TimeUnit.MINUTES);
     }
 
-    /// Runs one scheduled pull. Exceptions are caught, because scheduleAtFixedRate silently cancels
-    /// the schedule for the rest of the session if the task throws.
+    /// Runs one scheduled pull. Skips while the library has unsaved changes, because a merge would be
+    /// applied underneath the user's edits. Exceptions are caught, because scheduleAtFixedRate
+    /// silently cancels the schedule for the rest of the session if the task throws.
     private void pull(GitAutoSync gitAutoSync) {
         try {
-            if (bibDatabaseContext.getMetaData().isGitAutoPull()) {
-                bibDatabaseContext.getDatabasePath().ifPresent(path -> gitAutoSync.pull(path, bibDatabaseContext));
+            if (hasUnsavedChanges.getAsBoolean() || !bibDatabaseContext.getMetaData().isGitAutoPull()) {
+                return;
             }
+            bibDatabaseContext.getDatabasePath().ifPresent(path -> gitAutoSync.pull(path, bibDatabaseContext));
         } catch (Exception e) {
             LOGGER.warn("Scheduled Git pull failed", e);
         }
@@ -64,7 +71,8 @@ public class GitPullScheduler {
                              DialogService dialogService,
                              GuiPreferences preferences,
                              StateManager stateManager,
-                             TaskExecutor taskExecutor) {
+                             TaskExecutor taskExecutor,
+                             BooleanSupplier hasUnsavedChanges) {
 
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty() || GitHandler.findRepositoryRoot(databasePath.get()).isEmpty()) {
@@ -82,7 +90,7 @@ public class GitPullScheduler {
                 taskExecutor,
                 preferences,
                 stateManager);
-        RUNNING_INSTANCES.add(new GitPullScheduler(bibDatabaseContext, gitAutoSync, intervalInMinutes));
+        RUNNING_INSTANCES.add(new GitPullScheduler(bibDatabaseContext, gitAutoSync, hasUnsavedChanges, intervalInMinutes));
     }
 
     /// Shuts down the scheduler which is associated with the given [BibDatabaseContext].

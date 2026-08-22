@@ -24,6 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved
 ///
 /// Same operations as [GitCommitAction] and [GitPushAction], but started by a save instead of the user
 /// so failures are shown as notifications rather than modal dialogs
+@NullMarked
 public class GitAutoSync {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitAutoSync.class);
 

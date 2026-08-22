@@ -8,7 +8,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesViewModel> {
     @FXML private CheckBox autoCommit;
     @FXML private CheckBox autoPush;

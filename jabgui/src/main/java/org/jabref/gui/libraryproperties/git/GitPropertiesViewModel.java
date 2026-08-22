@@ -7,6 +7,9 @@ import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class GitPropertiesViewModel implements PropertiesTabViewModel {
     private final BooleanProperty autoCommitProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoPushProperty = new SimpleBooleanProperty();
