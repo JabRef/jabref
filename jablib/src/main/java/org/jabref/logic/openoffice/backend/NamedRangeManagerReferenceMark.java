@@ -12,11 +12,13 @@ import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.XComponentContext;
 
 public class NamedRangeManagerReferenceMark implements NamedRangeManager {
 
     @Override
     public NamedRange createNamedRange(XTextDocument doc,
+                                       XComponentContext context,
                                        String refMarkName,
                                        XTextCursor position,
                                        boolean insertSpaceBefore,
@@ -24,7 +26,7 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                                        boolean withoutBrackets)
             throws
             CreationException {
-        return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
+        return NamedRangeReferenceMark.create(doc, context, refMarkName, position, insertSpaceBefore, insertSpaceAfter, withoutBrackets);
     }
 
     @Override
@@ -44,4 +46,3 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                 .map(x -> x);
     }
 }
-

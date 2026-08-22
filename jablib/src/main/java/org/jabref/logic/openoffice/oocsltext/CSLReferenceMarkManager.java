@@ -24,11 +24,13 @@ import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.rangesort.RangeSort;
 import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
 
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -44,6 +46,7 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +59,10 @@ public class CSLReferenceMarkManager {
     private static final String FORMATTED_CITATION_TEXT_PROPERTY_PREFIX = "JabRef_formatted_citation_text:";
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]*>");
+    private static final Pattern FULL_SUPERSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sup>.*</sup>(?:</span>)?$");
+    private static final Pattern FULL_SUBSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sub>.*</sub>(?:</span>)?$");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
     private final Map<String, CSLReferenceMark> marksByName = new HashMap<>();
@@ -68,7 +74,8 @@ public class CSLReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public CSLReferenceMarkManager(XTextDocument document) {
+    public CSLReferenceMarkManager(XTextDocument document, XComponentContext componentContext) {
+        this.componentContext = componentContext;
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
@@ -231,6 +238,30 @@ public class CSLReferenceMarkManager {
                                 .findFirst();
     }
 
+    private void restoreEscapementFormattingIfNeeded(String text, XTextCursor cursor) {
+        XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        if (propertySet == null) {
+            return;
+        }
+
+        try {
+            if (FULL_SUPERSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) 33);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            } else if (FULL_SUBSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) -10);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            }
+        } catch (com.sun.star.beans.UnknownPropertyException
+                 | com.sun.star.beans.PropertyVetoException
+                 | com.sun.star.lang.WrappedTargetException
+                 | com.sun.star.uno.RuntimeException exception) {
+            LOGGER.warn("Could not restore escapement formatting for rewritten citation text", exception);
+        }
+    }
+
     public void insertReferenceIntoOO(List<BibEntry> entries,
                                       XTextDocument doc,
                                       XTextCursor position,
@@ -291,6 +322,12 @@ public class CSLReferenceMarkManager {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
+
+        if (containsEscapementMarkup(ooText.toString())) {
+            OOTextIntoOO.removeEscapementFormatting(position);
+        } else if (!insertSpaceAfter) {
+            UnoDispatch.resetAttributesAtRangeEnd(doc, componentContext, endRange);
+        }
     }
 
     public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
@@ -502,6 +539,11 @@ public class CSLReferenceMarkManager {
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
+        if (updatedName.equals(mark.getName()) && updatedText.equals(currentText)) {
+            mark.setCitationNumbers(newNumbers);
+            return;
+        }
+
         updateMarkAndText(mark, updatedText, updatedName);
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -511,6 +553,16 @@ public class CSLReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> {
+                    if (!containsEscapementMarkup(updatedText)) {
+                        UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor);
+                    }
+                });
+    }
+
+    private static boolean containsEscapementMarkup(String text) {
+        return text.contains("<sup>") || text.contains("<sub>");
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
@@ -570,6 +622,7 @@ public class CSLReferenceMarkManager {
             // Move cursor to wrap the entire inserted content
             cursor.gotoRange(startRange, false);
             cursor.gotoRange(endRange, true);
+            restoreEscapementFormattingIfNeeded(newText, cursor);
 
             // Create and attach DocumentAnnotation
             DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, markName, cursor, true);

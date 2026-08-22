@@ -66,7 +66,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
-import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
@@ -330,7 +330,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgresServer.class)));
         Supplier<SearchBackend> inMemoryFactory = () ->
-                new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
+                new InMemoryLuceneSearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences(), preferences.getFilePreferences(), taskExecutor);
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
                 sqlFactory,
@@ -358,6 +358,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
         boolean isSelectedTab = false;
+        BibDatabaseContext previousDatabaseContext = this.bibDatabaseContext;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -368,18 +369,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             isSelectedTab = true;
         }
 
-        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
-        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
-        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+        stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getOpenDatabases().add(bibDatabaseContext);
-
         initializeComponentsAndListeners(false);
 
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
+
         if (isSelectedTab) {
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            if (stateManager.getActiveDatabase().filter(databaseContext -> databaseContext == previousDatabaseContext).isPresent()) {
+                stateManager.replaceActiveDatabase(bibDatabaseContext);
+            } else {
+                stateManager.setActiveDatabase(bibDatabaseContext);
+            }
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
