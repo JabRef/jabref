@@ -31,6 +31,7 @@ public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesVi
         this.viewModel = new GitPropertiesViewModel(databaseContext);
 
         autoCommit.selectedProperty().bindBidirectional(viewModel.autoCommitProperty());
+        autoPush.selectedProperty().bindBidirectional(viewModel.autoPushProperty());
         autoPush.disableProperty().bind(autoCommit.selectedProperty().not());
         autoPull.selectedProperty().bindBidirectional(viewModel.autoPullProperty());
     }
