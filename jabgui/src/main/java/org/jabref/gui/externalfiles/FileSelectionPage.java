@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -55,7 +56,6 @@ public class FileSelectionPage extends WizardPane {
         this.viewModel = viewModel;
         this.stateManager = stateManager;
 
-        setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
         setupUI();
         setupBindings();
@@ -89,6 +89,15 @@ public class FileSelectionPage extends WizardPane {
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
+        unlinkedFilesList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                TreeItem<FileNodeViewModel> selectedItem = unlinkedFilesList.getSelectionModel().getSelectedItem();
+                if (selectedItem instanceof CheckBoxTreeItem<FileNodeViewModel> checkBoxItem) {
+                    checkBoxItem.setSelected(!checkBoxItem.isSelected());
+                    event.consume();
+                }
+            }
+        });
         VBox.setVgrow(unlinkedFilesList, Priority.ALWAYS);
 
         HBox buttonBar = new HBox(5);
@@ -115,6 +124,8 @@ public class FileSelectionPage extends WizardPane {
     private void setupBindings() {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
+
+        headerTextProperty().bind(Bindings.when(viewModel.taskActiveProperty()).then("").otherwise(Localization.lang("Select files to import")));
 
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(), fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren)).orElse(null)));
 
@@ -173,6 +184,7 @@ public class FileSelectionPage extends WizardPane {
     @Override
     public void onEnteringPage(Wizard wizard) {
         // Start search if not already done
+        Platform.runLater(() -> hideHeaderGraphic());
         if (viewModel.treeRootProperty().get().isEmpty()) {
             ((BorderPane) getContent()).setCenter(progressPane);
             viewModel.startSearch();
@@ -187,6 +199,18 @@ public class FileSelectionPage extends WizardPane {
                     nextButtonBound = true;
                 }
             });
+        }
+    }
+
+    private void hideHeaderGraphic() {
+        if (getScene() == null) {
+            return;
+        }
+        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
+            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
         }
     }
 
