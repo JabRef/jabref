@@ -38,15 +38,30 @@ class InputOption {
 
     /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
     /// @throws ImportServiceException if a URL was supplied and could not be downloaded
-    // [impl->req~jabkit.cli.input-url~1]
-    @ADR(65)
     Path getInputFile() throws ImportServiceException {
-        String input = inputSource.positionalInput != null
-                       ? inputSource.positionalInput
-                       : inputSource.optionInput;
+        return resolveInput(inputSource.positionalInput != null
+                            ? inputSource.positionalInput
+                            : inputSource.optionInput);
+    }
 
+    /// @return `true` if the given input argument is an `http(s)`/`ftp` URL rather than a local path
+    static boolean isUrl(String input) {
         String lowerCaseInput = input.toLowerCase(Locale.ROOT);
-        if (lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://")) {
+        return lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://");
+    }
+
+    /// Resolves a single input argument to a local file: a URL is downloaded to a temporary file,
+    /// anything else is taken as a (possibly Cygwin-style) local path.
+    ///
+    /// Commands reading more than one input cannot use this mixin — its [ArgGroup] binds a single
+    /// argument — and call this method per input instead.
+    ///
+    /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
+    /// @throws ImportServiceException if a URL was supplied and could not be downloaded
+    // [impl->req~jabkit.cli.input-url~2]
+    @ADR(65)
+    static Path resolveInput(String input) throws ImportServiceException {
+        if (isUrl(input)) {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
