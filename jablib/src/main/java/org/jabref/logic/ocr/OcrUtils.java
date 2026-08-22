@@ -47,6 +47,7 @@ public final class OcrUtils {
         }
     }
 
+    /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
     public static OcrResult performOcr(ArrayList<String> command, String engineName) {
         Process process = null;
         try {
