@@ -37,49 +37,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         }
         Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
         ArrayList<String> command = buildCommand(pdfPath, outputPath);
-        Process process = null;
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            process = processBuilder.start();
-
-            // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-
-            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
-            if (!finished) {
-                process.destroyForcibly();
-                return OcrResult.failure(OcrFailureReason.TIMEOUT);
-            }
-
-            if (process.exitValue() == 0) {
-                return OcrResult.success(outputPath);
-            } else {
-                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while running OCRmyPDF.", e);
-            return OcrResult.failure(OcrFailureReason.IO_ERROR);
-        } catch (InterruptedException e) {
-            process.destroyForcibly();
-            Thread.currentThread().interrupt();
-            LOGGER.error("OCRmyPDF process was interrupted.", e);
-            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
-        String outputFile = outputPath.toString();
-        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
-            case SKIP ->
-                    "--skip-text";
-            case FORCE ->
-                    "--force-ocr";
-            case REDO ->
-                    "--redo-ocr";
-        };
-        // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add(ocrCommand);
-        command.add(pdfPath.toString());
-        command.add(outputFile);
+        
         OcrResult ocrResult = OcrUtils.performOcr(command, getName());
         if (ocrResult.isSuccess()) {
             return OcrResult.success(outputPath);
