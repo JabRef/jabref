@@ -41,6 +41,7 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
@@ -413,6 +414,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         public boolean shouldUseCustomApiKey() {
             return useCustomApiKey.get();
+        }
+
+        public boolean hasConfiguredApiKey() {
+            return isCustomizable() && !StringUtil.isBlank(apiKey.get()) && shouldUseCustomApiKey();
         }
 
         public BooleanProperty useCustomApiKeyProperty() {

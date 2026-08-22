@@ -14,12 +14,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
@@ -39,6 +42,9 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     // Estimate for header height (used in table prefHeight calculation)
     private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
+
+    // Fixed width of the "API key saved" indicator column.
+    private static final double KEY_INDICATOR_WIDTH = 24.0;
 
     private final VBox fetchersContainer = new VBox();
 
@@ -189,6 +195,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         Label nameLabel = new Label(item.getName());
         nameLabel.getStyleClass().add("fetcher-name");
 
+        Label apiKeyIndicator = buildApiKeyIndicator(item);
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -206,8 +214,48 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        container.getChildren().addAll(enabledCheckBox, nameLabel, apiKeyIndicator, spacer, helpButton, configureButton);
         return container;
+    }
+
+    private Label buildApiKeyIndicator(WebSearchTabViewModel.FetcherViewModel item) {
+        Label indicator = new Label();
+        indicator.setMinWidth(KEY_INDICATOR_WIDTH);
+        indicator.setPrefWidth(KEY_INDICATOR_WIDTH);
+        indicator.setMaxWidth(KEY_INDICATOR_WIDTH);
+        indicator.setAlignment(Pos.CENTER);
+        bindApiKeyIndicator(indicator, item);
+        return indicator;
+    }
+
+    private void bindApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
+        Runnable refresh = () -> updateApiKeyIndicator(indicator, item);
+        refresh.run();
+
+        item.apiKeyProperty().addListener((_, _, _) -> refresh.run());
+        item.useCustomApiKeyProperty().addListener((_, _, _) -> refresh.run());
+        item.customizableProperty().addListener((_, _, _) -> refresh.run());
+        viewModel.getApikeyPersistProperty().addListener((_, _, _) -> refresh.run());
+        viewModel.apiKeyPersistAvailable().addListener((_, _, _) -> refresh.run());
+    }
+
+    private void updateApiKeyIndicator(Label indicator, WebSearchTabViewModel.FetcherViewModel item) {
+        if (!item.hasConfiguredApiKey()) {
+            indicator.setText("");
+            indicator.setGraphic(null);
+            indicator.setTooltip(null);
+            return;
+        }
+
+        boolean willPersist = viewModel.apiKeyPersistAvailable().get() && viewModel.getApikeyPersistProperty().get();
+        if (willPersist) {
+            indicator.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SAVE));
+            indicator.setTooltip(new Tooltip(Localization.lang("API key is saved")));
+        } else {
+            indicator.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.CLOCK));
+            indicator.setTooltip(new Tooltip(Localization.lang("API key is set for this session only")));
+        }
+        indicator.setText("");
     }
 
     private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
