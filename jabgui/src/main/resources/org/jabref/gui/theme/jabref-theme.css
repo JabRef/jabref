@@ -1,0 +1,942 @@
+/*
+* Default JabRef theme
+* ==========
+* Declares the complete JabRef color token set (`-color-*`), once per color scheme.
+* jabref-base.css and every other JabRef stylesheet only *consume* these tokens and must
+* never declare a color of their own -- that is what makes a theme swappable.
+*
+* A theme is therefore a single file that assigns a value to every token listed below.
+* See primer-theme.css for a second implementation of the same contract.
+*/
+
+@media (prefers-color-scheme: light) {
+    * {
+        /* Surfaces, from the window canvas outwards to the raised chrome */
+        -color-bg-primary: #FFFFFF;
+        -color-bg-secondary: #FEFEFE;
+        -color-bg-tertiary: #F4F4F4;
+        -color-bg-overlay: #FEFEFE;
+        /* Alternating rows in tables and lists */
+        -color-bg-alt: derive(-color-bg-secondary, -5%);
+        -color-bg-search: #FBFBFB;
+
+        /* Foreground */
+        -color-fg-default: #000000;
+        -color-fg-muted: #404040;
+        -color-fg-subtle: #808080;
+        -color-fg-emphasis: #FFFFFF;
+        -color-fg-menu-active: #000000;
+
+        /* Borders */
+        -color-border-default: #DDDDDD;
+        -color-border-muted: #DFDFDF;
+
+        /* Accent -- the JabRef brand color and its tint */
+        -color-accent: #50618F;
+        -color-accent-subtle: #A3B7E6;
+
+        /* Buttons. The resting fill is transparent so buttons read as flat outlines;
+           hover and pressed are translucent overlays that darken whatever is behind them. */
+        -color-button: transparent;
+        -color-button-hover: rgba(0, 0, 0, 0.12);
+        -color-button-pressed: rgba(0, 0, 0, 0.30);
+        -color-button-border: #DDDDDD;
+        -color-button-default: #C6D3F0;
+
+        /* Selection */
+        -color-selection: #A3B7E6;
+        -color-selection-inactive: #D3D3D3;
+
+        /* Translucent overlays used to tint icons and rows on hover */
+        -color-overlay-hover: #0001;
+        -color-overlay-armed: #0002;
+
+        /* Status. The '-subtle' variants are translucent fills laid over a control. */
+        -color-success: #10AC84;
+        -color-success-emphasis: #1DD1A1;
+        -color-warning: #FF9F43;
+        -color-warning-subtle: rgba(255, 159, 67, 0.5);
+        -color-danger: #FF6B6B;
+        -color-danger-emphasis: #EE5253;
+        -color-danger-subtle: rgba(240, 128, 128, 0.5);
+        -color-info: rgba(41, 166, 236, 0.66);
+        -color-info-subtle: rgba(163, 183, 230, 0.16);
+
+        /* Links */
+        -color-link: #50618F;
+        -color-link-hover: #004499;
+
+        /* Source-code editors */
+        -color-syntax-keyword: #7559C2;
+        -color-syntax-tag: #DC143C;
+        -color-syntax-attribute: #9400D3;
+        -color-syntax-string: #008000;
+        -color-syntax-comment: #008080;
+        -color-syntax-punctuation: #808080;
+        -color-search-highlight-bg: #FFFF00;
+        -color-search-highlight-fg: #7800A9;
+
+        /* Scrollbars */
+        -color-scrollbar-thumb: #999999;
+        -color-scrollbar-track: #FCFCFC;
+
+        /* Tooltips */
+        -color-tooltip-bg: #A3B7E6;
+        -color-tooltip-fg: #000000;
+
+        /* Drag & drop targets */
+        -color-drag-target: #A3B7E6;
+        -color-drag-target-hover: #B1C7FA;
+
+        /* Group hit-count badge */
+        -color-badge-bg: #6F6F6F;
+        -color-badge-fg: #FFFFFF;
+
+        /* Scrim used to dim the app behind the walkthrough spotlight, and drop shadows */
+        -color-scrim: rgba(34, 47, 62, 0.75);
+        -color-shadow: rgba(0, 0, 0, 0.6);
+        -color-shadow-subtle: rgba(0, 0, 0, 0.1);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    * {
+        /* Surfaces, from the window canvas outwards to the raised chrome */
+        -color-bg-primary: #000000;
+        -color-bg-secondary: #272B38;
+        -color-bg-tertiary: #141824;
+        -color-bg-overlay: #272B38;
+        /* Alternating rows in tables and lists */
+        -color-bg-alt: derive(-color-bg-secondary, -5%);
+        -color-bg-search: #2C2E3B;
+
+        /* Foreground */
+        -color-fg-default: #E5E7EA;
+        -color-fg-muted: #7D8591;
+        -color-fg-subtle: #6B7280;
+        -color-fg-emphasis: #E5E7EA;
+        -color-fg-menu-active: #EFF1F5;
+
+        /* Borders */
+        -color-border-default: #424758;
+        -color-border-muted: #333744;
+
+        /* Accent -- the JabRef brand color and its tint */
+        -color-accent: #2C9490;
+        -color-accent-subtle: #255652;
+
+        /* Buttons. The resting fill is transparent so buttons read as flat outlines;
+           hover and pressed are translucent overlays that lighten whatever is behind them. */
+        -color-button: transparent;
+        -color-button-hover: rgba(255, 255, 255, 0.12);
+        -color-button-pressed: rgba(255, 255, 255, 0.24);
+        -color-button-border: #424758;
+        -color-button-default: #1B403D;
+
+        /* Selection */
+        -color-selection: #255652;
+        -color-selection-inactive: #333744;
+
+        /* Translucent overlays used to tint icons and rows on hover */
+        -color-overlay-hover: #FFF1;
+        -color-overlay-armed: #FFF2;
+
+        /* Status. The '-subtle' variants are translucent fills laid over a control. */
+        -color-success: #1CB631;
+        -color-success-emphasis: #28D93C;
+        -color-warning: #B77620;
+        -color-warning-subtle: rgba(183, 118, 32, 0.5);
+        -color-danger: #DB1D2B;
+        -color-danger-emphasis: #B71C1F;
+        -color-danger-subtle: rgba(219, 29, 43, 0.4);
+        -color-info: rgba(41, 166, 236, 0.66);
+        -color-info-subtle: rgba(37, 86, 82, 0.35);
+
+        /* Links */
+        -color-link: #2C9490;
+        -color-link-hover: #5FDDD3;
+
+        /* Source-code editors */
+        -color-syntax-keyword: #B72486;
+        -color-syntax-tag: #FF7B72;
+        -color-syntax-attribute: #D2A8FF;
+        -color-syntax-string: #7EE787;
+        -color-syntax-comment: #6FD8D2;
+        -color-syntax-punctuation: #8B949E;
+        -color-search-highlight-bg: #7A6A00;
+        -color-search-highlight-fg: #E9C7FF;
+
+        /* Scrollbars */
+        -color-scrollbar-thumb: #E5E7EA;
+        -color-scrollbar-track: #040406;
+
+        /* Tooltips */
+        -color-tooltip-bg: #255652;
+        -color-tooltip-fg: #EFF1F5;
+
+        /* Drag & drop targets */
+        -color-drag-target: #255652;
+        -color-drag-target-hover: #5FDDD3;
+
+        /* Group hit-count badge */
+        -color-badge-bg: #151924;
+        -color-badge-fg: #E5E7EA;
+
+        /* Scrim used to dim the app behind the walkthrough spotlight, and drop shadows */
+        -color-scrim: rgba(0, 0, 0, 0.75);
+        -color-shadow: rgba(0, 0, 0, 0.8);
+        -color-shadow-subtle: rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* JavaFX CSS overwrites with our JabRef colors. */
+.root {
+    -fx-base: -color-bg-tertiary;
+
+    -fx-background: -color-bg-primary;
+    -fx-color: -color-bg-tertiary;
+    -fx-accent: -color-accent-subtle;
+
+    -fx-body-color: derive(-color-bg-tertiary, 20%);
+    -fx-body-color-bottomup: derive(-color-bg-tertiary, 20%);
+    -fx-body-color-to-right: derive(-color-bg-tertiary, 20%);
+
+    -fx-control-inner-background: -color-bg-secondary;
+    -fx-control-inner-background-alt: derive(-color-bg-secondary, -5%);
+
+    -fx-dark-text-color: -color-fg-default;
+    -fx-mid-text-color: -color-fg-muted;
+    -fx-light-text-color: -color-fg-emphasis;
+
+    -fx-box-border: derive(-color-bg-tertiary, -5%);
+    -fx-text-box-border: derive(-color-bg-tertiary, 10%);
+    -fx-outer-border: -color-border-default;
+
+    -fx-inner-border: derive(-color-bg-tertiary, 65%);
+    -fx-inner-border-horizontal: derive(-color-bg-tertiary, 65%);
+    -fx-inner-border-bottomup: derive(-color-bg-tertiary, 65%);
+
+    -fx-focus-color: -color-accent-subtle;
+    -fx-faint-focus-color: derive(-color-accent-subtle, 50%);
+
+    -fx-default-button: -color-button-default;
+    -fx-hover-base: derive(-color-bg-tertiary, 30%);
+    -fx-pressed-base: derive(-color-bg-tertiary, -5%);
+
+    -fx-shadow-highlight-color: transparent;
+
+    -fx-mark-color: -fx-text-base-color;
+    -fx-mark-highlight-color: transparent;
+
+    -fx-selection-bar: -color-selection;
+    -fx-selection-bar-non-focused: -color-selection-inactive;
+
+    -fx-cell-focus-inner-border: derive(-color-accent-subtle, 30%);
+
+    -fx-focused-text-base-color: -color-fg-emphasis;
+    -fx-focused-mark-color: -color-fg-emphasis;
+
+    -fx-background-color: -color-bg-primary;
+}
+
+/* JavaFX Button-like */
+.button,
+.toggle-button,
+.menu-button,
+.choice-box,
+.combo-box-base,
+.combo-box-base:editable > .arrow-button {
+    -fx-background: -color-button;
+    -fx-background-color: -fx-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
+}
+
+/* JavaFX Button */
+.button {
+    -fx-border-color: -color-button-border;
+    -fx-border-width: 0.062em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.button:hover {
+    -fx-background: -color-button-hover;
+}
+
+.button:focused,
+.button:pressed {
+    -fx-background: -color-button-pressed;
+}
+
+.button:default,
+.button:default:hover,
+.button:default:focused,
+.button:default:pressed {
+    -fx-background: -color-button-default;
+}
+
+/* JavaFX ToggleButton */
+.toggle-button:hover,
+.toggle-button:selected:hover {
+    -fx-background-color: -color-overlay-hover;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -color-overlay-hover;
+    -fx-text-fill: -color-selection;
+    -fx-fill: -color-selection;
+}
+
+/* JavaFX CheckBox */
+.check-box {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.check-box > .box {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0.125em;
+    -fx-border-radius: 0.062em;
+    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
+}
+
+.check-box:selected > .box {
+    -fx-background-insets: 0.125em;
+    -fx-border-color: -color-accent;
+    -fx-background-color: -color-accent;
+}
+
+.check-box > .box > .mark {
+    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -color-bg-secondary;
+    -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
+    -fx-stroke-width: 5;
+}
+
+/* JavaFX RadioButton */
+.radio-button > .radio {
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
+    -fx-background-color: -color-scrollbar-thumb, -color-bg-secondary;
+    -fx-background-insets: 0, 0.125em;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.radio-button:selected > .radio {
+    -fx-background-color: -color-accent, -fx-background;
+}
+
+.radio-button > .radio > .dot {
+    -fx-padding: 0.25em; /* radius of the inner dot when selected */
+    -fx-background-insets: 0;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -color-accent;
+}
+
+/* JavaFX Layout container */
+.scroll-pane,
+.scroll-pane > .viewport,
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* JavaFX Dialog */
+.dialog-pane {
+    -fx-font-size: 1em;
+    -fx-background-color: -color-bg-overlay;
+}
+
+/* JavaFX TextFlow / HyperLink */
+TextFlow > Text {
+    -fx-fill: -fx-text-background-color;
+}
+
+TextFlow > .hyperlink,
+.hyperlink {
+    -fx-padding: 0;
+    -fx-underline: false;
+    -fx-border-style: null;
+    -fx-border-color: transparent;
+    -fx-text-fill: -color-accent;
+    -fx-fill: -color-accent;
+}
+
+TextFlow > .hyperlink:visited,
+.hyperlink:visited {
+    -fx-text-fill: -color-accent-subtle;
+    -fx-fill: -color-accent-subtle;
+}
+
+.TextFlow > .hyperlink:hover,
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+TextFlow > .tooltip-text-bold {
+    -fx-font-weight: bold;
+}
+
+TextFlow > .tooltip-text-italic {
+    -fx-font-style: italic;
+}
+
+TextFlow > .tooltip-text-monospaced {
+    -fx-font-family: monospace;
+}
+
+/* JavaFX Tooltip */
+.tooltip {
+    -fx-background: -color-tooltip-bg;
+    -fx-background-color: -fx-background;
+    -fx-opacity: 95%;
+    -fx-font-size: 1em;
+    -fx-font-family: sans-serif;
+    -fx-font-weight: normal;
+    -fx-text-fill: -color-tooltip-fg;
+    -fx-show-delay: 300ms;
+    -fx-hide-delay: 300ms;
+}
+
+.tooltip > TextFlow > Text {
+    -fx-font-size: 1em;
+}
+
+/* JavaFX ColorPicker */
+.color-picker:armed,
+.color-picker:hover,
+.color-picker:focused,
+.color-picker {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.color-palette {
+    -fx-background-color: -color-bg-primary;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
+
+.color-palette-region .button {
+    -fx-border-width: 0;
+}
+
+.custom-color-dialog {
+    -fx-background-color: -color-bg-overlay;
+}
+
+/* JavaFX Progress Indicator */
+.progress-indicator {
+    -fx-progress-color: -color-accent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+.progress-indicator:hover {
+    -fx-background-color: -color-overlay-hover;
+}
+
+/* JavaFX MenuBar / MenuItem */
+.menu-bar {
+    -fx-background-color: -color-bg-tertiary;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em;
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em;
+}
+
+.menu-bar .menu-button {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+}
+
+
+.menu-bar > .container {
+    -fx-border-width: 0;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background: -color-border-default;
+    -fx-background-color: -fx-background;
+}
+
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:focused > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: -color-fg-menu-active;
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.menu-item:focused {
+    -fx-text-fill: -color-border-default;
+    -fx-background: -color-border-default;
+    -fx-background-color: -fx-background;
+}
+
+.menu-item:focused > .label {
+    -fx-text-fill: -color-fg-menu-active;
+}
+
+.menu-button > .label {
+    -fx-padding: 0 8 0 8;
+}
+
+/* JavaFX ContextMenu */
+.context-menu {
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1;
+}
+
+/* JavaFX Separator */
+.separator:horizontal .line {
+    -fx-border-color: -color-border-muted;
+    -fx-border-width: 0.3;
+    -fx-border-insets: 1 15 0 20;
+}
+
+.separator:vertical .line {
+    -fx-border-color: -color-border-muted;
+    -fx-border-width: 1;
+    -fx-border-insets: 5 15 5 15;
+}
+
+/* JavaFX TabPane */
+.tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: -color-border-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0.5 0.5 0.5 0.5;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-pref-height: 3em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
+    -fx-border-color: -color-accent;
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -color-bg-secondary;
+    -fx-border-color: -color-accent;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
+    -fx-background-color: -color-accent;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-border-radius: 0;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -color-border-default;
+}
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 0 0 0 0;
+}
+
+/* JavaFX SplitPane */
+.split-pane > .split-pane-divider {
+    -fx-background-color: -color-border-muted;
+    -fx-padding: 0 .5 0 .5;
+}
+
+/* JavaFX ComboBoxBase / ComboBox / DatePicker */
+.combo-box-base {
+    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-insets: 0, 1 0 1 1;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: -color-bg-overlay;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+    -fx-border-width: 1;
+    -fx-border-color: -color-border-default;
+    -fx-padding: 0;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    -fx-background: -color-bg-overlay;
+    -fx-background-color: -color-bg-overlay;
+}
+
+.combo-box-popup > .list-view > .placeholder > .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -color-accent-subtle;
+    -fx-background-color: -color-accent-subtle;
+}
+
+.combo-box-base:editable > .text-field,
+.date-picker > .text-field {
+    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+}
+
+.combo-box-base:editable:focused > .text-field,
+.combo-box-base:editable > .text-field:focused,
+.date-picker > .text-field:focused {
+    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 0;
+}
+
+.date-picker:focused > .text-field {
+    -fx-background-color: -color-bg-secondary;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > * > .spinner > .button > .left-arrow,
+.date-picker-popup > * > .spinner > .button > .right-arrow {
+    -fx-background: -color-accent-subtle;
+    -fx-background-color: -color-accent-subtle;
+}
+
+/*
+ * The month and year labels get no text fill of their own from modena, so they fall back to the
+ * '-fx-text-base-color' ladder -- which lands on '-fx-light-text-color' here and paints them white
+ * on the light gray month-year pane. State the foreground instead of leaving it to the ladder.
+ * (modena also hardcodes the secondary label to orange.)
+ */
+.date-picker-popup > .month-year-pane > .spinner > .label,
+.date-picker-popup > .month-year-pane > .secondary-label {
+    -fx-text-fill: -color-fg-default;
+}
+
+/*
+ * modena paints the week numbers with '-fx-accent' and the grid with
+ * 'derive(-fx-selection-bar-non-focused, 60%)'. Both of those are selection *tints* here, not
+ * foregrounds, so the week numbers came out pale blue on a near-white cell. Give the popup's
+ * text the same foreground tokens as the rest of the UI.
+ */
+.date-picker-popup > * > .week-number-cell {
+    -fx-text-fill: -color-fg-muted;
+}
+
+/*
+ * The day names sit on a transparent cell, so modena's ladder reads the window background rather
+ * than the grid they actually appear on and lands on black in both color schemes.
+ */
+.date-picker-popup > * > .day-name-cell {
+    -fx-text-fill: -color-fg-default;
+}
+
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: -color-border-muted;
+}
+
+.date-picker-popup > * > .day-cell {
+    -fx-border-color: -color-border-muted;
+}
+
+/* JavaFX Accordion / TitledPane */
+
+.accordion .titled-pane {
+    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+    -fx-arrow-side: right;
+}
+
+.accordion .titled-pane .title {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 5 5 5 5;
+}
+
+.accordion .titled-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/*
+ * Default (left-side) arrow: give it a bit more breathing room
+ * before the title text, e.g. the entry editor's collapsible
+ * field sections (which aren't hosted in an .accordion).
+ */
+.titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.4em 0.0em 0.0em;
+}
+
+/*
+ * The arrow button has some right padding that's added
+ * by "modena.css". This simply puts the padding on the
+ * left since the arrow is positioned on the right.
+ * Only .accordion sets -fx-arrow-side to "right" (see rule
+ * above), so this more specific selector only wins there.
+ */
+.accordion .titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.0em 0.0em 1.0em;
+}
+
+/* JavaFX ScrollBar / ScrollPane */
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-opacity: 0.3;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+    -fx-background-color: -color-scrollbar-track;
+    -fx-opacity: 0.6;
+    -fx-background-radius: 0em;
+}
+
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: -color-scrollbar-thumb;
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed {
+    -fx-background-color: -color-scrollbar-thumb;
+}
+
+/* Hide increment and decrement buttons */
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Hide increment and decrement arrows */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow,
+.scroll-bar:horizontal > .increment-button > .increment-arrow,
+.scroll-bar:vertical > .decrement-button > .decrement-arrow,
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-shape: null;
+    -fx-padding: 0;
+}
+
+/* Need some padding since otherwise no scroll-bar is displayed at all */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-padding: 0.333em 0.167em 0.333em 0.167em; /* 4 2 4 2 */
+}
+
+.scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-padding: 0em 0.333em 0em 0.333em; /* 2 4 2 4 */
+}
+
+/* Restore full visibility of scrollbars for active elements */
+.list-view:hover .scroll-bar,
+.tree-view:hover .scroll-bar,
+.table-view:hover .scroll-bar,
+.tree-table-view:hover .scroll-bar,
+.text-input:hover .scroll-bar,
+.scroll-pane:hover .scroll-bar {
+    -fx-opacity: 1;
+}
+
+/* JavaFX TextInput / TextField / TextArea */
+
+.text-input {
+    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-prompt-text-fill: -color-scrollbar-thumb;
+}
+
+.text-input:focused {
+    -fx-highlight-fill: -color-accent-subtle;
+    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
+    -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
+}
+
+.text-area {
+    -fx-background-color: -color-bg-secondary;
+}
+
+.text-area .content {
+    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
+    -fx-background-radius: 0;
+}
+
+.text-area:focused .content {
+    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 0;
+}
+
+.text-area > .scroll-pane > .corner {
+    -fx-background-radius: 0 0 0 0;
+    -fx-background-color: -color-bg-primary;
+}
+
+/* JavaFX ProgressBar */
+.progress-bar > .bar {
+    -fx-background-color: -color-accent;
+}
+
+.progress-bar:indeterminate > .bar {
+    -fx-background-color: -color-accent;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -color-accent-subtle;
+}
+
+/* JavaFX Cell Container */
+.table-view,
+.tree-table-view {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view:focused,
+.tree-table-view:focused {
+    -fx-background-insets: 0;
+}
+
+.table-cell,
+.tree-table-cell {
+    -fx-cell-size: 4.0em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background: -color-border-default;
+    -fx-background-color: -fx-background;
+    /*-fx-fill: -color-fg-emphasis;*/
+    /*-fx-text-fill: -color-fg-emphasis;*/
+}
+
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
+.tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:filled:selected {
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+}
+
+/* Selected rows */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:filled:selected {
+    -fx-background: -color-selection;
+    -fx-background-color: -color-selection;
+    -fx-table-cell-border-color: transparent;
+}
+
+/* Selected when control is not focused
+ * In the context of the MainTable: an element is focused at a double click. A single click "just" selects it.
+ */
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.table-row-cell:filled > .table-cell:filled:selected,
+.tree-table-row-cell:filled > .tree-table-cell:filled:selected {
+    -fx-background: -color-selection;
+    -fx-background-color: -color-selection;
+    -fx-table-cell-border-color: transparent;
+}
+
+.column-header-background {
+    -fx-background-color: -color-bg-secondary;
+    -fx-border-width: 0;
+}
+
+.column-header-background:hover {
+    -fx-background-color: -color-border-default;
+}
+
+.column-header,
+.table-view .filler,
+.tree-table-view .filler {
+    -fx-background-color: transparent, -color-bg-secondary;
+    -fx-background-insets: 0, 0 0.02em 0 0.02em;
+    -fx-font-weight: bold;
+    -fx-size: 3em;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -color-border-default;
+}
+
+.column-header > .label {
+    -fx-padding: 0 1em 0 1em;
+    -fx-alignment: center-left;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+/* JavaFX WebView */
+.web-view {
+    -fx-page-fill: -color-fg-emphasis;
+}

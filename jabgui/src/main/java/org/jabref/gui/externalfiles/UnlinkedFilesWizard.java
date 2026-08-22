@@ -52,7 +52,7 @@ public class UnlinkedFilesWizard {
             }
         });
 
-        Optional<ButtonType> result = wizard.showAndWait();
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
 
         if (result.isPresent()) {
             if (result.get() == ButtonType.FINISH) {
