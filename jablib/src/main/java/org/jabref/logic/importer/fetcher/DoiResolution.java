@@ -156,12 +156,21 @@ public class DoiResolution implements FulltextFetcher {
         if (pdfUrl.isPresent()) {
             try {
                 URL url = base.toURI().resolve(pdfUrl.get()).toURL();
+                if (!isHttpScheme(url)) {
+                    LOGGER.warn("Ignoring embedded PDF link with non-http(s) scheme: {}", url);
+                    return Optional.empty();
+                }
                 return Optional.of(url);
             } catch (MalformedURLException | URISyntaxException _) {
                 return Optional.empty();
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean isHttpScheme(URL url) {
+        String protocol = url.getProtocol();
+        return "http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol);
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {

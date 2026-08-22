@@ -133,6 +133,29 @@ val embeddedPostgresDependencyByTarget = mapOf(
     "windows-latest" to EmbeddedPostgresBinaries.windowsAmd64
 )
 
+// Browser-extension fulltext bridge (../browser-bridge). A native binary built
+// out-of-Gradle by JBang + GraalVM, provisioned by mise (browser-bridge/build.sh).
+// jpackage bundles it into the image, mirroring how buildres/*/jabrefHost.py ships.
+// Requires `mise` on PATH; CI provisions it in .github/workflows/binaries.yml.
+val browserBridgeDir = rootProject.layout.projectDirectory.dir("browser-bridge")
+val browserBridgeBinary =
+    if (System.getProperty("os.name").lowercase().contains("win")) "jabext-bridge.exe" else "jabext-bridge"
+
+val buildBrowserBridge by tasks.registering(Exec::class) {
+    group = "build"
+    description = "Builds the native browser-extension fulltext bridge (browser-bridge/build.sh)."
+    workingDir = browserBridgeDir.asFile
+    commandLine("bash", "build.sh")
+    inputs.files(
+        browserBridgeDir.file("JabExtBridge.java"),
+        browserBridgeDir.file("Json.java"),
+        browserBridgeDir.file("reflect-config.json"),
+        browserBridgeDir.file("build.sh"),
+        browserBridgeDir.file(".mise.toml")
+    )
+    outputs.file(browserBridgeDir.dir("build").file(browserBridgeBinary))
+}
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
@@ -175,6 +198,7 @@ javaModulePackaging {
             include("JabRefTopBanner.bmp")
             include("JabRef.VisualElementsManifest.xml")
         })
+        targetResources.from(browserBridgeDir.dir("build").asFileTree.matching { include(browserBridgeBinary) })
     }
     targetsWithOs("linux") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
@@ -200,6 +224,7 @@ javaModulePackaging {
             include("native-messaging-host/**")
             include("jabrefHost.py")
         })
+        targetResources.from(browserBridgeDir.dir("build").asFileTree.matching { include(browserBridgeBinary) })
     }
     targetsWithOs("macos") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
@@ -230,6 +255,7 @@ javaModulePackaging {
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
             include("Resources/**")
         })
+        targetResources.from(browserBridgeDir.dir("build").asFileTree.matching { include(browserBridgeBinary) })
     }
 }
 
@@ -260,6 +286,11 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         javaOptions.add("--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
+}
+
+// Every jpackage image bundles the native bridge, so build it first.
+tasks.withType<Jpackage>().configureEach {
+    dependsOn(buildBrowserBridge)
 }
 
 tasks.test {

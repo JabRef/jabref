@@ -51,6 +51,7 @@ class WebFetchersTest {
     private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of(
             "org.jabref.logic.importer.fetcher.ArXivFetcher$ArXiv",
             "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel",
+            "org.jabref.logic.importer.FulltextFetchersTest$TrustedFileFetcher",
             "org.jabref.logic.importer.SearchBasedFetcherTest$StubSearchBasedFetcher");
 
     private ImportFormatPreferences importFormatPreferences;
@@ -164,6 +165,9 @@ class WebFetchersTest {
 
             // Some classes implement FulltextFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
+
+            // Remove interfaces
+            expected.remove(FileSchemeFulltextFetcher.class);
 
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);

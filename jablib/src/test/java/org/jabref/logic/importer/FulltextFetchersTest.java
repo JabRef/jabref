@@ -3,6 +3,8 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -14,6 +16,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -27,6 +30,13 @@ class FulltextFetchersTest {
     private interface FulltextFetcherWithTrustLevel extends FulltextFetcher {
         default TrustLevel getTrustLevel() {
             return TrustLevel.UNKNOWN;
+        }
+    }
+
+    /// A fetcher trusted to return local `file:` URLs (marker interface).
+    private interface TrustedFileFetcher extends FileSchemeFulltextFetcher {
+        default TrustLevel getTrustLevel() {
+            return TrustLevel.PUBLISHER;
         }
     }
 
@@ -74,6 +84,30 @@ class FulltextFetchersTest {
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finderLow, finderHigh));
 
         assertEquals(Optional.of(highUrl), fetchers.findFullTextPDF(entry).map(FetcherResult::source));
+    }
+
+    @Test
+    void rejectFileUrlFromUntrustedFetcher(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("paper.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        FulltextFetcherWithTrustLevel finder = e -> Optional.of(fileUrl);
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
+
+        assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+    }
+
+    @Test
+    void acceptFileUrlFromTrustedFetcher(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("paper.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        TrustedFileFetcher finder = e -> Optional.of(fileUrl);
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
+
+        assertEquals(Optional.of(fileUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
 
     @Test

@@ -31,6 +31,8 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProvider;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProviderDiscovery;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -69,6 +71,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
 
+    private final ObservableList<BrowserExtensionProvider> externalFetchers = FXCollections.observableArrayList();
+
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
@@ -99,6 +103,15 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         setupPlainCitationParsers();
         setupSearchEngines();
+        setupExternalFetchers();
+    }
+
+    private void setupExternalFetchers() {
+        externalFetchers.setAll(BrowserExtensionProviderDiscovery.discover());
+    }
+
+    public ObservableList<BrowserExtensionProvider> getExternalFetchers() {
+        return externalFetchers;
     }
 
     private void setupPlainCitationParsers() {
