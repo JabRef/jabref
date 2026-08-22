@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +36,12 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     ScholarFetcher fetcher = new ScholarFetcher(importerPreferences);
+    private BibEntry entry;
 
     @BeforeEach
     void setUp() {
+        entry = new BibEntry();
+
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         fetcher = new ScholarFetcher(importerPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
@@ -131,5 +136,27 @@ public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, Pag
     @Override
     public String getTestJournal() {
         return "unsupported";
+    }
+
+    @Test
+    void findFullTextByUrl() throws IOException, FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(new UnknownField("scholarapi"), "7184");
+        assertEquals(Optional.of("https://scholarapi.net/api/v1/pdf/7184"),
+                fetcher.findFullText(entry).map(URL::toString));
+    }
+
+    @Test
+    void findFullTextReturnsEmptyWhenIdMissing() throws IOException, FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        assertEquals(Optional.empty(), fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextReturnsEmptyWhenHasPdfIsFalse() throws IOException, FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(new UnknownField("scholarapi"), "7184")
+                .withField(new UnknownField("scholarApiHasPdf"), "false");
+        assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 }

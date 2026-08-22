@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -41,12 +42,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyFetcher {
+public class ScholarFetcher implements FulltextFetcher, PagedSearchBasedFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "ScholarAPI";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScholarFetcher.class);
 
     private static final String LIST_URL = "https://scholarapi.net/api/v1/list";
+    private static final String PDF_URL = "https://scholarapi.net/api/v1/pdf";
 
     private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
 
@@ -264,6 +266,32 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             uriBuilder.addParameter("indexed_after", cursor);
         }
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        Optional<String> id = entry.getField(new UnknownField("scholarapi"));
+        if (id.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<String> hasPdf = entry.getField(new UnknownField("scholarApiHasPdf"));
+        if (hasPdf.filter(value -> !Boolean.parseBoolean(value)).isPresent()) {
+            return Optional.empty();
+        }
+        return Optional.of(URLUtil.create(PDF_URL + "/" + id.get()));
+    }
+
+    @Override
+    public Map<String, String> getDownloadHeaders() {
+        return importerPreferences.getApiKey(getName())
+                                  .filter(key -> !key.isBlank())
+                                  .map(key -> Map.of("X-API-Key", key))
+                                  .orElse(Map.of());
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 
     private record PageKey(String query, int startYear, int endYear, int pageNumber) {
