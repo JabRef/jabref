@@ -1,12 +1,8 @@
 package org.jabref.logic.ocr;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
-import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -70,6 +66,25 @@ public class OcrMyPdfEngine implements OcrEngine {
             Thread.currentThread().interrupt();
             LOGGER.error("OCRmyPDF process was interrupted.", e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED);
+        String outputFile = outputPath.toString();
+        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
+            case SKIP ->
+                    "--skip-text";
+            case FORCE ->
+                    "--force-ocr";
+            case REDO ->
+                    "--redo-ocr";
+        };
+        // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        command.add(ocrCommand);
+        command.add(pdfPath.toString());
+        command.add(outputFile);
+        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        if (ocrResult.isSuccess()) {
+            return OcrResult.success(outputPath);
+        } else {
+            return ocrResult;
         }
     }
 
