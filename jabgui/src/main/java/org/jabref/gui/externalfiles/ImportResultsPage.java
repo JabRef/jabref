@@ -148,7 +148,7 @@ public class ImportResultsPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
-        Platform.runLater(() -> hideHeaderGraphic());   // ← add this line
+        Platform.runLater(() -> hideHeaderGraphic());
         Platform.runLater(() -> {
             if (viewModel.resultTableItems().isEmpty()) {
                 viewModel.startImport();
