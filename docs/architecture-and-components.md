@@ -63,6 +63,27 @@ General information about architectural decision records is available at <https:
 We regard each "larger" feature as component.
 Each such component gets a label "component: {component-name}" to enable ease issue searching of it.
 
+For pull requests, component labels are applied automatically based on the changed files:
+[`.github/labeler.yml`](https://github.com/JabRef/jabref/blob/main/.github/labeler.yml) maps source directories to component labels and is evaluated by the [labeler action](https://github.com/actions/labeler) on every pull request.
+When adding a new component label or moving a component's code, update that mapping, too.
+Components without a clear home in the source tree (e.g., "component: ui", "component: unicode") are labeled by hand.
+
+Most components live in one of JabRef's Gradle modules and follow the layering shown above:
+
+```mermaid
+flowchart TD
+    jabgui["jabgui<br/>(JavaFX desktop application:<br/>maintable, entry-editor, groups UI, preferences UI, theming, ...)"]
+    jabkit["jabkit<br/>(command line interface)"]
+    jabsrv["jabsrv<br/>(HTTP server:<br/>cite-as-you-write)"]
+    jabls["jabls<br/>(language server)"]
+    jablib["jablib<br/>(core library: model + logic:<br/>bib(la)tex, importer/fetcher, exporter, cleanup, integrity, search, ...)"]
+
+    jabgui --> jablib
+    jabkit --> jablib
+    jabsrv --> jablib
+    jabls --> jablib
+```
+
 ### AI
 
 - Open issues: [component: ai](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+ai%22)
