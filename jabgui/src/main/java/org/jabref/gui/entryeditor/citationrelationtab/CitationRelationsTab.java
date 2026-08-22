@@ -45,7 +45,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -147,7 +146,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-        setId("citationRelationsTab");
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
@@ -366,11 +364,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         return bottomLine;
     }
 
-    /// Method to create main SplitPane holding all lists, buttons and labels for tab and starts search
+    /// Method to create main pane holding the fetcher selection, all lists, buttons, and labels
+    /// for tab, and starts the search
     ///
     /// @param entry BibEntry which is currently selected in JabRef Database
-    /// @return SplitPane to display
-    private SplitPane getPaneAndStartSearch(BibEntry entry) {
+    /// @return BorderPane to display
+    private BorderPane getPaneAndStartSearch(BibEntry entry) {
         // Create Layout Containers
         VBox citingVBox = new VBox();
         VBox citedByVBox = new VBox();
@@ -378,10 +377,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByVBox.setFillWidth(true);
         citingVBox.setAlignment(Pos.TOP_CENTER);
         citedByVBox.setAlignment(Pos.TOP_CENTER);
-        AnchorPane citingHBox = new AnchorPane();
-        citingHBox.setPrefHeight(40);
-        AnchorPane citedByHBox = new AnchorPane();
-        citedByHBox.setPrefHeight(40);
+        HBox citingHBox = new HBox();
+        citingHBox.getStyleClass().add("citation-panel-header");
+        citingHBox.setAlignment(Pos.CENTER_LEFT);
+        HBox citedByHBox = new HBox();
+        citedByHBox.getStyleClass().add("citation-panel-header");
+        citedByHBox.setAlignment(Pos.CENTER_LEFT);
 
         // Create Headings
         // See ADR-0047
@@ -410,10 +411,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create refresh Buttons for both sides
         Button refreshCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.REFRESH);
         refreshCitingButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
-        styleTopBarNode(refreshCitingButton, 15.0);
         Button refreshCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.REFRESH);
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
-        styleTopBarNode(refreshCitedByButton, 15.0);
 
         fetcherCombo = new ComboBox<>(
                 FXCollections.observableList(List.of(CitationFetcherType.values()))
@@ -423,7 +422,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         new ViewModelListCellFactory<CitationFetcherType>()
                 .withText(CitationFetcherType::getName)
                 .install(fetcherCombo);
-        styleTopBarNode(fetcherCombo, 75.0);
         fetcherCombo.valueProperty().bindBidirectional(entryEditorPreferences.citationFetcherTypeProperty());
 
         // Add context menus to labels for opening API URLs
@@ -434,30 +432,27 @@ public class CitationRelationsTab extends EntryEditorTab {
         Button abortCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         abortCitingButton.getGraphic().resize(30, 30);
         abortCitingButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
-        styleTopBarNode(abortCitingButton, 15.0);
         Button abortCitedButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         abortCitedButton.getGraphic().resize(30, 30);
         abortCitedButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
-        styleTopBarNode(abortCitedButton, 15.0);
 
         ProgressIndicator citingProgress = new ProgressIndicator();
         citingProgress.setMaxSize(25, 25);
-        styleTopBarNode(citingProgress, 50.0);
         ProgressIndicator citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(25, 25);
-        styleTopBarNode(citedByProgress, 50.0);
 
         // Create import buttons for both sides
         Button importCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
-        styleTopBarNode(importCitingButton, 50.0);
         Button importCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
-        styleTopBarNode(importCitedByButton, 50.0);
         hideNodes(importCitingButton, importCitedByButton);
 
-        citingHBox.getChildren().addAll(citingLabel, fetcherCombo, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
-        citedByHBox.getChildren().addAll(citedByLabel, refreshCitedByButton, importCitedByButton, citedByProgress, abortCitedButton);
+        citingHBox.getChildren().addAll(citingLabel, citingProgress, importCitingButton, refreshCitingButton, abortCitingButton);
+        citedByHBox.getChildren().addAll(citedByLabel, citedByProgress, importCitedByButton, refreshCitedByButton, abortCitedButton);
+        HBox fetcherBar = new HBox(new Label(Localization.lang("Citation fetcher")), fetcherCombo);
+        fetcherBar.getStyleClass().add("citation-fetcher-bar");
+        fetcherBar.setAlignment(Pos.CENTER_LEFT);
 
         VBox.setVgrow(citingListView, Priority.ALWAYS);
         VBox.setVgrow(citedByListView, Priority.ALWAYS);
@@ -498,14 +493,23 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
+        container.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        container.setMinSize(0, 0);
         styleFetchedListView(citedByListView, citedByComponents);
         styleFetchedListView(citingListView, citingComponents);
+
+        // The fetcher applies to both panels, so it belongs above the split, not inside the left panel's header.
+        BorderPane pane = new BorderPane();
+        pane.setTop(fetcherBar);
+        pane.setCenter(container);
+        pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        pane.setMinSize(0, 0);
 
         // switch to the tab will not trigger refresh from the remote
         searchForRelations(citingComponents, citedByComponents, false);
         searchForRelations(citedByComponents, citingComponents, false);
 
-        return container;
+        return pane;
     }
 
     /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button.
@@ -705,7 +709,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
         label.getStyleClass().add("padding-5px");
-        label.setAlignment(Pos.CENTER);
+        label.setAlignment(Pos.CENTER_LEFT);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
     }
@@ -756,15 +760,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         return contextMenu;
     }
 
-    /// Method to style refresh buttons
-    ///
-    /// @param node node to style
-    private void styleTopBarNode(Node node, double offset) {
-        AnchorPane.setTopAnchor(node, 0.0);
-        AnchorPane.setBottomAnchor(node, 0.0);
-        AnchorPane.setRightAnchor(node, offset);
-    }
-
     @Override
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
@@ -779,12 +774,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask = null;
         }
 
-        SplitPane splitPane = getPaneAndStartSearch(entry);
-        splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        splitPane.setMinSize(0, 0);
+        BorderPane searchContainer = getPaneAndStartSearch(entry);
 
         BorderPane root = new BorderPane();
-        root.setCenter(splitPane);
+        root.setId("citationRelationsTabRoot");
+        root.setCenter(searchContainer);
         root.setBottom(sciteResultsPane);
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
@@ -900,7 +894,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 Label placeholder = new Label(labelText);
                 placeholder.setWrapText(true);
                 citationComponents.listView().setPlaceholder(placeholder);
-                citationComponents.refreshButton().setVisible(true);
+                showNodes(citationComponents.refreshButton());
                 dialogService.notify(isCites
                                      ? Localization.lang("Error while fetching cited entries.")
                                      : Localization.lang("Error while fetching citing entries."));
@@ -996,11 +990,17 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void hideNodes(Node... nodes) {
-        Arrays.stream(nodes).forEach(node -> node.setVisible(false));
+        Arrays.stream(nodes).forEach(node -> {
+            node.setVisible(false);
+            node.setManaged(false);
+        });
     }
 
     private void showNodes(Node... nodes) {
-        Arrays.stream(nodes).forEach(node -> node.setVisible(true));
+        Arrays.stream(nodes).forEach(node -> {
+            node.setVisible(true);
+            node.setManaged(true);
+        });
     }
 
     /// Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field

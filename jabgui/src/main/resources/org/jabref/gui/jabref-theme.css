@@ -1778,17 +1778,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-alignment: center;
 }
 
-#citationRelationsTab .addEntryButton {
+#citationRelationsTabRoot .addEntryButton {
     -fx-font-size: 2em;
 }
 
-#citationRelationsTab .addEntryButton:selected {
+#citationRelationsTabRoot .addEntryButton:selected {
     -fx-background-color: transparent;
     -fx-fill: -jr-selected;
 }
 
-#citationRelationsTab .entry-container {
+#citationRelationsTabRoot .entry-container {
     -fx-padding: 0.5em 0em 0.5em 0em;
+}
+
+#citationRelationsTabRoot .citation-fetcher-bar {
+    -fx-padding: 0.4em 0.6em 0.4em 0.6em;
+    -fx-spacing: 0.6em;
+}
+
+#citationRelationsTabRoot .citation-panel-header {
+    -fx-padding: 0em 0.6em 0em 0.2em;
+    -fx-spacing: 0.5em;
 }
 
 /* JournalInfo */
