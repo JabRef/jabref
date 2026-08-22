@@ -235,6 +235,7 @@ public class SearchConfigurationPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
+        Platform.runLater(() -> hideHeaderGraphic());
         viewModel.treeRootProperty().setValue(Optional.empty());
         Platform.runLater(() -> {
             Node nextButton = this.lookupButton(ButtonType.NEXT);
@@ -246,5 +247,17 @@ public class SearchConfigurationPage extends WizardPane {
                 getScene().getWindow().sizeToScene();
             }
         });
+    }
+
+    private void hideHeaderGraphic() {
+        if (getScene() == null) {
+            return;
+        }
+        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
+            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
+        }
     }
 }
