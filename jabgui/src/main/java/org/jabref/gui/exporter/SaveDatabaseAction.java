@@ -133,7 +133,7 @@ public class SaveDatabaseAction {
     }
 
     /// @param file the new file name to save the database to. This is stored in the database context of the panel upon successful save.
-     /// @return true on successful save
+    /// @return true on successful save
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
@@ -225,6 +225,7 @@ public class SaveDatabaseAction {
 
         libraryTab.suspendChangeMonitor();
 
+        boolean fileChangedDuringSave = false;
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
@@ -243,13 +244,24 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
-            dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            if (ex.getCause() instanceof FileChangedException) {
+                LOGGER.info("Library {} was modified by another program while saving; save aborted", targetPath, ex);
+                fileChangedDuringSave = true;
+            } else {
+                LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
             return false;
         } finally {
             libraryTab.resumeChangeMonitor();
             // release panel from save status
             libraryTab.setSaving(false);
+            if (fileChangedDuringSave) {
+                dialogService.notify(Localization.lang("Library was not saved: the file was modified by another program."));
+                // The change monitor was suspended during the save and thus never saw the concurrent write; trigger
+                // the scan manually so the user gets the standard external-changes review flow
+                libraryTab.scanForExternalChanges();
+            }
         }
     }
 
@@ -283,8 +295,6 @@ public class SaveDatabaseAction {
                 encodingProblems = fileWriter.getEncodingProblems();
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
-            } catch (FileChangedException ex) {
-                throw new SaveException(Localization.lang("The library file was modified by another program while saving. To avoid overwriting those changes, your changes were not saved. Please review the changes on disk and save again."), ex);
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }

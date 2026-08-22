@@ -64,6 +64,7 @@ class AtomicFileOutputStreamTest {
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(targetFile));
     }
 
+    // [utest->req~logic.exporter.concurrent-save-detection~1]
     @Test
     void interleavedSavesDoNotOverwriteEachOther(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("simultaneous-save.txt");

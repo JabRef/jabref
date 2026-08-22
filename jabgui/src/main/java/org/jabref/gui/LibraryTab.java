@@ -825,6 +825,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
     }
 
+    /// Scans the file on disk for changes compared to the in-memory library and shows the standard external-changes
+    /// notification (with the review flow) if there are any. Needed after a save was aborted because of a concurrent
+    /// write: the change monitor is suspended while saving, so it never sees that write itself.
+    public void scanForExternalChanges() {
+        changeMonitor.ifPresent(DatabaseChangeMonitor::fileUpdated);
+    }
+
     public void insertEntry(final BibEntry bibEntry) {
         insertEntries(List.of(bibEntry));
     }

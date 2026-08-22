@@ -113,7 +113,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// Creates a new output stream to write to or replace the file at the specified path.
     ///
     /// @param path       the path of the file to write to or replace
-     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
+    /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
@@ -197,6 +197,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// opened. Comparison is based on size and modification time, so a concurrent write within the file system's
     /// timestamp resolution that also keeps the size identical goes undetected. There is also an unavoidable race
     /// between this check and the subsequent commit; the check is therefore repeated as late as possible.
+    // [impl->req~logic.exporter.concurrent-save-detection~1]
     private void ensureTargetFileUnchanged() throws FileChangedException {
         if (targetFileSnapshot == null) {
             return;
