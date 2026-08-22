@@ -1791,6 +1791,16 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 0em 0.5em 0em;
 }
 
+.citation-fetcher-bar {
+    -fx-padding: 0.4em 0.6em 0.4em 0.6em;
+    -fx-spacing: 0.6em;
+}
+
+.citation-panel-header {
+    -fx-padding: 0em 0.6em 0em 0.2em;
+    -fx-spacing: 0.5em;
+}
+
 /* JournalInfo */
 .journalInfo {
     -fx-background-color: -jr-background-alt;
