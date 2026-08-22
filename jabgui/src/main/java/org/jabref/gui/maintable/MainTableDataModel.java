@@ -48,7 +48,6 @@ import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
 
 public class MainTableDataModel {
     private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
-
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -174,10 +173,15 @@ public class MainTableDataModel {
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
-            boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
-            entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
+            applyGroupMatchesToAllEntries();
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    // Apply group matches to all entries
+    private void applyGroupMatchesToAllEntries() {
+        boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
+        boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
+        entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
     }
 
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
@@ -281,15 +285,30 @@ public class MainTableDataModel {
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // When entries are removed, we need to refresh the search matches
-            // to ensure the filtered list is properly updated and doesn't show stale entries
-            BackgroundTask.wrap(() -> {
-                // Re-run the current search to update the filtered results
-                if (searchQueryProperty.get().isPresent()) {
-                    setSearchMatches(searchContext.search(searchQueryProperty.get().get()));
-                } else {
-                    clearSearchMatches();
-                }
-            }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+            // to ensure the filtered list is properly updated and doesn't show stale entries.
+            // Re-apply the current group filter too, so it stays on the selected group
+            // instead of falling back to "All entries".
+            boolean isSearchFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+
+            BackgroundTask.wrap(() ->
+                    searchQueryProperty.get().map(searchQuery -> searchContext.search(searchQuery))
+            ).onSuccess(searchResultsOpt -> {
+                // Everything below runs on the FX thread (BackgroundTask#onSuccess callback).
+                searchResultsOpt.ifPresentOrElse(
+                        results -> entriesViewModel.forEach(entry -> {
+                            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+                            updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isSearchFloatingMode);
+                        }),
+                        () -> entriesViewModel.forEach(entry -> {
+                            entry.isMatchedBySearch().set(true);
+                            entry.hasFullTextResultsProperty().set(false);
+                            updateEntrySearchMatch(entry, true, isSearchFloatingMode);
+                        })
+                );
+                // Re-apply the group filter post deletion.
+                applyGroupMatchesToAllEntries();
+                FilteredListProxy.refilterListReflection(entriesFiltered);
+            }).executeWith(taskExecutor);
         }
     }
 }
