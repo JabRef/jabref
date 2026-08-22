@@ -33,6 +33,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -60,6 +61,7 @@ public class SaveDatabaseAction {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -69,12 +71,14 @@ public class SaveDatabaseAction {
                               DialogService dialogService,
                               GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              JournalAbbreviationRepository journalAbbreviationRepository) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.stateManager = stateManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     public boolean save() {
@@ -276,7 +280,10 @@ public class SaveDatabaseAction {
                         saveConfiguration,
                         preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
+                        entryTypesManager)
+                        .withJournalAbbreviationRepository(
+                                journalAbbreviationRepository,
+                                preferences.getAbbreviationPreferences().shouldUseFJournalField());
 
                 if (selectedOnly) {
                     databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());

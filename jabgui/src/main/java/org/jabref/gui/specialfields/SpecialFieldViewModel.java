@@ -67,6 +67,10 @@ public class SpecialFieldViewModel {
     }
 
     public Action getAction() {
+        return getAction(field);
+    }
+
+    public static Action getAction(SpecialField field) {
         return switch (field) {
             case PRINTED ->
                     StandardActions.PRINTED;

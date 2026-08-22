@@ -380,6 +380,7 @@ public class GroupTreeView extends BorderPane {
                     }
 
                     if (shouldDisplayGroupCount) {
+                        group.ensureMatchedEntriesLoaded();
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
@@ -510,8 +511,9 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
+    // [impl->req~ux.groups.create-explicit-from-selection~1]
     private void selectNode(GroupNodeViewModel value) {
-        selectNode(value, false);
+        selectNode(value, true);
     }
 
     private void selectNode(GroupNodeViewModel value, boolean expandParents) {

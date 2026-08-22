@@ -20,6 +20,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryConverter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -44,6 +45,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OpenDirectoryLibraryAction openDirectoryLibraryAction;
 
     public ConvertToDirectoryLibraryAction(LibraryTabContainer tabContainer,
@@ -53,6 +55,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
                                            StateManager stateManager,
                                            FileUpdateMonitor fileUpdateMonitor,
                                            BibEntryTypesManager entryTypesManager,
+                                           JournalAbbreviationRepository journalAbbreviationRepository,
                                            UndoManager undoManager,
                                            ClipBoardManager clipBoardManager,
                                            TaskExecutor taskExecutor) {
@@ -61,6 +64,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.openDirectoryLibraryAction = new OpenDirectoryLibraryAction(tabContainer, dialogService, preferences,
                 aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
 
@@ -108,7 +112,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
             return;
         }
 
-        if (!new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager).save()) {
+        if (!new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository).save()) {
             return;
         }
         try {

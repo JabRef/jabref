@@ -20,15 +20,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -68,7 +65,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
-import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
@@ -312,19 +309,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.dataLoadingTask = dataLoadingTask;
     }
 
-    /// The layout to display in the tab when it is loading
-    private Node createLoadingAnimationLayout() {
-        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-        BorderPane pane = new BorderPane();
-        pane.setCenter(progressIndicator);
-        return pane;
-    }
-
-    private void onDatabaseLoadingStarted() {
-        Node loadingLayout = createLoadingAnimationLayout();
-        getMainTable().placeholderProperty().setValue(loadingLayout);
-    }
-
     private void onDatabaseLoadingSucceed(ParserResult result) {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         if (result.getChangedOnMigration()) {
@@ -345,7 +329,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgresServer.class)));
         Supplier<SearchBackend> inMemoryFactory = () ->
-                new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
+                new InMemoryLuceneSearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences(), preferences.getFilePreferences(), taskExecutor);
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
                 sqlFactory,
@@ -373,6 +357,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
         boolean isSelectedTab = false;
+        BibDatabaseContext previousDatabaseContext = this.bibDatabaseContext;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -383,18 +368,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             isSelectedTab = true;
         }
 
-        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
-        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
-        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+        stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getOpenDatabases().add(bibDatabaseContext);
-
         initializeComponentsAndListeners(false);
 
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
+
         if (isSelectedTab) {
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            if (stateManager.getActiveDatabase().filter(databaseContext -> databaseContext == previousDatabaseContext).isPresent()) {
+                stateManager.replaceActiveDatabase(bibDatabaseContext);
+            } else {
+                stateManager.setActiveDatabase(bibDatabaseContext);
+            }
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
@@ -404,7 +391,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext, coarseChangeFilter);
-            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
@@ -703,7 +690,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -930,8 +917,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager.getJabRefClipboardTransferData(),
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Pasted %0 entry(s) to %1"),
-                Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+                params -> Localization.lang("Pasted %0 entry(s) to %1", params),
+                params -> Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -961,8 +948,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Moved %0 entry(s) to %1"),
-                Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+                params -> Localization.lang("Moved %0 entry(s) to %1", params),
+                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -1124,8 +1111,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
-        dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
-                       .onSuccess(newTab::onDatabaseLoadingSucceed)
+        dataLoadingTask.onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
                        .executeWith(taskExecutor);
 

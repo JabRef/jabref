@@ -1,13 +1,16 @@
 package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -42,6 +45,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
+import org.jabref.gui.welcome.DonationPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -58,6 +62,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
@@ -67,9 +72,13 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
@@ -105,6 +114,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    /// JSON shape of [#ENTRY_EDITOR_CUSTOM_TABS]; Jackson reads JSON objects into insertion-ordered maps,
+    /// so the tabs' display order survives the round-trip.
+    private static final TypeReference<LinkedHashMap<String, List<String>>> CUSTOM_TABS_TYPE = new TypeReference<>() {
+    };
 
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -184,6 +200,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region GroupsPreferences
     private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
+    private static final String AUTO_INCLUDE_SELECTED_ENTRIES = "autoIncludeSelectedEntries";
     // The view mode spans the three GROUP_VIEW_* flags above; this synthetic key is never written to the backing store
     // and only serves as the binding's reporting key in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
     private static final String GROUP_VIEW_MODE = "groupViewMode";
@@ -226,6 +243,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // backing store and only serves as the tabModels binding's reporting key in getPreferences()/getDefaults()
     // (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
+    // All custom tabs in one JSON object, `{"tab name": ["field pattern", ...], ...}`, in display order.
+    // The numbered-series format of versions up to v6.0-alpha.6 is converted to this key by
+    // org.jabref.migrations.PreferencesMigrations#upgradeEntryEditorCustomTabs (key name duplicated there).
+    private static final String ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
+    private static final String ENTRY_EDITOR_TAB_ORDER = "entryEditorTabOrder";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
@@ -395,8 +417,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
-    /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
-    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.BuiltIn} order.
+    /// The single source of truth for the entry editor's tab list: every built-in tab's visibility flag
+    /// plus the user-defined custom tabs, ordered by [#ENTRY_EDITOR_TAB_ORDER] (falling back to
+    /// [EntryEditorTabModel.BuiltIn] order followed by the custom tabs).
     private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
@@ -426,10 +449,85 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
         ));
 
-        return tabModels;
+        String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
+        if (StringUtil.isNotBlank(storedCustomTabs)) {
+            try {
+                OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
+                        tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
+            } catch (JacksonException e) {
+                LOGGER.warn("Could not read the custom entry editor tabs, dropping them", e);
+            }
+        }
+
+        return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
+    }
+
+    /// Reorders `tabModels` to match `storedOrder` (see [#ENTRY_EDITOR_TAB_ORDER]). The Preview tab stays
+    /// first; tabs unknown to the stored order (e.g. built-ins introduced after the order was written) keep
+    /// their default relative position at the end. Tabs sharing an ID (duplicate custom-tab names in
+    /// persisted data — the preferences UI prevents them, but older versions and hand-edited stores may
+    /// not) are kept, consumed one per matching stored-order entry.
+    @VisibleForTesting
+    static List<EntryEditorTabModel> applyStoredTabOrder(List<EntryEditorTabModel> tabModels, List<String> storedOrder) {
+        if (storedOrder.isEmpty()) {
+            return tabModels;
+        }
+
+        SequencedMap<String, ArrayDeque<EntryEditorTabModel>> remaining = new LinkedHashMap<>();
+        List<EntryEditorTabModel> ordered = new ArrayList<>();
+        for (EntryEditorTabModel model : tabModels) {
+            if (model.isPreview()) {
+                ordered.add(model);
+            } else {
+                remaining.computeIfAbsent(tabOrderId(model), _ -> new ArrayDeque<>()).add(model);
+            }
+        }
+        for (String id : storedOrder) {
+            ArrayDeque<EntryEditorTabModel> models = remaining.get(id);
+            if (models != null) {
+                ordered.add(models.removeFirst());
+                if (models.isEmpty()) {
+                    remaining.remove(id);
+                }
+            }
+        }
+        remaining.values().forEach(ordered::addAll);
+        return ordered;
+    }
+
+    /// Stable identifier of a tab in [#ENTRY_EDITOR_TAB_ORDER]. Custom tabs are prefixed so a custom tab
+    /// named like a [EntryEditorTabModel.BuiltIn] constant cannot collide with it.
+    private static String tabOrderId(EntryEditorTabModel model) {
+        return switch (model) {
+            case EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
+                    boolean _
+            ) ->
+                    type.name();
+            case EntryEditorTabModel.CustomizedFieldsTab(
+                    String name,
+                    List<String> _
+            ) ->
+                    "custom:" + name;
+        };
     }
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
+        List<EntryEditorTabModel.CustomizedFieldsTab> customTabs = configs.stream()
+                                                                          .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                                                                          .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                                                                          .toList();
+        // Keyed by name, so a duplicate tab name cannot exist in the stored format (the preferences UI
+        // prevents creating duplicates; legacy duplicates merge here, last one wins).
+        SequencedMap<String, List<String>> customTabsByName = new LinkedHashMap<>();
+        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns()));
+        put(ENTRY_EDITOR_CUSTOM_TABS, OBJECT_MAPPER.writeValueAsString(customTabsByName));
+
+        putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
+                                                     .filter(config -> !config.isPreview())
+                                                     .map(JabRefGuiPreferences::tabOrderId)
+                                                     .toList());
+
         for (EntryEditorTabModel config : configs) {
             if (config instanceof EntryEditorTabModel.BuiltInTab(
                     EntryEditorTabModel.BuiltIn type,
@@ -768,6 +866,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(GROUP_VIEW_INVERT, defaultValues.groupViewModeProperty().contains(GroupViewMode.INVERT)),
                 getBoolean(AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup()),
                 getBoolean(DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount()),
+                getBoolean(AUTO_INCLUDE_SELECTED_ENTRIES, defaultValues.shouldAutoIncludeSelectedEntries()),
                 GroupHierarchyType.safeValueOf(get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())),
                 getBoolean(GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton())
         );
@@ -777,6 +876,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> getGroupViewModes(defaultValues));
         bindBoolean(groupsPreferences.autoAssignGroupProperty(), AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup());
         bindBoolean(groupsPreferences.displayGroupCountProperty(), DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount());
+        bindBoolean(groupsPreferences.autoIncludeSelectedEntriesProperty(), AUTO_INCLUDE_SELECTED_ENTRIES, defaultValues.shouldAutoIncludeSelectedEntries());
         bindObject(groupsPreferences.defaultHierarchicalContextProperty(), DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext(),
                 GroupHierarchyType::name, GroupHierarchyType::safeValueOf);
         bindBoolean(groupsPreferences.showAiChatButtonProperty(), GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton());

@@ -138,9 +138,32 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Setup JBang (included at setup-gralde)
-      - uses: ./.github/actions/setup-gradle
+      # No setup-gradle here: this job never runs Gradle, it only needs a JDK and JBang.
+      - uses: actions/setup-java@v5
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        with:
+          distribution: 'corretto'
+          java-version: '25'
+      - name: Generate JBang cache key
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: cache-key
+        run: echo "cache_key=jbang-ghprcomment-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Cache JBang
+        # Own key: ghprcomment pulls different dependencies than the other JBang jobs.
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: actions/cache@v6
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-ghprcomment-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
+      - name: Setup JBang
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
 
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
@@ -151,7 +174,7 @@ jobs:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
 
       - name: 'Adapt label "status: changes-required"'
-        if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.name == 'Source Code Tests') && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
           echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
@@ -161,7 +184,34 @@ jobs:
             repos/$REPO/issues/$PR_NUMBER/comments \
             --jq '.[] | select(.user.login=="jabref-machine")')
 
-          if [[ -n "$COMMENTS" ]]; then
+          # Qodo comments in review threads (not issue comments); a thread counts as long as it is
+          # active (not resolved, not outdated) and the PR author has not replied to it
+          QODO_THREADS=$(gh api graphql \
+            -f owner="${REPO%/*}" -f repo="${REPO#*/}" -F pr="$PR_NUMBER" \
+            -f query='
+              query($owner: String!, $repo: String!, $pr: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $pr) {
+                    author { login }
+                    reviewThreads(first: 100) {
+                      nodes {
+                        isResolved
+                        isOutdated
+                        comments(first: 100) { nodes { author { login } } }
+                      }
+                    }
+                  }
+                }
+              }' \
+            --jq '.data.repository.pullRequest as $pr
+              | [ $pr.reviewThreads.nodes[]
+                  | select((.isResolved or .isOutdated) | not)
+                  | [.comments.nodes[].author.login // ""]
+                  | select(.[0] == "qodo-free-for-open-source-projects")
+                  | select([.[1:][] | select(. == $pr.author.login)] == [])
+                ] | length')
+
+          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 ]]; then
             echo "Bot comments - adding label changes-required"
             gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY

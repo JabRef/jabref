@@ -41,7 +41,7 @@ jobs:
             </details>
 
             We appreciate your contribution and are here to help if needed!
-          days_until_unassign: 14
+          days_until_unassign: 8
           unassigned_text: |
             ### 📋 Assignment Update
 

@@ -1,10 +1,16 @@
 package org.jabref.gui.preferences.entryeditor;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +18,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
@@ -23,6 +28,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -41,10 +47,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CitationCountFetcherType> citationCountFetcherTypes =
+            new SimpleListProperty<>(FXCollections.observableArrayList(CitationCountFetcherType.values()));
 
     /// Working copy of tab configurations — not the live preferences list.
-    /// Written to preferences only in {@link #storeSettings()}.
-    private final ObservableList<EntryEditorTabModel> tabModels = FXCollections.observableArrayList();
+    /// Written to preferences only in [#storeSettings()]. Excludes the Preview tab (see [#setValues()]).
+    private final ObservableList<EditorTabViewModel> tabs = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
     private final EntryEditorPreferences entryEditorPreferences;
@@ -53,11 +61,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
     private boolean mscKeywordDescriptionsInitialized;
 
-    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public EntryEditorTabViewModel(DialogService dialogService,
+                                   EntryEditorPreferences entryEditorPreferences,
+                                   MrDlibPreferences mrDlibPreferences,
+                                   AbbreviationPreferences abbreviationPreferences,
+                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferences.getMrDlibPreferences();
-        this.abbreviationPreferences = preferences.getAbbreviationPreferences();
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.mrDlibPreferences = mrDlibPreferences;
+        this.abbreviationPreferences = abbreviationPreferences;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
@@ -67,9 +79,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         // The Preview tab is configured via the "show preview as a separate tab" preference, not here,
         // so it is omitted from the configurable tab list (its model visibility bit is unused).
-        tabModels.setAll(entryEditorPreferences.getTabModels().stream()
-                                               .filter(model -> !model.isPreview())
-                                               .toList());
+        tabs.setAll(entryEditorPreferences.getTabModels().stream()
+                                          .filter(model -> !model.isPreview())
+                                          .map(EditorTabViewModel::fromModel)
+                                          .toList());
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
@@ -83,21 +96,66 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         mscKeywordDescriptionsInitialized = true;
     }
 
+    /// Restores the default tab set: every built-in tab visible in default order, no custom tabs.
     public void resetToDefaults() {
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.BuiltInTab builtIn && !builtIn.isVisible()) {
-                tabModels.set(i, builtIn.withVisible(true));
-            }
+        tabs.setAll(EntryEditorPreferences.getDefault().getTabModels().stream()
+                                          .filter(model -> !model.isPreview())
+                                          .map(EditorTabViewModel::fromModel)
+                                          .toList());
+    }
+
+    /// Adds a custom tab with the given name, or returns the existing tab when one with that name
+    /// (custom or built-in, compared case-insensitively) is already present. Empty for a blank name.
+    public Optional<EditorTabViewModel> addCustomTab(String name) {
+        if (StringUtil.isBlank(name)) {
+            return Optional.empty();
+        }
+        String trimmed = name.trim();
+        Optional<EditorTabViewModel> existing = tabs.stream()
+                                                    .filter(tab -> tab.getDisplayName().equalsIgnoreCase(trimmed))
+                                                    .findFirst();
+        if (existing.isPresent()) {
+            return existing;
+        }
+        EditorTabViewModel tab = EditorTabViewModel.newCustomTab(trimmed);
+        tabs.add(tab);
+        return Optional.of(tab);
+    }
+
+    public void removeTab(EditorTabViewModel tab) {
+        if (tab.isCustom()) {
+            tabs.remove(tab);
         }
     }
 
-    /// Toggles the visibility of a tab. Called by the cell's checkbox.
-    public void toggleTabVisibility(EntryEditorTabModel config) {
-        int index = tabModels.indexOf(config);
-        if (index < 0) {
-            return;
+    /// Adds a field pattern to the given custom tab; `false` if the pattern is blank or already on that tab.
+    public boolean addFieldPattern(EditorTabViewModel tab, String pattern) {
+        if (StringUtil.isBlank(pattern)) {
+            return false;
         }
-        tabModels.set(index, config.withVisible(!config.isVisible()));
+        String trimmed = pattern.trim();
+        if (containsIgnoreCase(tab.getFieldPatterns(), trimmed)) {
+            return false;
+        }
+        tab.getFieldPatterns().add(trimmed);
+        return true;
+    }
+
+    public void removeFieldPattern(EditorTabViewModel tab, String pattern) {
+        tab.getFieldPatterns().remove(pattern);
+    }
+
+    /// `true` if the pattern occurs on more than one tab (duplicates within one tab are prevented on add) —
+    /// the fields table shows a warning sign on such rows. Literal comparison only; overlap between a regex
+    /// pattern and the field names it captures is not detected.
+    public boolean isFieldPatternDuplicated(String pattern) {
+        return tabs.stream()
+                   .filter(tab -> containsIgnoreCase(tab.getFieldPatterns(), pattern))
+                   .count() > 1;
+    }
+
+    private static boolean containsIgnoreCase(List<String> patterns, String pattern) {
+        return patterns.stream().anyMatch(existing -> existing.equalsIgnoreCase(pattern));
     }
 
     @Override
@@ -114,21 +172,20 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
         abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
-        // Write tab visibility from the working copy
-        for (EntryEditorTabModel tabModel : tabModels) {
-            if (tabModel instanceof EntryEditorTabModel.BuiltInTab(
-                    EntryEditorTabModel.BuiltIn key,
-                    boolean _
-            )) {
-                entryEditorPreferences.setTabVisible(key, tabModel.isVisible());
-            }
-        }
+        // Replace the tab list wholesale from the working copy: the Preview tab (filtered out in
+        // setValues()) stays in front, everything else takes the working copy's order and content.
+        List<EntryEditorTabModel> newModels = new ArrayList<>();
+        entryEditorPreferences.getTabModels().stream()
+                              .filter(EntryEditorTabModel::isPreview)
+                              .forEach(newModels::add);
+        tabs.stream().map(EditorTabViewModel::toModel).forEach(newModels::add);
+        entryEditorPreferences.getTabModels().setAll(newModels);
     }
 
     // region Properties
 
-    public ObservableList<EntryEditorTabModel> getTabModels() {
-        return tabModels;
+    public ObservableList<EditorTabViewModel> getTabs() {
+        return tabs;
     }
 
     public BooleanProperty openOnNewEntryProperty() {
@@ -165,6 +222,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
+    }
+
+    public ReadOnlyListProperty<CitationCountFetcherType> citationCountFetcherTypes() {
+        return citationCountFetcherTypes;
     }
 
     // endregion

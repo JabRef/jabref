@@ -30,7 +30,7 @@ public class CitationGroups {
     private Optional<List<CitationGroupId>> globalOrder;
 
     /// This is going to be the bibliography
-    private Optional<CitedKeys> bibliography;
+    private Optional<CitedReferences> bibliography;
 
     /// Constructor
     public CitationGroups(Map<CitationGroupId, CitationGroup> citationGroups) {
@@ -72,14 +72,14 @@ public class CitationGroups {
         //
         // CitationDatabaseLookupResult for the same citation key is the same object. Until we
         // insert a new citation from the GUI.
-        CitedKeys cks = getCitedKeysUnordered();
-        cks.lookupInDatabases(databases);
-        cks.distributeLookupResults(this);
+        CitedReferences citedReferences = getCitedReferencesUnordered();
+        citedReferences.lookupInDatabases(databases);
+        citedReferences.distributeLookupResults(this);
 
         // (2) lookup each citation directly
         //
         // CitationDatabaseLookupResult for the same citation key may be a different object:
-        // CitedKey.addPath has to use equals, so CitationDatabaseLookupResult has to override
+        // CitedReference.addPath has to use equals, so CitationDatabaseLookupResult has to override
         // Object.equals, which depends on BibEntry.equals and BibDatabase.equals doing the
         // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
         // may be lost in more complicated consistency checking in addPath.
@@ -131,57 +131,57 @@ public class CitationGroups {
     }
 
     /// Collect citations into a list of cited sources using neither CitationGroup.globalOrder or Citation.localOrder
-    public CitedKeys getCitedKeysUnordered() {
-        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
+    public CitedReferences getCitedReferencesUnordered() {
+        LinkedHashMap<String, CitedReference> citedReferenceByCitationKey = new LinkedHashMap<>();
         for (CitationGroup group : citationGroupsUnordered.values()) {
             int storageIndexInGroup = 0;
-            for (Citation cit : group.citationsInStorageOrder) {
-                String key = cit.citationKey;
+            for (Citation citation : group.citationsInStorageOrder) {
+                String citationKey = citation.citationKey;
                 CitationPath path = new CitationPath(group.groupId, storageIndexInGroup);
-                if (res.containsKey(key)) {
-                    res.get(key).addPath(path, cit);
+                if (citedReferenceByCitationKey.containsKey(citationKey)) {
+                    citedReferenceByCitationKey.get(citationKey).addPath(path, citation);
                 } else {
-                    res.put(key, new CitedKey(key, path, cit));
+                    citedReferenceByCitationKey.put(citationKey, new CitedReference(citationKey, path, citation));
                 }
                 storageIndexInGroup++;
             }
         }
-        return new CitedKeys(res);
+        return new CitedReferences(citedReferenceByCitationKey);
     }
 
-    /// CitedKeys created iterating citations in (globalOrder,localOrder)
-    public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
+    /// CitedReferences created iterating citations in (globalOrder,localOrder)
+    public CitedReferences getCitedReferencesSortedInOrderOfAppearance() {
         if (!hasGlobalOrder()) {
-            throw new IllegalStateException("getSortedCitedKeys: no globalOrder");
+            throw new IllegalStateException("getSortedCitedReferences: no globalOrder");
         }
-        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
+        LinkedHashMap<String, CitedReference> citedReferenceByCitationKey = new LinkedHashMap<>();
         for (CitationGroup group : getCitationGroupsInGlobalOrder()) {
             for (int i : group.getLocalOrder()) {
-                Citation cit = group.citationsInStorageOrder.get(i);
-                String citationKey = cit.citationKey;
+                Citation citation = group.citationsInStorageOrder.get(i);
+                String citationKey = citation.citationKey;
                 CitationPath path = new CitationPath(group.groupId, i);
-                if (res.containsKey(citationKey)) {
-                    res.get(citationKey).addPath(path, cit);
+                if (citedReferenceByCitationKey.containsKey(citationKey)) {
+                    citedReferenceByCitationKey.get(citationKey).addPath(path, citation);
                 } else {
-                    res.put(citationKey, new CitedKey(citationKey, path, cit));
+                    citedReferenceByCitationKey.put(citationKey, new CitedReference(citationKey, path, citation));
                 }
             }
         }
-        return new CitedKeys(res);
+        return new CitedReferences(citedReferenceByCitationKey);
     }
 
-    public Optional<CitedKeys> getBibliography() {
+    public Optional<CitedReferences> getBibliography() {
         return bibliography;
     }
 
     /// @return Citation keys where lookupCitations() failed.
     public List<String> getUnresolvedKeys() {
-        CitedKeys bib = getBibliography().orElse(getCitedKeysUnordered());
+        CitedReferences bibliography = getBibliography().orElse(getCitedReferencesUnordered());
 
         List<String> unresolvedKeys = new ArrayList<>();
-        for (CitedKey ck : bib.values()) {
-            if (ck.getLookupResult().isEmpty()) {
-                unresolvedKeys.add(ck.citationKey);
+        for (CitedReference citedReference : bibliography.values()) {
+            if (citedReference.getLookupResult().isEmpty()) {
+                unresolvedKeys.add(citedReference.citationKey);
             }
         }
         return unresolvedKeys;
@@ -192,10 +192,10 @@ public class CitationGroups {
             throw new IllegalStateException("createNumberedBibliographySortedInOrderOfAppearance:"
                     + " already have a bibliography");
         }
-        CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();
-        citedKeys.numberCitedKeysInCurrentOrder();
-        citedKeys.distributeNumbers(this);
-        bibliography = Optional.of(citedKeys);
+        CitedReferences citedReferences = getCitedReferencesSortedInOrderOfAppearance();
+        citedReferences.numberCitedReferencesInCurrentOrder();
+        citedReferences.distributeNumbers(this);
+        bibliography = Optional.of(citedReferences);
     }
 
     /// precondition: database lookup already performed (otherwise we just sort citation keys)
@@ -203,9 +203,9 @@ public class CitationGroups {
         if (bibliography.isPresent()) {
             throw new IllegalStateException("createPlainBibliographySortedByComparator: already have a bibliography");
         }
-        CitedKeys citedKeys = getCitedKeysUnordered();
-        citedKeys.sortByComparator(entryComparator);
-        bibliography = Optional.of(citedKeys);
+        CitedReferences citedReferences = getCitedReferencesUnordered();
+        citedReferences.sortByComparator(entryComparator);
+        bibliography = Optional.of(citedReferences);
     }
 
     /// precondition: database lookup already performed (otherwise we just sort citation keys)
@@ -213,11 +213,11 @@ public class CitationGroups {
         if (bibliography.isPresent()) {
             throw new IllegalStateException("createNumberedBibliographySortedByComparator: already have a bibliography");
         }
-        CitedKeys citedKeys = getCitedKeysUnordered();
-        citedKeys.sortByComparator(entryComparator);
-        citedKeys.numberCitedKeysInCurrentOrder();
-        citedKeys.distributeNumbers(this);
-        bibliography = Optional.of(citedKeys);
+        CitedReferences citedReferences = getCitedReferencesUnordered();
+        citedReferences.sortByComparator(entryComparator);
+        citedReferences.numberCitedReferencesInCurrentOrder();
+        citedReferences.distributeNumbers(this);
+        bibliography = Optional.of(citedReferences);
     }
 
     /*
