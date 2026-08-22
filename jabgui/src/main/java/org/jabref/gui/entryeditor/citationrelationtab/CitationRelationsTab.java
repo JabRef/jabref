@@ -499,7 +499,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citedByListView, citedByComponents);
         styleFetchedListView(citingListView, citingComponents);
 
-        // Create BorderPane to act as the main wrapper for the tab's upper section.
+        // The fetcher applies to both panels, so it belongs above the split, not inside the left panel's header.
         BorderPane pane = new BorderPane();
         pane.setTop(fetcherBar);
         pane.setCenter(container);
