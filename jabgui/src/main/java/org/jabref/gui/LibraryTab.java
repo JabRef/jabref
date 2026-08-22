@@ -818,11 +818,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void suspendChangeMonitor() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::suspendChangeDetection);
     }
 
+    /// Resuming also scans for external changes that arrived while the monitor was suspended, e.g. a concurrent write
+    /// that aborted the suspended save — the standard external-changes review flow is offered for them.
     public void resumeChangeMonitor() {
-        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+        changeMonitor.ifPresent(DatabaseChangeMonitor::resumeChangeDetection);
     }
 
     public void insertEntry(final BibEntry bibEntry) {
@@ -1022,6 +1024,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void resetChangedProperties() {
         this.nonUndoableChangeProperty.setValue(false);
         this.changedProperty.setValue(false);
+        // Both call sites mean "in-memory library now matches the disk", so file events for this state need no scan
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markConsistentWithDisk);
     }
 
     public void back() {

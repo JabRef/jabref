@@ -30,6 +30,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.FileChangedException;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -224,6 +225,7 @@ public class SaveDatabaseAction {
 
         libraryTab.suspendChangeMonitor();
 
+        boolean fileChangedDuringSave = false;
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
@@ -242,13 +244,22 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
-            dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            if (ex.getCause() instanceof FileChangedException) {
+                LOGGER.info("Library {} was modified by another program while saving; save aborted", targetPath, ex);
+                fileChangedDuringSave = true;
+            } else {
+                LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
             return false;
         } finally {
             libraryTab.resumeChangeMonitor();
             // release panel from save status
             libraryTab.setSaving(false);
+            if (fileChangedDuringSave) {
+                // resumeChangeMonitor() above already scans for the concurrent write and offers the review flow
+                dialogService.notify(Localization.lang("Library was not saved: the file was modified by another program."));
+            }
         }
     }
 
@@ -258,6 +269,7 @@ public class SaveDatabaseAction {
                 = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
+            Set<Character> encodingProblems = Set.of();
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
@@ -278,13 +290,16 @@ public class SaveDatabaseAction {
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
-                if (fileWriter.hasEncodingProblems()) {
-                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);
-                }
+                encodingProblems = fileWriter.getEncodingProblems();
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
+            }
+            // Deliberately outside the try-with-resources: the retry must run after the writer above committed its
+            // content, otherwise the writer's close() would overwrite the re-encoded file with the problematic one
+            if (!encodingProblems.isEmpty()) {
+                saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder);
             }
             return true;
         }
