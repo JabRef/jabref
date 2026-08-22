@@ -60,8 +60,8 @@ public class GitAutoSync {
     public void commit(Path bibFilePath, BibDatabaseContext databaseContext, boolean pushAfterCommit) {
         gitHandlerRegistry.fromAnyPath(bibFilePath).ifPresent(gitHandler ->
                 BackgroundTask.wrap(() -> doCommit(gitHandler))
-                              .onSuccess(_ -> {
-                                  if (pushAfterCommit) {
+                              .onSuccess(committed -> {
+                                  if (committed && pushAfterCommit) {
                                       pullThenPush(bibFilePath, databaseContext);
                                   }
                               })

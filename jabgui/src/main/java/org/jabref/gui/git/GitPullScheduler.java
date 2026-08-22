@@ -35,7 +35,7 @@ public class GitPullScheduler {
 
     private GitPullScheduler(BibDatabaseContext bibDatabaseContext, GitAutoSync gitAutoSync, int intervalInMinutes) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.executor = new ScheduledThreadPoolExecutor(2);
+        this.executor = new ScheduledThreadPoolExecutor(1);
         this.executor.scheduleAtFixedRate(
                 () -> pull(gitAutoSync),
                 intervalInMinutes,
