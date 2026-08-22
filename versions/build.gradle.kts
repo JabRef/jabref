@@ -141,6 +141,7 @@ dependencies.constraints {
     api("org.jabref:html-to-node:0.2.0")
     api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
+    api("org.itsallcode:simple-process:0.3.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")

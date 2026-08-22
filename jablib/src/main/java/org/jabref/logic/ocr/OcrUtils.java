@@ -1,15 +1,16 @@
 package org.jabref.logic.ocr;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
-import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.itsallcode.process.SimpleProcess;
+import org.itsallcode.process.SimpleProcessBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,61 +24,62 @@ public final class OcrUtils {
     /// Checks if the OCR engine is available for use.
     ///
     /// @return true if the engine is available, false otherwise.
-    public static boolean isAvailable(OcrPreferences ocrPreferences) {
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--version");
+    private static boolean isAvailable(ArrayList<String> enginePath) {
+        enginePath.add("--version");
+        SimpleProcess<String> process;
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                LOGGER.debug("Checking OCR engine availability timed out");
-                return false;
-            }
-            return process.exitValue() == 0;
-        } catch (IOException e) {
-            LOGGER.error("OCR engine is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
+            process = SimpleProcessBuilder.create()
+                                          .command(enginePath)
+                                          .redirectErrorStream(true)
+                                          .streamLogLevel(Level.FINE)
+                                          .start();
+        } catch (UncheckedIOException e) {
+            LOGGER.debug("OCR engine executable not found: {}", enginePath, e);
             return false;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.error("Checking OCR engine availability was interrupted", e);
+        }
+
+        try {
+            process.waitForTermination(Duration.ofSeconds(OcrUtils.CHECKING_TIMEOUT));
+            process.destroyForcibly();
+            return process.exitValue() == 0;
+        } catch (IllegalStateException e) {
+            process.destroyForcibly();
+            LOGGER.debug("Checking OCR engine availability timed out");
             return false;
         }
     }
 
     /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
-    public static OcrResult performOcr(ArrayList<String> command, String engineName) {
-        Process process = null;
+    public static OcrResult performOcr(OcrPreferences ocrPreferences, ArrayList<String> command) {
+        ArrayList<String> enginePath = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        if (!isAvailable(enginePath)) {
+            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
+        }
+
+        SimpleProcess<String> process;
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            process = processBuilder.start();
-
-            // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-
-            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
-            if (!finished) {
-                process.destroyForcibly();
-                return OcrResult.failure(OcrFailureReason.TIMEOUT);
-            }
-
-            if (process.exitValue() == 0) {
-                return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
-            } else {
-                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while running {}.", engineName, e);
+            process = SimpleProcessBuilder.create()
+                                          .command(command)
+                                          .redirectErrorStream(true)
+                                          .streamLogLevel(Level.FINE)
+                                          .start();
+        } catch (UncheckedIOException e) {
+            LOGGER.error("Failed to start OCR process: {}", command, e);
             return OcrResult.failure(OcrFailureReason.IO_ERROR);
-        } catch (InterruptedException e) {
+        }
+
+        try {
+            process.waitForTermination(Duration.ofMinutes(OcrUtils.TIMEOUT_MINS));
+        } catch (IllegalStateException e) {
             process.destroyForcibly();
-            Thread.currentThread().interrupt();
-            LOGGER.error("{} process was interrupted.", engineName, e);
-            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
+            LOGGER.debug("Performing OCR timed out");
+            return OcrResult.failure(OcrFailureReason.TIMEOUT);
+        }
+
+        if (process.exitValue() == 0) {
+            return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
+        } else {
+            return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
         }
     }
 

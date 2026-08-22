@@ -121,8 +121,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     Localization.lang("OCR process failed");
             case IO_ERROR ->
                     Localization.lang("Could not start OCR process");
-            case INTERRUPTED ->
-                    Localization.lang("OCR was cancelled");
         };
     }
 

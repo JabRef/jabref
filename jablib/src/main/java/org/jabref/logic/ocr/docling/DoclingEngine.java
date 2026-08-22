@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrFailureReason;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
@@ -49,21 +48,18 @@ public class DoclingEngine implements OcrEngine {
 
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) throws IOException {
-        if (!OcrUtils.isAvailable(ocrPreferences)) {
-            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
-        }
         Path outputDir = pdfPath.getParent();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--to");
-        command.add("json");
-        command.add("--no-tables");
-        command.add("--image-export-mode");
-        command.add("placeholder");
-        command.add("--output");
-        command.add(outputDir.toString());
-        command.add(pdfPath.toString());
-        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        ArrayList<String> ocrCommand = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        ocrCommand.add("--to");
+        ocrCommand.add("json");
+        ocrCommand.add("--no-tables");
+        ocrCommand.add("--image-export-mode");
+        ocrCommand.add("placeholder");
+        ocrCommand.add("--output");
+        ocrCommand.add(outputDir.toString());
+        ocrCommand.add(pdfPath.toString());
+        OcrResult ocrResult = OcrUtils.performOcr(ocrPreferences, ocrCommand);
         if (ocrResult.isSuccess()) {
             String fileName = pdfPath.getFileName().toString();
             String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;

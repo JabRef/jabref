@@ -32,12 +32,9 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// or [OcrResult.Failure] with an error message if OCR failed.
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) {
-        if (!OcrUtils.isAvailable(ocrPreferences)) {
-            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
-        }
         Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
-        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
+        String preExistingTextCommand = switch (ocrPreferences.getPagesHaveText()) {
             case SKIP ->
                     "--skip-text";
             case FORCE ->
@@ -46,11 +43,11 @@ public class OcrMyPdfEngine implements OcrEngine {
                     "--redo-ocr";
         };
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add(ocrCommand);
-        command.add(pdfPath.toString());
-        command.add(outputFile);
-        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        ArrayList<String> ocrCommand = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        ocrCommand.add(preExistingTextCommand);
+        ocrCommand.add(pdfPath.toString());
+        ocrCommand.add(outputFile);
+        OcrResult ocrResult = OcrUtils.performOcr(ocrPreferences, ocrCommand);
         if (ocrResult.isSuccess()) {
             return OcrResult.success(outputPath);
         } else {
