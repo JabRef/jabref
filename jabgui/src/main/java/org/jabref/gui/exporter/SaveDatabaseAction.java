@@ -257,14 +257,8 @@ public class SaveDatabaseAction {
             // release panel from save status
             libraryTab.setSaving(false);
             if (fileChangedDuringSave) {
+                // resumeChangeMonitor() above already scans for the concurrent write and offers the review flow
                 dialogService.notify(Localization.lang("Library was not saved: the file was modified by another program."));
-                if (libraryTab.getBibDatabaseContext().getDatabasePath().filter(targetPath::equals).isPresent()) {
-                    // The change monitor was suspended during the save and thus never saw the concurrent write;
-                    // trigger the scan manually so the user gets the standard external-changes review flow. Only for
-                    // plain saves: during "Save as", the context (and thus the monitor) still points to the old path,
-                    // so a scan would not compare against the file that conflicted.
-                    libraryTab.scanForExternalChanges();
-                }
             }
         }
     }
