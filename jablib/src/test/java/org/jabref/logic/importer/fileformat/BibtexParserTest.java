@@ -1785,6 +1785,30 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestGitAutoPull() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPull());
+    }
+
+    @Test
+    void integrationTestGitAutoCommit() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoCommit:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoCommit());
+    }
+
+    @Test
+    void integrationTestGitAutoPush() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPush:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPush());
+    }
+
+    @Test
     void integrationTestContentSelectors() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@Comment{jabref-meta: selector_pubstate:approved;captured;received;status;}"));
