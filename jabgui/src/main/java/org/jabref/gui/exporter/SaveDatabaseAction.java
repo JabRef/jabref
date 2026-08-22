@@ -30,6 +30,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.FileChangedException;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -132,7 +133,7 @@ public class SaveDatabaseAction {
     }
 
     /// @param file the new file name to save the database to. This is stored in the database context of the panel upon successful save.
-    /// @return true on successful save
+     /// @return true on successful save
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
@@ -258,6 +259,7 @@ public class SaveDatabaseAction {
                 = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
+            Set<Character> encodingProblems = Set.of();
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
@@ -278,13 +280,18 @@ public class SaveDatabaseAction {
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
-                if (fileWriter.hasEncodingProblems()) {
-                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);
-                }
+                encodingProblems = fileWriter.getEncodingProblems();
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (FileChangedException ex) {
+                throw new SaveException(Localization.lang("The library file was modified by another program while saving. To avoid overwriting those changes, your changes were not saved. Please review the changes on disk and save again."), ex);
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
+            }
+            // Deliberately outside the try-with-resources: the retry must run after the writer above committed its
+            // content, otherwise the writer's close() would overwrite the re-encoded file with the problematic one
+            if (!encodingProblems.isEmpty()) {
+                saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder);
             }
             return true;
         }

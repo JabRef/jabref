@@ -10,9 +10,12 @@ import java.nio.channels.FileChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
@@ -47,6 +50,9 @@ import org.slf4j.LoggerFactory;
 /// original file untouched).
 /// 2. If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
 /// kept.
+/// 3. If the target file was modified by another process between opening this stream and committing it (e.g. a second
+/// JabRef instance saving the same library), the commit is aborted with a [FileChangedException], leaving the other
+/// process's version of the file untouched.
 ///
 /// Implementation inspired by code from [Marty Lamb](https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java) and [Apache](https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java).
 @NullMarked
@@ -83,7 +89,16 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private final FileCopyOperation backupFileCopyOperation;
 
+    /// State of the target file when this stream was opened. `null` if the attributes could not be read, in which case
+    /// concurrent-change detection is disabled for this write.
+    @Nullable private final TargetFileSnapshot targetFileSnapshot;
+
     private boolean errorDuringWrite = false;
+
+    /// Existence, size, and modification time of the target file, used to detect writes by other processes.
+    private record TargetFileSnapshot(boolean exists, long size, @Nullable FileTime lastModifiedTime) {
+        private static final TargetFileSnapshot ABSENT = new TargetFileSnapshot(false, -1, null);
+    }
 
     @FunctionalInterface
     interface FileMoveOperation {
@@ -98,7 +113,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// Creates a new output stream to write to or replace the file at the specified path.
     ///
     /// @param path       the path of the file to write to or replace
-    /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
+     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
@@ -162,6 +177,34 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this.temporaryFileChannel = temporaryFileChannel;
         this.fileMoveOperation = fileMoveOperation;
         this.backupFileCopyOperation = backupFileCopyOperation;
+        this.targetFileSnapshot = snapshotTargetFile(path);
+    }
+
+    @Nullable
+    private static TargetFileSnapshot snapshotTargetFile(Path targetFile) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(targetFile, BasicFileAttributes.class);
+            return new TargetFileSnapshot(true, attributes.size(), attributes.lastModifiedTime());
+        } catch (NoSuchFileException exception) {
+            return TargetFileSnapshot.ABSENT;
+        } catch (IOException exception) {
+            LOGGER.warn("Could not read attributes of {}. Concurrent-change detection is disabled for this write.", targetFile, exception);
+            return null;
+        }
+    }
+
+    /// Best-effort lost-update guard: detects whether another process modified the target file after this stream was
+    /// opened. Comparison is based on size and modification time, so a concurrent write within the file system's
+    /// timestamp resolution that also keeps the size identical goes undetected. There is also an unavoidable race
+    /// between this check and the subsequent commit; the check is therefore repeated as late as possible.
+    private void ensureTargetFileUnchanged() throws FileChangedException {
+        if (targetFileSnapshot == null) {
+            return;
+        }
+        TargetFileSnapshot currentState = snapshotTargetFile(targetFile);
+        if (currentState != null && !targetFileSnapshot.equals(currentState)) {
+            throw new FileChangedException(targetFile);
+        }
     }
 
     private static Path createTemporaryFile(Path targetFile) throws IOException {
@@ -242,6 +285,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 return;
             }
 
+            // Check before creating the backup, so that no backup of a concurrently written file is left behind
+            ensureTargetFileUnchanged();
+
             boolean mustOverwriteTargetInPlace = targetHasHardLinks() || Files.isSymbolicLink(targetFile);
 
             // We successfully wrote everything to the temporary file, lets copy it to the correct place
@@ -261,6 +307,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     }
                 }
             }
+
+            // Re-check right before the commit: creating the backup of a large file can take a while, so the first
+            // check may be long in the past by now
+            ensureTargetFileUnchanged();
 
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {
