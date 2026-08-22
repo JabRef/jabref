@@ -397,7 +397,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
-        
+
         GitPullScheduler.start(bibDatabaseContext, dialogService, preferences, stateManager, taskExecutor);
     }
 
