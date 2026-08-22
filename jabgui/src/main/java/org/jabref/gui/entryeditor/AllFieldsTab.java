@@ -115,6 +115,11 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
             new EnumMap<>(FieldListSections.SectionType.class);
 
+    /// Tracks the [TitledPane] created for each section type, so we can expand a collapsed
+    /// section on demand (e.g. when jump-to-field targets a field inside it).
+    private final Map<FieldListSections.SectionType, TitledPane> sectionPanes =
+            new EnumMap<>(FieldListSections.SectionType.class);
+
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
 
@@ -253,6 +258,14 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
     }
 
+    @Override
+    public void requestFocus(Field fieldName) {
+        Optional.ofNullable(sectionPanes.get(FieldListSections.sectionOf(fieldName)))
+                .filter(pane -> !pane.isExpanded())
+                .ifPresent(pane -> pane.setExpanded(true));
+        super.requestFocus(fieldName);
+    }
+
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
     /// then the always-present collapsible sections (identifiers / files & links /
     /// bibliometrics / comments / meta, collapsed when empty) each with its own add-chips,
@@ -260,6 +273,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
+        sectionPanes.clear();
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
         int labelIndex = 0;
@@ -444,6 +458,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (pane.isExpanded()) {
             populateContent.run();
         }
+        sectionPanes.put(type, pane);
         return pane;
     }
 
@@ -571,19 +586,25 @@ public class AllFieldsTab extends FieldsEditorTab {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
         Platform.runLater(() -> {
-            // The tab may have been rebound to a different entry before this deferred block runs;
-            // the editors map would then belong to that other entry, so focusing/adding here would
-            // act on the wrong entry. Bail out unless we are still showing the entry we started with.
-            if (getCurrentEntry() != entry) {
-                return;
-            }
-            requestFocus(field);
-            // Adding the File field via its "+" chip should immediately open the add-file dialog,
-            // since an empty File editor has no other purpose than to receive a file.
-            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                linkedFilesEditor.addNewFile();
-            }
+            // Re-check the staleness guard inside this inner block because the entry may have changed between the two pulses.
+            Platform.runLater(() -> {
+                if (getCurrentEntry() != entry) {
+                    return;
+                }
+                requestFocus(field);
+                // Adding the File field via its "+" chip should immediately open the add-file dialog,
+                // since an empty File editor has no other purpose than to receive a file.
+                if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                    linkedFilesEditor.addNewFile();
+                }
+            });
         });
+    }
+
+    /// Adds `field` to the entry's field list (if not already shown) and focuses it.
+    public void addFieldAndFocus(Field field) {
+        Optional.ofNullable(getCurrentEntry())
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {

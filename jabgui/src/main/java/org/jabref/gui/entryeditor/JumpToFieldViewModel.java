@@ -1,13 +1,13 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class JumpToFieldViewModel extends AbstractViewModel {
 
@@ -27,13 +27,10 @@ public class JumpToFieldViewModel extends AbstractViewModel {
             return List.of();
         }
 
-        return entryEditor.getAllPossibleTabs().stream()
-                          .filter(FieldsEditorTab.class::isInstance)
-                          .map(FieldsEditorTab.class::cast)
-                          .flatMap(tab -> tab.getShownFields().stream())
-                          .map(Field::getName)
-                          .distinct()
-                          .sorted()
-                          .collect(Collectors.toList());
+        return FieldFactory.getAllFieldsWithOutInternal().stream()
+                           .map(Field::getName)
+                           .distinct()
+                           .sorted()
+                           .toList();
     }
 }

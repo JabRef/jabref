@@ -254,10 +254,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                     }
-                    case JUMP_TO_FIELD -> {
-                        openJumpToFieldDialog();
-                        event.consume();
-                    }
                     case HELP -> {
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -298,7 +294,9 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         openJumpToFieldDialog();
     }
 
-    private void openJumpToFieldDialog() {
+    /// Shows the jump-to-field dialog for the currently edited entry.
+    /// Handled globally in [org.jabref.gui.frame.JabRefFrame] so that it works regardless of where the keyboard focus lies.
+    public void openJumpToFieldDialog() {
         if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
             BaseDialog.bringToFront(jumpToFieldDialog);
             return;

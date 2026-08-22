@@ -2,10 +2,14 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -137,11 +141,46 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        getNode().getChildrenUnmodifiable()
-                 .stream()
-                 .findFirst()
-                 .orElse(getNode())
-                 .requestFocus();
+        Node target = findTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
+        target.requestFocus();
+        Platform.runLater(() -> Optional.ofNullable(target.getScene()).ifPresent(_ -> scrollToVisible(target)));
+    }
+
+    private static Optional<TextInputControl> findTextInput(Node node) {
+        if (node instanceof TextInputControl textInput) {
+            return Optional.of(textInput);
+        }
+        if (node instanceof Parent parent) {
+            return parent.getChildrenUnmodifiable().stream()
+                         .map(FieldEditorFX::findTextInput)
+                         .flatMap(Optional::stream)
+                         .findFirst();
+        }
+        return Optional.empty();
+    }
+
+    private static void scrollToVisible(Node node) {
+        Node current = node.getParent();
+        while (current != null) {
+            if (current instanceof ScrollPane scrollPane) {
+                Node content = scrollPane.getContent();
+                if (content == null) {
+                    return;
+                }
+                double viewportHeight = scrollPane.getViewportBounds().getHeight();
+                double contentHeight = content.getBoundsInLocal().getHeight();
+                if (contentHeight <= viewportHeight) {
+                    return;
+                }
+                Bounds targetInContent = content.sceneToLocal(node.localToScene(node.getBoundsInLocal()));
+                double targetCenterY = targetInContent.getCenterY();
+                double maxScrollY = contentHeight - viewportHeight;
+                double desiredScrollY = targetCenterY - (viewportHeight / 2);
+                scrollPane.setVvalue(Math.clamp(desiredScrollY / maxScrollY, 0, 1));
+                return;
+            }
+            current = current.getParent();
+        }
     }
 
     /// Returns relative size of the field editor in terms of display space.

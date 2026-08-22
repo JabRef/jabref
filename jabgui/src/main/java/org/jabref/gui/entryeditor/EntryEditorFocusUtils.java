@@ -72,7 +72,9 @@ class EntryEditorFocusUtils {
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            () -> addFieldViaAllFieldsTab(Optional.ofNullable(aliasField).orElse(field)));
                 }
         ));
     }
@@ -83,6 +85,20 @@ class EntryEditorFocusUtils {
                       .map(FieldsEditorTab.class::cast)
                       .filter(tab -> tab.getShownFields().contains(field))
                       .findFirst();
+    }
+
+    private void addFieldViaAllFieldsTab(Field field) {
+        if (!FieldFactory.getAllFieldsWithOutInternal().contains(field)) {
+            return;
+        }
+        tabPane.getTabs().stream()
+               .filter(AllFieldsTab.class::isInstance)
+               .map(AllFieldsTab.class::cast)
+               .findFirst()
+               .ifPresent(allFieldsTab -> {
+                   tabPane.getSelectionModel().select(allFieldsTab);
+                   allFieldsTab.addFieldAndFocus(field);
+               });
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
