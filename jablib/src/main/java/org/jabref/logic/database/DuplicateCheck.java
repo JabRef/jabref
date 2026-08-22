@@ -338,6 +338,20 @@ public class DuplicateCheck {
     public Optional<BibEntry> containsDuplicate(final BibDatabase database,
                                                 final BibEntry entry,
                                                 final BibDatabaseMode bibDatabaseMode) {
-        return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
+        return containsDuplicate(database.getEntries(), entry, bibDatabaseMode);
+    }
+
+    /// Same as [#containsDuplicate(BibDatabase,BibEntry,BibDatabaseMode)], but searches a plain collection.
+    ///
+    /// Callers which do not run on the JavaFX Application Thread should pass a snapshot:
+    /// [BibDatabase#getEntries] returns a live view of the entry list, which may be modified while it is iterated.
+    ///
+    /// @param entries The entries to search.
+    /// @param entry   The entry of which we are looking for duplicates.
+    /// @return The first duplicate entry found. Empty Optional if no duplicates are found.
+    public Optional<BibEntry> containsDuplicate(final Collection<BibEntry> entries,
+                                                final BibEntry entry,
+                                                final BibDatabaseMode bibDatabaseMode) {
+        return entries.stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
     }
 }

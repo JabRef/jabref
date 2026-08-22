@@ -81,9 +81,10 @@ class RfcFetcherTest {
     @ValueSource(strings = {
             // syntactically valid identifier
             "draft-test-draft-spec",
-            "RFC9999",
+            "RFC99999",
             // invalid identifier
-            "banana"})
+            "banana"
+    })
     void performSearchByIdFindsNothingWithValidDraftIdentifier(String identifier) {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById(identifier));
     }

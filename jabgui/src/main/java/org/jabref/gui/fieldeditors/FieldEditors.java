@@ -30,6 +30,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -117,6 +118,8 @@ public class FieldEditors {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction, databaseContext);
         } else if (field == StandardField.ICORERANKING) {
             return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
+        } else if (field instanceof SpecialField specialField) {
+            return new SpecialFieldEditor(specialField, preferences, undoManager);
         } else {
             // There was no specific editor found
 

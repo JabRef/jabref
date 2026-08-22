@@ -177,10 +177,10 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
                 factory.createMenuItem(StandardActions.OPEN_FOLDER_AS_LIBRARY, new OpenDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
                 fileHistoryMenu,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.CONVERT_TO_FOLDER_LIBRARY, new ConvertToDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository)),
+                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager, entryTypesManager, journalAbbreviationRepository)),
+                factory.createMenuItem(StandardActions.CONVERT_TO_FOLDER_LIBRARY, new ConvertToDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, journalAbbreviationRepository, undoManager, clipBoardManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -194,7 +194,7 @@ public class MainMenu extends MenuBar {
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
 
                 new SeparatorMenuItem(),
 
@@ -293,7 +293,7 @@ public class MainMenu extends MenuBar {
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences())) {
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, undoManager, dialogService, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
@@ -312,7 +312,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.UPDATE_WITH_WEB_INFO,
-                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor)),
+                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor, undoManager)),
                 // endregion
 
                 new SeparatorMenuItem(),
