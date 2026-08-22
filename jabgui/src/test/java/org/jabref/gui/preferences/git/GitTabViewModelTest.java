@@ -1,11 +1,9 @@
-package org.jabref.gui.git;
+package org.jabref.gui.preferences.git;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.git.GitHubRepositoryAccess;
 import org.jabref.logic.git.GitHubRepositoryAccessChecker;
 import org.jabref.logic.git.preferences.GitPreferences;
-import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 
@@ -17,22 +15,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class GitShareToGitHubDialogViewModelTest {
+class GitTabViewModelTest {
 
     private DialogService dialogService;
     private GitHubRepositoryAccessChecker gitHubRepositoryAccessChecker;
-    private GitShareToGitHubDialogViewModel viewModel;
+    private GitTabViewModel viewModel;
 
     @BeforeEach
     void setUp() {
         dialogService = mock(DialogService.class);
         gitHubRepositoryAccessChecker = mock(GitHubRepositoryAccessChecker.class);
-        viewModel = new GitShareToGitHubDialogViewModel(
-                GitPreferences.getDefault(),
-                mock(StateManager.class),
+        viewModel = new GitTabViewModel(
                 dialogService,
                 new CurrentThreadTaskExecutor(),
-                mock(GitHandlerRegistry.class),
+                GitPreferences.getDefault(),
                 gitHubRepositoryAccessChecker);
     }
 

@@ -23,6 +23,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.git.GitAutoSync;
+import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -32,18 +34,21 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,6 +146,7 @@ public class SaveDatabaseAction {
             // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
+            GitPullScheduler.shutdown(context);
             libraryTab.closeSearchContext();
         }
 
@@ -238,6 +244,7 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
+                autoCommit(targetPath);
             }
             dialogService.notify(Localization.lang("Library saved"));
             return success;
@@ -250,6 +257,19 @@ public class SaveDatabaseAction {
             // release panel from save status
             libraryTab.setSaving(false);
         }
+    }
+
+    private void autoCommit(Path targetPath) {
+        BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
+        if (!databaseContext.getMetaData().isGitAutoCommit()) {
+            return;
+        }
+        new GitAutoSync(dialogService,
+                Injector.instantiateModelOrService(GitHandlerRegistry.class),
+                Injector.instantiateModelOrService(TaskExecutor.class),
+                preferences,
+                stateManager)
+                .commit(targetPath, databaseContext, databaseContext.getMetaData().isGitAutoPush());
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {

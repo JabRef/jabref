@@ -148,6 +148,12 @@ public class MetaDataParser {
                 } else {
                     metaData.markAsNotProtected();
                 }
+            } else if (MetaData.GIT_AUTO_PULL.equals(entry.getKey())) {
+                metaData.setGitAutoPull(Boolean.parseBoolean(getSingleItem(values)));
+            } else if (MetaData.GIT_AUTO_COMMIT.equals(entry.getKey())) {
+                metaData.setGitAutoCommit(Boolean.parseBoolean(getSingleItem(values)));
+            } else if (MetaData.GIT_AUTO_PUSH.equals(entry.getKey())) {
+                metaData.setGitAutoPush(Boolean.parseBoolean(getSingleItem(values)));
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
