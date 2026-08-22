@@ -1284,6 +1284,280 @@
     },
     {
       "type": "sun.util.resources.cldr.TimeZoneNames_en_US"
+    },
+    {
+      "type": "java.lang.Enum",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "toString",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "accessibilityActionDescription",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityActionNames",
+          "parameterTypes": []
+        },
+        {
+          "name": "accessibilityArrayAttributeCount",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityArrayAttributeValues",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "accessibilityAttributeNames",
+          "parameterTypes": []
+        },
+        {
+          "name": "accessibilityAttributeValue",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityAttributeValueForParameter",
+          "parameterTypes": [
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityFocusedUIElement",
+          "parameterTypes": []
+        },
+        {
+          "name": "accessibilityHitTest",
+          "parameterTypes": [
+            "float",
+            "float"
+          ]
+        },
+        {
+          "name": "accessibilityIndexOfChild",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityIsAttributeSettable",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilityIsIgnored",
+          "parameterTypes": []
+        },
+        {
+          "name": "accessibilityParameterizedAttributeNames",
+          "parameterTypes": []
+        },
+        {
+          "name": "accessibilityPerformAction",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "accessibilitySetValue",
+          "parameterTypes": [
+            "long",
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacAction",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacAttribute",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacNotification",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacOrientation",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacRole",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacSubrole",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacAccessible$MacText",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.mac.MacVariant",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "double1"
+        },
+        {
+          "name": "float1"
+        },
+        {
+          "name": "float2"
+        },
+        {
+          "name": "float3"
+        },
+        {
+          "name": "float4"
+        },
+        {
+          "name": "int1"
+        },
+        {
+          "name": "int2"
+        },
+        {
+          "name": "intArray"
+        },
+        {
+          "name": "key"
+        },
+        {
+          "name": "length"
+        },
+        {
+          "name": "location"
+        },
+        {
+          "name": "long1"
+        },
+        {
+          "name": "longArray"
+        },
+        {
+          "name": "string"
+        },
+        {
+          "name": "stringArray"
+        },
+        {
+          "name": "type"
+        },
+        {
+          "name": "variantArray"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.sw.SWPipeline",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
     }
   ],
   "resources": [
@@ -1449,6 +1723,12 @@
     {
       "module": "snuggletex.core",
       "glob": "uk/ac/ed/ph/snuggletex/math-function-definitions.txt"
+    },
+    {
+      "glob": "cayw.css"
+    },
+    {
+      "glob": "JabRef-icon-64.png"
     }
   ]
 }
