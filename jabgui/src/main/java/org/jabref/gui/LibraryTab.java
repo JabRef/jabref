@@ -41,6 +41,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -393,6 +394,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
+        
+        GitPullScheduler.start(bibDatabaseContext, dialogService, preferences, stateManager, taskExecutor);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -740,6 +743,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     preferences.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
+        }
+
+        try {
+            GitPullScheduler.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down Git pull scheduler", e);
         }
 
         if (tableModel != null) {
