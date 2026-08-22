@@ -778,6 +778,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         BorderPane searchContainer = getPaneAndStartSearch(entry);
 
         BorderPane root = new BorderPane();
+        root.setId("citationRelationsTab");
         root.setCenter(searchContainer);
         root.setBottom(sciteResultsPane);
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
