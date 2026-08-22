@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+<DialogPane minWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
     <content>
         <fx:define>
@@ -50,12 +50,12 @@
                 </VBox>
                 <VBox HBox.hgrow="SOMETIMES">
                     <Label text="%Hierarchical context"/>
-                    <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
+                    <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="Infinity"/>
                 </VBox>
                 <VBox HBox.hgrow="SOMETIMES"
                       layoutX="10.0" layoutY="10.0"
-                      minWidth="130.0" maxWidth="130.0"
-                      prefWidth="130.0" spacing="10.0">
+                      minWidth="130.0" maxWidth="Infinity"
+                      spacing="10.0">
                     <CheckBox fx:id="colorUseCheckbox" text="%Color"/>
                     <VBox disable="${!colorUseCheckbox.selected}">
                         <ColorPicker fx:id="colorField" minHeight="25.0"/>
@@ -68,7 +68,7 @@
             </HBox>
             <Label text="%Collect by" styleClass="sectionHeader"/>
             <HBox>
-                <VBox spacing="10.0">
+                <VBox spacing="10.0" minWidth="200.0" HBox.hgrow="SOMETIMES">
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>
