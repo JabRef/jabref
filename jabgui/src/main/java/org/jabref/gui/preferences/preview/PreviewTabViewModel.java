@@ -1,11 +1,15 @@
 package org.jabref.gui.preferences.preview;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
@@ -51,6 +56,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,9 +78,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
 
-    private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<PreviewLayout> lastRoutedLayoutProperty = new SimpleObjectProperty<>();
+    private final ListProperty<PreviewLayout> cslListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<PreviewLayout> customizedListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
-    private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
+    private final FilteredList<PreviewLayout> filteredCslLayouts = new FilteredList<>(this.cslListProperty());
+    private final FilteredList<PreviewLayout> filteredCustomizedLayouts = new FilteredList<>(this.customizedListProperty());
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
@@ -82,6 +92,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
+    private final StringProperty styleNameProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -133,12 +144,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
-        availableListProperty.clear();
-        if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
-            availableListProperty.getValue().add(TextBasedPreviewLayout.of(
-                    previewPreferences.getCustomPreviewLayout(),
-                    layoutFormatterPreferences,
-                    abbreviationRepository));
+        cslListProperty.clear();
+        customizedListProperty.clear();
+        for (CustomizedPreviewStyle stored : previewPreferences.getCustomizedPreviewStyles()) {
+            TextBasedPreviewLayout textBasedPreviewLayout = new TextBasedPreviewLayout(stored.id(), stored.name(), stored.text(), layoutFormatterPreferences, abbreviationRepository);
+            if (chosenListProperty.stream().noneMatch(currLayout -> currLayout instanceof TextBasedPreviewLayout textLayout && textLayout.getId().equals(stored.id()))) {
+                customizedListProperty.getValue().add(textBasedPreviewLayout);
+            }
         }
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
@@ -149,7 +161,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))
-                                                 .forEach(availableListProperty::add))
+                                                 .forEach(style -> {
+                                                     cslListProperty.add(style);
+                                                 }))
                       .onFailure(ex -> {
                           LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list.", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
@@ -159,19 +173,17 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         bstStylesPaths.addAll(previewPreferences.getBstPreviewLayoutPaths());
         bstStylesPaths.forEach(path -> {
             BstPreviewLayout layout = new BstPreviewLayout(path);
-            availableListProperty.add(layout);
+            cslListProperty.add(layout);
         });
 
         shouldDownloadCovers.setValue(previewPreferences.shouldDownloadCovers());
     }
 
-    public void setPreviewLayout(PreviewLayout selectedLayout) {
-        if (selectedLayout == null) {
-            selectedIsEditableProperty.setValue(false);
-            selectedLayoutProperty.setValue(null);
-            return;
-        }
+    public void setPreviewLayout(@Nullable PreviewLayout selectedLayout) {
+        Optional.ofNullable(selectedLayout).ifPresentOrElse(this::applySelectedLayout, this::clearSelectedLayout);
+    }
 
+    private void applySelectedLayout(PreviewLayout selectedLayout) {
         try {
             selectedLayoutProperty.setValue(selectedLayout);
         } catch (StringIndexOutOfBoundsException exception) {
@@ -181,8 +193,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
         }
 
+        styleNameProperty.setValue(selectedLayout.getDisplayName());
         boolean isEditingAllowed = selectedLayout instanceof TextBasedPreviewLayout;
         setContentForPreview(selectedLayout.getText(), isEditingAllowed);
+    }
+
+    private void clearSelectedLayout() {
+        selectedIsEditableProperty.setValue(false);
+        selectedLayoutProperty.setValue(null);
+        styleNameProperty.setValue("");
     }
 
     private void setContentForPreview(String text, boolean editable) {
@@ -191,36 +210,39 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void refreshPreview() {
-        setPreviewLayout(null);
-        setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
+        Optional.ofNullable(selectedLayoutProperty.getValue())
+                .ifPresentOrElse(this::applySelectedLayout, this::clearSelectedLayout);
     }
 
-    private PreviewLayout findLayoutByName(String name) {
-        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                                    .findAny()
-                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                                                              .findAny()
-                                                              .orElse(null));
+    public void refreshStyleName(String name) {
+        styleNameProperty.set(" ");
+        styleNameProperty.set(name);
     }
 
     /// Store the changes of preference-preview settings.
+    // [impl->req~entry-preview.persist-custom-style~1]
     @Override
     public void storeSettings() {
         if (chosenListProperty.isEmpty()) {
-            PreviewLayout textBasedPreviewLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
-            if (textBasedPreviewLayout != null) {
-                chosenListProperty.add(textBasedPreviewLayout);
-            } else {
-                chosenListProperty.add(TextBasedPreviewLayout.of(
-                        TextBasedPreviewLayout.DEFAULT,
-                        layoutFormatterPreferences,
-                        abbreviationRepository));
-            }
+            PreviewLayout defaultLayout = customizedListProperty.stream()
+                                                                .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                .findFirst()
+                                                                .orElseGet(() -> TextBasedPreviewLayout.of(
+                                                                        TextBasedPreviewLayout.NAME,
+                                                                        TextBasedPreviewLayout.DEFAULT,
+                                                                        layoutFormatterPreferences,
+                                                                        abbreviationRepository));
+            chosenListProperty.add(defaultLayout);
         }
 
-        if (findLayoutByName(TextBasedPreviewLayout.NAME) instanceof TextBasedPreviewLayout customLayout) {
-            previewPreferences.setCustomPreviewLayout(customLayout.getText());
-        }
+        List<CustomizedPreviewStyle> toStore = java.util.stream.Stream.concat(
+                                                           customizedListProperty.stream(),
+                                                           chosenListProperty.stream().filter(TextBasedPreviewLayout.class::isInstance))
+                                                                      .map(TextBasedPreviewLayout.class::cast)
+                                                                      .distinct()
+                                                                      .map(layout -> new CustomizedPreviewStyle(layout.getId(), layout.getDisplayName(), layout.getText()))
+                                                                      .toList();
+        previewPreferences.getCustomizedPreviewStyles().setAll(toStore);
 
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
@@ -253,10 +275,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    public void addToChosen() {
+    public void addToChosen(ListProperty<PreviewLayout> sourceList) {
+        // Adding style from 'available' to 'selected' must know where the source list is from
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
         availableSelectionModelProperty.getValue().clearSelection();
-        availableListProperty.removeAll(selected);
+        sourceList.removeAll(selected);
         chosenListProperty.addAll(selected);
     }
 
@@ -264,8 +287,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         List<PreviewLayout> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedItems());
         chosenSelectionModelProperty.getValue().clearSelection();
         chosenListProperty.removeAll(selected);
-        availableListProperty.addAll(selected);
-        availableListProperty.sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+        for (PreviewLayout layout : selected) {
+            ListProperty<PreviewLayout> destination = destinationFor(layout);
+            if (!destination.getValue().contains(layout)) {
+                destination.add(layout);
+            }
+            lastRoutedLayoutProperty.setValue(layout);
+        }
+        cslListProperty.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+        customizedListProperty.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
     }
 
     public void selectedInChosenUp() {
@@ -312,14 +342,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetDefaultLayout() {
-        PreviewLayout defaultLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (defaultLayout instanceof TextBasedPreviewLayout layout) {
+        if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
             layout.setText(TextBasedPreviewLayout.of(
                     TextBasedPreviewLayout.DEFAULT,
                     layoutFormatterPreferences,
                     abbreviationRepository).getText());
+            refreshPreview();
         }
-        refreshPreview();
     }
 
     /// XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
@@ -400,20 +429,41 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of chosenListView
     ///
     /// @param targetList either availableListView or chosenListView
-
     public boolean dragDropped(ListProperty<PreviewLayout> targetList, Dragboard dragboard) {
         boolean success = false;
 
         if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
             List<PreviewLayout> draggedLayouts = localDragboard.getPreviewLayouts();
             if (!draggedLayouts.isEmpty()) {
+                if (dragSourceList == targetList) { // ignore if dropping into the same list
+                    return false;
+                }
+
                 dragSourceSelectionModel.getValue().clearSelection();
                 dragSourceList.getValue().removeAll(draggedLayouts);
-                targetList.getValue().addAll(draggedLayouts);
-                success = true;
 
-                if (targetList == availableListProperty) {
-                    targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+                if (dragSourceList == chosenListProperty) {     // drag from 'Selected' list
+                    // Allows for citations to drop into the list that they belong in from 'Selected', regardless of which available ListView physically received the drop.
+                    for (PreviewLayout layout : draggedLayouts) {
+                        ListProperty<PreviewLayout> destination = destinationFor(layout);   // get list based on type
+                        if (!destination.getValue().contains(layout)) { // check for duplicate
+                            destination.add(layout);
+                        }
+                        lastRoutedLayoutProperty.setValue(layout);
+                    }
+                    success = true;
+
+                    cslListProperty.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+                    customizedListProperty.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+                } else {                                        // drag from 'Available' lists
+                    // prevents adding duplicate names
+                    List<PreviewLayout> filteredLayouts = draggedLayouts.stream().filter(layout -> !targetList.getValue().contains(layout)).toList();
+                    targetList.getValue().addAll(filteredLayouts);
+                    success = true;
+
+                    if (targetList == cslListProperty) {
+                        targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
+                    }
                 }
             }
         }
@@ -424,7 +474,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// This is called, when the user drops some PreviewLayouts on another cell in chosenListView to sort them
     ///
     /// @param targetLayout the Layout, the user drops a layout on
-
     public boolean dragDroppedInChosenCell(PreviewLayout targetLayout, Dragboard dragboard) {
         boolean success = false;
 
@@ -434,6 +483,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 chosenSelectionModelProperty.getValue().clearSelection();
                 int targetId = chosenListProperty.getValue().indexOf(targetLayout);
 
+                // An empty cell reference below the last occupied row can resolve to -1 here.
+                // Treat it the same as "no specific target".
+                // Otherwise, the dragged cell gets consumed, placed in an invalid index, and drops into nothing
+                if (targetId < 0) {
+                    targetLayout = null;
+                }
                 // see https://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
                 int onSelectedDelta = 0;
                 while (draggedSelectedLayouts.contains(targetLayout)) {
@@ -450,12 +505,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 dragSourceList.getValue().removeAll(draggedSelectedLayouts);
 
                 if (targetLayout != null) {
-                    targetId = chosenListProperty.getValue().indexOf(targetLayout) + onSelectedDelta;
+                    targetId = chosenListProperty.getValue().indexOf(targetLayout);
                 } else if (targetId != 0) {
                     targetId = chosenListProperty.getValue().size();
                 }
 
-                chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);
+                List<PreviewLayout> filteredLayouts = draggedSelectedLayouts.stream().filter(layout -> !chosenListProperty.getValue().contains(layout)).toList();
+                chosenListProperty.getValue().addAll(targetId, filteredLayouts);
 
                 draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
 
@@ -474,18 +530,33 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return showPreviewInEntryTableTooltip;
     }
 
-    public ListProperty<PreviewLayout> availableListProperty() {
-        return availableListProperty;
+    public ListProperty<PreviewLayout> cslListProperty() {
+        return cslListProperty;
     }
 
-    public FilteredList<PreviewLayout> getFilteredAvailableLayouts() {
-        return this.filteredAvailableLayouts;
+    public ListProperty<PreviewLayout> customizedListProperty() {
+        return customizedListProperty;
+    }
+
+    public ListProperty<PreviewLayout> destinationFor(PreviewLayout layout) {
+        return (layout instanceof TextBasedPreviewLayout) ? customizedListProperty : cslListProperty;
+    }
+
+    public FilteredList<PreviewLayout> getFilteredCslLayouts() {
+        return this.filteredCslLayouts;
+    }
+
+    public FilteredList<PreviewLayout> getFilteredCustomizedLayouts() {
+        return this.filteredCustomizedLayouts;
     }
 
     public void setAvailableFilter(String searchTerm) {
-        this.filteredAvailableLayouts.setPredicate(
+        // need to filter on both csl and customized tabs now
+        Predicate<PreviewLayout> predicate =
                 preview -> searchTerm.isEmpty()
-                        || preview.containsCaseIndependent(searchTerm));
+                        || preview.containsCaseIndependent(searchTerm);
+        this.filteredCslLayouts.setPredicate(predicate);
+        this.filteredCustomizedLayouts.setPredicate(predicate);
     }
 
     public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() {
@@ -516,19 +587,109 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return shouldDownloadCovers;
     }
 
+    public ObjectProperty<PreviewLayout> lastRoutedLayoutProperty() {
+        return lastRoutedLayoutProperty;
+    }
+
+    public StringProperty styleNameProperty() {
+        return styleNameProperty;
+    }
+
     public void addBstStyle(Path bstFile) {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
         bstStylesPaths.add(bstFile);
-        availableListProperty().add(bstPreviewLayout);
+        cslListProperty().add(bstPreviewLayout);
         chosenListProperty().add(bstPreviewLayout);
     }
 
     public void removeCustomStyle(PreviewLayout layout) {
         if (layout instanceof BstPreviewLayout bstLayout) {
-            availableListProperty.remove(bstLayout);
+            cslListProperty.remove(bstLayout);
             chosenListProperty.remove(bstLayout);
             // Remove the path so it doesn't come back on restart
             bstStylesPaths.remove((bstLayout.getFilePath()));
+        }
+    }
+
+    public void addCustomizedStyle() {
+        TextBasedPreviewLayout layout =
+                TextBasedPreviewLayout.of(
+                        nextCustomStyleDefaultName(),
+                        TextBasedPreviewLayout.DEFAULT,
+                        layoutFormatterPreferences,
+                        abbreviationRepository);
+
+        customizedListProperty.add(layout);
+
+        availableSelectionModelProperty.getValue().clearSelection();
+        availableSelectionModelProperty.getValue().select(layout);
+        setPreviewLayout(layout);
+    }
+
+    public void removeCustomizedStyle() {
+        PreviewLayout layout =
+                availableSelectionModelProperty.getValue().getSelectedItem();
+
+        // customized citation item are TextBasedPreviewLayout
+        // This check prevents original csl citations from being deleted
+        if (!(layout instanceof TextBasedPreviewLayout)) {
+            return;
+        }
+
+        customizedListProperty.remove(layout);
+        availableSelectionModelProperty.getValue().clearSelection();
+    }
+
+    /// Commits an edit made in the style-name field to the currently selected TextBasedPreviewLayout.
+    /// No-ops for non-customized (CSL/BST) selections. Reverts the field on blank/duplicate input.
+    /// [impl->req~entry-preview.rename-custom-style~1]
+    public void renameSelectedStyle(@NonNull String newName) {
+        String oldName = styleNameProperty.get();
+        if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
+            if (!newName.isBlank()) {
+                String trimmed = newName.trim();
+                if (trimmed.equals(layout.getDisplayName())) {
+                    return;
+                }
+                // check for duplicates in both lists.
+                boolean isDupInCustomizedListProperty = customizedListProperty.stream()
+                                                                              .filter(existing -> existing != layout)
+                                                                              .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
+                boolean isDupInCslListProperty = cslListProperty.stream()
+                                                                .filter(existing -> existing != layout)
+                                                                .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
+                boolean isDupInChosenListProperty = chosenListProperty().stream()
+                                                                        .filter(existing -> existing != layout)
+                                                                        .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
+                if (isDupInCslListProperty || isDupInCustomizedListProperty || isDupInChosenListProperty) {
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Error"),
+                            Localization.lang("A style with this name already exists."));
+                    styleNameProperty.setValue(layout.getDisplayName());
+                } else {
+                    layout.setName(trimmed);
+                    styleNameProperty.setValue(trimmed);
+                    customizedListProperty.getValue().sort(Comparator.comparing(PreviewLayout::getDisplayName, String.CASE_INSENSITIVE_ORDER));
+                }
+            } else {
+                refreshStyleName(oldName);
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Error"),
+                        Localization.lang("A blank space cannot be used to rename your style."));
+            }
+        }
+    }
+
+    private String nextCustomStyleDefaultName() {
+        while (true) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS");
+            String candidate = Localization.lang("Customized preview style %0", LocalDateTime.now().format(formatter));
+            boolean exists = customizedListProperty.stream()
+                                                   .map(PreviewLayout::getDisplayName)
+                                                   .anyMatch(candidate::equals);
+            if (!exists) {
+                return candidate;
+            }
         }
     }
 }
