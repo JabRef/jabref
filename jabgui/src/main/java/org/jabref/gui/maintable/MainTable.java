@@ -578,8 +578,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // Different actions depending on where the user releases the drop in the target row
                 // - Bottom + top -> import entries
                 case TOP,
-                     BOTTOM ->
-                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                     BOTTOM -> {
+                    if (!importHandler.confirmBibFileImportIfNecessary(files)) {
+                        event.setDropCompleted(false);
+                        event.consume();
+                        return;
+                    }
+                    importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                }
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     Map<Boolean, List<Path>> partitionedFiles = files.stream()
@@ -588,6 +594,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     List<Path> otherFiles = partitionedFiles.get(false);
 
                     if (!importableFiles.isEmpty()) {
+                        if (!importHandler.confirmBibFileImportIfNecessary(importableFiles)) {
+                            event.setDropCompleted(false);
+                            event.consume();
+                            return;
+                        }
                         importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
                     }
                     if (!otherFiles.isEmpty()) {
@@ -613,6 +624,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .map(File::toPath)
                                     .map(FileUtil::resolveIfShortcut)
                                     .toList();
+            if (!importHandler.confirmBibFileImportIfNecessary(files)) {
+                event.setDropCompleted(false);
+                event.consume();
+                return;
+            }
             importHandler
                     .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);
