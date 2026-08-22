@@ -458,6 +458,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String GITHUB_USERNAME_KEY = "githubUsername";
     private static final String GITHUB_REMOTE_URL_KEY = "githubRemoteUrl";
     private static final String GITHUB_REMEMBER_PAT_KEY = "githubRememberPat";
+    private static final String GIT_PULL_INTERVAL_KEY = "gitPullInterval";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
@@ -2637,11 +2638,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 rememberPat ? readKeyring(KeyringSlot.GITHUB_PAT).orElse(defaultValues.getPat())
                             : defaultValues.getPat(),
                 get(GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl()),
-                rememberPat);
+                rememberPat,
+                getInt(GIT_PULL_INTERVAL_KEY, defaultValues.getPullInterval()));
 
         bindString(gitPreferences.usernameProperty(), GITHUB_USERNAME_KEY, defaultValues.getUsername());
         bindString(gitPreferences.repositoryUrlProperty(), GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl());
         bindToKeyring(gitPreferences.patProperty(), KeyringSlot.GITHUB_PAT, gitPreferences::getPersistPat);
+        bindInt(gitPreferences.pullIntervalProperty(), GIT_PULL_INTERVAL_KEY, defaultValues.getPullInterval());
         bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
                 (_, _, newValue) -> {
                     putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
