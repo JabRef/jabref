@@ -417,6 +417,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
+    private static final String OCR_LANGUAGES = "ocrLanguages";
     // endregion
 
     // region Push to application preferences
@@ -2172,14 +2173,20 @@ public class JabRefCliPreferences implements CliPreferences {
 
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
+        List<String> savedLanguages = getStringList(OCR_LANGUAGES);
+
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
-                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
+                savedLanguages.isEmpty() ? defaultValues.getOcrLanguages() : savedLanguages);
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+
+        ocrPreferences.ocrLanguagesProperty().addListener((observable, oldValue, newValue) ->
+                putStringList(OCR_LANGUAGES, newValue));
 
         return ocrPreferences;
     }

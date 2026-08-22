@@ -52,6 +52,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
+    private final ListProperty<String> ocrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -75,6 +76,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             }
             autoDetectEnginePath();
         });
+        javafx.beans.binding.Bindings.bindContentBidirectional(this.ocrLanguages, this.ocrPreferences.getOcrLanguages());
     }
 
     @Override
@@ -188,5 +190,9 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             LOGGER.debug("{} is not available as engine's path: IOException occurred", path, e);
             return false;
         }
+    }
+
+    public ListProperty<String> ocrLanguagesProperty() {
+        return ocrLanguages;
     }
 }
