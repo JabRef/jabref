@@ -109,8 +109,6 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     Localization.lang("Committed successfully");
             case COMMITTED_AND_PUSHED ->
                     Localization.lang("Committed and pushed successfully");
-            case COMMITTED_WITHOUT_PUSH ->
-                    Localization.lang("Nothing to push. Local branch is up to date.");
         };
     }
 
@@ -172,7 +170,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         try {
             PushResult result = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry)
                                               .push(repository.database(), repository.bibFilePath());
-            return result.noop() ? CommitOutcome.COMMITTED_WITHOUT_PUSH : CommitOutcome.COMMITTED_AND_PUSHED;
+            // commitOn() only returns here after creating a new local commit, so the branch must be
+            // AHEAD at this point. A noop (up-to-date) result would mean the remote already has this
+            // exact commit, which indicates a concurrent push raced us rather than a normal outcome.
+            if (result.noop()) {
+                throw new PushFailedException(new JabRefException(
+                        Localization.lang("Push aborted: Remote already has this commit. Please check the remote repository.")));
+            }
+            return CommitOutcome.COMMITTED_AND_PUSHED;
         } catch (JabRefException | GitAPIException | IOException e) {
             throw new PushFailedException(e);
         }
@@ -196,8 +201,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     /// What a finished dialog action actually achieved, so the user can be told the truth about it.
     private enum CommitOutcome {
         COMMITTED,
-        COMMITTED_AND_PUSHED,
-        COMMITTED_WITHOUT_PUSH
+        COMMITTED_AND_PUSHED
     }
 
     /// Marks a failure that happened once the commit already existed, so the user is not told the commit itself failed.
