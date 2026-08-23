@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
@@ -17,6 +16,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -163,20 +163,7 @@ public interface FieldEditorFX {
         Node current = node.getParent();
         while (current != null) {
             if (current instanceof ScrollPane scrollPane) {
-                Node content = scrollPane.getContent();
-                if (content == null) {
-                    return;
-                }
-                double viewportHeight = scrollPane.getViewportBounds().getHeight();
-                double contentHeight = content.getBoundsInLocal().getHeight();
-                if (contentHeight <= viewportHeight) {
-                    return;
-                }
-                Bounds targetInContent = content.sceneToLocal(node.localToScene(node.getBoundsInLocal()));
-                double targetCenterY = targetInContent.getCenterY();
-                double maxScrollY = contentHeight - viewportHeight;
-                double desiredScrollY = targetCenterY - (viewportHeight / 2);
-                scrollPane.setVvalue(Math.clamp(desiredScrollY / maxScrollY, 0, 1));
+                ScrollUtils.scrollIntoScrollPane(scrollPane, node.localToScene(node.getBoundsInLocal()));
                 return;
             }
             current = current.getParent();
