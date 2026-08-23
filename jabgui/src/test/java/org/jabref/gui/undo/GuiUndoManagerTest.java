@@ -1,6 +1,11 @@
 package org.jabref.gui.undo;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javafx.application.Platform;
 
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
@@ -14,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.util.WaitForAsyncUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -78,5 +84,34 @@ class GuiUndoManagerTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         assertTrue(undoableImmediatelyAfterTheEdit.get());
+    }
+
+    /// Each queued update reads the stacks when it runs, not when it was requested, so a value
+    /// the manager has already moved past never reaches a property. Both mutations below land
+    /// while the JavaFX thread is blocked, so both updates run after the stack is empty again
+    /// and the menu is never told about an undo that is already gone.
+    @Test
+    void aQueuedUpdateAppliesTheStateItFindsWhenItRuns() throws InterruptedException {
+        List<Boolean> undoableValues = new CopyOnWriteArrayList<>();
+        WaitForAsyncUtils.asyncFx(() -> properties.undoableProperty()
+                                                  .addListener((observable, was, is) -> undoableValues.add(is)));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        CountDownLatch release = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                release.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        undoManager.addEdit(setAuthor("Bohr"));
+        undoManager.undo();
+        release.countDown();
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertFalse(properties.undoableProperty().get());
+        assertEquals(List.of(), undoableValues);
     }
 }

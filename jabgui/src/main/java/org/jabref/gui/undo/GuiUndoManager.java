@@ -39,19 +39,22 @@ public class GuiUndoManager {
         return redoable.getReadOnlyProperty();
     }
 
-    /// Reads the stacks first and sets the properties second, because the two steps may end up
-    /// on different threads: the read has to happen where the notification arrived, while the
-    /// write has to happen on the JavaFX thread.
+    /// Reads the stacks on the JavaFX thread rather than where the notification arrived, so that
+    /// what is written is what the manager holds at the moment of writing. Reading first and
+    /// carrying the values over would let a thread that read an older state post after one that
+    /// read a newer state, leaving the menu enabled over an empty stack until the next edit.
     ///
     /// Applied inline when the edit was already made on the JavaFX thread, so a caller that
     /// records a change and then reads the property in the same event does not see the previous
     /// value. Deferring unconditionally would leave the menu stale for a pulse.
+    ///
+    /// A burst of edits therefore queues one update per edit, and they are not coalesced: each
+    /// reads the current state, so every update after the first sets the value already there,
+    /// which a JavaFX property ignores without notifying anything.
     private void refresh() {
-        boolean canUndo = undoManager.canUndo();
-        boolean canRedo = undoManager.canRedo();
         UiTaskExecutor.runNowOrInJavaFXThread(() -> {
-            undoable.set(canUndo);
-            redoable.set(canRedo);
+            undoable.set(undoManager.canUndo());
+            redoable.set(undoManager.canRedo());
         });
     }
 }
