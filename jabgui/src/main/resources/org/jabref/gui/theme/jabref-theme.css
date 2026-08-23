@@ -541,7 +541,7 @@ TextFlow > .tooltip-text-monospaced {
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-bg-primary;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
