@@ -75,6 +75,13 @@ A field's row shows a small gray "remove field" icon button pinned to its top-ri
 
 Needs: impl
 
+## Custom tabs show a user-defined list of field patterns
+`req~entry-editor.custom-tabs~1`
+
+Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again without migration.
+
+Needs: impl
+
 ## Special fields are edited with the same icon controls as the main table
 `req~entry-editor.special-field-editors~1`
 
