@@ -1,6 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 
@@ -12,6 +13,8 @@ import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 /// For example, `\format[IfPlural(Eds.,Ed.)]{\editor}`
 /// should expand to `Eds.` if the document has more than one editor and `Ed.` if it only has one.
 public class IfPlural extends AbstractParamLayoutFormatter {
+
+    private static final Pattern AND_PATTERN = Pattern.compile("\\sand\\s");
 
     private String pluralText;
     private String singularText;
@@ -32,7 +35,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null)) {
             return ""; // TODO: argument missing or invalid. Print an error message here?
         }
-        if (fieldText.matches(".*\\sand\\s.*")) {
+        if (AND_PATTERN.matcher(fieldText).find()) {
             return pluralText;
         } else {
             return singularText;
