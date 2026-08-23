@@ -46,6 +46,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
+        mergedEntriesView.setTitle(Localization.lang("Merge entry with information"));
         mergedEntriesView.addSource(Localization.lang("Original entry"), originalEntry);
 
         Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
