@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -8,6 +9,8 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.net.ProgressInputStream;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
@@ -21,7 +24,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
@@ -39,7 +45,22 @@ class LibraryOfCongressTest {
     }
 
     @Test
-    void performSearchById() throws FetcherException {
+    void performSearchById() throws IOException, FetcherException {
+        // performSearchById() ultimately downloads from https://lccn.loc.gov/.../mods via
+        // IdBasedParserFetcher's default method, which would make this test a live network call.
+        // Stub getUrlDownload() to serve the same fixture parsesAttachedModsBookAsBook() uses
+        // below, so this test is deterministic and doesn't depend on the network or on upstream
+        // metadata formatting staying stable.
+        byte[] fixtureBytes;
+        try (InputStream inputStream = LibraryOfCongressTest.class.getResourceAsStream("library_of_congress_2010045158_mods.xml")) {
+            assertTrue(inputStream != null);
+            fixtureBytes = inputStream.readAllBytes();
+        }
+        URLDownload urlDownload = mock(URLDownload.class);
+        when(urlDownload.asInputStream()).thenReturn(new ProgressInputStream(new ByteArrayInputStream(fixtureBytes), fixtureBytes.length));
+        LibraryOfCongress spyFetcher = spy(fetcher);
+        doReturn(urlDownload).when(spyFetcher).getUrlDownload(any());
+
         BibEntry expected = new BibEntry()
                 .withField(StandardField.ADDRESS, "mau, Burlington, MA")
                 .withField(StandardField.AUTHOR, "West, Matthew")
@@ -55,7 +76,7 @@ class LibraryOfCongressTest {
                 .withField(StandardField.YEAR, "2011");
         expected.setType(StandardEntryType.Book);
 
-        assertEquals(Optional.of(expected), fetcher.performSearchById("2010045158"));
+        assertEquals(Optional.of(expected), spyFetcher.performSearchById("2010045158"));
     }
 
     @Test
