@@ -11,7 +11,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.undo.UndoManager;
+import org.jabref.model.undo.UndoManager;
 
 import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;

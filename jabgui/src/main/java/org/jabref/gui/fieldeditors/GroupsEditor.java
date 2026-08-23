@@ -8,13 +8,13 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.undo.UndoManager;
 
 import com.airhacks.afterburner.injection.Injector;
 

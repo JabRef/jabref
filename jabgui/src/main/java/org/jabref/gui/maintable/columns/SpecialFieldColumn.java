@@ -17,7 +17,6 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.SpecialFieldComparator;
@@ -26,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.model.undo.UndoManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;

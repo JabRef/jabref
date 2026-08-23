@@ -3,10 +3,10 @@ package org.jabref.gui.mergeentries;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.UndoManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

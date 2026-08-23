@@ -35,7 +35,6 @@ import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
@@ -50,6 +49,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;

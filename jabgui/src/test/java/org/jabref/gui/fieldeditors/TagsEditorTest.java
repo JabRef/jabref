@@ -13,11 +13,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +14,7 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.undo.UndoManager;
 
 public class GroupTreeNodeViewModel {
     private final GroupTreeNode node;

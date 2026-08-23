@@ -1,6 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import org.jabref.gui.undo.CompoundEdit;
+import org.jabref.model.undo.CompoundEdit;
 
 public class AutomaticFieldEditorUndoableEdit extends CompoundEdit {
     int affectedEntries;

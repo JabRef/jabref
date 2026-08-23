@@ -3,10 +3,10 @@ package org.jabref.gui.edit.automaticfiededitor;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableFieldChange;
 
 public class MoveFieldValueAction extends SimpleCommand {

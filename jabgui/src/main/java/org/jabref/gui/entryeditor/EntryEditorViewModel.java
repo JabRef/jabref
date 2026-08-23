@@ -25,7 +25,6 @@ import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -35,6 +34,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.UndoManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;

@@ -11,7 +11,6 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,6 +18,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 

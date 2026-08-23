@@ -11,6 +11,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.undo.ChangeSet;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.undo.UndoableRemoveString;
 

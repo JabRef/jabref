@@ -12,7 +12,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrMyPdfEngine;
@@ -23,6 +22,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;

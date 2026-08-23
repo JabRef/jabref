@@ -13,12 +13,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TableColumn;
 
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.undo.UndoManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;

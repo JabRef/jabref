@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 public class CustomFieldEditorViewModel extends StringMapBasedEditorViewModel {
 

@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.undo.CompoundEdit;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

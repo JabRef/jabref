@@ -2,10 +2,10 @@ package org.jabref.gui.collab.entrydelete;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableRemoveEntries;
 
 public final class EntryDelete extends DatabaseChange {

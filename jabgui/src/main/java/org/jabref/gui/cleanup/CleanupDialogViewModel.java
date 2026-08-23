@@ -16,8 +16,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.CompoundEdit;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -31,6 +29,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoManager;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

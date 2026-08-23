@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -14,6 +13,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Langid;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

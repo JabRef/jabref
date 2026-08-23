@@ -15,7 +15,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdFetcher;
@@ -27,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.undo.UndoManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;

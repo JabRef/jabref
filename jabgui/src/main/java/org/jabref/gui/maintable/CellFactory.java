@@ -10,10 +10,10 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoManager;
 
 public class CellFactory {
 

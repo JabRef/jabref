@@ -1,10 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 public class OwnerEditorViewModel extends AbstractEditorViewModel {
     private final CliPreferences preferences;

@@ -30,7 +30,6 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
@@ -51,6 +50,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;

@@ -15,7 +15,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
@@ -25,6 +24,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.undo.UndoManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;

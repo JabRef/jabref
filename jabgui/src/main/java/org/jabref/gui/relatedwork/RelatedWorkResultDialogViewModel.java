@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.UndoManager;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;

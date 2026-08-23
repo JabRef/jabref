@@ -17,9 +17,9 @@ import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.gui.collab.stringchange.BibTexStringChange;
 import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.undo.CompoundEdit;
 
 public sealed abstract class DatabaseChange permits EntryAdd, EntryChange, EntryDelete, GroupChange, MetadataChange, PreambleChange, BibTexStringAdd, BibTexStringChange, BibTexStringDelete, BibTexStringRename {
     protected final BibDatabaseContext databaseContext;

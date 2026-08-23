@@ -7,8 +7,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.CompoundEdit;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
@@ -19,6 +17,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 
 import org.slf4j.Logger;

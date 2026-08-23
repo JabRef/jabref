@@ -32,7 +32,6 @@ import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -42,6 +41,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.undo.UndoManager;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

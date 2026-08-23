@@ -14,13 +14,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;

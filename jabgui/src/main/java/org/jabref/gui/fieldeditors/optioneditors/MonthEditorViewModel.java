@@ -6,12 +6,12 @@ import java.util.Collection;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     private final BibDatabaseMode databaseMode;

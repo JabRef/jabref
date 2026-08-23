@@ -30,7 +30,6 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -42,6 +41,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.undo.UndoManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 

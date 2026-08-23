@@ -10,8 +10,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.CompoundEdit;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -20,6 +18,8 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 
 public class GenerateCitationKeyAction extends SimpleCommand {

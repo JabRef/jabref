@@ -13,13 +13,13 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;

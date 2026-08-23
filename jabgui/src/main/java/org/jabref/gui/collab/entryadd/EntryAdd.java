@@ -2,10 +2,10 @@ package org.jabref.gui.collab.entryadd;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableInsertEntries;
 
 public final class EntryAdd extends DatabaseChange {

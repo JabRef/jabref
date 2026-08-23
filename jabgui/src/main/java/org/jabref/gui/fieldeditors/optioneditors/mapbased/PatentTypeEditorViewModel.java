@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 public class PatentTypeEditorViewModel extends StringMapBasedEditorViewModel {
 

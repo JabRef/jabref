@@ -51,7 +51,7 @@ import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.undo.UndoManager;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;

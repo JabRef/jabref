@@ -9,6 +9,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.undo.UndoManager;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 

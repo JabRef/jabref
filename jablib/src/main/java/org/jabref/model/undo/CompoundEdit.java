@@ -1,4 +1,4 @@
-package org.jabref.gui.undo;
+package org.jabref.model.undo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.undo.BibChange;
-import org.jabref.model.undo.ChangeSet;
-import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 

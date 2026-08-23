@@ -2,10 +2,10 @@ package org.jabref.gui.collab.metedatachange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.undo.CompoundEdit;
 
 public final class MetadataChange extends DatabaseChange {
     private final MetaDataDiff metaDataDiff;

@@ -35,7 +35,6 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
@@ -50,6 +49,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;

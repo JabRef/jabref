@@ -2,12 +2,12 @@ package org.jabref.gui.collab.groupchange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableModifySubtree;
 
 public final class GroupChange extends DatabaseChange {

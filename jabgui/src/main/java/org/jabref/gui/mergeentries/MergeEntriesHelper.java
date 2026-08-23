@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.model.FieldChange;
@@ -14,6 +13,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableChangeType;
 import org.jabref.model.undo.UndoableFieldChange;
 

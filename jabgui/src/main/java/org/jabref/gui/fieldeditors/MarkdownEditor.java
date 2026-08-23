@@ -18,7 +18,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -26,6 +25,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoManager;
 
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import org.slf4j.Logger;

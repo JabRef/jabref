@@ -3,10 +3,10 @@ package org.jabref.gui.menus;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableChangeType;
 
 public class ChangeEntryTypeAction extends SimpleCommand {
