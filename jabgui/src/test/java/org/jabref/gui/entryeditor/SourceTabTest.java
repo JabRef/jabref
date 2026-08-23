@@ -32,6 +32,7 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -108,5 +109,28 @@ class SourceTabTest {
 
         // No exception should be thrown
         robot.interrupt(100);
+    }
+
+    @Test
+    void updatingPreviouslyBoundEntryDoesNotResetCurrentSource(FxRobot robot) {
+        BibEntry firstEntry = new BibEntry().withField(new UnknownField("title"), "First entry");
+        BibEntry secondEntry = new BibEntry().withField(new UnknownField("title"), "Second entry");
+
+        robot.interact(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(firstEntry);
+            sourceTab.notifyAboutFocus(firstEntry);
+
+            sourceTab.currentEntryProperty().set(secondEntry);
+            sourceTab.notifyAboutFocus(secondEntry);
+
+            jfx.incubator.scene.control.richtext.CodeArea sourceArea =
+                    (jfx.incubator.scene.control.richtext.CodeArea) sourceTab.getContent();
+            sourceArea.clear();
+            sourceArea.appendText("Unsaved source for the second entry");
+
+            firstEntry.setField(new UnknownField("author"), "Author");
+            assertEquals("Unsaved source for the second entry", sourceArea.getText());
+        });
     }
 }

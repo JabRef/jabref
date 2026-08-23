@@ -24,6 +24,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 
 public class EditSeparate {
 
@@ -31,6 +32,7 @@ public class EditSeparate {
     }
 
     public static OOResult<Boolean, JabRefException> separateCitations(XTextDocument doc,
+                                                                       XComponentContext context,
                                                                        OOFrontend frontend,
                                                                        List<BibDatabase> databases,
                                                                        JStyle style) {
@@ -74,6 +76,7 @@ public class EditSeparate {
 
                         UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                                 doc,
+                                context,
                                 List.of(citation.citationKey),
                                 List.of(citation.getPageInfo()),
                                 group.citationType,

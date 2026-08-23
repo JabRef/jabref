@@ -109,6 +109,18 @@ public class EntryEditorTabFactory {
                                                   : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
+            // Custom tabs have no preference-driven visibility gate: they exist exactly while configured,
+            // and hide themselves via content-driven visibility when their patterns resolve to no fields.
+            case EntryEditorTabModel.CustomizedFieldsTab customTab ->
+                    new UserDefinedFieldsTab(
+                            customTab,
+                            undoManager,
+                            undoAction,
+                            redoAction,
+                            preferences,
+                            journalAbbreviationRepository,
+                            stateManager,
+                            previewPanel);
         };
     }
 
