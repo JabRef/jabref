@@ -1,6 +1,7 @@
 package org.jabref.gui.exporter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -37,6 +40,8 @@ import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -162,6 +167,30 @@ class SaveDatabaseActionTest {
     void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         boolean result = saveDatabaseAction.save();
+        assertFalse(result);
+    }
+
+    @Test
+    @ExtendWith(ApplicationExtension.class)
+    void encodingRetryAbortsWhenFileWasSavedExternallyWhileDialogWasOpen() throws Exception {
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Café");
+        entry.setChanged(true);
+        BibDatabase database = new BibDatabase(List.of(entry));
+        saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
+        when(dbContext.getMetaData().getEncoding()).thenReturn(Optional.of(StandardCharsets.US_ASCII));
+        // "Café" is not encodable in US-ASCII, so the encoding-problems dialog opens. While it is open, another
+        // program saves the file; the user then chooses to retry with a different encoding.
+        when(dialogService.showCustomDialogAndWait(any(String.class), any(DialogPane.class), any(ButtonType.class), any(ButtonType.class)))
+                .thenAnswer(invocation -> {
+                    Files.writeString(file, "external content");
+                    ButtonType tryDifferentEncoding = invocation.getArgument(3);
+                    return Optional.of(tryDifferentEncoding);
+                });
+        when(dialogService.showChoiceDialogAndWait(any(), any(), any(), any(), any())).thenReturn(Optional.of(StandardCharsets.UTF_8));
+
+        boolean result = saveDatabaseAction.save();
+
+        assertEquals("external content", Files.readString(file));
         assertFalse(result);
     }
 

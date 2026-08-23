@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +47,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -299,13 +302,29 @@ public class SaveDatabaseAction {
             // Deliberately outside the try-with-resources: the retry must run after the writer above committed its
             // content, otherwise the writer's close() would overwrite the re-encoded file with the problematic one
             if (!encodingProblems.isEmpty()) {
-                saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder);
+                saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder, FileState.read(file));
             }
             return true;
         }
     }
 
-    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
+    /// Size and modification time of the library file as committed by the save above, used to detect a concurrent
+    /// save while the encoding dialogs of [#saveWithDifferentEncoding] are open. `null` when the attributes cannot be
+    /// read, which disables the detection.
+    private record FileState(long size, FileTime lastModified) {
+        @Nullable
+        static FileState read(Path file) {
+            try {
+                BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
+                return new FileState(attributes.size(), attributes.lastModifiedTime());
+            } catch (IOException exception) {
+                LOGGER.debug("Could not read attributes of {}", file, exception);
+                return null;
+            }
+        }
+    }
+
+    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder, @Nullable FileState committedState) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
@@ -329,6 +348,12 @@ public class SaveDatabaseAction {
                     encoding,
                     OS.ENCODINGS);
             if (newEncoding.isPresent()) {
+                if (committedState != null && !committedState.equals(FileState.read(file))) {
+                    // Another program saved the file while the encoding dialogs were open; the retry would take that
+                    // version as its baseline and overwrite it, so it is aborted like any other concurrent-save
+                    // conflict
+                    throw new SaveException(new FileChangedException(file));
+                }
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
 
