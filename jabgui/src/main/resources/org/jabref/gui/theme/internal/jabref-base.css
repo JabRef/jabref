@@ -1476,8 +1476,14 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* GroupTree */
 
+.sidePaneComponent,
+#preferencesDialog #sidepane,
+#groupTree {
+    -fx-background-color: -color-bg-sidepane;
+}
+
 #groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell {
-    -fx-background: -color-bg-alt;
+    -fx-background: -color-bg-sidepane;
 }
 
 #groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
@@ -1909,7 +1915,7 @@ journalInfo .grid-cell-b {
 }
 
 .quick-settings-button {
-    -fx-background-color: derive(-color-bg-tertiary, 10%);
+    -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.333em;

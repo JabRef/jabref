@@ -12,13 +12,15 @@
 @media (prefers-color-scheme: light) {
     * {
         /* Surfaces, from the window canvas outwards to the raised chrome */
-        -color-bg-primary: #FFFFFF;
+        -color-bg-primary: #F3F3F3;
         -color-bg-secondary: #FEFEFE;
-        -color-bg-tertiary: #F4F4F4;
+        -color-bg-tertiary: #FAFAFA;
         -color-bg-overlay: #FEFEFE;
         /* Alternating rows in tables and lists */
         -color-bg-alt: derive(-color-bg-secondary, -5%);
         -color-bg-search: #FBFBFB;
+        /* Side pane (web search, groups) and the preferences navigation */
+        -color-bg-sidepane: #DDDDDD;
 
         /* Foreground */
         -color-fg-default: #000000;
@@ -109,6 +111,8 @@
         /* Alternating rows in tables and lists */
         -color-bg-alt: derive(-color-bg-secondary, -5%);
         -color-bg-search: #2C2E3B;
+        /* Side pane (web search, groups) and the preferences navigation */
+        -color-bg-sidepane: #212330;
 
         /* Foreground */
         -color-fg-default: #E5E7EA;
@@ -576,7 +580,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-bg-primary;
 }
 
 .tab-pane > .tab-header-area {

@@ -130,6 +130,7 @@
         -color-bg-secondary: -color-bg-default;
         -color-bg-tertiary: -color-bg-subtle;
         -color-bg-search: -color-bg-inset;
+        -color-bg-sidepane: -color-bg-inset;
         -color-bg-alt: -color-bg-subtle;
 
         /* Foreground (-color-fg-default/-muted/-subtle/-emphasis come from Primer) */
@@ -317,6 +318,7 @@
         -color-bg-secondary: -color-bg-default;
         -color-bg-tertiary: -color-bg-subtle;
         -color-bg-search: -color-bg-inset;
+        -color-bg-sidepane: -color-bg-inset;
         -color-bg-alt: -color-bg-subtle;
 
         /* Foreground (-color-fg-default/-muted/-subtle/-emphasis come from Primer) */
