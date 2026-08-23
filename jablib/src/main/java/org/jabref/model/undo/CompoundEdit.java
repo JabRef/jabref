@@ -5,18 +5,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.FieldChange;
 
 import org.jspecify.annotations.NullMarked;
 
 /// Collects the changes of one user action so they undo as one step.
 ///
-/// Usually obtained from [UndoManager#addEdit], which owns the recorder's lifetime and pushes
-/// what it collected. Constructing one directly is for the commands that cannot use a block:
-/// those that collect on a background thread and push on the JavaFX thread, or that abandon
-/// the operation part-way through. Those hand [UndoManager#addEdit] the result of
-/// [#toChangeSet] themselves.
+/// Usually obtained from [org.jabref.logic.undo.UndoManager#addEdit], which owns the recorder's
+/// lifetime and pushes what it collected. Constructing one directly is for the commands that
+/// cannot use a block: those that collect on a background thread and push on the JavaFX
+/// thread, or that abandon the operation part-way through. Those hand
+/// [org.jabref.logic.undo.UndoManager#addEdit] the result of [#toChangeSet] themselves.
 ///
 /// The overloads taking [FieldChange] exist because that is what the model already returns
 /// from `setField`, `putKeywords`, `setCitationKey` and friends, so recording a change is a
