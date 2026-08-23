@@ -11,6 +11,7 @@ import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class UndoManager {
     /// there is one manager for the application and long commands record from background tasks:
     /// a shared field would fold edits the user makes meanwhile into the background command's
     /// step, and would have two threads appending to one recorder's list.
-    private final ThreadLocal<CompoundEdit> active = new ThreadLocal<>();
+    private final ThreadLocal<@Nullable CompoundEdit> active = new ThreadLocal<>();
 
     /// Records a single change as its own undo step, or as part of the enclosing step when
     /// called inside [#addEdit].
@@ -82,9 +83,9 @@ public class UndoManager {
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
     public void addEdit(BibChange change) {
-        CompoundEdit recorder = active.get();
-        if (recorder != null) {
-            recorder.addEdit(change);
+        CompoundEdit compound = active.get();
+        if (compound != null) {
+            compound.addEdit(change);
             return;
         }
         // A set that collected nothing is not an undo step. Pushing one would enable Undo and

@@ -1,5 +1,7 @@
 package org.jabref.model.undo;
 
+import org.jspecify.annotations.NullMarked;
+
 /// A single reversible modification of a library.
 ///
 /// Implementations are value objects: they hold the data needed to perform the change and the
@@ -9,8 +11,18 @@ package org.jabref.model.undo;
 ///
 /// Implementations carry no user-facing text. A description exists only at the granularity a
 /// user acts in, as the name of the enclosing [ChangeSet].
-public sealed interface BibChange
-        permits ChangeSet, UndoableInsertEntries, UndoableRemoveEntries, UndoableChangeType, UndoableFieldChange, UndoableModifySubtree, UndoablePreambleChange, UndoableStringChange, UndoableInsertString, UndoableRemoveString {
+@NullMarked
+public sealed interface BibChange permits
+        ChangeSet,
+        UndoableInsertEntries,
+        UndoableRemoveEntries,
+        UndoableChangeType,
+        UndoableFieldChange,
+        UndoableModifySubtree,
+        UndoablePreambleChange,
+        UndoableStringChange,
+        UndoableInsertString,
+        UndoableRemoveString {
 
     /// The change that reverses this one.
     ///
