@@ -329,10 +329,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         return viewModel.getCurrentlyEditedEntry();
     }
 
-    public List<EntryEditorTab> getAllPossibleTabs() {
-        return viewModel.getAllPossibleTabs();
-    }
-
     private void onEntryChanged(@NonNull BibEntry entry) {
         // Tabs observe viewModel.currentlyEditedEntryProperty() directly (bound in rebuildTabs), so no fan-out here.
         // Type changes are handled by onEntryTypeChanged via the view model's single type subscription.

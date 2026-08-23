@@ -167,11 +167,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return unmodifiableVisibleTabs;
     }
 
-    /// All tabs that can possibly be shown for the current entry (regardless of visibility), in display order.
-    public List<EntryEditorTab> getAllPossibleTabs() {
-        return List.copyOf(allPossibleTabs);
-    }
-
     /// The tab the editor should select when it (re)binds to an entry: the Source tab when the user opted
     /// into "show source by default", otherwise empty (the editor keeps the current selection). The policy
     /// lives here, not in the view.

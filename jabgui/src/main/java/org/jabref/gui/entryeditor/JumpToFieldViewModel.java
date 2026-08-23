@@ -1,13 +1,16 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 
 public class JumpToFieldViewModel extends AbstractViewModel {
 
@@ -23,14 +26,23 @@ public class JumpToFieldViewModel extends AbstractViewModel {
     }
 
     public List<String> getFieldNames() {
-        if (entryEditor.getCurrentlyEditedEntry() == null) {
+        BibEntry entry = entryEditor.getCurrentlyEditedEntry();
+        if (entry == null) {
             return List.of();
         }
 
-        return FieldFactory.getAllFieldsWithOutInternal().stream()
-                           .map(Field::getName)
-                           .distinct()
-                           .sorted()
-                           .toList();
+        return suggestedFields(entry).stream()
+                                     .map(Field::getName)
+                                     .distinct()
+                                     .sorted()
+                                     .toList();
+    }
+
+    private List<Field> suggestedFields(BibEntry entry) {
+        List<Field> suggestedFields = new ArrayList<>();
+        suggestedFields.add(InternalField.KEY_FIELD);
+        suggestedFields.addAll(entry.getFields());
+        suggestedFields.addAll(FieldFactory.getAllFieldsWithOutInternal());
+        return suggestedFields;
     }
 }
