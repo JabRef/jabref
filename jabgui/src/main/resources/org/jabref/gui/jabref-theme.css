@@ -180,6 +180,36 @@
     -fx-padding: 0.5em;
 }
 
+.citation-key-editor,
+.journal-editor,
+.identifier-editor,
+.issn-editor {
+    -fx-spacing: 0.333em;
+}
+
+.citation-key-editor-button {
+    -fx-padding: 0.333em 1em;
+}
+
+#generateCitationKeyButton {
+    -fx-padding: 0.333em 1em;
+}
+
+.citation-key-editor {
+    -fx-spacing: 0.333em;
+}
+
+#journalInfoButton,
+#toggleAbbreviationButton{
+.journal-editor-button{
+    -fx-padding: 0.4em 0.5em 0.3em 0.5em;
+}
+
+.identifier-editor-button,
+.issn-editor-button{
+    -fx-padding: 0.3em 0.5em 0.4em 0.5em;
+}
+
 .icon-buttonNoSpaceBottom:hover,
 .icon-buttonNoSpaceTop:hover,
 .icon-button:hover {
