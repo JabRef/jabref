@@ -10,18 +10,16 @@ import java.nio.channels.FileChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.jspecify.annotations.NullMarked;
@@ -89,16 +87,16 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private final FileCopyOperation backupFileCopyOperation;
 
-    /// State of the target file when this stream was opened. `null` if the attributes could not be read, in which case
-    /// concurrent-change detection is disabled for this write.
-    @Nullable private final TargetFileSnapshot targetFileSnapshot;
+    /// The state the target file must still be in when this stream commits: an inherited baseline (see the
+    /// [#AtomicFileOutputStream(Path,boolean,FileSnapshot)] constructor), or the state at stream creation. `null` if
+    /// the attributes could not be read, in which case concurrent-change detection is disabled for this write.
+    @Nullable private final FileSnapshot expectedTargetFileState;
+
+    /// State of the target file right after a successful commit; `null` before the commit, after an aborted or failed
+    /// one, and when the attributes could not be read.
+    @Nullable private FileSnapshot committedTargetFileState;
 
     private boolean errorDuringWrite = false;
-
-    /// Existence, size, and modification time of the target file, used to detect writes by other processes.
-    private record TargetFileSnapshot(boolean exists, long size, @Nullable FileTime lastModifiedTime) {
-        private static final TargetFileSnapshot ABSENT = new TargetFileSnapshot(false, -1, null);
-    }
 
     @FunctionalInterface
     interface FileMoveOperation {
@@ -115,26 +113,41 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// @param path       the path of the file to write to or replace
     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
+        this(path, keepBackup, null);
+    }
+
+    /// Creates a new output stream to write to or replace the file at the specified path, verifying against an
+    /// inherited baseline instead of the file's state at stream creation.
+    ///
+    /// @param path          the path of the file to write to or replace
+    /// @param keepBackup    whether to keep the backup file (.sav) after a successful write process
+    /// @param expectedState the state the target file is expected to (still) be in when this stream commits — a
+    ///                      snapshot from an earlier point of the same logical operation, so that a concurrent write
+    ///                      landing before this stream was even opened is still detected; `null` to verify against
+    ///                      the state at stream creation
+    public AtomicFileOutputStream(Path path, boolean keepBackup, @Nullable FileSnapshot expectedState) throws IOException {
+        this(path, createTemporaryFile(path), keepBackup, expectedState, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// The temporary file is opened as a [FileChannel], because the channel is needed for [FileChannel#force(boolean)].
     /// `Files.newOutputStream(...)` returns a `sun.nio.ch.ChannelOutputStream`, which does not offer it.
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
         this(path,
                 pathOfTemporaryFile,
                 FileChannel.open(pathOfTemporaryFile, StandardOpenOption.WRITE),
                 keepBackup,
+                expectedState,
                 fileMoveOperation,
                 backupFileCopyOperation);
     }
 
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
         this(path,
                 pathOfTemporaryFile,
                 Channels.newOutputStream(temporaryFileChannel),
                 temporaryFileChannel,
                 keepBackup,
+                expectedState,
                 fileMoveOperation,
                 backupFileCopyOperation);
     }
@@ -159,7 +172,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Required for proper testing
     AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
-        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, fileMoveOperation, backupFileCopyOperation);
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, null, fileMoveOperation, backupFileCopyOperation);
     }
 
     private AtomicFileOutputStream(Path path,
@@ -167,6 +180,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                                    OutputStream temporaryFileOutputStream,
                                    @Nullable FileChannel temporaryFileChannel,
                                    boolean keepBackup,
+                                   @Nullable FileSnapshot expectedState,
                                    FileMoveOperation fileMoveOperation,
                                    FileCopyOperation backupFileCopyOperation) throws IOException {
         super(temporaryFileOutputStream);
@@ -177,35 +191,33 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this.temporaryFileChannel = temporaryFileChannel;
         this.fileMoveOperation = fileMoveOperation;
         this.backupFileCopyOperation = backupFileCopyOperation;
-        this.targetFileSnapshot = snapshotTargetFile(path);
+        this.expectedTargetFileState = expectedState != null ? expectedState : FileSnapshot.read(path);
     }
 
-    @Nullable
-    private static TargetFileSnapshot snapshotTargetFile(Path targetFile) {
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(targetFile, BasicFileAttributes.class);
-            return new TargetFileSnapshot(true, attributes.size(), attributes.lastModifiedTime());
-        } catch (NoSuchFileException exception) {
-            return TargetFileSnapshot.ABSENT;
-        } catch (IOException exception) {
-            LOGGER.warn("Could not read attributes of {}. Concurrent-change detection is disabled for this write.", targetFile, exception);
-            return null;
-        }
-    }
-
-    /// Best-effort lost-update guard: detects whether another process modified the target file after this stream was
-    /// opened. Comparison is based on size and modification time, so a concurrent write within the file system's
-    /// timestamp resolution that also keeps the size identical goes undetected. There is also an unavoidable race
-    /// between this check and the subsequent commit; the check is therefore repeated as late as possible.
+    /// Best-effort lost-update guard: detects whether another process modified the target file after the expected
+    /// baseline state was captured. See [FileSnapshot] for the limits of the comparison; additionally, there is an
+    /// unavoidable race between this check and the subsequent commit, so the check is repeated as late as possible.
+    /// An unreadable current state does not abort the write (the commit itself will surface real I/O problems).
     // [impl->req~logic.exporter.concurrent-save-detection~1]
     private void ensureTargetFileUnchanged() throws FileChangedException {
-        if (targetFileSnapshot == null) {
+        if (expectedTargetFileState == null) {
             return;
         }
-        TargetFileSnapshot currentState = snapshotTargetFile(targetFile);
-        if (currentState != null && !targetFileSnapshot.equals(currentState)) {
+        FileSnapshot currentState = FileSnapshot.read(targetFile);
+        if (currentState != null && !expectedTargetFileState.equals(currentState)) {
             throw new FileChangedException(targetFile);
         }
+    }
+
+    /// Returns the state of the target file as written by this stream, captured immediately after the successful
+    /// commit. Callers spanning a longer logical operation (e.g. a save that may be retried with a different encoding
+    /// after a user dialog) can pass it as the expected state of a follow-up stream, so that the whole operation is
+    /// guarded against concurrent writes — including the time between the two streams.
+    ///
+    /// @return the committed state, or `null` when the stream did not commit (yet) or the attributes could not be read
+    @Nullable
+    public FileSnapshot getCommittedTargetFileState() {
+        return committedTargetFileState;
     }
 
     private static Path createTemporaryFile(Path targetFile) throws IOException {
@@ -338,6 +350,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 // Move temporary file (replace original if it exists)
                 moveTemporaryFileToTargetFile(backupCreated);
             }
+
+            // Captured directly after the commit, so the window in which a concurrent write could be mistaken for our
+            // own is as small as possible
+            committedTargetFileState = FileSnapshot.read(targetFile);
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {

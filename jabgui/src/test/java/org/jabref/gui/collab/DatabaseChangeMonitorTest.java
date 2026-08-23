@@ -69,13 +69,15 @@ class DatabaseChangeMonitorTest {
     }
 
     @Test
-    void suspendChangeDetectionKeepsWatchingAndRescansOnResume(@TempDir Path tempDir) {
+    void suspendChangeDetectionKeepsWatchingAndRescansOnResume(@TempDir Path tempDir) throws Exception {
         Path monitoredPath = tempDir.resolve("library.bib");
+        Files.writeString(monitoredPath, "@misc{a,}");
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
         DatabaseChangeMonitor monitor = createMonitor(monitoredPath, fileUpdateMonitor, taskExecutor);
 
         monitor.suspendChangeDetection();
+        Files.writeString(monitoredPath, "@misc{a,}\n@misc{b,}");
         monitor.fileUpdated();
 
         verify(fileUpdateMonitor, never()).removeListener(eq(monitoredPath), eq(monitor));
@@ -87,12 +89,14 @@ class DatabaseChangeMonitorTest {
     }
 
     @Test
-    void multipleFileUpdatesDuringSuspensionScheduleOneScanOnResume(@TempDir Path tempDir) {
+    void multipleFileUpdatesDuringSuspensionScheduleOneScanOnResume(@TempDir Path tempDir) throws Exception {
         Path monitoredPath = tempDir.resolve("library.bib");
+        Files.writeString(monitoredPath, "@misc{a,}");
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
         DatabaseChangeMonitor monitor = createMonitor(monitoredPath, mock(FileUpdateMonitor.class), taskExecutor);
 
         monitor.suspendChangeDetection();
+        Files.writeString(monitoredPath, "@misc{a,}\n@misc{b,}");
         monitor.fileUpdated();
         monitor.fileUpdated();
 
@@ -139,7 +143,7 @@ class DatabaseChangeMonitorTest {
         monitor.suspendChangeDetection();
         // Simulate JabRef's own save: the file changes, then is marked consistent before the monitor resumes
         Files.writeString(monitoredPath, "@misc{a,}\n@misc{b,}");
-        monitor.markConsistentWithDisk();
+        monitor.markConsistentWithDisk(null);
         monitor.fileUpdated();
         monitor.resumeChangeDetection();
 

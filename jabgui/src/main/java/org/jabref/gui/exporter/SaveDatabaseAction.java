@@ -6,8 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +39,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -125,7 +124,7 @@ public class SaveDatabaseAction {
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
+                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder(), null);
                 preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -238,14 +237,12 @@ public class SaveDatabaseAction {
             // Make sure to remember which encoding we used
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
-            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder());
+            FileSnapshot committedState = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder(), null);
 
-            if (success) {
-                libraryTab.getUndoManager().markUnchanged();
-                libraryTab.resetChangedProperties();
-            }
+            libraryTab.getUndoManager().markUnchanged();
+            libraryTab.resetChangedProperties(committedState);
             dialogService.notify(Localization.lang("Library saved"));
-            return success;
+            return true;
         } catch (SaveException ex) {
             if (ex.getCause() instanceof FileChangedException) {
                 LOGGER.info("Library {} was modified by another program while saving; save aborted", targetPath, ex);
@@ -266,14 +263,17 @@ public class SaveDatabaseAction {
         }
     }
 
-    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
+    /// @return the state of the file as committed by this save (or by its encoding retry), `null` when unreadable
+    @Nullable
+    private FileSnapshot saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder, @Nullable FileSnapshot expectedState) throws SaveException {
         // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
         SelfContainedSaveConfiguration saveConfiguration
                 = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
             Set<Character> encodingProblems = Set.of();
-            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
+            AtomicFileWriter fileWriter = createFileWriter(file, encoding, saveConfiguration.shouldMakeBackup(), expectedState);
+            try (fileWriter) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
@@ -299,32 +299,30 @@ public class SaveDatabaseAction {
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
+            FileSnapshot committedState = fileWriter.getCommittedTargetFileState();
             // Deliberately outside the try-with-resources: the retry must run after the writer above committed its
             // content, otherwise the writer's close() would overwrite the re-encoded file with the problematic one
             if (!encodingProblems.isEmpty()) {
-                saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder, FileState.read(file));
+                FileSnapshot retriedState = saveWithDifferentEncoding(file, selectedOnly, encoding, encodingProblems, saveType, saveOrder, committedState);
+                if (retriedState != null) {
+                    committedState = retriedState;
+                }
             }
-            return true;
+            return committedState;
         }
     }
 
-    /// Size and modification time of the library file as committed by the save above, used to detect a concurrent
-    /// save while the encoding dialogs of [#saveWithDifferentEncoding] are open. `null` when the attributes cannot be
-    /// read, which disables the detection.
-    private record FileState(long size, FileTime lastModified) {
-        @Nullable
-        static FileState read(Path file) {
-            try {
-                BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
-                return new FileState(attributes.size(), attributes.lastModifiedTime());
-            } catch (IOException exception) {
-                LOGGER.debug("Could not read attributes of {}", file, exception);
-                return null;
-            }
+    private static AtomicFileWriter createFileWriter(Path file, Charset encoding, boolean keepBackup, @Nullable FileSnapshot expectedState) throws SaveException {
+        try {
+            return new AtomicFileWriter(file, encoding, keepBackup, expectedState);
+        } catch (IOException ex) {
+            throw new SaveException("Problems saving: " + ex, ex);
         }
     }
 
-    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder, @Nullable FileState committedState) throws SaveException {
+    /// @return the state committed by the retry, or `null` when no retry happened and the first write stands
+    @Nullable
+    private FileSnapshot saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder, @Nullable FileSnapshot committedState) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
@@ -348,27 +346,20 @@ public class SaveDatabaseAction {
                     encoding,
                     OS.ENCODINGS);
             if (newEncoding.isPresent()) {
-                ensureFileUnchangedWhileDialogsWereOpen(file, committedState);
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
 
-                saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);
-                return;
+                // The committed state of the first write is the retry's expected baseline, so its writer detects a
+                // save that another program completed while the dialogs above were open
+                return saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder, committedState);
             }
         }
         // No retry happened ("Ignore", or the encoding choice was cancelled), so the first write is the result of the
         // save — unless another program overwrote it while the dialogs were open, in which case reporting success
         // would mark the library as saved although the file on disk no longer contains it
-        ensureFileUnchangedWhileDialogsWereOpen(file, committedState);
-    }
-
-    /// The encoding dialogs can stay open for a long time. A save that another program completes in that window must
-    /// not be overwritten by the retry (it would take that version as its baseline) and must not be reported as our
-    /// own successful save. Aborting through the regular concurrent-save-conflict path keeps the library marked as
-    /// changed and offers the external-changes review flow.
-    private static void ensureFileUnchangedWhileDialogsWereOpen(Path file, @Nullable FileState committedState) throws SaveException {
-        if (committedState != null && !committedState.equals(FileState.read(file))) {
+        if (committedState != null && !committedState.matches(file)) {
             throw new SaveException(new FileChangedException(file));
         }
+        return null;
     }
 }
