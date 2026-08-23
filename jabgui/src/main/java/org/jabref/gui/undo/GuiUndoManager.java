@@ -16,13 +16,13 @@ import org.jspecify.annotations.NullMarked;
 /// change from a plain unit test threw "Toolkit not initialized". Only an observer that feeds
 /// the UI needs that hop, so it lives with the observer. The journal stays plain Java.
 @NullMarked
-public class UndoManagerProperties {
+public class GuiUndoManager {
 
     private final UndoManager undoManager;
     private final ReadOnlyBooleanWrapper undoable;
     private final ReadOnlyBooleanWrapper redoable;
 
-    public UndoManagerProperties(UndoManager undoManager) {
+    public GuiUndoManager(UndoManager undoManager) {
         this.undoManager = undoManager;
         this.undoable = new ReadOnlyBooleanWrapper(undoManager.canUndo());
         this.redoable = new ReadOnlyBooleanWrapper(undoManager.canRedo());

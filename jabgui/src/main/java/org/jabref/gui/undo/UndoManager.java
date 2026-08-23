@@ -19,7 +19,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
 /// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
-/// subscribes through [UndoManagerProperties], which owns that hop.
+/// subscribes through [GuiUndoManager], which owns that hop.
 ///
 /// Stack operations are synchronized because commands push from background tasks — cleanup and
 /// import both do. [#addEdit] is not: it runs caller code, so holding the lock across it would

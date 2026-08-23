@@ -18,15 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// the JavaFX thread, and `Platform.runLater` is what requires one. The properties themselves
 /// would not.
 @ExtendWith(ApplicationExtension.class)
-class UndoManagerPropertiesTest {
+class GuiUndoManagerTest {
 
     private final UndoManager undoManager = new UndoManager();
-    private UndoManagerProperties properties;
+    private GuiUndoManager properties;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        properties = new UndoManagerProperties(undoManager);
+        properties = new GuiUndoManager(undoManager);
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 

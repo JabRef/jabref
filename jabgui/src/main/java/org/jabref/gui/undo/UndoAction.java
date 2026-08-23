@@ -17,15 +17,15 @@ public class UndoAction extends SimpleCommand {
     private final DialogService dialogService;
     private final UndoManager undoManager;
     /// Held as a field so the listener it registers on the manager stays reachable.
-    private final UndoManagerProperties undoManagerProperties;
+    private final GuiUndoManager guiUndoManager;
 
     public UndoAction(Supplier<LibraryTab> tabSupplier, UndoManager undoManager, DialogService dialogService, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
-        this.undoManagerProperties = new UndoManagerProperties(undoManager);
+        this.guiUndoManager = new GuiUndoManager(undoManager);
 
-        this.executable.bind(Bindings.and(needsDatabase(stateManager), undoManagerProperties.undoableProperty()));
+        this.executable.bind(Bindings.and(needsDatabase(stateManager), guiUndoManager.undoableProperty()));
     }
 
     @Override
