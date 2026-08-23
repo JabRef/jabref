@@ -5,7 +5,7 @@ import java.util.List;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /// This formatter takes two arguments and examines the field text.
-/// If the field text represents multiple individuals (i.e., it contains the string `and`),
+/// If the field text represents multiple individuals (i.e., it contains the string ` and ` - "and" with surrounding spaces),
 /// then the field text is replaced with the first argument,
 /// otherwise it is replaced with the second.
 ///
