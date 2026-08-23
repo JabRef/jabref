@@ -39,9 +39,15 @@ public class UndoManager {
     /// listener that touches the UI is responsible for getting itself onto the right thread.
     private final List<Runnable> listeners = new ArrayList<>();
 
-    /// Depth of the undo stack when the library was last saved, so that undoing back to it
-    /// reports the library as unchanged again.
-    private int savedDepth;
+    /// Net number of applied edits: +1 per recorded or redone change, -1 per undone one. A
+    /// counter rather than the stack depth because [#LIMIT] discards old edits from the bottom
+    /// of the stack: those edits stay applied, so the depth they leave behind no longer says
+    /// how far the library has moved from the last saved position.
+    private int revision;
+
+    /// [#revision] when the library was last saved, so that undoing back to it reports the
+    /// library as unchanged again.
+    private int savedRevision;
 
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
@@ -66,9 +72,11 @@ public class UndoManager {
             return;
         }
         undoStack.push(change);
+        revision++;
         while (undoStack.size() > LIMIT) {
+            // Only the stack is trimmed. The discarded edit remains applied to the library, so
+            // it still counts towards the distance from the last saved position.
             undoStack.removeLast();
-            savedDepth = Math.min(savedDepth, undoStack.size());
         }
         redoStack.clear();
         notifyListeners();
@@ -129,6 +137,7 @@ public class UndoManager {
         change.inverted().apply();
         undoStack.pop();
         redoStack.push(change);
+        revision--;
         notifyListeners();
     }
 
@@ -140,6 +149,7 @@ public class UndoManager {
         change.apply();
         redoStack.pop();
         undoStack.push(change);
+        revision++;
         notifyListeners();
     }
 
@@ -149,19 +159,21 @@ public class UndoManager {
 
     /// Marks the current position as saved.
     public synchronized void markUnchanged() {
-        savedDepth = undoStack.size();
+        savedRevision = revision;
     }
 
     /// Whether the library differs from the last saved position. Undoing back to that position
-    /// reports unchanged again, which is why this compares depth rather than counting edits.
+    /// reports unchanged again, which is why this compares [#revision] rather than counting
+    /// the edits still on the stack.
     public synchronized boolean hasChanged() {
-        return undoStack.size() != savedDepth;
+        return revision != savedRevision;
     }
 
     public synchronized void clear() {
         undoStack.clear();
         redoStack.clear();
-        savedDepth = 0;
+        revision = 0;
+        savedRevision = 0;
         notifyListeners();
     }
 

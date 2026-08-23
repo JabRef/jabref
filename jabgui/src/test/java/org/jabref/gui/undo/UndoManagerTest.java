@@ -202,4 +202,52 @@ class UndoManagerTest {
         undoRedoManager.undo();
         assertFalse(undoRedoManager.hasChanged());
     }
+
+    @Test
+    void editingPastTheStackLimitStillReportsChanged() {
+        // Fill the stack to its limit, then save. Every further edit trims one edit off the
+        // bottom, so the stack depth no longer moves — but the library has still changed.
+        for (int i = 0; i < 200; i++) {
+            undoRedoManager.addEdit(setAuthor("Author " + i));
+        }
+        undoRedoManager.markUnchanged();
+
+        undoRedoManager.addEdit(setAuthor("Planck"));
+        assertTrue(undoRedoManager.hasChanged());
+    }
+
+    @Test
+    void undoingEverythingAfterTrimmingReportsChanged() {
+        undoRedoManager.markUnchanged();
+        for (int i = 0; i < 200; i++) {
+            undoRedoManager.addEdit(setAuthor("Author " + i));
+        }
+
+        // The stack empties, but the edits it discarded to stay within its limit are still
+        // applied and can no longer be undone, so the library differs from the saved position.
+        while (undoRedoManager.canUndo()) {
+            undoRedoManager.undo();
+        }
+        assertTrue(undoRedoManager.hasChanged());
+    }
+
+    @Test
+    void redoingBackToTheSavedPositionReportsUnchanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+        undoRedoManager.undo();
+        assertTrue(undoRedoManager.hasChanged());
+
+        undoRedoManager.redo();
+        assertFalse(undoRedoManager.hasChanged());
+    }
+
+    @Test
+    void clearResetsTheSavedPosition() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        assertTrue(undoRedoManager.hasChanged());
+
+        undoRedoManager.clear();
+        assertFalse(undoRedoManager.hasChanged());
+    }
 }
