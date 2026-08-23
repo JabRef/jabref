@@ -1,7 +1,9 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -13,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -27,12 +30,14 @@ class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
+    private final Supplier<BibDatabaseMode> databaseModeSupplier;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource, Supplier<BibDatabaseMode> databaseModeSupplier) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
+        this.databaseModeSupplier = databaseModeSupplier;
     }
 
     // region — field focus capture / restore
@@ -81,22 +86,21 @@ class EntryEditorFocusUtils {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
                 () -> {
-                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresentOrElse(
-                            tab -> selectTabAndField(tab, aliasField),
-                            () -> addFieldViaAllFieldsTab(aliasField)
+                    Field requestedField = Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field))
+                                                   .orElse(field);
+                    getTabContainingField(requestedField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, requestedField),
+                            () -> addFieldViaAllFieldsTab(canonicalFieldForActiveMode(requestedField))
                     );
                 }
         ));
     }
 
-    private boolean focusTabShowing(Field field) {
-        return getTabContainingField(field)
-                .map(tab -> {
-                    selectTabAndField(tab, field);
-                    return true;
-                })
-                .orElse(false);
+    private Field canonicalFieldForActiveMode(Field field) {
+        Map<Field, Field> aliasesToCanonical = databaseModeSupplier.get() == BibDatabaseMode.BIBTEX
+                                               ? EntryConverter.FIELD_ALIASES_BIBLATEX_TO_BIBTEX
+                                               : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
+        return aliasesToCanonical.getOrDefault(field, field);
     }
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {

@@ -151,7 +151,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
 
-        this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
+        this.focusUtils = new EntryEditorFocusUtils(tabbed, this, () -> tabSupplier.get().getBibDatabaseContext().getMode());
 
         setupKeyBindings();
         setupDragAndDrop();
