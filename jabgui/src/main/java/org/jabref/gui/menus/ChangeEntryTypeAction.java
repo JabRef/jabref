@@ -5,9 +5,9 @@ import java.util.List;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableChangeType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.UndoableChangeType;
 
 public class ChangeEntryTypeAction extends SimpleCommand {
 
@@ -23,11 +23,11 @@ public class ChangeEntryTypeAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        undoManager.record(Localization.lang("Change entry type"), recorder ->
+        undoManager.addEdit(Localization.lang("Change entry type"), edit ->
                 entries.forEach(entry -> {
                     EntryType oldType = entry.getType();
                     if (entry.setType(type).isPresent()) {
-                        recorder.record(new UndoableChangeType(entry, oldType, type));
+                        edit.addEdit(new UndoableChangeType(entry, oldType, type));
                     }
                 }));
     }

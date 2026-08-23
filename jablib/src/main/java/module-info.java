@@ -1,6 +1,6 @@
 open module org.jabref.jablib {
     exports org.jabref.model;
-    exports org.jabref.model.change;
+    exports org.jabref.model.undo;
     exports org.jabref.logic;
 
     exports org.jabref.search;

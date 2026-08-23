@@ -11,9 +11,9 @@ import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import com.tobiasdiez.easybind.EasyObservableValue;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;

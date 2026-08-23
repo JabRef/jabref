@@ -1,4 +1,4 @@
-package org.jabref.model.change;
+package org.jabref.model.undo;
 
 import java.util.List;
 

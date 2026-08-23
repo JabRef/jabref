@@ -2,12 +2,12 @@ package org.jabref.gui.collab.entrychange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableInsertEntries;
-import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 
 public final class EntryChange extends DatabaseChange {
     private final BibEntry oldEntry;
@@ -34,10 +34,10 @@ public final class EntryChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(ChangeRecorder recorder) {
+    public void applyChange(CompoundEdit undoEdit) {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
-        recorder.record(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
-        recorder.record(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
+        undoEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
     }
 }

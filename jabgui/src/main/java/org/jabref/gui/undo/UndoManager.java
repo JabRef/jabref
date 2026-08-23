@@ -6,8 +6,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jabref.model.change.BibChange;
-import org.jabref.model.change.ChangeSet;
+import org.jabref.model.undo.BibChange;
+import org.jabref.model.undo.ChangeSet;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -22,7 +22,7 @@ import org.jspecify.annotations.NullMarked;
 /// subscribes through [UndoManagerProperties], which owns that hop.
 ///
 /// Stack operations are synchronized because commands push from background tasks — cleanup and
-/// import both do. [#record] is not: it runs caller code, so holding the lock across it would
+/// import both do. [#addEdit] is not: it runs caller code, so holding the lock across it would
 /// invite deadlock, and one recording block at a time is what commands actually do.
 @NullMarked
 public class UndoManager {
@@ -42,21 +42,21 @@ public class UndoManager {
     /// reports the library as unchanged again.
     private int savedDepth;
 
-    /// Set exactly while a [#record] block is in progress *on this thread*. Per-thread because
+    /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
     /// a shared field would fold edits the user makes meanwhile into the background command's
     /// step, and would have two threads appending to one recorder's list.
-    private final ThreadLocal<ChangeRecorder> active = new ThreadLocal<>();
+    private final ThreadLocal<CompoundEdit> active = new ThreadLocal<>();
 
     /// Records a single change as its own undo step, or as part of the enclosing step when
-    /// called inside [#record].
+    /// called inside [#addEdit].
     ///
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
     public synchronized void addEdit(BibChange change) {
-        ChangeRecorder recorder = active.get();
+        CompoundEdit recorder = active.get();
         if (recorder != null) {
-            recorder.record(change);
+            recorder.addEdit(change);
             return;
         }
         // A set that collected nothing is not an undo step. Pushing one would enable Undo and
@@ -83,9 +83,9 @@ public class UndoManager {
     /// undo step, so one user action stays one undo step even when a command delegates.
     ///
     /// @return whether anything was recorded, for callers that report the outcome to the user
-    public boolean record(String name, Consumer<ChangeRecorder> mutations) {
-        ChangeRecorder enclosing = active.get();
-        ChangeRecorder recorder = new ChangeRecorder(name);
+    public boolean addEdit(String name, Consumer<CompoundEdit> mutations) {
+        CompoundEdit enclosing = active.get();
+        CompoundEdit recorder = new CompoundEdit(name);
 
         active.set(recorder);
         try {
@@ -105,7 +105,7 @@ public class UndoManager {
         if (enclosing == null) {
             addEdit(changeSet);
         } else {
-            enclosing.record(changeSet);
+            enclosing.addEdit(changeSet);
         }
         return true;
     }

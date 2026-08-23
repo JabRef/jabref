@@ -9,7 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -63,7 +63,7 @@ class EditFieldContentTabViewModelTest {
         editFieldContentViewModel = new EditFieldContentViewModel(
                 bibDatabase,
                 List.of(entryA, entryB),
-                mock(ChangeRecorder.class),
+                mock(CompoundEdit.class),
                 dialogService,
                 stateManager);
     }

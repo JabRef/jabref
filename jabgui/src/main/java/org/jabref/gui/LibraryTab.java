@@ -72,8 +72,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
-import org.jabref.model.change.UndoableInsertEntries;
-import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -91,6 +89,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -482,7 +482,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
-        getUndoManager().record(Localization.lang("Save actions"), recorder -> recorder.recordAll(changes));
+        getUndoManager().addEdit(Localization.lang("Save actions"), edit -> edit.addAll(changes));
     }
 
     private void createMainTable() {

@@ -64,10 +64,10 @@ public class SpecialFieldAction extends SimpleCommand {
                 return;
             }
             List<BibEntry> besCopy = new ArrayList<>(bes);
-            boolean anyChange = undoManager.record(undoText, recorder -> {
+            boolean anyChange = undoManager.addEdit(undoText, edit -> {
                 for (BibEntry bibEntry : besCopy) {
                     // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                    recorder.record(UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame));
+                    edit.addEdit(UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame));
                 }
             });
             if (anyChange) {

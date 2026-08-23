@@ -6,14 +6,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableChangeType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.UndoableChangeType;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -49,10 +49,10 @@ class UpdateOriginalEntry {
 
     /// If any differences are found between the original entry and the merged entry, the original entry will be updated with the merged entry's information.
     private void updateOriginalEntry(BibEntry mergedEntry) {
-        boolean edited = undoManager.record(editName, recorder -> {
-            updateEntryType(mergedEntry, recorder);
+        boolean edited = undoManager.addEdit(editName, edit -> {
+            updateEntryType(mergedEntry, edit);
             if (!mergedEntry.getFields().isEmpty()) {
-                updateFields(mergedEntry, recorder);
+                updateFields(mergedEntry, edit);
             }
         });
 
@@ -63,7 +63,7 @@ class UpdateOriginalEntry {
         }
     }
 
-    private void updateEntryType(BibEntry mergedEntry, ChangeRecorder recorder) {
+    private void updateEntryType(BibEntry mergedEntry, CompoundEdit recorder) {
         EntryType oldType = originalEntry.getType();
         EntryType newType = mergedEntry.getType();
 
@@ -72,10 +72,10 @@ class UpdateOriginalEntry {
         }
 
         originalEntry.setType(newType);
-        recorder.record(new UndoableChangeType(originalEntry, oldType, newType));
+        recorder.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
     }
 
-    private void updateFields(BibEntry mergedEntry, ChangeRecorder recorder) {
+    private void updateFields(BibEntry mergedEntry, CompoundEdit recorder) {
         Set<Field> mergedFields = new TreeSet<>(Comparator.comparing(Field::getName));
         mergedFields.addAll(mergedEntry.getFields());
 
@@ -88,14 +88,14 @@ class UpdateOriginalEntry {
             Optional<String> mergedString = mergedEntry.getField(field);
 
             if (originalString.isEmpty() || !originalString.equals(mergedString)) {
-                recorder.record(originalEntry.setField(field, mergedString.orElseThrow()));
+                recorder.addEdit(originalEntry.setField(field, mergedString.orElseThrow()));
             }
         }
 
         // This one is for clearing fields
         for (Field field : originalFields) {
             if (!mergedFields.contains(field) && !FieldFactory.isInternalField(field)) {
-                recorder.record(originalEntry.clearField(field));
+                recorder.addEdit(originalEntry.clearField(field));
             }
         }
     }

@@ -143,12 +143,12 @@ public class GroupTreeNodeViewModel {
 
         // Removing and adding is one action to the user, so it is one undo step. Nothing is
         // pushed when neither list yields a change.
-        undoManager.record(Localization.lang("change entries of group"), recorder -> {
+        undoManager.addEdit(Localization.lang("change entries of group"), edit -> {
             if (!toRemove.isEmpty()) {
-                recorder.recordAll(removeEntriesFromGroup(toRemove));
+                edit.addAll(removeEntriesFromGroup(toRemove));
             }
             if (!toAdd.isEmpty()) {
-                recorder.recordAll(addEntriesToGroup(toAdd));
+                edit.addAll(addEntriesToGroup(toAdd));
             }
         });
     }

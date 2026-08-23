@@ -25,7 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -36,14 +36,14 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableChangeType;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
@@ -279,7 +279,7 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
-        ChangeRecorder compound = new ChangeRecorder(Localization.lang("source edit"));
+        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
         newEntry.getCitationKey()
                 .ifPresentOrElse(
@@ -292,7 +292,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.record(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                 outOfFocusEntry.clearField(fieldName);
             }
         }
@@ -311,14 +311,14 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.record(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                 outOfFocusEntry.setField(fieldName, newValue);
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.record(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
             outOfFocusEntry.setType(newEntry.getType());
         }
         undoManager.addEdit(compound.toChangeSet());

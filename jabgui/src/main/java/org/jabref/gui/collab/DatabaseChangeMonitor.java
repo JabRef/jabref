@@ -89,10 +89,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 saveState = stateManager.activeTabProperty().get().get();
 
-                undoManager.record(Localization.lang("Merged external changes"), recorder ->
+                undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                         changes.stream()
                                .filter(DatabaseChange::isAccepted)
-                               .forEach(change -> change.applyChange(recorder)));
+                               .forEach(change -> change.applyChange(edit)));
 
                 if (areAllChangesResolved.get()) {
                     if (databaseChangesResolverDialog.areAllChangesAccepted()) {

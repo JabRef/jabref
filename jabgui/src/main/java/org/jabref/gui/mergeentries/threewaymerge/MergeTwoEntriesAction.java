@@ -7,10 +7,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableInsertEntries;
-import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 
 public class MergeTwoEntriesAction extends SimpleCommand {
     private final EntriesMergeResult entriesMergeResult;
@@ -35,9 +35,9 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         database.insertEntry(entriesMergeResult.mergedEntry());
         database.removeEntries(entriesToRemove);
 
-        undoManager.record(Localization.lang("Merge entries"), recorder -> {
-            recorder.record(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
-            recorder.record(new UndoableRemoveEntries(database, entriesToRemove));
+        undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
+            edit.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
+            edit.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
         });
     }
 }

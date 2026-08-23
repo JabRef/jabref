@@ -85,8 +85,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.change.UndoableInsertEntries;
-import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -95,6 +93,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -1047,9 +1047,9 @@ public class CitationRelationsTab extends EntryEditorTab {
             libraryTab.get().getMainTable().setCitationMergeMode(true);
             database.insertEntry(mergedEntry);
 
-            undoManager.record(Localization.lang("Merge entries"), recorder -> {
-                recorder.record(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-                recorder.record(new UndoableInsertEntries(database, mergedEntry));
+            undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
+                edit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                edit.addEdit(new UndoableInsertEntries(database, mergedEntry));
             });
 
             dialogService.notify(Localization.lang("Merged entries"));

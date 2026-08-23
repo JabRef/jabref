@@ -15,13 +15,13 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -44,7 +44,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     public CopyOrMoveFieldContentTabViewModel(BibDatabase bibDatabase,
                                               List<BibEntry> selectedEntries,
-                                              ChangeRecorder compoundEdit,
+                                              CompoundEdit compoundEdit,
                                               DialogService dialogService,
                                               StateManager stateManager) {
         super(bibDatabase, compoundEdit, dialogService, stateManager);
@@ -117,7 +117,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
-                    copyFieldValueEdit.record(new UndoableFieldChange(entry,
+                    copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
                             toField.get(),
                             toFieldValue,
                             fromFieldValue));
@@ -155,14 +155,14 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 entry.setField(toField.get(), fromFieldValue);
                 entry.setField(fromField.get(), toFieldValue);
 
-                swapFieldValuesEdit.record(new UndoableFieldChange(
+                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
                         entry,
                         toField.get(),
                         toFieldValue,
                         fromFieldValue
                 ));
 
-                swapFieldValuesEdit.record(new UndoableFieldChange(
+                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
                         entry,
                         fromField.get(),
                         fromFieldValue,

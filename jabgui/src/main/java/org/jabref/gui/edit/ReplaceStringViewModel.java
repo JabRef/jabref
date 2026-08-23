@@ -11,12 +11,12 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NonNull;
 
@@ -46,14 +46,14 @@ public class ReplaceStringViewModel extends AbstractViewModel {
 
         List<BibEntry> entries = selOnly ? this.panel.getSelectedEntries() : this.panel.getDatabase().getEntries();
         AtomicInteger replacements = new AtomicInteger();
-        this.panel.getUndoManager().record(Localization.lang("Replace string"), recorder ->
-                entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, recorder))));
+        this.panel.getUndoManager().addEdit(Localization.lang("Replace string"), edit ->
+                entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, edit))));
         return replacements.get();
     }
 
     /// Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
     /// number of occurrences replaced.
-    private int replaceItem(BibEntry entry, ChangeRecorder recorder) {
+    private int replaceItem(BibEntry entry, CompoundEdit recorder) {
         int counter = 0;
         if (this.allFieldReplace) {
             for (Field field : entry.getFields()) {
@@ -67,7 +67,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         return counter;
     }
 
-    private int replaceField(BibEntry entry, Field field, ChangeRecorder recorder) {
+    private int replaceField(BibEntry entry, Field field, CompoundEdit recorder) {
         if (!entry.hasField(field)) {
             return 0;
         }
@@ -90,7 +90,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
         entry.setField(field, newStr);
-        recorder.record(new UndoableFieldChange(entry, field, txt, newStr));
+        recorder.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
         return counter;
     }
 

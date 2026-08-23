@@ -14,7 +14,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
@@ -25,12 +25,12 @@ import org.jspecify.annotations.NonNull;
 public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractViewModel {
     @NonNull protected final DialogService dialogService;
     @NonNull protected final StateManager stateManager;
-    @NonNull private final ChangeRecorder compoundEdit;
+    @NonNull private final CompoundEdit compoundEdit;
 
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
     public AbstractAutomaticFieldEditorTabViewModel(@NonNull BibDatabase bibDatabase,
-                                                    @NonNull ChangeRecorder compoundEdit,
+                                                    @NonNull CompoundEdit compoundEdit,
                                                     @NonNull DialogService dialogService,
                                                     @NonNull StateManager stateManager) {
         this.compoundEdit = compoundEdit;
@@ -53,7 +53,7 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractV
     }
 
     protected void addEdit(AutomaticFieldEditorUndoableEdit edits) {
-        compoundEdit.record(edits);
+        compoundEdit.addEdit(edits);
         dialogService.notify(new Notifications.UiNotification(
                 Localization.lang("Automatic field editor"),
                 Localization.lang("%0 / %1 affected entries", edits.getAffectedEntries(), stateManager.getSelectedEntries().size()))

@@ -30,12 +30,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.change.UndoableInsertEntries;
-import org.jabref.model.change.UndoableRemoveEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -220,16 +220,16 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
-        libraryTab.getUndoManager().record(Localization.lang("duplicate removal"), recorder -> {
+        libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
-                recorder.record(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
+                edit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
                 libraryTab.getDatabase().removeEntries(result.getToRemove());
                 libraryTab.markBaseChanged();
             }
             // and adding merged entries:
             if (!result.getToAdd().isEmpty()) {
-                recorder.record(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
+                edit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
                 libraryTab.getDatabase().insertEntries(result.getToAdd());
                 libraryTab.markBaseChanged();
             }

@@ -16,7 +16,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
@@ -158,7 +158,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
-                              ChangeRecorder recorder,
+                              CompoundEdit recorder,
                               List<JabRefException> failures,
                               Consumer<Runnable> mutationScheduler) {
         CleanupWorker cleaner = new CleanupWorker(
@@ -171,7 +171,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
-        recorder.recordAll(changes);
+        recorder.addAll(changes);
 
         failures.addAll(cleaner.getFailures());
 
@@ -190,9 +190,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         String editName = Localization.lang("Clean up entry(s)");
         // undo granularity is on a set of all entries
-        undoManager.record(editName, recorder -> {
+        undoManager.addEdit(editName, edit -> {
             for (BibEntry entry : entries) {
-                if (doCleanup(cleanupPreferences, entry, recorder, failures, Runnable::run)) {
+                if (doCleanup(cleanupPreferences, entry, edit, failures, Runnable::run)) {
                     modifiedEntriesCount++;
                 }
             }
@@ -215,7 +215,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         List<JabRefException> failures = new ArrayList<>();
 
         String editName = Localization.lang("Clean up entry(s)");
-        undoManager.record(editName, recorder -> {
+        undoManager.addEdit(editName, edit -> {
             for (int i = 0; i < count; i++) {
                 if (task.isCancelled()) {
                     break;
@@ -224,7 +224,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 // BibEntry uses ObservableMap which fires FX listeners on mutation.
                 // Heavy computation stays on this background thread; only field mutations are dispatched
                 // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
-                if (doCleanup(cleanupPreferences, entries.get(i), recorder, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
+                if (doCleanup(cleanupPreferences, entries.get(i), edit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
                     modifiedEntriesCount++;
                 }
 

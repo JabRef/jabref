@@ -1,4 +1,4 @@
-package org.jabref.model.change;
+package org.jabref.model.undo;
 
 /// A single reversible modification of a library.
 ///

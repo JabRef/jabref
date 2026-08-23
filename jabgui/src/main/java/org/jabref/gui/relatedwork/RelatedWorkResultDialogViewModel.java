@@ -56,12 +56,12 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         AtomicInteger insertedCount = new AtomicInteger();
         AtomicInteger unchangedCount = new AtomicInteger();
 
-        undoManager.record(Localization.lang("Insert related work comments"), recorder -> {
+        undoManager.addEdit(Localization.lang("Insert related work comments"), edit -> {
             for (RelatedWorkInsertionResult insertionResult : insertionResults) {
                 switch (insertionResult) {
                     case RelatedWorkInsertionResult.Inserted inserted -> {
                         insertedCount.incrementAndGet();
-                        recorder.record(inserted.fieldChange());
+                        edit.addEdit(inserted.fieldChange());
                     }
                     case RelatedWorkInsertionResult.Unchanged unchanged ->
                             unchangedCount.incrementAndGet();

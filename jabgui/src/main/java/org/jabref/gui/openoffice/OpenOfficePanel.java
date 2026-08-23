@@ -630,11 +630,11 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            undoManager.record(Localization.lang("Cite"), recorder -> {
+            undoManager.addEdit(Localization.lang("Cite"), edit -> {
                 for (BibEntry entry : entries) {
                     if (entry.getCitationKey().isEmpty()) {
                         // Generate key
-                        recorder.record(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
+                        edit.addEdit(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
                                 .generateAndSetKey(entry));
                     }
                 }

@@ -9,7 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -67,7 +67,7 @@ class RenameFieldViewModelTest {
         renameFieldViewModel = new RenameFieldViewModel(
                 List.of(entryA, entryB),
                 bibDatabase,
-                mock(ChangeRecorder.class),
+                mock(CompoundEdit.class),
                 dialogService,
                 stateManager);
     }

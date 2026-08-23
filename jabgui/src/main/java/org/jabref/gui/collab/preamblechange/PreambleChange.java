@@ -2,11 +2,11 @@ package org.jabref.gui.collab.preamblechange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.change.UndoablePreambleChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.undo.UndoablePreambleChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ public final class PreambleChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(ChangeRecorder recorder) {
+    public void applyChange(CompoundEdit undoEdit) {
         databaseContext.getDatabase().setPreamble(preambleDiff.getNewPreamble());
-        recorder.record(new UndoablePreambleChange(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
+        undoEdit.addEdit(new UndoablePreambleChange(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
     }
 
     public PreambleDiff getPreambleDiff() {

@@ -91,10 +91,10 @@ public class MergeLibraryAction extends SimpleCommand {
                 Localization.lang("External Changes Resolver"));
         dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
 
-        boolean anyChange = undoManager.record(Localization.lang("Merged external changes"), recorder ->
+        boolean anyChange = undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                 changes.stream()
                        .filter(DatabaseChange::isAccepted)
-                       .forEach(change -> change.applyChange(recorder)));
+                       .forEach(change -> change.applyChange(edit)));
 
         if (anyChange) {
             libraryTabContainer.getLibraryTabs().stream()

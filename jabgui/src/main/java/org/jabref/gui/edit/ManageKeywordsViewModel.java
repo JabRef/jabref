@@ -103,7 +103,7 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        undoManager.record(Localization.lang("Update keywords"), recorder -> {
+        undoManager.addEdit(Localization.lang("Update keywords"), edit -> {
             Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
             for (BibEntry entry : entries) {
@@ -114,7 +114,7 @@ public class ManageKeywordsViewModel {
                 entryKeywords.addAll(keywordsToAdd);
 
                 // put keywords back
-                recorder.record(entry.putKeywords(entryKeywords, keywordSeparator));
+                edit.addEdit(entry.putKeywords(entryKeywords, keywordSeparator));
             }
         });
     }

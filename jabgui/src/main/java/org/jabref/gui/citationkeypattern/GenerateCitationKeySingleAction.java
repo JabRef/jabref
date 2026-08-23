@@ -5,9 +5,9 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.UndoableFieldChange;
 
 public class GenerateCitationKeySingleAction extends SimpleCommand {
 

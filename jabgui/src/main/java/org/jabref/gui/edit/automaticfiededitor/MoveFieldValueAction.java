@@ -3,24 +3,24 @@ package org.jabref.gui.edit.automaticfiededitor;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoableFieldChange;
 
 public class MoveFieldValueAction extends SimpleCommand {
     private final Field fromField;
     private final Field toField;
     private final List<BibEntry> entries;
 
-    private final ChangeRecorder edits;
+    private final CompoundEdit edits;
 
     private int affectedEntriesCount;
 
     private final boolean overwriteToFieldContent;
 
-    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, ChangeRecorder edits, boolean overwriteToFieldContent) {
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, CompoundEdit edits, boolean overwriteToFieldContent) {
         this.fromField = fromField;
         this.toField = toField;
         this.entries = entries;
@@ -28,7 +28,7 @@ public class MoveFieldValueAction extends SimpleCommand {
         this.overwriteToFieldContent = overwriteToFieldContent;
     }
 
-    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, ChangeRecorder edits) {
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, CompoundEdit edits) {
         this(fromField, toField, entries, edits, true);
     }
 
@@ -43,8 +43,8 @@ public class MoveFieldValueAction extends SimpleCommand {
                     entry.setField(toField, fromFieldValue);
                     entry.setField(fromField, "");
 
-                    edits.record(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
-                    edits.record(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
+                    edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
+                    edits.addEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
                     affectedEntriesCount++;
                 }
             }

@@ -10,7 +10,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -19,8 +19,8 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
-import org.jabref.model.change.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.UndoableFieldChange;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
@@ -106,7 +106,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private BackgroundTask<Void> generateKeysInBackground() {
         return new BackgroundTask<>() {
-            private ChangeRecorder compound;
+            private CompoundEdit compound;
 
             @Override
             public Void call() {
@@ -119,7 +119,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 });
                 stateManager.getActiveDatabase().ifPresent(databaseContext -> {
                     // generate the new citation keys for each entry
-                    compound = new ChangeRecorder(Localization.lang("Autogenerate citation keys"));
+                    compound = new CompoundEdit(Localization.lang("Autogenerate citation keys"));
                     CitationKeyGenerator keyGenerator =
                             new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
                     int entriesDone = 0;
@@ -128,7 +128,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
                         Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
                         if (fieldChange != null) {
-                            fieldChange.ifPresent(change -> compound.record(new UndoableFieldChange(change)));
+                            fieldChange.ifPresent(change -> compound.addEdit(new UndoableFieldChange(change)));
                         }
                         entriesDone++;
                         int finalEntriesDone = entriesDone;
@@ -144,7 +144,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             @Override
             public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
                 // register the undo event only if new citation keys were generated
-                if (compound.hasChanges()) {
+                if (compound.hasEdits()) {
                     undoManager.addEdit(compound.toChangeSet());
                 }
 

@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
-import org.jabref.model.change.ChangeSet;
-import org.jabref.model.change.UndoableFieldChange;
-import org.jabref.model.change.UndoableRemoveString;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.ChangeSet;
+import org.jabref.model.undo.UndoableFieldChange;
+import org.jabref.model.undo.UndoableRemoveString;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,9 +72,9 @@ class UndoManagerTest {
 
     @Test
     void aRecordedBlockUndoesAsOneStep() {
-        undoRedoManager.record("edit", recorder -> {
-            recorder.record(entry.setField(StandardField.AUTHOR, "Bohr"));
-            recorder.record(entry.setField(StandardField.TITLE, "Relativity"));
+        undoRedoManager.addEdit("edit", edit -> {
+            edit.addEdit(entry.setField(StandardField.AUTHOR, "Bohr"));
+            edit.addEdit(entry.setField(StandardField.TITLE, "Relativity"));
         });
 
         undoRedoManager.undo();
@@ -86,18 +86,18 @@ class UndoManagerTest {
 
     @Test
     void aBlockThatChangesNothingIsNotPushed() {
-        undoRedoManager.record("no-op", recorder ->
+        undoRedoManager.addEdit("no-op", edit ->
                 // Setting the value it already has reports no change.
-                recorder.record(entry.setField(StandardField.AUTHOR, "Einstein")));
+                edit.addEdit(entry.setField(StandardField.AUTHOR, "Einstein")));
 
         assertFalse(undoRedoManager.canUndo());
     }
 
     @Test
     void nestedBlocksProduceASingleStep() {
-        undoRedoManager.record("outer", outer -> {
-            outer.record(entry.setField(StandardField.AUTHOR, "Bohr"));
-            undoRedoManager.record("inner", inner -> inner.record(entry.setField(StandardField.TITLE, "Relativity")));
+        undoRedoManager.addEdit("outer", outer -> {
+            outer.addEdit(entry.setField(StandardField.AUTHOR, "Bohr"));
+            undoRedoManager.addEdit("inner", inner -> inner.addEdit(entry.setField(StandardField.TITLE, "Relativity")));
         });
 
         undoRedoManager.undo();
@@ -109,8 +109,8 @@ class UndoManagerTest {
 
     @Test
     void pushInsideABlockJoinsIt() {
-        undoRedoManager.record("outer", outer -> {
-            outer.record(entry.setField(StandardField.AUTHOR, "Bohr"));
+        undoRedoManager.addEdit("outer", outer -> {
+            outer.addEdit(entry.setField(StandardField.AUTHOR, "Bohr"));
             undoRedoManager.addEdit(setAuthor("Planck"));
         });
 
@@ -166,8 +166,8 @@ class UndoManagerTest {
         CountDownLatch blockStarted = new CountDownLatch(1);
         CountDownLatch editMade = new CountDownLatch(1);
 
-        Thread background = new Thread(() -> undoRedoManager.record("background", recorder -> {
-            recorder.record(setAuthor("Bohr"));
+        Thread background = new Thread(() -> undoRedoManager.addEdit("background", edit -> {
+            edit.addEdit(setAuthor("Bohr"));
             blockStarted.countDown();
             try {
                 editMade.await();

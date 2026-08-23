@@ -24,7 +24,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.ChangeRecorder;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.gui.undo.UndoManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -53,7 +53,6 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
-import org.jabref.model.change.UndoableInsertEntries;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -64,6 +63,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -160,7 +160,7 @@ public class ImportHandler {
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
-                ChangeRecorder compoundEdit = new ChangeRecorder(Localization.lang("Import entries"));
+                CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Import entries"));
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -251,7 +251,7 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.record(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
 
                     counter++;
                 }
@@ -259,7 +259,7 @@ public class ImportHandler {
                 // The whole import is one undo step, so this is pushed once, after the loop.
                 // Pushing inside it added the same compound once per file, which left one stack
                 // entry per file and made the second undo throw.
-                if (compoundEdit.hasChanges()) {
+                if (compoundEdit.hasEdits()) {
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
                 }

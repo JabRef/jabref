@@ -11,19 +11,19 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
-import org.jabref.gui.undo.ChangeRecorder;
-import org.jabref.model.change.UndoableFieldChange;
+import org.jabref.gui.undo.CompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.undo.UndoableFieldChange;
 
 public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final List<BibEntry> selectedEntries;
 
     public ClearContentViewModel(BibDatabase bibDatabase,
                                  List<BibEntry> selectedEntries,
-                                 ChangeRecorder compoundEdit,
+                                 CompoundEdit compoundEdit,
                                  DialogService dialogService,
                                  StateManager stateManager) {
         super(bibDatabase, compoundEdit, dialogService, stateManager);
@@ -41,7 +41,7 @@ public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewMo
             Optional<String> oldFieldValue = entry.getField(field);
             if (oldFieldValue.isPresent()) {
                 entry.clearField(field)
-                     .ifPresent(change -> edits.record(new UndoableFieldChange(change)));
+                     .ifPresent(change -> edits.addEdit(new UndoableFieldChange(change)));
                 affectedEntriesCount++;
             }
         }
