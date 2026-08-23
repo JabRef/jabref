@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 /// @param lastModifiedTime the modification time, `null` when the file did not exist
 @NullMarked
 public record FileSnapshot(boolean exists, long size, @Nullable FileTime lastModifiedTime) {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSnapshot.class);
 
     private static final FileSnapshot ABSENT = new FileSnapshot(false, -1, null);
