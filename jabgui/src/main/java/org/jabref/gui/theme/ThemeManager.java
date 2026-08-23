@@ -115,6 +115,10 @@ public class ThemeManager {
             LOGGER.debug("Using default font size of {}pt", mainFontSize);
             scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
         }
+
+        if (scene.getRoot() instanceof DialogPane dialogPane) {
+            BaseDialog.applyButtonFix(dialogPane);
+        }
     }
 
     private void initializeWindowThemeUpdater() {
