@@ -1,9 +1,14 @@
 package org.jabref.gui.undo;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,6 +46,31 @@ class UndoManagerTest {
         String before = entry.getField(StandardField.AUTHOR).orElse(null);
         entry.setField(StandardField.AUTHOR, value);
         return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
+    }
+
+    /// Waits for the other thread, failing this test rather than hanging the suite.
+    private static void await(CountDownLatch released, String message) {
+        try {
+            assertTrue(released.await(5, TimeUnit.SECONDS), message);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        }
+    }
+
+    /// Whether the other thread got as far as finishing, which a deadlocked one never does.
+    private static boolean completes(Future<?> work) {
+        try {
+            work.get(5, TimeUnit.SECONDS);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        } catch (ExecutionException e) {
+            throw new AssertionError(e.getCause());
+        }
     }
 
     @Test
@@ -167,25 +197,23 @@ class UndoManagerTest {
     /// One manager serves the whole application and long commands record from background tasks.
     /// An edit made meanwhile must become its own step, not join the background command's.
     @Test
-    void aBlockOnAnotherThreadDoesNotCaptureThisThreadsEdits() throws Exception {
+    @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    void aBlockOnAnotherThreadDoesNotCaptureThisThreadsEdits() {
         CountDownLatch blockStarted = new CountDownLatch(1);
         CountDownLatch editMade = new CountDownLatch(1);
 
-        Thread background = new Thread(() -> undoRedoManager.addEdit("background", edit -> {
-            edit.addEdit(setAuthor("Bohr"));
-            blockStarted.countDown();
-            try {
-                editMade.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }));
-        background.start();
+        try (ExecutorService background = Executors.newSingleThreadExecutor()) {
+            Future<?> block = background.submit(() -> undoRedoManager.addEdit("background", edit -> {
+                edit.addEdit(setAuthor("Bohr"));
+                blockStarted.countDown();
+                await(editMade, "the recording block was never released");
+            }));
 
-        blockStarted.await();
-        undoRedoManager.addEdit(setAuthor("Planck"));
-        editMade.countDown();
-        background.join();
+            await(blockStarted, "the recording block never started");
+            undoRedoManager.addEdit(setAuthor("Planck"));
+            editMade.countDown();
+            assertTrue(completes(block), "the recording block never finished");
+        }
 
         // One step for the foreground edit, one for the block.
         undoRedoManager.undo();
@@ -281,24 +309,18 @@ class UndoManagerTest {
     /// while the stack monitor is held, that read would block until the listener returns and
     /// the listener would block until the read completes.
     ///
-    /// The listener records the outcome instead of asserting it, because it runs on whichever
+    /// The listener records the outcome rather than asserting it, because it runs on whichever
     /// thread pushed the edit and an assertion failing there would never reach the test.
     @Test
     @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     void listenersDoNotRunWhileTheStackLockIsHeld() {
         AtomicBoolean readCompleted = new AtomicBoolean();
-        undoRedoManager.addListener(() -> {
-            Thread reader = new Thread(undoRedoManager::canUndo, "undo-state-reader");
-            reader.start();
-            try {
-                reader.join(Duration.ofSeconds(5));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            readCompleted.set(!reader.isAlive());
-        });
 
-        undoRedoManager.addEdit(setAuthor("Bohr"));
+        try (ExecutorService reader = Executors.newSingleThreadExecutor()) {
+            undoRedoManager.addListener(() -> readCompleted.set(completes(reader.submit(undoRedoManager::canUndo))));
+
+            undoRedoManager.addEdit(setAuthor("Bohr"));
+        }
 
         assertTrue(readCompleted.get(), "reading the manager from a listener deadlocked");
         assertTrue(undoRedoManager.canUndo());

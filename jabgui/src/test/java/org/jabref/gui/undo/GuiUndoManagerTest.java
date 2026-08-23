@@ -3,6 +3,7 @@ package org.jabref.gui.undo;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
@@ -100,7 +101,9 @@ class GuiUndoManagerTest {
         CountDownLatch release = new CountDownLatch(1);
         Platform.runLater(() -> {
             try {
-                release.await();
+                // Bounded, so that a failure here fails this test rather than leaving the
+                // JavaFX thread blocked for every test that follows.
+                release.await(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
