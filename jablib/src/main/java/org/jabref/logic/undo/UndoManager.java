@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
 /// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
-/// subscribes through [GuiUndoManager], which owns that hop.
+/// subscribes through [org.jabref.gui.undo.GuiUndoManager], which owns that hop.
 ///
 /// Commands push from background tasks — cleanup and import both do — so each operation takes
 /// this object's monitor for exactly as long as it touches the stacks, and no longer:
@@ -115,32 +115,37 @@ public class UndoManager {
     /// A nested call becomes a nested [ChangeSet] inside its caller's set rather than a second
     /// undo step, so one user action stays one undo step even when a command delegates.
     ///
+    /// The handover happens in a `finally`, so a block that fails part-way through still hands
+    /// over what it managed to change. The library is modified either way at that point, and
+    /// the difference between the two paths is only whether the user can take it back. The
+    /// failure itself is not swallowed: it propagates once the step is on the stack.
+    ///
     /// @return whether anything was recorded, for callers that report the outcome to the user
     public boolean addEdit(String name, Consumer<CompoundEdit> mutations) {
         CompoundEdit enclosing = active.get();
-        CompoundEdit recorder = new CompoundEdit(name);
+        CompoundEdit compoundEdit = new CompoundEdit(name);
+        ChangeSet changeSet;
 
-        active.set(recorder);
+        active.set(compoundEdit);
         try {
-            mutations.accept(recorder);
+            mutations.accept(compoundEdit);
         } finally {
             if (enclosing == null) {
                 active.remove();
             } else {
                 active.set(enclosing);
             }
-        }
 
-        ChangeSet changeSet = recorder.toChangeSet();
-        if (changeSet.isEmpty()) {
-            return false;
+            changeSet = compoundEdit.toChangeSet();
+            if (!changeSet.isEmpty()) {
+                if (enclosing == null) {
+                    addEdit(changeSet);
+                } else {
+                    enclosing.addEdit(changeSet);
+                }
+            }
         }
-        if (enclosing == null) {
-            addEdit(changeSet);
-        } else {
-            enclosing.addEdit(changeSet);
-        }
-        return true;
+        return !changeSet.isEmpty();
     }
 
     public synchronized boolean canUndo() {

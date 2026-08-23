@@ -17,6 +17,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.undo.ChangeSet;
@@ -42,10 +43,14 @@ class UndoManagerTest {
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 
+    private UndoableFieldChange setField(Field field, String value) {
+        String before = entry.getField(field).orElse(null);
+        entry.setField(field, value);
+        return new UndoableFieldChange(entry, field, before, value);
+    }
+
     private UndoableFieldChange setAuthor(String value) {
-        String before = entry.getField(StandardField.AUTHOR).orElse(null);
-        entry.setField(StandardField.AUTHOR, value);
-        return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
+        return setField(StandardField.AUTHOR, value);
     }
 
     /// Waits for the other thread, failing this test rather than hanging the suite.
@@ -272,6 +277,51 @@ class UndoManagerTest {
 
         undoRedoManager.redo();
         assertFalse(undoRedoManager.hasChanged());
+    }
+
+    /// The library is already modified by whatever the block managed to do before it failed, so
+    /// the half it recorded has to reach the stack — otherwise that half cannot be taken back.
+    @Test
+    void aBlockThatFailsPartWayHandsOverWhatItAlreadyChanged() {
+        assertThrows(IllegalStateException.class, () -> undoRedoManager.addEdit("half", edit -> {
+            edit.addEdit(setAuthor("Bohr"));
+            throw new IllegalStateException("the command gave up here");
+        }));
+
+        assertTrue(undoRedoManager.canUndo());
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
+    /// Nothing recorded means nothing to hand over, failure or not: an empty step would enable
+    /// Undo and let the next Ctrl+Z consume a no-op instead of the user's previous edit.
+    @Test
+    void aBlockThatFailsBeforeRecordingAnythingPushesNoStep() {
+        assertThrows(IllegalStateException.class, () -> undoRedoManager.addEdit("nothing", _ -> {
+            throw new IllegalStateException("the command gave up immediately");
+        }));
+
+        assertFalse(undoRedoManager.canUndo());
+    }
+
+    /// A failing nested block hands its changes to the enclosing one for the same reason, and
+    /// the enclosing block decides for itself whether the failure ends the whole step.
+    @Test
+    void aNestedBlockThatFailsHandsOverToItsEnclosingBlock() {
+        undoRedoManager.addEdit("outer", outer -> {
+            outer.addEdit(setAuthor("Bohr"));
+            assertThrows(IllegalStateException.class, () -> undoRedoManager.addEdit("inner", inner -> {
+                inner.addEdit(setField(StandardField.TITLE, "On the quantum theory"));
+                throw new IllegalStateException("the nested command gave up here");
+            }));
+        });
+
+        // One step for the whole thing, holding both the outer change and the nested one. The
+        // nested change touches a different field, so losing it would survive undoing the outer.
+        undoRedoManager.undo();
+        assertFalse(undoRedoManager.canUndo());
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.TITLE));
     }
 
     @Test
