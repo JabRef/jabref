@@ -33,6 +33,9 @@ public class Protocol implements AutoCloseable {
     ///
     /// The remote listener uses this overload after checking whether the connection is a
     /// plain-text health check rather than a serialized remote-operation request.
+    ///
+    /// @param socket      the connection to communicate over; only its output stream is used
+    /// @param inputStream the stream to read requests from — a wrapper around the socket's input stream that supports non-destructive probing, restored to the start of the request
     public Protocol(Socket socket, InputStream inputStream) throws IOException {
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
