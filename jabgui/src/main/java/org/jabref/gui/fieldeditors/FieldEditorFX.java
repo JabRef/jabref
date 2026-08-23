@@ -142,7 +142,12 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        Node target = NodeTraversalUtils.findFirstTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
+        Node target = NodeTraversalUtils.findFirstTextInput(getNode())
+                                        .map(input -> (Node) input)
+                                        .orElseGet(() -> getNode().getChildrenUnmodifiable()
+                                                                  .stream()
+                                                                  .findFirst()
+                                                                  .orElse(getNode()));
         target.requestFocus();
         Platform.runLater(() -> Optional.ofNullable(target.getScene()).ifPresent(_ -> scrollToVisible(target)));
     }
