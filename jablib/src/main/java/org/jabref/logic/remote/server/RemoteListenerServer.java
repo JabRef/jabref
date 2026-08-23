@@ -1,9 +1,9 @@
 package org.jabref.logic.remote.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PushbackInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -59,7 +59,7 @@ public class RemoteListenerServer implements Runnable {
 
     // [impl->req~jabref.remote.health-check~1]
     private void handleConnection(Socket socket) throws IOException {
-        try (PushbackInputStream input = new PushbackInputStream(socket.getInputStream(), 1)) {
+        try (BufferedInputStream input = new BufferedInputStream(socket.getInputStream())) {
             if (isHealthCheck(input)) {
                 handleHealthCheck(input, socket.getOutputStream());
                 return;
@@ -72,17 +72,27 @@ public class RemoteListenerServer implements Runnable {
         }
     }
 
-    private boolean isHealthCheck(PushbackInputStream input) throws IOException {
+    /// Probing must not consume anything on a non-match: [Protocol] deserializes from the same
+    /// stream afterwards, so any partially matching prefix is un-read via mark/reset.
+    ///
+    /// The full prefix is only read after the first byte matched. A serialized [Protocol] request
+    /// starts with the object-stream header (`0xAC`...), of which the client initially sends only
+    /// four bytes — blocking here for the full prefix length would deadlock both sides until the
+    /// socket timeout.
+    private boolean isHealthCheck(BufferedInputStream input) throws IOException {
+        input.mark(HEALTH_CHECK_PREFIX.length);
         int firstByte = input.read();
         if (firstByte != HEALTH_CHECK_PREFIX[0]) {
-            if (firstByte != -1) {
-                input.unread(firstByte);
-            }
+            input.reset();
             return false;
         }
 
         byte[] remainingPrefix = input.readNBytes(HEALTH_CHECK_PREFIX.length - 1);
-        return Arrays.equals(remainingPrefix, HEALTH_CHECK_REMAINING_PREFIX);
+        if (Arrays.equals(remainingPrefix, HEALTH_CHECK_REMAINING_PREFIX)) {
+            return true;
+        }
+        input.reset();
+        return false;
     }
 
     private void handleHealthCheck(InputStream input, OutputStream output) throws IOException {

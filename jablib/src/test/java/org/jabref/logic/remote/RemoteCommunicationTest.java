@@ -72,6 +72,17 @@ class RemoteCommunicationTest {
     }
 
     @Test
+    void nearMissHealthCheckPrefixDoesNotBreakSubsequentRequests() throws IOException {
+        try (Socket socket = new Socket("localhost", 34567);
+             OutputStream output = socket.getOutputStream()) {
+            output.write("JABREF/2 PING\n".getBytes(StandardCharsets.UTF_8));
+            output.flush();
+        }
+
+        assertTrue(client.ping());
+    }
+
+    @Test
     void commandLineArgumentSinglePassedToServer() {
         final String[] message = new String[] {"my message"};
 
