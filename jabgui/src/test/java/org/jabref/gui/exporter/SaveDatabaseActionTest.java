@@ -49,6 +49,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -192,6 +193,30 @@ class SaveDatabaseActionTest {
 
         assertEquals("external content", Files.readString(file));
         assertFalse(result);
+    }
+
+    @Test
+    @ExtendWith(ApplicationExtension.class)
+    void ignoredEncodingProblemsReportFailureWhenFileWasSavedExternallyWhileDialogWasOpen() throws Exception {
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Café");
+        entry.setChanged(true);
+        BibDatabase database = new BibDatabase(List.of(entry));
+        saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
+        when(dbContext.getMetaData().getEncoding()).thenReturn(Optional.of(StandardCharsets.US_ASCII));
+        // While the encoding-problems dialog is open, another program saves the file; the user then clicks "Ignore".
+        // The committed first write no longer is the file's content, so the save must not be reported as successful.
+        when(dialogService.showCustomDialogAndWait(any(String.class), any(DialogPane.class), any(ButtonType.class), any(ButtonType.class)))
+                .thenAnswer(invocation -> {
+                    Files.writeString(file, "external content");
+                    ButtonType ignore = invocation.getArgument(2);
+                    return Optional.of(ignore);
+                });
+
+        boolean result = saveDatabaseAction.save();
+
+        assertEquals("external content", Files.readString(file));
+        assertFalse(result);
+        verify(libraryTab, never()).resetChangedProperties();
     }
 
     @Test

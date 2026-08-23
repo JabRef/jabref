@@ -348,17 +348,27 @@ public class SaveDatabaseAction {
                     encoding,
                     OS.ENCODINGS);
             if (newEncoding.isPresent()) {
-                if (committedState != null && !committedState.equals(FileState.read(file))) {
-                    // Another program saved the file while the encoding dialogs were open; the retry would take that
-                    // version as its baseline and overwrite it, so it is aborted like any other concurrent-save
-                    // conflict
-                    throw new SaveException(new FileChangedException(file));
-                }
+                ensureFileUnchangedWhileDialogsWereOpen(file, committedState);
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
 
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);
+                return;
             }
+        }
+        // No retry happened ("Ignore", or the encoding choice was cancelled), so the first write is the result of the
+        // save — unless another program overwrote it while the dialogs were open, in which case reporting success
+        // would mark the library as saved although the file on disk no longer contains it
+        ensureFileUnchangedWhileDialogsWereOpen(file, committedState);
+    }
+
+    /// The encoding dialogs can stay open for a long time. A save that another program completes in that window must
+    /// not be overwritten by the retry (it would take that version as its baseline) and must not be reported as our
+    /// own successful save. Aborting through the regular concurrent-save-conflict path keeps the library marked as
+    /// changed and offers the external-changes review flow.
+    private static void ensureFileUnchangedWhileDialogsWereOpen(Path file, @Nullable FileState committedState) throws SaveException {
+        if (committedState != null && !committedState.equals(FileState.read(file))) {
+            throw new SaveException(new FileChangedException(file));
         }
     }
 }
