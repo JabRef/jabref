@@ -158,7 +158,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
-                              CompoundEdit recorder,
+                              CompoundEdit compoundEdit,
                               List<JabRefException> failures,
                               Consumer<Runnable> mutationScheduler) {
         CleanupWorker cleaner = new CleanupWorker(
@@ -171,7 +171,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
-        recorder.addAll(changes);
+        compoundEdit.addAll(changes);
 
         failures.addAll(cleaner.getFailures());
 
