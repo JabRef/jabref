@@ -483,8 +483,13 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
+        return showFileOpenDialog(fileDialogConfiguration, mainWindow);
+    }
+
+    @Override
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        File file = chooser.showOpenDialog(mainWindow);
+        File file = chooser.showOpenDialog(owner);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
