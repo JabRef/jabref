@@ -223,14 +223,12 @@ public class DuplicateSearch extends SimpleCommand {
         libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
-                edit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
-                libraryTab.getDatabase().removeEntries(result.getToRemove());
+                edit.apply(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
                 libraryTab.markBaseChanged();
             }
             // and adding merged entries:
             if (!result.getToAdd().isEmpty()) {
-                edit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
-                libraryTab.getDatabase().insertEntries(result.getToAdd());
+                edit.apply(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
                 libraryTab.markBaseChanged();
             }
         });

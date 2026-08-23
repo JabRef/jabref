@@ -25,8 +25,7 @@ public final class BibTexStringDelete extends DatabaseChange {
     @Override
     public void applyChange(CompoundEdit undoEdit) {
         try {
-            databaseContext.getDatabase().removeString(deletedString.getId());
-            undoEdit.addEdit(new UndoableRemoveString(databaseContext.getDatabase(), deletedString));
+            undoEdit.apply(new UndoableRemoveString(databaseContext.getDatabase(), deletedString));
         } catch (Exception ex) {
             LOGGER.warn("Error: could not remove string '{}': {}", deletedString.getName(), ex.getMessage(), ex);
         }

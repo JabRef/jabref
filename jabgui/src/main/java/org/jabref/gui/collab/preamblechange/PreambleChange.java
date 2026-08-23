@@ -25,8 +25,7 @@ public final class PreambleChange extends DatabaseChange {
 
     @Override
     public void applyChange(CompoundEdit undoEdit) {
-        databaseContext.getDatabase().setPreamble(preambleDiff.getNewPreamble());
-        undoEdit.addEdit(new UndoablePreambleChange(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
+        undoEdit.apply(new UndoablePreambleChange(databaseContext.getDatabase(), preambleDiff.getOriginalPreamble(), preambleDiff.getNewPreamble()));
     }
 
     public PreambleDiff getPreambleDiff() {

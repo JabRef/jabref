@@ -32,12 +32,9 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
         List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
 
-        database.insertEntry(entriesMergeResult.mergedEntry());
-        database.removeEntries(entriesToRemove);
-
         undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-            edit.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
-            edit.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
+            edit.apply(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
+            edit.apply(new UndoableRemoveEntries(database, entriesToRemove));
         });
     }
 }

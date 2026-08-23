@@ -257,12 +257,7 @@ public class ImportHandler {
                 }
 
                 // The whole import is one undo step, so this is pushed once, after the loop.
-                // Pushing inside it would add the same compound once per file, which leaves one
-                // stack entry per file and makes the second undo throw.
-                if (compoundEdit.hasEdits()) {
-                    // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
-                }
+                undoManager.addEdit(compoundEdit.toChangeSet());
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
                 UiTaskExecutor.runInJavaFXThread(() -> importEntries(allEntriesToAdd));

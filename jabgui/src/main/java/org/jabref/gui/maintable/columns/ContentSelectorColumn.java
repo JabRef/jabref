@@ -51,10 +51,11 @@ public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
         for (String item : values) {
             MenuItem menuItem = new MenuItem(item);
             menuItem.setOnAction(event -> {
-                String oldValue = entry.getField(field).orElse(null);
-                entry.setField(field, item);
-                if (undoManager != null) {
-                    undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, item));
+                UndoableFieldChange change = new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), item);
+                if (undoManager == null) {
+                    change.apply();
+                } else {
+                    undoManager.apply(change);
                 }
             });
             menu.getItems().add(menuItem);

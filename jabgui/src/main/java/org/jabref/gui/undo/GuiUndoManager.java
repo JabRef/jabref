@@ -31,6 +31,10 @@ public class GuiUndoManager {
         undoManager.addListener(this::refresh);
     }
 
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
+
     public ReadOnlyBooleanProperty undoableProperty() {
         return undoable.getReadOnlyProperty();
     }

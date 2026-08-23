@@ -161,6 +161,30 @@ class UndoManagerTest {
     }
 
     @Test
+    void applyPerformsTheChangeAndRecordsIt() {
+        undoRedoManager.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void applyInsideABlockJoinsIt() {
+        undoRedoManager.addEdit("both", edit -> {
+            edit.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+            edit.apply(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the quantum theory"));
+        });
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("On the quantum theory"), entry.getField(StandardField.TITLE));
+
+        undoRedoManager.undo();
+        assertFalse(undoRedoManager.canUndo());
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.TITLE));
+    }
+
+    @Test
     void anEmptySetIsNotAnUndoStep() {
         undoRedoManager.addEdit(new ChangeSet("nothing", List.of()));
 

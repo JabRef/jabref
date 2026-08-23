@@ -1043,13 +1043,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            database.removeEntry(mergeResult.originalLeftEntry());
-            libraryTab.get().getMainTable().setCitationMergeMode(true);
-            database.insertEntry(mergedEntry);
-
             undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-                edit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-                edit.addEdit(new UndoableInsertEntries(database, mergedEntry));
+                edit.apply(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                libraryTab.get().getMainTable().setCitationMergeMode(true);
+                edit.apply(new UndoableInsertEntries(database, mergedEntry));
             });
 
             dialogService.notify(Localization.lang("Merged entries"));

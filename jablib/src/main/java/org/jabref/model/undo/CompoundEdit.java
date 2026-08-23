@@ -34,6 +34,12 @@ public class CompoundEdit {
         changes.add(change);
     }
 
+    /// Performs `change` and records it, see [org.jabref.logic.undo.UndoManager#apply].
+    public void apply(BibChange change) {
+        change.apply();
+        addEdit(change);
+    }
+
     /// Records a field change if one happened. An empty [Optional] means the model rejected
     /// the write or the value was unchanged, and nothing is recorded.
     public void addEdit(Optional<FieldChange> change) {

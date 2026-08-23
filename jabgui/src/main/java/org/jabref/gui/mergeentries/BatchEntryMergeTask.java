@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
@@ -120,7 +119,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private void updateUndoManager(List<String> updatedEntries) {
         if (!updatedEntries.isEmpty()) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
     }
 
