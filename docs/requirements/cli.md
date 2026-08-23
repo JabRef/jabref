@@ -23,8 +23,6 @@ See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more
 
 Needs: impl
 
-<!-- markdownlint-disable-file MD022 -->
-
 ## Input file argument accepts an http(s)/ftp URL
 `req~jabkit.cli.input-url~1`
 
@@ -78,3 +76,5 @@ Windows-style paths (containing `:`) and titles (containing `:` between citation
 are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->
