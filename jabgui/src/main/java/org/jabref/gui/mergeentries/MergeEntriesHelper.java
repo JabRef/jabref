@@ -34,7 +34,7 @@ public final class MergeEntriesHelper {
     ///
     /// @param entryFromFetcher The entry containing new information (source, from the fetcher)
     /// @param entryFromLibrary The entry to be updated (target, from the library)
-    /// @param compoundEdit   Compound edit to collect undo information
+    /// @param compoundEdit     Compound edit to collect undo information
     /// @param keywordSeparator Separator character used for union-merging the groups field
     public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit, char keywordSeparator) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
