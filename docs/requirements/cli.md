@@ -3,6 +3,16 @@ parent: Requirements
 ---
 # CLI
 
+## Remote server health check
+`req~jabref.remote.health-check~1`
+
+The remote listener accepts the versioned plain-text request `JABREF/1 PING` and responds with
+`JABREF/1 PONG jabref`. This check identifies a running JabRef instance without requiring clients
+to implement the Java serialization protocol. Existing serialized remote-operation requests remain
+supported.
+
+Needs: impl
+
 ## Input file as positional argument across all commands
 `req~jabkit.cli.input-flag~2`
 

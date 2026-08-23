@@ -1,9 +1,14 @@
 package org.jabref.logic.remote.server;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import javafx.util.Pair;
 
@@ -21,6 +26,11 @@ public class RemoteListenerServer implements Runnable {
 
     private static final int TIMEOUT = 1000;
 
+    private static final byte[] HEALTH_CHECK_PREFIX = "JABREF/1 ".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] HEALTH_CHECK_REMAINING_PREFIX = Arrays.copyOfRange(HEALTH_CHECK_PREFIX, 1, HEALTH_CHECK_PREFIX.length);
+    private static final byte[] HEALTH_CHECK_REQUEST = "PING\n".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] HEALTH_CHECK_RESPONSE = "JABREF/1 PONG jabref\n".getBytes(StandardCharsets.UTF_8);
+
     private final RemoteMessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
@@ -35,10 +45,7 @@ public class RemoteListenerServer implements Runnable {
             while (!Thread.interrupted()) {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
-                    try (Protocol protocol = new Protocol(socket)) {
-                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
-                        handleMessage(protocol, input.getKey(), input.getValue());
-                    }
+                    handleConnection(socket);
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
@@ -47,6 +54,42 @@ public class RemoteListenerServer implements Runnable {
             }
         } finally {
             closeServerSocket();
+        }
+    }
+
+    // [impl->req~jabref.remote.health-check~1]
+    private void handleConnection(Socket socket) throws IOException {
+        try (PushbackInputStream input = new PushbackInputStream(socket.getInputStream(), 1)) {
+            if (isHealthCheck(input)) {
+                handleHealthCheck(input, socket.getOutputStream());
+                return;
+            }
+
+            try (Protocol protocol = new Protocol(socket, input)) {
+                Pair<RemoteMessage, Object> message = protocol.receiveMessage();
+                handleMessage(protocol, message.getKey(), message.getValue());
+            }
+        }
+    }
+
+    private boolean isHealthCheck(PushbackInputStream input) throws IOException {
+        int firstByte = input.read();
+        if (firstByte != HEALTH_CHECK_PREFIX[0]) {
+            if (firstByte != -1) {
+                input.unread(firstByte);
+            }
+            return false;
+        }
+
+        byte[] remainingPrefix = input.readNBytes(HEALTH_CHECK_PREFIX.length - 1);
+        return Arrays.equals(remainingPrefix, HEALTH_CHECK_REMAINING_PREFIX);
+    }
+
+    private void handleHealthCheck(InputStream input, OutputStream output) throws IOException {
+        byte[] request = input.readNBytes(HEALTH_CHECK_REQUEST.length);
+        if (Arrays.equals(request, HEALTH_CHECK_REQUEST)) {
+            output.write(HEALTH_CHECK_RESPONSE);
+            output.flush();
         }
     }
 

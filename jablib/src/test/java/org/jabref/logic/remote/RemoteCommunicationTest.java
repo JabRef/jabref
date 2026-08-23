@@ -1,6 +1,10 @@
 package org.jabref.logic.remote;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -14,6 +18,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,6 +52,22 @@ class RemoteCommunicationTest {
 
     @Test
     void pingReturnsTrue() throws IOException, InterruptedException {
+        assertTrue(client.ping());
+    }
+
+    @Test
+    void healthCheckReturnsPongWithoutAffectingSerializedProtocol() throws IOException {
+        try (Socket socket = new Socket("localhost", 34567);
+             OutputStream output = socket.getOutputStream();
+             InputStream input = socket.getInputStream()) {
+            output.write("JABREF/1 PING\n".getBytes(StandardCharsets.UTF_8));
+            output.flush();
+
+            assertEquals(
+                    "JABREF/1 PONG jabref\n",
+                    new String(input.readAllBytes(), StandardCharsets.UTF_8));
+        }
+
         assertTrue(client.ping());
     }
 
