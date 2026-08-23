@@ -2,8 +2,8 @@
 # Used by .github/workflows/pr-labeler.yml (actions/labeler).
 #
 # Only components with a clear home in the source tree are listed here.
-# Purely conceptual labels (e.g. "component: ui", "component: unicode",
-# "component: collaboration", "component: installation") are still applied by hand.
+# Purely conceptual labels (e.g. "component: unicode", "component: collaboration",
+# "component: installation") are still applied by hand.
 #
 # Glob syntax: https://github.com/actions/labeler
 # The component labels themselves are documented at
@@ -240,6 +240,12 @@
           - 'jablib/src/**/org/jabref/logic/crawler/**'
           - 'jablib/src/**/org/jabref/model/study/**'
           - 'jabgui/src/**/org/jabref/gui/slr/**'
+
+"component: ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/*.fxml'
+          - 'jabgui/src/**/*.css'
 
 "component: theming":
   - changed-files:
