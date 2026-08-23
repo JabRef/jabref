@@ -25,7 +25,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private String findString;
     private String replaceString;
     private Set<Field> fields;
-    private final LibraryTab panel;
+    private final LibraryTab libraryTab;
 
     private final StringProperty findStringProperty = new SimpleStringProperty();
     private final StringProperty replaceStringProperty = new SimpleStringProperty();
@@ -34,19 +34,20 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private final BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
     public ReplaceStringViewModel(@NonNull LibraryTab libraryTab) {
-        this.panel = libraryTab;
+        this.libraryTab = libraryTab;
     }
 
     public int replace() {
         findString = findStringProperty.getValue();
         replaceString = replaceStringProperty.getValue();
         fields = FieldFactory.parseFieldList(fieldStringProperty.getValue());
-        boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
-        List<BibEntry> entries = selOnly ? this.panel.getSelectedEntries() : this.panel.getDatabase().getEntries();
+        List<BibEntry> entries = selectOnlyProperty.getValue()
+                                 ? libraryTab.getSelectedEntries()
+                                 : libraryTab.getDatabase().getEntries();
         AtomicInteger replacements = new AtomicInteger();
-        this.panel.getUndoManager().addEdit(Localization.lang("Replace string"), edit ->
+        libraryTab.getUndoManager().addEdit(Localization.lang("Replace string"), edit ->
                 entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, edit))));
         return replacements.get();
     }
