@@ -87,6 +87,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We fixed saving libraries with long file names, hard links, or file systems that do not support atomic moves. [#7718](https://github.com/JabRef/jabref/issues/7718)
 - We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
 - We fixed an issue where removing filtered entries from a group could cause JabRef to throw an exception. [#16541](https://github.com/JabRef/jabref/issues/16541)
@@ -95,6 +96,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where empty values in the merge entries dialog could not be selected to clear the merged entry field. [#15014](https://github.com/JabRef/jabref/issues/15014)
 - We fixed an issue where `Update with bibliographic information via entry data` did not apply the confirmed merge result back to the selected entry. [#15265](https://github.com/JabRef/jabref/issues/15265)
 - We fixed an issue where `Update with bibliographic information via entry data` could fail with an exception while the merge dialog was open. [#16583](https://github.com/JabRef/jabref/pull/16583)
+- We fixed unreadable text colors and a missing window title in the multi-way merge dialog. [#16553](https://github.com/JabRef/jabref/issues/16553)
 - We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
 - We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
 - We fixed an issue where the exception message would show in the notification. [#14886](https://github.com/JabRef/jabref/issues/14886)
