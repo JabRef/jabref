@@ -155,10 +155,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// not trigger a scan.
     ///
     /// @param diskState the matching on-disk state, ideally as reported by the writer that committed it (captured
-    ///                  right after the commit, this leaves no window in which a concurrent write could be mistaken
-    ///                  for the consistent state); `null` to read the current state from the file instead, which is
-    ///                  subject to such a window — its worst case is a delayed notification, never a lost update,
-    ///                  since lost-update protection lives in [org.jabref.logic.exporter.AtomicFileOutputStream]
+    ///                                   right after the commit, this leaves no window in which a concurrent write could be mistaken
+    ///                                   for the consistent state); `null` to read the current state from the file instead, which is
+    ///                                   subject to such a window — its worst case is a delayed notification, never a lost update,
+    ///                                   since lost-update protection lives in [org.jabref.logic.exporter.AtomicFileOutputStream]
     public void markConsistentWithDisk(@Nullable FileSnapshot diskState) {
         synchronized (database) {
             if (diskState != null) {

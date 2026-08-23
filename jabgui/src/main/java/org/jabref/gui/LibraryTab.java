@@ -1030,7 +1030,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// All call sites mean "in-memory library now matches the disk", so file events for that state need no scan.
     ///
     /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to
-    ///                  determine it from the file (e.g. after merging all external changes)
+    ///                                   determine it from the file (e.g. after merging all external changes)
     public void resetChangedProperties(@Nullable FileSnapshot diskState) {
         this.nonUndoableChangeProperty.setValue(false);
         this.changedProperty.setValue(false);

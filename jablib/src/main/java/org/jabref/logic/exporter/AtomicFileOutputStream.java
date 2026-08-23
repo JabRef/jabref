@@ -122,9 +122,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// @param path          the path of the file to write to or replace
     /// @param keepBackup    whether to keep the backup file (.sav) after a successful write process
     /// @param expectedState the state the target file is expected to (still) be in when this stream commits — a
-    ///                      snapshot from an earlier point of the same logical operation, so that a concurrent write
-    ///                      landing before this stream was even opened is still detected; `null` to verify against
-    ///                      the state at stream creation
+    ///                                           snapshot from an earlier point of the same logical operation, so that a concurrent write
+    ///                                           landing before this stream was even opened is still detected; `null` to verify against
+    ///                                           the state at stream creation
     public AtomicFileOutputStream(Path path, boolean keepBackup, @Nullable FileSnapshot expectedState) throws IOException {
         this(path, createTemporaryFile(path), keepBackup, expectedState, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
