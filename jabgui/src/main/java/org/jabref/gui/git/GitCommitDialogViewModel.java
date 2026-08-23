@@ -109,13 +109,24 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     Localization.lang("Committed successfully");
             case COMMITTED_AND_PUSHED ->
                     Localization.lang("Committed and pushed successfully");
+            case PUSHED ->
+                    Localization.lang("Pushed successfully.");
+            case NOTHING_TO_PUSH ->
+                    Localization.lang("Nothing to commit. Local branch is up to date.");
         };
     }
 
     private CommitOutcome doCommitAndPush() throws JabRefException, GitAPIException, IOException {
         ResolvedRepository repository = resolveRepository();
-        commitOn(repository);
-        return pushTo(repository);
+        // Unlike doCommit(), a missing commit here is not fatal: a previous attempt may already have
+        // committed and only the push failed, so retrying should still try to push that commit.
+        boolean committedNow = repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
+        return pushTo(repository, committedNow);
+    }
+
+    private String commitMessageOrDefault() {
+        String message = commitMessage.get();
+        return StringUtil.isBlank(message) ? Localization.lang("Update references") : message;
     }
 
     private void doCommit() throws JabRefException, GitAPIException, IOException {
@@ -154,30 +165,29 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
-        String message = commitMessage.get();
-        if (StringUtil.isBlank(message)) {
-            message = Localization.lang("Update references");
-        }
-
-        boolean committed = repository.gitHandler().createCommitOnCurrentBranch(message, amend.get());
+        boolean committed = repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
         // TODO: Replace control-flow-by-exception with a proper control structure
         if (!committed) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
         }
     }
 
-    private CommitOutcome pushTo(ResolvedRepository repository) throws PushFailedException {
+    private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
         try {
             PushResult result = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry)
                                               .push(repository.database(), repository.bibFilePath());
-            // commitOn() only returns here after creating a new local commit, so the branch must be
-            // AHEAD at this point. A noop (up-to-date) result would mean the remote already has this
-            // exact commit, which indicates a concurrent push raced us rather than a normal outcome.
             if (result.noop()) {
-                throw new PushFailedException(new JabRefException(
-                        Localization.lang("Push aborted: Remote already has this commit. Please check the remote repository.")));
+                if (committedNow) {
+                    // We just created a new local commit, so the branch must be AHEAD at push time.
+                    // A noop (up-to-date) result here means the remote already had this exact commit,
+                    // which indicates a concurrent push raced us rather than a normal outcome.
+                    throw new PushFailedException(new JabRefException(
+                            Localization.lang("Push aborted: Remote already has this commit. Please check the remote repository.")));
+                }
+                // Nothing new to commit this time, and the remote already has everything (not an error).
+                return CommitOutcome.NOTHING_TO_PUSH;
             }
-            return CommitOutcome.COMMITTED_AND_PUSHED;
+            return committedNow ? CommitOutcome.COMMITTED_AND_PUSHED : CommitOutcome.PUSHED;
         } catch (JabRefException | GitAPIException | IOException e) {
             throw new PushFailedException(e);
         }
@@ -201,16 +211,17 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     /// What a finished dialog action actually achieved, so the user can be told the truth about it.
     private enum CommitOutcome {
         COMMITTED,
-        COMMITTED_AND_PUSHED
+        COMMITTED_AND_PUSHED,
+        PUSHED,
+        NOTHING_TO_PUSH
     }
 
-    /// Marks a failure that happened once the commit already existed, so the user is not told the commit itself failed.
     private static class PushFailedException extends JabRefException {
         PushFailedException(Throwable cause) {
-            super(messageOrFallback(cause), cause);
+            super(Localization.lang("The commit was saved locally, but the push failed: %0", causeMessage(cause)), cause);
         }
 
-        private static String messageOrFallback(Throwable cause) {
+        private static String causeMessage(Throwable cause) {
             String message = cause.getLocalizedMessage();
             return message != null ? message : Localization.lang("Git Push Failed");
         }
