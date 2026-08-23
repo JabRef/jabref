@@ -57,7 +57,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
-        final CompoundEdit nc = new CompoundEdit(Localization.lang("Automatically set file links"));
+        final CompoundEdit compound = new CompoundEdit(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -65,7 +65,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+                compound.addEdit(fieldChange); // push to undo manager is in succeeded
 
                 // Wait because there are several rounds in one auto-link operation
                 // The later round depends on the updated bibEntry of the previous round
@@ -96,8 +96,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     return;
                 }
 
-                if (nc.hasEdits()) {
-                    undoManager.addEdit(nc.toChangeSet());
+                if (compound.hasEdits()) {
+                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

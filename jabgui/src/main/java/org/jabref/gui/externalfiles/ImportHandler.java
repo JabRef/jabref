@@ -257,8 +257,8 @@ public class ImportHandler {
                 }
 
                 // The whole import is one undo step, so this is pushed once, after the loop.
-                // Pushing inside it added the same compound once per file, which left one stack
-                // entry per file and made the second undo throw.
+                // Pushing inside it would add the same compound once per file, which leaves one
+                // stack entry per file and makes the second undo throw.
                 if (compoundEdit.hasEdits()) {
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit.toChangeSet()));
@@ -523,7 +523,7 @@ public class ImportHandler {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {
-                //    compoundEdit.record(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                //    compoundEdit.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
                 //            undo));
                 // }
             }
