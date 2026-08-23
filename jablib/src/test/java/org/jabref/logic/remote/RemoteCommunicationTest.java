@@ -72,6 +72,20 @@ class RemoteCommunicationTest {
     }
 
     @Test
+    void healthCheckPrefixWithUnknownRequestGetsNoResponse() throws IOException {
+        try (Socket socket = new Socket("localhost", 34567);
+             OutputStream output = socket.getOutputStream();
+             InputStream input = socket.getInputStream()) {
+            output.write("JABREF/1 FOO!\n".getBytes(StandardCharsets.UTF_8));
+            output.flush();
+
+            assertEquals("", new String(input.readAllBytes(), StandardCharsets.UTF_8));
+        }
+
+        assertTrue(client.ping());
+    }
+
+    @Test
     void nearMissHealthCheckPrefixDoesNotBreakSubsequentRequests() throws IOException {
         try (Socket socket = new Socket("localhost", 34567);
              OutputStream output = socket.getOutputStream()) {

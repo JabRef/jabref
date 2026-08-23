@@ -29,7 +29,7 @@ public class RemoteListenerServer implements Runnable {
     private static final byte[] HEALTH_CHECK_PREFIX = "JABREF/1 ".getBytes(StandardCharsets.UTF_8);
     private static final byte[] HEALTH_CHECK_REMAINING_PREFIX = Arrays.copyOfRange(HEALTH_CHECK_PREFIX, 1, HEALTH_CHECK_PREFIX.length);
     private static final byte[] HEALTH_CHECK_REQUEST = "PING\n".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] HEALTH_CHECK_RESPONSE = "JABREF/1 PONG jabref\n".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] HEALTH_CHECK_RESPONSE = ("JABREF/1 PONG " + Protocol.IDENTIFIER + "\n").getBytes(StandardCharsets.UTF_8);
 
     private final RemoteMessageHandler messageHandler;
     private final ServerSocket serverSocket;
