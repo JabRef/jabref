@@ -20,14 +20,14 @@ JabRef --HTTP--> jabext_host --native-messaging--> extension --> tab/PDF
 
 ## Naming
 
-| Symbol                                           | Value                              |
-| ------------------------------------------------ | ---------------------------------- |
-| Native-messaging host (registry / connectNative) | `jabext_bridge`                    |
-| JabRef provider name (discovery file)            | `jabext-bridge`                    |
-| Host script (Linux/macOS)                        | `jabext_host.py`                   |
+| Symbol                                           | Value                                 |
+| ------------------------------------------------ | ------------------------------------- |
+| Native-messaging host (registry / connectNative) | `jabext_bridge`                       |
+| JabRef provider name (discovery file)            | `jabext-bridge`                       |
+| Host script (Linux/macOS)                        | `jabext_host.py`                      |
 | Host script + launcher (Windows)                 | `jabext_host.ps1` + `jabext_host.bat` |
-| Firefox extension gecko id                       | `@jabfox`                          |
-| Chromium extension id (pinned)                   | `bifehkofibaamoeaopjglfkddgkijdlh` |
+| Firefox extension gecko id                       | `@jabfox`                             |
+| Chromium extension id (pinned)                   | `bifehkofibaamoeaopjglfkddgkijdlh`    |
 
 The Chromium extension id is fixed by the `manifest.key` field in the
 extension's [`wxt.config.ts`][ext] and matches the store-published JabRef
@@ -36,17 +36,17 @@ the store install alike.
 
 ## Layout
 
-| Path                                      | Role                                                                |
-| ----------------------------------------- | ------------------------------------------------------------------- |
+| Path                                      | Role                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
 | `jabext_host.py`                          | The host: loopback HTTP server + native-messaging dispatch. Stdlib only. |
-| `jabext_host.ps1`                         | Windows mirror (HttpListener + NM reader runspace)                  |
-| `jabext_host.bat`                         | NM launcher for Windows (browsers launch only `.exe`/`.bat`)        |
-| `e2e_test.py`                             | End-to-end harness; drives either host as a subprocess              |
-| `install/install.sh`                      | Linux installer (Firefox + Chromium family)                         |
-| `install/install.ps1`                     | Windows installer                                                   |
-| `install/install.command`                 | macOS installer                                                     |
-| `native-messaging/firefox.json.template`  | NM manifest template, Firefox                                       |
-| `native-messaging/chromium.json.template` | NM manifest template, Chromium                                      |
+| `jabext_host.ps1`                         | Windows mirror (HttpListener + NM reader runspace)                       |
+| `jabext_host.bat`                         | NM launcher for Windows (browsers launch only `.exe`/`.bat`)             |
+| `e2e_test.py`                             | End-to-end harness; drives either host as a subprocess                   |
+| `install/install.sh`                      | Linux installer (Firefox + Chromium family)                              |
+| `install/install.ps1`                     | Windows installer                                                        |
+| `install/install.command`                 | macOS installer                                                          |
+| `native-messaging/firefox.json.template`  | NM manifest template, Firefox                                            |
+| `native-messaging/chromium.json.template` | NM manifest template, Chromium                                           |
 
 ## Testing
 
