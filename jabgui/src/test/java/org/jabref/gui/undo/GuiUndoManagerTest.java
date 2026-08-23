@@ -1,5 +1,7 @@
 package org.jabref.gui.undo;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -43,8 +45,8 @@ class GuiUndoManagerTest {
         assertFalse(properties.redoableProperty().get());
     }
 
-    /// The update is posted to the JavaFX thread rather than applied inline, so each assertion
-    /// has to let that queue drain first.
+    /// Recorded from the test thread, so the update is posted to the JavaFX thread rather than
+    /// applied inline and each assertion has to let that queue drain first.
     @Test
     void propertiesFollowTheStacks() {
         undoManager.addEdit(setAuthor("Bohr"));
@@ -61,5 +63,20 @@ class GuiUndoManagerTest {
         WaitForAsyncUtils.waitForFxEvents();
         assertTrue(properties.undoableProperty().get());
         assertFalse(properties.redoableProperty().get());
+    }
+
+    /// Recorded from the JavaFX thread, where there is nothing to wait for: the property is
+    /// already current when the edit returns, rather than a pulse behind it.
+    @Test
+    void propertiesFollowTheStacksWithoutADelayOnTheJavaFxThread() {
+        AtomicBoolean undoableImmediatelyAfterTheEdit = new AtomicBoolean();
+
+        WaitForAsyncUtils.asyncFx(() -> {
+            undoManager.addEdit(setAuthor("Bohr"));
+            undoableImmediatelyAfterTheEdit.set(properties.undoableProperty().get());
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertTrue(undoableImmediatelyAfterTheEdit.get());
     }
 }

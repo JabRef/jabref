@@ -1,9 +1,9 @@
 package org.jabref.logic.undo;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import org.jabref.model.undo.BibChange;
@@ -11,6 +11,8 @@ import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The undo journal: a stack of changes, and the API for putting changes on it.
 ///
@@ -22,11 +24,25 @@ import org.jspecify.annotations.NullMarked;
 /// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
 /// subscribes through [GuiUndoManager], which owns that hop.
 ///
-/// Stack operations are synchronized because commands push from background tasks — cleanup and
-/// import both do. [#addEdit] is not: it runs caller code, so holding the lock across it would
-/// invite deadlock, and one recording block at a time is what commands actually do.
+/// Commands push from background tasks — cleanup and import both do — so each operation takes
+/// this object's monitor for exactly as long as it touches the stacks, and no longer:
+///
+///   - Applying the change is inside the lock. It has to be: if the stack transition and the
+///     model write could interleave, two threads could undo the same change.
+///   - Running foreign code is outside it. [#addEdit(String,Consumer)] never holds the lock
+///     while it calls `mutations`, and [#notifyListeners] runs after the monitor is released.
+///     Code this class does not own may block on another thread — a listener refreshing a menu
+///     may wait for the JavaFX thread — and a lock held across such a call is a deadlock
+///     waiting for the other thread to want the journal.
+///
+/// Listeners are told *that* the stacks changed, never what changed, so they read the state
+/// they need when they run. Two threads recording concurrently may therefore notify in the
+/// opposite order to the one in which they pushed, and it does not matter: every listener
+/// still reads the latest state, so the worst case is being told twice about the same one.
 @NullMarked
 public class UndoManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoManager.class);
 
     /// Same depth javax.swing.undo.UndoManager defaulted to. The stack retains the BibEntry
     /// objects of removed entries, so an unbounded one keeps every deletion of a session alive.
@@ -37,7 +53,12 @@ public class UndoManager {
 
     /// Notified after every change to either stack. Commands push from background tasks, so a
     /// listener that touches the UI is responsible for getting itself onto the right thread.
-    private final List<Runnable> listeners = new ArrayList<>();
+    ///
+    /// Copy-on-write rather than a plain list under the lock: registration happens a handful of
+    /// times while the window is built, notification happens on every edit. Paying for a copy
+    /// on the rare operation keeps the frequent one lock-free, and publishing through this list
+    /// is what makes a listener registered on one thread visible to a push on another.
+    private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
     /// Net number of applied edits: +1 per recorded or redone change, -1 per undone one. A
     /// counter rather than the stack depth because [#LIMIT] discards old edits from the bottom
@@ -60,7 +81,7 @@ public class UndoManager {
     ///
     /// A lone change needs no group and therefore no name: a [ChangeSet] exists to hold
     /// several changes together, and its name describes that grouping to the user.
-    public synchronized void addEdit(BibChange change) {
+    public void addEdit(BibChange change) {
         CompoundEdit recorder = active.get();
         if (recorder != null) {
             recorder.addEdit(change);
@@ -71,14 +92,16 @@ public class UndoManager {
         if ((change instanceof ChangeSet changeSet) && changeSet.isEmpty()) {
             return;
         }
-        undoStack.push(change);
-        revision++;
-        while (undoStack.size() > LIMIT) {
-            // Only the stack is trimmed. The discarded edit remains applied to the library, so
-            // it still counts towards the distance from the last saved position.
-            undoStack.removeLast();
+        synchronized (this) {
+            undoStack.push(change);
+            revision++;
+            while (undoStack.size() > LIMIT) {
+                // Only the stack is trimmed. The discarded edit remains applied to the library,
+                // so it still counts towards the distance from the last saved position.
+                undoStack.removeLast();
+            }
+            redoStack.clear();
         }
-        redoStack.clear();
         notifyListeners();
     }
 
@@ -129,30 +152,36 @@ public class UndoManager {
 
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
-    public synchronized void undo() {
-        BibChange change = undoStack.peek();
-        if (change == null) {
-            return;
+    public void undo() {
+        synchronized (this) {
+            BibChange change = undoStack.peek();
+            if (change == null) {
+                return;
+            }
+            change.inverted().apply();
+            undoStack.pop();
+            redoStack.push(change);
+            revision--;
         }
-        change.inverted().apply();
-        undoStack.pop();
-        redoStack.push(change);
-        revision--;
         notifyListeners();
     }
 
-    public synchronized void redo() {
-        BibChange change = redoStack.peek();
-        if (change == null) {
-            return;
+    public void redo() {
+        synchronized (this) {
+            BibChange change = redoStack.peek();
+            if (change == null) {
+                return;
+            }
+            change.apply();
+            redoStack.pop();
+            undoStack.push(change);
+            revision++;
         }
-        change.apply();
-        redoStack.pop();
-        undoStack.push(change);
-        revision++;
         notifyListeners();
     }
 
+    /// Registers a listener, from any thread and at any time — including from inside another
+    /// listener, since [#notifyListeners] iterates a snapshot.
     public void addListener(Runnable listener) {
         listeners.add(listener);
     }
@@ -169,15 +198,27 @@ public class UndoManager {
         return revision != savedRevision;
     }
 
-    public synchronized void clear() {
-        undoStack.clear();
-        redoStack.clear();
-        revision = 0;
-        savedRevision = 0;
+    public void clear() {
+        synchronized (this) {
+            undoStack.clear();
+            redoStack.clear();
+            revision = 0;
+            savedRevision = 0;
+        }
         notifyListeners();
     }
 
+    /// Runs every listener even if one of them throws. By the time this is called the change is
+    /// on the stack and applied to the library, so letting a listener's failure out would
+    /// report a completed operation as failed — and would silently deprive the remaining
+    /// listeners of a notification they have no other way to get.
     private void notifyListeners() {
-        listeners.forEach(Runnable::run);
+        for (Runnable listener : listeners) {
+            try {
+                listener.run();
+            } catch (Exception e) {
+                LOGGER.error("Undo listener failed", e);
+            }
+        }
     }
 }

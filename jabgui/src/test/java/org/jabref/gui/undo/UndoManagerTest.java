@@ -1,8 +1,11 @@
 package org.jabref.gui.undo;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
@@ -17,6 +20,7 @@ import org.jabref.model.undo.UndoableRemoveString;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -240,6 +244,64 @@ class UndoManagerTest {
 
         undoRedoManager.redo();
         assertFalse(undoRedoManager.hasChanged());
+    }
+
+    @Test
+    void aListenerRegisteredWhileNotifyingDoesNotDisturbTheNotification() {
+        AtomicInteger registeredLater = new AtomicInteger();
+        undoRedoManager.addListener(() -> undoRedoManager.addListener(registeredLater::incrementAndGet));
+
+        // Iterating the listeners directly would throw ConcurrentModificationException here.
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        assertTrue(undoRedoManager.canUndo());
+        // The snapshot this notification iterates predates the new listener, so it runs from
+        // the next notification onwards, not from this one.
+        assertEquals(0, registeredLater.get());
+
+        undoRedoManager.undo();
+        assertEquals(1, registeredLater.get());
+    }
+
+    @Test
+    void aThrowingListenerNeitherFailsTheEditNorHidesTheOthers() {
+        AtomicInteger reached = new AtomicInteger();
+        undoRedoManager.addListener(() -> {
+            throw new IllegalStateException("this listener is broken");
+        });
+        undoRedoManager.addListener(reached::incrementAndGet);
+
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        assertTrue(undoRedoManager.canUndo());
+        assertEquals(1, reached.get());
+    }
+
+    /// A listener that waits for another thread to read the manager. Were listeners still run
+    /// while the stack monitor is held, that read would block until the listener returns and
+    /// the listener would block until the read completes.
+    ///
+    /// The listener records the outcome instead of asserting it, because it runs on whichever
+    /// thread pushed the edit and an assertion failing there would never reach the test.
+    @Test
+    @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    void listenersDoNotRunWhileTheStackLockIsHeld() {
+        AtomicBoolean readCompleted = new AtomicBoolean();
+        undoRedoManager.addListener(() -> {
+            Thread reader = new Thread(undoRedoManager::canUndo, "undo-state-reader");
+            reader.start();
+            try {
+                reader.join(Duration.ofSeconds(5));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            readCompleted.set(!reader.isAlive());
+        });
+
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        assertTrue(readCompleted.get(), "reading the manager from a listener deadlocked");
+        assertTrue(undoRedoManager.canUndo());
     }
 
     @Test
