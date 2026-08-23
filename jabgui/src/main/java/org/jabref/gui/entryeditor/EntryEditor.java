@@ -393,7 +393,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     public void selectField(String fieldName) {
-        focusUtils.focusOrAddField(FieldFactory.parseField(fieldName));
+        Optional.ofNullable(viewModel.getCurrentlyEditedEntry())
+                .ifPresent(entry -> {
+                    focusUtils.focusOrAddField(FieldFactory.parseField(entry.getType(), fieldName));
+                });
     }
 
     public void setFocusToField(Field field) {
