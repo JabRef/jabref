@@ -21,7 +21,7 @@
 
 "component: automatic-field-editor":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/edit/automaticfieldeditor/**'
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/edit/automaticfiededitor/**'
 
 "component: backup":
   - changed-files:
