@@ -72,11 +72,31 @@ class EntryEditorFocusUtils {
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresentOrElse(
-                            tab -> selectTabAndField(tab, aliasField),
-                            () -> addFieldViaAllFieldsTab(Optional.ofNullable(aliasField).orElse(field)));
+                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
                 }
         ));
+    }
+
+    void focusOrAddField(Field field) {
+        UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
+                tab -> selectTabAndField(tab, field),
+                () -> {
+                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            () -> addFieldViaAllFieldsTab(aliasField)
+                    );
+                }
+        ));
+    }
+
+    private boolean focusTabShowing(Field field) {
+        return getTabContainingField(field)
+                .map(tab -> {
+                    selectTabAndField(tab, field);
+                    return true;
+                })
+                .orElse(false);
     }
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {
