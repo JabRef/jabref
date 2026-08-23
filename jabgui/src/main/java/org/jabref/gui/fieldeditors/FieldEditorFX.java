@@ -16,6 +16,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.NodeTraversalUtils;
 import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -141,22 +142,9 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        Node target = findTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
+        Node target = NodeTraversalUtils.findFirstTextInput(getNode()).map(input -> (Node) input).orElseGet(this::getNode);
         target.requestFocus();
         Platform.runLater(() -> Optional.ofNullable(target.getScene()).ifPresent(_ -> scrollToVisible(target)));
-    }
-
-    private static Optional<TextInputControl> findTextInput(Node node) {
-        if (node instanceof TextInputControl textInput) {
-            return Optional.of(textInput);
-        }
-        if (node instanceof Parent parent) {
-            return parent.getChildrenUnmodifiable().stream()
-                         .map(FieldEditorFX::findTextInput)
-                         .flatMap(Optional::stream)
-                         .findFirst();
-        }
-        return Optional.empty();
     }
 
     private static void scrollToVisible(Node node) {

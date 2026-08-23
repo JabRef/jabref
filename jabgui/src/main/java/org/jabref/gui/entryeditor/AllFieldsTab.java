@@ -29,7 +29,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -52,6 +51,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.NodeTraversalUtils;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -375,7 +375,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// preserving its HBox grow priority) and overlays `button` on it. Returns the new overlay
     /// pane, or empty if the editor exposes no plain text input to overlay onto.
     private static Optional<StackPane> overlayInsideTextInput(Node editorNode, Button button) {
-        return findPrimaryTextInput(editorNode).flatMap(input -> {
+        return NodeTraversalUtils.findFirstTextInput(editorNode).flatMap(input -> {
             if (!(input.getParent() instanceof Pane parent)) {
                 return Optional.empty();
             }
@@ -393,23 +393,6 @@ public class AllFieldsTab extends FieldsEditorTab {
             overlay.getChildren().addAll(input, button);
             return Optional.of(overlay);
         });
-    }
-
-    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
-    /// or empty for composite editors that have none.
-    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
-        if (node instanceof TextInputControl textInput) {
-            return Optional.of(textInput);
-        }
-        if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                Optional<TextInputControl> found = findPrimaryTextInput(child);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     /// Hides a still-empty, user-added field row again (reachable only for non-required,
