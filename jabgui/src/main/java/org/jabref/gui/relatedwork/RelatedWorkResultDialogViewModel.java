@@ -10,11 +10,11 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.model.undo.UndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 
 public class RelatedWorkResultDialogViewModel extends AbstractViewModel {

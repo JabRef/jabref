@@ -4,7 +4,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.model.undo.UndoManager;
+import org.jabref.logic.undo.UndoManager;
 
 import org.jspecify.annotations.NullMarked;
 

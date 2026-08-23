@@ -4,8 +4,8 @@ import org.jabref.gui.autocompleter.AppendWordsStrategy;
 import org.jabref.gui.autocompleter.AutoCompletionStrategy;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.undo.UndoManager;
 
 public class SimpleEditorViewModel extends AbstractEditorViewModel {
 

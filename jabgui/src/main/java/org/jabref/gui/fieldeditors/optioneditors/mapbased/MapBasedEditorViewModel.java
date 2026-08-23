@@ -7,8 +7,8 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.optioneditors.OptionEditorViewModel;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.undo.UndoManager;
 
 import com.google.common.collect.BiMap;
 import org.slf4j.Logger;

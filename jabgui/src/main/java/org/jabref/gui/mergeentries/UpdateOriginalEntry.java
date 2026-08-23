@@ -7,12 +7,12 @@ import java.util.TreeSet;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.undo.CompoundEdit;
-import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableChangeType;
 
 import org.jspecify.annotations.NullMarked;

@@ -16,6 +16,7 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
-import org.jabref.model.undo.UndoManager;
 
 public class ChangeEntryTypeMenu {
 

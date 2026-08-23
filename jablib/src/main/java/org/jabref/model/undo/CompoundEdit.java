@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.FieldChange;
 
 import org.jspecify.annotations.NullMarked;

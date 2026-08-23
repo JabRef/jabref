@@ -24,13 +24,13 @@ import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.undo.CompoundEdit;
-import org.jabref.model.undo.UndoManager;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

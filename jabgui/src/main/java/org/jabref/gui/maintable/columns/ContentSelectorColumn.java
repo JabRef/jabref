@@ -9,12 +9,12 @@ import javafx.scene.control.MenuItem;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 
 import com.tobiasdiez.easybind.EasyBind;

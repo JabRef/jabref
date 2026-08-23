@@ -39,7 +39,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.undo.UndoManager;
+import org.jabref.logic.undo.UndoManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.TagsField;

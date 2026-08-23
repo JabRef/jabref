@@ -1,9 +1,9 @@
 package org.jabref.gui.undo;
 
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 
 import org.junit.jupiter.api.BeforeEach;

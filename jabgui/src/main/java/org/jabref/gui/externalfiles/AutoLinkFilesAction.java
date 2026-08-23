@@ -15,12 +15,12 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.undo.CompoundEdit;
-import org.jabref.model.undo.UndoManager;
 import org.jabref.model.undo.UndoableFieldChange;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;

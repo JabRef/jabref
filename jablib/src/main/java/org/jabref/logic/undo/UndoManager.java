@@ -1,10 +1,14 @@
-package org.jabref.model.undo;
+package org.jabref.logic.undo;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.jabref.model.undo.BibChange;
+import org.jabref.model.undo.ChangeSet;
+import org.jabref.model.undo.CompoundEdit;
 
 import org.jspecify.annotations.NullMarked;
 

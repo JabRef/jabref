@@ -25,7 +25,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.undo.UndoManager;
+import org.jabref.logic.undo.UndoManager;
 
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import org.slf4j.Logger;
