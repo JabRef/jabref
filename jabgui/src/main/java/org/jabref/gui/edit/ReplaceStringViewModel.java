@@ -54,21 +54,21 @@ public class ReplaceStringViewModel extends AbstractViewModel {
 
     /// Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
     /// number of occurrences replaced.
-    private int replaceItem(BibEntry entry, CompoundEdit recorder) {
+    private int replaceItem(BibEntry entry, CompoundEdit compound) {
         int counter = 0;
         if (this.allFieldReplace) {
             for (Field field : entry.getFields()) {
-                counter += replaceField(entry, field, recorder);
+                counter += replaceField(entry, field, compound);
             }
         } else {
             for (Field espField : fields) {
-                counter += replaceField(entry, espField, recorder);
+                counter += replaceField(entry, espField, compound);
             }
         }
         return counter;
     }
 
-    private int replaceField(BibEntry entry, Field field, CompoundEdit recorder) {
+    private int replaceField(BibEntry entry, Field field, CompoundEdit compound) {
         if (!entry.hasField(field)) {
             return 0;
         }
@@ -91,7 +91,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
         entry.setField(field, newStr);
-        recorder.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
+        compound.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
         return counter;
     }
 
