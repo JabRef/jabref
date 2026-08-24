@@ -65,7 +65,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
-import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
@@ -74,6 +74,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
@@ -102,6 +103,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -329,7 +331,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgresServer.class)));
         Supplier<SearchBackend> inMemoryFactory = () ->
-                new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
+                new InMemoryLuceneSearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences(), preferences.getFilePreferences(), taskExecutor);
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
                 sqlFactory,
@@ -357,6 +359,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
         boolean isSelectedTab = false;
+        BibDatabaseContext previousDatabaseContext = this.bibDatabaseContext;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -367,18 +370,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             isSelectedTab = true;
         }
 
-        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
-        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
-        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+        stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getOpenDatabases().add(bibDatabaseContext);
-
         initializeComponentsAndListeners(false);
 
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
+
         if (isSelectedTab) {
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            if (stateManager.getActiveDatabase().filter(databaseContext -> databaseContext == previousDatabaseContext).isPresent()) {
+                stateManager.replaceActiveDatabase(bibDatabaseContext);
+            } else {
+                stateManager.setActiveDatabase(bibDatabaseContext);
+            }
             stateManager.activeTabProperty().set(Optional.of(this));
         }
 
@@ -815,11 +820,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void suspendChangeMonitor() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::suspendChangeDetection);
     }
 
+    /// Resuming also scans for external changes that arrived while the monitor was suspended, e.g. a concurrent write
+    /// that aborted the suspended save — the standard external-changes review flow is offered for them.
     public void resumeChangeMonitor() {
-        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+        changeMonitor.ifPresent(DatabaseChangeMonitor::resumeChangeDetection);
     }
 
     public void insertEntry(final BibEntry bibEntry) {
@@ -1017,8 +1024,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void resetChangedProperties() {
+        resetChangedProperties(null);
+    }
+
+    /// All call sites mean "in-memory library now matches the disk", so file events for that state need no scan.
+    ///
+    /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
+    public void resetChangedProperties(@Nullable FileSnapshot diskState) {
         this.nonUndoableChangeProperty.setValue(false);
         this.changedProperty.setValue(false);
+        changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 
     public void back() {

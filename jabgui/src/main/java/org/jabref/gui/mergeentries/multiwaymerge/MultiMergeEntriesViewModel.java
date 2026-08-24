@@ -33,6 +33,9 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.ISSN;
+import org.jabref.model.entry.types.StandardEntryType;
+
+import org.jspecify.annotations.Nullable;
 
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
@@ -42,6 +45,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(FXCollections.observableArrayList());
 
+    private final Set<Field> explicitlyClearedFields = new HashSet<>();
     private final Map<Field, Set<String>> autoFetchedIdentifiers = new HashMap<>();
 
     public void addSource(EntrySource entrySource) {
@@ -64,12 +68,20 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
+
+        if (StandardEntryType.Misc == mergedEntry.get().getType()
+                && StandardEntryType.Misc != entry.getType()) {
+            mergedEntry.get().setType(entry.getType());
+        }
+
         for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
             Field field = fieldEntry.getKey();
             String newValue = fieldEntry.getValue();
 
             if (!mergedEntry.get().getFieldsObservable().containsKey(field)) {
-                mergedEntry.get().setField(field, newValue);
+                if (!explicitlyClearedFields.contains(field)) {
+                    mergedEntry.get().setField(field, newValue);
+                }
             } else {
                 String currentValue = mergedEntry.get().getField(field).orElse("");
                 PlausibilityComparatorFactory.INSTANCE
@@ -82,6 +94,18 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
                         });
             }
         }
+    }
+
+    // [impl->req~ux.merge-entries.select-empty-field~1]
+    public void setMergedFieldValue(Field field, @Nullable String value) {
+        if ((value == null) || value.isEmpty()) {
+            explicitlyClearedFields.add(field);
+            mergedEntry.get().clearField(field);
+            return;
+        }
+
+        explicitlyClearedFields.remove(field);
+        mergedEntry.get().setField(field, value);
     }
 
     public Map<Field, String> findNewFetchableIdentifiers(BibEntry entry) {

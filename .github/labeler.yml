@@ -1,0 +1,260 @@
+# Maps changed files to "component: *" labels on pull requests.
+# Used by .github/workflows/pr-labeler.yml (actions/labeler).
+#
+# Only components with a clear home in the source tree are listed here.
+# Purely conceptual labels (e.g. "component: unicode", "component: collaboration",
+# "component: installation") are still applied by hand.
+#
+# Glob syntax: https://github.com/actions/labeler
+# The component labels themselves are documented at
+# https://devdocs.jabref.org/architecture-and-components.html
+
+"component: ai":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/ai/**'
+          - 'jabgui/src/**/org/jabref/gui/ai/**'
+
+"component: autocompletion":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/autocompleter/**'
+
+"component: automatic-field-editor":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/edit/automaticfieldeditor/**'
+
+"component: backup":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/autosaveandbackup/**'
+          - 'jabgui/src/**/org/jabref/gui/backup/**'
+
+"component: bib(la)tex":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/bibtex/**'
+          - 'jablib/src/**/org/jabref/model/entry/**'
+
+"component: browser-plugin":
+  - changed-files:
+      - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/browserext/**'
+
+"component: citationkey-generator":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/citationkeypattern/**'
+          - 'jabgui/src/**/org/jabref/gui/citationkeypattern/**'
+
+"component: citation-relations":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/citation/**'
+          - 'jablib/src/**/org/jabref/logic/relatedwork/**'
+          - 'jabgui/src/**/org/jabref/gui/relatedwork/**'
+
+"component: cite-as-you-write":
+  - changed-files:
+      - any-glob-to-any-file: 'jabsrv/src/**/cayw/**'
+
+"component: cleanup-ops":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/cleanup/**'
+          - 'jabgui/src/**/org/jabref/gui/cleanup/**'
+
+"component: consistency-check":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/quality/**'
+          - 'jabgui/src/**/org/jabref/gui/consistency/**'
+
+"component: css":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/*.css'
+
+"component: duplicate-finder":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/duplicationFinder/**'
+
+"component: entry-editor":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/entryeditor/**'
+          - 'jabgui/src/**/org/jabref/gui/fieldeditors/**'
+
+"component: entry-preview":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/preview/**'
+          - 'jablib/src/**/org/jabref/logic/citationstyle/**'
+          - 'jabgui/src/**/org/jabref/gui/preview/**'
+
+"component: export-or-save":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/exporter/**'
+          - 'jablib/src/**/org/jabref/logic/layout/**'
+          - 'jabgui/src/**/org/jabref/gui/exporter/**'
+
+"component: external-application-integration":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/push/**'
+          - 'jabgui/src/**/org/jabref/gui/push/**'
+
+"component: external-changes":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/collab/**'
+
+"component: external-files":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/externalfiles/**'
+          - 'jabgui/src/**/org/jabref/gui/externalfiles/**'
+          - 'jabgui/src/**/org/jabref/gui/externalfiletype/**'
+          - 'jabgui/src/**/org/jabref/gui/linkedfile/**'
+          - 'jabgui/src/**/org/jabref/gui/copyfiles/**'
+
+"component: fetcher":
+  - changed-files:
+      - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/importer/fetcher/**'
+
+"component: git":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/git/**'
+          - 'jabgui/src/**/org/jabref/gui/git/**'
+
+"component: groups":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/groups/**'
+          - 'jablib/src/**/org/jabref/model/groups/**'
+          - 'jabgui/src/**/org/jabref/gui/groups/**'
+
+# Importer changes that are not fetcher changes (fetchers have their own label).
+"component: import-load":
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'jablib/src/**/org/jabref/logic/importer/**'
+              - 'jabgui/src/**/org/jabref/gui/importer/**'
+          - all-globs-to-all-files: '!jablib/src/**/org/jabref/logic/importer/fetcher/**'
+
+"component: integrity-checker":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/integrity/**'
+          - 'jabgui/src/**/org/jabref/gui/integrity/**'
+
+"component: internationalization":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/l10n/**'
+          - 'jablib/src/main/resources/l10n/**'
+          - 'jabgui/src/**/org/jabref/gui/l10n/**'
+
+"component: JabKit [cli]":
+  - changed-files:
+      - any-glob-to-any-file: 'jabkit/**'
+
+"component: jabsrv":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabsrv/**'
+          - 'jabsrv-cli/**'
+
+"component: journal abbreviations":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/journals/**'
+          - 'jablib/src/main/abbrv.jabref.org/**'
+
+"component: keybinding":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/keyboard/**'
+
+"component: libre-office":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/openoffice/**'
+          - 'jablib/src/**/org/jabref/model/openoffice/**'
+          - 'jabgui/src/**/org/jabref/gui/openoffice/**'
+
+"component: logging":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/errorconsole/**'
+          - 'jabgui/src/**/org/jabref/gui/logging/**'
+
+"component: lsp":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabls/**'
+          - 'jabls-cli/**'
+
+"component: maintable":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
+
+"component: merge":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+
+"component: microsoft-word-integration":
+  - changed-files:
+      - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/msbib/**'
+
+"component: ocr":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/ocr/**'
+          - 'jablib/src/**/org/jabref/model/ocr/**'
+
+"component: pdf-viewer":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/documentviewer/**'
+
+"component: preferences":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/preferences/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/**'
+
+"component: search":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/search/**'
+          - 'jablib/src/**/org/jabref/model/search/**'
+          - 'jabgui/src/**/org/jabref/gui/search/**'
+
+"component: shared-database":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/shared/**'
+          - 'jabgui/src/**/org/jabref/gui/shared/**'
+
+"component: slr":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/crawler/**'
+          - 'jablib/src/**/org/jabref/model/study/**'
+          - 'jabgui/src/**/org/jabref/gui/slr/**'
+
+"component: ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/*.fxml'
+          - 'jabgui/src/**/*.css'
+
+"component: theming":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/theme/**'
+
+"component: welcome-tab":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/welcome/**'
+
+"component: welcome-walkthrough":
+  - changed-files:
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/walkthrough/**'

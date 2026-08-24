@@ -212,6 +212,15 @@ public class AllFieldsTab extends FieldsEditorTab {
         super.bindToEntry(entry);
     }
 
+    @Override
+    protected void dispose() {
+        // The entry's event bus holds listeners strongly; without unregistering, a discarded tab
+        // instance would be retained (and keep reacting) for as long as the entry lives.
+        subscribedEntry.ifPresent(entry -> entry.unregisterListener(this));
+        subscribedEntry = Optional.empty();
+        super.dispose();
+    }
+
     /// Refreshes the list when a field is set or unset from outside this tab
     /// (Source tab, fetchers, undo, …). Rebuilds only when the set of shown fields
     /// actually changes, so typing inside a visible editor never rebuilds or steals focus.

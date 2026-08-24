@@ -28,7 +28,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.edit.ReplaceStringAction;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
+import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorAction;
 import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
@@ -289,7 +289,7 @@ public class MainMenu extends MenuBar {
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences())) {
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, undoManager, dialogService, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
@@ -308,7 +308,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.UPDATE_WITH_WEB_INFO,
-                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor)),
+                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor, undoManager)),
                 // endregion
 
                 new SeparatorMenuItem(),

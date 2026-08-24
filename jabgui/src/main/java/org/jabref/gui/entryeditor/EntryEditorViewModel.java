@@ -214,6 +214,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private void disposeTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
+        allPossibleTabs.forEach(EntryEditorTab::dispose);
         allPossibleTabs.forEach(tab -> tab.currentEntryProperty().unbind());
         allPossibleTabs.clear();
     }

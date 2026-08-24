@@ -16,6 +16,8 @@ env:
   MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  ScholarApiKey: ${{ secrets.SCHOLARAPIKEY_FOR_TESTS }}
+  CROSSREF_EMAIL: ${{ secrets.CROSSREF_EMAIL_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -242,13 +244,16 @@ jobs:
       - name: Cache JBang
         # Combined cache action: restores at start and saves ~/.jbang on a
         # cache miss in the post-job step. A madrlint-specific key keeps this
-        # cache separate from the shared "jbang-" cache used by setup-gradle.
+        # cache separate from the other JBang-using jobs.
         uses: actions/cache@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-madrlint-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
       - uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
@@ -296,15 +301,19 @@ jobs:
         shell: bash
         run: |
           echo "cache_key=jbang-heylogs-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v6
+      - name: Cache JBang
+        # Combined cache action: the restore-only variant never wrote the key.
+        uses: actions/cache@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
             jbang-heylogs-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
       - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+        uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
       - name: Lint CHANGELOG.md
         run: |
           # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
@@ -522,6 +531,21 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: echo "cache_key=jbang-check-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Cache JBang
+        # Shared by the "JBang (main)" and "JBang (PR)" jobs - both build the same scripts,
+        # so they resolve the same dependencies. A PR run restores the entry written on main.
+        uses: actions/cache@v6
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-check-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
       - uses: ./.github/actions/setup-gradle
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
@@ -537,12 +561,29 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: echo "cache_key=jbang-check-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Cache JBang
+        # Shared by the "JBang (main)" and "JBang (PR)" jobs - both build the same scripts,
+        # so they resolve the same dependencies. A PR run restores the entry written on main.
+        uses: actions/cache@v6
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-check-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
       - uses: ./.github/actions/setup-gradle
       # Publish jablib to the local Maven repository so the JBang scripts pick up
       # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
       # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
       - name: Publish jablib to the local Maven repository
-        run: gradle -PprojVersion=6.0 :jablib:publishToMavenLocal
+        # -Dmaven.repo.local: the jbang-check action points JBANG_REPO at ~/.jbang/repository,
+        # so the snapshot has to be published there instead of into ~/.m2.
+        run: gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
