@@ -284,24 +284,52 @@ class GuiPreferencesMigrationsTest {
     @Test
     void upgradeThemeMigratesOldDarkCssToDarkTheme() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
+        when(preferences.get("fxTheme", null)).thenReturn("Dark.css");
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
 
         verify(workspacePreferences).setColorScheme(ThemeColorScheme.DARK);
+        verify(preferences).deleteKey("fxTheme");
     }
 
     @Test
     void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme", "")).thenReturn("");
-        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
+        when(preferences.get("fxTheme", null)).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", true)).thenReturn(false);
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
 
         verify(workspacePreferences).setColorScheme(ThemeColorScheme.LIGHT);
+    }
+
+    @Test
+    void upgradeThemeKeepsDefaultsWhenThemeSyncOsWasEnabled() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", null)).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", true)).thenReturn(true);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences, never()).setTheme(any());
+        verify(workspacePreferences, never()).setColorScheme(any());
+    }
+
+    @Test
+    void upgradeThemeDoesNothingWhenOldPreferenceIsAbsent() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", null)).thenReturn(null);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(preferences, never()).deleteKey(anyString());
+        verify(workspacePreferences, never()).setTheme(any());
+        verify(workspacePreferences, never()).setColorScheme(any());
+        verify(workspacePreferences, never()).setCustomTheme(any());
     }
 
     @Test

@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.SequencedMap;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -580,19 +579,34 @@ public class PreferencesMigrations {
 
     /// upgrade the old theme css names of the theme to the new theme properties
     /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
+    ///
+    /// The old keys are deleted after reading them, so the migration runs at most once --
+    /// migrations run on every startup, and re-applying the old value each time would
+    /// overwrite whatever the user selected in the new UI in the meantime.
     static void upgradeTheme(JabRefGuiPreferences preferences) {
-        String theme = preferences.get("fxTheme", "");
-        boolean themeSyncOs = preferences.getBoolean("themeSyncOs", false);
+        String theme = preferences.get("fxTheme", null);
+        // The old preference defaulted to syncing with the OS color scheme
+        boolean themeSyncOs = preferences.getBoolean("themeSyncOs", true);
 
-        // no value means light theme when sync with os theme switch is not on
-        if ("".equals(theme) && !themeSyncOs) {
-            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
-            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.LIGHT);
+        if (theme != null) {
+            preferences.deleteKey("fxTheme");
+        }
+        if (preferences.get("themeSyncOs", null) != null) {
+            preferences.deleteKey("themeSyncOs");
+        }
 
+        if (theme == null) {
+            // Fresh install, or already migrated: keep the new defaults (follow the system color scheme)
             return;
         }
 
-        if ("Base.css".equals(theme) || "light".equals(theme)) {
+        if ("".equals(theme) && themeSyncOs) {
+            // Old default behavior: follow the OS color scheme -- matches the new defaults
+            return;
+        }
+
+        // no value means light theme when sync with os theme switch is not on
+        if ("".equals(theme) || "Base.css".equals(theme) || "light".equals(theme)) {
             preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
             preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.LIGHT);
 
@@ -606,8 +620,6 @@ public class PreferencesMigrations {
             return;
         }
 
-        if (!Set.of("", "Base.css", "light", "Dark.css", "dark").contains(theme)) {
-            preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
-        }
+        preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
     }
 }
