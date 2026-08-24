@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors.identifier;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -23,6 +21,7 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

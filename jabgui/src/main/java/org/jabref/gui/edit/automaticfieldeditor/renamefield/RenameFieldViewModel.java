@@ -16,13 +16,13 @@ import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabV
 import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
 import org.jabref.gui.edit.automaticfieldeditor.MoveFieldValueAction;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.CompoundEdit;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -42,7 +42,7 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     public RenameFieldViewModel(List<BibEntry> selectedEntries,
                                 BibDatabase database,
-                                NamedCompoundEdit compoundEdit,
+                                CompoundEdit compoundEdit,
                                 DialogService dialogService,
                                 StateManager stateManager) {
         super(database, compoundEdit, dialogService, stateManager);
@@ -112,10 +112,6 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
                     false).executeAndGetAffectedEntriesCount();
 
             edits.setAffectedEntries(affectedEntriesCount);
-
-            if (edits.hasEdits()) {
-                edits.end();
-            }
         }
 
         addEdit(edits);

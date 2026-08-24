@@ -1,10 +1,5 @@
 package org.jabref.gui.mergeentries.threewaymerge;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.CompoundEdit;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -25,6 +20,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +54,12 @@ public class FieldRowViewModel {
 
     private final FieldMergerFactory fieldMergerFactory;
 
-    private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
+    /// Values captured the first time this row's fields were merged, so that unmerge can put
+    /// them back and a later merge can reapply the same result. Null until the first merge.
+    private @Nullable MergedValues mergedValues;
+
+    /// Whether the merged value is currently shown, as opposed to the two original values.
+    private boolean showingMergedValue;
 
     public FieldRowViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory) {
         this.field = field;
@@ -189,26 +190,25 @@ public class FieldRowViewModel {
             throw new UnsupportedOperationException();
         }
 
-        String oldLeftFieldValue = getLeftFieldValue();
-        String oldRightFieldValue = getRightFieldValue();
-
-        FieldMerger fieldMerger = fieldMergerFactory.create(field);
-        String mergedFields = fieldMerger.merge(getLeftFieldValue(), getRightFieldValue());
-        setLeftFieldValue(mergedFields);
-        setRightFieldValue(mergedFields);
-
-        if (fieldsMergedEdit.canRedo()) {
-            fieldsMergedEdit.redo();
-        } else {
-            fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));
-            fieldsMergedEdit.end();
+        if (mergedValues == null) {
+            FieldMerger fieldMerger = fieldMergerFactory.create(field);
+            mergedValues = new MergedValues(getLeftFieldValue(), getRightFieldValue(),
+                    fieldMerger.merge(getLeftFieldValue(), getRightFieldValue()));
         }
+
+        setLeftFieldValue(mergedValues.merged());
+        setRightFieldValue(mergedValues.merged());
+        showingMergedValue = true;
     }
 
     public void unmergeFields() {
-        if (fieldsMergedEdit.canUndo()) {
-            fieldsMergedEdit.undo();
+        if ((mergedValues == null) || !showingMergedValue) {
+            return;
         }
+
+        setLeftFieldValue(mergedValues.left());
+        setRightFieldValue(mergedValues.right());
+        showingMergedValue = false;
     }
 
     public BooleanBinding hasEqualLeftAndRightBinding() {
@@ -279,29 +279,6 @@ public class FieldRowViewModel {
         return mergedEntry;
     }
 
-    class MergeFieldsUndo extends AbstractUndoableEdit {
-        private final String oldLeft;
-        private final String oldRight;
-        private final String mergedFields;
-
-        MergeFieldsUndo(String oldLeft, String oldRight, String mergedFields) {
-            this.oldLeft = oldLeft;
-            this.oldRight = oldRight;
-            this.mergedFields = mergedFields;
-        }
-
-        @Override
-        public void undo() throws CannotUndoException {
-            super.undo();
-            setLeftFieldValue(oldLeft);
-            setRightFieldValue(oldRight);
-        }
-
-        @Override
-        public void redo() throws CannotRedoException {
-            super.redo();
-            setLeftFieldValue(mergedFields);
-            setRightFieldValue(mergedFields);
-        }
+    private record MergedValues(String left, String right, String merged) {
     }
 }

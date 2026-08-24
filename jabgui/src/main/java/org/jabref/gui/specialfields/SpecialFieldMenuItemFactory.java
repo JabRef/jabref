@@ -3,8 +3,6 @@ package org.jabref.gui.specialfields;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -13,6 +11,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 
