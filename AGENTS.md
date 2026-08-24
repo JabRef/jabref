@@ -493,12 +493,33 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
+- **One line, maximum 20 words, one sentence.** If one sentence is truly not enough, use two — never more. No sub-bullets, no code blocks.
+- **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
+- Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
 - Do not add extra blank lines in CHANGELOG.md
+- Do not reorder or reword existing entries, and do not create a new version heading.
 - CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
 - When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
+
+### CHANGELOG.md example
+
+Good:
+
+```markdown
+- We fixed an issue where the entry editor lost focus after saving a library. [#1234](https://github.com/JabRef/jabref/issues/1234)
+```
+
+Bad — explains the implementation, names internals, too long:
+
+```markdown
+- We fixed a bug in the entry editor where, due to a race condition in the JavaFX
+  focus handling inside `EntryEditor#setFocus`, the focus was lost after the library
+  was saved. This was especially annoying for users who ... The fix introduces a
+  guard flag that ...
+```
 
 ### Developer documentation
 
