@@ -384,6 +384,40 @@
     }
 }
 
+/* Bridge Modena's lookup colors onto the Primer palette. Anything JavaFX (or
+ * jabref-base.css) still resolves through Modena's color ladders -- e.g.
+ * -fx-text-base-color and -fx-text-background-color, which pick a readable text
+ * color for the current background -- would otherwise fall back to Modena's
+ * light-grey defaults and produce dark-on-dark text in the dark color scheme. */
+.root {
+    -fx-base: -color-bg-tertiary;
+
+    -fx-background: -color-bg-primary;
+    -fx-color: -color-bg-tertiary;
+    -fx-accent: -color-accent-subtle;
+
+    -fx-control-inner-background-alt: -color-bg-alt;
+
+    -fx-dark-text-color: -color-fg-default;
+    -fx-mid-text-color: -color-fg-muted;
+    -fx-light-text-color: -color-fg-emphasis;
+
+    -fx-outer-border: -color-border-default;
+
+    -fx-focus-color: -color-accent-subtle;
+    -fx-faint-focus-color: derive(-color-accent-subtle, 50%);
+
+    -fx-default-button: -color-button-default;
+
+    -fx-mark-color: -fx-text-base-color;
+
+    -fx-selection-bar: -color-selection;
+    -fx-selection-bar-non-focused: -color-selection-inactive;
+
+    -fx-focused-text-base-color: -color-fg-emphasis;
+    -fx-focused-mark-color: -color-fg-emphasis;
+}
+
 .root {
     -fx-background-color: -color-bg-default;
     -fx-control-inner-background: -color-bg-default;
