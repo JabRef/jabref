@@ -493,7 +493,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
-- **One line, maximum 20 words, one sentence.** If one sentence is truly not enough, use two — never more. No sub-bullets, no code blocks.
+- **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
 - **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
 - Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
 - Do not add extra blank lines in CHANGELOG.md
