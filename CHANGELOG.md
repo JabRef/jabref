@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 - Added OCR language selection support in Preferences. [#16618](https://github.com/JabRef/jabref/issues/16618)
+
 ### Changed
 
 - The LibreOffice integration's bibliography generation for CSL styles is now more performant for a large number of entries. [#16555](https://github.com/JabRef/jabref/pull/16555)
