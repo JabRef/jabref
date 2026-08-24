@@ -250,9 +250,13 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetButton.setOnAction(_ -> resetTabs());
 
+        Button classicTabsButton = new Button(Localization.lang("Add classic tabs"));
+        classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\" and \"Abstract\" known from JabRef 5.")));
+        classicTabsButton.setOnAction(_ -> viewModel.addClassicTabs());
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox bottomRow = new HBox(GAP, addFieldName, addFieldButton, spacer, resetButton);
+        HBox bottomRow = new HBox(GAP, addFieldName, addFieldButton, spacer, classicTabsButton, resetButton);
 
         VBox column = new VBox(GAP, fieldsTable, bottomRow, regexInfo);
         HBox.setHgrow(column, Priority.ALWAYS);

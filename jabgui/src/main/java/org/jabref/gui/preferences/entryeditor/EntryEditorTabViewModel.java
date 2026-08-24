@@ -122,6 +122,21 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return Optional.of(tab);
     }
 
+    /// Adds the classic "General" and "Abstract" tabs (see [EntryEditorTabModel.CustomizedFieldsTab#classicTabs()])
+    /// directly after "Main"; tabs whose name is already taken are skipped.
+    public void addClassicTabs() {
+        int insertAt = 1 + tabs.stream()
+                               .map(EditorTabViewModel::getDisplayName)
+                               .toList()
+                               .indexOf(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
+        for (EntryEditorTabModel.CustomizedFieldsTab classicTab : EntryEditorTabModel.CustomizedFieldsTab.classicTabs()) {
+            boolean exists = tabs.stream().anyMatch(tab -> tab.getDisplayName().equalsIgnoreCase(classicTab.name()));
+            if (!exists) {
+                tabs.add(insertAt++, EditorTabViewModel.fromModel(classicTab));
+            }
+        }
+    }
+
     public void removeTab(EditorTabViewModel tab) {
         if (tab.isCustom()) {
             tabs.remove(tab);

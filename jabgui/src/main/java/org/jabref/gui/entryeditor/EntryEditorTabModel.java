@@ -1,17 +1,21 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 /// Model of the tabs that appear in the entry editor.
 ///
@@ -111,6 +115,21 @@ public sealed interface EntryEditorTabModel
 
         public CustomizedFieldsTab {
             fieldPatterns = List.copyOf(fieldPatterns);
+        }
+
+        /// The former default tabs "General" and "Abstract" of JabRef 5, for users who prefer these fields
+        /// split off from the "Main" tab (which shows them as well).
+        public static List<CustomizedFieldsTab> classicTabs() {
+            List<String> generalFields = Stream.concat(
+                                                       Stream.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF,
+                                                               StandardField.KEYWORDS, StandardField.EPRINT, StandardField.EPRINTTYPE, StandardField.URL,
+                                                               StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP),
+                                                       EnumSet.allOf(SpecialField.class).stream())
+                                               .map(Field::getName)
+                                               .toList();
+            return List.of(
+                    new CustomizedFieldsTab(Localization.lang("General"), generalFields),
+                    new CustomizedFieldsTab(Localization.lang("Abstract"), List.of(StandardField.ABSTRACT.getName())));
         }
 
         @Override

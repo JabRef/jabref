@@ -2,10 +2,12 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.SequencedMap;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -87,15 +89,45 @@ public class PreferencesMigrations {
 
         SequencedMap<String, List<String>> customTabs = new LinkedHashMap<>();
         String tabName;
+        boolean anyStored = false;
         for (int i = 0; (tabName = prefs.get(V6_0_ALPHA_CUSTOM_TAB_NAME + i, null)) != null; i++) {
-            customTabs.put(tabName, prefs.getStringList(V6_0_ALPHA_CUSTOM_TAB_FIELDS + i));
+            anyStored = true;
+            List<String> fields = prefs.getStringList(V6_0_ALPHA_CUSTOM_TAB_FIELDS + i);
+            if (isLegacyDefaultTab(fields)) {
+                LOGGER.info("Dropping entry editor tab '{}': it only repeats fields of the \"Main\" tab.", tabName);
+            } else {
+                customTabs.put(tabName, fields);
+            }
         }
-        if (customTabs.isEmpty()) {
+        if (!anyStored) {
             return;
         }
 
         LOGGER.info("Migrating {} custom entry editor tab(s) to the JSON preference format.", customTabs.size());
         prefs.put(V6_0_ENTRY_EDITOR_CUSTOM_TABS, new ObjectMapper().writeValueAsString(customTabs));
+    }
+
+    /// Whether a pre-v6.0-alpha.7 custom tab is one of the former default tabs "General" or "Abstract".
+    ///
+    /// Old versions wrote the default tabs to the store as if the user had defined them (any "Save" in the
+    /// preferences dialog and the former per-startup General-fields migration did), so the store cannot
+    /// tell defaults from customizations. Since [#12711](https://github.com/JabRef/jabref/issues/12711) the
+    /// "Main" tab shows all these fields, so such a tab is pure duplication. The tab name is not checked:
+    /// it was stored localized, and not necessarily in the current language.
+    ///
+    /// The "General" field set grew over the years (2019: the base set; then `doi`, `eprint`, `url`;
+    /// `citationcount`; `icore`; `eprinttype`), always including all special fields. Any stored set between
+    /// the smallest and the largest of these is treated as a default.
+    private static boolean isLegacyDefaultTab(List<String> fields) {
+        Set<String> stored = fields.stream().map(String::toLowerCase).collect(Collectors.toSet());
+        if (stored.equals(Set.of(StandardField.ABSTRACT.getName()))) {
+            return true;
+        }
+        Set<String> base = EnumSet.allOf(SpecialField.class).stream().map(SpecialField::getName).collect(Collectors.toSet());
+        base.addAll(List.of("crossref", "keywords", "file", "groups", "owner", "timestamp"));
+        Set<String> largest = new HashSet<>(base);
+        largest.addAll(List.of("doi", "eprint", "url", "citationcount", "icore", "eprinttype"));
+        return stored.containsAll(base) && largest.containsAll(stored);
     }
 
     /// The legacy key `smartFileAnnotations` toggled a "smart visibility" mode. Mode was adapted for all tabs in

@@ -43,6 +43,18 @@ class EntryEditorTabViewModelTest {
     }
 
     @Test
+    void classicTabsAreInsertedAfterMainAndNotDuplicated() {
+        viewModel.setValues();
+
+        viewModel.addClassicTabs();
+        viewModel.addClassicTabs();
+
+        List<String> names = viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList();
+        assertEquals(List.of(Localization.lang("Main"), Localization.lang("General"), Localization.lang("Abstract")), names.subList(0, 3));
+        assertEquals(1, names.stream().filter(Localization.lang("General")::equals).count());
+    }
+
+    @Test
     void customTabRoundTripsThroughStoreSettings() {
         viewModel.setValues();
 
