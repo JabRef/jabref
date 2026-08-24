@@ -96,7 +96,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         mscKeywordDescriptionsInitialized = true;
     }
 
-    /// Restores the default tab set: every built-in tab visible in default order, no custom tabs.
+    /// Restores the default tab set: every built-in tab visible in default order, plus the default "General" tab.
     public void resetToDefaults() {
         tabs.setAll(EntryEditorPreferences.getDefault().getTabModels().stream()
                                           .filter(model -> !model.isPreview())

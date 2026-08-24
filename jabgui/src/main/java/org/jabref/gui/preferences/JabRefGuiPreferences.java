@@ -449,8 +449,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
         ));
 
-        String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
-        if (StringUtil.isNotBlank(storedCustomTabs)) {
+        String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, null);
+        if (storedCustomTabs == null) {
+            // Never stored: the default custom tabs apply. An empty stored map means the user removed them all.
+            defaults.getTabModels().stream()
+                    .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                    .forEach(tabModels::add);
+        } else if (StringUtil.isNotBlank(storedCustomTabs)) {
             try {
                 OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
                         tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
@@ -459,7 +464,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         }
 
-        return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
+        List<String> storedOrder = getStringList(ENTRY_EDITOR_TAB_ORDER);
+        if (storedOrder.isEmpty()) {
+            // Never stored: order as the defaults do (e.g. the default custom "General" tab directly after "Main").
+            storedOrder = defaults.getTabModels().stream().map(JabRefGuiPreferences::tabOrderId).toList();
+        }
+        return applyStoredTabOrder(tabModels, storedOrder);
     }
 
     /// Reorders `tabModels` to match `storedOrder` (see [#ENTRY_EDITOR_TAB_ORDER]). The Preview tab stays

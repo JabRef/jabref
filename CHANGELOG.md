@@ -158,7 +158,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the redundant "Look up BibTeX entries in all open libraries" setting from the LibreOffice panel, which is now the toggle of "Look up BibTeX entries in the currently selected library only". [#16484](https://github.com/JabRef/jabref/pull/16484)
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
-- We removed the default custom entry editor tabs "General" and "Abstract"; their content is part of the new "Main" tab. User-defined custom tabs are kept. [#12711](https://github.com/JabRef/jabref/issues/12711)
+- We removed the default custom entry editor tab "Abstract"; its content is part of the new "Main" tab. User-defined custom tabs are kept. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
 - We removed the [CiteSeerX](https://en.wikipedia.org/wiki/CiteSeerX) fetcher, because the service is defunct and its links now redirect to the Wayback Machine. [#16299](https://github.com/JabRef/jabref/issues/16299)
 

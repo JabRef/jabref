@@ -1,9 +1,9 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -18,6 +18,10 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 public class EntryEditorPreferences {
 
@@ -93,10 +97,28 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
+    /// Every built-in tab visible in [EntryEditorTabModel.BuiltIn] order, plus the default custom "General" tab
+    /// (the fields also shown in the "Other" section of the "Main" tab, and the special fields) directly after "Main".
     private static List<EntryEditorTabModel> getDefaultTabModels() {
-        return Arrays.stream(EntryEditorTabModel.BuiltIn.values())
-                     .<EntryEditorTabModel>map(tab -> new EntryEditorTabModel.BuiltInTab(tab, true))
-                     .collect(Collectors.toCollection(ArrayList::new));
+        List<EntryEditorTabModel> tabModels = new ArrayList<>();
+        for (EntryEditorTabModel.BuiltIn tab : EntryEditorTabModel.BuiltIn.values()) {
+            tabModels.add(new EntryEditorTabModel.BuiltInTab(tab, true));
+            if (tab == EntryEditorTabModel.BuiltIn.ALL_FIELDS) {
+                tabModels.add(getDefaultGeneralTab());
+            }
+        }
+        return tabModels;
+    }
+
+    public static EntryEditorTabModel.CustomizedFieldsTab getDefaultGeneralTab() {
+        List<String> fields = Stream.concat(
+                                            Stream.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF,
+                                                    StandardField.KEYWORDS, StandardField.EPRINT, StandardField.EPRINTTYPE, StandardField.URL,
+                                                    StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP),
+                                            EnumSet.allOf(SpecialField.class).stream())
+                                    .map(Field::getName)
+                                    .toList();
+        return new EntryEditorTabModel.CustomizedFieldsTab(Localization.lang("General"), fields);
     }
 
     public static EntryEditorPreferences getDefault() {
