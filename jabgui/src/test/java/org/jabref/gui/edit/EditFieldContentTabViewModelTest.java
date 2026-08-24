@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
+import org.jabref.gui.edit.automaticfieldeditor.editfieldcontent.EditFieldContentViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

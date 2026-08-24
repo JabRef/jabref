@@ -3,6 +3,16 @@ parent: Requirements
 ---
 # CLI
 
+## Remote server health check
+`req~jabref.remote.health-check~1`
+
+The remote listener accepts the versioned plain-text request `JABREF/1 PING` and responds with
+`JABREF/1 PONG jabref`. This check identifies a running JabRef instance without requiring clients
+to implement the Java serialization protocol. Existing serialized remote-operation requests remain
+supported.
+
+Needs: impl
+
 ## Input file as positional argument across all commands
 `req~jabkit.cli.input-flag~2`
 
@@ -12,8 +22,6 @@ Exactly one of the two forms must be supplied.
 See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more details.
 
 Needs: impl
-
-<!-- markdownlint-disable-file MD022 -->
 
 ## Input file argument accepts an http(s)/ftp URL
 `req~jabkit.cli.input-url~1`
@@ -68,3 +76,5 @@ Windows-style paths (containing `:`) and titles (containing `:` between citation
 are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->

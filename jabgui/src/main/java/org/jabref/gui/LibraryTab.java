@@ -68,6 +68,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
@@ -98,6 +99,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -807,11 +809,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void suspendChangeMonitor() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::suspendChangeDetection);
     }
 
+    /// Resuming also scans for external changes that arrived while the monitor was suspended, e.g. a concurrent write
+    /// that aborted the suspended save — the standard external-changes review flow is offered for them.
     public void resumeChangeMonitor() {
-        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+        changeMonitor.ifPresent(DatabaseChangeMonitor::resumeChangeDetection);
     }
 
     public void insertEntry(final BibEntry bibEntry) {
@@ -1008,8 +1012,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void resetChangedProperties() {
+        resetChangedProperties(null);
+    }
+
+    /// All call sites mean "in-memory library now matches the disk", so file events for that state need no scan.
+    ///
+    /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
+    public void resetChangedProperties(@Nullable FileSnapshot diskState) {
         this.nonUndoableChangeProperty.setValue(false);
         this.changedProperty.setValue(false);
+        changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 
     public void back() {
