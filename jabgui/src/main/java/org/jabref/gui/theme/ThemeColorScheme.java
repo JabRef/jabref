@@ -3,7 +3,7 @@ package org.jabref.gui.theme;
 import org.jabref.logic.l10n.Localization;
 
 public enum ThemeColorScheme {
-    FOLLOW_SYSTEM(Localization.lang("Follow System")),
+    FOLLOW_SYSTEM(Localization.lang("Follow system")),
     LIGHT(Localization.lang("Light")),
     DARK(Localization.lang("Dark"));
 

@@ -65,12 +65,12 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         viewModel.selectedThemeProperty(),
                                         ThemePreset::getLocalizedName,
                                         theme -> theme.validate(viewModel.themeValidationStatus()))
-                                .combo(Localization.lang("Color Scheme"),
+                                .combo(Localization.lang("Color scheme"),
                                         viewModel.colorSchemeListProperty(),
                                         viewModel.selectedThemeColorSchemeProperty(),
                                         ThemeColorScheme::getLocalizedName,
                                         colorScheme -> colorScheme.validate(viewModel.themeColorSchemeValidationStatus()))
-                                .checkWithField(Localization.lang("Custom Theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
+                                .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
                                         path -> path
                                                 .browse(viewModel::importCSSFile)
                                                 .disableWhen(viewModel.customThemeEnabledProperty().not())

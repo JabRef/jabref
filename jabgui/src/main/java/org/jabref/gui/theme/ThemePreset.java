@@ -3,8 +3,8 @@ package org.jabref.gui.theme;
 import org.jabref.logic.l10n.Localization;
 
 public enum ThemePreset {
-    JABREF(Localization.lang("JabRef Theme"), "jabref-theme.css"),
-    PRIMER(Localization.lang("Primer Theme"), "primer-theme.css");
+    JABREF(Localization.lang("JabRef theme"), "jabref-theme.css"),
+    PRIMER(Localization.lang("Primer theme"), "primer-theme.css");
 
     private final String themeName;
     private final String css;

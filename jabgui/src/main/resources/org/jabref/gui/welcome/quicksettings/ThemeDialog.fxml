@@ -32,7 +32,7 @@
                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
                     <HBox alignment="CENTER_LEFT" spacing="4.0" GridPane.rowIndex="3" GridPane.columnIndex="0">
-                        <CheckBox fx:id="customTheme" text="%Custom Theme" />
+                        <CheckBox fx:id="customTheme" text="%Custom theme" />
                         <HelpButton fx:id="helpButton"/>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0"
@@ -48,7 +48,7 @@
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Label text="%Color Scheme"
+                    <Label text="%Color scheme"
                            GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                     <ComboBox fx:id="themeColorScheme" prefWidth="200.0"
                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
