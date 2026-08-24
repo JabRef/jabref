@@ -8,8 +8,11 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
@@ -62,8 +66,9 @@ class AtomicFileOutputStreamTest {
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(targetFile));
     }
 
+    // [utest->req~logic.exporter.concurrent-save-detection~1]
     @Test
-    void interleavedSavesUseSeparateTemporaryFiles(@TempDir Path tempDir) throws IOException {
+    void interleavedSavesDoNotOverwriteEachOther(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("simultaneous-save.txt");
         Files.writeString(targetFile, FIFTY_CHARS);
 
@@ -75,8 +80,106 @@ class AtomicFileOutputStreamTest {
         firstSave.close();
         assertEquals("first", Files.readString(targetFile));
 
-        secondSave.close();
-        assertEquals("second", Files.readString(targetFile));
+        // The save finishing last must not win: it would overwrite the content committed by the first save
+        assertThrows(FileChangedException.class, secondSave::close);
+        assertEquals("first", Files.readString(targetFile));
+        try (Stream<Path> remainingFiles = Files.list(tempDir)) {
+            // Neither a temporary nor a backup file of the aborted save is left behind
+            assertEquals(List.of(targetFile), remainingFiles.toList());
+        }
+    }
+
+    @Test
+    void externalChangeOfTargetAbortsSave(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("externally-changed.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile);
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        Files.writeString(targetFile, "externally changed");
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+        assertEquals("externally changed", Files.readString(targetFile));
+    }
+
+    @Test
+    void externalCreationOfTargetAbortsSave(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("externally-created.txt");
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile);
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        Files.writeString(targetFile, "externally created");
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+        assertEquals("externally created", Files.readString(targetFile));
+    }
+
+    @Test
+    void externalChangeDuringBackupCreationLeavesNoBackupBehind(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("changed-during-backup.txt");
+        Path temporaryFile = tempDir.resolve("changed-during-backup.txt.tmp");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(
+                targetFile,
+                temporaryFile,
+                Files.newOutputStream(temporaryFile),
+                false,
+                (source, target) -> {
+                    throw new AssertionError("The aborted save must not commit");
+                },
+                (source, target) -> {
+                    Files.copy(source, target);
+                    // Simulate a concurrent writer hitting the target while the backup copy is running
+                    Files.writeString(source, "changed during backup");
+                });
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+
+        assertEquals("changed during backup", Files.readString(targetFile));
+        assertFalse(Files.exists(atomicFileOutputStream.getBackup()));
+    }
+
+    @Test
+    void inheritedBaselineDetectsChangePredatingStreamCreation(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("inherited-baseline.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+        FileSnapshot baseline = FileSnapshot.read(targetFile);
+        // The concurrent write happens before the stream is opened — only the inherited baseline can detect it
+        Files.writeString(targetFile, "changed before stream creation");
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile, false, baseline);
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+        assertEquals("changed before stream creation", Files.readString(targetFile));
+    }
+
+    @Test
+    void committedTargetFileStateMatchesFileAfterSuccessfulClose(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("committed-state.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile);
+        assertNull(atomicFileOutputStream.getCommittedTargetFileState());
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        atomicFileOutputStream.close();
+
+        assertEquals(FileSnapshot.read(targetFile), atomicFileOutputStream.getCommittedTargetFileState());
+    }
+
+    @Test
+    void externalDeletionOfTargetAbortsSave(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("externally-deleted.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile);
+        atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        Files.delete(targetFile);
+
+        assertThrows(FileChangedException.class, atomicFileOutputStream::close);
+        assertFalse(Files.exists(targetFile));
     }
 
     @Test
