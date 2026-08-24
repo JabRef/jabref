@@ -386,7 +386,7 @@ public class ImportHandler {
                       .onSuccess(adjustedEntry -> {
                           importCleanedEntries(transferInformation, List.of(adjustedEntry));
                           tracker.markImported(adjustedEntry);
-                          // After all entries moved, they are removed from the source library.
+                          // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
                           // TODO: Add undo support for moving entries between libraries.
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
                               BibDatabase sourceDatabase = transferInformation.bibDatabaseContext().getDatabase();
