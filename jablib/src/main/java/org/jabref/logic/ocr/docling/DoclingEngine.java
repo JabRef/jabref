@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.ocr.OcrEngine;
@@ -60,9 +61,17 @@ public class DoclingEngine implements OcrEngine {
         command.add("--no-tables");
         command.add("--image-export-mode");
         command.add("placeholder");
+
+        List<String> languages = ocrPreferences.getOcrLanguages();
+        if (!languages.isEmpty()) {
+            command.add("--ocr-lang");
+            command.add(String.join(",", languages));
+        }
+
         command.add("--output");
         command.add(outputDir.toString());
         command.add(pdfPath.toString());
+
         OcrResult ocrResult = OcrUtils.performOcr(command, getName());
         if (ocrResult.isSuccess()) {
             String fileName = pdfPath.getFileName().toString();

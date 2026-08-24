@@ -2185,8 +2185,8 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
-        ocrPreferences.ocrLanguagesProperty().addListener((observable, oldValue, newValue) ->
-                putStringList(OCR_LANGUAGES, newValue));
+        ocrPreferences.getOcrLanguages().addListener((javafx.collections.ListChangeListener<String>) change ->
+                putStringList(OCR_LANGUAGES, List.copyOf(ocrPreferences.getOcrLanguages())));
 
         return ocrPreferences;
     }

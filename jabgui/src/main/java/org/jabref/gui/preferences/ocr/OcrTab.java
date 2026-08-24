@@ -77,11 +77,11 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 
             @Override
             public OcrLanguage fromString(String string) {
-                return null;
+                throw new UnsupportedOperationException("Conversion from String is not supported");
             }
         });
 
-        viewModel.ocrLanguagesProperty().stream()
+        viewModel.ocrLanguagesProperty().get().stream()
                  .map(OcrLanguage::fromCode)
                  .forEach(languagesCombo.getCheckModel()::check);
 
@@ -95,7 +95,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
         );
 
         HBox.setHgrow(languagesCombo, Priority.ALWAYS);
-        HBox row = new HBox(8.0, new Label(Localization.lang("OCR languages")), languagesCombo);
+        HBox row = new HBox(8.0, new Label(Localization.lang("OCR Languages")), languagesCombo);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
