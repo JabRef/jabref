@@ -53,6 +53,7 @@ public class UnlinkedFilesWizard {
         });
 
         Optional<ButtonType> result = wizard.showAndWait();
+        page2.shutdown();
 
         if (result.isPresent()) {
             if (result.get() == ButtonType.FINISH) {
@@ -78,7 +79,7 @@ public class UnlinkedFilesWizard {
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferences, stateManager, taskExecutor);
 
         page1 = new SearchConfigurationPage(viewModel, bibDatabaseContext, preferences);
-        page2 = new FileSelectionPage(stateManager, viewModel);
+        page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);
         page3 = new ImportResultsPage(viewModel);
 
         page1.setPrefSize(650, 550);
