@@ -6,15 +6,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrFailureReason;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
-import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ocr.docling.DoclingBBox;
 import org.jabref.model.ocr.docling.DoclingDocument;
@@ -51,7 +48,7 @@ public class DoclingEngine implements OcrEngine {
     }
 
     @Override
-    public OcrResult performOcrAndEmbedText(Path pdfPath) {
+    public OcrResult performOcrAndEmbedText(Path pdfPath) throws IOException {
         if (!OcrUtils.isAvailable(ocrPreferences)) {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
@@ -66,38 +63,14 @@ public class DoclingEngine implements OcrEngine {
         command.add("--output");
         command.add(outputDir.toString());
         command.add(pdfPath.toString());
-        Process process = null;
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            process = processBuilder.start();
-
-            // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-
-            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
-            if (!finished) {
-                process.destroyForcibly();
-                return OcrResult.failure(OcrFailureReason.TIMEOUT);
-            }
-
-            if (process.exitValue() == 0) {
-                String fileName = pdfPath.getFileName().toString();
-                String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
-                Path jsonOutputPath = outputDir.resolve(baseName + ".json");
-                return embedText(jsonOutputPath, pdfPath);
-            } else {
-                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while running Docling.", e);
-            return OcrResult.failure(OcrFailureReason.IO_ERROR);
-        } catch (InterruptedException e) {
-            process.destroyForcibly();
-            Thread.currentThread().interrupt();
-            LOGGER.error("Docling process was interrupted.", e);
-            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
+        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        if (ocrResult.isSuccess()) {
+            String fileName = pdfPath.getFileName().toString();
+            String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+            Path jsonOutputPath = outputDir.resolve(baseName + ".json");
+            return embedText(jsonOutputPath, pdfPath);
+        } else {
+            return ocrResult;
         }
     }
 
