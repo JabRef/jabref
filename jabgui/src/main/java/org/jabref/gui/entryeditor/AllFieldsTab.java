@@ -566,10 +566,13 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// field if necessary) and focuses it.
     // [impl->req~entry-editor.main-tab.add-chips~1]
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        showFieldEditor(bibDatabaseContext, entry, field, true);
+    }
+
+    private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field, boolean openAddFileDialogForFile) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
         Platform.runLater(() -> {
-            // Re-check the staleness guard inside this inner block because the entry may have changed between the two pulses.
             Platform.runLater(() -> {
                 if (getCurrentEntry() != entry) {
                     return;
@@ -577,17 +580,17 @@ public class AllFieldsTab extends FieldsEditorTab {
                 requestFocus(field);
                 // Adding the File field via its "+" chip should immediately open the add-file dialog,
                 // since an empty File editor has no other purpose than to receive a file.
-                if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                // navigation must not pop up a modal dialog as a side effect.
+                if (openAddFileDialogForFile && (StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
                     linkedFilesEditor.addNewFile();
                 }
             });
         });
     }
 
-    /// Adds `field` to the entry's field list (if not already shown) and focuses it.
     public void addFieldAndFocus(Field field) {
         Optional.ofNullable(getCurrentEntry())
-                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field));
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field, false));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
