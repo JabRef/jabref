@@ -1102,6 +1102,13 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* EntryEditor */
+/* The tab content area is transparent by default, so the window-canvas color
+   (-color-bg-primary) would shine through behind the field grids. Paint it like
+   the "Main" tab's container so all tabs read as one content surface. */
+#entryEditor .tab-pane > .tab-content-area {
+    -fx-background-color: -color-bg-secondary;
+}
+
 #entryEditor .editorPane {
     -fx-hgap: 8;
     -fx-vgap: 8;
