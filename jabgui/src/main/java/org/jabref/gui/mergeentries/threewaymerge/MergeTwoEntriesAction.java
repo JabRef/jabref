@@ -33,8 +33,8 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
 
         undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-            edit.apply(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
-            edit.apply(new UndoableRemoveEntries(database, entriesToRemove));
+            edit.applyEdit(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
+            edit.applyEdit(new UndoableRemoveEntries(database, entriesToRemove));
         });
     }
 }

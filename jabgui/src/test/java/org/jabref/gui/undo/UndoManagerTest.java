@@ -164,7 +164,7 @@ class UndoManagerTest {
 
     @Test
     void applyPerformsTheChangeAndRecordsIt() {
-        undoRedoManager.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+        undoRedoManager.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
         assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
 
         undoRedoManager.undo();
@@ -174,8 +174,8 @@ class UndoManagerTest {
     @Test
     void applyInsideABlockJoinsIt() {
         undoRedoManager.addEdit("both", edit -> {
-            edit.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
-            edit.apply(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the quantum theory"));
+            edit.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+            edit.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the quantum theory"));
         });
         assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("On the quantum theory"), entry.getField(StandardField.TITLE));
@@ -486,7 +486,7 @@ class UndoManagerTest {
         BibEntry probingEntry = new ProbingEntry("Bohr",
                 () -> lockedWhileApplying.set(Thread.holdsLock(undoRedoManager)));
 
-        undoRedoManager.apply(new UndoableFieldChange(probingEntry, StandardField.AUTHOR, null, "Bohr"));
+        undoRedoManager.applyEdit(new UndoableFieldChange(probingEntry, StandardField.AUTHOR, null, "Bohr"));
 
         assertTrue(lockedWhileApplying.get(),
                 "the library was written before the journal was locked, so an undo could have run in between");
@@ -499,8 +499,8 @@ class UndoManagerTest {
     @Test
     void applyingInsideABlockRecordsIntoThatStep() {
         undoRedoManager.addEdit("two fields", edit -> {
-            edit.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
-            edit.apply(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the constitution of atoms"));
+            edit.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+            edit.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the constitution of atoms"));
         });
 
         assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));

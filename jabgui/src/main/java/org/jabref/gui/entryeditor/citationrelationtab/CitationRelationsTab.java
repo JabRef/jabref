@@ -1044,9 +1044,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             BibDatabase database = libraryTab.get().getDatabase();
             undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-                edit.apply(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                edit.applyEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
                 libraryTab.get().getMainTable().setCitationMergeMode(true);
-                edit.apply(new UndoableInsertEntries(database, mergedEntry));
+                edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));
             });
 
             dialogService.notify(Localization.lang("Merged entries"));

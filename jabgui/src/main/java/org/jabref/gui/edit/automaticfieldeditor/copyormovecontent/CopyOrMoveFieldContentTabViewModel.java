@@ -116,7 +116,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
             if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
-                    copyFieldValueEdit.apply(new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue));
+                    copyFieldValueEdit.applyEdit(new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue));
                     affectedEntriesCount++;
                 }
             }
@@ -148,8 +148,8 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             String toFieldValue = entry.getField(toField.get()).orElse("");
 
             if (overwriteFieldContent.get() && StringUtil.isNotBlank(fromFieldValue) && StringUtil.isNotBlank(toFieldValue)) {
-                swapFieldValuesEdit.apply(new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue));
-                swapFieldValuesEdit.apply(new UndoableFieldChange(entry, fromField.get(), fromFieldValue, toFieldValue));
+                swapFieldValuesEdit.applyEdit(new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue));
+                swapFieldValuesEdit.applyEdit(new UndoableFieldChange(entry, fromField.get(), fromFieldValue, toFieldValue));
                 affectedEntriesCount++;
             }
         }

@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
 /// Commands push from background tasks — cleanup and import both do — so each operation takes
 /// this object's monitor for exactly as long as it touches the stacks, and no longer:
 ///
-///   - Applying the change is inside the lock, in [#apply], [#undo] and [#redo] alike. It has
+///   - Applying the change is inside the lock, in [#applyEdit], [#undo] and [#redo] alike.
+///     It has
 ///     to be: if the stack transition and the model write could interleave, two threads could
 ///     undo the same change, or an undo could land between a change being applied and being
 ///     recorded.
@@ -107,9 +108,7 @@ public class UndoManager {
             compound.addEdit(change);
             return;
         }
-        // A set that collected nothing is not an undo step. Pushing one would enable Undo and
-        // let the next Ctrl+Z consume a no-op instead of the user's previous edit.
-        if ((change instanceof ChangeSet changeSet) && changeSet.isEmpty()) {
+        if (isEmptyStep(change)) {
             return;
         }
         synchronized (this) {
@@ -123,21 +122,25 @@ public class UndoManager {
     /// one without the other, nor in time, since both happen under one acquisition of the
     /// monitor.
     ///
+    /// The counterpart to [#addEdit(BibChange)], and the difference between the two is only who
+    /// performs the change: `addEdit` takes a change the caller has already made, this one makes
+    /// it. Everything after that is the same journal entry.
+    ///
     /// The single acquisition is the point. Applying and then recording as two operations leaves
     /// a window in which the library holds the change and the journal does not: an [#undo]
     /// arriving there reverts the *previous* change, and the history that ends up on the stack
-    /// describes a library state that never existed.
+    /// describes a library state that never existed. `addEdit` cannot offer this — by the time
+    /// it hears about the change, the caller made it long ago.
     ///
     /// Inside an [#addEdit] block there is no window to close. That recorder belongs to one
     /// thread and nothing reaches the stacks until the block ends, so no lock is taken here.
-    public void apply(BibChange change) {
+    public void applyEdit(BibChange change) {
         CompoundEdit compound = active.get();
         if (compound != null) {
-            compound.apply(change);
+            compound.applyEdit(change);
             return;
         }
-        // Applying an empty set changes nothing, so this is the same no-op as in addEdit.
-        if ((change instanceof ChangeSet changeSet) && changeSet.isEmpty()) {
+        if (isEmptyStep(change)) {
             return;
         }
         synchronized (this) {
@@ -147,11 +150,20 @@ public class UndoManager {
         notifyListeners();
     }
 
+    /// Whether `change` would be an undo step that does nothing.
+    ///
+    /// A set that collected nothing is not an undo step: pushing one would enable Undo and let
+    /// the next Ctrl+Z consume a no-op instead of the user's previous edit. Applying one changes
+    /// nothing either, so both entry points skip it for the same reason.
+    private static boolean isEmptyStep(BibChange change) {
+        return (change instanceof ChangeSet changeSet) && changeSet.isEmpty();
+    }
+
     /// Puts `change` on the undo stack as a new position and discards the redo stack, which the
     /// new change has made unreachable.
     ///
     /// Callers hold this object's monitor: the stack transition is what the monitor protects,
-    /// and [#apply] needs the model write to happen inside the same acquisition.
+    /// and [#applyEdit] needs the model write to happen inside the same acquisition.
     private void push(BibChange change) {
         assert Thread.holdsLock(this);
 

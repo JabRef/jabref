@@ -292,7 +292,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
             }
         }
 
@@ -310,13 +310,13 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.apply(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
         undoManager.addEdit(compound.toChangeSet());
 
