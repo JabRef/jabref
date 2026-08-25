@@ -120,7 +120,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         ResolvedRepository repository = resolveRepository();
         // Unlike doCommit(), a missing commit here is not fatal: a previous attempt may already have
         // committed and only the push failed, so retrying should still try to push that commit.
-        boolean committedNow = repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
+        boolean committedNow = commitCurrent(repository);
         return pushTo(repository, committedNow);
     }
 
@@ -165,11 +165,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
-        boolean committed = repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
         // TODO: Replace control-flow-by-exception with a proper control structure
-        if (!committed) {
+        if (!commitCurrent(repository)) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
         }
+    }
+
+    private boolean commitCurrent(ResolvedRepository repository) throws GitAPIException, IOException {
+        return repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
     }
 
     private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
