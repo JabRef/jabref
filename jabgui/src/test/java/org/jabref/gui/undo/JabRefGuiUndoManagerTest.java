@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 
-import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -28,15 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// the JavaFX thread, and `Platform.runLater` is what requires one. The properties themselves
 /// would not.
 @ExtendWith(ApplicationExtension.class)
-class GuiUndoManagerTest {
+class JabRefGuiUndoManagerTest {
 
-    private final JabRefUndoManager undoManager = new JabRefUndoManager();
-    private GuiUndoManager properties;
+    private final JabRefGuiUndoManager undoManager = new JabRefGuiUndoManager();
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        properties = new GuiUndoManager(undoManager);
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 
@@ -48,8 +45,8 @@ class GuiUndoManagerTest {
 
     @Test
     void propertiesStartOutMatchingAnEmptyManager() {
-        assertFalse(properties.undoableProperty().get());
-        assertFalse(properties.redoableProperty().get());
+        assertFalse(undoManager.undoableProperty().get());
+        assertFalse(undoManager.redoableProperty().get());
     }
 
     /// Recorded from the test thread, so the update is posted to the JavaFX thread rather than
@@ -58,18 +55,18 @@ class GuiUndoManagerTest {
     void propertiesFollowTheStacks() {
         undoManager.addEdit(setAuthor("Bohr"));
         WaitForAsyncUtils.waitForFxEvents();
-        assertTrue(properties.undoableProperty().get());
-        assertFalse(properties.redoableProperty().get());
+        assertTrue(undoManager.undoableProperty().get());
+        assertFalse(undoManager.redoableProperty().get());
 
         undoManager.undo();
         WaitForAsyncUtils.waitForFxEvents();
-        assertFalse(properties.undoableProperty().get());
-        assertTrue(properties.redoableProperty().get());
+        assertFalse(undoManager.undoableProperty().get());
+        assertTrue(undoManager.redoableProperty().get());
 
         undoManager.redo();
         WaitForAsyncUtils.waitForFxEvents();
-        assertTrue(properties.undoableProperty().get());
-        assertFalse(properties.redoableProperty().get());
+        assertTrue(undoManager.undoableProperty().get());
+        assertFalse(undoManager.redoableProperty().get());
     }
 
     /// Recorded from the JavaFX thread, where there is nothing to wait for: the property is
@@ -80,7 +77,7 @@ class GuiUndoManagerTest {
 
         WaitForAsyncUtils.asyncFx(() -> {
             undoManager.addEdit(setAuthor("Bohr"));
-            undoableImmediatelyAfterTheEdit.set(properties.undoableProperty().get());
+            undoableImmediatelyAfterTheEdit.set(undoManager.undoableProperty().get());
         });
         WaitForAsyncUtils.waitForFxEvents();
 
@@ -94,7 +91,7 @@ class GuiUndoManagerTest {
     @Test
     void aQueuedUpdateAppliesTheStateItFindsWhenItRuns() throws InterruptedException {
         List<Boolean> undoableValues = new CopyOnWriteArrayList<>();
-        WaitForAsyncUtils.asyncFx(() -> properties.undoableProperty()
+        WaitForAsyncUtils.asyncFx(() -> undoManager.undoableProperty()
                                                   .addListener((observable, was, is) -> undoableValues.add(is)));
         WaitForAsyncUtils.waitForFxEvents();
 
@@ -114,7 +111,7 @@ class GuiUndoManagerTest {
         release.countDown();
         WaitForAsyncUtils.waitForFxEvents();
 
-        assertFalse(properties.undoableProperty().get());
+        assertFalse(undoManager.undoableProperty().get());
         assertEquals(List.of(), undoableValues);
     }
 }

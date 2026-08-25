@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.logic.undo.JabRefUndoManager;
+import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class ReplaceStringViewModelTest {
 
     private final LibraryTab libraryTab = mock(LibraryTab.class);
-    private final JabRefUndoManager undoManager = new JabRefUndoManager();
+    private final JabRefGuiUndoManager undoManager = new JabRefGuiUndoManager();
     private BibEntry entry;
     private ReplaceStringViewModel viewModel;
 

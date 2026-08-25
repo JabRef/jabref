@@ -9,19 +9,18 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.JabRefUndoManager;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class UndoAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
-    private final JabRefUndoManager undoManager;
+    private final GuiUndoManager undoManager;
 
     public UndoAction(Supplier<LibraryTab> tabSupplier, GuiUndoManager guiUndoManager, DialogService dialogService, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
-        this.undoManager = guiUndoManager.getUndoManager();
+        this.undoManager = guiUndoManager;
 
         this.executable.bind(Bindings.and(needsDatabase(stateManager), guiUndoManager.undoableProperty()));
     }

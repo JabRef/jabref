@@ -35,6 +35,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
@@ -45,7 +46,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -67,7 +67,7 @@ public class WelcomeTab extends Tab {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final JabRefUndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
@@ -88,7 +88,7 @@ public class WelcomeTab extends Tab {
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
-                      JabRefUndoManager undoManager,
+                      GuiUndoManager undoManager,
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,

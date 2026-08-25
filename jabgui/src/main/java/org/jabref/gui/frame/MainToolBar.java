@@ -31,7 +31,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -55,8 +54,7 @@ public class MainToolBar extends ToolBar {
     private final ClipBoardManager clipBoardManager;
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
-    private final JabRefUndoManager undoManager;
-    private final GuiUndoManager guiUndoManager;
+    private final GuiUndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
@@ -74,8 +72,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       JabRefUndoManager undoManager,
-                       GuiUndoManager guiUndoManager,
+                          GuiUndoManager undoManager,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -89,7 +86,6 @@ public class MainToolBar extends ToolBar {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
-        this.guiUndoManager = guiUndoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createToolBar();
@@ -133,8 +129,8 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
