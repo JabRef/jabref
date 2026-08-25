@@ -155,4 +155,21 @@ class BSTCitationOOAdapterTest {
         assertEquals(Map.of("smith2020", 1, "smith2020a", 2), styleOrderAndLabels.identifierToNumberMap());
         assertEquals(Map.of("smith2020a", "SG20"), styleOrderAndLabels.identifierToLabelMap());
     }
+
+    @Test
+    void computeStyleOrderAndLabels_normalizesEtalcharLabels() {
+        String renderedBibliography = """
+                \\begin{thebibliography}{}
+                \\bibitem[TLY{\\etalchar{+}}21]{Tan_2021}
+                Tan entry
+                \\end{thebibliography}
+                """;
+
+        BSTCitationOOAdapter.StyleOrderAndLabels styleOrderAndLabels = BSTCitationOOAdapter.computeStyleOrderAndLabels(
+                renderedBibliography,
+                Map.of("Tan_2021", "Tan_2021"));
+
+        assertEquals(Map.of("Tan_2021", 1), styleOrderAndLabels.identifierToNumberMap());
+        assertEquals(Map.of("Tan_2021", "TLY+21"), styleOrderAndLabels.identifierToLabelMap());
+    }
 }

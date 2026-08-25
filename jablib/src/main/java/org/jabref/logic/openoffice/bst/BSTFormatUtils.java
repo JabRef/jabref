@@ -16,6 +16,8 @@ import org.jspecify.annotations.NullMarked;
 public final class BSTFormatUtils {
 
     private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
+    private static final Pattern BRACED_ETALCHAR_PATTERN = Pattern.compile("\\{\\\\etalchar\\{([^}]*)}}");
+    private static final Pattern ETALCHAR_PATTERN = Pattern.compile("\\\\etalchar\\{([^}]*)}");
 
     private BSTFormatUtils() {
     }
@@ -61,6 +63,11 @@ public final class BSTFormatUtils {
         s = replaceLegacySwitch(s, "it", "textit");
         s = replaceLegacySwitch(s, "em", "emph");
         return s;
+    }
+
+    public static String normalizeBibItemLabel(String label) {
+        String normalized = BRACED_ETALCHAR_PATTERN.matcher(label).replaceAll("$1");
+        return ETALCHAR_PATTERN.matcher(normalized).replaceAll("$1");
     }
 
     private static String replaceLegacySwitch(String input, String legacy, String modern) {

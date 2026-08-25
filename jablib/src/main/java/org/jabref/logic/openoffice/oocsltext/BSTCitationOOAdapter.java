@@ -356,7 +356,7 @@ public class BSTCitationOOAdapter {
 
             String label = bibitemMatcher.group("label");
             if ((label != null) && !label.isBlank()) {
-                identifierToLabel.put(identifier, label);
+                identifierToLabel.put(identifier, BSTFormatUtils.normalizeBibItemLabel(label));
             }
         }
 
