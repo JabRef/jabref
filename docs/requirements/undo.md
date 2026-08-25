@@ -12,6 +12,9 @@ Reaching an equal number of applied changes along a different history does not: 
 The same holds for a position dropped when the stack reaches its depth limit.
 This decides whether the modified marker is shown and whether closing the library offers to save it, so a wrong answer loses the user's work silently.
 
+The requirement is stated per library, while one journal currently serves the whole application: with several libraries open, the saved position of one is the saved position of all.
+Closing that gap is separate work and is not covered here.
+
 Needs: impl, utest
 
 ## An undoable change is applied and recorded as one operation

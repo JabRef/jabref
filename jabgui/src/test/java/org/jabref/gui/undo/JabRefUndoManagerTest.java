@@ -366,6 +366,20 @@ class JabRefUndoManagerTest {
         assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
     }
 
+    /// Severity does not make the library less modified: an Error ends the block like anything
+    /// else, and what it wrote before dying still has to be takeable back.
+    @Test
+    void aBlockKilledByAnErrorHandsOverWhatItAlreadyChanged() {
+        assertThrows(AssertionError.class, () -> undoRedoManager.addEdit("half", edit -> {
+            edit.addEdit(setAuthor("Bohr"));
+            throw new AssertionError("a model invariant gave way here");
+        }));
+
+        assertTrue(undoRedoManager.canUndo());
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
     /// Nothing recorded means nothing to hand over, failure or not: an empty step would enable
     /// Undo and let the next Ctrl+Z consume a no-op instead of the user's previous edit.
     @Test

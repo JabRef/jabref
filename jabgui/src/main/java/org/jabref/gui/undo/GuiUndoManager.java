@@ -36,7 +36,12 @@ public interface GuiUndoManager extends UndoManager {
     /// Marks the current position as saved.
     void markUnchanged();
 
-    /// Discards both stacks, for a library that is being closed or reloaded.
+    /// Discards both stacks and the saved position.
+    ///
+    /// Nothing calls this today, which is a defect rather than a spare method: closing a library
+    /// leaves its changes on the stack, so a later undo re-applies them against a database that
+    /// is gone, and the entries they hold stay alive for the session. Calling it on close needs
+    /// the journal to belong to a library first — one journal currently serves them all.
     void clear();
 
     /// Notified after every change to either stack, from whichever thread made it.
