@@ -17,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -74,7 +75,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     }
 
     public void setFieldValue() {
-        CompoundEdit edits = new CompoundEdit("CHANGE_SELECTED_FIELD");
+        CompoundEdit edits = new CompoundEdit(Localization.lang("Set"));
         String toSetFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
@@ -92,7 +93,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     }
 
     public void appendToFieldValue() {
-        CompoundEdit edits = new CompoundEdit("APPEND_TO_SELECTED_FIELD");
+        CompoundEdit edits = new CompoundEdit(Localization.lang("Append"));
         String toAppendFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {

@@ -26,6 +26,9 @@ public final class CompoundEdit {
     private final String name;
     private final List<BibChange> changes = new ArrayList<>();
 
+    /// @param name what the user did, as they would recognise it — see [ChangeSet]. It travels
+    ///             unchanged into the set that [#toChangeSet] builds, so whatever is passed here
+    ///             is what a reader eventually sees.
     public CompoundEdit(String name) {
         this.name = name;
     }

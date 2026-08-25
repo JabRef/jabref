@@ -14,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
 import org.jabref.gui.edit.automaticfieldeditor.MoveFieldValueAction;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -107,7 +108,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void copyValue() {
-        CompoundEdit copyFieldValueEdit = new CompoundEdit("COPY_FIELD_VALUE");
+        CompoundEdit copyFieldValueEdit = new CompoundEdit(Localization.lang("Copy content"));
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
@@ -125,7 +126,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void moveValue() {
-        CompoundEdit moveEdit = new CompoundEdit("MOVE_EDIT");
+        CompoundEdit moveEdit = new CompoundEdit(Localization.lang("Move content"));
         int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
             affectedEntriesCount = new MoveFieldValueAction(fromField.get(),
@@ -138,7 +139,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void swapValues() {
-        CompoundEdit swapFieldValuesEdit = new CompoundEdit("SWAP_FIELD_VALUES");
+        CompoundEdit swapFieldValuesEdit = new CompoundEdit(Localization.lang("Swap content"));
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
