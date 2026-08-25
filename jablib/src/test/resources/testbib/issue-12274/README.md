@@ -2,7 +2,7 @@
 
 This is an example for [#12274](https://github.com/JabRef/jabref/issues/12274).
 
-## Example 1: Straight-foward-case
+## Example 1: Straight-forward-case
 
 1. Open JabRef.
 2. Open `issue-12274.bib`.
