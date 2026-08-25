@@ -20,7 +20,8 @@ public class BackupFileUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
 
-    /// Extension of the single backup that JabRef versions before 6.0 wrote next to the library
+    /// Extension of the single backup next to the library, as written by JabRef 5.8 up to the 6.0 alphas when the backup directory was not available.
+    /// Before 5.8, `<library>.bak` was the copy of the previous content made on save (the automatic backup was `<library>.sav` then), which is a usable backup as well.
     private static final String LEGACY_BACKUP_EXTENSION = ".bak";
 
     private BackupFileUtil() {

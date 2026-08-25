@@ -44,7 +44,7 @@ public class SaveConfiguration {
 
     /// Required by {@link org.jabref.gui.autosaveandbackup.BackupManager}. Should not be used in other settings
     ///
-    /// @param newMakeBackup whether a backup (.sav file) should be made
+    /// @param newMakeBackup whether the .sav copy of the previous file content is kept after a successful save
     public SaveConfiguration withMakeBackup(Boolean newMakeBackup) {
         this.makeBackup = newMakeBackup;
         return this;
