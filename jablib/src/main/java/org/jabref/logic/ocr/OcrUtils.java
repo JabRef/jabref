@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
@@ -22,6 +23,10 @@ public final class OcrUtils {
     public static final int TIMEOUT_MINS = 10;
     public static final int CHECKING_TIMEOUT = 10;
     public static final Logger LOGGER = LoggerFactory.getLogger(OcrUtils.class);
+
+    /// Upper bound on how much of a failing OCR process's output is kept for the failure
+    /// dialog. A verbose engine should not be able to grow this without bound.
+    private static final int MAX_CAPTURED_OUTPUT_LENGTH = 3000;
 
     /// Checks if the OCR engine is available for use.
     ///
@@ -52,40 +57,46 @@ public final class OcrUtils {
 
     /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
     public static OcrResult performOcr(ArrayList<String> command, String engineName) {
-        String commandLine = String.join(" ", command);
+        String commandLine = command.stream()
+                                     .map(OcrUtils::quoteIfNeeded)
+                                     .collect(Collectors.joining(" "));
         StringBuilder outputBuilder = new StringBuilder();
         Process process = null;
-        Future<?> gobblerFuture = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             process = processBuilder.start();
 
-            // Get the output and the errors of the process
+            // Draining the output concurrently, rather than after process.waitFor(), avoids a
+            // deadlock: the process can block trying to write to a full output pipe if nothing
+            // reads it while the process is still running.
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), line -> {
                 LOGGER.debug(line);
-                outputBuilder.append(line).append(System.lineSeparator());
+                if (outputBuilder.length() < MAX_CAPTURED_OUTPUT_LENGTH) {
+                    outputBuilder.append(line).append(System.lineSeparator());
+                }
             });
-            gobblerFuture = HeadlessExecutorService.INSTANCE.execute(() -> {
+            Future<?> gobblerFuture = HeadlessExecutorService.INSTANCE.execute(() -> {
                 streamGobblerInput.run();
                 return null;
             });
 
-            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
-            if (!finished) {
+            // A single wait, bounded by the real timeout. Once the gobbler task finishes, the
+            // process's output stream has closed, so the process has exited or is about to;
+            // process.waitFor() below then returns immediately. This replaces waiting twice
+            // (once on the process, once on the gobbler with its own separate timeout), which
+            // is also what left a window for outputBuilder to be read while still being written.
+            try {
+                gobblerFuture.get(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
+            } catch (TimeoutException e) {
                 process.destroyForcibly();
-                // destroyForcibly() closes the process's output pipe, so the gobbler hits EOF and
-                // finishes on its own shortly after; waiting for it before reading outputBuilder
-                // avoids a data race between this thread reading it and the gobbler still
-                // appending to it.
-                awaitGobblerQuietly(gobblerFuture);
                 return OcrResult.failure(OcrFailureReason.TIMEOUT, commandLine, outputBuilder.toString());
+            } catch (ExecutionException e) {
+                LOGGER.error("Error while reading output of {}.", engineName, e);
+                return OcrResult.failure(OcrFailureReason.IO_ERROR, commandLine, outputBuilder.toString());
             }
 
-            // The process has exited, so its output is fully written; wait for the gobbler to finish
-            // draining it so the captured output is complete (and safe to read from this thread)
-            // before it is read below.
-            awaitGobblerQuietly(gobblerFuture);
+            process.waitFor();
 
             if (process.exitValue() == 0) {
                 return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
@@ -96,28 +107,23 @@ public final class OcrUtils {
             LOGGER.error("Error while running {}.", engineName, e);
             return OcrResult.failure(OcrFailureReason.IO_ERROR, commandLine, outputBuilder.toString());
         } catch (InterruptedException e) {
-            process.destroyForcibly();
-            // See the TIMEOUT branch above: must wait before reading outputBuilder here too.
-            awaitGobblerQuietly(gobblerFuture);
+            if (process != null) {
+                process.destroyForcibly();
+            }
             Thread.currentThread().interrupt();
             LOGGER.error("{} process was interrupted.", engineName, e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED, commandLine, outputBuilder.toString());
         }
     }
 
-    /// Waits briefly for the output-gobbler task to finish, so its buffered output is safe to
-    /// read afterward. A null future (the process never started) is a no-op.
-    private static void awaitGobblerQuietly(Future<?> gobblerFuture) {
-        if (gobblerFuture == null) {
-            return;
+    /// Wraps an argument in double quotes if it contains whitespace, so a command line built by
+    /// joining arguments with spaces (for display only, not re-parsed) does not read as having
+    /// more arguments than it does, e.g. a path like `/Program Files/engine`.
+    private static String quoteIfNeeded(String argument) {
+        if (argument.isEmpty() || argument.chars().anyMatch(Character::isWhitespace)) {
+            return "\"" + argument + "\"";
         }
-        try {
-            gobblerFuture.get(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException | TimeoutException e) {
-            LOGGER.debug("Output gobbler did not finish cleanly", e);
-        }
+        return argument;
     }
 
     /// Generates the output path for the searchable PDF.

@@ -36,7 +36,7 @@ class OcrUtilsTest {
 
         OcrResult.Failure failure = assertInstanceOf(OcrResult.Failure.class, result);
         assertEquals(OcrFailureReason.NON_ZERO_EXIT, failure.reason());
-        assertEquals("sh -c echo jabref-ocr-test-output; exit 1", failure.commandLine());
+        assertEquals("sh -c \"echo jabref-ocr-test-output; exit 1\"", failure.commandLine());
         assertTrue(failure.output().contains("jabref-ocr-test-output"),
                 "Expected captured output to contain the command's stdout, but was: " + failure.output());
     }
