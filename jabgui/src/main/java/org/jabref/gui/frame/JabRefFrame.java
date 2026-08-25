@@ -49,7 +49,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
@@ -59,6 +59,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -96,7 +97,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
+    private final GuiUndoManager guiUndoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -124,7 +126,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        GuiPreferences preferences,
                        AiService aiService,
                        StateManager stateManager,
-                       CountingUndoManager undoManager,
+                       UndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
@@ -137,6 +139,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.guiUndoManager = new GuiUndoManager(undoManager);
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -176,8 +179,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+                new UndoAction(this::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager),
+                new RedoAction(this::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager));
         Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.sidePane = new SidePane(
@@ -234,6 +237,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 undoManager,
+                guiUndoManager,
                 journalAbbreviationRepository);
 
         MainMenu mainMenu = new MainMenu(
@@ -249,6 +253,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 journalAbbreviationRepository,
                 entryTypesManager,
                 undoManager,
+                guiUndoManager,
                 clipBoardManager,
                 this::getOpenDatabaseAction,
                 aiService,

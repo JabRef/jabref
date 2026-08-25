@@ -9,11 +9,11 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -23,13 +23,13 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
     private final GuiPreferences guiPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
 
     public UpdateWithBibliographicInformationByWebFetchers(DialogService dialogService,
                                                            GuiPreferences preferences,
                                                            StateManager stateManager,
                                                            TaskExecutor taskExecutor,
-                                                           CountingUndoManager undoManager) {
+                                                           UndoManager undoManager) {
         this.dialogService = dialogService;
         this.guiPreferences = preferences;
         this.stateManager = stateManager;
@@ -46,6 +46,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
+        mergedEntriesView.setTitle(Localization.lang("Merge entry with information"));
         mergedEntriesView.addSource(Localization.lang("Original entry"), originalEntry);
 
         Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(

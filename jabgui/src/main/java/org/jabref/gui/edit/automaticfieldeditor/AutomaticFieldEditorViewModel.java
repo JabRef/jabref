@@ -1,0 +1,48 @@
+package org.jabref.gui.edit.automaticfieldeditor;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.edit.automaticfieldeditor.clearcontent.ClearContentTabView;
+import org.jabref.gui.edit.automaticfieldeditor.copyormovecontent.CopyOrMoveFieldContentTabView;
+import org.jabref.gui.edit.automaticfieldeditor.editfieldcontent.EditFieldContentTabView;
+import org.jabref.gui.edit.automaticfieldeditor.renamefield.RenameFieldTabView;
+import org.jabref.logic.undo.UndoManager;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.undo.CompoundEdit;
+
+public class AutomaticFieldEditorViewModel extends AbstractViewModel {
+    public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
+    private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
+    private final CompoundEdit dialogEdits = new CompoundEdit(NAMED_COMPOUND_EDITS);
+
+    private final UndoManager undoManager;
+
+    public AutomaticFieldEditorViewModel(BibDatabase database,
+                                         UndoManager undoManager,
+                                         DialogService dialogService,
+                                         StateManager stateManager) {
+        this.undoManager = undoManager;
+        fieldEditorTabs.addAll(
+                new EditFieldContentTabView(database, dialogEdits, dialogService, stateManager),
+                new CopyOrMoveFieldContentTabView(database, dialogEdits, dialogService, stateManager),
+                new ClearContentTabView(database, dialogEdits, dialogService, stateManager),
+                new RenameFieldTabView(database, dialogEdits, dialogService, stateManager)
+        );
+    }
+
+    public ObservableList<AutomaticFieldEditorTab> getFieldEditorTabs() {
+        return fieldEditorTabs;
+    }
+
+    public void saveChanges() {
+        undoManager.addEdit(dialogEdits.toChangeSet());
+    }
+
+    public void cancelChanges() {
+        dialogEdits.toChangeSet().inverted().apply();
+    }
+}
