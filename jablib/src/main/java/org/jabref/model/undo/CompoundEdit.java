@@ -21,7 +21,7 @@ import org.jspecify.annotations.NullMarked;
 /// from `setField`, `putKeywords`, `setCitationKey` and friends, so recording a change is a
 /// matter of handing the return value over rather than restating it.
 @NullMarked
-public class CompoundEdit {
+public final class CompoundEdit {
 
     private final String name;
     private final List<BibChange> changes = new ArrayList<>();

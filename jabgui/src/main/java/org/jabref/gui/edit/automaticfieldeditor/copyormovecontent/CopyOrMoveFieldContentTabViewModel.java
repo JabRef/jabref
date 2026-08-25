@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
 import org.jabref.gui.edit.automaticfieldeditor.MoveFieldValueAction;
 import org.jabref.logic.util.strings.StringUtil;
@@ -108,7 +107,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void copyValue() {
-        AutomaticFieldEditorUndoableEdit copyFieldValueEdit = new AutomaticFieldEditorUndoableEdit("COPY_FIELD_VALUE");
+        CompoundEdit copyFieldValueEdit = new CompoundEdit("COPY_FIELD_VALUE");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
@@ -121,13 +120,12 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 }
             }
         }
-        copyFieldValueEdit.setAffectedEntries(affectedEntriesCount);
 
-        addEdit(copyFieldValueEdit);
+        addEdit(copyFieldValueEdit, affectedEntriesCount);
     }
 
     public void moveValue() {
-        AutomaticFieldEditorUndoableEdit moveEdit = new AutomaticFieldEditorUndoableEdit("MOVE_EDIT");
+        CompoundEdit moveEdit = new CompoundEdit("MOVE_EDIT");
         int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
             affectedEntriesCount = new MoveFieldValueAction(fromField.get(),
@@ -135,13 +133,12 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                     selectedEntries,
                     moveEdit).executeAndGetAffectedEntriesCount();
         }
-        moveEdit.setAffectedEntries(affectedEntriesCount);
 
-        addEdit(moveEdit);
+        addEdit(moveEdit, affectedEntriesCount);
     }
 
     public void swapValues() {
-        AutomaticFieldEditorUndoableEdit swapFieldValuesEdit = new AutomaticFieldEditorUndoableEdit("SWAP_FIELD_VALUES");
+        CompoundEdit swapFieldValuesEdit = new CompoundEdit("SWAP_FIELD_VALUES");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
@@ -153,8 +150,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 affectedEntriesCount++;
             }
         }
-        swapFieldValuesEdit.setAffectedEntries(affectedEntriesCount);
 
-        addEdit(swapFieldValuesEdit);
+        addEdit(swapFieldValuesEdit, affectedEntriesCount);
     }
 }
