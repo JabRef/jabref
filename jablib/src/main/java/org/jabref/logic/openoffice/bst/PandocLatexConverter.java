@@ -29,8 +29,8 @@ public class PandocLatexConverter {
     private static final String PANDOC_EXECUTABLE = "pandoc";
 
     /// Candidate commands tried by [autoDetect] on Windows, in priority order.
-    /// The MSI installer usually adds `pandoc` to `PATH`.
     private static final List<String> WINDOWS_CANDIDATES = List.of(
+            // MSI installer adds to PATH; AppData path varies per user so we do not hardcode those locations here.
             PANDOC_EXECUTABLE
     );
     /// Additional Windows install-directory hints resolved at runtime to absolute paths such as
