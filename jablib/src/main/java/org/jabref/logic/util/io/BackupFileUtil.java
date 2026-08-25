@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.Optional;
 
@@ -53,16 +55,13 @@ public class BackupFileUtil {
     public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType, Path backupDir) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
-        String extension = "." + fileType.getExtensions().getFirst();
-
         if (Files.notExists(backupDir)) {
-            // In case there is no app directory, we search in the directory of the bib file
-            Path result = FileUtil.addExtension(targetFile, extension);
-            if (Files.exists(result)) {
-                return Optional.of(result);
-            } else {
-                return Optional.empty();
-            }
+            // In case there is no app directory, we search in the directory of the bib file.
+            // Every extension of the file type is tried, so that a backup written by an older version is found, too.
+            return fileType.getExtensions().stream()
+                           .map(extension -> FileUtil.addExtension(targetFile, "." + extension))
+                           .filter(Files::exists)
+                           .max(Comparator.comparing(BackupFileUtil::getLastModifiedTime));
         }
 
         // Search the directory for the latest file
@@ -79,6 +78,15 @@ public class BackupFileUtil {
             return Optional.empty();
         }
         return mostRecentFile;
+    }
+
+    private static FileTime getLastModifiedTime(Path path) {
+        try {
+            return Files.getLastModifiedTime(path);
+        } catch (IOException e) {
+            LOGGER.debug("Could not determine modification time of {}", path, e);
+            return FileTime.fromMillis(0);
+        }
     }
 
     ///
