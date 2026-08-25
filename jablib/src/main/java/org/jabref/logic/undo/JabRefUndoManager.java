@@ -241,10 +241,10 @@ public class JabRefUndoManager implements UndoManager {
     /// undoable instead of vanishing from both stacks.
     public void undo() {
         synchronized (this) {
-            UndoJournalEntry journalEntry = undoStack.peek();
-            if (journalEntry == null) {
+            if (undoStack.isEmpty()) {
                 return;
             }
+            UndoJournalEntry journalEntry = undoStack.getFirst();
             journalEntry.change().inverted().apply();
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
@@ -256,10 +256,10 @@ public class JabRefUndoManager implements UndoManager {
 
     public void redo() {
         synchronized (this) {
-            UndoJournalEntry journalEntry = redoStack.peek();
-            if (journalEntry == null) {
+            if (redoStack.isEmpty()) {
                 return;
             }
+            UndoJournalEntry journalEntry = redoStack.getFirst();
             journalEntry.change().apply();
             redoStack.pop();
             undoStack.push(journalEntry);
@@ -297,8 +297,7 @@ public class JabRefUndoManager implements UndoManager {
     /// The identity of the position the history is at: the change on top of the undo stack, or
     /// [#emptyStackId] when everything has been undone.
     private synchronized long currentPosition() {
-        UndoJournalEntry top = undoStack.peek();
-        return top == null ? emptyStackId : top.id();
+        return undoStack.isEmpty() ? emptyStackId : undoStack.getFirst().id();
     }
 
     public void clear() {
