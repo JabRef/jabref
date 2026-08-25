@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -103,7 +103,7 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        undoManager.addEdit(Localization.lang("Update keywords"), edit -> {
+        undoManager.addEdit(StandardActions.MANAGE_KEYWORDS.getText(), edit -> {
             Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
             for (BibEntry entry : entries) {

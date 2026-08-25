@@ -220,6 +220,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
+        // Named for the effect, not for the command: "Find duplicates" started this, but what a
+        // reader undoes is the removal and the merges their review of each pair produced.
         libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
