@@ -674,3 +674,30 @@ jobs:
             exit 1
           fi
           echo "✅ gradlew.bat blob is LF"
+
+  native-messaging-host-e2e:
+    name: NM host e2e (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tool versions
+        shell: bash
+        run: |
+          python --version
+          pwsh --version || echo "pwsh not found — PS1 host will be skipped"
+      # Spawns each host as a subprocess and plays browser + extension + JabRef
+      # over real pipes/HTTP. Exits non-zero on any failed assertion.
+      # pwsh ships on both runner images, so both hosts (.py and .ps1) run on both OSes.
+      - name: Native-messaging host e2e (py + ps1)
+        shell: bash
+        working-directory: browser-bridge
+        run: python e2e_test.py
