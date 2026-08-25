@@ -303,7 +303,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             return;
         }
         if (!focusUtils.isAllFieldsTabEnabled()) {
-            dialogService.notify(Localization.lang("Enable the Main tab in Preferences -> Entry Editor to use jump-to-field"));
+            dialogService.notify(Localization.lang("Enable the Main tab in Preferences > Entry editor to use jump-to-field"));
             return;
         }
 
