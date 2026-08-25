@@ -11,12 +11,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- The remote instance listener now answers the plain-text health check `JABREF/1 PING` with `JABREF/1 PONG jabref`, so external tools (e.g. browser extensions) can detect a running JabRef without speaking the Java serialization protocol. [#16654](https://github.com/JabRef/jabref/pull/16654)
 - We added some missing tooltips to buttons such as "Export Cited" and "Bibliography properties" in the OpenOffice/LibreOffice panel. [#16492](https://github.com/JabRef/jabref/pull/16492)
 - We added support for the `Export cited` functionality with CSL and BST styles in the OpenOffice/LibreOffice integration. [#16491](https://github.com/JabRef/jabref/issues/16491)
 - We added a per-library journal abbreviation preference to Library Properties, allowing automatic LTWA abbreviation on save. [#15495](https://github.com/JabRef/jabref/issues/15495)
 - The LibreOffice integration's "Cite special" mode for JStyles can now cite author-year (without parenthesis), author-only and year-only entries. [forum#670](https://discourse.jabref.org/t/cite-special-openoffice-libreoffice-connection-tool/670). [#7861](https://github.com/JabRef/jabref/issues/7861)
 - The LibreOffice/OpenOffice integration now works with Track Changes enabled in the document. [#9403](https://github.com/JabRef/jabref/issues/9403). [#14018](https://github.com/JabRef/jabref/issues/14018)
 - We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
+- We added an "Enter URL" tab to the "New Entry" dialog, which creates a `@Misc` entry from a pasted URL, using the linked page's title (when reachable) and recording the access date. [#15411](https://github.com/JabRef/jabref/issues/15411)
 - We added an "add space before citation" option in the LibreOffice integration. [#16349](https://github.com/JabRef/jabref/issues/16349)
 - CSL Citations emitted by JabRef in LibreOffice can now be read by Zotero (under a new preference "Zotero Compatibility Mode") and vice versa. [#15878](https://github.com/JabRef/jabref/issues/15878)
 - We added support for bibliography generation using `.bst` files in the OpenOffice/LibreOffice integration. [#624](https://github.com/JabRef/jabref/issues/624)
@@ -48,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
+- We added a PDF preview with extracted metadata in the unlinked files dialog. [#16159](https://github.com/JabRef/jabref/issues/16159)
 - We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
 - We added autofocus and clipboard prefill to the commit message field in the Git Commit dialog. [#16340](https://github.com/JabRef/jabref/issues/16340)
 - We added OCR engine selection to the OCR preferences, allowing users to choose the engine they want to use. [#16455](https://github.com/JabRef/jabref/pull/16455)
@@ -86,6 +89,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We fixed an issue where two JabRef instances saving the same library file could silently overwrite each other's changes. The instance finishing last now aborts its save and offers the usual review flow for the external changes instead. [#16646](https://github.com/JabRef/jabref/pull/16646)
+- We fixed missed external-change detection while JabRef saves a library, so concurrent changes can be reviewed for resolution. [#16646](https://github.com/JabRef/jabref/pull/16646)
 - We fixed saving libraries with long file names, hard links, or file systems that do not support atomic moves. [#7718](https://github.com/JabRef/jabref/issues/7718)
 - We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
