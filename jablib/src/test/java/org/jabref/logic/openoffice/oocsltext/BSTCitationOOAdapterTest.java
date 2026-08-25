@@ -164,6 +164,29 @@ class BSTCitationOOAdapterTest {
     }
 
     @Test
+    void buildStyleDefinedCitationText_throwsWhenLabelMissing() {
+        assertThrows(MissingStyleDefinedCitationLabelException.class,
+                () -> BSTCitationOOAdapter.buildStyleDefinedCitationText(List.of("smith2020"), Map.of()));
+    }
+
+    @Test
+    void computeStyleOrderAndLabels_ignoresCommandLabels() {
+        String renderedBibliography = """
+                \\begin{thebibliography}{}
+                \\bibitem[\\protect\\astroncite{Tan et al.}{2021}]{Tan_2021}
+                Tan entry
+                \\end{thebibliography}
+                """;
+
+        BSTCitationOOAdapter.StyleOrderAndLabels styleOrderAndLabels = BSTCitationOOAdapter.computeStyleOrderAndLabels(
+                renderedBibliography,
+                Map.of("Tan_2021", "Tan_2021"));
+
+        assertEquals(Map.of("Tan_2021", 1), styleOrderAndLabels.identifierToNumberMap());
+        assertEquals(Map.of(), styleOrderAndLabels.identifierToLabelMap());
+    }
+
+    @Test
     void computeStyleOrderAndLabels_normalizesEtalcharLabels() {
         String renderedBibliography = """
                 \\begin{thebibliography}{}

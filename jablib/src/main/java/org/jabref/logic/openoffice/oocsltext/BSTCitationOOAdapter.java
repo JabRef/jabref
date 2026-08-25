@@ -57,9 +57,6 @@ public class BSTCitationOOAdapter {
     private final OpenOfficePreferences openOfficePreferences;
 
     private Map<String, String> identifierToLabelMap = Map.of();
-    private List<String> cachedLabelIdentifiers = List.of();
-    private String cachedBstStylePath = "";
-    private boolean styleDefinedLabelsInitialized;
 
     public BSTCitationOOAdapter(XTextDocument document, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
@@ -97,14 +94,18 @@ public class BSTCitationOOAdapter {
         markManager.setRealTimeNumberUpdateRequired(
                 openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);
         markManager.readAndUpdateExistingMarks();
-        invalidateStyleDefinedLabels();
+        if (openOfficePreferences.getBstCitationFormat() == BstCitationFormat.STYLE_DEFINED) {
+            updateStyleDefinedCitationTexts(ctx.getDatabase());
+        } else {
+            invalidateStyleDefinedLabels();
+        }
     }
 
     /// Inserts the bibliography by rendering each cited entry through BST → pandoc → OOText.
     /// Entries are sorted by first-appearance (citation-number) order or BST style order.
     public void insertBibliography(XTextCursor cursor, BstStyle style, List<BibEntry> entries,
                                    BibDatabaseContext ctx)
-            throws IOException, InterruptedException, com.sun.star.uno.Exception, CreationException {
+            throws IOException, InterruptedException, com.sun.star.uno.Exception, CreationException, MissingStyleDefinedCitationLabelException {
         if (!pandoc.isAvailable()) {
             throw new IllegalStateException(
                     "pandoc is not available at the configured path. "
@@ -141,7 +142,7 @@ public class BSTCitationOOAdapter {
             sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
         } else {
             styleOrderAndLabels = computeStyleOrderAndLabels(bstVM, sorted, database);
-            cacheStyleDefinedLabels(style.getPath(), getCitationSetIdentifiers(sorted), styleOrderAndLabels.identifierToLabelMap());
+            identifierToLabelMap = new LinkedHashMap<>(styleOrderAndLabels.identifierToLabelMap());
             Map<String, Integer> identifierToNumberMap = styleOrderAndLabels.identifierToNumberMap();
             sorted.sort(Comparator.comparingInt(entry -> identifierToNumberMap.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
         }
@@ -161,7 +162,7 @@ public class BSTCitationOOAdapter {
                 int number = markManager.getCitationNumber(identifier);
                 finalLine = "[" + number + "] " + body;
             } else if (useStyleDefinedBibliographyLabels) {
-                String label = identifierToLabelMap.getOrDefault(identifier, String.valueOf(markManager.getCitationNumber(identifier)));
+                String label = getStyleDefinedLabelOrThrow(identifier, identifierToLabelMap);
                 finalLine = "[" + label + "] " + body;
             } else {
                 finalLine = body;
@@ -213,10 +214,13 @@ public class BSTCitationOOAdapter {
 
     private String buildStyleDefinedCitation(List<BibEntry> entries, BibDatabaseContext ctx) throws MissingStyleDefinedCitationLabelException {
         ensureStyleDefinedLabels(getCitedEntriesIncluding(entries, ctx.getDatabase()), ctx.getDatabase());
+        return buildStyleDefinedCitationText(entries.stream().map(BSTCitationOOAdapter::keyOrId).toList(), identifierToLabelMap);
+    }
 
+    @VisibleForTesting
+    static String buildStyleDefinedCitationText(List<String> identifiers, Map<String, String> identifierToLabelMap) throws MissingStyleDefinedCitationLabelException {
         StringJoiner joiner = new StringJoiner(", ", "[", "]");
-        for (BibEntry entry : entries) {
-            String identifier = keyOrId(entry);
+        for (String identifier : identifiers) {
             joiner.add(getStyleDefinedLabelOrThrow(identifier, identifierToLabelMap));
         }
         return joiner.toString();
@@ -228,19 +232,12 @@ public class BSTCitationOOAdapter {
             return;
         }
 
-        List<String> citedIdentifiers = getCitationSetIdentifiers(entries);
-        if (styleDefinedLabelsInitialized
-                && cachedBstStylePath.equals(style.getPath())
-                && cachedLabelIdentifiers.equals(citedIdentifiers)) {
-            return;
-        }
-
         try {
             StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), entries, database);
-            cacheStyleDefinedLabels(style.getPath(), citedIdentifiers, styleOrderAndLabels.identifierToLabelMap());
+            identifierToLabelMap = new LinkedHashMap<>(styleOrderAndLabels.identifierToLabelMap());
         } catch (IOException e) {
             LOGGER.warn("Could not compute BST style-defined citation labels for {}", style.getPath(), e);
-            cacheStyleDefinedLabels(style.getPath(), citedIdentifiers, Map.of());
+            identifierToLabelMap = Map.of();
         }
     }
 
@@ -271,26 +268,14 @@ public class BSTCitationOOAdapter {
         return citedEntries;
     }
 
-    private void cacheStyleDefinedLabels(String stylePath, List<String> citedIdentifiers, Map<String, String> labels) {
-        identifierToLabelMap = new LinkedHashMap<>(labels);
-        cachedLabelIdentifiers = List.copyOf(citedIdentifiers);
-        cachedBstStylePath = stylePath;
-        styleDefinedLabelsInitialized = true;
+    private void updateStyleDefinedCitationTexts(BibDatabase database)
+            throws CreationException, com.sun.star.uno.Exception, MissingStyleDefinedCitationLabelException {
+        ensureStyleDefinedLabels(getCitedEntriesIncluding(List.of(), database), database);
+        markManager.updateAllStyleDefinedCitationTexts(identifierToLabelMap);
     }
 
     private void invalidateStyleDefinedLabels() {
         identifierToLabelMap = Map.of();
-        cachedLabelIdentifiers = List.of();
-        cachedBstStylePath = "";
-        styleDefinedLabelsInitialized = false;
-    }
-
-    private static List<String> getCitationSetIdentifiers(List<BibEntry> entries) {
-        SequencedSet<String> identifiers = new LinkedHashSet<>();
-        for (BibEntry entry : entries) {
-            identifiers.add(keyOrId(entry));
-        }
-        return List.copyOf(identifiers);
     }
 
     @VisibleForTesting
@@ -349,6 +334,11 @@ public class BSTCitationOOAdapter {
     }
 
     @VisibleForTesting
+    static boolean isSupportedStyleDefinedLabel(String label) {
+        return !label.contains("\\");
+    }
+
+    @VisibleForTesting
     static StyleOrderAndLabels computeStyleOrderAndLabels(String renderedBibliography, Map<String, String> keyToIdentifier) {
         Matcher bibitemMatcher = BIBITEM_PATTERN.matcher(renderedBibliography);
         int order = 1;
@@ -364,7 +354,10 @@ public class BSTCitationOOAdapter {
 
             String label = bibitemMatcher.group("label");
             if ((label != null) && !label.isBlank()) {
-                identifierToLabel.put(identifier, BSTFormatUtils.normalizeBibItemLabel(label));
+                String normalizedLabel = BSTFormatUtils.normalizeBibItemLabel(label);
+                if (isSupportedStyleDefinedLabel(normalizedLabel)) {
+                    identifierToLabel.put(identifier, normalizedLabel);
+                }
             }
         }
 

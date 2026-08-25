@@ -277,6 +277,31 @@ public class BSTReferenceMarkManager {
                 .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
     }
 
+    public void updateAllStyleDefinedCitationTexts(Map<String, String> identifierToLabelMap)
+            throws Exception, CreationException, MissingStyleDefinedCitationLabelException {
+        sortMarksInOrder();
+        for (BSTReferenceMark mark : marksInOrder) {
+            String updatedText = BSTCitationOOAdapter.buildStyleDefinedCitationText(mark.getCitationKeys(), identifierToLabelMap);
+            updateMarkText(mark, updatedText);
+        }
+    }
+
+    private void updateMarkText(BSTReferenceMark mark, String newText) throws Exception, CreationException {
+        String currentText = mark.getTextContent().getAnchor().getString();
+        if (currentText.equals(newText)) {
+            return;
+        }
+
+        updateMarkAndText(mark, newText, mark.getName());
+
+        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
+        XNameAccess marks = supplier.getReferenceMarks();
+        XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, marks.getByName(mark.getName()));
+        mark.updateTextContent(newContent);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
+    }
+
     private void updateMarkAndText(BSTReferenceMark mark, String newText, String markName) throws Exception, CreationException {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
