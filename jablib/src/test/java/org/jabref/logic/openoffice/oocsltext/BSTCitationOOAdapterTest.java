@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -115,5 +116,43 @@ class BSTCitationOOAdapterTest {
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
         assertEquals("(Doe, 2007)", result);
+    }
+
+    @Test
+    void computeStyleOrderAndLabels_extractsStyleDefinedLabels() {
+        String renderedBibliography = """
+                \\begin{thebibliography}{}
+                \\bibitem[SG20]{smith2020}
+                Smith entry
+                \\bibitem[SG20a]{smith2020a}
+                Smith entry with suffix
+                \\end{thebibliography}
+                """;
+
+        BSTCitationOOAdapter.StyleOrderAndLabels styleOrderAndLabels = BSTCitationOOAdapter.computeStyleOrderAndLabels(
+                renderedBibliography,
+                Map.of("smith2020", "smith2020", "smith2020a", "smith2020a"));
+
+        assertEquals(Map.of("smith2020", 1, "smith2020a", 2), styleOrderAndLabels.identifierToNumberMap());
+        assertEquals(Map.of("smith2020", "SG20", "smith2020a", "SG20a"), styleOrderAndLabels.identifierToLabelMap());
+    }
+
+    @Test
+    void computeStyleOrderAndLabels_ignoresMissingBibitemLabels() {
+        String renderedBibliography = """
+                \\begin{thebibliography}{}
+                \\bibitem{smith2020}
+                Smith entry
+                \\bibitem[SG20]{smith2020a}
+                Smith entry with suffix
+                \\end{thebibliography}
+                """;
+
+        BSTCitationOOAdapter.StyleOrderAndLabels styleOrderAndLabels = BSTCitationOOAdapter.computeStyleOrderAndLabels(
+                renderedBibliography,
+                Map.of("smith2020", "smith2020", "smith2020a", "smith2020a"));
+
+        assertEquals(Map.of("smith2020", 1, "smith2020a", 2), styleOrderAndLabels.identifierToNumberMap());
+        assertEquals(Map.of("smith2020a", "SG20"), styleOrderAndLabels.identifierToLabelMap());
     }
 }

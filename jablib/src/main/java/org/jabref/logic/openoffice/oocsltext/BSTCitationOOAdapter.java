@@ -3,7 +3,6 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,20 +41,25 @@ import org.slf4j.LoggerFactory;
 
 /// Inserts BST-styled citations and bibliography into a LibreOffice document.
 ///
-/// In-text citation format (numeric `[n]` or author-year `(Name, Year)`) is controlled by
-/// [OpenOfficePreferences#getBstCitationFormat]. The bibliography is always rendered by the
-/// BST engine regardless of the citation format setting.
+/// In-text citation format is controlled by [OpenOfficePreferences#getBstCitationFormat]:
+/// numeric `[n]`, author-year `(Name, Year)`, or style-defined `\bibitem[label]{key}` markers.
+/// The bibliography is always rendered by the BST engine regardless of the citation format setting.
 @NullMarked
 public class BSTCitationOOAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
-    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
+    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[(?<label>[^\\]]*)\\])?\\{(?<key>[^}]+)}");
 
     private final XComponentContext componentContext;
     private final XTextDocument document;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
+
+    private Map<String, String> identifierToLabelMap = Map.of();
+    private List<String> cachedLabelIdentifiers = List.of();
+    private String cachedBstStylePath = "";
+    private boolean styleDefinedLabelsInitialized;
 
     public BSTCitationOOAdapter(XTextDocument document, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
@@ -70,6 +74,7 @@ public class BSTCitationOOAdapter {
     /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences#getBstCitationFormat]:
     /// - [BstCitationFormat#NUMERIC]: `[1]`, `[1, 3]`, ...
     /// - [BstCitationFormat#AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
+    /// - [BstCitationFormat#STYLE_DEFINED]: `[ABC20]`, `[ABC20a]`, ...
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
@@ -77,6 +82,8 @@ public class BSTCitationOOAdapter {
                     buildNumericCitation(entries);
             case AUTHOR_YEAR ->
                     buildAuthorYearCitation(entries, ctx);
+            case STYLE_DEFINED ->
+                    buildStyleDefinedCitation(entries, ctx);
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
@@ -90,10 +97,11 @@ public class BSTCitationOOAdapter {
         markManager.setRealTimeNumberUpdateRequired(
                 openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);
         markManager.readAndUpdateExistingMarks();
+        invalidateStyleDefinedLabels();
     }
 
     /// Inserts the bibliography by rendering each cited entry through BST → pandoc → OOText.
-    /// Entries are sorted by first-appearance (citation-number) order.
+    /// Entries are sorted by first-appearance (citation-number) order or BST style order.
     public void insertBibliography(XTextCursor cursor, BstStyle style, List<BibEntry> entries,
                                    BibDatabaseContext ctx)
             throws IOException, InterruptedException, com.sun.star.uno.Exception, CreationException {
@@ -121,21 +129,21 @@ public class BSTCitationOOAdapter {
         }
         BstEntryRenderer renderer = new BstEntryRenderer(bstVM);
 
-        // Bibliography ordering strategy:
-        // - NUMERIC mode: first-appearance (manager's citation numbers)
-        // - AUTHOR_YEAR mode: style-defined order from the BST VM (e.g., APA alphabetical)
-        boolean useNumberedBibliography = openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC;
+        BstCitationFormat citationFormat = openOfficePreferences.getBstCitationFormat();
+        boolean useNumericBibliographyOrder = citationFormat == BstCitationFormat.NUMERIC;
+        boolean useStyleDefinedBibliographyLabels = citationFormat == BstCitationFormat.STYLE_DEFINED;
 
         List<BibEntry> sorted = new ArrayList<>(entries);
         BibDatabase database = ctx.getDatabase();
+        StyleOrderAndLabels styleOrderAndLabels = new StyleOrderAndLabels(Map.of(), Map.of());
 
-        if (useNumberedBibliography) {
-            // Keep numeric styles (e.g., IEEEtran) on first-appearance
+        if (useNumericBibliographyOrder) {
             sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
         } else {
-            // Compute the style-driven order once and sort accordingly
-            Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, bstVM, sorted, database);
-            sorted.sort(Comparator.comparingInt(entry -> styleOrder.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
+            styleOrderAndLabels = computeStyleOrderAndLabels(bstVM, sorted, database);
+            cacheStyleDefinedLabels(style.getPath(), getCitationSetIdentifiers(sorted), styleOrderAndLabels.identifierToLabelMap());
+            Map<String, Integer> identifierToNumberMap = styleOrderAndLabels.identifierToNumberMap();
+            sorted.sort(Comparator.comparingInt(entry -> identifierToNumberMap.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
         }
 
         for (BibEntry entry : sorted) {
@@ -149,9 +157,12 @@ public class BSTCitationOOAdapter {
             String body = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
             String finalLine;
-            if (useNumberedBibliography) {
+            if (useNumericBibliographyOrder) {
                 int number = markManager.getCitationNumber(identifier);
                 finalLine = "[" + number + "] " + body;
+            } else if (useStyleDefinedBibliographyLabels) {
+                String label = identifierToLabelMap.getOrDefault(identifier, String.valueOf(markManager.getCitationNumber(identifier)));
+                finalLine = "[" + label + "] " + body;
             } else {
                 finalLine = body;
             }
@@ -168,6 +179,7 @@ public class BSTCitationOOAdapter {
 
     public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
         markManager.readAndUpdateExistingMarks();
+        invalidateStyleDefinedLabels();
     }
 
     public List<String> getCitedIdentifiers() throws WrappedTargetException, NoSuchElementException {
@@ -189,8 +201,6 @@ public class BSTCitationOOAdapter {
     }
 
     private String buildNumericCitation(List<BibEntry> entries) {
-        // Use the manager's current numbering (may be style-order or first-appearance),
-        // but present numbers in ascending order inside a multi-entry bracket.
         List<Integer> numbers = new ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
             numbers.add(markManager.getCitationNumber(keyOrId(entry)));
@@ -201,6 +211,89 @@ public class BSTCitationOOAdapter {
         return joiner.toString();
     }
 
+    private String buildStyleDefinedCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
+        ensureStyleDefinedLabels(getCitedEntriesIncluding(entries, ctx.getDatabase()), ctx.getDatabase());
+
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        for (BibEntry entry : entries) {
+            String identifier = keyOrId(entry);
+            String label = identifierToLabelMap.getOrDefault(identifier, String.valueOf(markManager.getCitationNumber(identifier)));
+            joiner.add(label);
+        }
+        return joiner.toString();
+    }
+
+    private void ensureStyleDefinedLabels(List<BibEntry> entries, BibDatabase database) {
+        if (!(openOfficePreferences.getCurrentStyle() instanceof BstStyle style)) {
+            invalidateStyleDefinedLabels();
+            return;
+        }
+
+        List<String> citedIdentifiers = getCitationSetIdentifiers(entries);
+        if (styleDefinedLabelsInitialized
+                && cachedBstStylePath.equals(style.getPath())
+                && cachedLabelIdentifiers.equals(citedIdentifiers)) {
+            return;
+        }
+
+        try {
+            StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), entries, database);
+            cacheStyleDefinedLabels(style.getPath(), citedIdentifiers, styleOrderAndLabels.identifierToLabelMap());
+        } catch (IOException e) {
+            LOGGER.warn("Could not compute BST style-defined citation labels for {}", style.getPath(), e);
+            cacheStyleDefinedLabels(style.getPath(), citedIdentifiers, Map.of());
+        }
+    }
+
+    private List<BibEntry> getCitedEntriesIncluding(List<BibEntry> entries, BibDatabase database) {
+        Map<String, BibEntry> entriesByIdentifier = new LinkedHashMap<>();
+        for (BibEntry entry : entries) {
+            entriesByIdentifier.put(keyOrId(entry), entry);
+        }
+
+        SequencedSet<String> citedIdentifiers = new LinkedHashSet<>();
+        for (BSTReferenceMark mark : markManager.getMarksInOrder().reversed()) {
+            citedIdentifiers.addAll(mark.getCitationKeys());
+        }
+        citedIdentifiers.addAll(entriesByIdentifier.keySet());
+
+        List<BibEntry> citedEntries = new ArrayList<>(citedIdentifiers.size());
+        for (String identifier : citedIdentifiers) {
+            BibEntry newEntry = entriesByIdentifier.get(identifier);
+            if (newEntry != null) {
+                citedEntries.add(newEntry);
+                continue;
+            }
+
+            database.getEntryByCitationKey(identifier)
+                    .or(() -> database.getEntryById(identifier))
+                    .ifPresent(citedEntries::add);
+        }
+        return citedEntries;
+    }
+
+    private void cacheStyleDefinedLabels(String stylePath, List<String> citedIdentifiers, Map<String, String> labels) {
+        identifierToLabelMap = new LinkedHashMap<>(labels);
+        cachedLabelIdentifiers = List.copyOf(citedIdentifiers);
+        cachedBstStylePath = stylePath;
+        styleDefinedLabelsInitialized = true;
+    }
+
+    private void invalidateStyleDefinedLabels() {
+        identifierToLabelMap = Map.of();
+        cachedLabelIdentifiers = List.of();
+        cachedBstStylePath = "";
+        styleDefinedLabelsInitialized = false;
+    }
+
+    private static List<String> getCitationSetIdentifiers(List<BibEntry> entries) {
+        SequencedSet<String> identifiers = new LinkedHashSet<>();
+        for (BibEntry entry : entries) {
+            identifiers.add(keyOrId(entry));
+        }
+        return List.copyOf(identifiers);
+    }
+
     @VisibleForTesting
     static String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
         StringJoiner joiner = new StringJoiner("; ", "(", ")");
@@ -209,7 +302,7 @@ public class BSTCitationOOAdapter {
             String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase())
                                .map(String::trim)
                                .filter(y -> !y.isEmpty())
-                               .orElse("n.d."); // apa-like fallback when year is missing
+                               .orElse("n.d.");
             joiner.add(authorPart + ", " + year);
         }
         return joiner.toString();
@@ -217,7 +310,6 @@ public class BSTCitationOOAdapter {
 
     @VisibleForTesting
     static String extractFirstAuthorLastName(BibEntry entry) {
-        // use natbib-like author formatting: 1 -> "Last", 2 -> "Last and Last", 3+ -> "Last et al."
         return entry.getField(StandardField.AUTHOR)
                     .map(AuthorList::parse)
                     .map(AuthorList::getAsNatbib)
@@ -229,41 +321,53 @@ public class BSTCitationOOAdapter {
         return entry.getCitationKey().orElse(entry.getId());
     }
 
-    // Compute identifier -> number map using the BST VM’s bibliography sort order.
-    // For entries missing a citation key, we temporarily assign keyOrId as the key,
-    // so the emitted \bibitem{...} contains a stable identifier we can parse back.
     @VisibleForTesting
-    static Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM bstVM, List<BibEntry> entries, BibDatabase database) {
-        // Clone entries and ensure each has a non-empty key matching keyOrId
-        List<BibEntry> normalized = new ArrayList<>(entries.size());
+    static StyleOrderAndLabels computeStyleOrderAndLabels(BstVM bstVM, List<BibEntry> entries, BibDatabase database) {
+        List<BibEntry> normalizedEntries = new ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
             BibEntry entryCopy = new BibEntry(entry);
             if (entryCopy.getCitationKey().isEmpty()) {
                 entryCopy = entryCopy.withCitationKey(keyOrId(entry));
             }
-            normalized.add(entryCopy);
+            normalizedEntries.add(entryCopy);
         }
-        // Render all entries at once to get style-driven order in thebibliography
-        String renderedBibliography = bstVM.render(normalized, database);
+
+        String renderedBibliography = bstVM.render(normalizedEntries, database);
+        Map<String, String> keyToIdentifier = new LinkedHashMap<>();
+        for (BibEntry entry : normalizedEntries) {
+            entry.getCitationKey().ifPresent(key -> keyToIdentifier.put(key, keyOrId(entry)));
+        }
+        return computeStyleOrderAndLabels(renderedBibliography, keyToIdentifier);
+    }
+
+    @VisibleForTesting
+    static StyleOrderAndLabels computeStyleOrderAndLabels(String renderedBibliography, Map<String, String> keyToIdentifier) {
         Matcher bibitemMatcher = BIBITEM_PATTERN.matcher(renderedBibliography);
         int order = 1;
-        Map<String, Integer> emittedKeyOrder = new LinkedHashMap<>();
-        while (bibitemMatcher.find()) {
-            String key = bibitemMatcher.group(1);
-            if (!emittedKeyOrder.containsKey(key)) {
-                emittedKeyOrder.put(key, order++);
-            }
-        }
-        // Map from emitted key back to identifier (for entries where we substituted)
-        Map<String, String> keyToIdentifier = new HashMap<>();
-        for (BibEntry entry : normalized) {
-            String key = entry.getCitationKey().orElse("");
-            if (!key.isEmpty()) {
-                keyToIdentifier.put(key, keyOrId(entry));
-            }
-        }
         Map<String, Integer> identifierToNumber = new LinkedHashMap<>();
-        emittedKeyOrder.forEach((key, index) -> identifierToNumber.put(keyToIdentifier.getOrDefault(key, key), index));
-        return identifierToNumber;
+        Map<String, String> identifierToLabel = new LinkedHashMap<>();
+
+        while (bibitemMatcher.find()) {
+            String key = bibitemMatcher.group("key");
+            String identifier = keyToIdentifier.getOrDefault(key, key);
+            if (!identifierToNumber.containsKey(identifier)) {
+                identifierToNumber.put(identifier, order++);
+            }
+
+            String label = bibitemMatcher.group("label");
+            if ((label != null) && !label.isBlank()) {
+                identifierToLabel.put(identifier, label);
+            }
+        }
+
+        return new StyleOrderAndLabels(identifierToNumber, identifierToLabel);
+    }
+
+    @VisibleForTesting
+    record StyleOrderAndLabels(Map<String, Integer> identifierToNumberMap, Map<String, String> identifierToLabelMap) {
+        StyleOrderAndLabels {
+            identifierToNumberMap = new LinkedHashMap<>(identifierToNumberMap);
+            identifierToLabelMap = new LinkedHashMap<>(identifierToLabelMap);
+        }
     }
 }

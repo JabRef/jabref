@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764]([https://github.com/JabRef/jabref/issues/16357](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764))
 - The remote instance listener now answers the plain-text health check `JABREF/1 PING` with `JABREF/1 PONG jabref`, so external tools (e.g. browser extensions) can detect a running JabRef without speaking the Java serialization protocol. [#16654](https://github.com/JabRef/jabref/pull/16654)
 - We added some missing tooltips to buttons such as "Export Cited" and "Bibliography properties" in the OpenOffice/LibreOffice panel. [#16492](https://github.com/JabRef/jabref/pull/16492)
 - We added support for the `Export cited` functionality with CSL and BST styles in the OpenOffice/LibreOffice integration. [#16491](https://github.com/JabRef/jabref/issues/16491)
@@ -104,6 +105,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed unreadable text colors and a missing window title in the multi-way merge dialog. [#16553](https://github.com/JabRef/jabref/issues/16553)
 - We fixed an issue where switching the citation provider in the "Citations" tab froze the user interface while the results were matched against the library. [#16270](https://github.com/JabRef/jabref/issues/16270)
 - We fixed an issue where reference mark expands onto the text when cursor is at the end of the mark. [#16515](https://github.com/JabRef/jabref/issues/16515)
+- We fixed automatic Pandoc path detection in OpenOffice/LibreOffice preferences on Windows. [TODO](https://github.com/JabRef/jabref/pull/TODO)
 - We fixed an issue where the exception message would show in the notification. [#14886](https://github.com/JabRef/jabref/issues/14886)
 - CSL citations and bibliography in the LibreOffice integration now respect the "Look up BibTeX entries in the currently selected library only" preference. [#16484](https://github.com/JabRef/jabref/pull/16484)
 - We fixed an issue where dragging and dropping a `.bib` file onto an entry in the main table moved the file to the PDF/file folder. [#16335](https://github.com/JabRef/jabref/issues/16335)
