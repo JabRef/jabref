@@ -2513,6 +2513,12 @@ journalInfo .grid-cell-b {
     -fx-fixed-cell-size: 2.3em;
 }
 
+/* A zero preferred width means a row never reports being wider than the viewport, so the list never shows a
+   horizontal scrollbar; the row content is laid out at the viewport width instead (the file name ellipsizes). */
+.linked-files-list .list-cell {
+    -fx-pref-width: 0;
+}
+
 .delete-files-dialog {
     -fx-padding: 10px;
     -fx-background-color: -fx-background;
