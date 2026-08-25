@@ -2,11 +2,11 @@ package org.jabref.gui.collab.stringrename;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableStringChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableStringChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +26,13 @@ public final class BibTexStringRename extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
+    public void applyChange(CompoundEdit undoEdit) {
         if (databaseContext.getDatabase().hasStringByName(newString.getName())) {
             // The name to change to is already in the database, so we can't comply.
             LOGGER.info("Cannot rename string '{}' to '{}' because the name is already in use", oldString.getName(), newString.getName());
         }
 
-        String currentName = oldString.getName();
-        String newName = newString.getName();
-        oldString.setName(newName);
-        undoEdit.addEdit(new UndoableStringChange(oldString, true, currentName, newName));
+        undoEdit.apply(new UndoableStringChange(oldString, UndoableStringChange.Part.NAME, oldString.getName(), newString.getName()));
     }
 
     public BibtexString getOldString() {

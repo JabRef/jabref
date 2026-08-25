@@ -1,6 +1,8 @@
 package org.jabref.gui.edit;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,12 +11,12 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NonNull;
 
@@ -23,7 +25,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private String findString;
     private String replaceString;
     private Set<Field> fields;
-    private final LibraryTab panel;
+    private final LibraryTab libraryTab;
 
     private final StringProperty findStringProperty = new SimpleStringProperty();
     private final StringProperty replaceStringProperty = new SimpleStringProperty();
@@ -32,33 +34,27 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private final BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
     public ReplaceStringViewModel(@NonNull LibraryTab libraryTab) {
-        this.panel = libraryTab;
+        this.libraryTab = libraryTab;
     }
 
     public int replace() {
         findString = findStringProperty.getValue();
         replaceString = replaceStringProperty.getValue();
         fields = FieldFactory.parseFieldList(fieldStringProperty.getValue());
-        boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
-        final NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Replace string"));
-        int counter = 0;
-        if (selOnly) {
-            for (BibEntry bibEntry : this.panel.getSelectedEntries()) {
-                counter += replaceItem(bibEntry, compound);
-            }
-        } else {
-            for (BibEntry bibEntry : this.panel.getDatabase().getEntries()) {
-                counter += replaceItem(bibEntry, compound);
-            }
-        }
-        return counter;
+        List<BibEntry> entries = selectOnlyProperty.getValue()
+                                 ? libraryTab.getSelectedEntries()
+                                 : libraryTab.getDatabase().getEntries();
+        AtomicInteger replacements = new AtomicInteger();
+        libraryTab.getUndoManager().addEdit(Localization.lang("Replace string"), edit ->
+                entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, edit))));
+        return replacements.get();
     }
 
     /// Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
     /// number of occurrences replaced.
-    private int replaceItem(BibEntry entry, NamedCompoundEdit compound) {
+    private int replaceItem(BibEntry entry, CompoundEdit compound) {
         int counter = 0;
         if (this.allFieldReplace) {
             for (Field field : entry.getFields()) {
@@ -72,7 +68,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         return counter;
     }
 
-    private int replaceField(BibEntry entry, Field field, NamedCompoundEdit compound) {
+    private int replaceField(BibEntry entry, Field field, CompoundEdit compound) {
         if (!entry.hasField(field)) {
             return 0;
         }
@@ -88,6 +84,10 @@ public class ReplaceStringViewModel extends AbstractViewModel {
             stringBuilder.append(this.replaceString); // Insert s2
             piv = ind + len1;
         }
+        if (counter == 0) {
+            return 0;
+        }
+
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
         entry.setField(field, newStr);
