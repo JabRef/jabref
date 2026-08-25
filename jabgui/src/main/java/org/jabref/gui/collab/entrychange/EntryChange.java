@@ -1,15 +1,13 @@
 package org.jabref.gui.collab.entrychange;
 
-import javax.swing.undo.CompoundEdit;
-
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 
 public final class EntryChange extends DatabaseChange {
     private final BibEntry oldEntry;
@@ -36,14 +34,8 @@ public final class EntryChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
-        databaseContext.getDatabase().removeEntry(oldEntry);
-        databaseContext.getDatabase().insertEntry(newEntry);
-        CompoundEdit changeEntryEdit = new CompoundEdit();
-        changeEntryEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
-        changeEntryEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
-        changeEntryEdit.end();
-
-        undoEdit.addEdit(changeEntryEdit);
+    public void applyChange(CompoundEdit undoEdit) {
+        undoEdit.apply(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        undoEdit.apply(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
     }
 }

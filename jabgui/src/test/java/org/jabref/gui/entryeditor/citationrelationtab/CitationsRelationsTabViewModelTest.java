@@ -3,8 +3,6 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -22,6 +20,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
