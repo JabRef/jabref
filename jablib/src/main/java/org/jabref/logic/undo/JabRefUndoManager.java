@@ -145,8 +145,12 @@ public class JabRefUndoManager implements UndoManager {
     /// describes a library state that never existed. `addEdit` cannot offer this — by the time
     /// it hears about the change, the caller made it long ago.
     ///
-    /// Inside an [#addEdit] block there is no window to close. That recorder belongs to one
-    /// thread and nothing reaches the stacks until the block ends, so no lock is taken here.
+    /// Inside an [#addEdit] block no lock is taken, and the window is *not* closed there: the
+    /// change reaches the library at once while the step reaches the stack only when the block
+    /// ends. What the thread-local recorder rules out is two threads writing one recorder, not
+    /// an undo interleaving with a block's writes. A block that mutates off the JavaFX thread
+    /// therefore still races a concurrent undo, which is a defect this class cannot fix alone,
+    /// because only the command knows when its block ends — see P21 in the undo plan.
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
     public void applyEdit(BibChange change) {
