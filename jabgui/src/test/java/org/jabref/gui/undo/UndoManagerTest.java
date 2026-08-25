@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -24,6 +25,7 @@ import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.undo.UndoableRemoveString;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -443,6 +445,69 @@ class UndoManagerTest {
 
         assertTrue(readCompleted.get(), "reading the manager from a listener deadlocked");
         assertTrue(undoRedoManager.canUndo());
+    }
+
+    /// An entry that runs `probe` from inside `setField`, when the field is set to `value`. The
+    /// write happens on the thread making the change, so the probe runs at the one moment
+    /// [UndoManager#apply] has written to the library and not yet recorded anything — the window
+    /// this test is about.
+    private static class ProbingEntry extends BibEntry {
+
+        private final String value;
+        private final Runnable probe;
+
+        ProbingEntry(String value, Runnable probe) {
+            super(StandardEntryType.Article);
+            this.value = value;
+            this.probe = probe;
+        }
+
+        @Override
+        public Optional<FieldChange> setField(Field field, @Nullable String newValue) {
+            Optional<FieldChange> change = super.setField(field, newValue);
+            if (value.equals(newValue)) {
+                probe.run();
+            }
+            return change;
+        }
+    }
+
+    /// Applying and recording are one operation, holding the journal's monitor throughout. Were
+    /// they two, an undo arriving in between would revert the *previous* change while this one
+    /// stayed applied but unrecorded, leaving a history that describes a library state that
+    /// never existed.
+    ///
+    /// Asked of the applying thread rather than staged between two threads. A second thread can
+    /// only ever show that it did not get in *within some interval*, which makes the assertion a
+    /// statement about a timeout; whether the lock is held is a fact available on the spot.
+    @Test
+    void applyingAChangeHappensWhileTheJournalIsLocked() {
+        AtomicBoolean lockedWhileApplying = new AtomicBoolean();
+        BibEntry probingEntry = new ProbingEntry("Bohr",
+                () -> lockedWhileApplying.set(Thread.holdsLock(undoRedoManager)));
+
+        undoRedoManager.apply(new UndoableFieldChange(probingEntry, StandardField.AUTHOR, null, "Bohr"));
+
+        assertTrue(lockedWhileApplying.get(),
+                "the library was written before the journal was locked, so an undo could have run in between");
+        assertEquals(Optional.of("Bohr"), probingEntry.getField(StandardField.AUTHOR));
+        assertTrue(undoRedoManager.canUndo());
+    }
+
+    /// Inside a block there is no window to close, and taking the manager's monitor there would
+    /// hold it across the whole block. The change is applied and joins the step being collected.
+    @Test
+    void applyingInsideABlockRecordsIntoThatStep() {
+        undoRedoManager.addEdit("two fields", edit -> {
+            edit.apply(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+            edit.apply(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the constitution of atoms"));
+        });
+
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        undoRedoManager.undo();
+        assertFalse(undoRedoManager.canUndo(), "the two changes did not become one step");
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.TITLE));
     }
 
     @Test

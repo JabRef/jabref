@@ -28,8 +28,10 @@ import org.slf4j.LoggerFactory;
 /// Commands push from background tasks — cleanup and import both do — so each operation takes
 /// this object's monitor for exactly as long as it touches the stacks, and no longer:
 ///
-///   - Applying the change is inside the lock. It has to be: if the stack transition and the
-///     model write could interleave, two threads could undo the same change.
+///   - Applying the change is inside the lock, in [#apply], [#undo] and [#redo] alike. It has
+///     to be: if the stack transition and the model write could interleave, two threads could
+///     undo the same change, or an undo could land between a change being applied and being
+///     recorded.
 ///   - Running foreign code is outside it. [#addEdit(String,Consumer)] never holds the lock
 ///     while it calls `mutations`, and [#notifyListeners] runs after the monitor is released.
 ///     Code this class does not own may block on another thread — a listener refreshing a menu
@@ -111,23 +113,56 @@ public class UndoManager {
             return;
         }
         synchronized (this) {
-            undoStack.push(new UndoJournalEntry(nextId++, change));
-            if (undoStack.size() > LIMIT) {
-                // The discarded edit remains applied to the library, so the stack it leaves
-                // behind can never again be the position the library started in.
-                undoStack.removeLast();
-                emptyStackId = nextId++;
-            }
-            redoStack.clear();
+            push(change);
         }
         notifyListeners();
     }
 
     /// Performs `change` and records it in one go, so that the write to the library and the
-    /// undo step describing it cannot drift apart at the call site.
+    /// undo step describing it cannot drift apart — neither at the call site, which cannot do
+    /// one without the other, nor in time, since both happen under one acquisition of the
+    /// monitor.
+    ///
+    /// The single acquisition is the point. Applying and then recording as two operations leaves
+    /// a window in which the library holds the change and the journal does not: an [#undo]
+    /// arriving there reverts the *previous* change, and the history that ends up on the stack
+    /// describes a library state that never existed.
+    ///
+    /// Inside an [#addEdit] block there is no window to close. That recorder belongs to one
+    /// thread and nothing reaches the stacks until the block ends, so no lock is taken here.
     public void apply(BibChange change) {
-        change.apply();
-        addEdit(change);
+        CompoundEdit compound = active.get();
+        if (compound != null) {
+            compound.apply(change);
+            return;
+        }
+        // Applying an empty set changes nothing, so this is the same no-op as in addEdit.
+        if ((change instanceof ChangeSet changeSet) && changeSet.isEmpty()) {
+            return;
+        }
+        synchronized (this) {
+            change.apply();
+            push(change);
+        }
+        notifyListeners();
+    }
+
+    /// Puts `change` on the undo stack as a new position and discards the redo stack, which the
+    /// new change has made unreachable.
+    ///
+    /// Callers hold this object's monitor: the stack transition is what the monitor protects,
+    /// and [#apply] needs the model write to happen inside the same acquisition.
+    private void push(BibChange change) {
+        assert Thread.holdsLock(this);
+
+        undoStack.push(new UndoJournalEntry(nextId++, change));
+        if (undoStack.size() > LIMIT) {
+            // The discarded edit remains applied to the library, so the stack it leaves
+            // behind can never again be the position the library started in.
+            undoStack.removeLast();
+            emptyStackId = nextId++;
+        }
+        redoStack.clear();
     }
 
     /// Runs `mutations`, recording whatever it reports, and pushes the result as one undo step

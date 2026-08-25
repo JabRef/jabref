@@ -34,7 +34,11 @@ public class CompoundEdit {
         changes.add(change);
     }
 
-    /// Performs `change` and records it, see [org.jabref.logic.undo.UndoManager#apply].
+    /// Performs `change` and records it in this step, the recorder's counterpart to
+    /// [org.jabref.logic.undo.UndoManager#apply].
+    ///
+    /// No lock, unlike the manager's method: a recorder belongs to the thread running its block,
+    /// and nothing it collects is reachable from another thread until the block ends.
     public void apply(BibChange change) {
         change.apply();
         addEdit(change);
