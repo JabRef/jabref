@@ -138,4 +138,11 @@ class OOError extends JabRefException {
                         + "\n"
                         + Localization.lang("Please select some from the library before citing."));
     }
+
+    public static OOError bstStyleDoesNotDefineCitationFormat() {
+        return new OOError(Localization.lang("No citation format defined"),
+                Localization.lang("The selected BST style does not define any citation format for style-defined citations.")
+                        + "\n"
+                        + Localization.lang("Please choose either numeric or author-year."));
+    }
 }

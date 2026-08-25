@@ -76,7 +76,7 @@ public class BSTCitationOOAdapter {
     /// - [BstCitationFormat#AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
     /// - [BstCitationFormat#STYLE_DEFINED]: `[ABC20]`, `[ABC20a]`, ...
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
-            throws CreationException, com.sun.star.uno.Exception {
+            throws CreationException, com.sun.star.uno.Exception, MissingStyleDefinedCitationLabelException {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
             case NUMERIC ->
                     buildNumericCitation(entries);
@@ -211,14 +211,13 @@ public class BSTCitationOOAdapter {
         return joiner.toString();
     }
 
-    private String buildStyleDefinedCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
+    private String buildStyleDefinedCitation(List<BibEntry> entries, BibDatabaseContext ctx) throws MissingStyleDefinedCitationLabelException {
         ensureStyleDefinedLabels(getCitedEntriesIncluding(entries, ctx.getDatabase()), ctx.getDatabase());
 
         StringJoiner joiner = new StringJoiner(", ", "[", "]");
         for (BibEntry entry : entries) {
             String identifier = keyOrId(entry);
-            String label = identifierToLabelMap.getOrDefault(identifier, String.valueOf(markManager.getCitationNumber(identifier)));
-            joiner.add(label);
+            joiner.add(getStyleDefinedLabelOrThrow(identifier, identifierToLabelMap));
         }
         return joiner.toString();
     }
@@ -338,6 +337,15 @@ public class BSTCitationOOAdapter {
             entry.getCitationKey().ifPresent(key -> keyToIdentifier.put(key, keyOrId(entry)));
         }
         return computeStyleOrderAndLabels(renderedBibliography, keyToIdentifier);
+    }
+
+    @VisibleForTesting
+    static String getStyleDefinedLabelOrThrow(String identifier, Map<String, String> identifierToLabelMap) throws MissingStyleDefinedCitationLabelException {
+        String label = identifierToLabelMap.get(identifier);
+        if ((label == null) || label.isBlank()) {
+            throw new MissingStyleDefinedCitationLabelException();
+        }
+        return label;
     }
 
     @VisibleForTesting

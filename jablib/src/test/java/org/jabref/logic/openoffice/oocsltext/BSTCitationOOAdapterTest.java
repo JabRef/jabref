@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BSTCitationOOAdapterTest {
 
@@ -154,6 +155,12 @@ class BSTCitationOOAdapterTest {
 
         assertEquals(Map.of("smith2020", 1, "smith2020a", 2), styleOrderAndLabels.identifierToNumberMap());
         assertEquals(Map.of("smith2020a", "SG20"), styleOrderAndLabels.identifierToLabelMap());
+    }
+
+    @Test
+    void getStyleDefinedLabelOrThrow_throwsWhenLabelMissing() {
+        assertThrows(MissingStyleDefinedCitationLabelException.class,
+                () -> BSTCitationOOAdapter.getStyleDefinedLabelOrThrow("smith2020", Map.of()));
     }
 
     @Test

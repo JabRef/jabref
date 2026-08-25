@@ -26,6 +26,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.BSTCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.MissingStyleDefinedCitationLabelException;
 import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
@@ -810,6 +811,8 @@ public class OOBibBase {
                 try {
                     bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
                     return OOVoidResult.ok();
+                } catch (MissingStyleDefinedCitationLabelException e) {
+                    return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
                 } catch (CreationException | com.sun.star.uno.Exception e) {
                     return OOVoidResult.error(OOError.fromMisc(e));
                 }
