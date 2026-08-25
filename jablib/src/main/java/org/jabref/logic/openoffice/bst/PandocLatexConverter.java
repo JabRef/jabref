@@ -6,11 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,11 @@ public class PandocLatexConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PandocLatexConverter.class);
 
-    /// Candidate paths tried by [autoDetect], in priority order, per OS.
-    private static final List<String> WINDOWS_CANDIDATES = List.of(
-            "pandoc"
-            // MSI installer adds to PATH; AppData path varies per user so we leave PATH as the only candidate
+    /// Candidate commands tried by [autoDetect] on Windows, in priority order.
+    /// The MSI installer usually adds `pandoc` to `PATH`; we additionally probe the standard
+    /// `Program Files\\Pandoc` installation directory at runtime.
+    private static final List<WindowsAutoDetectCandidate> WINDOWS_CANDIDATES = List.of(
+            new WindowsAutoDetectCandidate("pandoc", Optional.of("Pandoc"))
     );
     private static final List<String> MACOS_CANDIDATES = List.of(
             "pandoc",
@@ -49,12 +52,30 @@ public class PandocLatexConverter {
     /// Returns the first pandoc executable found in the OS-specific candidate list,
     /// or [Optional.empty] if none responds to `--version` within 5 seconds.
     public static Optional<String> autoDetect() {
-        List<String> candidates = OS.WINDOWS ? WINDOWS_CANDIDATES
-                                             : OS.OS_X ? MACOS_CANDIDATES
-                                                       : LINUX_CANDIDATES;
-        return candidates.stream()
-                         .filter(PandocLatexConverter::probeCandidate)
-                         .findFirst();
+        return getAutoDetectCandidates(OS.WINDOWS, OS.OS_X).stream()
+                                                           .filter(PandocLatexConverter::probeCandidate)
+                                                           .findFirst();
+    }
+
+    @VisibleForTesting
+    static List<String> getAutoDetectCandidates(boolean windows, boolean osX) {
+        if (windows) {
+            return WINDOWS_CANDIDATES.stream()
+                                     .flatMap(PandocLatexConverter::resolveWindowsCandidate)
+                                     .distinct()
+                                     .toList();
+        }
+
+        return osX ? MACOS_CANDIDATES : LINUX_CANDIDATES;
+    }
+
+    private static Stream<String> resolveWindowsCandidate(WindowsAutoDetectCandidate candidate) {
+        Stream<String> commandCandidate = Stream.of(candidate.command());
+        Stream<String> detectedInstallationCandidate = candidate.windowsInstallDirectoryName()
+                                                                .map(directoryName -> OS.detectProgramPath(candidate.command(), directoryName))
+                                                                .stream()
+                                                                .filter(path -> !path.isBlank());
+        return Stream.concat(commandCandidate, detectedInstallationCandidate);
     }
 
     private static boolean probeCandidate(String candidate) {
@@ -76,6 +97,9 @@ public class PandocLatexConverter {
 
     public boolean isAvailable() {
         return probeCandidate(pandocPath);
+    }
+
+    private record WindowsAutoDetectCandidate(String command, Optional<String> windowsInstallDirectoryName) {
     }
 
     /// Converts a LaTeX fragment to HTML via pandoc stdin/stdout (no temp files).
