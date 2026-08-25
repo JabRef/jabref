@@ -96,19 +96,19 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
-<<<<<<< HEAD
 ### Pressing Escape when a combo box popup is open closes only the combo box
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
 The enclosing dialog must remain open.
-=======
+
+Needs: impl
+
 ### Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 
 When JabRef saves a library, it must keep observing filesystem changes, defer change detection until the save has finished, and then inspect the resulting file for external changes that require conflict resolution.
 Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
->>>>>>> upstream/main
 
 Needs: impl
 
