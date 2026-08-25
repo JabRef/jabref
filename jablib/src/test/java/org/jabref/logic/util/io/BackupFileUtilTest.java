@@ -3,7 +3,6 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
@@ -54,31 +53,29 @@ class BackupFileUtilTest {
                     testPath,
                     BackupFileType.BACKUP,
                     backupDir);
-            // The intended fallback behavior is to put the backup file in the same directory as the .bib file
-            assertEquals(Path.of("tmp", "test.bib.bib"), result);
+            // The intended fallback behavior is to put the backup file next to the library, using the same name pattern
+            assertEquals(Path.of("tmp").toAbsolutePath(), result.getParent());
+            String fileNameWithoutTimestamp = result.getFileName().toString().replaceAll("\\d{4}-\\d{2}-\\d{2}--\\d{2}\\.\\d{2}\\.\\d{2}", "<timestamp>");
+            assertEquals(BackupFileUtil.getUniqueFilePrefix(testPath) + "--test.bib--<timestamp>.bib", fileNameWithoutTimestamp);
         }
     }
 
     @Test
-    void legacyBakSidecarIsFoundWhenBackupDirectoryIsAbsent(@TempDir Path tempDir) throws IOException {
+    void latestBackupNextToLibraryIsFoundWhenBackupDirectoryIsAbsent(@TempDir Path tempDir) throws IOException {
         Path library = tempDir.resolve("test.bib");
-        Path legacyBackup = Files.writeString(tempDir.resolve("test.bib.bak"), "");
+        String prefix = BackupFileUtil.getUniqueFilePrefix(library) + "--test.bib--";
+        Files.writeString(tempDir.resolve(prefix + "2024-01-01--00.00.00.bib"), "");
+        Path latestBackup = Files.writeString(tempDir.resolve(prefix + "2025-01-01--00.00.00.bib"), "");
+        Files.writeString(tempDir.resolve("test.bib.bak"), "");
 
-        assertEquals(Optional.of(legacyBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, BackupFileType.BACKUP, tempDir.resolve("missing")));
+        assertEquals(Optional.of(latestBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, tempDir.resolve("missing")));
     }
 
     @Test
-    void newestSidecarWinsWhenBackupDirectoryIsAbsent(@TempDir Path tempDir) throws IOException {
+    void legacyBackupNextToLibraryIsFoundWhenNoOtherBackupExists(@TempDir Path tempDir) throws IOException {
         Path library = tempDir.resolve("test.bib");
-        Path absentBackupDir = tempDir.resolve("missing");
         Path legacyBackup = Files.writeString(tempDir.resolve("test.bib.bak"), "");
-        Path currentBackup = Files.writeString(tempDir.resolve("test.bib.bib"), "");
 
-        Files.setLastModifiedTime(legacyBackup, FileTime.fromMillis(2_000));
-        Files.setLastModifiedTime(currentBackup, FileTime.fromMillis(1_000));
-        assertEquals(Optional.of(legacyBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, BackupFileType.BACKUP, absentBackupDir));
-
-        Files.setLastModifiedTime(currentBackup, FileTime.fromMillis(3_000));
-        assertEquals(Optional.of(currentBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, BackupFileType.BACKUP, absentBackupDir));
+        assertEquals(Optional.of(legacyBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, tempDir.resolve("missing")));
     }
 }

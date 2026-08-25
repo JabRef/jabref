@@ -85,7 +85,7 @@ public class BackupManager {
 
     /// Determines the most recent existing backup file name
     static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
-        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
+        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
     }
 
     /// Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
@@ -311,22 +311,8 @@ public class BackupManager {
     }
 
     private void fillQueue(Path backupDir) {
-        if (!Files.exists(backupDir)) {
-            return;
-        }
-        bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
-            // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
-            try {
-                List<Path> allSavFiles = Files.list(backupDir)
-                                              // just list the .sav belonging to the given targetFile
-                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                              .sorted().toList();
-                backupFilesQueue.addAll(allSavFiles);
-            } catch (IOException e) {
-                LOGGER.error("Could not determine most recent file", e);
-            }
-        });
+        bibDatabaseContext.getDatabasePath().ifPresent(databasePath ->
+                backupFilesQueue.addAll(BackupFileUtil.getExistingBackupFiles(databasePath, backupDir)));
     }
 
     /// Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.

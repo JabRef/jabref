@@ -8,9 +8,9 @@ import org.jspecify.annotations.NullMarked;
 public enum BackupFileType implements FileType {
 
     // Used at BackupManager.
-    // New backups get the first extension (.bib), so that they can be opened in JabRef directly.
-    // .bak was used before; it is kept so that backups written by older versions are still found.
-    BACKUP("Backup", "bib", "bak"),
+    // The backup gets the .bib extension, so that it can be opened in JabRef directly.
+    // Backups written with the former .bak extension are still found, because lookups match on the file name prefix only.
+    BACKUP("Backup", "bib"),
 
     // Used when writing the .bib file. See {@link org.jabref.logic.exporter.AtomicFileWriter}
     // Used for copying the .bib away before overwriting on save.
@@ -20,9 +20,9 @@ public enum BackupFileType implements FileType {
 
     private final List<String> extensions;
 
-    BackupFileType(String name, String... extensions) {
+    BackupFileType(String name, String extension) {
         this.name = name;
-        this.extensions = List.of(extensions);
+        this.extensions = List.of(extension);
     }
 
     @Override

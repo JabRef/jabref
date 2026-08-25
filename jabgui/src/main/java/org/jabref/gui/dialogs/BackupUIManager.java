@@ -24,7 +24,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -85,7 +84,7 @@ public class BackupUIManager {
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);

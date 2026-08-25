@@ -12,7 +12,6 @@ import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 
 import org.controlsfx.control.HyperlinkLabel;
@@ -32,7 +31,7 @@ public class BackupResolverDialog extends FXDialog {
         getDialogPane().setMinHeight(180);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
+        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
         String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));
         String content = Localization.lang("A backup file for '%0' was found at [%1]", originalPath.getFileName().toString(), backupFilename) + "\n" +
                 Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
