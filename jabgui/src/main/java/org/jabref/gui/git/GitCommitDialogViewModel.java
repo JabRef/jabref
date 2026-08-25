@@ -179,15 +179,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         try {
             PushResult result = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry)
                                               .push(repository.database(), repository.bibFilePath());
-            if (result.noop()) {
-                if (committedNow) {
-                    // We just created a new local commit, so the branch must be AHEAD at push time.
-                    // A noop (up-to-date) result here means the remote already had this exact commit,
-                    // which indicates a concurrent push raced us rather than a normal outcome.
-                    throw new PushFailedException(new JabRefException(
-                            Localization.lang("Push aborted: Remote already has this commit. Please check the remote repository.")));
-                }
-                // Nothing new to commit this time, and the remote already has everything (not an error).
+            if (result.noop() && !committedNow) {
                 return CommitOutcome.NOTHING_TO_PUSH;
             }
             return committedNow ? CommitOutcome.COMMITTED_AND_PUSHED : CommitOutcome.PUSHED;
