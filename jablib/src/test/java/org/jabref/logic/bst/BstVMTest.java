@@ -13,6 +13,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -232,5 +233,16 @@ public class BstVMTest {
         vm.render(List.of());
 
         assertEquals("colorful morning", vm.getContext().stack().pop());
+    }
+
+    @Test
+    void emptyStacksCanBeParsed() {
+        assertDoesNotThrow(() -> new BstVM("""
+                FUNCTION {empty.block}
+                {
+                    {
+                    }
+                }
+                """));
     }
 }
