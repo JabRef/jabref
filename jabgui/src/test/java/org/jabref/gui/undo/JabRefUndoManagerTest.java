@@ -325,6 +325,26 @@ class JabRefUndoManagerTest {
         assertTrue(undoRedoManager.hasChanged());
     }
 
+    /// The boundary of the two trim tests around it: the saved change is the one the limit drops.
+    /// It stays applied, so undoing everything still on the stack leaves the library at exactly
+    /// the state that was saved, and it has to say so.
+    @Test
+    void undoingBackToASavedPositionTheLimitDroppedReportsUnchanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+
+        // One more than the stack holds, so the trim drops the saved change and nothing else.
+        for (int i = 0; i < 100; i++) {
+            undoRedoManager.addEdit(setAuthor("Author " + i));
+        }
+        while (undoRedoManager.canUndo()) {
+            undoRedoManager.undo();
+        }
+
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        assertFalse(undoRedoManager.hasChanged());
+    }
+
     @Test
     void undoingEverythingAfterTrimmingReportsChanged() {
         // [utest->req~logic.undo.saved-position-identity~1]

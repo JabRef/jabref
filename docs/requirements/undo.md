@@ -9,7 +9,7 @@ parent: Requirements
 A library counts as unmodified exactly when its history stands at the position it was saved at.
 Undoing back to that position reports the library unmodified again.
 Reaching an equal number of applied changes along a different history does not: recording a change discards the redo stack, so after saving, undoing that change and editing again, the saved position no longer exists and can never be matched.
-The same holds for a position dropped when the stack reaches its depth limit.
+A position dropped because the stack reached its depth limit is the opposite case: the change stays applied to the library, so undoing everything that remains puts the library back at that position, and it counts as unmodified again if that is where it was saved.
 This decides whether the modified marker is shown and whether closing the library offers to save it, so a wrong answer loses the user's work silently.
 
 The requirement is stated per library, while one journal currently serves the whole application: with several libraries open, the saved position of one is the saved position of all.

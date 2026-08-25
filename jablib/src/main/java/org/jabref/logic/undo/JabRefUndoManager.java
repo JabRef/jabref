@@ -89,9 +89,14 @@ public class JabRefUndoManager implements UndoManager {
     /// later one that happens to sit at the same depth.
     private long nextId = ORIGIN + 1;
 
-    /// The identity of the empty undo stack. [#ORIGIN] until a [#LIMIT] trim or a [#clear]
-    /// discards history for good — from then on an empty stack is no longer the state the
-    /// library started in, so it takes a fresh id that nothing saved earlier can match.
+    /// The identity of the empty undo stack: the position the library stands at once everything
+    /// still on the stack has been undone.
+    ///
+    /// [#ORIGIN] while nothing has been discarded. A change dropped by the [#LIMIT] trim stays
+    /// applied, so from then on an empty stack means "that change, and nothing after it": it
+    /// takes the id of the change that fell off, and a save taken at exactly that position is
+    /// recognised again when the user undoes their way back to it. [#clear] is the other case —
+    /// it discards history the library keeps, so no earlier position may match afterwards.
     private long emptyStackId = ORIGIN;
 
     /// The position the library was last saved at, as an id rather than a count. Compared by
@@ -179,10 +184,10 @@ public class JabRefUndoManager implements UndoManager {
 
         undoStack.push(new UndoJournalEntry(nextId++, change));
         if (undoStack.size() > LIMIT) {
-            // The discarded edit remains applied to the library, so the stack it leaves
-            // behind can never again be the position the library started in.
-            undoStack.removeLast();
-            emptyStackId = nextId++;
+            // The discarded change remains applied, so the empty stack now stands for the
+            // position that change produced, and inherits its id. Trimming repeatedly walks that
+            // identity forward, one dropped change at a time.
+            emptyStackId = undoStack.removeLast().id();
         }
         redoStack.clear();
     }
@@ -288,9 +293,11 @@ public class JabRefUndoManager implements UndoManager {
     /// modified library as saved, and [org.jabref.gui.LibraryTab#requestClose] closes such a
     /// library without offering to save it.
     ///
-    /// Ids are never reused, so a saved position that a redo-stack clear or a [#LIMIT] trim has
-    /// discarded can never be matched again — which is the correct answer in both cases: that
-    /// position is no longer reachable.
+    /// Ids are never reused, so a saved position discarded by a redo-stack clear can never be
+    /// matched again — correct, because the library can no longer be brought back to it. A
+    /// position dropped by the [#LIMIT] trim is the opposite case: the change stays applied, so
+    /// undoing everything that remains lands exactly on it, and [#emptyStackId] carries its
+    /// identity for that reason.
     // [impl->req~logic.undo.saved-position-identity~1]
     public synchronized boolean hasChanged() {
         return currentPosition() != savedId;
