@@ -65,4 +65,3 @@ The JavaFX layer *extends* the journal rather than wrapping it, and subscribes t
 * Good, because a declared type states what a class does with undo; only five classes ask for more than recording, and no implementation type is threaded through the GUI.
 * Bad, because `JabRefUndoManager` is now an extension point: it stays non-final and shares its monitor with the JavaFX subclass.
 * Bad, because `GuiUndoManager` restates eight signatures the journal already implements, and the two must be kept in step by hand.
-
