@@ -14,8 +14,10 @@ public sealed interface OcrResult {
 
     /// Represents a failed OCR result.
     ///
-    /// Contains the reason why the failure occurred that the GUI part can localize it and output to the user.
-    record Failure(OcrFailureReason reason) implements OcrResult {
+    /// Contains the reason why the failure occurred that the GUI part can localize it and output to the user,
+    /// plus the command line that was executed and its captured output, when available, so the GUI can show
+    /// them for debugging. Both are empty strings when the failure occurred before a command could be run.
+    record Failure(OcrFailureReason reason, String commandLine, String output) implements OcrResult {
     }
 
     /// Checks if this result is success.
@@ -35,6 +37,12 @@ public sealed interface OcrResult {
 
     /// Factory method to create a failure result with an error message.
     static OcrResult failure(OcrFailureReason reason) {
-        return new Failure(reason);
+        return new Failure(reason, "", "");
+    }
+
+    /// Factory method to create a failure result including the command that was run and its output,
+    /// so the GUI can surface them for debugging.
+    static OcrResult failure(OcrFailureReason reason, String commandLine, String output) {
+        return new Failure(reason, commandLine, output);
     }
 }

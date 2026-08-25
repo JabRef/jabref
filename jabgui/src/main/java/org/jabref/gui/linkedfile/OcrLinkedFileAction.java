@@ -111,7 +111,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     }
 
     String getFailureResult(OcrResult.Failure failure, OcrEngine ocrEngine) {
-        return switch (failure.reason()) {
+        String reasonMessage = switch (failure.reason()) {
             case NOT_AVAILABLE ->
                     Localization.lang("%0 is not available at: %1", ocrEngine.getName(), preferences.getOcrPreferences().getOcrEnginePath());
             case TIMEOUT ->
@@ -123,6 +123,23 @@ public class OcrLinkedFileAction extends SimpleCommand {
             case INTERRUPTED ->
                     Localization.lang("OCR was cancelled");
         };
+
+        if (failure.commandLine().isEmpty()) {
+            return reasonMessage;
+        }
+
+        StringBuilder message = new StringBuilder(reasonMessage)
+                .append("\n\n")
+                .append(Localization.lang("Command"))
+                .append(": ")
+                .append(failure.commandLine());
+        if (!failure.output().isEmpty()) {
+            message.append("\n\n")
+                   .append(Localization.lang("Output"))
+                   .append(":\n")
+                   .append(failure.output());
+        }
+        return message.toString();
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {
