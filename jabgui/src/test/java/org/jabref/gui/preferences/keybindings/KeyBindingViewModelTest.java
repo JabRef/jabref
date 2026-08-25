@@ -9,17 +9,17 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.support.DisabledOnCIServer;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -89,9 +89,8 @@ class KeyBindingViewModelTest {
     }
 
     @Test
+    @EnabledOnOs(OS.MAC)
     void controlKeyIsRecordedAsBindingOnMacOs() {
-        assumeTrue(OS.OS_X);
-
         KeyBindingRepository liveRepo = new KeyBindingRepository();
 
         KeyBindingsTabViewModel viewModel =
@@ -123,9 +122,8 @@ class KeyBindingViewModelTest {
     }
 
     @Test
+    @EnabledOnOs(OS.MAC)
     void controlKeyCombinedWithShiftIsRecordedAsBindingOnMacOs() {
-        assumeTrue(OS.OS_X);
-
         KeyBindingRepository liveRepo = new KeyBindingRepository();
 
         KeyBindingsTabViewModel viewModel =
