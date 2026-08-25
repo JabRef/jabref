@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -30,14 +29,12 @@ class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
-    private final Supplier<BibDatabaseMode> databaseModeSupplier;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource, Supplier<BibDatabaseMode> databaseModeSupplier) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
-        this.databaseModeSupplier = databaseModeSupplier;
     }
 
     // region — field focus capture / restore
@@ -85,19 +82,12 @@ class EntryEditorFocusUtils {
     void focusOrAddField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
-                () -> {
-                    Field requestedField = Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field))
-                                                   .orElse(field);
-                    getTabContainingField(requestedField).ifPresentOrElse(
-                            tab -> selectTabAndField(tab, requestedField),
-                            () -> addFieldViaAllFieldsTab(canonicalFieldForActiveMode(requestedField))
-                    );
-                }
+                () -> addFieldViaAllFieldsTab(field)
         ));
     }
 
-    private Field canonicalFieldForActiveMode(Field field) {
-        Map<Field, Field> aliasesToCanonical = databaseModeSupplier.get() == BibDatabaseMode.BIBTEX
+    private Field canonicalFieldForActiveMode(Field field, BibDatabaseMode mode) {
+        Map<Field, Field> aliasesToCanonical = mode == BibDatabaseMode.BIBTEX
                                                ? EntryConverter.FIELD_ALIASES_BIBLATEX_TO_BIBTEX
                                                : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
         return aliasesToCanonical.getOrDefault(field, field);
@@ -112,16 +102,18 @@ class EntryEditorFocusUtils {
     }
 
     private void addFieldViaAllFieldsTab(Field field) {
-        if (!FieldFactory.getAllFieldsWithOutInternal().contains(field)) {
-            return;
-        }
         tabPane.getTabs().stream()
                .filter(AllFieldsTab.class::isInstance)
                .map(AllFieldsTab.class::cast)
                .findFirst()
                .ifPresent(allFieldsTab -> {
+                   BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                   Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                   if (!FieldFactory.getAllFieldsWithOutInternal().contains(canonicalField)) {
+                       return;
+                   }
                    tabPane.getSelectionModel().select(allFieldsTab);
-                   allFieldsTab.addFieldAndFocus(field);
+                   allFieldsTab.addFieldAndFocus(canonicalField);
                });
     }
 

@@ -599,7 +599,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     // endregion
 
-    private BibDatabaseMode getDatabaseMode() {
+    BibDatabaseMode getDatabaseMode() {
         return stateManager.getActiveDatabase()
                            .map(BibDatabaseContext::getMode)
                            .orElse(BibDatabaseMode.BIBLATEX);
