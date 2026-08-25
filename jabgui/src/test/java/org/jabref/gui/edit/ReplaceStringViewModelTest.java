@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.undo.JabRefGuiUndoManager;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class ReplaceStringViewModelTest {
 
     private final LibraryTab libraryTab = mock(LibraryTab.class);
-    private final JabRefGuiUndoManager undoManager = new JabRefGuiUndoManager();
+    private final HeadlessGuiUndoManager undoManager = new HeadlessGuiUndoManager();
     private BibEntry entry;
     private ReplaceStringViewModel viewModel;
 
@@ -96,6 +96,7 @@ class ReplaceStringViewModelTest {
         viewModel.replace();
 
         assertTrue(undoManager.canUndo());
+        assertTrue(undoManager.undoableProperty().get(), "the property did not follow the stack");
         undoManager.undo();
         assertEquals(before, entry.getField(StandardField.JOURNALTITLE).orElseThrow());
     }
