@@ -8,8 +8,6 @@ import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -48,11 +46,6 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -71,10 +64,12 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
@@ -96,6 +91,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -103,6 +100,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +110,7 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -184,7 +182,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       CountingUndoManager undoManager,
+                       UndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
@@ -489,14 +487,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
-        for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
-        }
-        compoundEdit.end();
-        if (compoundEdit.hasEdits()) {
-            getUndoManager().addEdit(compoundEdit);
-        }
+        getUndoManager().addEdit(Localization.lang("Save actions"), edit -> edit.addAll(changes));
     }
 
     private void createMainTable() {
@@ -790,7 +781,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public CountingUndoManager getUndoManager() {
+    public UndoManager getUndoManager() {
         return undoManager;
     }
 
@@ -827,11 +818,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void suspendChangeMonitor() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::suspendChangeDetection);
     }
 
+    /// Resuming also scans for external changes that arrived while the monitor was suspended, e.g. a concurrent write
+    /// that aborted the suspended save — the standard external-changes review flow is offered for them.
     public void resumeChangeMonitor() {
-        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+        changeMonitor.ifPresent(DatabaseChangeMonitor::resumeChangeDetection);
     }
 
     public void insertEntry(final BibEntry bibEntry) {
@@ -989,8 +982,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
-        bibDatabaseContext.getDatabase().removeEntries(entries);
+        getUndoManager().apply(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
 
         if (mode != StandardActions.CUT) {
             List<LinkedFile> linkedFileList = entries.stream()
@@ -1029,8 +1021,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void resetChangedProperties() {
+        resetChangedProperties(null);
+    }
+
+    /// All call sites mean "in-memory library now matches the disk", so file events for that state need no scan.
+    ///
+    /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
+    public void resetChangedProperties(@Nullable FileSnapshot diskState) {
         this.nonUndoableChangeProperty.setValue(false);
         this.changedProperty.setValue(false);
+        changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 
     public void back() {
@@ -1086,7 +1086,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              CountingUndoManager undoManager,
+                                              UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
@@ -1134,7 +1134,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                (CountingUndoManager) undoManager,
+                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 false);

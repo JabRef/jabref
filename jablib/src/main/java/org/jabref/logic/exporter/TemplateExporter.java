@@ -29,11 +29,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Base class for export formats based on templates.
+@NullMarked
 public class TemplateExporter extends Exporter {
 
     static final String LAYOUT_PREFIX = "/resource/layout/";
@@ -54,21 +56,6 @@ public class TemplateExporter extends Exporter {
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
-    /// @param displayName Name to display to the user.
-    /// @param consoleName Name to call this format in the console.
-    /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
-    /// @param extension   Should contain the . (for instance .txt).
-    public TemplateExporter(String displayName,
-                            String consoleName,
-                            String lfFileName,
-                            String directory,
-                            FileType extension) {
-        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
-    }
-
-    /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    ///
     /// @param name       to display to the user and to call this format in the console.
     /// @param lfFileName Name of the main layout file.
     /// @param extension  May or may not contain the . (for instance .txt).
@@ -80,7 +67,7 @@ public class TemplateExporter extends Exporter {
         this(name,
                 name,
                 lfFileName,
-                null,
+                "",
                 StandardFileType.fromExtensions(extension),
                 layoutPreferences,
                 saveOrder);
@@ -91,7 +78,7 @@ public class TemplateExporter extends Exporter {
     /// @param displayName Name to display to the user.
     /// @param consoleName Name to call this format in the console.
     /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
+    /// @param directory   Directory in which to find the layout file (a blank string can be passed).
     /// @param extension   Should contain the . (for instance .txt).
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -100,7 +87,7 @@ public class TemplateExporter extends Exporter {
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder) {
-        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
+        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, BlankLineBehaviour.KEEP_BLANKS);
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -108,17 +95,17 @@ public class TemplateExporter extends Exporter {
     /// @param displayName        Name to display to the user.
     /// @param consoleName        Name to call this format in the console.
     /// @param lfFileName         Name of the main layout file.
-    /// @param directory          Directory in which to find the layout file.
+    /// @param directory          Directory in which to find the layout file (a blank string can be passed).
     /// @param extension          Should contain the . (for instance .txt).
     /// @param layoutPreferences  Preferences for layout
     /// @param blankLineBehaviour how to behave regarding blank lines.
     public TemplateExporter(String displayName,
                             String consoleName,
-                            @NonNull String lfFileName,
+                            String lfFileName,
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SelfContainedSaveOrder saveOrder,
+                            @Nullable SelfContainedSaveOrder saveOrder,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (lfFileName.endsWith(LAYOUT_EXTENSION)) {
@@ -154,7 +141,7 @@ public class TemplateExporter extends Exporter {
         if (customExport) {
             dir = "";
         } else {
-            dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
+            dir = LAYOUT_PREFIX + (directory.isEmpty() ? "" : directory + '/');
         }
 
         // Attempt to get a Reader for the file path given, either by
@@ -177,16 +164,14 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext,
-                       Path file,
-                       @NonNull List<BibEntry> entries) throws IOException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
         export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     @Override
-    public void export(@NonNull final BibDatabaseContext databaseContext,
+    public void export(final BibDatabaseContext databaseContext,
                        final Path file,
-                       @NonNull List<BibEntry> entries,
+                       List<BibEntry> entries,
                        List<Path> fileDirForDatabase,
                        JournalAbbreviationRepository abbreviationRepository) throws IOException {
         Charset encodingToUse = StandardCharsets.UTF_8;
