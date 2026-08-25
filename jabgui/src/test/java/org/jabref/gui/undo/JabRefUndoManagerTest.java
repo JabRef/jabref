@@ -451,7 +451,7 @@ class JabRefUndoManagerTest {
 
     /// An entry that runs `probe` from inside `setField`, when the field is set to `value`. The
     /// write happens on the thread making the change, so the probe runs at the one moment
-    /// [JabRefUndoManager#apply] has written to the library and not yet recorded anything — the window
+    /// [JabRefUndoManager#applyEdit] has written to the library and not yet recorded anything — the window
     /// this test is about.
     private static class ProbingEntry extends BibEntry {
 
