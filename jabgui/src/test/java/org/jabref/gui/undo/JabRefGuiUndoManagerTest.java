@@ -91,8 +91,8 @@ class JabRefGuiUndoManagerTest {
     @Test
     void aQueuedUpdateAppliesTheStateItFindsWhenItRuns() throws InterruptedException {
         List<Boolean> undoableValues = new CopyOnWriteArrayList<>();
-        WaitForAsyncUtils.asyncFx(() -> undoManager.undoableProperty()
-                                                  .addListener((observable, was, is) -> undoableValues.add(is)));
+        WaitForAsyncUtils.asyncFx(() -> undoManager.undoableProperty().addListener(
+                (_, _, added) -> undoableValues.add(added)));
         WaitForAsyncUtils.waitForFxEvents();
 
         CountDownLatch release = new CountDownLatch(1);
