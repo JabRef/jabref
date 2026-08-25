@@ -184,6 +184,7 @@ public class FileSelectionPage extends WizardPane {
     @Override
     public void onEnteringPage(Wizard wizard) {
         // Start search if not already done
+        headerGraphicHidden = false;
         Platform.runLater(() -> hideHeaderGraphic());
         if (viewModel.treeRootProperty().get().isEmpty()) {
             ((BorderPane) getContent()).setCenter(progressPane);
@@ -202,8 +203,10 @@ public class FileSelectionPage extends WizardPane {
         }
     }
 
+    private boolean headerGraphicHidden = false;
+
     private void hideHeaderGraphic() {
-        if (getScene() == null) {
+        if (headerGraphicHidden || getScene() == null) {
             return;
         }
         javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
@@ -211,6 +214,7 @@ public class FileSelectionPage extends WizardPane {
             javafx.scene.Node graphicContainer = grid.getChildren().get(1);
             graphicContainer.setVisible(false);
             graphicContainer.setManaged(false);
+            headerGraphicHidden = true;
         }
     }
 

@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
@@ -36,6 +35,7 @@ public class UnlinkedFilesWizard {
     private SearchConfigurationPage page1;
     private FileSelectionPage page2;
     private ImportResultsPage page3;
+    private boolean cssInstalled = false;
 
     public UnlinkedFilesWizard() {
     }
@@ -45,15 +45,19 @@ public class UnlinkedFilesWizard {
             return;
         }
 
-        Platform.runLater(() -> {
-            if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
-                stage.setResizable(true);
-                stage.setWidth(650);
-                stage.setHeight(550);
-                stage.getIcons().addAll(IconTheme.getLogoSet());
-                themeManager.installCssOnScene(stage.getScene());
-            }
-        });
+        cssInstalled = false;
+
+        javafx.scene.Scene dialogScene = wizard.getDialog().getDialogPane().getScene();
+
+        if (dialogScene != null) {
+            applyThemeAndStageSettings(dialogScene);
+        } else {
+            wizard.getDialog().getDialogPane().sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (!cssInstalled && newScene != null) {
+                    applyThemeAndStageSettings(newScene);
+                }
+            });
+        }
 
         Optional<ButtonType> result = wizard.showAndWait();
 
@@ -109,5 +113,17 @@ public class UnlinkedFilesWizard {
         if (viewModel.selectedSortProperty().get() != null) {
             preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(viewModel.selectedSortProperty().get());
         }
+    }
+
+    private void applyThemeAndStageSettings(javafx.scene.Scene scene) {
+        if (cssInstalled || !(scene.getWindow() instanceof javafx.stage.Stage stage)) {
+            return;
+        }
+        cssInstalled = true;
+        stage.setResizable(true);
+        stage.setWidth(650);
+        stage.setHeight(550);
+        stage.getIcons().addAll(IconTheme.getLogoSet());
+        themeManager.installCssOnScene(scene);
     }
 }
