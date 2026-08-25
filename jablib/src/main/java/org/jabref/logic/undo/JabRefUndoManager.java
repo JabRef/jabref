@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class JabRefUndoManager implements UndoManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndoManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefUndoManager.class);
 
     /// Same depth javax.swing.undo.UndoManager defaulted to. The stack retains the BibEntry
     /// objects of removed entries, so an unbounded one keeps every deletion of a session alive.
