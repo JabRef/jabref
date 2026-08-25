@@ -112,7 +112,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             case PUSHED ->
                     Localization.lang("Pushed successfully.");
             case NOTHING_TO_PUSH ->
-                    Localization.lang("Nothing to commit. Local branch is up to date.");
+                    Localization.lang("Nothing to commit.");
         };
     }
 
