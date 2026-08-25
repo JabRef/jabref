@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /// Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
 /// An intelligent {@link java.util.concurrent.ExecutorService} with a {@link java.util.concurrent.BlockingQueue} prevents a high load while making backups and
-/// rejects all redundant backup tasks. This class does not manage the .bak file which is created when opening a
+/// rejects all redundant backup tasks. This class does not manage the .sav file which is created when saving a
 /// database.
 public class BackupManager {
 

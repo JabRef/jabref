@@ -92,7 +92,8 @@ class BackupManagerTest {
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(noChangesBib, BackupFileType.BACKUP, backupDir);
         Files.copy(noChangesBibBak, target, StandardCopyOption.REPLACE_EXISTING);
 
-        // create "older" .bak files containing changes
+        // create "older" backup files containing changes
+        // They use the legacy .bak extension: backups written before the switch to .bib must still be considered
         for (int i = 0; i < 10; i++) {
             Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
             Path directory = backupDir;

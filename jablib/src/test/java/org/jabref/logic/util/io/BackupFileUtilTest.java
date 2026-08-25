@@ -52,8 +52,8 @@ class BackupFileUtilTest {
                     testPath,
                     BackupFileType.BACKUP,
                     backupDir);
-            // The intended fallback behavior is to put the .bak file in the same directory as the .bib file
-            assertEquals(Path.of("tmp", "test.bib.bak"), result);
+            // The intended fallback behavior is to put the backup file in the same directory as the .bib file
+            assertEquals(Path.of("tmp", "test.bib.bib"), result);
         }
     }
 }
