@@ -270,6 +270,7 @@ class JabRefUndoManagerTest {
     /// never passes through the saved position, because pushing B discarded A.
     @Test
     void editingAfterUndoingTheSavedChangeReportsChanged() {
+        // [utest->req~logic.undo.saved-position-identity~1]
         undoRedoManager.addEdit(setAuthor("Bohr"));
         undoRedoManager.markUnchanged();
 
@@ -326,6 +327,7 @@ class JabRefUndoManagerTest {
 
     @Test
     void undoingEverythingAfterTrimmingReportsChanged() {
+        // [utest->req~logic.undo.saved-position-identity~1]
         undoRedoManager.markUnchanged();
         for (int i = 0; i < 200; i++) {
             undoRedoManager.addEdit(setAuthor("Author " + i));
@@ -482,6 +484,7 @@ class JabRefUndoManagerTest {
     /// statement about a timeout; whether the lock is held is a fact available on the spot.
     @Test
     void applyingAChangeHappensWhileTheJournalIsLocked() {
+        // [utest->req~logic.undo.apply-and-record-atomically~1]
         AtomicBoolean lockedWhileApplying = new AtomicBoolean();
         BibEntry probingEntry = new ProbingEntry("Bohr",
                 () -> lockedWhileApplying.set(Thread.holdsLock(undoRedoManager)));

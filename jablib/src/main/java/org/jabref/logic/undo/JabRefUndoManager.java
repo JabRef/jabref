@@ -139,6 +139,7 @@ public class JabRefUndoManager implements UndoManager {
     /// Inside an [#addEdit] block there is no window to close. That recorder belongs to one
     /// thread and nothing reaches the stacks until the block ends, so no lock is taken here.
     @Override
+    // [impl->req~logic.undo.apply-and-record-atomically~1]
     public void applyEdit(BibChange change) {
         CompoundEdit compound = active.get();
         if (compound != null) {
@@ -290,6 +291,7 @@ public class JabRefUndoManager implements UndoManager {
     /// Ids are never reused, so a saved position that a redo-stack clear or a [#LIMIT] trim has
     /// discarded can never be matched again — which is the correct answer in both cases: that
     /// position is no longer reachable.
+    // [impl->req~logic.undo.saved-position-identity~1]
     public synchronized boolean hasChanged() {
         return currentPosition() != savedId;
     }
