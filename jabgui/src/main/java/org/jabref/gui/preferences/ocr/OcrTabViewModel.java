@@ -7,15 +7,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
@@ -28,18 +36,29 @@ import org.slf4j.LoggerFactory;
 public class OcrTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrTabViewModel.class);
     private static final int CHECKING_TIMEOUT = 10;
-    private static final List<String> DEFAULT_OCR_PATHS = List.of(
+    private static final List<String> DEFAULT_OCRMYPDF_PATHS = List.of(
             "ocrmypdf",
             "python -m ocrmypdf",
             "py -m ocrmypdf",
             "python3 -m ocrmypdf"
     );
+    private static final List<String> DEFAULT_DOCLING_PATHS = List.of(
+            "docling"
+    );
+    private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.OCRMYPDF);
+    private final ListProperty<EngineSelection> engineOptions =
+            new SimpleListProperty<>(FXCollections.observableArrayList(EngineSelection.values()));
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
+    private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
+    private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
+            new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final OcrPreferences ocrPreferences;
     private final TaskExecutor taskExecutor;
+
+    private boolean isInitializing = true;
 
     public OcrTabViewModel(DialogService dialogService,
                            FilePreferences filePreferences,
@@ -49,20 +68,49 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = filePreferences;
         this.ocrPreferences = ocrPreferences;
         this.taskExecutor = taskExecutor;
+
+        selectedEngine.addListener((_, oldValue, newValue) -> {
+            if (isInitializing || oldValue == newValue) {
+                return;
+            }
+            autoDetectEnginePath();
+        });
     }
 
     @Override
     public void setValues() {
+        isInitializing = true;
+        selectedEngine.setValue(ocrPreferences.getEngineSelection());
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
+        selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
+        isInitializing = false;
     }
 
     @Override
     public void storeSettings() {
+        ocrPreferences.setEngineSelection(selectedEngine.getValue());
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
+        ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
     }
 
     public StringProperty ocrEnginePathProperty() {
         return ocrEnginePath;
+    }
+
+    public ObjectProperty<EngineSelection> selectedEngineProperty() {
+        return selectedEngine;
+    }
+
+    public ReadOnlyListProperty<EngineSelection> engineOptions() {
+        return engineOptions;
+    }
+
+    public ObjectProperty<PagesWithTextHandling> selectedPagesHaveTextProperty() {
+        return selectedPagesHaveText;
+    }
+
+    public ReadOnlyListProperty<PagesWithTextHandling> pagesHaveTextOptions() {
+        return pagesHaveTextOptions;
     }
 
     public void browseEnginePath() {
@@ -73,27 +121,43 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         selectedPath.ifPresent(path -> ocrEnginePathProperty().set(path.toString()));
     }
 
-    public Optional<String> autoDetectDefaultEnginePath() {
-        return DEFAULT_OCR_PATHS.stream()
-                                .filter(this::enginePathExists)
-                                .findFirst();
+    public Optional<String> autoDetectDefaultEnginePath(EngineSelection engineToDetect) {
+        if (engineToDetect == EngineSelection.OCRMYPDF) {
+            return DEFAULT_OCRMYPDF_PATHS.stream()
+                                         .filter(this::enginePathExists)
+                                         .findFirst();
+        }
+        return DEFAULT_DOCLING_PATHS.stream()
+                                    .filter(this::enginePathExists)
+                                    .findFirst();
     }
 
     public void autoDetectEnginePath() {
-        BackgroundTask<Optional<String>> autoDetectTask = BackgroundTask.wrap(this::autoDetectDefaultEnginePath);
+        EngineSelection selectionAtStart = selectedEngine.get();
+        BackgroundTask<Optional<String>> autoDetectTask =
+                BackgroundTask.wrap(() -> autoDetectDefaultEnginePath(selectionAtStart));
+        String engineSelectionName = selectionAtStart.getDisplayName();
 
-        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of engine path"));
+        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of %0 path", engineSelectionName));
         autoDetectTask.showToUser(true);
         autoDetectTask.onSuccess(result -> {
+            if (selectedEngine.get() != selectionAtStart) {
+                return;
+            }
             if (result.isPresent()) {
                 String path = result.get();
                 ocrEnginePathProperty().set(path);
-                dialogService.notify(Localization.lang("OCRmyPDF detected at: %0", path));
+                dialogService.notify(Localization.lang("%0 detected at: %1", engineSelectionName, path));
             } else {
-                dialogService.notify(Localization.lang("OCRmyPDF could not be detected automatically"));
+                dialogService.notify(Localization.lang("%0 could not be detected automatically", engineSelectionName));
             }
         });
-        autoDetectTask.onFailure(_ -> dialogService.notify(Localization.lang("Auto detect engine path failed")));
+        autoDetectTask.onFailure(_ -> {
+            if (selectedEngine.get() != selectionAtStart) {
+                return;
+            }
+            dialogService.notify(Localization.lang("Auto detection of %0 path failed", engineSelectionName));
+        });
         taskExecutor.execute(autoDetectTask);
     }
 

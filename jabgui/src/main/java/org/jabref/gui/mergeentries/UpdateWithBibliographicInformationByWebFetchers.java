@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.DialogService;
@@ -12,6 +13,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -21,15 +23,18 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
     private final GuiPreferences guiPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
 
     public UpdateWithBibliographicInformationByWebFetchers(DialogService dialogService,
                                                            GuiPreferences preferences,
                                                            StateManager stateManager,
-                                                           TaskExecutor taskExecutor) {
+                                                           TaskExecutor taskExecutor,
+                                                           UndoManager undoManager) {
         this.dialogService = dialogService;
         this.guiPreferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -41,7 +46,8 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
-        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
+        mergedEntriesView.setTitle(Localization.lang("Merge entry with information"));
+        mergedEntriesView.addSource(Localization.lang("Original entry"), originalEntry);
 
         Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
                 guiPreferences.getImporterPreferences(),
@@ -60,6 +66,14 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
             });
         }
 
-        dialogService.showCustomDialogAndWait(mergedEntriesView);
+        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(mergedEntriesView);
+        new UpdateOriginalEntry(
+                originalEntry,
+                mergedEntry,
+                dialogService,
+                undoManager,
+                Localization.lang("Merge entry with information"),
+                Localization.lang("Updated entry with merged information"))
+                .update();
     }
 }

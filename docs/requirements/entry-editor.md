@@ -12,6 +12,13 @@ When users search or select a group not containing the entry shown in the Entry 
 
 Needs: impl
 
+## Validation decoration is initialized before opening the entry editor
+`req~entry-editor.validation-decoration.startup~1`
+
+ControlsFX validation decoration is initialized during GUI startup, so opening the first entry editor does not replace the JavaFX scene root and trigger a full CSS reapplication on the entry-editor interaction path.
+
+Needs: impl
+
 ## Citations tab should show citation preview on hover
 `req~entry-editor.citations.hover-preview~1`
 
@@ -65,6 +72,20 @@ Needs: impl
 `req~entry-editor.main-tab.remove-field~1`
 
 A field's row shows a small gray "remove field" icon button pinned to its top-right corner while the field's editor is focused and the field is currently blank. Clicking it hides the row again. The citation key and the entry type's required fields never show this button, so they cannot be removed this way.
+
+Needs: impl
+
+## Custom tabs show a user-defined list of field patterns
+`req~entry-editor.custom-tabs~1`
+
+Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again without migration.
+
+Needs: impl
+
+## Special fields are edited with the same icon controls as the main table
+`req~entry-editor.special-field-editors~1`
+
+Special fields (ranking, priority, read status, printed, quality, relevance) are edited with the same icon-based controls the main table's special field columns use: a five-star rating for the ranking, one icon toggle per value for priority and read status (deselecting the active toggle clears the field), and a single icon toggle for the one-value fields printed, quality, and relevance. Field labels and add-chips show the localized special field name instead of the raw field name. Values changed elsewhere (main table, source tab, undo) are reflected live.
 
 Needs: impl
 

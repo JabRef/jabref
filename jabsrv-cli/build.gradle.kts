@@ -2,8 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("org.jabref.gradle.module")
-    id("org.jabref.gradle.feature.shadowjar")
     id("application")
+    id("org.jabref.gradle.feature.nativecompile")
+    id("org.jabref.gradle.feature.shadowjar")
 }
 
 group = "org.jabref.jabsrv"
@@ -61,5 +62,15 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("jabsrv")
+            mainClass.set("org.jabref.http.server.cli.ServerCli")
+            buildArgs.add("-Djava.awt.headless=true")
+        }
     }
 }

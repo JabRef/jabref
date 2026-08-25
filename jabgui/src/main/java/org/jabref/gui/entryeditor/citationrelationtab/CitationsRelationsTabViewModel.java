@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.concurrent.Future;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,6 +19,7 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.SciteAiFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -176,7 +175,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void lookUpDoi(BibEntry entry) {
-        CrossRef doiFetcher = new CrossRef();
+        CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
                       .onRunning(() -> {

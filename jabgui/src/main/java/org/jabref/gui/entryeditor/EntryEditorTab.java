@@ -70,6 +70,10 @@ public abstract class EntryEditorTab extends Tab {
 
     protected abstract void bindToEntry(BibEntry entry);
 
+    /// Releases listeners owned by this tab before it is discarded.
+    protected void dispose() {
+    }
+
     /// Override to perform a special action on focus (like selecting the first field in the editor).
     protected void handleFocus() {
     }

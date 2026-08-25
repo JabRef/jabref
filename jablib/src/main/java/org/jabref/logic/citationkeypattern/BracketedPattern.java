@@ -1,11 +1,11 @@
 package org.jabref.logic.citationkeypattern;
 
 import java.math.BigInteger;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -204,10 +203,11 @@ public class BracketedPattern {
     public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
         StringBuilder expandedPattern = new StringBuilder();
         pattern = pattern.replace("\\\"", "\u0A17");
-        StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
+        // The parser dispatches on single characters only, so each character forms a token of its own.
+        Iterator<String> parsedPattern = Arrays.asList(pattern.split("")).iterator();
 
-        while (parsedPattern.hasMoreTokens()) {
-            String token = parsedPattern.nextToken();
+        while (parsedPattern.hasNext()) {
+            String token = parsedPattern.next();
             switch (token) {
                 case "\"" ->
                         appendQuote(expandedPattern, parsedPattern);
@@ -216,8 +216,8 @@ public class BracketedPattern {
                     expandedPattern.append(bracketContentHandler.apply(fieldMarker));
                 }
                 case "\\" -> {
-                    if (parsedPattern.hasMoreTokens()) {
-                        expandedPattern.append(parsedPattern.nextToken());
+                    if (parsedPattern.hasNext()) {
+                        expandedPattern.append(parsedPattern.next());
                     } else {
                         LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
@@ -233,18 +233,18 @@ public class BracketedPattern {
     /// Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
     /// There may be brackets in it.
     /// Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
-    /// is encountered, and has been consumed, by the `StringTokenizer`.
+    /// is encountered, and has been consumed, by the tokenizer.
     ///
     /// @param pattern   pattern used by `expandBrackets`, used for logging
     /// @param tokenizer the tokenizer producing the tokens
     /// @return the content enclosed by brackets
-    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
+    private static String contentBetweenBrackets(Iterator<String> tokenizer, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
         int subBrackets = 0;
         // make sure to read until the paired ']'
-        while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
-            String token = tokenizer.nextToken();
+        while (tokenizer.hasNext() && !foundClosingBracket) {
+            String token = tokenizer.next();
             // If the beginning of a quote is found, append the content
             switch (token) {
                 case "\"" ->
@@ -276,15 +276,15 @@ public class BracketedPattern {
 
     /// Appends the content between, and including, two \" to the provided `StringBuilder`. Intended to be
     /// used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
-    /// encountered by the StringTokenizer.
+    /// encountered by the tokenizer.
     ///
     /// @param stringBuilder the `StringBuilder` to which tokens will be appended
     /// @param tokenizer     the tokenizer producing the tokens
-    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
+    private static void appendQuote(StringBuilder stringBuilder, Iterator<String> tokenizer) {
         stringBuilder.append("\"");  // We know that the previous token was \"
         String token = "";
-        while (tokenizer.hasMoreTokens() && !"\"".equals(token)) {
-            token = tokenizer.nextToken();
+        while (tokenizer.hasNext() && !"\"".equals(token)) {
+            token = tokenizer.next();
             stringBuilder.append(token);
         }
     }
@@ -1258,11 +1258,7 @@ public class BracketedPattern {
             return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        Optional<String> unicodeFormattedName = LatexToUnicodeAdapter.parse(content);
-        if (unicodeFormattedName.isEmpty()) {
-            LOGGER.warn("{} could not be converted to unicode. This can result in an incorrect or missing institute citation key", content);
-        }
-        String result = unicodeFormattedName.orElse(Normalizer.normalize(content, Normalizer.Form.NFC));
+        String result = LatexToUnicodeAdapter.format(content);
 
         // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
         result = StringUtil.replaceSpecialCharacters(result);

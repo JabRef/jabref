@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -32,6 +30,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -214,6 +213,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private void disposeTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
+        allPossibleTabs.forEach(EntryEditorTab::dispose);
         allPossibleTabs.forEach(tab -> tab.currentEntryProperty().unbind());
         allPossibleTabs.clear();
     }

@@ -1,7 +1,5 @@
 package org.jabref.gui.shared;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,8 +19,10 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -63,6 +63,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -106,7 +107,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 fileUpdateMonitor,
                 undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                journalAbbreviationRepository);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 

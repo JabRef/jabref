@@ -120,7 +120,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.FILE, ":https\\://arxiv.org/pdf/1405.2249v1:PDF")
                 .withField(StandardField.KEYWORDS, "Mathematical Physics (math-ph), Differential Geometry (math.DG), Symplectic Geometry (math.SG), FOS: Physical sciences, FOS: Mathematics, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42")
-                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1405.2249")
+                .withField(InternalField.KEY_FIELD, "Diez:2013fdp")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
     }
 
@@ -348,6 +348,24 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
+    void citationKeyIsAdoptedFromInspireWhenPaperIsIndexedThere() throws FetcherException {
+        // 1405.2249 has no manually-assigned (journal) DOI, so ArXivFetcher's own DOI-based
+        // enrichment never produces a citation key for it; but it is indexed on INSPIRE, which
+        // should supply its curated texkey instead of leaving the entry keyless.
+        Optional<BibEntry> entry = fetcher.performSearchById("1405.2249");
+        assertEquals(Optional.of("Diez:2013fdp"), entry.flatMap(BibEntry::getCitationKey));
+    }
+
+    @Test
+    void urlShapedCitationKeyIsLeftUnchangedWhenPaperIsNotIndexedOnInspire() throws FetcherException {
+        // 1811.10364 (mainResultPaper, a cs.IR paper) has no manually-assigned DOI, so it ends up
+        // with a URL-shaped key from the automatically-assigned arXiv DOI's metadata. It is not
+        // indexed on INSPIRE (a physics-only database), so that key is left as-is.
+        Optional<BibEntry> entry = fetcher.performSearchById("1811.10364");
+        assertEquals(Optional.of("https://doi.org/10.48550/arxiv.1811.10364"), entry.flatMap(BibEntry::getCitationKey));
+    }
+
+    @Test
     void searchEntryByIdWith4DigitsAndPrefix() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv:1405.2249"));
     }
@@ -372,6 +390,14 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchIdentifierForSlicePaper() throws FetcherException {
         sliceTheoremPaper.clearField(StandardField.EPRINT);
+
+        assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
+    }
+
+    @Test
+    void searchIdentifierForSlicePaperByDoiUrl() throws FetcherException {
+        sliceTheoremPaper.clearField(StandardField.EPRINT);
+        sliceTheoremPaper.setField(StandardField.DOI, "https://doi.org/10.48550/arXiv.1405.2249");
 
         assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
     }
@@ -413,12 +439,15 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void supportsPhraseSearch() throws FetcherException {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> broaderSearchResult = fetcher.performSearch("taxonomy distributed");
 
-        // TODO: Current error "<summary>Invalid query string: 'OR ti:"Taxonomy AND all:of AND all:Distributed"'</summary>"
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
-
-        // Phrase search result has to be subset of the default search result
-        assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
+        assertFalse(resultWithPhraseSearch.isEmpty());
+        List<Optional<String>> broaderSearchIdentifiers = broaderSearchResult.stream()
+                                                                             .map(entry -> entry.getField(StandardField.EPRINT))
+                                                                             .toList();
+        assertTrue(resultWithPhraseSearch.stream()
+                                         .map(entry -> entry.getField(StandardField.EPRINT))
+                                         .allMatch(broaderSearchIdentifiers::contains));
     }
 
     /// A phrase is a sequence of terms wrapped in quotes.
@@ -565,7 +594,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.YEAR, "2016")
                 .withField(StandardField.VOLUME, "113")
                 .withField(InternalField.KEY_FIELD, "Zheng_2016")
-                .withField(StandardField.PUBLISHER, "Proceedings of the National Academy of Sciences")
+                .withField(StandardField.PUBLISHER, "National Academy of Sciences")
                 .withField(StandardField.PAGES, "15000--15005")
                 .withField(StandardField.NUMBER, "52");
 
