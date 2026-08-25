@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -22,6 +23,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.EngineSelection;
+import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.util.BackgroundTask;
@@ -52,8 +54,8 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
-    private final ListProperty<String> ocrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
-
+    private final ListProperty<OcrLanguage> ocrLanguageOptions = new SimpleListProperty<>(FXCollections.observableArrayList(OcrLanguage.values()));
+    private final ListProperty<OcrLanguage> selectedOcrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final OcrPreferences ocrPreferences;
@@ -76,7 +78,18 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             }
             autoDetectEnginePath();
         });
-        javafx.beans.binding.Bindings.bindContentBidirectional(this.ocrLanguages, this.ocrPreferences.getOcrLanguages());
+        List<OcrLanguage> saved = ocrPreferences.getOcrLanguages().stream()
+                                                .map(OcrLanguage::safeValueOf)
+                                                .toList();
+        selectedOcrLanguages.setAll(saved);
+
+        selectedOcrLanguages.addListener((InvalidationListener) obs -> {
+            ocrPreferences.getOcrLanguages().setAll(
+                    selectedOcrLanguages.stream()
+                                        .map(OcrLanguage::getCode)
+                                        .toList()
+            );
+        });
     }
 
     @Override
@@ -113,6 +126,14 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     public ReadOnlyListProperty<PagesWithTextHandling> pagesHaveTextOptions() {
         return pagesHaveTextOptions;
+    }
+
+    public ListProperty<OcrLanguage> ocrLanguageOptionsProperty() {
+        return ocrLanguageOptions;
+    }
+
+    public ListProperty<OcrLanguage> selectedOcrLanguagesProperty() {
+        return selectedOcrLanguages;
     }
 
     public void browseEnginePath() {
@@ -190,9 +211,5 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             LOGGER.debug("{} is not available as engine's path: IOException occurred", path, e);
             return false;
         }
-    }
-
-    public ListProperty<String> ocrLanguagesProperty() {
-        return ocrLanguages;
     }
 }

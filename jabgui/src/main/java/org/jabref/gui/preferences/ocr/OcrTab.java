@@ -1,7 +1,7 @@
 package org.jabref.gui.preferences.ocr;
 
+import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -40,7 +40,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName)
                         .custom(buildEnginePathRow()))
 
-                .section(Localization.lang("OCR Languages"), languages -> languages
+                .section(Localization.lang("OCR languages"), languages -> languages
                         .custom(buildLanguagesRow()))
 
                 .section(Localization.lang("Handling of pre-existing text"), scanned -> scanned
@@ -65,9 +65,8 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     }
 
     private Node buildLanguagesRow() {
-        CheckComboBox<OcrLanguage> languagesCombo = new CheckComboBox<>(
-                FXCollections.observableArrayList(OcrLanguage.values())
-        );
+        var items = FXCollections.observableArrayList(OcrLanguage.values());
+        CheckComboBox<OcrLanguage> languagesCombo = new CheckComboBox<>(items);
 
         languagesCombo.setConverter(new StringConverter<>() {
             @Override
@@ -77,25 +76,23 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 
             @Override
             public OcrLanguage fromString(String string) {
-                throw new UnsupportedOperationException("Conversion from String is not supported");
+                return null;
             }
         });
 
-        viewModel.ocrLanguagesProperty().get().stream()
-                 .map(OcrLanguage::fromCode)
-                 .forEach(languagesCombo.getCheckModel()::check);
+        items.stream()
+             .filter(viewModel.selectedOcrLanguagesProperty()::contains)
+             .forEach(languagesCombo.getCheckModel()::check);
 
         languagesCombo.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<OcrLanguage>) change ->
-                        viewModel.ocrLanguagesProperty().setAll(
-                                languagesCombo.getCheckModel().getCheckedItems().stream()
-                                              .map(OcrLanguage::getCode)
-                                              .toList()
+                (InvalidationListener) obs ->
+                        viewModel.selectedOcrLanguagesProperty().setAll(
+                                languagesCombo.getCheckModel().getCheckedItems()
                         )
         );
 
         HBox.setHgrow(languagesCombo, Priority.ALWAYS);
-        HBox row = new HBox(8.0, new Label(Localization.lang("OCR Languages")), languagesCombo);
+        HBox row = new HBox(8.0, new Label(Localization.lang("OCR languages")), languagesCombo);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }

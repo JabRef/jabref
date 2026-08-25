@@ -37,6 +37,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -2174,18 +2175,19 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         List<String> savedLanguages = getStringList(OCR_LANGUAGES);
+        List<String> ocrLanguagesToLoad = savedLanguages.isEmpty() ? defaultValues.getOcrLanguages() : savedLanguages;
 
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
                 EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
-                savedLanguages.isEmpty() ? defaultValues.getOcrLanguages() : savedLanguages);
+                ocrLanguagesToLoad);
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
-        ocrPreferences.getOcrLanguages().addListener((javafx.collections.ListChangeListener<String>) change ->
+        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<String>) change ->
                 putStringList(OCR_LANGUAGES, List.copyOf(ocrPreferences.getOcrLanguages())));
 
         return ocrPreferences;
