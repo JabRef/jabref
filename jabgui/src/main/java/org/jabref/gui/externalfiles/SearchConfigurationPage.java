@@ -48,6 +48,7 @@ public class SearchConfigurationPage extends WizardPane {
     private ComboBox<FileExtensionViewModel> fileTypeCombo;
     private ComboBox<DateRange> fileDateCombo;
     private ComboBox<ExternalFileSorter> fileSortCombo;
+    private boolean headerGraphicHidden = false;
 
     public SearchConfigurationPage(UnlinkedFilesDialogViewModel viewModel,
                                    BibDatabaseContext bibDatabaseContext,
@@ -249,8 +250,6 @@ public class SearchConfigurationPage extends WizardPane {
             }
         });
     }
-
-    private boolean headerGraphicHidden = false;
 
     private void hideHeaderGraphic() {
         if (headerGraphicHidden || getScene() == null) {
