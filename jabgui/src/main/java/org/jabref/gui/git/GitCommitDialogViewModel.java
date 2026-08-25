@@ -2,7 +2,6 @@ package org.jabref.gui.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -16,7 +15,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
-import org.jabref.logic.git.diff.DiffFiles;
 import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
@@ -40,7 +38,6 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final GuiPreferences guiPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
@@ -54,15 +51,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             DialogService dialogService,
             TaskExecutor taskExecutor,
             GitHandlerRegistry gitHandlerRegistry,
-            GuiPreferences guiPreferences,
+            GuiPreferences preferences,
             ImportFormatPreferences importFormatPreferences,
             FileUpdateMonitor fileUpdateMonitor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
-        this.guiPreferences = guiPreferences;
-        this.importFormatPreferences = guiPreferences.getImportFormatPreferences();
+        this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
@@ -95,49 +91,28 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         });
     }
 
-    public BackgroundTask<List<DiffFiles>> diffTask() {
-        return BackgroundTask.wrap(() -> List.of(computeDiff()));
+    public BackgroundTask<DiffDatabases> diffTask() {
+        return BackgroundTask.wrap(this::computeDiffDatabases);
     }
 
-    private DiffFiles computeDiff() throws JabRefException, IOException {
+    private DiffDatabases computeDiffDatabases() throws JabRefException, IOException {
         TrackedFile trackedFile = getTrackedBibFile();
+        Path repositoryRoot = trackedFile.gitHandler().getRepositoryPathAsFile().toPath();
+        Path relativeFilePath = repositoryRoot.relativize(trackedFile.bibFilePath());
 
-        Path repoRoot = trackedFile.gitHandler()
-                                   .getRepositoryPathAsFile()
-                                   .toPath()
-                                   .toRealPath();
+        BibDatabaseContext headDatabase = GitDiffChecker.checkDiffAgainstLastCommit(
+                trackedFile.gitHandler(), relativeFilePath, importFormatPreferences, fileUpdateMonitor);
+        BibDatabaseContext savedDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(
+                trackedFile.bibFilePath(), importFormatPreferences, fileUpdateMonitor);
+        return new DiffDatabases(headDatabase, savedDatabase);
+    }
 
-        Path relativePath = repoRoot.relativize(
-                trackedFile.bibFilePath().toRealPath()
-        );
-
-        return GitDiffChecker.checkDiffAgainstLastCommit(
-                trackedFile.gitHandler(),
-                relativePath,
-                importFormatPreferences,
-                fileUpdateMonitor
-        );
+    public record DiffDatabases(BibDatabaseContext headDatabase, BibDatabaseContext savedDatabase) {
     }
 
     private void doCommit() throws JabRefException, GitAPIException, IOException {
-        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
-        if (activeDatabaseOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("No library open"));
-        }
-
-        BibDatabaseContext dbContext = activeDatabaseOpt.get();
-        Optional<Path> bibFilePathOpt = dbContext.getDatabasePath();
-        if (bibFilePathOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
-        }
-
-        Path bibFilePath = bibFilePathOpt.get();
-        Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
-        if (repoRootOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
-        }
-
-        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());
+        TrackedFile trackedFile = getTrackedBibFile();
+        GitHandler gitHandler = trackedFile.gitHandler();
 
         GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
         if (!status.tracking()) {

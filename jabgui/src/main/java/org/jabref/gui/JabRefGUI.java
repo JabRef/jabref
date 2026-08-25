@@ -90,7 +90,7 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static UndoManager undoManager;
+    public static UndoManager undoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
