@@ -16,7 +16,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -60,7 +60,7 @@ class SourceTabTest {
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
 
         sourceTab = new SourceTab(
-                new UndoManager(),
+                new JabRefUndoManager(),
                 fieldPreferences,
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),

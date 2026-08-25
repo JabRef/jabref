@@ -29,7 +29,7 @@ import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -141,7 +141,7 @@ class SaveDatabaseActionTest {
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        when(libraryTab.getUndoManager()).thenReturn(mock(UndoManager.class));
+        when(libraryTab.getUndoManager()).thenReturn(mock(JabRefUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager, mock(JournalAbbreviationRepository.class));
         return saveDatabaseAction;

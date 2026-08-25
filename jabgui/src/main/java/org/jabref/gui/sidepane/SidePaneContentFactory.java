@@ -13,7 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -29,7 +29,7 @@ public class SidePaneContentFactory {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
@@ -41,7 +41,7 @@ public class SidePaneContentFactory {
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
                                   ClipBoardManager clipBoardManager,
-                                  UndoManager undoManager) {
+                                  JabRefUndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;

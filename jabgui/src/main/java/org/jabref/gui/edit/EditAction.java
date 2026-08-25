@@ -11,7 +11,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 
 import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
@@ -27,10 +27,10 @@ public class EditAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final StandardActions action;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
 
     public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
-                      UndoManager undoManager) {
+                      JabRefUndoManager undoManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;

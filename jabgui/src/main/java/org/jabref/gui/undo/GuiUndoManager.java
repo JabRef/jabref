@@ -4,11 +4,11 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Exposes an [UndoManager]'s state as JavaFX properties, for binding menu and toolbar
+/// Exposes an [JabRefUndoManager]'s state as JavaFX properties, for binding menu and toolbar
 /// enablement.
 ///
 /// Deliberately separate from the manager, for the marshalling rather than the properties.
@@ -19,11 +19,11 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class GuiUndoManager {
 
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
     private final ReadOnlyBooleanWrapper undoable;
     private final ReadOnlyBooleanWrapper redoable;
 
-    public GuiUndoManager(UndoManager undoManager) {
+    public GuiUndoManager(JabRefUndoManager undoManager) {
         this.undoManager = undoManager;
         this.undoable = new ReadOnlyBooleanWrapper(undoManager.canUndo());
         this.redoable = new ReadOnlyBooleanWrapper(undoManager.canRedo());
@@ -31,7 +31,7 @@ public class GuiUndoManager {
         undoManager.addListener(this::refresh);
     }
 
-    public UndoManager getUndoManager() {
+    public JabRefUndoManager getUndoManager() {
         return undoManager;
     }
 

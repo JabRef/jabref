@@ -31,7 +31,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -55,7 +55,7 @@ public class MainToolBar extends ToolBar {
     private final ClipBoardManager clipBoardManager;
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
     private final GuiUndoManager guiUndoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
@@ -74,7 +74,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       UndoManager undoManager,
+                       JabRefUndoManager undoManager,
                        GuiUndoManager guiUndoManager,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;

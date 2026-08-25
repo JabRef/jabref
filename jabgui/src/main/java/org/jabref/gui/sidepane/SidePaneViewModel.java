@@ -21,7 +21,7 @@ import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -49,7 +49,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
-                             UndoManager undoManager) {
+                             JabRefUndoManager undoManager) {
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.dialogService = dialogService;

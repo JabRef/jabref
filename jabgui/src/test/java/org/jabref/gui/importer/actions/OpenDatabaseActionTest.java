@@ -13,7 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,7 +49,7 @@ public class OpenDatabaseActionTest {
                 mock(StateManager.class),
                 mock(FileUpdateMonitor.class),
                 mock(BibEntryTypesManager.class),
-                mock(UndoManager.class),
+                mock(JabRefUndoManager.class),
                 mock(ClipBoardManager.class),
                 mock(TaskExecutor.class)
         ));

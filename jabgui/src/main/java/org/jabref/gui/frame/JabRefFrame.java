@@ -59,7 +59,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -97,7 +97,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
     private final GuiUndoManager guiUndoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -126,7 +126,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        GuiPreferences preferences,
                        AiService aiService,
                        StateManager stateManager,
-                       UndoManager undoManager,
+                       JabRefUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,

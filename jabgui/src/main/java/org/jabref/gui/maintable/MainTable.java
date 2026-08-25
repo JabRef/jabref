@@ -64,7 +64,7 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -94,7 +94,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;

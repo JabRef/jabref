@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(ApplicationExtension.class)
 class GuiUndoManagerTest {
 
-    private final UndoManager undoManager = new UndoManager();
+    private final JabRefUndoManager undoManager = new JabRefUndoManager();
     private GuiUndoManager properties;
     private BibEntry entry;
 

@@ -52,7 +52,7 @@ import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -101,7 +101,7 @@ public class OpenOfficePanel {
 
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private final UndoManager undoManager;
+    private final JabRefUndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
@@ -125,7 +125,7 @@ public class OpenOfficePanel {
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
                            ClipBoardManager clipBoardManager,
-                           UndoManager undoManager) {
+                           JabRefUndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;

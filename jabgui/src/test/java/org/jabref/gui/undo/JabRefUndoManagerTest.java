@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -35,9 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UndoManagerTest {
+class JabRefUndoManagerTest {
 
-    private final UndoManager undoRedoManager = new UndoManager();
+    private final JabRefUndoManager undoRedoManager = new JabRefUndoManager();
     private BibEntry entry;
 
     @BeforeEach
@@ -449,7 +449,7 @@ class UndoManagerTest {
 
     /// An entry that runs `probe` from inside `setField`, when the field is set to `value`. The
     /// write happens on the thread making the change, so the probe runs at the one moment
-    /// [UndoManager#apply] has written to the library and not yet recorded anything — the window
+    /// [JabRefUndoManager#apply] has written to the library and not yet recorded anything — the window
     /// this test is about.
     private static class ProbingEntry extends BibEntry {
 
