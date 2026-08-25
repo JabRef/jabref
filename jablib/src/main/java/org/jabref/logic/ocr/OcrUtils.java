@@ -3,8 +3,12 @@ package org.jabref.logic.ocr;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -51,7 +55,7 @@ public final class OcrUtils {
         String commandLine = String.join(" ", command);
         StringBuilder outputBuilder = new StringBuilder();
         Process process = null;
-        Thread gobblerThread = null;
+        Future<?> gobblerFuture = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
@@ -62,23 +66,26 @@ public final class OcrUtils {
                 LOGGER.debug(line);
                 outputBuilder.append(line).append(System.lineSeparator());
             });
-            gobblerThread = new Thread(streamGobblerInput, engineName + "-output-gobbler");
-            gobblerThread.start();
+            gobblerFuture = HeadlessExecutorService.INSTANCE.execute(() -> {
+                streamGobblerInput.run();
+                return null;
+            });
 
             boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
                 // destroyForcibly() closes the process's output pipe, so the gobbler hits EOF and
-                // exits on its own shortly after; joining before reading outputBuilder avoids a
-                // data race between this thread reading it and the gobbler still appending to it.
-                joinGobblerQuietly(gobblerThread);
+                // finishes on its own shortly after; waiting for it before reading outputBuilder
+                // avoids a data race between this thread reading it and the gobbler still
+                // appending to it.
+                awaitGobblerQuietly(gobblerFuture);
                 return OcrResult.failure(OcrFailureReason.TIMEOUT, commandLine, outputBuilder.toString());
             }
 
             // The process has exited, so its output is fully written; wait for the gobbler to finish
             // draining it so the captured output is complete (and safe to read from this thread)
             // before it is read below.
-            joinGobblerQuietly(gobblerThread);
+            awaitGobblerQuietly(gobblerFuture);
 
             if (process.exitValue() == 0) {
                 return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
@@ -90,24 +97,26 @@ public final class OcrUtils {
             return OcrResult.failure(OcrFailureReason.IO_ERROR, commandLine, outputBuilder.toString());
         } catch (InterruptedException e) {
             process.destroyForcibly();
-            // See the TIMEOUT branch above: must join before reading outputBuilder here too.
-            joinGobblerQuietly(gobblerThread);
+            // See the TIMEOUT branch above: must wait before reading outputBuilder here too.
+            awaitGobblerQuietly(gobblerFuture);
             Thread.currentThread().interrupt();
             LOGGER.error("{} process was interrupted.", engineName, e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED, commandLine, outputBuilder.toString());
         }
     }
 
-    /// Waits briefly for the output-gobbler thread to finish, so its buffered output is safe to
-    /// read afterward. A null thread (the process never started) is a no-op.
-    private static void joinGobblerQuietly(Thread gobblerThread) {
-        if (gobblerThread == null) {
+    /// Waits briefly for the output-gobbler task to finish, so its buffered output is safe to
+    /// read afterward. A null future (the process never started) is a no-op.
+    private static void awaitGobblerQuietly(Future<?> gobblerFuture) {
+        if (gobblerFuture == null) {
             return;
         }
         try {
-            gobblerThread.join(TimeUnit.SECONDS.toMillis(5));
+            gobblerFuture.get(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } catch (ExecutionException | TimeoutException e) {
+            LOGGER.debug("Output gobbler did not finish cleanly", e);
         }
     }
 
