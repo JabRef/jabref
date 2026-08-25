@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -22,7 +20,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -33,6 +30,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
@@ -70,7 +68,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
 
@@ -81,7 +79,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager,
+                              UndoManager undoManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;

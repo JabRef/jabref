@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -27,10 +25,6 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -40,12 +34,16 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
@@ -82,7 +80,7 @@ public class SourceTab extends EntryEditorTab {
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
-    public SourceTab(CountingUndoManager undoManager,
+    public SourceTab(UndoManager undoManager,
                      FieldPreferences fieldPreferences,
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
@@ -281,7 +279,7 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
+        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
         newEntry.getCitationKey()
                 .ifPresentOrElse(
@@ -294,8 +292,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
-                outOfFocusEntry.clearField(fieldName);
+                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
             }
         }
 
@@ -313,18 +310,15 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
-                outOfFocusEntry.setField(fieldName, newValue);
+                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
-            outOfFocusEntry.setType(newEntry.getType());
+            compound.apply(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
-        compound.end();
-        undoManager.addEdit(compound);
+        undoManager.addEdit(compound.toChangeSet());
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {

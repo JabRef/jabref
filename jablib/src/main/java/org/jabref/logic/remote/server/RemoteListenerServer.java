@@ -1,9 +1,14 @@
 package org.jabref.logic.remote.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import javafx.util.Pair;
 
@@ -21,6 +26,11 @@ public class RemoteListenerServer implements Runnable {
 
     private static final int TIMEOUT = 1000;
 
+    private static final byte[] HEALTH_CHECK_PREFIX = "JABREF/1 ".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] HEALTH_CHECK_REMAINING_PREFIX = Arrays.copyOfRange(HEALTH_CHECK_PREFIX, 1, HEALTH_CHECK_PREFIX.length);
+    private static final byte[] HEALTH_CHECK_REQUEST = "PING\n".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] HEALTH_CHECK_RESPONSE = ("JABREF/1 PONG " + Protocol.IDENTIFIER + "\n").getBytes(StandardCharsets.UTF_8);
+
     private final RemoteMessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
@@ -35,10 +45,7 @@ public class RemoteListenerServer implements Runnable {
             while (!Thread.interrupted()) {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
-                    try (Protocol protocol = new Protocol(socket)) {
-                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
-                        handleMessage(protocol, input.getKey(), input.getValue());
-                    }
+                    handleConnection(socket);
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
@@ -47,6 +54,52 @@ public class RemoteListenerServer implements Runnable {
             }
         } finally {
             closeServerSocket();
+        }
+    }
+
+    // [impl->req~jabref.remote.health-check~1]
+    private void handleConnection(Socket socket) throws IOException {
+        try (BufferedInputStream input = new BufferedInputStream(socket.getInputStream())) {
+            if (isHealthCheck(input)) {
+                handleHealthCheck(input, socket.getOutputStream());
+                return;
+            }
+
+            try (Protocol protocol = new Protocol(socket, input)) {
+                Pair<RemoteMessage, Object> message = protocol.receiveMessage();
+                handleMessage(protocol, message.getKey(), message.getValue());
+            }
+        }
+    }
+
+    /// Probing must not consume anything on a non-match: [Protocol] deserializes from the same
+    /// stream afterwards, so any partially matching prefix is un-read via mark/reset.
+    ///
+    /// The full prefix is only read after the first byte matched. A serialized [Protocol] request
+    /// starts with the object-stream header (`0xAC`...), of which the client initially sends only
+    /// four bytes — blocking here for the full prefix length would deadlock both sides until the
+    /// socket timeout.
+    private boolean isHealthCheck(BufferedInputStream input) throws IOException {
+        input.mark(HEALTH_CHECK_PREFIX.length);
+        int firstByte = input.read();
+        if (firstByte != HEALTH_CHECK_PREFIX[0]) {
+            input.reset();
+            return false;
+        }
+
+        byte[] remainingPrefix = input.readNBytes(HEALTH_CHECK_PREFIX.length - 1);
+        if (Arrays.equals(remainingPrefix, HEALTH_CHECK_REMAINING_PREFIX)) {
+            return true;
+        }
+        input.reset();
+        return false;
+    }
+
+    private void handleHealthCheck(InputStream input, OutputStream output) throws IOException {
+        byte[] request = input.readNBytes(HEALTH_CHECK_REQUEST.length);
+        if (Arrays.equals(request, HEALTH_CHECK_REQUEST)) {
+            output.write(HEALTH_CHECK_RESPONSE);
+            output.flush();
         }
     }
 
