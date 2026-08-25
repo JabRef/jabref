@@ -55,6 +55,20 @@ class EntryEditorTabViewModelTest {
     }
 
     @Test
+    void classicTabStoredUnderAnotherLanguageIsNotAddedAgain() {
+        viewModel.setValues();
+        EditorTabViewModel german = viewModel.addCustomTab("Allgemein").orElseThrow();
+        EntryEditorTabModel.CustomizedFieldsTab general = EntryEditorTabModel.CustomizedFieldsTab.classicTabs().getFirst();
+        general.fieldPatterns().forEach(field -> viewModel.addFieldPattern(german, field.toUpperCase()));
+
+        viewModel.addClassicTabs();
+
+        List<String> names = viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList();
+        assertFalse(names.contains(general.name()));
+        assertTrue(names.contains(Localization.lang("Abstract")));
+    }
+
+    @Test
     void customTabRoundTripsThroughStoreSettings() {
         viewModel.setValues();
 

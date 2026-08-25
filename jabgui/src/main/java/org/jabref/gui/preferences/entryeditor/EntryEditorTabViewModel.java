@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -123,18 +125,27 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     /// Adds the classic "General" and "Abstract" tabs (see [EntryEditorTabModel.CustomizedFieldsTab#classicTabs()])
-    /// directly after "Main"; tabs whose name is already taken are skipped.
+    /// directly after "Main". A classic tab is skipped when a tab with its name exists, or when a custom tab
+    /// already has exactly its fields: custom names are persisted verbatim, so a classic tab added under one
+    /// language would otherwise be added again under another.
     public void addClassicTabs() {
         int insertAt = 1 + tabs.stream()
                                .map(EditorTabViewModel::getDisplayName)
                                .toList()
                                .indexOf(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         for (EntryEditorTabModel.CustomizedFieldsTab classicTab : EntryEditorTabModel.CustomizedFieldsTab.classicTabs()) {
-            boolean exists = tabs.stream().anyMatch(tab -> tab.getDisplayName().equalsIgnoreCase(classicTab.name()));
+            Set<String> classicFields = lowerCaseSet(classicTab.fieldPatterns());
+            boolean exists = tabs.stream().anyMatch(tab ->
+                    tab.getDisplayName().equalsIgnoreCase(classicTab.name())
+                            || (tab.isCustom() && lowerCaseSet(tab.getFieldPatterns()).equals(classicFields)));
             if (!exists) {
                 tabs.add(insertAt++, EditorTabViewModel.fromModel(classicTab));
             }
         }
+    }
+
+    private static Set<String> lowerCaseSet(List<String> patterns) {
+        return patterns.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 
     public void removeTab(EditorTabViewModel tab) {
