@@ -59,7 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- The dialog for deleting linked files and the prompt for renaming one now state what undo can and cannot take back: undo restores the entry's link, never the file on disk. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We changed the delete and rename file dialogs to state that undo does not restore files on disk. [TODO](TODO)
 - The LibreOffice integration's bibliography generation for CSL styles is now more performant for a large number of entries. [#16555](https://github.com/JabRef/jabref/pull/16555)
 - We now identify Crossref requests with a configured email address, allowing them to use Crossref's polite pool. [#16535](https://github.com/JabRef/jabref/pull/16535)
 - We improved user experience by making the welcome tab visible when no libraries are open. [#16451](https://github.com/JabRef/jabref/issues/16451)
@@ -89,7 +89,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where a library could be closed without asking to save it: after saving, undoing that change and then editing again, JabRef reported the library as unmodified although it held unsaved changes. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We fixed an issue where a library could be closed without asking to save unsaved changes. [TODO](TODO)
 - We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where two JabRef instances saving the same library file could silently overwrite each other's changes. The instance finishing last now aborts its save and offers the usual review flow for the external changes instead. [#16646](https://github.com/JabRef/jabref/pull/16646)
