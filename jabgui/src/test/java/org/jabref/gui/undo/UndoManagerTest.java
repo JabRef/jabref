@@ -264,6 +264,51 @@ class UndoManagerTest {
         assertFalse(undoRedoManager.hasChanged());
     }
 
+    /// The defect P14 fixes: an edit balance returns to the saved value along a history that
+    /// never passes through the saved position, because pushing B discarded A.
+    @Test
+    void editingAfterUndoingTheSavedChangeReportsChanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+
+        undoRedoManager.undo();
+        undoRedoManager.addEdit(setAuthor("Planck"));
+
+        assertFalse(undoRedoManager.canRedo(), "the saved change is still reachable");
+        assertTrue(undoRedoManager.hasChanged());
+    }
+
+    /// Redoing forward again does not return to the saved position either: the change that was
+    /// saved is gone, and the one now on the stack was never saved.
+    @Test
+    void redoingAnEditMadeAfterUndoingTheSavedChangeReportsChanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+        undoRedoManager.undo();
+        undoRedoManager.addEdit(setAuthor("Planck"));
+
+        undoRedoManager.undo();
+        undoRedoManager.redo();
+
+        assertTrue(undoRedoManager.hasChanged());
+    }
+
+    /// Positions are identified, not counted, so a stack that returns to the depth it was saved
+    /// at along a different history is not the saved position.
+    @Test
+    void aDifferentHistoryOfTheSameLengthIsNotTheSavedPosition() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setField(StandardField.TITLE, "On the constitution of atoms"));
+        undoRedoManager.markUnchanged();
+
+        undoRedoManager.undo();
+        undoRedoManager.undo();
+        undoRedoManager.addEdit(setAuthor("Planck"));
+        undoRedoManager.addEdit(setField(StandardField.TITLE, "On the law of energy distribution"));
+
+        assertTrue(undoRedoManager.hasChanged());
+    }
+
     @Test
     void editingPastTheStackLimitStillReportsChanged() {
         // Fill the stack to its limit, then save. Every further edit trims one edit off the

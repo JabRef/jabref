@@ -49,8 +49,21 @@ public class UndoManager {
     /// objects of removed entries, so an unbounded one keeps every deletion of a session alive.
     private static final int LIMIT = 100;
 
-    private final Deque<BibChange> undoStack = new ArrayDeque<>();
-    private final Deque<BibChange> redoStack = new ArrayDeque<>();
+    /// The id of the empty stack before anything was ever pushed. Distinct from every id
+    /// [#nextId] hands out, so "nothing has been done yet" is a position like any other.
+    private static final long ORIGIN = 0L;
+
+    /// A change together with the identity of the position it occupies in the history.
+    ///
+    /// The id lives here rather than on the change because a [BibChange] is a value describing a
+    /// modification, and a position in this journal is bookkeeping that only this class needs.
+    /// Putting it on the change would also cost `inverted()` its involution: it would have to
+    /// either copy the id, giving two distinct positions the same identity, or drop it.
+    private record UndoJournalEntry(long id, BibChange change) {
+    }
+
+    private final Deque<UndoJournalEntry> undoStack = new ArrayDeque<>();
+    private final Deque<UndoJournalEntry> redoStack = new ArrayDeque<>();
 
     /// Notified after every change to either stack. Commands push from background tasks, so a
     /// listener that touches the UI is responsible for getting itself onto the right thread.
@@ -61,15 +74,19 @@ public class UndoManager {
     /// is what makes a listener registered on one thread visible to a push on another.
     private final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
-    /// Net number of applied edits: +1 per recorded or redone change, -1 per undone one. A
-    /// counter rather than the stack depth because [#LIMIT] discards old edits from the bottom
-    /// of the stack: those edits stay applied, so the depth they leave behind no longer says
-    /// how far the library has moved from the last saved position.
-    private int revision;
+    /// Source of position ids. Only ever increments, so an id identifies one position for the
+    /// lifetime of this manager: a position that history has discarded can never be matched by a
+    /// later one that happens to sit at the same depth.
+    private long nextId = ORIGIN + 1;
 
-    /// [#revision] when the library was last saved, so that undoing back to it reports the
-    /// library as unchanged again.
-    private int savedRevision;
+    /// The identity of the empty undo stack. [#ORIGIN] until a [#LIMIT] trim or a [#clear]
+    /// discards history for good — from then on an empty stack is no longer the state the
+    /// library started in, so it takes a fresh id that nothing saved earlier can match.
+    private long emptyStackId = ORIGIN;
+
+    /// The position the library was last saved at, as an id rather than a count. Compared by
+    /// [#hasChanged].
+    private long savedId = ORIGIN;
 
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
@@ -94,12 +111,12 @@ public class UndoManager {
             return;
         }
         synchronized (this) {
-            undoStack.push(change);
-            revision++;
+            undoStack.push(new UndoJournalEntry(nextId++, change));
             if (undoStack.size() > LIMIT) {
-                // Only the stack is trimmed. The discarded edit remains applied to the library,
-                // so it still counts towards the distance from the last saved position.
+                // The discarded edit remains applied to the library, so the stack it leaves
+                // behind can never again be the position the library started in.
                 undoStack.removeLast();
+                emptyStackId = nextId++;
             }
             redoStack.clear();
         }
@@ -171,28 +188,28 @@ public class UndoManager {
     /// undoable instead of vanishing from both stacks.
     public void undo() {
         synchronized (this) {
-            BibChange change = undoStack.peek();
-            if (change == null) {
+            UndoJournalEntry journalEntry = undoStack.peek();
+            if (journalEntry == null) {
                 return;
             }
-            change.inverted().apply();
+            journalEntry.change().inverted().apply();
             undoStack.pop();
-            redoStack.push(change);
-            revision--;
+            // Moved with its id, so redoing returns to the position it came from rather than to
+            // a new one that only looks the same.
+            redoStack.push(journalEntry);
         }
         notifyListeners();
     }
 
     public void redo() {
         synchronized (this) {
-            BibChange change = redoStack.peek();
-            if (change == null) {
+            UndoJournalEntry journalEntry = redoStack.peek();
+            if (journalEntry == null) {
                 return;
             }
-            change.apply();
+            journalEntry.change().apply();
             redoStack.pop();
-            undoStack.push(change);
-            revision++;
+            undoStack.push(journalEntry);
         }
         notifyListeners();
     }
@@ -205,22 +222,41 @@ public class UndoManager {
 
     /// Marks the current position as saved.
     public synchronized void markUnchanged() {
-        savedRevision = revision;
+        savedId = currentPosition();
     }
 
-    /// Whether the library differs from the last saved position. Undoing back to that position
-    /// reports unchanged again, which is why this compares [#revision] rather than counting
-    /// the edits still on the stack.
+    /// Whether the library differs from the last saved position.
+    ///
+    /// Compares *which* position the history is at, not how far it has travelled. A count cannot
+    /// answer this: pushing a change clears the redo stack, so two different histories reach the
+    /// same count — save, undo, then make a different edit, and an edit balance is back where it
+    /// started although the library now holds something that was never saved. That reported a
+    /// modified library as saved, and [org.jabref.gui.LibraryTab#requestClose] closes such a
+    /// library without offering to save it.
+    ///
+    /// Ids are never reused, so a saved position that a redo-stack clear or a [#LIMIT] trim has
+    /// discarded can never be matched again — which is the correct answer in both cases: that
+    /// position is no longer reachable.
     public synchronized boolean hasChanged() {
-        return revision != savedRevision;
+        return currentPosition() != savedId;
+    }
+
+    /// The identity of the position the history is at: the change on top of the undo stack, or
+    /// [#emptyStackId] when everything has been undone.
+    private synchronized long currentPosition() {
+        UndoJournalEntry top = undoStack.peek();
+        return top == null ? emptyStackId : top.id();
     }
 
     public void clear() {
         synchronized (this) {
             undoStack.clear();
             redoStack.clear();
-            revision = 0;
-            savedRevision = 0;
+            // A fresh id rather than ORIGIN: the discarded history is unreachable, so no position
+            // saved before this point may ever compare equal again. Saving it as the current
+            // position keeps a cleared manager reporting an unchanged library, as before.
+            emptyStackId = nextId++;
+            savedId = emptyStackId;
         }
         notifyListeners();
     }
