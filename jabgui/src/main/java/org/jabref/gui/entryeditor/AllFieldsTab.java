@@ -572,6 +572,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field, boolean openAddFileDialogForFile) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
+        // The outer runLater lets one pulse pass so the editors rebuilt become focusable
+        // before the inner runLater requests focus on them.
         Platform.runLater(() -> {
             Platform.runLater(() -> {
                 if (getCurrentEntry() != entry) {
