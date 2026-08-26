@@ -333,7 +333,16 @@ public class UnlinkedFilesDialogViewModel {
 
     /// Entries whose citation key (or a broken file link) matches the given unlinked file, as computed by the last search.
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
-        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(filePath.toAbsolutePath().normalize(), List.of()));
+        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(canonicalize(filePath), List.of()));
+    }
+
+    /// The search directory may be a symlink or alias of a configured file directory, so keys must be filesystem identities.
+    private static Path canonicalize(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            return path.toAbsolutePath().normalize();
+        }
     }
 
     /// Every entry lookup walks the complete file directory tree, so this is computed once per search in the background.
@@ -351,7 +360,7 @@ public class UnlinkedFilesDialogViewModel {
             try {
                 for (LinkedFile associatedFile : util.findAssociatedNotLinkedFiles(entry)) {
                     associatedFile.findIn(directories)
-                                  .map(path -> path.toAbsolutePath().normalize())
+                                  .map(UnlinkedFilesDialogViewModel::canonicalize)
                                   .ifPresent(path -> result.computeIfAbsent(path, _ -> new ArrayList<>()).add(entry));
                 }
             } catch (IOException e) {

@@ -36,6 +36,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -148,36 +150,9 @@ public class UnlinkedFilesDialogViewModelTest {
     /// Resolving the related entries of every listed file must not take a directory walk per (file, entry) pair.
     @Test
     void relatedEntriesForHundredUnlinkedFiles(@TempDir Path directory) throws IOException {
-        BibDatabaseContext databaseContext = spy(new BibDatabaseContext());
-        databaseContext.setDatabasePath(directory.resolve("library.bib"));
-        List<BibEntry> entries = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            String key = "author%03d".formatted(i);
-            BibEntry entry = new BibEntry(StandardEntryType.Article)
-                    .withCitationKey(key)
-                    .withField(StandardField.AUTHOR, key)
-                    .withField(StandardField.TITLE, "Title " + i);
-            entries.add(entry);
-            Files.createFile(directory.resolve(key + ".pdf"));
-        }
-        databaseContext.getDatabase().insertEntries(entries);
-
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getExternalFileTypes())
-                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
-        when(guiPreferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
-        when(guiPreferences.getAutoLinkPreferences())
-                .thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
-        FilePreferences filePreferences = guiPreferences.getFilePreferences();
-        when(filePreferences.getUserAndHost()).thenReturn("user-host");
-        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(directory));
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
-
-        viewModel = new UnlinkedFilesDialogViewModel(null, null, null, guiPreferences, stateManager, new CurrentThreadTaskExecutor());
-        viewModel.directoryPathProperty().set(directory.toString());
-        viewModel.selectedExtensionProperty().set(new FileExtensionViewModel(StandardFileType.PDF, externalApplicationsPreferences));
-        viewModel.selectedDateProperty().set(DateRange.ALL_TIME);
-        viewModel.selectedSortProperty().set(ExternalFileSorter.DEFAULT);
+        List<BibEntry> entries = createEntriesWithUnlinkedPdfs(directory, 100);
+        BibDatabaseContext databaseContext = spy(libraryIn(directory, entries));
+        viewModel = viewModelSearching(directory, databaseContext, directory);
 
         viewModel.startSearch();
         assertEquals(100, viewModel.treeRootProperty().get().orElseThrow().getFileCount());
@@ -190,5 +165,58 @@ public class UnlinkedFilesDialogViewModelTest {
             assertEquals(List.of(entry), viewModel.getRelatedEntriesForFiles(pdf));
         }
         verifyNoInteractions(databaseContext);
+    }
+
+    @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
+    void relatedEntriesFoundWhenSearchDirectoryIsSymlinkToFileDirectory(@TempDir Path tempDir) throws IOException {
+        Path fileDirectory = Files.createDirectory(tempDir.resolve("files"));
+        Path searchDirectory = Files.createSymbolicLink(tempDir.resolve("link"), fileDirectory);
+        List<BibEntry> entries = createEntriesWithUnlinkedPdfs(fileDirectory, 1);
+        viewModel = viewModelSearching(searchDirectory, libraryIn(fileDirectory, entries), fileDirectory);
+
+        viewModel.startSearch();
+
+        assertEquals(entries, viewModel.getRelatedEntriesForFiles(searchDirectory.resolve("author000.pdf")));
+    }
+
+    private static List<BibEntry> createEntriesWithUnlinkedPdfs(Path directory, int count) throws IOException {
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            String key = "author%03d".formatted(i);
+            entries.add(new BibEntry(StandardEntryType.Article)
+                    .withCitationKey(key)
+                    .withField(StandardField.AUTHOR, key)
+                    .withField(StandardField.TITLE, "Title " + i));
+            Files.createFile(directory.resolve(key + ".pdf"));
+        }
+        return entries;
+    }
+
+    private static BibDatabaseContext libraryIn(Path directory, List<BibEntry> entries) {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.setDatabasePath(directory.resolve("library.bib"));
+        databaseContext.getDatabase().insertEntries(entries);
+        return databaseContext;
+    }
+
+    private UnlinkedFilesDialogViewModel viewModelSearching(Path searchDirectory, BibDatabaseContext databaseContext, Path fileDirectory) {
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(guiPreferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(guiPreferences.getAutoLinkPreferences())
+                .thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
+        FilePreferences filePreferences = guiPreferences.getFilePreferences();
+        when(filePreferences.getUserAndHost()).thenReturn("user-host");
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(fileDirectory));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+
+        UnlinkedFilesDialogViewModel result = new UnlinkedFilesDialogViewModel(null, null, null, guiPreferences, stateManager, new CurrentThreadTaskExecutor());
+        result.directoryPathProperty().set(searchDirectory.toString());
+        result.selectedExtensionProperty().set(new FileExtensionViewModel(StandardFileType.PDF, externalApplicationsPreferences));
+        result.selectedDateProperty().set(DateRange.ALL_TIME);
+        result.selectedSortProperty().set(ExternalFileSorter.DEFAULT);
+        return result;
     }
 }
