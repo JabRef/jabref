@@ -56,7 +56,8 @@ class DatabaseChangeMonitorTest {
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
                 mock(UndoManager.class),
-                mock(StateManager.class));
+                mock(StateManager.class),
+                mock(LibraryTab.class));
 
         ArgumentCaptor<FileUpdateListener> listenerCaptor = ArgumentCaptor.forClass(FileUpdateListener.class);
         verify(fileUpdateMonitor).addListenerForFile(eq(originalPath), listenerCaptor.capture());
@@ -76,7 +77,8 @@ class DatabaseChangeMonitorTest {
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
                 mock(UndoManager.class),
-                mock(StateManager.class));
+                mock(StateManager.class),
+                mock(LibraryTab.class));
     }
 
     @Test
@@ -181,9 +183,10 @@ class DatabaseChangeMonitorTest {
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
                 undoManager,
-                mock(StateManager.class));
+                mock(StateManager.class),
+                libraryTab);
 
-        monitor.applyResolvedChanges(List.of(mergedChange), false, libraryTab);
+        monitor.applyResolvedChanges(List.of(mergedChange), false);
 
         assertEquals(1, database.getEntryCount());
         assertEquals("Merged title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
@@ -212,9 +215,10 @@ class DatabaseChangeMonitorTest {
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
                 undoManager,
-                mock(StateManager.class));
+                mock(StateManager.class),
+                libraryTab);
 
-        monitor.applyResolvedChanges(List.of(diskChange), true, libraryTab);
+        monitor.applyResolvedChanges(List.of(diskChange), true);
 
         assertEquals(1, database.getEntryCount());
         assertEquals("Disk title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
@@ -247,7 +251,8 @@ class DatabaseChangeMonitorTest {
                 dialogService,
                 mock(GuiPreferences.class),
                 mock(UndoManager.class),
-                mock(StateManager.class));
+                mock(StateManager.class),
+                mock(LibraryTab.class));
 
         DatabaseChange firstChange = new EntryAdd(new BibEntry().withCitationKey("first"), new BibDatabaseContext(), null);
         DatabaseChange secondChange = new EntryAdd(new BibEntry().withCitationKey("second"), new BibDatabaseContext(), null);

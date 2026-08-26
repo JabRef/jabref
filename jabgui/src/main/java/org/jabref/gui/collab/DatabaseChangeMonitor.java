@@ -37,6 +37,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private final LibraryTab libraryTab;
     private final Optional<Path> monitoredPath;
     private boolean changeDetectionSuspended;
     @Nullable private ExternalLibraryChangeNotification activeNotification;
@@ -52,7 +53,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  DialogService dialogService,
                                  GuiPreferences preferences,
                                  UndoManager undoManager,
-                                 StateManager stateManager) {
+                                 StateManager stateManager,
+                                 LibraryTab libraryTab) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
@@ -60,6 +62,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.libraryTab = libraryTab;
         this.monitoredPath = this.database.getDatabasePath();
 
         this.listeners = new ArrayList<>();
@@ -113,8 +116,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 if (areAllChangesResolved.orElse(false)) {
                     applyResolvedChanges(
                             databaseChangesResolverDialog.getResolvedChanges(),
-                            databaseChangesResolverDialog.resolvedChangesMatchDisk(),
-                            stateManager.activeTabProperty().get().get());
+                            databaseChangesResolverDialog.resolvedChangesMatchDisk());
 
                     clearActiveNotification(this);
                     return OnClickBehaviour.REMOVE;
@@ -197,10 +199,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     ///
     /// @param resolvedChanges          the externally resolved changes to apply to the in-memory database
     /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk, so the library can be marked clean; `false` if the resolved result differs from disk and still needs saving
-    /// @param libraryTab               the library tab whose dirty state should be updated
-    void applyResolvedChanges(List<DatabaseChange> resolvedChanges,
-                              boolean resolvedChangesMatchDisk,
-                              LibraryTab libraryTab) {
+    void applyResolvedChanges(List<DatabaseChange> resolvedChanges, boolean resolvedChangesMatchDisk) {
         undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                 resolvedChanges.stream()
                                .filter(DatabaseChange::isAccepted)

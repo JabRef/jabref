@@ -3,7 +3,6 @@ package org.jabref.gui.collab;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -90,15 +89,11 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     }
 
     public boolean resolvedChangesMatchDisk() {
-        return Optional.ofNullable(viewModel)
-                       .map(ExternalChangesResolverViewModel::resolvedChangesMatchDisk)
-                       .orElse(false);
+        return viewModel.resolvedChangesMatchDisk();
     }
 
     public List<DatabaseChange> getResolvedChanges() {
-        return Optional.ofNullable(viewModel)
-                       .map(ExternalChangesResolverViewModel::getResolvedChanges)
-                       .orElseGet(() -> List.copyOf(changes));
+        return viewModel.getResolvedChanges();
     }
 
     @FXML

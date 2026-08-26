@@ -1,8 +1,6 @@
 package org.jabref.gui.collab;
 
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -26,7 +24,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     /// Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
     /// track of changes even when they're removed from the UI and to expose the final resolved change set.
     private final ObservableList<DatabaseChange> changes = FXCollections.observableArrayList();
-    private final Map<DatabaseChange, Boolean> resolvedChangesMatchDisk = new IdentityHashMap<>();
+    /// Only a merge can leave a change accepted yet different from disk; accepted changes are the disk version by definition.
+    private boolean mergedResultDiffersFromDisk;
     private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
     private final ReadOnlyBooleanWrapper areAllChangesResolved = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper areAllChangesAccepted = new ReadOnlyBooleanWrapper(false);
@@ -81,8 +80,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public boolean resolvedChangesMatchDisk() {
         return !changes.isEmpty()
-                && changes.stream().allMatch(DatabaseChange::isAccepted)
-                && changes.stream().allMatch(change -> resolvedChangesMatchDisk.getOrDefault(change, false));
+                && !mergedResultDiffersFromDisk
+                && changes.stream().allMatch(DatabaseChange::isAccepted);
     }
 
     public BooleanExpression canAskUserToResolveChangeProperty() {
@@ -92,7 +91,6 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     public void acceptChange() {
         getSelectedChange().ifPresent(selectedChange -> {
             selectedChange.accept();
-            resolvedChangesMatchDisk.put(selectedChange, true);
             getVisibleChanges().remove(selectedChange);
             updateResolutionState();
         });
@@ -102,7 +100,6 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         getSelectedChange().ifPresent(selectedChange -> {
             // The change objects outlive this dialog: a cancelled review re-opens on the same list, so an earlier accept must not stick
             selectedChange.setAccepted(false);
-            resolvedChangesMatchDisk.put(selectedChange, false);
             getVisibleChanges().remove(selectedChange);
             updateResolutionState();
         });
@@ -116,8 +113,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             } else {
                 changes.add(databaseChange);
             }
-            resolvedChangesMatchDisk.remove(oldChange);
-            resolvedChangesMatchDisk.put(databaseChange, mergedChangeMatchesDiskVersion(oldChange, databaseChange));
+            mergedResultDiffersFromDisk |= !mergedChangeMatchesDiskVersion(oldChange, databaseChange);
             databaseChange.accept();
             getVisibleChanges().remove(oldChange);
             updateResolutionState();
