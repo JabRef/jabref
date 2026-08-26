@@ -40,7 +40,6 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import de.undercouch.citeproc.output.Bibliography;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -437,20 +436,20 @@ public class CSLCitationOOAdapter {
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
-        Optional<Bibliography> bibliography = CitationStyleGenerator.generateBibliographyObject(
+        Optional<List<String>> bibliographyEntryIds = CitationStyleGenerator.generateBibliographyEntryIds(
                 citedEntries,
                 selectedStyle.getSource(),
                 HTML_OUTPUT_FORMAT,
                 unifiedBibDatabaseContext,
                 bibEntryTypesManager);
 
-        if (bibliography.isEmpty() || bibliography.get().getEntryIds() == null) {
+        if (bibliographyEntryIds.isEmpty()) {
             return Map.of();
         }
 
         Map<String, Integer> citationKeyToNumber = new LinkedHashMap<>();
         int number = 1;
-        for (String citationKey : bibliography.get().getEntryIds()) {
+        for (String citationKey : bibliographyEntryIds.get()) {
             if (!citationKeyToNumber.containsKey(citationKey)) {
                 citationKeyToNumber.put(citationKey, number++);
             }
