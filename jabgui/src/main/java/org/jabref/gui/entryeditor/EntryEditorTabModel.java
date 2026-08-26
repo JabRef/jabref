@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -16,6 +17,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+
+import io.github.adr.linked.ADR;
 
 /// Model of the tabs that appear in the entry editor.
 ///
@@ -110,6 +113,8 @@ public sealed interface EntryEditorTabModel
     record CustomizedFieldsTab(String name, List<String> fieldPatterns)
             implements EntryEditorTabModel {
 
+        private static final String LOCALIZED_NAME_PREFIX = "%";
+
         /// A pattern without any regex metacharacter is a plain field name.
         private static final Pattern PLAIN_FIELD_NAME = Pattern.compile("[^\\\\^$.|?*+()\\[\\]{}]+");
 
@@ -128,8 +133,23 @@ public sealed interface EntryEditorTabModel
                                                .map(Field::getName)
                                                .toList();
             return List.of(
-                    new CustomizedFieldsTab(Localization.lang("General"), generalFields),
-                    new CustomizedFieldsTab(Localization.lang("Abstract"), List.of(StandardField.ABSTRACT.getName())));
+                    new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "General", generalFields),
+                    new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Abstract", List.of(StandardField.ABSTRACT.getName())));
+        }
+
+        /// The name shown in the UI. Names of the [#classicTabs()] are stored as `%<localization key>` and
+        /// translated here, so they follow a language change; user-typed names are shown as stored.
+        @ADR(23)
+        public static String localizedName(String name) {
+            if (!name.startsWith(LOCALIZED_NAME_PREFIX)) {
+                return name;
+            }
+            ResourceBundle messages = Localization.getMessages();
+            return messages.getString(name.substring(1));
+        }
+
+        public String displayName() {
+            return localizedName(name);
         }
 
         @Override

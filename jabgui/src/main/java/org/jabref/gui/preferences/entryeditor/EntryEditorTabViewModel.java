@@ -125,9 +125,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     /// Adds the classic "General" and "Abstract" tabs (see [EntryEditorTabModel.CustomizedFieldsTab#classicTabs()])
-    /// directly after "Main". A classic tab is skipped when a tab with its name exists, or when a custom tab
-    /// already has exactly its fields: custom names are persisted verbatim, so a classic tab added under one
-    /// language would otherwise be added again under another.
+    /// directly after "Main". A classic tab is skipped when it is already present (by stored name), when a
+    /// tab with its display name exists, or when a custom tab already has exactly its fields.
     // [impl->req~entry-editor.classic-tabs~1]
     public void addClassicTabs() {
         int insertAt = 1 + tabs.stream()
@@ -137,7 +136,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         for (EntryEditorTabModel.CustomizedFieldsTab classicTab : EntryEditorTabModel.CustomizedFieldsTab.classicTabs()) {
             Set<String> classicFields = lowerCaseSet(classicTab.fieldPatterns());
             boolean exists = tabs.stream().anyMatch(tab ->
-                    tab.getDisplayName().equalsIgnoreCase(classicTab.name())
+                    tab.getCustomName().equals(classicTab.name())
+                            || tab.getDisplayName().equalsIgnoreCase(classicTab.displayName())
                             || (tab.isCustom() && lowerCaseSet(tab.getFieldPatterns()).equals(classicFields)));
             if (!exists) {
                 tabs.add(insertAt++, EditorTabViewModel.fromModel(classicTab));

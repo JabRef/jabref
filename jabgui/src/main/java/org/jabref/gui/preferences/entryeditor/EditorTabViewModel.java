@@ -60,12 +60,17 @@ public class EditorTabViewModel {
         return new EntryEditorTabModel.CustomizedFieldsTab(customName, List.copyOf(fieldPatterns));
     }
 
+    /// The stored name of a custom tab (may be a `%`-prefixed localization key); empty for built-in tabs.
+    public String getCustomName() {
+        return customName;
+    }
+
     public boolean isCustom() {
         return builtIn == null;
     }
 
     public String getDisplayName() {
-        return builtIn != null ? builtIn.displayName() : customName;
+        return builtIn != null ? builtIn.displayName() : EntryEditorTabModel.CustomizedFieldsTab.localizedName(customName);
     }
 
     public BooleanProperty visibleProperty() {

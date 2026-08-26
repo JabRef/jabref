@@ -4,7 +4,7 @@ nav_order: 23
 ---
 # Localized Preferences
 
-Note: This is not implemented yet
+Note: Implemented for the names of the classic custom entry editor tabs (`EntryEditorTabModel.CustomizedFieldsTab#localizedName`); other localized preferences are not migrated yet.
 
 ## Context and Problem Statement
 

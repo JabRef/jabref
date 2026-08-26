@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.List;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -52,5 +53,14 @@ class EntryEditorTabModelTest {
     @Test
     void invalidRegexResolvesToNothing() {
         assertEquals(List.of(StandardField.AUTHOR), resolve(entry, "author", "comment-["));
+    }
+
+    @Test
+    void classicTabNamesAreLocalizedOnDisplayOnly() {
+        EntryEditorTabModel.CustomizedFieldsTab general = EntryEditorTabModel.CustomizedFieldsTab.classicTabs().getFirst();
+
+        assertEquals("%General", general.name());
+        assertEquals(Localization.lang("General"), general.displayName());
+        assertEquals("General", new EntryEditorTabModel.CustomizedFieldsTab("General", List.of()).displayName());
     }
 }

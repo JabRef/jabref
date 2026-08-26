@@ -69,7 +69,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
         EasyBind.subscribe(currentEntryProperty(), entry ->
                 hasResolvedFields.set((entry != null) && !model.resolveFields(entry).isEmpty()));
 
-        setText(model.name());
+        setText(model.displayName());
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
