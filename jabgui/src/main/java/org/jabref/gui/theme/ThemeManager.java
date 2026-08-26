@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -143,9 +144,8 @@ public class ThemeManager {
     }
 
     private void updateColorSchemeOnScene(Scene scene) {
-        ColorScheme javafxColorScheme = switch (colorScheme) {
-            case null ->
-                    null;
+        ThemeColorScheme effectiveColorScheme = Optional.ofNullable(colorScheme).orElse(ThemeColorScheme.FOLLOW_SYSTEM);
+        ColorScheme javafxColorScheme = switch (effectiveColorScheme) {
             case FOLLOW_SYSTEM ->
                     null;
             case LIGHT ->
@@ -158,7 +158,7 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
-        ThemePreset newTheme = workspacePreferences.getTheme();
+        ThemePreset newTheme = Optional.ofNullable(workspacePreferences.getTheme()).orElse(ThemePreset.JABREF);
 
         boolean cssChanged = false;
         if (theme != newTheme) {
@@ -173,7 +173,7 @@ public class ThemeManager {
             LOGGER.debug("Theme set to {}", newTheme);
         }
 
-        ThemeColorScheme newColorScheme = workspacePreferences.getColorScheme();
+        ThemeColorScheme newColorScheme = Optional.ofNullable(workspacePreferences.getColorScheme()).orElse(ThemeColorScheme.FOLLOW_SYSTEM);
         if (colorScheme != newColorScheme) {
             colorScheme = newColorScheme;
 

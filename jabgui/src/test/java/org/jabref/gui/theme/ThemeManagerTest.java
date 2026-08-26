@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
@@ -14,8 +16,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import org.jabref.gui.WorkspacePreferences;
-import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,12 +25,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
@@ -49,7 +54,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void themeManagerUsesProvidedTheme() throws IOException {
+    void themeManagerUsesProvidedTheme() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -64,7 +69,25 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeAvailableEvenWhenDeleted() throws IOException {
+    void nullThemeSettingsFallBackToDefaults() throws InterruptedException {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setTheme(null);
+        workspacePreferences.setColorScheme(null);
+
+        ThemeManager themeManager = createThemeManager(workspacePreferences);
+
+        Scene scene = mock(Scene.class);
+        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+
+        themeManager.updateCssOnScene(scene);
+
+        assertEquals(List.of(
+                ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation(),
+                ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation()), scene.getStylesheets());
+    }
+
+    @Test
+    void customThemeAvailableEvenWhenDeleted() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -83,7 +106,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
+    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("test.css");
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(ThemePreset.JABREF);
@@ -104,7 +127,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void largeCustomThemeNotHeldInMemory() throws IOException {
+    void largeCustomThemeNotHeldInMemory() throws IOException, InterruptedException {
         // Create a temporary custom theme that is just a large comment over 48 kilobytes in size.
         Path largeCssTestFile = tempFolder.resolve("test.css");
         Files.createFile(largeCssTestFile);
@@ -141,7 +164,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void installThemeOnScene() throws IOException {
+    void installThemeOnScene() throws IOException, InterruptedException {
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
@@ -163,8 +186,6 @@ class ThemeManagerTest {
         assertTrue(scene.getStylesheets().contains(TEST_CSS_DATA));
     }
 
-    /// Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
-    /// for the thread to start up and the changed css to reload.
     @Test
     void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
@@ -177,20 +198,12 @@ class ThemeManagerTest {
 
         assertEquals(TEST_CSS_DATA, styleSheet.orElseThrow().getSceneStylesheetLocation());
 
-        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
-        Thread thread = new Thread(fileUpdateMonitor);
-        thread.start();
+        FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
 
-        // Wait for the watch service to start
-        Thread.sleep(500);
+        createThemeManager(workspacePreferences, fileUpdateMonitor);
 
-        final ThemeManager themeManager = createThemeManager(workspacePreferences, fileUpdateMonitor);
-
-        Scene scene = mock(Scene.class);
-        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
-        when(scene.getRoot()).thenReturn(mock(Parent.class));
-
-        themeManager.updateCssOnScene(scene);
+        ArgumentCaptor<FileUpdateListener> listenerCaptor = ArgumentCaptor.forClass(FileUpdateListener.class);
+        verify(fileUpdateMonitor).addListenerForFile(eq(testCss), listenerCaptor.capture());
 
         Files.writeString(testCss, """
                 /* And now for something slightly different */
@@ -198,21 +211,17 @@ class ThemeManagerTest {
                     -fx-font-family: serif;
                 }""", StandardOpenOption.CREATE);
 
-        // Wait for the stylesheet to be reloaded
-        Thread.sleep(500);
-
-        fileUpdateMonitor.shutdown();
-        thread.join();
+        listenerCaptor.getValue().fileUpdated();
 
         assertEquals("data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=",
                 styleSheet.orElseThrow().getSceneStylesheetLocation(), "stylesheet embedded in data: url should have reloaded");
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) {
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) throws InterruptedException {
         return createThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) {
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
 
         AtomicReference<ThemeManager> themeManager = new AtomicReference<>();
@@ -221,12 +230,7 @@ class ThemeManagerTest {
             latch.countDown();
         });
 
-        // Run in FX UI Thread and wait until finished.
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        assertTrue(latch.await(10, TimeUnit.SECONDS), "Theme manager creation timed out");
 
         return themeManager.get();
     }
