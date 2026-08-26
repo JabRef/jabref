@@ -492,7 +492,14 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 Run this loop only when the contributor asks for it:
 
 1. Mark the PR ready for review: `gh pr ready <number>`.
-2. Wait for [Qodo](https://www.qodo.ai/) (GitHub login `qodo-free-for-open-source-projects[bot]`). It posts a "Code Review by Qodo" PR comment and one review thread per finding, usually within a few minutes. Poll every two minutes; give up and tell the contributor after 15 minutes without a review. The query below lists only the threads that still need a reply — active (not resolved, not outdated) Qodo threads without a comment by the PR author — with the comment id needed for replying:
+2. Wait for [Qodo](https://www.qodo.ai/) (GitHub login `qodo-free-for-open-source-projects[bot]`). It posts a "Code Review by Qodo" PR comment and one review thread per finding, usually within a few minutes. On later pushes it re-reviews by *editing* that comment (its `updated_at` moves past the push time) and opens threads only for new findings — so wait for the comment, not for a new review:
+
+   ```bash
+   gh api repos/JabRef/jabref/issues/<number>/comments \
+     --jq '.[] | select(.body | startswith("<h3>Code Review by Qodo")) | .updated_at'
+   ```
+
+   Poll every two minutes; give up and tell the contributor after 15 minutes. The query below lists only the threads that still need a reply — active (not resolved, not outdated) Qodo threads without a comment by the PR author — with the comment id needed for replying:
 
    ```bash
    gh api graphql -F pr=<number> -f query='
