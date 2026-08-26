@@ -15,13 +15,13 @@ public class OcrPreferences {
     private final ObjectProperty<EngineSelection> engineSelection;
     private final StringProperty ocrEnginePath;
     private final ObjectProperty<PagesWithTextHandling> pagesWithTextHandling;
-    private final ListProperty<String> ocrLanguages;
+    private final ListProperty<OcrLanguage> ocrLanguages;
 
     private OcrPreferences() {
-        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of("eng"));
+        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH));
     }
 
-    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<String> ocrLanguages) {
+    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages) {
         this.ocrEnginePath = new SimpleStringProperty(ocrEnginePath);
         this.pagesWithTextHandling = new SimpleObjectProperty<>(pagesWithTextHandling);
         this.engineSelection = new SimpleObjectProperty<>(engineSelection);
@@ -68,15 +68,15 @@ public class OcrPreferences {
         return new OcrPreferences();
     }
 
-    public ObservableList<String> getOcrLanguages() {
+    public ObservableList<OcrLanguage> getOcrLanguages() {
         return ocrLanguages.get();
     }
 
-    public ListProperty<String> ocrLanguagesProperty() {
+    public ListProperty<OcrLanguage> ocrLanguagesProperty() {
         return ocrLanguages;
     }
 
-    public void setOcrLanguages(ObservableList<String> ocrLanguages) {
+    public void setOcrLanguages(ObservableList<OcrLanguage> ocrLanguages) {
         this.ocrLanguages.set(ocrLanguages);
     }
 }

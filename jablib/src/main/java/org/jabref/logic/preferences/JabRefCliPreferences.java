@@ -80,6 +80,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.EngineSelection;
+import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -2175,7 +2176,11 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         List<String> savedLanguages = getStringList(OCR_LANGUAGES);
-        List<String> ocrLanguagesToLoad = savedLanguages.isEmpty() ? defaultValues.getOcrLanguages() : savedLanguages;
+        List<OcrLanguage> ocrLanguagesToLoad = savedLanguages.isEmpty()
+                                               ? defaultValues.getOcrLanguages()
+                                               : savedLanguages.stream()
+                                                               .map(OcrLanguage::safeValueOf)
+                                                               .toList();
 
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
@@ -2187,8 +2192,10 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
-        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<String>) change ->
-                putStringList(OCR_LANGUAGES, List.copyOf(ocrPreferences.getOcrLanguages())));
+        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) change ->
+                putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()
+                                                           .map(OcrLanguage::getCode)
+                                                           .toList()));
 
         return ocrPreferences;
     }

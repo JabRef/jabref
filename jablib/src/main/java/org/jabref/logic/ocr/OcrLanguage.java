@@ -43,4 +43,9 @@ public enum OcrLanguage {
         }
         return ENGLISH;
     }
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
 }

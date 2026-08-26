@@ -1,7 +1,9 @@
 package org.jabref.gui.preferences.ocr;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -9,7 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -65,30 +66,36 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     }
 
     private Node buildLanguagesRow() {
-        var items = FXCollections.observableArrayList(OcrLanguage.values());
+        ObservableList<OcrLanguage> items = FXCollections.observableArrayList(OcrLanguage.values());
         CheckComboBox<OcrLanguage> languagesCombo = new CheckComboBox<>(items);
 
-        languagesCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(OcrLanguage lang) {
-                return lang.getDisplayName();
-            }
+        final boolean[] isSyncing = {false};
 
-            @Override
-            public OcrLanguage fromString(String string) {
-                return null;
+        viewModel.selectedOcrLanguagesProperty().addListener((InvalidationListener) _ -> {
+            if (isSyncing[0]) {
+                return;
             }
+            Platform.runLater(() -> {
+                isSyncing[0] = true;
+                languagesCombo.getCheckModel().clearChecks();
+                items.stream()
+                     .filter(viewModel.selectedOcrLanguagesProperty()::contains)
+                     .forEach(languagesCombo.getCheckModel()::check);
+                isSyncing[0] = false;
+            });
         });
 
-        items.stream()
-             .filter(viewModel.selectedOcrLanguagesProperty()::contains)
-             .forEach(languagesCombo.getCheckModel()::check);
-
         languagesCombo.getCheckModel().getCheckedItems().addListener(
-                (InvalidationListener) obs ->
-                        viewModel.selectedOcrLanguagesProperty().setAll(
-                                languagesCombo.getCheckModel().getCheckedItems()
-                        )
+                (InvalidationListener) _ -> {
+                    if (isSyncing[0]) {
+                        return;
+                    }
+                    isSyncing[0] = true;
+                    viewModel.selectedOcrLanguagesProperty().setAll(
+                            languagesCombo.getCheckModel().getCheckedItems()
+                    );
+                    isSyncing[0] = false;
+                }
         );
 
         HBox.setHgrow(languagesCombo, Priority.ALWAYS);

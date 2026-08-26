@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -56,6 +55,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
     private final ListProperty<OcrLanguage> ocrLanguageOptions = new SimpleListProperty<>(FXCollections.observableArrayList(OcrLanguage.values()));
     private final ListProperty<OcrLanguage> selectedOcrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final OcrPreferences ocrPreferences;
@@ -78,18 +78,6 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             }
             autoDetectEnginePath();
         });
-        List<OcrLanguage> saved = ocrPreferences.getOcrLanguages().stream()
-                                                .map(OcrLanguage::safeValueOf)
-                                                .toList();
-        selectedOcrLanguages.setAll(saved);
-
-        selectedOcrLanguages.addListener((InvalidationListener) obs -> {
-            ocrPreferences.getOcrLanguages().setAll(
-                    selectedOcrLanguages.stream()
-                                        .map(OcrLanguage::getCode)
-                                        .toList()
-            );
-        });
     }
 
     @Override
@@ -98,6 +86,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         selectedEngine.setValue(ocrPreferences.getEngineSelection());
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
         selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
+        selectedOcrLanguages.setAll(ocrPreferences.getOcrLanguages());
         isInitializing = false;
     }
 
@@ -106,6 +95,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         ocrPreferences.setEngineSelection(selectedEngine.getValue());
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
         ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
+        ocrPreferences.getOcrLanguages().setAll(selectedOcrLanguages);
     }
 
     public StringProperty ocrEnginePathProperty() {
