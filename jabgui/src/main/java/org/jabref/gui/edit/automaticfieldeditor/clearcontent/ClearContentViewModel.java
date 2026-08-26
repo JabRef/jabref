@@ -11,19 +11,19 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorUndoableEdit;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableFieldChange;
 
 public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final List<BibEntry> selectedEntries;
 
     public ClearContentViewModel(BibDatabase bibDatabase,
                                  List<BibEntry> selectedEntries,
-                                 NamedCompoundEdit compoundEdit,
+                                 CompoundEdit compoundEdit,
                                  DialogService dialogService,
                                  StateManager stateManager) {
         super(bibDatabase, compoundEdit, dialogService, stateManager);
@@ -46,10 +46,6 @@ public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewMo
             }
         }
         edits.setAffectedEntries(affectedEntriesCount);
-
-        if (edits.hasEdits()) {
-            edits.end();
-        }
 
         addEdit(edits);
     }

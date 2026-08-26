@@ -375,4 +375,22 @@ class GuiPreferencesMigrationsTest {
 
         verify(preferences, never()).put(eq("entryEditorCustomTabs"), anyString());
     }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXConvertsLegacySpaceFormat() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl A", "shift B"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("shortcut+A", "shift+B"));
+    }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXDoesNotRewriteExistingCtrlBinding() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl+A"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
 }

@@ -1,7 +1,5 @@
 package org.jabref.gui.edit.automaticfieldeditor;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -12,13 +10,14 @@ import org.jabref.gui.edit.automaticfieldeditor.clearcontent.ClearContentTabView
 import org.jabref.gui.edit.automaticfieldeditor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.edit.automaticfieldeditor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfieldeditor.renamefield.RenameFieldTabView;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.undo.CompoundEdit;
 
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
-    private final NamedCompoundEdit dialogEdits = new NamedCompoundEdit(NAMED_COMPOUND_EDITS);
+    private final CompoundEdit dialogEdits = new CompoundEdit(NAMED_COMPOUND_EDITS);
 
     private final UndoManager undoManager;
 
@@ -40,12 +39,10 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     }
 
     public void saveChanges() {
-        dialogEdits.end();
-        undoManager.addEdit(dialogEdits);
+        undoManager.addEdit(dialogEdits.toChangeSet());
     }
 
     public void cancelChanges() {
-        dialogEdits.end();
-        dialogEdits.undo();
+        dialogEdits.toChangeSet().inverted().apply();
     }
 }

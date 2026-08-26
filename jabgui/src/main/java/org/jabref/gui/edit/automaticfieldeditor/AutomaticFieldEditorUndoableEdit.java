@@ -1,11 +1,8 @@
 package org.jabref.gui.edit.automaticfieldeditor;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
+import org.jabref.model.undo.CompoundEdit;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
-
-public class AutomaticFieldEditorUndoableEdit extends NamedCompoundEdit {
+public class AutomaticFieldEditorUndoableEdit extends CompoundEdit {
     int affectedEntries;
 
     public AutomaticFieldEditorUndoableEdit(String name) {
@@ -19,15 +16,5 @@ public class AutomaticFieldEditorUndoableEdit extends NamedCompoundEdit {
 
     public void setAffectedEntries(int affectedEntries) {
         this.affectedEntries = affectedEntries;
-    }
-
-    @Override
-    public void undo() throws CannotUndoException {
-        super.undo();
-    }
-
-    @Override
-    public void redo() throws CannotRedoException {
-        super.redo();
     }
 }

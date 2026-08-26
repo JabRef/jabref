@@ -2,8 +2,6 @@ package org.jabref.gui.edit;
 
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
 import javafx.scene.control.TextInputControl;
 
@@ -13,6 +11,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.logic.undo.UndoManager;
 
 import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;

@@ -2,13 +2,12 @@ package org.jabref.gui.fieldeditors.optioneditors;
 
 import java.util.Collection;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
 
 public abstract class OptionEditorViewModel<T> extends AbstractEditorViewModel {
