@@ -39,4 +39,12 @@ Rendering or scrolling the result tree must not perform file-system searches.
 
 Needs: impl, utest
 
+## The unlinked-files PDF preview can be closed
+`req~jabgui.externalfiles.unlinked-files.preview.close~1`
+
+The user can close the PDF preview side pane in the unlinked-files dialog and show it again when needed.
+Closing the side pane releases the displayed PDF document.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
