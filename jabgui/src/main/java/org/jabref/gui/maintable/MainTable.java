@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
@@ -62,9 +61,10 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -424,7 +424,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
-        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -581,9 +581,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
-                    BibEntry entry = target.getEntry();
-                    ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
-                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                    Map<Boolean, List<Path>> partitionedFiles = files.stream()
+                                                                     .collect(Collectors.partitioningBy(importHandler::canImportAsBibEntry));
+                    List<Path> importableFiles = partitionedFiles.get(true);
+                    List<Path> otherFiles = partitionedFiles.get(false);
+
+                    if (!importableFiles.isEmpty()) {
+                        importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
+                    }
+                    if (!otherFiles.isEmpty()) {
+                        BibEntry entry = target.getEntry();
+                        ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
+                        DragDrop.handleDropOfFiles(otherFiles, transferMode, fileLinker, entry);
+                    }
                 }
             }
 

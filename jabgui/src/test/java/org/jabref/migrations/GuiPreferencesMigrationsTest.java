@@ -303,4 +303,46 @@ class GuiPreferencesMigrationsTest {
 
         verify(workspacePreferences).setTheme(Theme.light());
     }
+
+    @Test
+    void upgradeEntryEditorCustomTabsConvertsSeriesToJson() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("General");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("keywords", "doi"));
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn("Abstract");
+        when(preferences.getStringList("customTabFields_1")).thenReturn(List.of("abstract"));
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put("entryEditorCustomTabs",
+                "{\"General\":[\"keywords\",\"doi\"],\"Abstract\":[\"abstract\"]}");
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsKeepsExistingJson() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn("{\"General\":[\"keywords\"]}");
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences, never()).put(eq("entryEditorCustomTabs"), anyString());
+    }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXConvertsLegacySpaceFormat() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl A", "shift B"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("shortcut+A", "shift+B"));
+    }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXDoesNotRewriteExistingCtrlBinding() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl+A"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
 }

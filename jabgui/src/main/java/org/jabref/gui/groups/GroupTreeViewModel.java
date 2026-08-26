@@ -196,11 +196,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
                 selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                // panel.getUndoManager().addEdit(undo);
+                // panel.getUndoManager().addEdit(undo.toChangeSet());
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
@@ -282,7 +283,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
-            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) newGroup;
 
             return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
                     && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
@@ -408,13 +409,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // AbstractUndoableEdit undoAddPreviousEntries = null;
                 // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 // if (undoAddPreviousEntries == null) {
-                //    panel.getUndoManager().addEdit(undo);
+                //    panel.getUndoManager().push(undo.toChangeSet());
                 // } else {
-                //    NamedCompound nc = new NamedCompound("Modify Group");
-                //    nc.addEdit(undo);
-                //    nc.addEdit(undoAddPreviousEntries);
-                //    nc.end();/
-                //      panel.getUndoManager().addEdit(nc);
+                //    Compound compound = new Compound("Modify Group");
+                //    compound.addEdit(undo);
+                //    compound.addEdit(undoAddPreviousEntries);
+                //    compound.end();/
+                //      panel.getUndoManager().push(compound.toChangeSet());
                 // }
                 // if (!addChange.isEmpty()) {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
@@ -529,7 +530,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmation) {
             // TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
             for (GroupNodeViewModel child : group.getChildren()) {
                 removeGroupsAndSubGroupsFromEntries(child);
             }
@@ -556,7 +557,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -594,7 +595,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().push(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -629,7 +630,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_WITHOUT_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -677,7 +678,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // TODO: Add undo
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
         // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
-        // panel.getUndoManager().addEdit(undoAll);
+        // panel.getUndoManager().addEdit(undoAll.toChangeSet());
 
         // TODO Display massages
         // if (undo == null) {
@@ -685,7 +686,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         //            node.getGroup().getName()));
         //    return;
         // }
-        // panel.getUndoManager().addEdit(undo);
+        // panel.getUndoManager().addEdit(undo.toChangeSet());
         // final String groupName = node.getGroup().getName();
         // if (assignedEntries == 1) {
         //    frame.output(Localization.lang("Assigned 1 entry to group \"%0\".", groupName));
@@ -704,7 +705,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // TODO: Add undo
         // if (!undo.isEmpty()) {
-        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo).toChangeSet());
     }
 
     public void clearGroup(GroupNodeViewModel group) {

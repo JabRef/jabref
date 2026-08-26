@@ -40,6 +40,20 @@ The user needs a visible error dialog, in addition to the log entry, since [digg
 
 Needs: impl
 
+## Merge entries dialog allows selecting empty field values
+`req~ux.merge-entries.select-empty-field~1`
+
+When the merge entries dialog shows a field that is missing in one of the source entries, the user must be able to explicitly select that empty value so the merged entry is cleared for that field.
+
+Needs: impl
+
+## Updating an entry via entry data applies the confirmed merge result
+`req~ux.update-entry-web-info.apply-merge-result~1`
+
+When a user chooses `Update with bibliographic information via entry data` and confirms the merge dialog, the selected merged values must be written back to the original entry as one undoable update.
+
+Needs: impl
+
 ## GitHub personal access token verification
 `req~ux.git-share.personal-access-token-verification~1`
 
@@ -72,6 +86,21 @@ Needs: impl
 `req~ux.active-library.preview-responsiveness~1`
 
 When a user activates a large library, automatic group construction and group-count evaluation must not delay rendering the selected entry preview.
+
+Needs: impl
+
+### Creating a new explicit group can reuse the current selection
+`req~ux.groups.create-explicit-from-selection~1`
+
+When a user creates a new explicit group, JabRef should allow reusing the currently selected entries for that group and should keep the newly created group selected afterwards.
+
+Needs: impl
+
+### Saving keeps external change detection active
+`req~ux.external-library-changes.after-save~1`
+
+When JabRef saves a library, it must keep observing filesystem changes, defer change detection until the save has finished, and then inspect the resulting file for external changes that require conflict resolution.
+Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
 
 Needs: impl
 

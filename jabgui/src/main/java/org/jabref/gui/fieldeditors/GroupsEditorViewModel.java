@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -14,6 +12,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;

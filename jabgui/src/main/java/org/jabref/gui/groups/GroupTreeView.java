@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -68,6 +66,7 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -511,8 +510,9 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
+    // [impl->req~ux.groups.create-explicit-from-selection~1]
     private void selectNode(GroupNodeViewModel value) {
-        selectNode(value, false);
+        selectNode(value, true);
     }
 
     private void selectNode(GroupNodeViewModel value, boolean expandParents) {

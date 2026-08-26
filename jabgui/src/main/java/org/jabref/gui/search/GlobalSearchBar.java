@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -60,6 +58,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;

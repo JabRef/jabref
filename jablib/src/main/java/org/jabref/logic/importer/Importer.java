@@ -77,7 +77,7 @@ public abstract class Importer implements Comparable<Importer> {
     ///
     /// @param extension the extension to check, without leading dot
     public boolean supportsFileExtension(String extension) {
-        return getFileType().getExtensions().contains(extension);
+        return getFileType().getExtensions().stream().anyMatch(extension::equalsIgnoreCase);
     }
 
     /// Parse the database in the source.
