@@ -119,6 +119,7 @@ public final class IkonliIcon implements JabRefIcon {
         }
 
         // Override the default color from the css files
+        // FIXME: Inline style should be removed eventually.
         if (color != null) {
             fontIcon.setStyle(fontIcon.getStyle() +
                     "-fx-fill: %s;".formatted(ColorUtil.toRGBCode(color)) +
