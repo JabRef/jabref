@@ -26,6 +26,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// [impl->req~import.fetcher.base~1]
 @NullMarked
 public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
@@ -141,12 +142,18 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
         String code = typeNorm.getString(0);
 
         return switch (code) {
-            case String c when c.startsWith("18") -> StandardEntryType.PhdThesis;
-            case String c when c.startsWith("13") -> StandardEntryType.InProceedings;
-            case String c when c.startsWith("14") -> StandardEntryType.TechReport;
-            case String c when c.startsWith("121") -> StandardEntryType.Article;
-            case String c when c.startsWith("11") -> StandardEntryType.Book;
-            default -> StandardEntryType.Misc;
+            case String c when c.startsWith("18") ->
+                    StandardEntryType.PhdThesis;
+            case String c when c.startsWith("13") ->
+                    StandardEntryType.InProceedings;
+            case String c when c.startsWith("14") ->
+                    StandardEntryType.TechReport;
+            case String c when c.startsWith("121") ->
+                    StandardEntryType.Article;
+            case String c when c.startsWith("11") ->
+                    StandardEntryType.Book;
+            default ->
+                    StandardEntryType.Misc;
         };
     }
 
