@@ -2,8 +2,10 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -31,6 +33,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 public class PreferencesMigrations {
 
@@ -65,6 +68,34 @@ public class PreferencesMigrations {
         upgradeResolveBibTeXStringsFields(preferences);
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
+        upgradeEntryEditorCustomTabs(preferences);
+    }
+
+    /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
+    /// series (`customTabName_0`/`customTabFields_0`, ...). Since [#16598](https://github.com/JabRef/jabref/pull/16598)
+    /// they are stored as one JSON object, `{"tab name": ["field pattern", ...], ...}`. The old keys are
+    /// kept in case an old version of JabRef is used with these preferences; they are only read when the
+    /// new key does not exist yet.
+    static void upgradeEntryEditorCustomTabs(JabRefGuiPreferences prefs) {
+        final String V6_0_ALPHA_CUSTOM_TAB_NAME = "customTabName_";
+        final String V6_0_ALPHA_CUSTOM_TAB_FIELDS = "customTabFields_";
+        final String V6_0_ENTRY_EDITOR_CUSTOM_TABS = "entryEditorCustomTabs";
+
+        if (prefs.get(V6_0_ENTRY_EDITOR_CUSTOM_TABS, null) != null) {
+            return;
+        }
+
+        SequencedMap<String, List<String>> customTabs = new LinkedHashMap<>();
+        String tabName;
+        for (int i = 0; (tabName = prefs.get(V6_0_ALPHA_CUSTOM_TAB_NAME + i, null)) != null; i++) {
+            customTabs.put(tabName, prefs.getStringList(V6_0_ALPHA_CUSTOM_TAB_FIELDS + i));
+        }
+        if (customTabs.isEmpty()) {
+            return;
+        }
+
+        LOGGER.info("Migrating {} custom entry editor tab(s) to the JSON preference format.", customTabs.size());
+        prefs.put(V6_0_ENTRY_EDITOR_CUSTOM_TABS, new ObjectMapper().writeValueAsString(customTabs));
     }
 
     /// The legacy key `smartFileAnnotations` toggled a "smart visibility" mode. Mode was adapted for all tabs in
@@ -246,10 +277,18 @@ public class PreferencesMigrations {
         }
     }
 
-    private static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
+    static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
         UnaryOperator<String> replaceKeys = str -> {
-            String result = str.replace("ctrl ", "ctrl+");
-            result = result.replace("ctrl+", "shortcut+");
+            // Legacy bindings use a space before the key (e.g. "ctrl A"); already-migrated
+            // bindings use a plus (e.g. "ctrl+A" or "shortcut+A") and must be left untouched,
+            // otherwise intentional macOS "ctrl+" bindings would be rewritten to "shortcut+" on every startup.
+            boolean isLegacyFormat = str.contains("ctrl ") || str.contains("shift ")
+                    || str.contains("alt ") || str.contains("meta ");
+            if (!isLegacyFormat) {
+                return str;
+            }
+
+            String result = str.replace("ctrl ", "shortcut+");
             result = result.replace("shift ", "shift+");
             result = result.replace("alt ", "alt+");
             result = result.replace("meta ", "meta+");

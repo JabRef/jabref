@@ -13,8 +13,6 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
@@ -54,6 +52,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -210,6 +209,15 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+    }
+
+    @Override
+    protected void dispose() {
+        // The entry's event bus holds listeners strongly; without unregistering, a discarded tab
+        // instance would be retained (and keep reacting) for as long as the entry lives.
+        subscribedEntry.ifPresent(entry -> entry.unregisterListener(this));
+        subscribedEntry = Optional.empty();
+        super.dispose();
     }
 
     /// Refreshes the list when a field is set or unset from outside this tab

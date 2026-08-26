@@ -171,6 +171,44 @@
                 </VBox>
             </Tab>
 
+            <Tab fx:id="tabEnterUrl"
+                 text="%Enter URL"
+                 closable="false">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
+                    <Label text="%Enter a URL to create a new entry for that link.">
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
+                    </Label>
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="10.0">
+                        <Label text="%URL"/>
+                        <TextField
+                                fx:id="urlText"
+                                prefHeight="30.0"
+                                HBox.hgrow="ALWAYS">
+                            <tooltip>
+                                <Tooltip text="%Specify the URL to create an entry for."/>
+                            </tooltip>
+                        </TextField>
+                    </HBox>
+                    <Label fx:id="urlErrorInvalidText"
+                           text="%You must provide a valid URL.">
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+            </Tab>
+
             <Tab fx:id="tabInterpretCitations"
                  text="%Interpret Citations"
                  closable="false">

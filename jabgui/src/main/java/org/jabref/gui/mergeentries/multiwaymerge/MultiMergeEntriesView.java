@@ -356,7 +356,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 cellButton.setTooltip(buttonTooltip);
 
                 cellButton.setToggleGroup(row.toggleGroup);
-                if (row.toggleGroup.getSelectedToggle() == null) {
+                // An empty cell is only added so the user can explicitly clear the merged field. Auto-selecting it
+                // would clear the value that was just merged (rows are created as a reaction to that value being set).
+                if (!content.isEmpty() && (row.toggleGroup.getSelectedToggle() == null)) {
                     cellButton.setSelected(true);
                 }
 
