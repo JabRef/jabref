@@ -79,7 +79,7 @@ public class UnlinkedFilesDialogViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
+    private BackgroundTask<SearchResult> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
     private final BibDatabaseContext bibDatabase;
@@ -123,6 +123,9 @@ public class UnlinkedFilesDialogViewModel {
         treeRootProperty.setValue(Optional.empty());
     }
 
+    private record SearchResult(FileNodeViewModel treeRoot, Map<Path, List<BibEntry>> relatedEntriesByFile) {
+    }
+
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
@@ -130,26 +133,43 @@ public class UnlinkedFilesDialogViewModel {
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
+        if (findUnlinkedFilesTask != null) {
+            findUnlinkedFilesTask.cancel();
+        }
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
-                .thenRun(treeRoot -> {
-                    relatedEntriesByFile = findRelatedEntriesByFile();
-                    return treeRoot;
-                })
-                .onRunning(() -> {
-                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressTextProperty.setValue(Localization.lang("Searching file system..."));
-                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
-                    taskActiveProperty.setValue(true);
-                    treeRootProperty.setValue(Optional.empty());
-                })
-                .onFinished(() -> {
-                    progressValueProperty.set(0);
-                    taskActiveProperty.setValue(false);
-                })
-                .onSuccess(treeRoot -> treeRootProperty.setValue(Optional.of(treeRoot)));
-
-        findUnlinkedFilesTask.executeWith(taskExecutor);
+        UnlinkedFilesCrawler crawler = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences());
+        BackgroundTask<SearchResult> task = new BackgroundTask<>() {
+            @Override
+            public SearchResult call() throws IOException {
+                FileNodeViewModel treeRoot = crawler.call();
+                // The result of a cancelled search is dropped by the executor, so skip the expensive lookup
+                return new SearchResult(treeRoot, isCancelled() ? Map.of() : findRelatedEntriesByFile());
+            }
+        };
+        findUnlinkedFilesTask = task;
+        // Callbacks of a superseded search must not touch the state of the search that replaced it
+        task.onRunning(() -> {
+                progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                progressTextProperty.setValue(Localization.lang("Searching file system..."));
+                progressTextProperty.bind(task.messageProperty());
+                taskActiveProperty.setValue(true);
+                treeRootProperty.setValue(Optional.empty());
+            })
+            .onFinished(() -> {
+                if (findUnlinkedFilesTask != task) {
+                    return;
+                }
+                progressValueProperty.set(0);
+                taskActiveProperty.setValue(false);
+            })
+            .onSuccess(result -> {
+                if (findUnlinkedFilesTask != task) {
+                    return;
+                }
+                relatedEntriesByFile = result.relatedEntriesByFile();
+                treeRootProperty.setValue(Optional.of(result.treeRoot()));
+            })
+            .executeWith(taskExecutor);
     }
 
     public void startImport() {

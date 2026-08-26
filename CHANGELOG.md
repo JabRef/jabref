@@ -88,7 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where the "Search for unlinked local files" dialog froze on the file selection page for libraries with many entries and unlinked files. [#16695](https://github.com/JabRef/jabref/pull/16695)
+- We fixed an issue where the unlinked files dialog froze when the library had many entries and files. [#16695](https://github.com/JabRef/jabref/pull/16695)
 - We fixed an issue where a PDF imported as a new entry via the merge dialog lost its file link. [#16677](https://github.com/JabRef/jabref/pull/16677)
 - We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
