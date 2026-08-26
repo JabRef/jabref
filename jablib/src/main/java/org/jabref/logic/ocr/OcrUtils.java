@@ -58,8 +58,8 @@ public final class OcrUtils {
     /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
     public static OcrResult performOcr(ArrayList<String> command, String engineName) {
         String commandLine = command.stream()
-                                     .map(OcrUtils::quoteIfNeeded)
-                                     .collect(Collectors.joining(" "));
+                                    .map(OcrUtils::quoteIfNeeded)
+                                    .collect(Collectors.joining(" "));
         StringBuilder outputBuilder = new StringBuilder();
         Process process = null;
         try {
