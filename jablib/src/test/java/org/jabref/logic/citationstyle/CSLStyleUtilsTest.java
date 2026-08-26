@@ -69,7 +69,13 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void parseStyleInfo(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedHasBibliographySortOrder, boolean expectedUsesHangingIndent) throws IOException {
+    void parseStyleInfo(String styleName,
+                        String expectedTitle,
+                        String expectedShortTitle,
+                        boolean expectedNumericNature,
+                        boolean expectedBibliographicNature,
+                        boolean expectedHasBibliographySortOrder,
+                        boolean expectedUsesHangingIndent) throws IOException {
         String styleContent;
         try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(styleName)) {
             styleContent = new String(inputStream.readAllBytes());
@@ -99,7 +105,13 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedHasBibliographySortOrder, boolean expectedUsesHangingIndent) {
+    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName,
+                                                              String expectedTitle,
+                                                              String expectedShortTitle,
+                                                              boolean expectedNumericNature,
+                                                              boolean expectedBibliographicNature,
+                                                              boolean expectedHasBibliographySortOrder,
+                                                              boolean expectedUsesHangingIndent) {
         // use absolute path to test csl so that it is treated as external file
         Path resourcePath = Path.of("").toAbsolutePath()
                                 .resolve("src/test/resources/org/jabref/logic/citationstyle")
