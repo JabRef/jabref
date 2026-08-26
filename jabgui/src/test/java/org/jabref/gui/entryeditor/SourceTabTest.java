@@ -25,7 +25,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
-import org.fxmisc.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -138,8 +138,7 @@ class SourceTabTest {
         robot.interrupt(100);
 
         robot.interact(() -> {
-            jfx.incubator.scene.control.richtext.CodeArea sourceArea =
-                    (jfx.incubator.scene.control.richtext.CodeArea) sourceTab.getContent();
+          CodeArea sourceArea = (CodeArea) sourceTab.getContent();
             assertEquals(shortEntry.getStringRepresentation(shortEntry, BibDatabaseMode.BIBLATEX, entryTypesManager, fieldPreferences),
                     sourceArea.getText());
         });
