@@ -1,5 +1,8 @@
 package org.jabref.gui.welcome.quicksettings.viewmodel;
 
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -76,7 +79,23 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     }
 
     public boolean isValidConfiguration() {
-        return getSelectedTheme() != null && getSelectedThemeColorScheme() != null;
+        if (getSelectedTheme() == null || getSelectedThemeColorScheme() == null) {
+            return false;
+        }
+        if (!customThemeEnabled.get()) {
+            return true;
+        }
+
+        String customThemePath = customPathToThemeProperty.get();
+        if (StringUtil.isBlank(customThemePath)) {
+            return false;
+        }
+
+        try {
+            return Files.isRegularFile(Path.of(customThemePath));
+        } catch (InvalidPathException e) {
+            return false;
+        }
     }
 
     public void saveSettings() {

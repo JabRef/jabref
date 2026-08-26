@@ -357,6 +357,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
+        validator.addValidators(themeValidator, themeColorSchemeValidator);
 
         if (remoteServerProperty.getValue()) {
             validator.addValidators(remotePortValidator);
