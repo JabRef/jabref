@@ -23,17 +23,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -97,7 +100,16 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     private Node buildTabConfigRegion() {
         HBox columns = new HBox(GAP, buildTabsColumn(), buildFieldsColumn());
         VBox.setVgrow(columns, Priority.ALWAYS);
-        return columns;
+
+        Button classicTabsButton = new Button(Localization.lang("Add classic tabs"));
+        classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\" and \"Abstract\" known from JabRef 5.")));
+        classicTabsButton.setOnAction(_ -> viewModel.addClassicTabs());
+
+        Button resetButton = new Button(Localization.lang("Reset to default tabs"));
+        resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        resetButton.setOnAction(_ -> resetTabs());
+
+        return new VBox(GAP, columns, new HBox(GAP, classicTabsButton, resetButton));
     }
 
     // region Tabs column
@@ -243,22 +255,19 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 tab -> (tab == null) || !tab.isCustom()));
         addFieldButton.disableProperty().bind(addFieldName.disabledProperty().or(addFieldName.textProperty().isEmpty()));
 
-        Label regexInfo = new Label(Localization.lang("A field name can also be a regular expression, e.g. \"comment-.*\"."));
-        regexInfo.getStyleClass().add("italic");
+        // Field names may be regular expressions; that is explained in the linked documentation.
+        Button helpButton = new Button();
+        helpButton.getStyleClass().addAll("icon-button", "narrow");
+        helpButton.setPrefSize(20.0, 20.0);
+        new ActionFactory().configureIconButton(
+                StandardActions.HELP,
+                new HelpAction(HelpFile.ENTRY_EDITOR_TABS, dialogService, preferences.getExternalApplicationsPreferences()),
+                helpButton);
 
-        Button resetButton = new Button(Localization.lang("Reset to default tabs"));
-        resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
-        resetButton.setOnAction(_ -> resetTabs());
+        HBox.setHgrow(addFieldName, Priority.ALWAYS);
+        HBox bottomRow = new HBox(GAP, addFieldName, addFieldButton, helpButton);
 
-        Button classicTabsButton = new Button(Localization.lang("Add classic tabs"));
-        classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\" and \"Abstract\" known from JabRef 5.")));
-        classicTabsButton.setOnAction(_ -> viewModel.addClassicTabs());
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox bottomRow = new HBox(GAP, addFieldName, addFieldButton, spacer, classicTabsButton, resetButton);
-
-        VBox column = new VBox(GAP, fieldsTable, bottomRow, regexInfo);
+        VBox column = new VBox(GAP, fieldsTable, bottomRow);
         HBox.setHgrow(column, Priority.ALWAYS);
         return column;
     }

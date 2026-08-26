@@ -15,6 +15,7 @@ public enum HelpFile {
     TIMESTAMP("advanced/entryeditor/timestamp"),
     CUSTOM_EXPORTS_NAME_FORMATTER("collaborative-work/export/customexports#using-custom-name-formatters"),
     GENERAL_FIELDS("setup/generalfields"),
+    ENTRY_EDITOR_TABS("setup/generalfields#fields"),
     REMOTE("advanced/remote"),
     REGEX_SEARCH("finding-sorting-and-cleaning-entries/filelinks#using-regular-expression-search-for-auto-linking"),
     PREVIEW("setup/preview"),
