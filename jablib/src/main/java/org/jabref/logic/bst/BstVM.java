@@ -21,6 +21,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/// Parsed executable program of one specific `.bst` file.
+///
+/// [BstVM] cannot be used as a static, style-agnostic machine because each instance holds the
+/// parse tree of one concrete `.bst` program. It also keeps the latest execution context for
+/// testing/debugging, so callers should treat it as style-specific runtime state rather than a
+/// global utility.
 @NullMarked
 public class BstVM {
 

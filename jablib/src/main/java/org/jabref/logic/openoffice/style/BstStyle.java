@@ -29,6 +29,11 @@ public class BstStyle implements OOStyle {
     private final @Nullable Path filePath;
     private final String name;
     private final String source;
+    /// Parsed executable program for this specific `.bst` style.
+    ///
+    /// [BstVM] is **not** style-agnostic: it represents the parsed program of one concrete `.bst`
+    /// file. We keep it on the style so repeated preview/citation/bibliography operations can reuse
+    /// the parsed program and avoid reparsing and reallocating a new [BstVM] on each operation.
     private final BstVM bstVM;
     private final boolean hasSortCommand;
 
@@ -68,7 +73,7 @@ public class BstStyle implements OOStyle {
         }
     }
 
-    /// Creates a [BstVM] for this style.
+    /// Returns the parsed [BstVM] for this style.
     public BstVM createBstVM() {
         return bstVM;
     }
