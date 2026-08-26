@@ -36,8 +36,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /// Inserts BST-styled citations and bibliography into a LibreOffice document.
 ///
@@ -47,7 +46,6 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class BSTCitationOOAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
     /// Matches a rendered `\\bibitem`, capturing its optional display label and required key.
     ///
     /// Examples:
