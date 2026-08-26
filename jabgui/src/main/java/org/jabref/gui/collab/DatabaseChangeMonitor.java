@@ -193,6 +193,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       .executeWith(taskExecutor);
     }
 
+    /// Applies the accepted external changes and updates the library's dirty state.
+    ///
+    /// @param resolvedChanges          the externally resolved changes to apply to the in-memory database
+    /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk, so the library can be marked clean; `false` if the resolved result differs from disk and still needs saving
+    /// @param libraryTab               the library tab whose dirty state should be updated
     void applyResolvedChanges(List<DatabaseChange> resolvedChanges,
                               boolean resolvedChangesMatchDisk,
                               LibraryTab libraryTab) {
