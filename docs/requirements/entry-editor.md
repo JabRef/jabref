@@ -89,4 +89,11 @@ Special fields (ranking, priority, read status, printed, quality, relevance) are
 
 Needs: impl
 
+## Source tab replaces its content atomically when entries change
+`req~entry-editor.source-tab.atomic-replacement~1`
+
+When changing the selected entry, the Source tab replaces its full document in one operation so transient model states cannot prevent the newly selected entry's source from being displayed.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

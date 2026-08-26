@@ -186,6 +186,7 @@ public class SourceTab extends EntryEditorTab {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
+                // [impl->req~entry-editor.source-tab.atomic-replacement~1]
                 codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
                         getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
