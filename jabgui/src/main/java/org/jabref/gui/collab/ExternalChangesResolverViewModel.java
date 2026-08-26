@@ -100,6 +100,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public void denyChange() {
         getSelectedChange().ifPresent(selectedChange -> {
+            // The change objects outlive this dialog: a cancelled review re-opens on the same list, so an earlier accept must not stick
+            selectedChange.setAccepted(false);
             resolvedChangesMatchDisk.put(selectedChange, false);
             getVisibleChanges().remove(selectedChange);
             updateResolutionState();

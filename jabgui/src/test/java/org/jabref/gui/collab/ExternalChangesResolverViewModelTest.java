@@ -67,6 +67,19 @@ class ExternalChangesResolverViewModelTest {
     }
 
     @Test
+    void denyChangeRevertsEarlierAccept() {
+        DatabaseChange change = new EntryAdd(new BibEntry().withCitationKey("Key"), new BibDatabaseContext(), null);
+        change.accept();
+        ExternalChangesResolverViewModel viewModel = new ExternalChangesResolverViewModel(List.of(change));
+
+        viewModel.selectedChangeProperty().set(change);
+        viewModel.denyChange();
+
+        assertFalse(change.isAccepted());
+        assertTrue(viewModel.areAllChangesDenied());
+    }
+
+    @Test
     void acceptMergedChangeReplacesResolvedChange() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         BibEntry oldEntry = new BibEntry().withCitationKey("Old");
