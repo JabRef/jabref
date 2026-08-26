@@ -166,6 +166,7 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
             JSONObject jsonObject = new JSONObject(response);
             return !jsonObject.has("error");
         } catch (Exception e) {
+            LOGGER.debug("BASE API key validation failed", e);
             return false;
         }
     }

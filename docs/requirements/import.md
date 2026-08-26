@@ -12,4 +12,11 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
+## Fetch entries from Bielefeld Academic Search Engine (BASE)
+`req~import.fetcher.base~1`
+
+JabRef allows searching and importing bibliographic metadata from the Bielefeld Academic Search Engine (BASE) via its API.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
