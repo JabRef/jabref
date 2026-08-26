@@ -177,7 +177,6 @@ public class MainTableDataModel {
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
-    // Apply group matches to all entries
     private void applyGroupMatchesToAllEntries() {
         boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
         boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
@@ -299,11 +298,7 @@ public class MainTableDataModel {
                             entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
                             updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isSearchFloatingMode);
                         }),
-                        () -> entriesViewModel.forEach(entry -> {
-                            entry.isMatchedBySearch().set(true);
-                            entry.hasFullTextResultsProperty().set(false);
-                            updateEntrySearchMatch(entry, true, isSearchFloatingMode);
-                        })
+                        MainTableDataModel.this::clearSearchMatches
                 );
                 // Re-apply the group filter post deletion.
                 applyGroupMatchesToAllEntries();
