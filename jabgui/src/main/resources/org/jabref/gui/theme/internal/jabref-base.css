@@ -323,6 +323,12 @@
     -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
+/* Sidepane */
+
+.sidePaneComponent {
+    -fx-background-color: -color-bg-sidepane;
+}
+
 .sidePaneComponentHeader {
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: 3em;
@@ -1475,17 +1481,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-accent-subtle;
 }
 
-/* PreferenceDialog */
-
-#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 8;
-    -fx-background: -color-bg-alt;
-}
-
 /* GroupTree */
 
-.sidePaneComponent,
-#preferencesDialog #sidepane,
 #groupTree {
     -fx-background-color: -color-bg-sidepane;
 }
@@ -1616,6 +1613,22 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn > .hits:all-selected {
     -fx-background-color: -color-success;
+}
+
+/* PreferencesDialog */
+
+#preferencesDialog #sidepane {
+    -fx-background-color: -color-bg-sidepane;
+}
+
+#preferencesDialog #preferencesTabList {
+    -fx-background-color: transparent;
+}
+
+#preferencesTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 8;
+    -fx-background: transparent;
+    -fx-text-fill: -color-fg-default;
 }
 
 #preferencesDialog .button-bar > .container {
