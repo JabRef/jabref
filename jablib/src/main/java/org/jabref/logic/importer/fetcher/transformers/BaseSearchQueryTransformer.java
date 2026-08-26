@@ -1,5 +1,8 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class BaseSearchQueryTransformer extends AbstractQueryTransformer {
 
     @Override
@@ -33,7 +36,11 @@ public class BaseSearchQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYear(String year) {
-        return createKeyValuePair("dcyear", year);
+    protected String handleYear(String yearRange) {
+        String result = super.handleYearRange(yearRange);
+        if (result.isEmpty()) {
+            return result;
+        }
+        return "(%s)".formatted(result);
     }
 }
