@@ -14,11 +14,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorTab;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.CompoundEdit;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -28,7 +28,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     public Button copyContentButton;
-    private final NamedCompoundEdit compoundEdit;
+    private final CompoundEdit compoundEdit;
     private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
@@ -47,7 +47,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     private CopyOrMoveFieldContentTabViewModel viewModel;
 
     public CopyOrMoveFieldContentTabView(BibDatabase database,
-                                         NamedCompoundEdit compoundEdit,
+                                         CompoundEdit compoundEdit,
                                          DialogService dialogService,
                                          StateManager stateManager) {
         this.compoundEdit = compoundEdit;

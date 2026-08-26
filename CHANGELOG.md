@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The LibreOffice integration's "Cite special" mode for JStyles can now cite author-year (without parenthesis), author-only and year-only entries. [forum#670](https://discourse.jabref.org/t/cite-special-openoffice-libreoffice-connection-tool/670). [#7861](https://github.com/JabRef/jabref/issues/7861)
 - The LibreOffice/OpenOffice integration now works with Track Changes enabled in the document. [#9403](https://github.com/JabRef/jabref/issues/9403). [#14018](https://github.com/JabRef/jabref/issues/14018)
 - We added configurable keyword delimiter detection for imported BibTeX, so that delimiters such as `;` are recognized and normalized to your configured keyword separator. [#12974](https://github.com/JabRef/jabref/issues/12974)
+- We added an "Enter URL" tab to the "New Entry" dialog, which creates a `@Misc` entry from a pasted URL, using the linked page's title (when reachable) and recording the access date. [#15411](https://github.com/JabRef/jabref/issues/15411)
 - We added an "add space before citation" option in the LibreOffice integration. [#16349](https://github.com/JabRef/jabref/issues/16349)
 - CSL Citations emitted by JabRef in LibreOffice can now be read by Zotero (under a new preference "Zotero Compatibility Mode") and vice versa. [#15878](https://github.com/JabRef/jabref/issues/15878)
 - We added support for bibliography generation using `.bst` files in the OpenOffice/LibreOffice integration. [#624](https://github.com/JabRef/jabref/issues/624)
@@ -90,9 +91,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where a PDF imported as a new entry via the merge dialog lost its file link. [#16677](https://github.com/JabRef/jabref/pull/16677)
+- We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
+- We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where two JabRef instances saving the same library file could silently overwrite each other's changes. The instance finishing last now aborts its save and offers the usual review flow for the external changes instead. [#16646](https://github.com/JabRef/jabref/pull/16646)
 - We fixed missed external-change detection while JabRef saves a library, so concurrent changes can be reviewed for resolution. [#16646](https://github.com/JabRef/jabref/pull/16646)
 - We fixed saving libraries with long file names, hard links, or file systems that do not support atomic moves. [#7718](https://github.com/JabRef/jabref/issues/7718)
+- We fixed an issue where the Control key could not be used when recording a new keyboard shortcut in the preferences on macOS. [#16604](https://github.com/JabRef/jabref/issues/16604)
+- We fixed the Control key not being recognized when recording a keyboard shortcut on macOS. [#16604](https://github.com/JabRef/jabref/issues/16604)
 - We fixed an issue where full-text search in linked files was not working when the experimental Postgres search backend is disabled. [#16591](https://github.com/JabRef/jabref/pull/16591)
 - We fixed unreadable notification text and icons when using the dark theme. [#16475](https://github.com/JabRef/jabref/issues/16475)
 - We fixed an issue where removing filtered entries from a group could cause JabRef to throw an exception. [#16541](https://github.com/JabRef/jabref/issues/16541)
