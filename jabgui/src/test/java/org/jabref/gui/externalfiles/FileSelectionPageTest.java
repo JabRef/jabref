@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -43,7 +44,8 @@ class FileSelectionPageTest {
         when(viewModel.progressValueProperty()).thenReturn(new SimpleDoubleProperty());
         when(viewModel.progressTextProperty()).thenReturn(new SimpleStringProperty());
         when(viewModel.taskActiveProperty()).thenReturn(new SimpleBooleanProperty());
-        when(viewModel.treeRootProperty()).thenReturn(new SimpleObjectProperty<>(Optional.empty()));
+        SimpleObjectProperty<Optional<FileNodeViewModel>> treeRoot = new SimpleObjectProperty<>(Optional.empty());
+        when(viewModel.treeRootProperty()).thenReturn(treeRoot);
         when(viewModel.checkedFileListProperty()).thenReturn(new SimpleListProperty<>(FXCollections.<TreeItem<FileNodeViewModel>>observableArrayList()));
 
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
@@ -54,6 +56,9 @@ class FileSelectionPageTest {
                 viewModel,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 taskExecutor);
+
+        // The result content (including the preview pane) is only shown once a search has produced a tree
+        treeRoot.set(Optional.of(new FileNodeViewModel(Path.of(""))));
 
         stage.setScene(new Scene(page));
         stage.show();
