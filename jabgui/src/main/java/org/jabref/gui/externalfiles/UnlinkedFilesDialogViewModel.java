@@ -129,7 +129,10 @@ public class UnlinkedFilesDialogViewModel {
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(
+        if (findUnlinkedFilesTask != null) {
+            findUnlinkedFilesTask.cancel();
+        }
+        UnlinkedFilesCrawler task = new UnlinkedFilesCrawler(
                 directory,
                 selectedFileFilter,
                 selectedDateFilter,
@@ -137,25 +140,29 @@ public class UnlinkedFilesDialogViewModel {
                 bibDatabase,
                 preferences.getFilePreferences(),
                 preferences.getExternalApplicationsPreferences(),
-                preferences.getAutoLinkPreferences())
-                .onRunning(() -> {
-                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressTextProperty.setValue(Localization.lang("Searching file system..."));
-                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
-                    taskActiveProperty.setValue(true);
-                    treeRootProperty.setValue(Optional.empty());
-                    relatedEntriesByFile = Map.of();
-                })
-                .onFinished(() -> {
-                    progressValueProperty.set(0);
-                    taskActiveProperty.setValue(false);
-                })
-                .onSuccess(searchResult -> {
-                    relatedEntriesByFile = searchResult.relatedEntriesByFile();
-                    treeRootProperty.setValue(Optional.of(searchResult.treeRoot()));
-                });
-
-        findUnlinkedFilesTask.executeWith(taskExecutor);
+                preferences.getAutoLinkPreferences());
+        findUnlinkedFilesTask = task;
+        task.onRunning(() -> {
+                progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                progressTextProperty.setValue(Localization.lang("Searching file system..."));
+                progressTextProperty.bind(task.messageProperty());
+                taskActiveProperty.setValue(true);
+                treeRootProperty.setValue(Optional.empty());
+                relatedEntriesByFile = Map.of();
+            })
+            .onFinished(() -> {
+                progressValueProperty.set(0);
+                taskActiveProperty.setValue(false);
+            })
+            .onSuccess(searchResult -> {
+                // A search that completed before being superseded must not overwrite the newer search's state
+                if (findUnlinkedFilesTask != task) {
+                    return;
+                }
+                relatedEntriesByFile = searchResult.relatedEntriesByFile();
+                treeRootProperty.setValue(Optional.of(searchResult.treeRoot()));
+            })
+            .executeWith(taskExecutor);
     }
 
     public void startImport() {
@@ -339,10 +346,6 @@ public class UnlinkedFilesDialogViewModel {
 
     /// Returns the entries associated with a file in the most recent search.
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
-        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(normalizePath(filePath), List.of()));
-    }
-
-    private static Path normalizePath(Path path) {
-        return path.toAbsolutePath().normalize();
+        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(UnlinkedFilesSearchResult.normalizePath(filePath), List.of()));
     }
 }

@@ -11,7 +11,6 @@ import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
 public class FindUnlinkedFilesAction extends SimpleCommand {
 
     public FindUnlinkedFilesAction(DialogService dialogService, StateManager stateManager) {
-
         this.executable.bind(needsSavedLocalDatabase(stateManager));
     }
 

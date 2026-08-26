@@ -23,6 +23,7 @@ import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -82,14 +83,19 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
                 filePreferences,
                 autoLinkPreferences);
 
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
+            if (isCancelled()) {
+                return Map.of();
+            }
             try {
                 Collection<LinkedFile> associatedFiles = autoSetFileLinksUtil.findAssociatedNotLinkedFiles(entry);
                 Set<Path> associatedPaths = new HashSet<>();
                 for (LinkedFile associatedFile : associatedFiles) {
-                    associatedFile.findIn(databaseContext, filePreferences)
-                                  .map(UnlinkedFilesCrawler::normalizePath)
-                                  .ifPresent(associatedPaths::add);
+                    // The links are relative and deduplicated, so a name present in several file directories must be expanded again
+                    FileUtil.findListOfFiles(associatedFile.getLink(), fileDirectories).stream()
+                            .map(UnlinkedFilesSearchResult::normalizePath)
+                            .forEach(associatedPaths::add);
                 }
                 for (Path associatedPath : associatedPaths) {
                     relatedEntriesByFile.computeIfAbsent(associatedPath, ignored -> new ArrayList<>()).add(entry);
@@ -101,10 +107,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
 
         return relatedEntriesByFile.entrySet().stream()
                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> List.copyOf(entry.getValue())));
-    }
-
-    private static Path normalizePath(Path path) {
-        return path.toAbsolutePath().normalize();
     }
 
     /// Searches recursively all files in the specified directory. <br>

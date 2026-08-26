@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -23,6 +24,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.nio.file.DirectoryStream.Filter;
@@ -127,13 +130,75 @@ class UnlinkedFilesCrawlerTest {
                 databaseContext,
                 filePreferences).call();
 
-        assertEquals(List.of(entry), result.relatedEntriesByFile().get(file));
+        assertEquals(List.of(entry), result.relatedEntries(file));
+    }
+
+    @Test
+    void cachesRelatedEntriesForSameFileNameInEveryFileDirectory(@TempDir Path testRoot) throws IOException {
+        Path firstDirectory = Files.createDirectory(testRoot.resolve("first"));
+        Path secondDirectory = Files.createDirectory(testRoot.resolve("second"));
+        Path firstFile = Files.createFile(firstDirectory.resolve("citeKey.pdf"));
+        Path secondFile = Files.createFile(secondDirectory.resolve("citeKey.pdf"));
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(firstDirectory, secondDirectory));
+
+        UnlinkedFilesSearchResult result = newCrawler(testRoot, path -> true, databaseContext, filePreferences).call();
+
+        assertEquals(List.of(entry), result.relatedEntries(firstFile));
+        assertEquals(List.of(entry), result.relatedEntries(secondFile));
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void cachesRelatedEntriesForSymlinkedSearchDirectory(@TempDir Path testRoot) throws IOException {
+        Path fileDirectory = Files.createDirectory(testRoot.resolve("files"));
+        Files.createFile(fileDirectory.resolve("citeKey.pdf"));
+        Path link = Files.createSymbolicLink(testRoot.resolve("link"), fileDirectory);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(fileDirectory));
+
+        UnlinkedFilesSearchResult result = newCrawler(link, path -> true, databaseContext, filePreferences).call();
+
+        assertEquals(List.of(entry), result.relatedEntries(link.resolve("citeKey.pdf")));
+    }
+
+    @Test
+    void skipsRelatedEntryLookupWhenCancelled(@TempDir Path testRoot) throws IOException {
+        Files.createFile(testRoot.resolve("citeKey.pdf"));
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(testRoot));
+
+        UnlinkedFilesCrawler crawler = newCrawler(testRoot, path -> true, databaseContext, filePreferences);
+        crawler.cancel();
+
+        assertEquals(Map.of(), crawler.call().relatedEntriesByFile());
     }
 
     private static UnlinkedFilesCrawler newCrawler(Path directory,
-                                                    Filter<Path> fileFilter,
-                                                    BibDatabaseContext databaseContext,
-                                                    FilePreferences filePreferences) {
+                                                   Filter<Path> fileFilter,
+                                                   BibDatabaseContext databaseContext,
+                                                   FilePreferences filePreferences) {
         return new UnlinkedFilesCrawler(
                 directory,
                 fileFilter,
