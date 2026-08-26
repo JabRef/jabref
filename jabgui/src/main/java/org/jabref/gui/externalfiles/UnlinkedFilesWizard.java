@@ -2,8 +2,6 @@ package org.jabref.gui.externalfiles;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 
@@ -12,6 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;

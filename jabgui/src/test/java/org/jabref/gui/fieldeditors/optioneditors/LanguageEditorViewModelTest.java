@@ -4,13 +4,12 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Langid;

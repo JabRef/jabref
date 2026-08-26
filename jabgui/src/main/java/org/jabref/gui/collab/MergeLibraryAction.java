@@ -11,11 +11,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -31,14 +30,14 @@ public class MergeLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     public MergeLibraryAction(DialogService dialogService,
                               StateManager stateManager,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              CountingUndoManager undoManager,
+                              UndoManager undoManager,
                               LibraryTabContainer libraryTabContainer) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -92,15 +91,12 @@ public class MergeLibraryAction extends SimpleCommand {
                 Localization.lang("External Changes Resolver"));
         dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
 
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-        changes.stream()
-               .filter(DatabaseChange::isAccepted)
-               .forEach(change -> change.applyChange(compoundEdit));
-        compoundEdit.end();
+        boolean anyChange = undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                changes.stream()
+                       .filter(DatabaseChange::isAccepted)
+                       .forEach(change -> change.applyChange(edit)));
 
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
-
+        if (anyChange) {
             libraryTabContainer.getLibraryTabs().stream()
                                .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
                                .findFirst()

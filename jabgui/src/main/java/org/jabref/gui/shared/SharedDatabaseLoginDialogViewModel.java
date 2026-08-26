@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -45,6 +43,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;

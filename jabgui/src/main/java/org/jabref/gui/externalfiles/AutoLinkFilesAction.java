@@ -5,24 +5,23 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -58,7 +57,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
-        final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang("Automatically set file links"));
+        final CompoundEdit compound = new CompoundEdit(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -66,7 +65,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+                compound.addEdit(fieldChange); // push to undo manager is in succeeded
 
                 // Wait because there are several rounds in one auto-link operation
                 // The later round depends on the updated bibEntry of the previous round
@@ -97,9 +96,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     return;
                 }
 
-                if (nc.hasEdits()) {
-                    nc.end();
-                    undoManager.addEdit(nc);
+                if (compound.hasEdits()) {
+                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(
