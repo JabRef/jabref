@@ -37,7 +37,6 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 
-
 /// Inserts BST-styled citations and bibliography into a LibreOffice document.
 ///
 /// In-text citation format is controlled by [OpenOfficePreferences#getBstCitationFormat]:
