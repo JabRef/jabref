@@ -48,6 +48,11 @@ import org.slf4j.LoggerFactory;
 public class BSTCitationOOAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
+    /// Matches a rendered `\\bibitem`, capturing its optional display label and required key.
+    ///
+    /// Examples:
+    /// - `\\bibitem{smith2020}` → label absent, key `smith2020`
+    /// - `\\bibitem[SG20]{smith2020}` → label `SG20`, key `smith2020`
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[(?<label>[^\\]]*)\\])?\\{(?<key>[^}]+)}");
 
     private final XComponentContext componentContext;

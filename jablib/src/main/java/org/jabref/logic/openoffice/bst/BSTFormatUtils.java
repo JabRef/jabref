@@ -65,6 +65,12 @@ public final class BSTFormatUtils {
         return s;
     }
 
+    /// Normalizes a BST `\\bibitem[...]` label by replacing supported label-only helper macros
+    /// with their plain-text equivalents.
+    ///
+    /// Currently this converts alpha-style `\\etalchar{...}` markers such as
+    /// `TLY{\\etalchar{+}}21` to `TLY+21` so the label can be shown directly in previews and
+    /// LibreOffice citations.
     public static String normalizeBibItemLabel(String label) {
         String normalized = BRACED_ETALCHAR_PATTERN.matcher(label).replaceAll("$1");
         return ETALCHAR_PATTERN.matcher(normalized).replaceAll("$1");
