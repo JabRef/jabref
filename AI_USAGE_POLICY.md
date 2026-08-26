@@ -31,7 +31,7 @@ We recommend AI tools trained on JabRef data, such as [DeepWiki](https://deepwik
 1. **Understand fully:** You must be able to explain every line of code you submit
 2. **Test thoroughly:** Review and test all code before submission
 3. **Take responsibility:** You are accountable for bugs, issues, or problems with your contribution
-4. **Disclose usage:** Note which AI tools you used in your PR description
+4. **Disclose usage:** Note which AI tools you used and the AI Influence Level (`AIL0`–`AIL4`) in your PR description
 5. **Follow guidelines:** Comply with all rules in [AGENTS.md](./AGENTS.md) and [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ### Example disclosure
@@ -64,8 +64,11 @@ We recommend AI tools trained on JabRef data, such as [DeepWiki](https://deepwik
 
 ## AI-generated text must be marked
 
-Any AI-generated text posted to GitHub — PR descriptions, comments, review replies — must start with 🤖 (for example `🤖 Generated with <tool>`), so that readers can tell at a glance whether a human or a tool is speaking.
+Prefer writing in your own words: read what the tool gave you, then write your own version — [don't paste the AI](https://dontpastetheai.com/).
+Any AI-generated text you post to GitHub anyway — PR descriptions, comments, review replies — must start with 🤖 (for example `🤖 Generated with <tool>`), so that readers can tell at a glance whether a human or a tool is speaking.
 Unmarked AI-generated text leads to the PR being closed.
+
+Every pull request states its [AI Influence Level](https://danielmiessler.com/blog/ai-influence-level-ail) in the "AI usage" section as a tag from `AIL0` (no AI involved) to `AIL4` (AI created, human gave the idea). `AIL5` (little human involvement) is not accepted. CI checks that the tag is present and that commits carrying an AI `Co-Authored-By` trailer come with a disclosure.
 
 ## Why do we have this policy?
 

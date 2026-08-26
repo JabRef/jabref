@@ -151,6 +151,79 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
 
+  ai-usage-level:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    name: AI usage level declared
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check for AIL tag in section "AI usage"
+        run: |
+          set -e
+
+          # HTML comments of the template mention AIL tags as examples - ignore them
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | perl -0pe 's/<!--.*?-->//gs')
+          SECTION=$(printf '%s\n' "$BODY" | sed -n '/^### AI usage/,/^### Checklist/p')
+          AIL=$(printf '%s\n' "$SECTION" | grep -oE '\bAIL[0-9]\b' | head -1 || true)
+
+          case "$AIL" in
+            AIL[0-4]) echo "✅ $AIL declared." ;;
+            "") echo "❌ No AI Influence Level (AIL0–AIL4) declared in section 'AI usage'."; exit 1 ;;
+            *) echo "❌ $AIL declared: fully AI-generated pull requests are not accepted."; exit 1 ;;
+          esac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+  ai-usage-disclosed:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    name: AI usage disclosed
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check that AI traces come with a disclosure
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | perl -0pe 's/<!--.*?-->//gs')
+          TRAILERS=$(gh pr view "${{ github.event.number }}" --json commits --jq '.commits[].messageBody' \
+            | grep -iE '^Co-Authored-By:.*(claude|anthropic|copilot|chatgpt|openai|codex|gemini|cursor|junie|devin|aider|windsurf)' || true)
+
+          if [ -z "$TRAILERS" ] && ! printf '%s' "$BODY" | grep -q '🤖'; then
+            echo "✅ No AI traces found."
+            exit 0
+          fi
+          echo "AI traces found:"
+          printf '%s\n' "$TRAILERS"
+
+          SECTION=$(printf '%s\n' "$BODY" | sed -n '/^### AI usage/,/^### Checklist/p')
+          if printf '%s\n' "$SECTION" | grep -qE '^_{3,}\s*$' || printf '%s\n' "$SECTION" | grep -qE '\bAIL0\b'; then
+            echo "❌ AI traces found, but section 'AI usage' is empty or claims AIL0."
+            exit 1
+          fi
+          echo "✅ AI usage disclosed."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
   upload-pr-number:
     runs-on: ubuntu-slim
     steps:

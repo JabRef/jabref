@@ -58,7 +58,8 @@ _____
    <!--
    DISCLOSE every AI tool used to produce this PR, including the exact model.
    Example: "Claude Code (model claude-opus-4-7)", "GitHub Copilot (GPT-4o)".
-   Categorize the use by the [AI Influence Level](https://danielmiessler.com/blog/ai-influence-level-ail). E.g., `AIL0` means no AI involved at all.
+   STATE the [AI Influence Level](https://danielmiessler.com/blog/ai-influence-level-ail) as a tag `AIL0` (no AI involved) to `AIL4`. `AIL5` (fully AI-generated) is not accepted; CI checks the tag.
+   Prefer writing in your own words (https://dontpastetheai.com/); AI-generated text you post anyway must start with 🤖.
 
    IF AN AI TOOL WAS USED:
      The AI MUST go through CHECKLIST.md one item at a time, verify each

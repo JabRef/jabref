@@ -479,9 +479,9 @@ PR title:
 PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 
 1. Read `.github/PULL_REQUEST_TEMPLATE.md`.
-2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
-3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
-4. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
+2. Fill every section: \"Summary\", \"Steps to test\", \"Related issues and pull requests\", \"AI usage\".
+3. The Summary must explain **intent**, not implementation trivia. Do not list modified classes one by one.
+4. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`) and the AI Influence Level as a tag `AIL0`–`AIL4` (CI rejects a missing tag and `AIL5`).
 5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
@@ -513,7 +513,7 @@ Run this loop only when the contributor asks for it:
    - Invalid or not applicable → reply in the thread with the reason (one or two sentences pointing to the code or rule that makes it wrong). Never resolve a thread silently.
    - Unsure → ask the contributor.
 
-   Reply with `gh api repos/JabRef/jabref/pulls/<number>/comments/<id>/replies -f body="..."`.
+   Reply with `gh api repos/JabRef/jabref/pulls/<number>/comments/<id>/replies -f body="🤖 Generated with ... "` — the reply starts with the marker (see [Marking AI-generated text](#marking-ai-generated-text)).
    Every Qodo thread needs a reply from the PR author: the `status: changes-required` label stays until each active thread has one.
 4. Qodo reviews every push again. Repeat steps 2–3 until the query returns nothing.
 
@@ -525,7 +525,7 @@ Every text an agent writes that is posted to GitHub — PR descriptions, PR comm
 🤖 Generated with <tool name>
 ```
 
-for example `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. In a PR body, put the marker at the top of the "PR Description" section. A human who rewrites the text afterwards removes the marker. Unmarked AI-generated text leads to the PR being closed. Commit messages are covered by the `Co-Authored-By:` trailer the tool adds.
+for example `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. In a PR body, put the marker at the top of the "Summary" section. A human who rewrites the text afterwards removes the marker. Unmarked AI-generated text leads to the PR being closed. Commit messages are covered by the `Co-Authored-By:` trailer the tool adds. Prefer letting the contributor write in their own words ([don't paste the AI](https://dontpastetheai.com/)) over posting marked text.
 
 ---
 

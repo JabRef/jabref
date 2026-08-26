@@ -23,6 +23,10 @@
           {
             "type": "command",
             "command": "python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/checklist-done-guard.py\""
+          },
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ai-disclosure-guard.py\""
           }
         ]
       }

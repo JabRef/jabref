@@ -203,6 +203,18 @@
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `- [x]` (done), `- [ ]` (yet to be done) or `- [/]` (not applicable).
     Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
+- jobName: 'AI usage level declared'
+  workflowName: 'Check PR Format'
+  always: true
+  message: >
+    Please state the [AI Influence Level](https://danielmiessler.com/blog/ai-influence-level-ail) of this pull request in the section "AI usage" of the description as a tag from `AIL0` (no AI involved) to `AIL4`.
+    Fully AI-generated pull requests (`AIL5`) are not accepted, see our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md).
+- jobName: 'AI usage disclosed'
+  workflowName: 'Check PR Format'
+  always: true
+  message: >
+    Your commits or description carry traces of AI tools (an AI `Co-Authored-By` trailer or a 🤖 marker), but the section "AI usage" of the description does not disclose them.
+    Please name the tools and models used and the AI Influence Level (`AIL1`–`AIL4`), see our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md).
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true
