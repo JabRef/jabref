@@ -18,10 +18,8 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
     private static final String GITHUB_PAT_DOCS_URL =
             "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens";
 
-    private static final String GITHUB_NEW_REPO_URL = "https://github.com/new";
-
     public GitTab() {
-        this.viewModel = new GitTabViewModel(dialogService, taskExecutor, preferences.getGitPreferences());
+        this.viewModel = new GitTabViewModel(dialogService, preferences.getGitPreferences());
         buildView();
     }
 
@@ -34,18 +32,14 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
         EnhancedPasswordField pat = PasswordFieldEditor.create(viewModel.patProperty()).withRevealButton().withClearButton().field();
 
         setContent(form()
-                .section(Localization.lang("GitHub"), github -> github
-                        .stringField(Localization.lang("Repository URL"), viewModel.repositoryUrlProperty(),
-                                field -> field.tooltip(Localization.lang("Create an empty repository on GitHub, then copy the HTTPS URL (ends with .git). Click to open GitHub."))
-                                              .help(GITHUB_NEW_REPO_URL))
+                .section(Localization.lang("Authentication"), authentication -> authentication
                         .stringField(Localization.lang("Username"), viewModel.usernameProperty())
                         .field(Localization.lang("PAT"), pat,
                                 field -> field.tooltip(Localization.lang("Personal Access Token"))
                                               .help(GITHUB_PAT_DOCS_URL))
-                        .custom(buildPersistPatCheckBox())
-                        .button(Localization.lang("Check GitHub access"), viewModel::checkGitHubAccess))
+                        .custom(buildPersistPatCheckBox()))
 
-                .section(Localization.lang("Automatic operations"), automatic -> automatic
+                .section(Localization.lang("Automatic synchronization"), automatic -> automatic
                         .stringField(Localization.lang("Pull interval (minutes)"), viewModel.pullIntervalProperty(),
                                 field -> field.validate(viewModel.pullIntervalValidationStatus())))
 

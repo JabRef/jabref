@@ -7,16 +7,15 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.git.GitHandler;
-import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,8 +41,8 @@ class GitShareToGitHubActionTest {
 
     @Test
     void isEnabledForSavedLocalLibraryWithRemote() {
-        GitShareToGitHubAction action = new GitShareToGitHubAction(mock(DialogService.class), stateManager, GitPreferences.getDefault());
+        GitShareToGitHubAction action = new GitShareToGitHubAction(mock(DialogService.class), stateManager);
 
-        Assertions.assertTrue(action.executableProperty().get());
+        assertTrue(action.executableProperty().get());
     }
 }
