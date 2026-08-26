@@ -38,8 +38,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final Optional<Path> monitoredPath;
-    private LibraryTab saveState;
     private boolean changeDetectionSuspended;
+    @Nullable private ExternalLibraryChangeNotification activeNotification;
 
     /// State of the monitored file as of the last scan or the last point where the in-memory library was known to
     /// match the disk (library load, successful save, all external changes merged). Guarded by
@@ -73,7 +73,21 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             }
         });
 
-        addListener(changes -> dialogService.notify(new ExternalLibraryChangeNotification(changes)));
+        addListener(this::notifyExternalChanges);
+    }
+
+    void notifyExternalChanges(List<DatabaseChange> changes) {
+        Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
+
+        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes);
+        dialogService.notify(notification);
+        activeNotification = notification;
+    }
+
+    private void clearActiveNotification(ExternalLibraryChangeNotification notification) {
+        if (activeNotification == notification) {
+            activeNotification = null;
+        }
     }
 
     private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
@@ -86,7 +100,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             setOnClick(_ -> OnClickBehaviour.NONE);
 
             NotificationAction<Path> dismissAction = new NotificationAction<>(Localization.lang("Dismiss changes"), _ -> {
-                remove();
+                clearActiveNotification(this);
                 return OnClickBehaviour.REMOVE;
             });
 
@@ -97,22 +111,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         Localization.lang("External Changes Resolver"));
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 if (areAllChangesResolved.orElse(false)) {
-                    List<DatabaseChange> resolvedChanges = databaseChangesResolverDialog.getResolvedChanges();
-                    saveState = stateManager.activeTabProperty().get().get();
+                    applyResolvedChanges(
+                            databaseChangesResolverDialog.getResolvedChanges(),
+                            databaseChangesResolverDialog.resolvedChangesMatchDisk(),
+                            stateManager.activeTabProperty().get().get());
 
-                    undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
-                            resolvedChanges.stream()
-                                           .filter(DatabaseChange::isAccepted)
-                                           .forEach(change -> change.applyChange(edit)));
-
-                    if (databaseChangesResolverDialog.areAllChangesAccepted()) {
-                        // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
-                        saveState.resetChangedProperties();
-                    } else {
-                        saveState.markBaseChanged();
-                    }
-
-                    remove();
+                    clearActiveNotification(this);
                     return OnClickBehaviour.REMOVE;
                 }
 
@@ -187,6 +191,21 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       })
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    void applyResolvedChanges(List<DatabaseChange> resolvedChanges,
+                              boolean resolvedChangesMatchDisk,
+                              LibraryTab libraryTab) {
+        undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                resolvedChanges.stream()
+                               .filter(DatabaseChange::isAccepted)
+                               .forEach(change -> change.applyChange(edit)));
+
+        if (resolvedChangesMatchDisk) {
+            libraryTab.resetChangedProperties();
+        } else {
+            libraryTab.markBaseChanged();
+        }
     }
 
     public void addListener(DatabaseChangeListener listener) {

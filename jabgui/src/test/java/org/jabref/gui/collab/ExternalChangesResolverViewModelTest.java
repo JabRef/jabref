@@ -46,6 +46,7 @@ class ExternalChangesResolverViewModelTest {
         assertTrue(viewModel.areAllChangesResolved());
         assertTrue(viewModel.areAllChangesAccepted());
         assertFalse(viewModel.areAllChangesDenied());
+        assertTrue(viewModel.resolvedChangesMatchDisk());
         assertEquals(List.of(change), viewModel.getResolvedChanges());
     }
 
@@ -61,6 +62,7 @@ class ExternalChangesResolverViewModelTest {
         assertTrue(viewModel.areAllChangesResolved());
         assertFalse(viewModel.areAllChangesAccepted());
         assertTrue(viewModel.areAllChangesDenied());
+        assertFalse(viewModel.resolvedChangesMatchDisk());
         assertEquals(List.of(change), viewModel.getResolvedChanges());
     }
 
@@ -80,7 +82,23 @@ class ExternalChangesResolverViewModelTest {
         assertTrue(viewModel.areAllChangesResolved());
         assertTrue(viewModel.areAllChangesAccepted());
         assertFalse(viewModel.areAllChangesDenied());
+        assertFalse(viewModel.resolvedChangesMatchDisk());
         assertEquals(1, viewModel.getResolvedChanges().size());
         assertSame(mergedChange, viewModel.getResolvedChanges().getFirst());
+    }
+
+    @Test
+    void acceptMergedDiskVersionKeepsResolvedStateConsistentWithDisk() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibEntry oldEntry = new BibEntry().withCitationKey("Old");
+        BibEntry diskEntry = new BibEntry().withCitationKey("Disk");
+        EntryChange originalChange = new EntryChange(oldEntry, diskEntry, databaseContext);
+        ExternalChangesResolverViewModel viewModel = new ExternalChangesResolverViewModel(List.of(originalChange));
+        EntryChange mergedChange = new EntryChange(oldEntry, new BibEntry(diskEntry), databaseContext);
+
+        viewModel.selectedChangeProperty().set(originalChange);
+        viewModel.acceptMergedChange(mergedChange);
+
+        assertTrue(viewModel.resolvedChangesMatchDisk());
     }
 }

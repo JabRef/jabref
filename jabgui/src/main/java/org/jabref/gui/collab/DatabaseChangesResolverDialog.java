@@ -89,6 +89,12 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         return areAllChangesDenied;
     }
 
+    public boolean resolvedChangesMatchDisk() {
+        return Optional.ofNullable(viewModel)
+                       .map(ExternalChangesResolverViewModel::resolvedChangesMatchDisk)
+                       .orElse(false);
+    }
+
     public List<DatabaseChange> getResolvedChanges() {
         return Optional.ofNullable(viewModel)
                        .map(ExternalChangesResolverViewModel::getResolvedChanges)
