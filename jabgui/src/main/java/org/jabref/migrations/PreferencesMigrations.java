@@ -277,10 +277,18 @@ public class PreferencesMigrations {
         }
     }
 
-    private static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
+    static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
         UnaryOperator<String> replaceKeys = str -> {
-            String result = str.replace("ctrl ", "ctrl+");
-            result = result.replace("ctrl+", "shortcut+");
+            // Legacy bindings use a space before the key (e.g. "ctrl A"); already-migrated
+            // bindings use a plus (e.g. "ctrl+A" or "shortcut+A") and must be left untouched,
+            // otherwise intentional macOS "ctrl+" bindings would be rewritten to "shortcut+" on every startup.
+            boolean isLegacyFormat = str.contains("ctrl ") || str.contains("shift ")
+                    || str.contains("alt ") || str.contains("meta ");
+            if (!isLegacyFormat) {
+                return str;
+            }
+
+            String result = str.replace("ctrl ", "shortcut+");
             result = result.replace("shift ", "shift+");
             result = result.replace("alt ", "alt+");
             result = result.replace("meta ", "meta+");

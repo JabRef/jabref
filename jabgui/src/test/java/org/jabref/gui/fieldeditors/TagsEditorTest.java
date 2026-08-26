@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -16,6 +14,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.StandardField;
