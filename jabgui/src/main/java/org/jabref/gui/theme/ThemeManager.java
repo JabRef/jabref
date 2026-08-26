@@ -75,6 +75,7 @@ public class ThemeManager {
 
         initializeWindowThemeUpdater();
         addStylesheetToWatchlist(JABREF_BASE_STYLE_SHEET, baseCssLiveUpdate);
+        addThemeStylesheetToWatchlist(theme);
 
         updateThemeSettings();
         updateFontSettings();
@@ -171,9 +172,7 @@ public class ThemeManager {
                 removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
             }
 
-            StyleSheet newThemeStyleSheet = newTheme.getStyleSheet();
-            themeCssLiveUpdate = () -> cssLiveUpdate(newThemeStyleSheet);
-            addStylesheetToWatchlist(newThemeStyleSheet, themeCssLiveUpdate);
+            addThemeStylesheetToWatchlist(newTheme);
 
             cssChanged = true;
             theme = newTheme;
@@ -231,6 +230,9 @@ public class ThemeManager {
         }
     }
 
+    /// Adds a stylesheet to the live-reload watch list only when it has a real filesystem path.
+    ///
+    /// Classpath resources cannot be watched.
     private void addStylesheetToWatchlist(StyleSheet styleSheet, FileUpdateListener updateMethod) {
         Path watchPath = styleSheet.getWatchPath();
         if (watchPath == null) {
@@ -243,6 +245,12 @@ public class ThemeManager {
         } catch (IOException e) {
             LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
         }
+    }
+
+    private void addThemeStylesheetToWatchlist(ThemePreset theme) {
+        StyleSheet themeStyleSheet = theme.getStyleSheet();
+        themeCssLiveUpdate = () -> cssLiveUpdate(themeStyleSheet);
+        addStylesheetToWatchlist(themeStyleSheet, themeCssLiveUpdate);
     }
 
     private void cssLiveUpdate(StyleSheet styleSheet) {

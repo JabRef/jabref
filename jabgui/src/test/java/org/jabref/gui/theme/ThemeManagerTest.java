@@ -100,6 +100,7 @@ class ThemeManagerTest {
         }).when(fileUpdateMonitor).addListenerForFile(any(), any());
 
         createThemeManager(workspacePreferences, fileUpdateMonitor);
+        listenerAddedOnJavaFxThread.set(false);
 
         workspacePreferences.setCustomTheme(StyleSheet.create(tempFolder.resolve("custom.css").toString()));
 
