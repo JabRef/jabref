@@ -128,6 +128,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     /// directly after "Main". A classic tab is skipped when a tab with its name exists, or when a custom tab
     /// already has exactly its fields: custom names are persisted verbatim, so a classic tab added under one
     /// language would otherwise be added again under another.
+    // [impl->req~entry-editor.classic-tabs~1]
     public void addClassicTabs() {
         int insertAt = 1 + tabs.stream()
                                .map(EditorTabViewModel::getDisplayName)

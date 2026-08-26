@@ -82,6 +82,13 @@ Users can define custom entry editor tabs in the preferences ("Entry editor" →
 
 Needs: impl
 
+## The classic "General" and "Abstract" tabs can be added with one click
+`req~entry-editor.classic-tabs~1`
+
+The "Editor tabs" preferences offer a button "Add classic tabs" which adds the custom tabs "General" (the JabRef 5 default field set: doi, icore, citationcount, crossref, keywords, eprint, eprinttype, url, file, groups, owner, timestamp, and all special fields) and "Abstract" (abstract) directly after the "Main" tab. A classic tab is not added when a tab of that name exists or a custom tab already has exactly its fields, so the button is idempotent — also after a language change, since custom tab names are stored verbatim. When upgrading from a version before the "Main" tab rework, stored tabs that are exactly one of the former default "General"/"Abstract" tabs (localized name and shipped field set) are not carried over, since the "Main" tab shows all their fields; any other stored tab is kept.
+
+Needs: impl
+
 ## Special fields are edited with the same icon controls as the main table
 `req~entry-editor.special-field-editors~1`
 

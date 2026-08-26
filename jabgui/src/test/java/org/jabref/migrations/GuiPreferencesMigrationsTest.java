@@ -337,6 +337,25 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
+    void upgradeEntryEditorCustomTabsKeepsCustomizedTabsResemblingDefaults() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        // stock field set, but user-defined name
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("My summary");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("abstract"));
+        // stock name, but a field removed from the v5 default set
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn("General");
+        when(preferences.getStringList("customTabFields_1")).thenReturn(List.of(
+                "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
+                "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put(eq("entryEditorCustomTabs"), eq(
+                "{\"My summary\":[\"abstract\"],\"General\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"]}"));
+    }
+
+    @Test
     void upgradeEntryEditorCustomTabsStoresEmptyMapWhenOnlyDefaultsWereStored() {
         when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
         when(preferences.get(eq("customTabName_0"), any())).thenReturn("Abstract");
