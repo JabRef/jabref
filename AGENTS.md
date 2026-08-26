@@ -82,7 +82,7 @@ Agents **must not**:
 - Bypass tests or CI checks
 - Reformat existing code
 - Write entire PRs
-- Write replies to comments of human reviewers (bot review threads are handled as described in [Qodo review loop](#qodo-review-loop))
+- Post unmarked AI-generated text (see [Marking AI-generated text](#marking-ai-generated-text))
 - Submit code the contributor doesn't understand
 - Generate documentation or comments without contributor's review
 - Automate the submission of code changes
@@ -492,11 +492,20 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 Run this loop only when the contributor asks for it:
 
 1. Mark the PR ready for review: `gh pr ready <number>`.
-2. Wait for [Qodo](https://www.qodo.ai/) (GitHub login `qodo-free-for-open-source-projects[bot]`). It posts a "Code Review by Qodo" PR comment and one review thread per finding, usually within a few minutes. Poll every two minutes; give up and tell the contributor after 15 minutes without a review.
+2. Wait for [Qodo](https://www.qodo.ai/) (GitHub login `qodo-free-for-open-source-projects[bot]`). It posts a "Code Review by Qodo" PR comment and one review thread per finding, usually within a few minutes. Poll every two minutes; give up and tell the contributor after 15 minutes without a review. The query below lists only the threads that still need a reply — active (not resolved, not outdated) Qodo threads without a comment by the PR author — with the comment id needed for replying:
 
    ```bash
-   gh api repos/JabRef/jabref/pulls/<number>/comments --paginate \
-     --jq '.[] | select(.user.login | startswith("qodo")) | select(.in_reply_to_id == null) | "\(.id) \(.path):\(.line)\n\(.body)\n"'
+   gh api graphql -F pr=<number> -f query='
+     query($pr: Int!) { repository(owner: "JabRef", name: "jabref") { pullRequest(number: $pr) {
+       author { login }
+       reviewThreads(first: 100) { nodes { isResolved isOutdated path line
+         comments(first: 100) { nodes { databaseId author { login } body } } } } } } }' \
+     --jq '.data.repository.pullRequest as $pr
+       | $pr.reviewThreads.nodes[]
+       | select((.isResolved or .isOutdated) | not)
+       | select(.comments.nodes[0].author.login | startswith("qodo"))
+       | select([.comments.nodes[].author.login] | index($pr.author.login) | not)
+       | "\(.comments.nodes[0].databaseId) \(.path):\(.line)\n\(.comments.nodes[0].body)\n"'
    ```
 
 3. Check every finding against the actual code. Qodo reviews the diff without knowing the surrounding design and is sometimes wrong (for example, it suggests mocking the remote API in fetcher tests, which `CHECKLIST.md` rejects on purpose).
@@ -506,7 +515,7 @@ Run this loop only when the contributor asks for it:
 
    Reply with `gh api repos/JabRef/jabref/pulls/<number>/comments/<id>/replies -f body="..."`.
    Every Qodo thread needs a reply from the PR author: the `status: changes-required` label stays until each active thread has one.
-4. Qodo reviews every push again. Repeat steps 2–3 until no thread is unanswered.
+4. Qodo reviews every push again. Repeat steps 2–3 until the query returns nothing.
 
 ### Marking AI-generated text
 
@@ -516,7 +525,7 @@ Every text an agent writes that is posted to GitHub — PR descriptions, PR comm
 🤖 Generated with <tool name>
 ```
 
-for example `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. In a PR body, put the marker at the top of the "PR Description" section. A human who rewrites the text afterwards removes the marker. Commit messages are covered by the `Co-Authored-By:` trailer the tool adds.
+for example `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. In a PR body, put the marker at the top of the "PR Description" section. A human who rewrites the text afterwards removes the marker. Unmarked AI-generated text leads to the PR being closed. Commit messages are covered by the `Co-Authored-By:` trailer the tool adds.
 
 ---
 

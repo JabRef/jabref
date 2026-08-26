@@ -5,7 +5,7 @@
 -->
 
 <!--
-Do not use AI to communicate with us.
+AI-generated text (PR description, comments, review replies) must start with 🤖 (e.g. `🤖 Generated with <tool>`). Unmarked AI-generated text gets the PR closed.
 AI-assisted code contributions are allowed only, if reviewed, understood, and owned by the contributor.
 Unreviewed, misleading, or misrepresented AI-generated submissions may be closed immediately and publicly labeled as such.
 -->

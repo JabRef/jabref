@@ -58,10 +58,14 @@ We recommend AI tools trained on JabRef data, such as [DeepWiki](https://deepwik
 ❌ **Not allowed (generative use):**
 
 - Write entire PRs
-- Write replies to PR review comments
 - Submit code the contributor doesn't understand
 - Generate documentation or comments without contributor's review
 - Automate the submission of code changes
+
+## AI-generated text must be marked
+
+Any AI-generated text posted to GitHub — PR descriptions, comments, review replies — must start with 🤖 (for example `🤖 Generated with <tool>`), so that readers can tell at a glance whether a human or a tool is speaking.
+Unmarked AI-generated text leads to the PR being closed.
 
 ## Why do we have this policy?
 
