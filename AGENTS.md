@@ -82,7 +82,7 @@ Agents **must not**:
 - Bypass tests or CI checks
 - Reformat existing code
 - Write entire PRs
-- Write replies to PR review comments
+- Write replies to comments of human reviewers (bot review threads are handled as described in [Qodo review loop](#qodo-review-loop))
 - Submit code the contributor doesn't understand
 - Generate documentation or comments without contributor's review
 - Automate the submission of code changes
@@ -486,6 +486,37 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
 8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change. If an issue is identified or created later, switch the link to the issue per the precedence rule above.
+
+### Qodo review loop
+
+Run this loop only when the contributor asks for it:
+
+1. Mark the PR ready for review: `gh pr ready <number>`.
+2. Wait for [Qodo](https://www.qodo.ai/) (GitHub login `qodo-free-for-open-source-projects[bot]`). It posts a "Code Review by Qodo" PR comment and one review thread per finding, usually within a few minutes. Poll every two minutes; give up and tell the contributor after 15 minutes without a review.
+
+   ```bash
+   gh api repos/JabRef/jabref/pulls/<number>/comments --paginate \
+     --jq '.[] | select(.user.login | startswith("qodo")) | select(.in_reply_to_id == null) | "\(.id) \(.path):\(.line)\n\(.body)\n"'
+   ```
+
+3. Check every finding against the actual code. Qodo reviews the diff without knowing the surrounding design and is sometimes wrong (for example, it suggests mocking the remote API in fetcher tests, which `CHECKLIST.md` rejects on purpose).
+   - Valid finding → fix it, commit, push, then reply in the thread stating what was changed.
+   - Invalid or not applicable → reply in the thread with the reason (one or two sentences pointing to the code or rule that makes it wrong). Never resolve a thread silently.
+   - Unsure → ask the contributor.
+
+   Reply with `gh api repos/JabRef/jabref/pulls/<number>/comments/<id>/replies -f body="..."`.
+   Every Qodo thread needs a reply from the PR author: the `status: changes-required` label stays until each active thread has one.
+4. Qodo reviews every push again. Repeat steps 2–3 until no thread is unanswered.
+
+### Marking AI-generated text
+
+Every text an agent writes that is posted to GitHub — PR descriptions, PR comments, review-thread replies, issue comments — must be visibly marked as AI-generated. Start it with the line
+
+```text
+🤖 Generated with <tool name>
+```
+
+for example `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. In a PR body, put the marker at the top of the "PR Description" section. A human who rewrites the text afterwards removes the marker. Commit messages are covered by the `Co-Authored-By:` trailer the tool adds.
 
 ---
 
