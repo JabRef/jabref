@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
@@ -31,7 +32,9 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,6 +87,27 @@ class ThemeManagerTest {
         assertEquals(List.of(
                 ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation(),
                 ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation()), scene.getStylesheets());
+    }
+
+    @Test
+    void customThemeChangesFromBackgroundThreadAreAppliedOnJavaFxThread() throws IOException, InterruptedException {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
+        AtomicBoolean listenerAddedOnJavaFxThread = new AtomicBoolean();
+        doAnswer(_ -> {
+            listenerAddedOnJavaFxThread.set(Platform.isFxApplicationThread());
+            return null;
+        }).when(fileUpdateMonitor).addListenerForFile(any(), any());
+
+        createThemeManager(workspacePreferences, fileUpdateMonitor);
+
+        workspacePreferences.setCustomTheme(StyleSheet.create(tempFolder.resolve("custom.css").toString()));
+
+        CountDownLatch updateFinished = new CountDownLatch(1);
+        Platform.runLater(updateFinished::countDown);
+
+        assertTrue(updateFinished.await(10, TimeUnit.SECONDS), "Custom theme update timed out");
+        assertTrue(listenerAddedOnJavaFxThread.get());
     }
 
     @Test

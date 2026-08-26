@@ -53,9 +53,9 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    private final FileUpdateListener baseCssLiveUpdate = this::baseCssLiveUpdate;
-    private final FileUpdateListener cssLiveUpdate = this::cssLiveUpdate;
-    private final FileUpdateListener customCssLiveUpdate = this::customCssLiveUpdate;
+    private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
+    private @Nullable FileUpdateListener themeCssLiveUpdate;
+    private @Nullable FileUpdateListener customCssLiveUpdate;
 
     private ThemePreset theme = ThemePreset.JABREF;
     private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
@@ -158,14 +158,22 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
+        if (!Platform.isFxApplicationThread()) {
+            UiTaskExecutor.runInJavaFXThread(this::updateThemeSettings);
+            return;
+        }
+
         ThemePreset newTheme = Optional.ofNullable(workspacePreferences.getTheme()).orElse(ThemePreset.JABREF);
 
         boolean cssChanged = false;
         if (theme != newTheme) {
-            if (theme != null) {
-                removeStylesheetFromWatchList(theme.getStyleSheet(), cssLiveUpdate);
+            if (themeCssLiveUpdate != null) {
+                removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
             }
-            addStylesheetToWatchlist(newTheme.getStyleSheet(), cssLiveUpdate);
+
+            StyleSheet newThemeStyleSheet = newTheme.getStyleSheet();
+            themeCssLiveUpdate = () -> cssLiveUpdate(newThemeStyleSheet);
+            addStylesheetToWatchlist(newThemeStyleSheet, themeCssLiveUpdate);
 
             cssChanged = true;
             theme = newTheme;
@@ -184,11 +192,14 @@ public class ThemeManager {
 
         StyleSheet newCustomTheme = workspacePreferences.getCustomTheme().orElse(null);
         if (!Objects.equals(customTheme, newCustomTheme)) {
-            if (customTheme != null) {
+            if (customTheme != null && customCssLiveUpdate != null) {
                 removeStylesheetFromWatchList(customTheme, customCssLiveUpdate);
             }
             if (newCustomTheme != null) {
+                customCssLiveUpdate = () -> cssLiveUpdate(newCustomTheme);
                 addStylesheetToWatchlist(newCustomTheme, customCssLiveUpdate);
+            } else {
+                customCssLiveUpdate = null;
             }
 
             customTheme = newCustomTheme;
@@ -204,6 +215,11 @@ public class ThemeManager {
     }
 
     private void updateFontSettings() {
+        if (!Platform.isFxApplicationThread()) {
+            UiTaskExecutor.runInJavaFXThread(this::updateFontSettings);
+            return;
+        }
+
         updateFontOnAllScenes();
     }
 
@@ -229,24 +245,9 @@ public class ThemeManager {
         }
     }
 
-    private void baseCssLiveUpdate() {
-        JABREF_BASE_STYLE_SHEET.reload();
-        LOGGER.debug("Updating base CSS for all scenes");
-        UiTaskExecutor.runInJavaFXThread(this::updateCssOnAllScenes);
-    }
-
-    private void cssLiveUpdate() {
-        theme.getStyleSheet().reload();
-        LOGGER.debug("Updating theme CSS for all scenes");
-        UiTaskExecutor.runInJavaFXThread(this::updateCssOnAllScenes);
-    }
-
-    private void customCssLiveUpdate() {
-        if (customTheme == null) {
-            return;
-        }
-        customTheme.reload();
-        LOGGER.debug("Updating custom CSS for all scenes");
+    private void cssLiveUpdate(StyleSheet styleSheet) {
+        styleSheet.reload();
+        LOGGER.debug("Updating CSS for all scenes");
         UiTaskExecutor.runInJavaFXThread(this::updateCssOnAllScenes);
     }
 
