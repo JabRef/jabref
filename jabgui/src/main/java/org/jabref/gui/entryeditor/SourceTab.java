@@ -186,13 +186,13 @@ public class SourceTab extends EntryEditorTab {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
+                        getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }

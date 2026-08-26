@@ -112,6 +112,29 @@ class SourceTabTest {
     }
 
     @Test
+    void replacingLongSourceWithShortSourceDoesNotThrowException(FxRobot robot) {
+        BibEntry longEntry = new BibEntry()
+                .withField(new UnknownField("author"), "Author")
+                .withField(new UnknownField("title"), "Title")
+                .withField(new UnknownField("year"), "2026")
+                .withField(new UnknownField("publisher"), "Publisher");
+        BibEntry shortEntry = new BibEntry().withField(new UnknownField("title"), "Short title");
+
+        robot.interact(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(longEntry);
+            sourceTab.notifyAboutFocus(longEntry);
+        });
+        robot.interrupt(100);
+
+        robot.interact(() -> {
+            sourceTab.currentEntryProperty().set(shortEntry);
+            sourceTab.notifyAboutFocus(shortEntry);
+        });
+        robot.interrupt(100);
+    }
+
+    @Test
     void updatingPreviouslyBoundEntryDoesNotResetCurrentSource(FxRobot robot) {
         BibEntry firstEntry = new BibEntry().withField(new UnknownField("title"), "First entry");
         BibEntry secondEntry = new BibEntry().withField(new UnknownField("title"), "Second entry");
