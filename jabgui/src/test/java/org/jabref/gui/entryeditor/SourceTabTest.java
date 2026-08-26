@@ -138,7 +138,7 @@ class SourceTabTest {
         robot.interrupt(100);
 
         robot.interact(() -> {
-          CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
             assertEquals(shortEntry.getStringRepresentation(shortEntry, BibDatabaseMode.BIBLATEX, entryTypesManager, fieldPreferences),
                     sourceArea.getText());
         });
