@@ -31,4 +31,12 @@ The function `Quality -> Automatically set file links` can help user to auto-lin
 
 Needs: impl, utest
 
+## Searching unlinked files must not block result scrolling
+`req~jabgui.externalfiles.unlinked-files.search.non-blocking-results~1`
+
+When searching for unlinked local files, related entries must be resolved before displaying the results.
+Rendering or scrolling the result tree must not perform file-system searches.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
