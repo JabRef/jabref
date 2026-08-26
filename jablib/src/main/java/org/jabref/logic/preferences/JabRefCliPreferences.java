@@ -2592,8 +2592,8 @@ public class JabRefCliPreferences implements CliPreferences {
                     return BstStyle.createInternal(currentStylePath);
                 }
                 // External BST style (absolute filesystem path)
-                java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
-                if (java.nio.file.Files.exists(bstPath)) {
+                Path bstPath = Path.of(currentStylePath);
+                if (Files.exists(bstPath)) {
                     return BstStyle.loadExternal(bstPath);
                 }
                 LOGGER.warn("BST style file not found: {}", currentStylePath);
