@@ -18,6 +18,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
@@ -44,6 +45,8 @@ class SourceTabTest {
     private CodeArea area;
     private TabPane pane;
     private SourceTab sourceTab;
+    private FieldPreferences fieldPreferences;
+    private BibEntryTypesManager entryTypesManager;
 
     @Start
     public void onStart(Stage stage) {
@@ -56,8 +59,9 @@ class SourceTabTest {
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        entryTypesManager = mock(BibEntryTypesManager.class);
 
         sourceTab = new SourceTab(
                 new UndoManager(),
@@ -65,7 +69,7 @@ class SourceTabTest {
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),
                 mock(DialogService.class),
-                mock(BibEntryTypesManager.class),
+                entryTypesManager,
                 keyBindingRepository,
                 stateManager,
                 new BibTeXSyntaxHighlighter()
@@ -132,6 +136,13 @@ class SourceTabTest {
             sourceTab.notifyAboutFocus(shortEntry);
         });
         robot.interrupt(100);
+
+        robot.interact(() -> {
+            jfx.incubator.scene.control.richtext.CodeArea sourceArea =
+                    (jfx.incubator.scene.control.richtext.CodeArea) sourceTab.getContent();
+            assertEquals(shortEntry.getStringRepresentation(shortEntry, BibDatabaseMode.BIBLATEX, entryTypesManager, fieldPreferences),
+                    sourceArea.getText());
+        });
     }
 
     @Test
