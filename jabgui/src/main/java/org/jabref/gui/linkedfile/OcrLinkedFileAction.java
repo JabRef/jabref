@@ -130,14 +130,10 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
         StringBuilder message = new StringBuilder(reasonMessage)
                 .append("\n\n")
-                .append(Localization.lang("Command"))
-                .append(": ")
-                .append(failure.commandLine());
+                .append(Localization.lang("Command: %0", failure.commandLine()));
         if (!failure.output().isEmpty()) {
             message.append("\n\n")
-                   .append(Localization.lang("Output"))
-                   .append(":\n")
-                   .append(failure.output());
+                   .append(Localization.lang("Output: %0", "\n" + failure.output()));
         }
         return message.toString();
     }
