@@ -93,6 +93,7 @@ Needs: impl
 `req~entry-editor.source-tab.atomic-replacement~1`
 
 When changing the selected entry, the Source tab replaces its full document in one operation so transient model states cannot prevent the newly selected entry's source from being displayed.
+While a new selection is still settling, saving or leaving the Source tab writes the visible source back to the entry it was rendered from, not the newly selected one.
 
 Needs: impl
 

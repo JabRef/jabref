@@ -97,7 +97,7 @@ class BibTeXHighlighterTest {
 
         when(model.size()).thenReturn(1);
         when(model.getPlainText(0)).thenReturn("");
-        when(model.getPlainText(4)).thenReturn("");
+        when(model.getPlainText(4)).thenThrow(new AssertionError("Stale paragraph access should be guarded"));
         when(syntaxHighlighter.computeHighlightRegions("")).thenReturn(List.of());
         highlighter.handleChange(model, null, null, 0, 0, 0);
 
