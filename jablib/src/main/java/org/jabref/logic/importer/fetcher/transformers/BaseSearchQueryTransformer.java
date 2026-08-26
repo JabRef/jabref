@@ -36,7 +36,12 @@ public class BaseSearchQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYear(String yearRange) {
+    protected String handleYear(String year) {
+        return createKeyValuePair("dcyear", year);
+    }
+
+    @Override
+    protected String handleYearRange(String yearRange) {
         String result = super.handleYearRange(yearRange);
         if (result.isEmpty()) {
             return result;
