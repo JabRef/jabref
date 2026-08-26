@@ -244,7 +244,10 @@ public class CSLCitationOOAdapter {
     }
 
     private void sortBibliographyEntriesByPreferredCitationNumbers(List<BibEntry> bibliographyEntries, Map<String, Integer> citationKeyToNumber) {
-        bibliographyEntries.sort(Comparator.comparingInt(entry -> citationKeyToNumber.getOrDefault(entry.getCitationKey().orElse(""), Integer.MAX_VALUE)));
+        bibliographyEntries.sort(Comparator.comparingInt(entry -> {
+            String citationKey = entry.getCitationKey().orElse("");
+            return citationKeyToNumber.getOrDefault(citationKey, markManager.getCitationNumber(citationKey));
+        }));
     }
 
     /// Writes bibliography entries using JabRef's standard CSL bibliography rendering.
