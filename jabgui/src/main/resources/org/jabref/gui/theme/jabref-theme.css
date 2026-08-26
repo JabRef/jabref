@@ -10,7 +10,7 @@
 */
 
 @media (prefers-color-scheme: light) {
-    * {
+    .root {
         /* Surfaces, from the window canvas outwards to the raised chrome */
         -color-bg-primary: #F3F3F3;
         -color-bg-secondary: #FEFEFE;
@@ -102,7 +102,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-    * {
+    .root {
         /* Surfaces, from the window canvas outwards to the raised chrome */
         -color-bg-primary: #000000;
         -color-bg-secondary: #272B38;
