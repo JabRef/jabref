@@ -22,9 +22,11 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     public static final String FETCHER_NAME = "Bielefeld Academic Search Engine";
@@ -54,6 +56,8 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        RATE_LIMITER.acquire(FETCHER_NAME);
+
         BaseSearchQueryTransformer transformer = new BaseSearchQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
 
@@ -85,11 +89,14 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
             }
 
             List<BibEntry> entries = new ArrayList<>();
-            JSONObject result = jsonObject.optJSONObject("response").optJSONObject("result");
+            JSONObject responseObject = jsonObject.optJSONObject("response");
+            JSONObject result = (responseObject != null) ? responseObject.optJSONObject("result") : null;
             if (result != null) {
                 JSONArray docs = result.optJSONArray("docs");
-                for (int i = 0; i < docs.length(); i++) {
-                    entries.add(parseEntry(docs.getJSONObject(i)));
+                if (docs != null) {
+                    for (int i = 0; i < docs.length(); i++) {
+                        entries.add(parseEntry(docs.getJSONObject(i)));
+                    }
                 }
             }
             return entries;
@@ -133,19 +140,14 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
         }
         String code = typeNorm.getString(0);
 
-        if (code.startsWith("18")) {
-            return StandardEntryType.PhdThesis;
-        } else if (code.startsWith("13")) {
-            return StandardEntryType.InProceedings;
-        } else if (code.startsWith("14")) {
-            return StandardEntryType.TechReport;
-        } else if (code.startsWith("11")) {
-            return StandardEntryType.Book;
-        } else if (code.startsWith("121")) {
-            return StandardEntryType.Article;
-        } else {
-            return StandardEntryType.Misc;
-        }
+        return switch (code) {
+            case String c when c.startsWith("18") -> StandardEntryType.PhdThesis;
+            case String c when c.startsWith("13") -> StandardEntryType.InProceedings;
+            case String c when c.startsWith("14") -> StandardEntryType.TechReport;
+            case String c when c.startsWith("121") -> StandardEntryType.Article;
+            case String c when c.startsWith("11") -> StandardEntryType.Book;
+            default -> StandardEntryType.Misc;
+        };
     }
 
     @Override
