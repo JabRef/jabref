@@ -3,8 +3,10 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleListProperty;
@@ -12,15 +14,25 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +41,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class UnlinkedFilesDialogViewModelTest {
@@ -127,5 +142,53 @@ public class UnlinkedFilesDialogViewModelTest {
                 fileList,
                 "fileList should contain exactly the relative paths of file1.pdf and file2.txt"
         );
+    }
+
+    /// Library with 100 entries whose citation keys match 100 unlinked PDFs.
+    /// Resolving the related entries of every listed file must not take a directory walk per (file, entry) pair.
+    @Test
+    void relatedEntriesForHundredUnlinkedFiles(@TempDir Path directory) throws IOException {
+        BibDatabaseContext databaseContext = spy(new BibDatabaseContext());
+        databaseContext.setDatabasePath(directory.resolve("library.bib"));
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            String key = "author%03d".formatted(i);
+            BibEntry entry = new BibEntry(StandardEntryType.Article)
+                    .withCitationKey(key)
+                    .withField(StandardField.AUTHOR, key)
+                    .withField(StandardField.TITLE, "Title " + i);
+            entries.add(entry);
+            Files.createFile(directory.resolve(key + ".pdf"));
+        }
+        databaseContext.getDatabase().insertEntries(entries);
+
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(guiPreferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(guiPreferences.getAutoLinkPreferences())
+                .thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
+        FilePreferences filePreferences = guiPreferences.getFilePreferences();
+        when(filePreferences.getUserAndHost()).thenReturn("user-host");
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(directory));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+
+        viewModel = new UnlinkedFilesDialogViewModel(null, null, null, guiPreferences, stateManager, new CurrentThreadTaskExecutor());
+        viewModel.directoryPathProperty().set(directory.toString());
+        viewModel.selectedExtensionProperty().set(new FileExtensionViewModel(StandardFileType.PDF, externalApplicationsPreferences));
+        viewModel.selectedDateProperty().set(DateRange.ALL_TIME);
+        viewModel.selectedSortProperty().set(ExternalFileSorter.DEFAULT);
+
+        viewModel.startSearch();
+        assertEquals(100, viewModel.treeRootProperty().get().orElseThrow().getFileCount());
+
+        // Rendering the file tree asks for the related entries of each listed file (repeatedly, on the FX thread);
+        // that must be answered from the search result without scanning the library and its file directories again
+        clearInvocations(databaseContext);
+        for (BibEntry entry : entries) {
+            Path pdf = directory.resolve(entry.getCitationKey().orElseThrow() + ".pdf");
+            assertEquals(List.of(entry), viewModel.getRelatedEntriesForFiles(pdf));
+        }
+        verifyNoInteractions(databaseContext);
     }
 }

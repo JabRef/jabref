@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +59,7 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ImportHandler importHandler;
     private final Map<Path, BibEntry> fileToSelectedEntryMap = new HashMap<>();
+    private Map<Path, List<BibEntry>> relatedEntriesByFile = Map.of();
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
@@ -132,6 +132,10 @@ public class UnlinkedFilesDialogViewModel {
         progressTextProperty.unbind();
 
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
+                .thenRun(treeRoot -> {
+                    relatedEntriesByFile = findRelatedEntriesByFile();
+                    return treeRoot;
+                })
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
@@ -327,32 +331,33 @@ public class UnlinkedFilesDialogViewModel {
         return checkedFileListProperty;
     }
 
-    /// This method retrieves a list of BibEntry objects that are related to the given file path.
-    /// It checks for associated files that are not yet linked to any entry in the database
-    /// and returns the entries that have such associated files.
+    /// Entries whose citation key (or a broken file link) matches the given unlinked file, as computed by the last search.
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
-        List<BibEntry> relatedEntriesList = new ArrayList<>();
-        List<BibEntry> allEntries = bibDatabase.getDatabase().getEntries();
+        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(filePath.toAbsolutePath().normalize(), List.of()));
+    }
 
+    /// Every entry lookup walks the complete file directory tree, so this is computed once per search in the background.
+    /// Doing it per rendered tree cell (entries x files directory walks on the FX thread) froze the dialog for larger libraries.
+    Map<Path, List<BibEntry>> findRelatedEntriesByFile() {
+        List<Path> directories = bibDatabase.getFileDirectories(preferences.getFilePreferences());
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 bibDatabase,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
 
-        for (BibEntry entry : allEntries) {
+        Map<Path, List<BibEntry>> result = new HashMap<>();
+        for (BibEntry entry : bibDatabase.getDatabase().getEntries()) {
             try {
-                Collection<LinkedFile> associatedFiles = util.findAssociatedNotLinkedFiles(entry);
-
-                if (associatedFiles.stream().anyMatch(linkedFile -> linkedFile.findIn(List.of(filePath)).isPresent())) {
-                    relatedEntriesList.add(entry);
+                for (LinkedFile associatedFile : util.findAssociatedNotLinkedFiles(entry)) {
+                    associatedFile.findIn(directories)
+                                  .map(path -> path.toAbsolutePath().normalize())
+                                  .ifPresent(path -> result.computeIfAbsent(path, _ -> new ArrayList<>()).add(entry));
                 }
             } catch (IOException e) {
                 LOGGER.warn("Error finding associated files for entry {}", entry.getCitationKey(), e);
             }
         }
-
-        LOGGER.debug("Found {} related entries for file {}", relatedEntriesList.size(), filePath);
-        return FXCollections.observableArrayList(relatedEntriesList);
+        return result;
     }
 }
