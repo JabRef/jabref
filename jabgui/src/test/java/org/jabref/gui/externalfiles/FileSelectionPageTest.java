@@ -30,6 +30,8 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,12 +79,12 @@ class FileSelectionPageTest {
                                 .filter(button -> button.getText().equals(Localization.lang("Show PDF preview")))
                                 .findFirst()
                                 .orElseThrow();
-        assertEquals(true, showButton.isVisible());
+        assertTrue(showButton.isVisible());
 
         robot.interact(showButton::fire);
 
         assertEquals(1, previewPanes());
-        assertEquals(false, showButton.isVisible());
+        assertFalse(showButton.isVisible());
     }
 
     private Button findButtonWithTooltip(String tooltipText) {
