@@ -75,8 +75,7 @@ public class BSTCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception, MissingStyleDefinedCitationLabelException {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
-            case NUMERIC,
-                 NUMERIC_STYLE_ORDER ->
+            case NUMERIC ->
                     buildNumericCitation(entries);
             case AUTHOR_YEAR ->
                     buildAuthorYearCitation(entries, ctx);
@@ -92,13 +91,14 @@ public class BSTCitationOOAdapter {
                 !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
                 !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
                 CSLCitationType.NORMAL);
-        markManager.setRealTimeNumberUpdateRequired(
-                openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC);
+        boolean useStyleDefinedNumericOrder = openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC
+                && currentStyleUsesStyleDefinedNumericOrder();
+        markManager.setRealTimeNumberUpdateRequired(openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC && !useStyleDefinedNumericOrder);
         markManager.readAndUpdateExistingMarks();
         if (openOfficePreferences.getBstCitationFormat() == BstCitationFormat.STYLE_DEFINED) {
             updateStyleDefinedCitationTexts(ctx.getDatabase());
-        } else if (openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC_STYLE_ORDER) {
-            updateNumericStyleOrderCitationTexts(ctx.getDatabase());
+        } else if (useStyleDefinedNumericOrder) {
+            updateNumericCitationTexts(ctx.getDatabase());
         } else {
             invalidateStyleDefinedLabels();
         }
@@ -124,34 +124,32 @@ public class BSTCitationOOAdapter {
                 openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, titleBreak);
 
-        BstVM bstVM;
-        try {
-            bstVM = style.createBstVM();
-        } catch (IOException e) {
-            LOGGER.warn("Could not load BST style: {}", style.getPath(), e);
-            throw e;
-        }
+        BstVM bstVM = style.createBstVM();
         BstEntryRenderer renderer = new BstEntryRenderer(bstVM);
 
         BstCitationFormat citationFormat = openOfficePreferences.getBstCitationFormat();
-        boolean useNumericBibliographyOrder = citationFormat == BstCitationFormat.NUMERIC;
-        boolean useStyleOrderedNumericBibliography = citationFormat == BstCitationFormat.NUMERIC_STYLE_ORDER;
+        boolean useNumericBibliography = citationFormat == BstCitationFormat.NUMERIC;
         boolean useStyleDefinedBibliographyLabels = citationFormat == BstCitationFormat.STYLE_DEFINED;
+        boolean useStyleDefinedNumericOrder = useNumericBibliography && bstVM.hasSortCommand();
 
         List<BibEntry> sorted = new ArrayList<>(entries);
         BibDatabase database = ctx.getDatabase();
         StyleOrderAndLabels styleOrderAndLabels = new StyleOrderAndLabels(Map.of(), Map.of());
+        List<BibEntry> entriesForStyleOrder = getCitedEntriesIncluding(List.of(), database);
+        if (entriesForStyleOrder.isEmpty()) {
+            entriesForStyleOrder = new ArrayList<>(entries);
+        }
 
-        if (useNumericBibliographyOrder) {
-            sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
-        } else {
-            styleOrderAndLabels = computeStyleOrderAndLabels(bstVM, sorted, database);
+        if (useStyleDefinedNumericOrder || useStyleDefinedBibliographyLabels || citationFormat == BstCitationFormat.AUTHOR_YEAR) {
+            styleOrderAndLabels = computeStyleOrderAndLabels(bstVM, entriesForStyleOrder, database);
             identifierToLabelMap = new LinkedHashMap<>(styleOrderAndLabels.identifierToLabelMap());
             Map<String, Integer> identifierToNumberMap = styleOrderAndLabels.identifierToNumberMap();
-            if (useStyleOrderedNumericBibliography) {
+            if (useStyleDefinedNumericOrder) {
                 markManager.updateAllCitationNumbers(identifierToNumberMap);
             }
             sorted.sort(Comparator.comparingInt(entry -> identifierToNumberMap.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
+        } else if (useNumericBibliography) {
+            sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
         }
 
         for (BibEntry entry : sorted) {
@@ -165,11 +163,10 @@ public class BSTCitationOOAdapter {
             String body = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
             String finalLine;
-            if (useNumericBibliographyOrder) {
-                int number = markManager.getCitationNumber(identifier);
-                finalLine = "[" + number + "] " + body;
-            } else if (useStyleOrderedNumericBibliography) {
-                int number = styleOrderAndLabels.identifierToNumberMap().getOrDefault(identifier, markManager.getCitationNumber(identifier));
+            if (useNumericBibliography) {
+                int number = useStyleDefinedNumericOrder
+                             ? styleOrderAndLabels.identifierToNumberMap().getOrDefault(identifier, markManager.getCitationNumber(identifier))
+                             : markManager.getCitationNumber(identifier);
                 finalLine = "[" + number + "] " + body;
             } else if (useStyleDefinedBibliographyLabels) {
                 String label = getStyleDefinedLabelOrThrow(identifier, identifierToLabelMap);
@@ -231,18 +228,25 @@ public class BSTCitationOOAdapter {
         return joiner.toString();
     }
 
-    private void updateNumericStyleOrderCitationTexts(BibDatabase database)
+    private void updateNumericCitationTexts(BibDatabase database)
             throws CreationException, com.sun.star.uno.Exception {
         if (!(openOfficePreferences.getCurrentStyle() instanceof BstStyle style)) {
             return;
         }
 
-        try {
-            StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), getCitedEntriesIncluding(List.of(), database), database);
-            markManager.updateAllCitationNumbers(styleOrderAndLabels.identifierToNumberMap());
-        } catch (IOException e) {
-            LOGGER.warn("Could not compute BST numeric style order for {}", style.getPath(), e);
+        if (!style.hasSortCommand()) {
+            return;
         }
+        StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), getCitedEntriesIncluding(List.of(), database), database);
+        markManager.updateAllCitationNumbers(styleOrderAndLabels.identifierToNumberMap());
+    }
+
+    private boolean currentStyleUsesStyleDefinedNumericOrder() {
+        if (!(openOfficePreferences.getCurrentStyle() instanceof BstStyle style)) {
+            return false;
+        }
+
+        return style.hasSortCommand();
     }
 
     private String buildStyleDefinedCitation(List<BibEntry> entries, BibDatabaseContext ctx) throws MissingStyleDefinedCitationLabelException {
@@ -265,13 +269,8 @@ public class BSTCitationOOAdapter {
             return;
         }
 
-        try {
-            StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), entries, database);
-            identifierToLabelMap = new LinkedHashMap<>(styleOrderAndLabels.identifierToLabelMap());
-        } catch (IOException e) {
-            LOGGER.warn("Could not compute BST style-defined citation labels for {}", style.getPath(), e);
-            identifierToLabelMap = Map.of();
-        }
+        StyleOrderAndLabels styleOrderAndLabels = computeStyleOrderAndLabels(style.createBstVM(), entries, database);
+        identifierToLabelMap = new LinkedHashMap<>(styleOrderAndLabels.identifierToLabelMap());
     }
 
     private List<BibEntry> getCitedEntriesIncluding(List<BibEntry> entries, BibDatabase database) {

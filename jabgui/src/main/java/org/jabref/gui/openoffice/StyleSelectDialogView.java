@@ -94,7 +94,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private Button addJStyleButton;
     @FXML private Button addBstStyleButton;
     @FXML private RadioButton numericFormatButton;
-    @FXML private RadioButton numericStyleOrderFormatButton;
     @FXML private RadioButton authorYearFormatButton;
     @FXML private RadioButton styleDefinedFormatButton;
     @FXML private VBox bstPreviewBox;
@@ -400,24 +399,17 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         // Citation format radio buttons
         ToggleGroup formatGroup = new ToggleGroup();
         numericFormatButton.setToggleGroup(formatGroup);
-        numericStyleOrderFormatButton.setToggleGroup(formatGroup);
         authorYearFormatButton.setToggleGroup(formatGroup);
         styleDefinedFormatButton.setToggleGroup(formatGroup);
 
         BstCitationFormat currentFormat = viewModel.bstCitationFormatProperty().get();
         numericFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC);
-        numericStyleOrderFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC_STYLE_ORDER);
         authorYearFormatButton.setSelected(currentFormat == BstCitationFormat.AUTHOR_YEAR);
         styleDefinedFormatButton.setSelected(currentFormat == BstCitationFormat.STYLE_DEFINED);
 
         numericFormatButton.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
                 viewModel.bstCitationFormatProperty().set(BstCitationFormat.NUMERIC);
-            }
-        });
-        numericStyleOrderFormatButton.selectedProperty().addListener((_, _, selected) -> {
-            if (selected) {
-                viewModel.bstCitationFormatProperty().set(BstCitationFormat.NUMERIC_STYLE_ORDER);
             }
         });
         authorYearFormatButton.selectedProperty().addListener((_, _, selected) -> {

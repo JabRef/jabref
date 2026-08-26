@@ -88,6 +88,23 @@ public class BstVM {
         return render(bibEntries, new BibDatabase(bibEntries));
     }
 
+    public boolean hasSortCommand() {
+        return containsSortCommand(tree);
+    }
+
+    private boolean containsSortCommand(ParseTree parseTree) {
+        if (parseTree instanceof BstParser.SortCommandContext) {
+            return true;
+        }
+
+        for (int i = 0; i < parseTree.getChildCount(); i++) {
+            if (containsSortCommand(parseTree.getChild(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @VisibleForTesting
     BstVMContext getContext() {
         if (latestContext != null) {

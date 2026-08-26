@@ -2586,16 +2586,20 @@ public class JabRefCliPreferences implements CliPreferences {
             return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                 .orElse(CSLStyleLoader.getDefaultStyle());
         } else if (currentStylePath.endsWith(".bst")) {
-            // Internal BST style (classpath resource path starting with /resource/openoffice/)
-            if (currentStylePath.startsWith("/")) {
-                return BstStyle.createInternal(currentStylePath);
+            try {
+                // Internal BST style (classpath resource path starting with /resource/openoffice/)
+                if (currentStylePath.startsWith("/")) {
+                    return BstStyle.createInternal(currentStylePath);
+                }
+                // External BST style (absolute filesystem path)
+                java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
+                if (java.nio.file.Files.exists(bstPath)) {
+                    return BstStyle.loadExternal(bstPath);
+                }
+                LOGGER.warn("BST style file not found: {}", currentStylePath);
+            } catch (IOException e) {
+                LOGGER.warn("Could not load BST style: {}", currentStylePath, e);
             }
-            // External BST style (absolute filesystem path)
-            java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
-            if (java.nio.file.Files.exists(bstPath)) {
-                return new BstStyle(bstPath);
-            }
-            LOGGER.warn("BST style file not found: {}", currentStylePath);
         } else if (journalAbbreviationRepository != null) {
             try {
                 return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);

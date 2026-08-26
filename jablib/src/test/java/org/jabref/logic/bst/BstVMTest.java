@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BstVMTest {
@@ -34,6 +35,7 @@ public class BstVMTest {
     @Test
     void abbrv() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        assertTrue(vm.hasSortCommand());
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -47,6 +49,7 @@ public class BstVMTest {
     @Test
     void ieeetran() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("IEEEtran.bst").toURI()));
+        assertFalse(vm.hasSortCommand());
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = """
