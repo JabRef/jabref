@@ -101,7 +101,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         HBox columns = new HBox(GAP, buildTabsColumn(), buildFieldsColumn());
         VBox.setVgrow(columns, Priority.ALWAYS);
 
-        Button classicTabsButton = new Button(Localization.lang("Add classic tabs"));
+        Button classicTabsButton = new Button(Localization.lang("Add classic 5.x tabs"));
         classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\" and \"Abstract\" known from JabRef 5.")));
         classicTabsButton.setOnAction(_ -> viewModel.addClassicTabs());
 

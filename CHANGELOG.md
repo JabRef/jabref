@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added a button "Add classic tabs" to the entry editor preferences, which adds the tabs "General" and "Abstract" known from JabRef 5. [#16672](https://github.com/JabRef/jabref/pull/16672)
+- We added a button "Add classic 5.x tabs" to the entry editor preferences, which adds the tabs "General" and "Abstract" known from JabRef 5. [#16672](https://github.com/JabRef/jabref/pull/16672)
 - The remote instance listener now answers the plain-text health check `JABREF/1 PING` with `JABREF/1 PONG jabref`, so external tools (e.g. browser extensions) can detect a running JabRef without speaking the Java serialization protocol. [#16654](https://github.com/JabRef/jabref/pull/16654)
 - We added some missing tooltips to buttons such as "Export Cited" and "Bibliography properties" in the OpenOffice/LibreOffice panel. [#16492](https://github.com/JabRef/jabref/pull/16492)
 - We added support for the `Export cited` functionality with CSL and BST styles in the OpenOffice/LibreOffice integration. [#16491](https://github.com/JabRef/jabref/issues/16491)
