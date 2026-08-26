@@ -135,7 +135,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -254,7 +254,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -603,7 +603,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: 'corretto'
