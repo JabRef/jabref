@@ -120,6 +120,13 @@ class BSTCitationOOAdapterTest {
     }
 
     @Test
+    void buildNumericCitationText_sortsNumbersAscending() {
+        assertEquals("[1, 3, 7]", BSTCitationOOAdapter.buildNumericCitationText(
+                List.of("gamma", "alpha", "beta"),
+                Map.of("alpha", 1, "beta", 7, "gamma", 3)));
+    }
+
+    @Test
     void computeStyleOrderAndLabels_extractsStyleDefinedLabels() {
         String renderedBibliography = """
                 \\begin{thebibliography}{}
