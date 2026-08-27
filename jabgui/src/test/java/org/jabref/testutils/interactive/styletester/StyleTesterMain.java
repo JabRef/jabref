@@ -4,13 +4,15 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.util.HeadlessExecutorService;
 
-/// Useful for checking the display of different controls. Not needed inside of JabRef.
+/// Useful for checking the display of different controls. Not needed inside JabRef.
 public class StyleTesterMain extends Application {
 
     static void main(String[] args) {
@@ -19,16 +21,18 @@ public class StyleTesterMain extends Application {
 
     @Override
     public void start(Stage stage) throws JabRefException {
-        StyleTesterView view = new StyleTesterView();
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
-        ThemeManager themeManager = new ThemeManager(
-                JabRefGuiPreferences.getInstance().getWorkspacePreferences(),
-                fileUpdateMonitor
-        );
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor);
+
+        DialogService dialogService = new JabRefDialogService(stage);
+
+        StyleTesterView view = new StyleTesterView(workspacePreferences, dialogService);
 
         Scene scene = new Scene(view.getContent());
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
+
         stage.setScene(scene);
         stage.show();
     }

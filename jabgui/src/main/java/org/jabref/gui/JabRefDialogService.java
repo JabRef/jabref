@@ -423,7 +423,7 @@ public class JabRefDialogService implements DialogService {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
         EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
         taskProgressView.setRetainTasks(false);
-        taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
+        taskProgressView.setGraphicFactory(task -> ThemeManager.downloadIconTitleMap.getOrDefault(task.getTitle(), null));
 
         Label message = new Label(content);
 
