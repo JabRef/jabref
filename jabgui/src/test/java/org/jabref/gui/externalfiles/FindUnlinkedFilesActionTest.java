@@ -42,7 +42,7 @@ class FindUnlinkedFilesActionTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         stateManager = new JabRefGuiStateManager();
-        action = new FindUnlinkedFilesAction(dialogService, stateManager);
+        action = new FindUnlinkedFilesAction(stateManager);
     }
 
     @Test
