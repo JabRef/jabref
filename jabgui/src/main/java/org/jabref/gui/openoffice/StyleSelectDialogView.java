@@ -333,10 +333,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
+            // FIXME: Inline style should be removed eventually.
             bstPandocWarning.setStyle(PANDOC_WARNING_LABEL_STYLE);
         } else {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path: %0", pandocPath));
+            // FIXME: Inline style should be removed eventually.
             bstPandocWarning.setStyle("");
         }
 
