@@ -695,7 +695,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             return;
         }
 
-        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
+        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(stateManager);
         findUnlinkedFilesAction.execute();
     }
 }
