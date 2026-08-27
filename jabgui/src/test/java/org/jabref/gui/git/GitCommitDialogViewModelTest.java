@@ -14,9 +14,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.jspecify.annotations.NullMarked;
-
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -64,7 +63,6 @@ class GitCommitDialogViewModelTest {
 
         try (MockedStatic<GitHandler> gitHandlerStatic = Mockito.mockStatic(GitHandler.class);
              MockedStatic<GitStatusChecker> statusCheckerStatic = Mockito.mockStatic(GitStatusChecker.class)) {
-
             gitHandlerStatic.when(() -> GitHandler.findRepositoryRoot(libraryPath))
                             .thenReturn(Optional.of(repositoryPath));
 
@@ -77,7 +75,7 @@ class GitCommitDialogViewModelTest {
             when(gitHandler.createCommitOnCurrentBranch(any(), any(boolean.class)))
                     .thenThrow(new JGitInternalException("Cannot lock Git index"));
 
-            viewModel.commit(() -> {});
+            viewModel.commit(() -> { });
 
             verify(dialogService).showErrorDialogAndWait(
                     Localization.lang("Git Commit Failed"),

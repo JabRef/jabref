@@ -17,7 +17,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -70,7 +69,6 @@ class GitPullActionTest {
                      Mockito.mockStatic(GitSyncService.class);
              MockedStatic<GitStatusViewModel> gitStatusViewModelStatic =
                      Mockito.mockStatic(GitStatusViewModel.class)) {
-
             gitStatusViewModelStatic.when(() -> GitStatusViewModel.fromPathAndContext(
                     stateManager,
                     taskExecutor,
