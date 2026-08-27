@@ -10,16 +10,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import com.airhacks.afterburner.injection.Injector;
 
 public class BaseDialog<T> extends Dialog<T> {
 
