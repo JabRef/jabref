@@ -2192,7 +2192,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
 
-        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) change ->
+        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) _ ->
                 putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()
                                                            .map(OcrLanguage::getCode)
                                                            .toList()));

@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -68,6 +69,18 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
     private Node buildLanguagesRow() {
         ObservableList<OcrLanguage> items = FXCollections.observableArrayList(OcrLanguage.values());
         CheckComboBox<OcrLanguage> languagesCombo = new CheckComboBox<>(items);
+
+        languagesCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(OcrLanguage lang) {
+                return lang.getDisplayName();
+            }
+
+            @Override
+            public OcrLanguage fromString(String string) {
+                return null;
+            }
+        });
 
         final boolean[] isSyncing = {false};
 

@@ -95,7 +95,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         ocrPreferences.setEngineSelection(selectedEngine.getValue());
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
         ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
-        ocrPreferences.getOcrLanguages().setAll(selectedOcrLanguages);
+        ocrPreferences.setOcrLanguages(selectedOcrLanguages);
     }
 
     public StringProperty ocrEnginePathProperty() {

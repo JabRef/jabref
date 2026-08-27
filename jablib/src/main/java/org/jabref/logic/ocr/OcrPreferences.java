@@ -64,10 +64,6 @@ public class OcrPreferences {
         this.pagesWithTextHandling.set(pagesHaveText);
     }
 
-    public static OcrPreferences getDefault() {
-        return new OcrPreferences();
-    }
-
     public ObservableList<OcrLanguage> getOcrLanguages() {
         return ocrLanguages.get();
     }
@@ -76,7 +72,11 @@ public class OcrPreferences {
         return ocrLanguages;
     }
 
-    public void setOcrLanguages(ObservableList<OcrLanguage> ocrLanguages) {
-        this.ocrLanguages.set(ocrLanguages);
+    public void setOcrLanguages(List<OcrLanguage> ocrLanguages) {
+        this.ocrLanguages.setAll(ocrLanguages);
+    }
+
+    public static OcrPreferences getDefault() {
+        return new OcrPreferences();
     }
 }
