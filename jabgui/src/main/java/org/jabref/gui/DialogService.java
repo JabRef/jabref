@@ -15,6 +15,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
@@ -230,6 +231,14 @@ public interface DialogService extends NotificationService {
     ///
     /// @return the selected file or an empty {@link Optional} if no file has been selected
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+
+    /// Shows a new file open dialog. The method doesn't return until the
+    /// displayed open dialog is dismissed.
+    ///
+    /// @param fileDialogConfiguration configuration for the file open dialog
+    /// @param owner the window that owns the file open dialog
+    /// @return the selected file or an empty {@link Optional} if no file has been selected
+    Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner);
 
     /// Shows a new file open dialog. The method doesn't return until the
     /// displayed open dialog is dismissed. The return value specifies
