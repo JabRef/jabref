@@ -52,6 +52,7 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final int BATCH_REPLACEMENT_THRESHOLD = 10;
 
     /// State attributes
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
@@ -113,6 +114,11 @@ public class BibDatabase {
 
     public ObservableList<BibEntry> getEntries() {
         return FXCollections.unmodifiableObservableList(entries);
+    }
+
+    /// Returns an immutable, stable snapshot of the current entries.
+    public synchronized List<BibEntry> getEntriesSnapshot() {
+        return List.copyOf(entries);
     }
 
     /// Returns a set of Strings, that contains all field names that are visible. This means that the fields
@@ -208,9 +214,11 @@ public class BibDatabase {
     ///
     /// @param toBeDeleted Entry to delete
     /// @param eventSource Source the event is sent from
+    // [impl->req~ux.large-library.bulk-entry-removal~1]
     public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
+        boolean useBatchReplacement = toBeDeleted.size() > BATCH_REPLACEMENT_THRESHOLD;
         Collection<String> idsToBeDeleted;
-        if (toBeDeleted.size() > 10) {
+        if (useBatchReplacement) {
             idsToBeDeleted = new HashSet<>();
         } else {
             idsToBeDeleted = new ArrayList<>(toBeDeleted.size());
@@ -225,7 +233,18 @@ public class BibDatabase {
             removeEntryFromIndex(entry);
         });
 
-        entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+        if (useBatchReplacement) {
+            List<BibEntry> entriesAfterDeletion = entries.stream()
+                                                          .filter(entry -> !idsToBeDeleted.contains(entry.getId()))
+                                                          .toList();
+            if ((entries.size() - entriesAfterDeletion.size()) > BATCH_REPLACEMENT_THRESHOLD) {
+                entries.setAll(entriesAfterDeletion);
+            } else {
+                entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+            }
+        } else {
+            entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+        }
         eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
     }
 
