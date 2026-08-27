@@ -94,7 +94,8 @@ public final class DocumentReader {
         PDFTextStripper pdfTextStripper = new PDFTextStripper() {
             @Override
             protected void operatorException(Operator operator, List<COSBase> operands, IOException e) throws IOException {
-                LOGGER.warn("Could not process page {} of linked file '{}': {}", pageNumber, fileLink, e.getMessage());
+                LOGGER.warn("Could not process page {} of linked file '{}'", pageNumber, fileLink, e);
+                super.operatorException(operator, operands, e);
             }
         };
         pdfTextStripper.setLineSeparator("\n");
