@@ -10,6 +10,7 @@ graalvmNative {
         named("main") {
             buildArgs.addAll(
                 "--no-fallback",
+                "-march=compatibility",
                 "-H:+ReportExceptionStackTraces",
                 "-H:IncludeLocales=en",
                 "--enable-all-security-services",
