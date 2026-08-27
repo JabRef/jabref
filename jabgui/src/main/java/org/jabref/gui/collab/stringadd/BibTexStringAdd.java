@@ -2,12 +2,12 @@ package org.jabref.gui.collab.stringadd;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableInsertString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +24,9 @@ public final class BibTexStringAdd extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
+    public void applyChange(CompoundEdit undoEdit) {
         try {
-            databaseContext.getDatabase().addString(addedString);
-            undoEdit.addEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));
+            undoEdit.apply(new UndoableInsertString(databaseContext.getDatabase(), addedString));
         } catch (KeyCollisionException ex) {
             LOGGER.warn("Error: could not add string '{}': {}", addedString.getName(), ex.getMessage(), ex);
         }

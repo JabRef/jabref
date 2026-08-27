@@ -4,8 +4,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -18,6 +16,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
