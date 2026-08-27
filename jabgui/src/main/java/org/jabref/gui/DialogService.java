@@ -237,7 +237,7 @@ public interface DialogService extends NotificationService {
     ///
     /// @param fileDialogConfiguration configuration for the file open dialog
     /// @param owner the window that owns the file open dialog
-    /// @return the selected file or an empty {@link Optional} if no file has been selected
+    /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner);
 
     /// Shows a new file open dialog. The method doesn't return until the
