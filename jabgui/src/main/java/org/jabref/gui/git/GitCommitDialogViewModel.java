@@ -67,6 +67,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     dialogService.notify(Localization.lang("Committed successfully"));
                     onSuccess.run();
                 })
+                // [impl->req~git.graceful-error-handling~1]
                 .onFailure(ex -> {
                     LOGGER.warn("Git commit failed", ex);
                     dialogService.showErrorDialogAndWait(

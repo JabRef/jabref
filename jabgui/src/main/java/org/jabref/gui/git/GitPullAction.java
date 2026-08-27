@@ -168,6 +168,7 @@ public class GitPullAction extends SimpleCommand {
         return gitSyncService.finalizeMerge(bibPath, pullPlan);
     }
 
+    // [impl->req~git.graceful-error-handling~1]
     private void showPullError(Throwable exception) {
         LOGGER.warn("Git pull failed", exception);
 

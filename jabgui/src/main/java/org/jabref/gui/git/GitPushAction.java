@@ -105,6 +105,7 @@ public class GitPushAction extends SimpleCommand {
         return result;
     }
 
+    // [impl->req~git.graceful-error-handling~1]
     private void showPushError(Throwable ex) {
         LOGGER.warn("Git push failed", ex);
         switch (ex) {
