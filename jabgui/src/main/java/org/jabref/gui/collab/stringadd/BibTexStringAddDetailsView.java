@@ -11,7 +11,7 @@ public final class BibTexStringAddDetailsView extends DatabaseChangeDetailsView 
     public BibTexStringAddDetailsView(BibTexStringAdd stringAdd) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Added string"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         container.getChildren().addAll(
                 header,
                 new Label(Localization.lang("Label: %0", stringAdd.getAddedString().getName())),

@@ -29,10 +29,10 @@ public class Walkthroughs extends VBox {
         this.stateManager = stateManager;
         this.preferences = preferences;
 
-        getStyleClass().add("welcome-section");
+        getStyleClass().addAll("spacing-12", "align-top-left");
 
         header = new Label(Localization.lang("Walkthroughs"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
         enableScroll();
     }
 
@@ -56,7 +56,7 @@ public class Walkthroughs extends VBox {
 
     private VBox createWalkthroughContent() {
         VBox content = new VBox();
-        content.getStyleClass().add("walkthroughs-container");
+        content.getStyleClass().addAll("spacing-4", "align-top-left");
 
         Button mainFileDirWalkthroughButton = createWalkthroughButton(
                 Localization.lang("Set main file directory"),
@@ -102,7 +102,7 @@ public class Walkthroughs extends VBox {
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
+        button.getStyleClass().addAll("quick-settings-button", "padding-10-16", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, preferences, walkthroughId).execute());
         return button;

@@ -11,7 +11,7 @@ public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsVi
     public BibTexStringChangeDetailsView(BibTexStringChange stringChange) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Modified string"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         container.getChildren().addAll(
                 header,
                 new Label(Localization.lang("Label: %0", stringChange.getOldString().getName())),

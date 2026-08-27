@@ -27,11 +27,11 @@
     </padding>
 
     <Label text="%Chat Status"
-           styleClass="titleHeader"/>
+           styleClass="h3,padding-bottom-6"/>
 
     <VBox spacing="10">
         <Label text="%Chatting parameters"
-               styleClass="sectionHeader"/>
+               styleClass="h4,padding-top-12"/>
 
         <HBox spacing="10"
               alignment="CENTER_LEFT">
@@ -53,7 +53,7 @@
     <VBox spacing="10"
           VBox.vgrow="ALWAYS">
         <Label text="%Entries in the chat"
-               styleClass="sectionHeader"/>
+               styleClass="h4,padding-top-12"/>
         <TableView
                 fx:id="entriesTable"
                 VBox.vgrow="ALWAYS"
@@ -76,7 +76,7 @@
     <VBox spacing="10"
           VBox.vgrow="ALWAYS">
         <Label text="%Ingestion status"
-               styleClass="sectionHeader"/>
+               styleClass="h4,padding-top-12"/>
         <TableView
                 fx:id="ingestionTable"
                 VBox.vgrow="ALWAYS"

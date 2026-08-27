@@ -145,6 +145,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         previewTab.setClosable(false);
 
         editArea = new CodeArea();
+        editArea.getStyleClass().add("padding-0");
         Tab editTab = new Tab(Localization.lang("Edit"), new VirtualizedScrollPane<>(editArea));
         editTab.setClosable(false);
 
@@ -189,7 +190,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     private Label sectionLabel(String text) {
         Label label = new Label(text);
-        label.getStyleClass().add("sectionHeader");
+        label.getStyleClass().addAll("h4", "padding-top-12");
         return label;
     }
 

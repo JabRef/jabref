@@ -11,7 +11,7 @@ public final class BibTexStringDeleteDetailsView extends DatabaseChangeDetailsVi
     public BibTexStringDeleteDetailsView(BibTexStringDelete stringDelete) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Deleted string"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         container.getChildren().addAll(
                 header,
                 new Label(Localization.lang("Label: %0", stringDelete.getDeletedString().getName())),

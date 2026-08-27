@@ -232,7 +232,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private void initPanel() {
         if (gridPane == null) {
             gridPane = new GridPane();
-            gridPane.getStyleClass().add("editorPane");
+            gridPane.getStyleClass().addAll("editorPane", "gap-8", "padding-4");
 
             // Wrap everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();

@@ -469,7 +469,7 @@ public class PreferencesFormBuilder {
                                           Consumer<SectionRegion> config) {
         Label header = new Label(title);
         searchable(title, header);
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
         HBox headerRow = row(header);

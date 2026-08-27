@@ -15,7 +15,7 @@ public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
 
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Changed preamble"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         container.getChildren().add(header);
 
         if (StringUtil.isNotBlank(preambleDiff.getOriginalPreamble())) {

@@ -114,7 +114,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private Node buildEntryTypesColumn() {
         Label header = new Label(Localization.lang("Entry types"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
 
         entryTypesTable.setMinWidth(Region.USE_PREF_SIZE);
         VBox.setVgrow(entryTypesTable, Priority.ALWAYS);
@@ -134,7 +134,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private Node buildFieldsColumn() {
         Label header = new Label(Localization.lang("Required and optional fields"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
 
         fields.setMinWidth(Region.USE_PREF_SIZE);
         VBox.setVgrow(fields, Priority.ALWAYS);

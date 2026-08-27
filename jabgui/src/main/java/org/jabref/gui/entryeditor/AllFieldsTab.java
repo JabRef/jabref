@@ -148,7 +148,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-        this.listContainer.getStyleClass().add("all-fields-container");
+        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-10-16", "spacing-8");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
@@ -276,7 +276,9 @@ public class AllFieldsTab extends FieldsEditorTab {
 
         // Main section rows go into the (already cleared) inherited gridPane
         if (!gridPane.getStyleClass().contains("all-fields-list")) {
-            gridPane.getStyleClass().add("all-fields-list");
+            // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
+            gridPane.getStyleClass().remove("padding-4");
+            gridPane.getStyleClass().addAll("all-fields-list", "padding-0");
         }
         addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
@@ -419,7 +421,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                                          BibDatabaseContext bibDatabaseContext,
                                          BibEntry entry) {
         VBox content = new VBox();
-        content.getStyleClass().add("all-fields-section-content");
+        content.getStyleClass().add("spacing-8");
 
         Runnable populateContent = () -> populateSectionContent(
                 content,
@@ -463,7 +465,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
-            chips.getStyleClass().add("all-fields-add-chips");
+            chips.getStyleClass().add("gap-6");
             chipFields.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
             content.getChildren().add(chips);
         }
@@ -495,7 +497,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         BibDatabaseMode mode = getDatabaseMode();
 
         FlowPane chips = new FlowPane();
-        chips.getStyleClass().add("all-fields-add-chips");
+        chips.getStyleClass().add("gap-6");
 
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
             List<Field> shown = List.copyOf(editors.keySet());
@@ -544,14 +546,14 @@ public class AllFieldsTab extends FieldsEditorTab {
         addButton.setOnAction(_ -> addAction.run());
         fieldNameBox.getEditor().setOnAction(_ -> addAction.run());
         HBox freeFormRow = new HBox(fieldNameBox, addButton);
-        freeFormRow.getStyleClass().add("all-fields-add-free-form");
+        freeFormRow.getStyleClass().addAll("spacing-6", "padding-top-4");
         freeFormRow.setAlignment(Pos.CENTER_LEFT);
         return freeFormRow;
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
-        chip.getStyleClass().add("all-fields-add-chip");
+        chip.getStyleClass().addAll("all-fields-add-chip", "padding-2-12");
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
     }

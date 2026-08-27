@@ -154,7 +154,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         ViewLoader.view(this).load().setAsDialogPane(this);
 
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
-        generateButton.getStyleClass().add("customGenerateButton");
+        generateButton.getStyleClass().addAll("customGenerateButton", "padding-6-24");
 
         final Stage stage = (Stage) getDialogPane().getScene().getWindow();
         stage.setHeight(650);

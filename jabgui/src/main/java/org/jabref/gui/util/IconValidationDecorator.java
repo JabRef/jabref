@@ -37,7 +37,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         Node graphic = Severity.ERROR == message.getSeverity()
                        ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
                        : IconTheme.JabRefIcons.WARNING.getGraphicNode();
-        graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
+        graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "text-danger" : "text-warning");
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));

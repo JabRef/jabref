@@ -23,7 +23,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll("h4", "padding-top-12");
         container.getChildren().add(header);
 
         // Add views for each detected difference
@@ -94,9 +94,9 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         ScrollPane rightScrollPane = createScrollPane(diskTextArea);
 
         Label inJabRef = new Label(Localization.lang("In JabRef"));
-        inJabRef.getStyleClass().add("lib-change-header");
+        inJabRef.getStyleClass().addAll("h4", "padding-2");
         Label onDisk = new Label(Localization.lang("On disk"));
-        onDisk.getStyleClass().add("lib-change-header");
+        onDisk.getStyleClass().addAll("h4", "padding-2");
 
         VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
         VBox rightContainer = new VBox(5, onDisk, rightScrollPane);
@@ -106,7 +106,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         splitPane.setDividerPositions(0.5);
 
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
-        legendLabel.getStyleClass().add("lib-change-legend");
+        legendLabel.getStyleClass().addAll("font-size-090", "text-subtle", "padding-4");
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
         resultContainer.setSpacing(5);

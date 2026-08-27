@@ -66,29 +66,29 @@ public class DonationProvider {
         preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
 
         Label title = new Label(Localization.lang("Support JabRef"));
-        title.getStyleClass().add("donation-toast-title");
+        title.getStyleClass().add("bold");
         Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
-        subtitle.getStyleClass().add("donation-toast-desc");
+        subtitle.getStyleClass().add("font-size-090");
         VBox textBox = new VBox(title, subtitle);
-        textBox.getStyleClass().add("donation-toast-text");
+        textBox.getStyleClass().add("spacing-2");
 
         Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();
         HBox leftContent = new HBox(10, iconNode, textBox);
         leftContent.setAlignment(Pos.CENTER_LEFT);
 
         Button neverButton = new Button(Localization.lang("Never show again"));
-        neverButton.getStyleClass().add("donation-btn-ghost");
+        neverButton.getStyleClass().addAll("donation-btn-ghost", "padding-6-12");
         neverButton.setOnAction(_ -> {
             preferences.getDonationPreferences().setNeverShowAgain(true);
             hideToast();
         });
 
         Button cancelButton = new Button(Localization.lang("Cancel"));
-        cancelButton.getStyleClass().add("donation-btn-secondary");
+        cancelButton.getStyleClass().addAll("donation-btn-secondary", "padding-6-12");
         cancelButton.setOnAction(_ -> hideToast());
 
         Button donateButton = new Button(Localization.lang("Donate"));
-        donateButton.getStyleClass().add("donation-btn-primary");
+        donateButton.getStyleClass().addAll("donation-btn-primary", "padding-6-12");
         donateButton.setDefaultButton(true);
         donateButton.setOnAction(_ -> {
             new OpenBrowserAction(DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
@@ -102,7 +102,7 @@ public class DonationProvider {
         HBox.setHgrow(textSpacer, Priority.ALWAYS);
 
         donationToast = new HBox(leftContent, textSpacer, rightButtons);
-        donationToast.getStyleClass().add("donation-toast");
+        donationToast.getStyleClass().addAll("donation-toast", "padding-10-12", "spacing-12", "align-center-left");
         donationToast.setMaxWidth(Region.USE_PREF_SIZE);
         donationToast.setMinWidth(Region.USE_PREF_SIZE);
         donationToast.setTranslateY(-40);

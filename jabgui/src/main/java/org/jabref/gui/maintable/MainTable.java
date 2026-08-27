@@ -198,18 +198,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         Button addExampleButton = new Button(Localization.lang("Add example entry"));
-        addExampleButton.getStyleClass().add("text-button-blue");
+        addExampleButton.getStyleClass().addAll("text-button-blue", "h4");
         addExampleButton.setOnAction(_ -> {
             BibEntry entry = addExampleEntry();
             libraryTab.showAndEdit(entry);
         });
 
         Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
-        importPdfsButton.getStyleClass().add("text-button-blue");
+        importPdfsButton.getStyleClass().addAll("text-button-blue", "h4");
         importPdfsButton.setOnAction(_ -> importPdfs());
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
-        noContentLabel.getStyleClass().add("welcome-header-label");
+        noContentLabel.getStyleClass().addAll("welcome-header-label", "h3", "bold");
 
         HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);

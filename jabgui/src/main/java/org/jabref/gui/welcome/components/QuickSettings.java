@@ -34,10 +34,10 @@ public class QuickSettings extends VBox {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        getStyleClass().add("welcome-section");
+        getStyleClass().addAll("spacing-12", "align-top-left");
 
         header = new Label(Localization.lang("Quick settings"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
         enableScroll();
     }
 
@@ -109,7 +109,7 @@ public class QuickSettings extends VBox {
                 entryTableButton,
                 pushApplicationButton,
                 onlineServicesButton);
-        newContent.getStyleClass().add("quick-settings-container");
+        newContent.getStyleClass().addAll("spacing-4", "align-top-left");
         return newContent;
     }
 
@@ -127,7 +127,7 @@ public class QuickSettings extends VBox {
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
+        button.getStyleClass().addAll("quick-settings-button", "padding-10-16", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(event -> action.run());
         return button;

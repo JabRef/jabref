@@ -4,8 +4,8 @@
 * - Always loaded by JabRef, on top of the active theme
 * - Contains UI specific styles independent from any theme
 * - Contains styling for custom JavaFX components
-* - Contains generic style classes ready to be used (at the very bottom of this
-*   file, so that they win over a component style class of the same specificity)
+* - Contains generic style classes ready to be used (see below). They and the
+*   component styles never declare the same property, so their order is free.
 * ==========
 * This file declares NO colors. Every color it uses comes from a `-color-*` token that the
 * active theme declares per color scheme (see jabref-theme.css for the full token contract).
@@ -465,10 +465,6 @@
     -fx-icon-color: -color-accent;
 }
 
-.progress-indicatorToolbar .percentage {
-    -fx-fill: null;
-}
-
 .mainMenu {
     -fx-background-color: -color-bg-tertiary;
     -fx-background-insets: 0;
@@ -905,12 +901,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-max-width: 64em;
 }
 
-.welcome-left-column,
-.welcome-right-column {
-    -fx-min-width: 0;
-    -fx-pref-width: 50%;
-    -fx-max-width: 50em;
-}
 
 /* Welcome Community  */
 .welcome-community-link {
@@ -1123,6 +1113,10 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ErrorConsole */
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
 #errorConsole .info-section {
     -fx-graphic-text-gap: 0.8em;
     -fx-line-spacing: 0.2em;
@@ -1458,19 +1452,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-accent;
 }
 
-.journalInfo .grid-cell {
-    -fx-border-color: transparent -color-border-default -color-border-default transparent;
-    -fx-border-width: 0 0.062em 0.062em 0;
-}
-
 .journalInfo .grid-cell-r {
     -fx-border-color: transparent -color-border-default transparent transparent;
     -fx-border-width: 0 0.062em 0 0;
-}
-
-journalInfo .grid-cell-b {
-    -fx-border-color: transparent transparent -color-border-default transparent;
-    -fx-border-width: 0 0 0.062em 0;
 }
 
 /* KeyBindingsTab */
@@ -1622,16 +1606,6 @@ journalInfo .grid-cell-b {
     -fx-border-radius: 0.333em;
 }
 
-/* Quick Settings: Theme Selection */
-.theme-option {
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
-}
-
-.theme-option:hover {
-    -fx-background-color: -color-overlay-hover;
-}
-
 /* Quick Settings: Push Application Configuration */
 .applications-list {
     -fx-pref-height: 16.667em;
@@ -1660,10 +1634,6 @@ journalInfo .grid-cell-b {
 }
 
 /* Walkthrough Styles */
-.walkthrough-overlay {
-    -fx-background-color: transparent;
-}
-
 .walkthrough-title-container {
     -fx-max-width: infinity;
 }
@@ -1768,11 +1738,6 @@ journalInfo .grid-cell-b {
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-font-size: 1.2em;
-}
-
-.walkthrough-fullscreen-content {
-    -fx-max-width: 48em;
-    -fx-fill-width: true;
 }
 
 /* TextFlowLimited */

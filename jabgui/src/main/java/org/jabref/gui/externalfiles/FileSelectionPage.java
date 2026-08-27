@@ -124,7 +124,7 @@ public class FileSelectionPage extends WizardPane {
         BorderPane mainLayout = new BorderPane();
 
         progressPane = new VBox(10);
-        progressPane.getStyleClass().add("file-selection-progress-pane");
+        progressPane.getStyleClass().addAll("align-center", "padding-20");
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.progressProperty().bind(viewModel.progressValueProperty());

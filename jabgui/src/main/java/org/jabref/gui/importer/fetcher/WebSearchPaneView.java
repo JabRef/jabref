@@ -110,7 +110,7 @@ public class WebSearchPaneView extends VBox {
         modeIndicator.textProperty().bind(viewModel.searchModeIndicatorProperty());
         modeIndicator.managedProperty().bind(modeIndicator.visibleProperty());
         modeIndicator.visibleProperty().bind(modeIndicator.textProperty().isNotEmpty());
-        modeIndicator.getStyleClass().add("mode-indicator");
+        modeIndicator.getStyleClass().addAll("mode-indicator", "font-size-090");
         modeIndicator.setMaxWidth(Double.MAX_VALUE);
         return modeIndicator;
     }

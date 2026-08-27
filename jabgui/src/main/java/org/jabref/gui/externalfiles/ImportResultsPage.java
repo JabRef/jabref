@@ -53,7 +53,7 @@ public class ImportResultsPage extends WizardPane {
 
         /// Progress pane
         progressPane = new VBox(10);
-        progressPane.getStyleClass().add("file-selection-progress-pane");
+        progressPane.getStyleClass().addAll("align-center", "padding-20");
         progressPane.setMaxWidth(Double.MAX_VALUE);
         progressPane.setMaxHeight(Double.MAX_VALUE);
 
