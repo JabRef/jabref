@@ -131,8 +131,8 @@ class BibDatabaseTest {
     @Test
     void removeManyEntriesReplacesEntriesList() {
         List<BibEntry> entriesToDelete = IntStream.range(0, 11)
-                                                 .mapToObj(_ -> new BibEntry())
-                                                 .toList();
+                                                  .mapToObj(_ -> new BibEntry())
+                                                  .toList();
         BibEntry remainingEntry = new BibEntry();
         database.insertEntries(entriesToDelete);
         database.insertEntry(remainingEntry);

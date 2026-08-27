@@ -235,8 +235,8 @@ public class BibDatabase {
 
         if (useBatchReplacement) {
             List<BibEntry> entriesAfterDeletion = entries.stream()
-                                                          .filter(entry -> !idsToBeDeleted.contains(entry.getId()))
-                                                          .toList();
+                                                         .filter(entry -> !idsToBeDeleted.contains(entry.getId()))
+                                                         .toList();
             if ((entries.size() - entriesAfterDeletion.size()) > BATCH_REPLACEMENT_THRESHOLD) {
                 entries.setAll(entriesAfterDeletion);
             } else {
