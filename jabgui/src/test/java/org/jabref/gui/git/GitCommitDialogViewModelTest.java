@@ -75,7 +75,8 @@ class GitCommitDialogViewModelTest {
             when(gitHandler.createCommitOnCurrentBranch(any(), any(boolean.class)))
                     .thenThrow(new JGitInternalException("Cannot lock Git index"));
 
-            viewModel.commit(() -> { });
+            viewModel.commit(() -> {
+            });
 
             verify(dialogService).showErrorDialogAndWait(
                     Localization.lang("Git Commit Failed"),

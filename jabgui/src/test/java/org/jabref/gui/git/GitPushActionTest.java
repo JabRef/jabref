@@ -75,18 +75,18 @@ class GitPushActionTest {
              MockedStatic<GitStatusViewModel> gitStatusViewModelStatic =
                      Mockito.mockStatic(GitStatusViewModel.class)) {
             gitStatusViewModelStatic.when(() -> GitStatusViewModel.fromPathAndContext(
-                    stateManager,
-                    taskExecutor,
-                    gitHandlerRegistry,
-                    libraryPath))
-                    .thenReturn(gitStatusViewModel);
+                                            stateManager,
+                                            taskExecutor,
+                                            gitHandlerRegistry,
+                                            libraryPath))
+                                    .thenReturn(gitStatusViewModel);
 
             GitSyncService syncService = mock(GitSyncService.class);
 
             gitSyncServiceStatic.when(() -> GitSyncService.create(
-                    importFormatPreferences,
-                    gitHandlerRegistry))
-                    .thenReturn(syncService);
+                                        importFormatPreferences,
+                                        gitHandlerRegistry))
+                                .thenReturn(syncService);
 
             JGitInternalException exception =
                     new JGitInternalException("Cannot lock Git index");
