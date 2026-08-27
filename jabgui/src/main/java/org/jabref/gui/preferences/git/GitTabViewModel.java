@@ -26,7 +26,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     private final StringProperty patProperty = new SimpleStringProperty("");
     private final BooleanProperty persistPatProperty = new SimpleBooleanProperty();
     private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
-    private final StringProperty pullIntervalProperty = new SimpleStringProperty("");
+    private final StringProperty pullIntervalInMinutesProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
     private final GitPreferences gitPreferences;
@@ -38,7 +38,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         this.gitPreferences = gitPreferences;
 
         pullIntervalValidator = new FunctionBasedValidator<>(
-                pullIntervalProperty,
+                pullIntervalInMinutesProperty,
                 input -> getIntervalAsInt(input).filter(interval -> interval > 0).isPresent(),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Git"),
@@ -52,7 +52,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         patProperty.setValue(gitPreferences.getPat());
         persistPatProperty.setValue(gitPreferences.getPersistPat());
         passwordPersistAvailable.setValue(OS.isKeyringAvailable());
-        pullIntervalProperty.setValue(String.valueOf(gitPreferences.getPullInterval()));
+        pullIntervalInMinutesProperty.setValue(String.valueOf(gitPreferences.getPullIntervalInMinutes()));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         gitPreferences.setUsername(usernameProperty.getValue().trim());
         gitPreferences.setPersistPat(persistPatProperty.getValue());
         gitPreferences.setPat(patProperty.getValue().trim());
-        gitPreferences.setPullInterval(Integer.parseInt(pullIntervalProperty.getValue().trim()));
+        gitPreferences.setPullIntervalInMinutes(Integer.parseInt(pullIntervalInMinutesProperty.getValue().trim()));
     }
 
     @Override
@@ -97,8 +97,8 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         return passwordPersistAvailable;
     }
 
-    public StringProperty pullIntervalProperty() {
-        return pullIntervalProperty;
+    public StringProperty pullIntervalInMinutesProperty() {
+        return pullIntervalInMinutesProperty;
     }
 
     public ValidationStatus pullIntervalValidationStatus() {

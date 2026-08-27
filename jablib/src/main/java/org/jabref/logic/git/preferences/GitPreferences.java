@@ -15,18 +15,18 @@ public class GitPreferences {
     private final StringProperty pat;
     private final StringProperty repositoryUrl;
     private final BooleanProperty rememberPat;
-    private final IntegerProperty pullInterval;
+    private final IntegerProperty pullIntervalInMinutes;
 
     public GitPreferences(String username,
                           String pat,
                           String repositoryUrl,
                           boolean rememberPat,
-                          int pullInterval) {
+                          int pullIntervalInMinutes) {
         this.username = new SimpleStringProperty(username);
         this.pat = new SimpleStringProperty(pat);
         this.repositoryUrl = new SimpleStringProperty(repositoryUrl);
         this.rememberPat = new SimpleBooleanProperty(rememberPat);
-        this.pullInterval = new SimpleIntegerProperty(pullInterval);
+        this.pullIntervalInMinutes = new SimpleIntegerProperty(pullIntervalInMinutes);
     }
 
     // Creates object with default preference values
@@ -36,7 +36,7 @@ public class GitPreferences {
                 "",     // pat: GitHub personal access token (stored in keyring when rememberPat is enabled)
                 "",     // repositoryUrl: URL of the remote repository
                 false,  // rememberPat: Whether the PAT should be persisted in the keyring
-                5       // pullInterval: Minutes between automatic pulls
+                5       // pullIntervalInMinutes: Minutes between automatic pulls
         );
     }
 
@@ -76,12 +76,12 @@ public class GitPreferences {
         this.rememberPat.set(remember);
     }
 
-    public int getPullInterval() {
-        return pullInterval.get();
+    public int getPullIntervalInMinutes() {
+        return pullIntervalInMinutes.get();
     }
 
-    public void setPullInterval(int pullInterval) {
-        this.pullInterval.set(pullInterval);
+    public void setPullIntervalInMinutes(int pullIntervalInMinutes) {
+        this.pullIntervalInMinutes.set(pullIntervalInMinutes);
     }
 
     public StringProperty usernameProperty() {
@@ -100,7 +100,7 @@ public class GitPreferences {
         return rememberPat;
     }
 
-    public IntegerProperty pullIntervalProperty() {
-        return pullInterval;
+    public IntegerProperty pullIntervalInMinutesProperty() {
+        return pullIntervalInMinutes;
     }
 }

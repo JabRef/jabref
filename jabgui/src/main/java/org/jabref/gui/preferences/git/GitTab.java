@@ -40,7 +40,7 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
                         .custom(buildPersistPatCheckBox()))
 
                 .section(Localization.lang("Automatic synchronization"), automatic -> automatic
-                        .stringField(Localization.lang("Pull interval (minutes)"), viewModel.pullIntervalProperty(),
+                        .stringField(Localization.lang("Pull interval (minutes)"), viewModel.pullIntervalInMinutesProperty(),
                                 field -> field.validate(viewModel.pullIntervalValidationStatus())))
 
                 .build());

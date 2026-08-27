@@ -79,7 +79,7 @@ public class GitPullScheduler {
             return;
         }
 
-        int intervalInMinutes = preferences.getGitPreferences().getPullInterval();
+        int intervalInMinutes = preferences.getGitPreferences().getPullIntervalInMinutes();
         if (intervalInMinutes <= 0) {
             LOGGER.warn("Ignoring non-positive Git pull interval {}", intervalInMinutes);
             return;

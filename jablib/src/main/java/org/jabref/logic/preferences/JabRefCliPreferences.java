@@ -2642,12 +2642,12 @@ public class JabRefCliPreferences implements CliPreferences {
                             : defaultValues.getPat(),
                 get(GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl()),
                 rememberPat,
-                getInt(GIT_PULL_INTERVAL_KEY, defaultValues.getPullInterval()));
+                getInt(GIT_PULL_INTERVAL_KEY, defaultValues.getPullIntervalInMinutes()));
 
         bindString(gitPreferences.usernameProperty(), GITHUB_USERNAME_KEY, defaultValues.getUsername());
         bindString(gitPreferences.repositoryUrlProperty(), GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl());
         bindToKeyring(gitPreferences.patProperty(), KeyringSlot.GITHUB_PAT, gitPreferences::getPersistPat);
-        bindInt(gitPreferences.pullIntervalProperty(), GIT_PULL_INTERVAL_KEY, defaultValues.getPullInterval());
+        bindInt(gitPreferences.pullIntervalInMinutesProperty(), GIT_PULL_INTERVAL_KEY, defaultValues.getPullIntervalInMinutes());
         bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
                 (_, _, newValue) -> {
                     putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
