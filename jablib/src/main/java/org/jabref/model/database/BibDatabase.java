@@ -220,15 +220,12 @@ public class BibDatabase {
             idsToBeDeleted.add(entry.getId());
         }
 
-        List<BibEntry> newEntries = new ArrayList<>(entries);
-        newEntries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
-
         toBeDeleted.forEach(entry -> {
             entriesId.remove(entry.getId());
             removeEntryFromIndex(entry);
         });
 
-        entries.setAll(newEntries);
+        entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
         eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
     }
 

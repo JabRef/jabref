@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javafx.collections.ListChangeListener;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
@@ -84,6 +86,28 @@ class BibDatabaseTest {
         assertFalse(database.containsEntryWithId(entry1.getId()));
         assertTrue(database.containsEntryWithId(entry2.getId()));
         assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    void removeEntryNotifiesOnlyAboutTheRemovedEntry() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        database.insertEntries(entry1, entry2, entry3);
+
+        List<List<BibEntry>> addedEntries = new ArrayList<>();
+        List<List<BibEntry>> removedEntries = new ArrayList<>();
+        database.getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                addedEntries.add(List.copyOf(change.getAddedSubList()));
+                removedEntries.add(List.copyOf(change.getRemoved()));
+            }
+        });
+
+        database.removeEntry(entry2);
+
+        assertEquals(List.of(List.of()), addedEntries);
+        assertEquals(List.of(List.of(entry2)), removedEntries);
     }
 
     @Test
