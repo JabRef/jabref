@@ -16,6 +16,8 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NullMarked;
+
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 class GitPushActionTest {
 
     private ImportFormatPreferences importFormatPreferences;
