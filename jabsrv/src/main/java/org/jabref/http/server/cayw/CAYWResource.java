@@ -154,14 +154,15 @@ public class CAYWResource {
         if (queryParams.isClipboard()) {
             // JavaFX requires running clipboard handling on JavaFX application thread.
             initializeGUI();
-            CountDownLatch clipboardLatch = new CountDownLatch(1);
             Platform.runLater(() -> {
                 ClipboardContent content = new ClipboardContent();
                 content.putString(formattedResponse);
                 javafx.scene.input.Clipboard.getSystemClipboard().setContent(content);
-                clipboardLatch.countDown();
             });
-            clipboardLatch.await();
+            return Response.accepted()
+                           .header(X_CONTENT_TYPE_OPTIONS, NO_SNIFF)
+                           .header(CONTENT_SECURITY_POLICY, CAYW_CONTENT_SECURITY_POLICY)
+                           .build();
         }
 
         // Push to Application parameter handling
