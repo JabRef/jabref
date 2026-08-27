@@ -9,7 +9,9 @@ import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
+import org.jabref.gui.util.URLs;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
@@ -54,28 +56,30 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
         setContent(form()
 
                 .section(Localization.lang("Appearance"), appearance -> appearance
-                        .searchableCombo(Localization.lang("Language"),
-                                viewModel.languagesListProperty(),
-                                viewModel.selectedLanguageProperty(),
-                                Language::getDisplayName)
-                        .combo(Localization.lang("Visual theme"),
-                                viewModel.themesListProperty(),
-                                viewModel.selectedThemeProperty(),
-                                ThemeTypes::getDisplayName,
-                                theme -> theme
-                                        .disableWhen(viewModel.themeSyncOsProperty())
-                                        .validate(viewModel.themeValidationStatus()))
-                        .checkbox(Localization.lang("Use System Preference"), viewModel.themeSyncOsProperty())
-                        .stringField(null, viewModel.customPathToThemeProperty(),
-                                path -> path
-                                        .browse(viewModel::importCSSFile)
-                                        .disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
-                                        .disableWhen(viewModel.themeSyncOsProperty())
-                                        .validate(viewModel.customPathToThemeValidationStatus()))
-                        .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
-                        .field(Localization.lang("Size"), buildFontSizeSpinner(),
-                                size -> size.validate(viewModel.fontSizeValidationStatus()))
-                        .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser))
+                                .searchableCombo(Localization.lang("Language"),
+                                        viewModel.languagesListProperty(),
+                                        viewModel.selectedLanguageProperty(),
+                                        Language::getDisplayName)
+                                .combo(Localization.lang("Theme"),
+                                        viewModel.themesListProperty(),
+                                        viewModel.selectedThemeProperty(),
+                                        ThemePreset::getLocalizedName,
+                                        theme -> theme.validate(viewModel.themeValidationStatus()))
+                                .combo(Localization.lang("Color scheme"),
+                                        viewModel.colorSchemeListProperty(),
+                                        viewModel.selectedThemeColorSchemeProperty(),
+                                        ThemeColorScheme::getLocalizedName,
+                                        colorScheme -> colorScheme.validate(viewModel.themeColorSchemeValidationStatus()))
+                                .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
+                                        path -> path
+                                                .browse(viewModel::importCSSFile)
+                                                .disableWhen(viewModel.customThemeEnabledProperty().not())
+                                                .grow())
+                                .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
+                                .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
+                                .field(Localization.lang("Size"), buildFontSizeSpinner(),
+                                        size -> size.validate(viewModel.fontSizeValidationStatus())),
+                        appearance -> appearance.help(URLs.CUSTOM_THEME_DOC))
 
                 .section(Localization.lang("User interface"), userInterface -> userInterface
                         .checkbox(Localization.lang("Open last edited libraries on startup"), viewModel.openLastStartupProperty())
