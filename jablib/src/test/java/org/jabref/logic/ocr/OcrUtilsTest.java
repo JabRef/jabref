@@ -51,4 +51,18 @@ class OcrUtilsTest {
         assertTrue(result.isSuccess());
         assertFalse(result.isFailure());
     }
+
+    @Test
+    void isAvailableWithMissingEnginePathReturnsFailureWithCommandLine() {
+        OcrPreferences ocrPreferences = new OcrPreferences(
+                "this-command-does-not-exist-jabref-ocr-test",
+                PagesWithTextHandling.SKIP,
+                EngineSelection.OCRMYPDF);
+
+        OcrResult result = OcrUtils.isAvailable(ocrPreferences);
+
+        OcrResult.Failure failure = assertInstanceOf(OcrResult.Failure.class, result);
+        assertEquals(OcrFailureReason.IO_ERROR, failure.reason());
+        assertEquals("this-command-does-not-exist-jabref-ocr-test --version", failure.commandLine());
+    }
 }

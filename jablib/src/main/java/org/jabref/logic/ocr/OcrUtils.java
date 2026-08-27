@@ -21,7 +21,6 @@ public final class OcrUtils {
 
     public static final String OCR_PDF_PREFIX = "_ocr.pdf";
     public static final int TIMEOUT_MINS = 10;
-    public static final int CHECKING_TIMEOUT = 10;
     public static final Logger LOGGER = LoggerFactory.getLogger(OcrUtils.class);
 
     /// Upper bound on how much of a failing OCR process's output is kept for the failure
@@ -30,29 +29,18 @@ public final class OcrUtils {
 
     /// Checks if the OCR engine is available for use.
     ///
-    /// @return true if the engine is available, false otherwise.
-    public static boolean isAvailable(OcrPreferences ocrPreferences) {
+    /// Reuses [#performOcr(ArrayList, String)] so a failed check carries the same command line and
+    /// captured output as any other OCR failure, instead of being reduced to a plain boolean. As a
+    /// result this check is bound by [#TIMEOUT_MINS] rather than the 10-second timeout used
+    /// previously; in practice `--version` returns almost instantly for an installed engine, so this
+    /// only matters when the configured path hangs instead of failing fast.
+    ///
+    /// @return an [OcrResult.Success] if the engine is available, or an [OcrResult.Failure] with the
+    /// command line and output captured while checking otherwise.
+    public static OcrResult isAvailable(OcrPreferences ocrPreferences) {
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
         command.add("--version");
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                LOGGER.debug("Checking OCR engine availability timed out");
-                return false;
-            }
-            return process.exitValue() == 0;
-        } catch (IOException e) {
-            LOGGER.error("OCR engine is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
-            return false;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.error("Checking OCR engine availability was interrupted", e);
-            return false;
-        }
+        return performOcr(command, "OCR engine availability check");
     }
 
     /// Helper method to abstract the common logic of running an OCR engine command and handling its output.

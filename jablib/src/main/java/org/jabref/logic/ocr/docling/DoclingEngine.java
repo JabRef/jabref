@@ -49,8 +49,10 @@ public class DoclingEngine implements OcrEngine {
 
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) throws IOException {
-        if (!OcrUtils.isAvailable(ocrPreferences)) {
-            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
+        OcrResult availability = OcrUtils.isAvailable(ocrPreferences);
+        if (availability.isFailure()) {
+            OcrResult.Failure failure = (OcrResult.Failure) availability;
+            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE, failure.commandLine(), failure.output());
         }
         Path outputDir = pdfPath.getParent();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
