@@ -16,6 +16,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.contentstream.operator.Operator;
+import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -45,12 +47,12 @@ public final class DocumentReader {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, fileLink);
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, pageNumber);
+                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, fileLink, pageNumber);
 
                 pages.add(newDocument);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read linked file '{}' ({})", fileLink, resolvedPdfPath.toAbsolutePath(), e);
             return pages;
         }
         if (pages.isEmpty()) {
@@ -88,8 +90,13 @@ public final class DocumentReader {
         addStringField(newDocument, PAGE_NUMBER.toString(), String.valueOf(pageNumber));
     }
 
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, int pageNumber) {
-        PDFTextStripper pdfTextStripper = new PDFTextStripper();
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, String fileLink, int pageNumber) {
+        PDFTextStripper pdfTextStripper = new PDFTextStripper() {
+            @Override
+            protected void operatorException(Operator operator, List<COSBase> operands, IOException e) throws IOException {
+                LOGGER.warn("Could not process page {} of linked file '{}': {}", pageNumber, fileLink, e.getMessage());
+            }
+        };
         pdfTextStripper.setLineSeparator("\n");
         pdfTextStripper.setStartPage(pageNumber);
         pdfTextStripper.setEndPage(pageNumber);
@@ -112,7 +119,7 @@ public final class DocumentReader {
                 newDocument.add(new TextField(ANNOTATIONS.toString(), String.join("\n", annotations), Field.Store.YES));
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read page {} of linked file '{}' ({})", pageNumber, fileLink, resolvedPath.toAbsolutePath(), e);
         }
     }
 
