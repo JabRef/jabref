@@ -135,6 +135,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("lib-change-scroll-pane");
         setAllAnchorsAndAttachChild(scrollPane);
         return scrollPane;
     }
@@ -147,6 +148,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         textArea.setEditable(false);
         textArea.setWrapText(false);
         textArea.setAutoHeight(true);
+        textArea.getStyleClass().add("lib-change-text-area");
         return textArea;
     }
 

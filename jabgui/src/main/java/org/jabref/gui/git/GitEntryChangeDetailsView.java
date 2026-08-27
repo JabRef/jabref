@@ -60,6 +60,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
         textArea.setEditable(false);
         textArea.setWrapText(false);
         textArea.setAutoHeight(true);
+        textArea.getStyleClass().add("lib-change-text-area");
         textArea.replaceText(entry.getStringRepresentation(entry, databaseContext.getMode(), entryTypesManager, preferences.getFieldPreferences()));
         textArea.moveTo(0, 0);
         textArea.showParagraphAtTop(0);
@@ -72,6 +73,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("lib-change-scroll-pane");
         Platform.runLater(() -> {
             scrollPane.setHvalue(0);
             scrollPane.setVvalue(0);

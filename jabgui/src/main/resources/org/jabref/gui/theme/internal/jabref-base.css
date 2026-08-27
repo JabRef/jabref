@@ -315,6 +315,23 @@
     -fx-padding: 4 0 0 5;
 }
 
+.lib-change-text-area {
+    -fx-background-color: -color-bg-secondary;
+    -fx-control-inner-background: -color-bg-secondary;
+    -fx-highlight-fill: -color-accent-subtle;
+    -fx-highlight-text-fill: -fx-text-background-color;
+}
+
+.lib-change-text-area .text {
+    -fx-fill: -fx-text-background-color;
+}
+
+.lib-change-scroll-pane,
+.lib-change-scroll-pane > .viewport {
+    -fx-background: -color-bg-secondary;
+    -fx-background-color: -color-bg-secondary;
+}
+
 .duplicate-entry {
     -fx-background-color: -color-success-emphasis;
 }
