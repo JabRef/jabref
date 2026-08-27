@@ -15,7 +15,6 @@ import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.entrychange.EntryChange;
-import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
 import org.jabref.gui.collab.groupchange.GroupChange;
 import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
@@ -98,18 +97,13 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     private Node createDetailsNode(DatabaseChange change, PreviewViewer previewViewer) {
         return switch (change) {
             case EntryChange entryChange ->
-                    new EntryChangeDetailsView(
+                    new GitEntryChangeDetailsView(
                             entryChange.getOldEntry(),
                             entryChange.getNewEntry(),
                             headDatabase,
                             workingTreeDatabase,
-                            dialogService,
                             preferences,
-                            entryTypesManager,
-                            previewViewer,
-                            taskExecutor,
-                            Localization.lang("Committed version"),
-                            Localization.lang("Saved file")
+                            entryTypesManager
                     );
             case org.jabref.gui.collab.entryadd.EntryAdd entryAdd ->
                     new EntryWithPreviewAndSourceDetailsView(
