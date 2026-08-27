@@ -12,7 +12,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.diff.GitDiffChecker;
@@ -51,7 +50,6 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             DialogService dialogService,
             TaskExecutor taskExecutor,
             GitHandlerRegistry gitHandlerRegistry,
-            GuiPreferences preferences,
             ImportFormatPreferences importFormatPreferences,
             FileUpdateMonitor fileUpdateMonitor) {
         this.stateManager = stateManager;
@@ -102,12 +100,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
         BibDatabaseContext headDatabase = GitDiffChecker.checkDiffAgainstLastCommit(
                 trackedFile.gitHandler(), relativeFilePath, importFormatPreferences, fileUpdateMonitor);
-        BibDatabaseContext savedDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(
+        BibDatabaseContext workingTreeDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(
                 trackedFile.bibFilePath(), importFormatPreferences, fileUpdateMonitor);
-        return new DiffDatabases(headDatabase, savedDatabase);
+        return new DiffDatabases(headDatabase, workingTreeDatabase);
     }
 
-    public record DiffDatabases(BibDatabaseContext headDatabase, BibDatabaseContext savedDatabase) {
+    public record DiffDatabases(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase) {
     }
 
     private void doCommit() throws JabRefException, GitAPIException, IOException {

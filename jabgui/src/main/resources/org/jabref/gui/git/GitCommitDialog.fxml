@@ -21,7 +21,7 @@
             </padding>
 
             <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="showDiffButton" text="%Show Diff" onAction="#showDiff"/>
+                <Button fx:id="showDiffButton" text="%Show diff" onAction="#showDiff"/>
             </HBox>
 
             <TextArea fx:id="commitMessage"

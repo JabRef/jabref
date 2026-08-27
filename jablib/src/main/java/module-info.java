@@ -305,6 +305,5 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires transitive org.libreoffice.uno;
     requires transitive org.jspecify;
-    requires io.github.javadiffutils;
     // endregion
 }

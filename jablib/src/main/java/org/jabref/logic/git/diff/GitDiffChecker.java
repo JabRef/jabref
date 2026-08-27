@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -19,16 +18,18 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GitDiffChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitDiffChecker.class);
 
     public static BibDatabaseContext checkDiffAgainstLastCommit(
             GitHandler gitHandler, Path filepath,
             ImportFormatPreferences importFormatPreferences,
-            FileUpdateMonitor fileUpdateMonitor) throws IOException, JabRefException {
+            FileUpdateMonitor fileUpdateMonitor) throws IOException {
         try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
             Repository repository = git.getRepository();
             String relativePath = filepath.toString().replace('\\', '/');
@@ -71,7 +72,7 @@ public class GitDiffChecker {
             RevCommit revCommit = revWalk.parseCommit(headId);
             try (TreeWalk treeWalk = TreeWalk.forPath(repository, relativePath, revCommit.getTree())) {
                 if (treeWalk == null) {
-                    LOGGER.debug("{} didi not exist as head, so it is newly added", relativePath);
+                    LOGGER.debug("{} did not exist at HEAD, so it is newly added", relativePath);
                     return Optional.empty();
                 }
                 ObjectId blobId = treeWalk.getObjectId(0);
