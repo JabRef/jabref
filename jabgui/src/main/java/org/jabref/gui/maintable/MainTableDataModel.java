@@ -279,6 +279,5 @@ public class MainTableDataModel {
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
         }
-
     }
 }

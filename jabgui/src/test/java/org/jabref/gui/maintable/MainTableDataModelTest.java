@@ -368,8 +368,8 @@ class MainTableDataModelTest {
             bibDatabaseContext.getDatabase().removeEntry(matchingEntry);
 
             visibleEntries.addAll(model.getEntriesFilteredAndSorted().stream()
-                                      .map(BibEntryTableViewModel::getEntry)
-                                      .toList());
+                                       .map(BibEntryTableViewModel::getEntry)
+                                       .toList());
         });
         WaitForAsyncUtils.waitForFxEvents();
 
