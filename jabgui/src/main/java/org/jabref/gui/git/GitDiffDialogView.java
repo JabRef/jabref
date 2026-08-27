@@ -128,9 +128,14 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             previewViewer
                     );
             case MetadataChange metadataChange ->
-                    new MetadataChangeDetailsView(metadataChange, preferences.getCitationKeyPatternPreferences().getKeyPatterns());
+                    new MetadataChangeDetailsView(
+                            metadataChange,
+                            preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
+                            Localization.lang("Committed version"),
+                            Localization.lang("Saved file")
+                    );
             case GroupChange groupChange ->
-                    new GroupChangeDetailsView(groupChange);
+                    new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');
             case PreambleChange preambleChange ->
                     new PreambleChangeDetailsView(preambleChange);
             case BibTexStringAdd stringAdd ->
