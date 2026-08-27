@@ -118,6 +118,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             Text shortenedChild = new Text(ellipseString(lastChildAsShown.getText()));
             shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());
             super.getChildren().add(shortenedChild);
+            shortenedChild.applyCss();
             super.autosize();
         }
         return true;

@@ -77,8 +77,8 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
         Optional<Filter> filter = fileHashes.isEmpty()
                                   ? Optional.empty()
                                   : Optional.of(MetadataFilterBuilder
-                .metadataKey(EmbeddingsCleaner.FILE_HASH_METADATA_KEY)
-                .isIn(fileHashes));
+                                                .metadataKey(EmbeddingsCleaner.FILE_HASH_METADATA_KEY)
+                                                .isIn(fileHashes));
 
         EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest
                 .builder()
@@ -99,8 +99,8 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
                     String citationKey = fileHash == null
                                          ? null
                                          : findEntryByFileHash(entriesFilter, fileHash)
-                                                 .flatMap(BibEntry::getCitationKey)
-                                                 .orElse(null);
+                                           .flatMap(BibEntry::getCitationKey)
+                                           .orElse(null);
                     return new RelevantInformation(citationKey, textSegment.text());
                 })
                 .toList();

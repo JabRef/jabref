@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -67,9 +65,6 @@ import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.URLs;
@@ -86,6 +81,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -97,6 +93,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -833,8 +831,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                           }).onFailure(ex -> {
                               LOGGER.error("Error while looking up DOI", ex);
                               hideNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), Localization.lang("Error while looking up DOI."));
-                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Error while looking up DOI."));
+                              setLabelOn(citationComponents.listView(), Localization.lang("Error while looking up DOI: %0", ex.getLocalizedMessage()));
+                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Error while looking up DOI: %0", ex.getLocalizedMessage()));
                           }).executeWith(taskExecutor);
         });
 
@@ -892,14 +890,18 @@ public class CitationRelationsTab extends EntryEditorTab {
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
                 hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
-                String labelText = citationComponents.searchType() == CitationFetcher.SearchType.CITES
-                                   ? Localization.lang("Error while fetching cited entries.")
-                                   : Localization.lang("Error while fetching citing entries.");
+                boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
+                // The tab has room for details; the notification stays short and free of exception internals.
+                String labelText = isCites
+                                   ? Localization.lang("Error while fetching cited entries: %0", exception.getLocalizedMessage())
+                                   : Localization.lang("Error while fetching citing entries: %0", exception.getLocalizedMessage());
                 Label placeholder = new Label(labelText);
                 placeholder.setWrapText(true);
                 citationComponents.listView().setPlaceholder(placeholder);
                 citationComponents.refreshButton().setVisible(true);
-                dialogService.notify(labelText);
+                dialogService.notify(isCites
+                                     ? Localization.lang("Error while fetching cited entries.")
+                                     : Localization.lang("Error while fetching citing entries."));
             })
             .executeWith(taskExecutor);
     }
@@ -1041,16 +1043,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            database.removeEntry(mergeResult.originalLeftEntry());
-            libraryTab.get().getMainTable().setCitationMergeMode(true);
-            database.insertEntry(mergedEntry);
-
-            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
-            compoundEdit.end();
-
-            undoManager.addEdit(compoundEdit);
+            undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
+                edit.apply(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                libraryTab.get().getMainTable().setCitationMergeMode(true);
+                edit.apply(new UndoableInsertEntries(database, mergedEntry));
+            });
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

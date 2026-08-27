@@ -1,7 +1,5 @@
 package org.jabref.gui.maintable;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -38,6 +36,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;

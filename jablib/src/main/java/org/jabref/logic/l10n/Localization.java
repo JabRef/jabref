@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /// them in unescaped form inside a [LocalizationBundle] which provides fast access because it caches the key-value
 /// pairs.
 ///
-/// The access to this is given by the functions [#lang(String,String...)] and
+/// The access to this is given by the functions [#lang(String, Object...)] and
 /// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
 @AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
@@ -168,4 +168,3 @@ public class Localization {
         }
     }
 }
-

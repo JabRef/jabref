@@ -20,8 +20,8 @@ plugins {
 
     id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "5.1.0"
-    id("net.ltgt.nullaway") version "3.1.0"
+    id("net.ltgt.errorprone") version "5.1.1"
+    id("net.ltgt.nullaway") version "3.2.0"
 }
 
 val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
@@ -199,6 +199,7 @@ val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
 val openAlexApiKey = providers.environmentVariable("OpenAlexApiKey").orElse("")
 val scopusApiKey = providers.environmentVariable("ScopusApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val scholarApiKey = providers.environmentVariable("ScholarApiKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 val wileyTdmApiKey = providers.environmentVariable("WileyTdmApiKey").orElse("")
@@ -222,6 +223,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("medlineApiKey", medlineApiKey)
     inputs.property("openAlexApiKey", openAlexApiKey)
     inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+    inputs.property("scholarApiKey", scholarApiKey)
     inputs.property("scopusApiKey", scopusApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
@@ -243,6 +245,7 @@ tasks.named<ProcessResources>("processResources") {
                 "openAlexApiKey" to inputs.properties["openAlexApiKey"],
                 "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
+                "scholarApiKey" to inputs.properties["scholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],
                 "wileyTdmApiKey" to inputs.properties["wileyTdmApiKey"],

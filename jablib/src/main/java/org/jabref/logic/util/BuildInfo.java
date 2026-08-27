@@ -39,15 +39,16 @@ public final class BuildInfo {
 
     public final String astrophysicsDataSystemAPIKey;
     public final String biodiversityHeritageApiKey;
+    public final String crossRefEmail;
     public final String ieeeAPIKey;
     public final String medlineApiKey;
     public final String openAlexApiKey;
+    public final String scholarApiKey;
     public final String scopusApiKey;
     public final String semanticScholarApiKey;
     public final String springerNatureAPIKey;
     public final String unpaywallEmail;
     public final String wileyTdmApiKey;
-    public final String crossRefEmail;
 
     public BuildInfo() {
         this("/build.properties");
@@ -72,15 +73,16 @@ public final class BuildInfo {
 
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
         biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
+        crossRefEmail = BuildInfo.getValue(properties, "crossRefEmail", "");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
         openAlexApiKey = BuildInfo.getValue(properties, "openAlexApiKey", "");
+        scholarApiKey = BuildInfo.getValue(properties, "scholarApiKey", "");
         scopusApiKey = BuildInfo.getValue(properties, "scopusApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
         wileyTdmApiKey = BuildInfo.getValue(properties, "wileyTdmApiKey", "");
-        crossRefEmail = BuildInfo.getValue(properties, "crossRefEmail", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {

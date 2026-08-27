@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
@@ -65,6 +64,7 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -581,9 +581,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
-                    BibEntry entry = target.getEntry();
-                    ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
-                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                    Map<Boolean, List<Path>> partitionedFiles = files.stream()
+                                                                     .collect(Collectors.partitioningBy(importHandler::canImportAsBibEntry));
+                    List<Path> importableFiles = partitionedFiles.get(true);
+                    List<Path> otherFiles = partitionedFiles.get(false);
+
+                    if (!importableFiles.isEmpty()) {
+                        importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
+                    }
+                    if (!otherFiles.isEmpty()) {
+                        BibEntry entry = target.getEntry();
+                        ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
+                        DragDrop.handleDropOfFiles(otherFiles, transferMode, fileLinker, entry);
+                    }
                 }
             }
 
@@ -685,7 +695,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             return;
         }
 
-        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
+        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(stateManager);
         findUnlinkedFilesAction.execute();
     }
 }

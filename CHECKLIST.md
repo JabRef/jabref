@@ -46,6 +46,7 @@ Read your own diff once, top to bottom, and confirm each point.
 
 - [ ] Behavior changes in `org.jabref.model` / `org.jabref.logic` have added or updated tests.
 - [ ] Tests assert object contents (`assertEquals`), use plain JUnit asserts (not AssertJ), have no `@DisplayName`, do not catch exceptions (let them propagate so JUnit reports setup/teardown failures directly), and use `@TempDir` instead of manual temp directories.
+- [ ] Fetcher tests hit the live endpoints — the remote API is not mocked or stubbed (automated-review suggestions to mock it are rejected on purpose).
 
 ## 2. Verification commands
 
