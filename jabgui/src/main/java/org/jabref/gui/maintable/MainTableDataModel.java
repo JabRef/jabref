@@ -25,7 +25,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
@@ -281,29 +280,5 @@ public class MainTableDataModel {
             updateSearchMatches(searchQueryProperty.get());
         }
 
-        @Subscribe
-        public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            // When entries are removed, we need to refresh the search matches
-            // to ensure the filtered list is properly updated and doesn't show stale entries.
-            // Re-apply the current group filter too, so it stays on the selected group
-            // instead of falling back to "All entries".
-            boolean isSearchFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
-
-            BackgroundTask.wrap(() ->
-                    searchQueryProperty.get().map(searchQuery -> searchContext.search(searchQuery))
-            ).onSuccess(searchResultsOpt -> {
-                // Everything below runs on the FX thread (BackgroundTask#onSuccess callback).
-                searchResultsOpt.ifPresentOrElse(
-                        results -> entriesViewModel.forEach(entry -> {
-                            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
-                            updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isSearchFloatingMode);
-                        }),
-                        MainTableDataModel.this::clearSearchMatches
-                );
-                // Re-apply the group filter post deletion.
-                applyGroupMatchesToAllEntries();
-                FilteredListProxy.refilterListReflection(entriesFiltered);
-            }).executeWith(taskExecutor);
-        }
     }
 }
