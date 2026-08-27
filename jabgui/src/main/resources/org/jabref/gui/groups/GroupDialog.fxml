@@ -37,7 +37,7 @@
                 <TextField fx:id="descriptionField"/>
             </VBox>
             <HBox spacing="10.0">
-                <VBox HBox.hgrow="SOMETIMES">
+                <VBox HBox.hgrow="ALWAYS">
                     <Label text="%Icon"/>
                     <HBox>
                         <TextField fx:id="iconField"/>
@@ -48,11 +48,11 @@
                         </Button>
                     </HBox>
                 </VBox>
-                <VBox HBox.hgrow="SOMETIMES">
+                <VBox HBox.hgrow="ALWAYS">
                     <Label text="%Hierarchical context"/>
                     <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="Infinity"/>
                 </VBox>
-                <VBox HBox.hgrow="SOMETIMES"
+                <VBox HBox.hgrow="ALWAYS"
                       layoutX="10.0" layoutY="10.0"
                       minWidth="130.0" maxWidth="Infinity"
                       spacing="10.0">
@@ -68,7 +68,7 @@
             </HBox>
             <Label text="%Collect by" styleClass="sectionHeader"/>
             <HBox>
-                <VBox spacing="10.0" minWidth="200.0" HBox.hgrow="SOMETIMES">
+                <VBox HBox.hgrow="ALWAYS" spacing="10.0">
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>

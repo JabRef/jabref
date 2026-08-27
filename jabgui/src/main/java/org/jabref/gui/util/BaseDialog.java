@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.Optional;
 
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -23,22 +24,12 @@ import com.airhacks.afterburner.injection.Injector;
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
-        getDialogPane().getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                close();
-            } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
-                getDefaultButton().ifPresent(Button::fire);
-            }
-
-            // all buttons in base dialogs react on enter
-            if (event.getCode() == KeyCode.ENTER) {
-                if (event.getTarget() instanceof Button) {
-                    ((Button) event.getTarget()).fire();
-                    event.consume();
-                }
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupButtonFix(newPane);
             }
         });
+        setupButtonFix(getDialogPane());
 
         this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
 
@@ -60,6 +51,11 @@ public class BaseDialog<T> extends Dialog<T> {
     private void setDialogIcon(Image image) {
         Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
         dialogWindow.getIcons().add(image);
+    }
+
+    private void setupButtonFix(DialogPane dialogPane) {
+        applyButtonFix(dialogPane);
+        dialogPane.getButtonTypes().addListener((ListChangeListener<ButtonType>) _ -> applyButtonFix(dialogPane));
     }
 
     /// Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
