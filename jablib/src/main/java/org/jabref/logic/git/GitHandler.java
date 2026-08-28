@@ -36,6 +36,7 @@ import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.FileUtils;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ public class GitHandler {
     /// Fails with a [JabRefException] if there already is a repository, or if the file cannot be staged —
     /// an ignore rule excludes it from `git add` silently. Everything this call created is removed again
     /// on failure, so the user can fix the cause and retry, or clone into the directory instead.
-    public void initAndCommit(Path fileToCommit) throws IOException, GitAPIException, JabRefException {
+    public void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
         if (isGitRepository()) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
         }
