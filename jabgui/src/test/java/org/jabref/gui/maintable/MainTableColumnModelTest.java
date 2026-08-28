@@ -11,12 +11,12 @@ import static org.mockito.Mockito.mock;
 
 class MainTableColumnModelTest {
 
-    private static String testName = "field:author";
-    private static MainTableColumnModel.Type testType = MainTableColumnModel.Type.NORMALFIELD;
-    private static String testQualifier = "author";
+    private static final String TEST_NAME = "field:author";
+    private static final MainTableColumnModel.Type TEST_TYPE = MainTableColumnModel.Type.NORMALFIELD;
+    private static final String TEST_QUALIFIER = "author";
 
-    private static String testTypeOnlyName = "linked_id";
-    private static MainTableColumnModel.Type testTypeOnlyType = MainTableColumnModel.Type.LINKED_IDENTIFIER;
+    private static final String TEST_TYPE_ONLY_NAME = "linked_id";
+    private static final MainTableColumnModel.Type TEST_TYPE_ONLY_TYPE = MainTableColumnModel.Type.LINKED_IDENTIFIER;
 
     @BeforeAll
     static void setup() {
@@ -25,42 +25,42 @@ class MainTableColumnModelTest {
 
     @Test
     void mainTableColumnModelParserRetrievesCorrectType() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_QUALIFIER);
 
-        assertEquals(testType, testColumnModel.getType());
+        assertEquals(TEST_TYPE, testColumnModel.getType());
     }
 
     @Test
     void mainTableColumnModelParserRetrievesCorrectQualifier() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_QUALIFIER);
 
-        assertEquals(testQualifier, testColumnModel.getQualifier());
+        assertEquals(TEST_QUALIFIER, testColumnModel.getQualifier());
     }
 
     @Test
     void fullMainTableColumnModelParserRetrievesCorrectType() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_NAME);
 
-        assertEquals(testType, testColumnModel.getType());
+        assertEquals(TEST_TYPE, testColumnModel.getType());
     }
 
     @Test
     void fullMainTableColumnModelParserRetrievesCorrectQualifier() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_NAME);
 
-        assertEquals(testQualifier, testColumnModel.getQualifier());
+        assertEquals(TEST_QUALIFIER, testColumnModel.getQualifier());
     }
 
     @Test
     void typeOnlyMainTableColumnModelParserRetrievesCorrectType() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testTypeOnlyName);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_TYPE_ONLY_NAME);
 
-        assertEquals(testTypeOnlyType, testColumnModel.getType());
+        assertEquals(TEST_TYPE_ONLY_TYPE, testColumnModel.getType());
     }
 
     @Test
     void typeOnlyMainTableColumnModelParserRetrievesCorrectQualifier() {
-        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testTypeOnlyName);
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse(TEST_TYPE_ONLY_NAME);
 
         assertEquals("", testColumnModel.getQualifier());
     }
