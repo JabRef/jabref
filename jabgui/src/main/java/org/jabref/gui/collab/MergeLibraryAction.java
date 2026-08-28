@@ -3,6 +3,7 @@ package org.jabref.gui.collab;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -89,18 +90,21 @@ public class MergeLibraryAction extends SimpleCommand {
                 changes,
                 activeDatabase,
                 Localization.lang("External Changes Resolver"));
-        dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+        Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+        if (areAllChangesResolved.orElse(false)) {
+            List<DatabaseChange> resolvedChanges = databaseChangesResolverDialog.getResolvedChanges();
 
-        boolean anyChange = undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
-                changes.stream()
-                       .filter(DatabaseChange::isAccepted)
-                       .forEach(change -> change.applyChange(edit)));
+            boolean anyChange = undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                    resolvedChanges.stream()
+                                   .filter(DatabaseChange::isAccepted)
+                                   .forEach(change -> change.applyChange(edit)));
 
-        if (anyChange) {
-            libraryTabContainer.getLibraryTabs().stream()
-                               .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
-                               .findFirst()
-                               .ifPresent(LibraryTab::markBaseChanged);
+            if (anyChange) {
+                libraryTabContainer.getLibraryTabs().stream()
+                                   .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
+                                   .findFirst()
+                                   .ifPresent(LibraryTab::markBaseChanged);
+            }
         }
     }
 }
