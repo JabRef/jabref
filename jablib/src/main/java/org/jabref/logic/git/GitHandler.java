@@ -29,15 +29,13 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,41 +91,37 @@ public class GitHandler {
     /// Unlike [#initIfNeeded()] this stages nothing else, so unrelated files in the directory
     /// (PDFs, notes, other libraries) stay untracked until the user adds them deliberately.
     ///
-    /// Fails with a [JabRefException] if there already is a repository, or if the file did not end up
-    /// in the commit — an ignore rule can exclude it from `git add` without failing the commit.
+    /// Fails with a [JabRefException] if there already is a repository, or if the file cannot be staged —
+    /// an ignore rule excludes it from `git add` silently. Everything this call created is removed again
+    /// on failure, so the user can fix the cause and retry, or clone into the directory instead.
     public void initAndCommit(Path fileToCommit) throws IOException, GitAPIException, JabRefException {
         if (isGitRepository()) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
         }
+        Path gitignore = repositoryPath.resolve(".gitignore");
+        boolean gitignoreExisted = Files.exists(gitignore);
+        String pathInRepository = repositoryPath.relativize(fileToCommit.toAbsolutePath()).toString();
         try (Git git = Git.init()
                           .setDirectory(repositoryPathAsFile)
                           .setInitialBranch("main")
                           .call()) {
-            // "git" object is not used later, but we need to close it after initialization
-        }
-        setupGitIgnore();
-        String pathInRepository = repositoryPath.relativize(fileToCommit.toAbsolutePath()).toString();
-        try (Git git = Git.open(repositoryPathAsFile)) {
+            setupGitIgnore();
             git.add()
                .addFilepattern(pathInRepository)
                .addFilepattern(".gitignore")
                .call();
-            git.commit()
-               .setAllowEmpty(true)
-               .setMessage("Initial commit")
-               .call();
-            if (!isCommitted(git.getRepository(), pathInRepository)) {
+            if (git.getRepository().readDirCache().findEntry(pathInRepository) < 0) {
                 throw new JabRefException(Localization.lang("Could not add %0 to the Git repository. Check the .gitignore file.", pathInRepository));
             }
-        }
-    }
-
-    private static boolean isCommitted(Repository repository, String pathInRepository) throws IOException {
-        try (RevWalk revWalk = new RevWalk(repository)) {
-            RevTree headTree = revWalk.parseCommit(repository.resolve(Constants.HEAD)).getTree();
-            try (TreeWalk treeWalk = TreeWalk.forPath(repository, pathInRepository, headTree)) {
-                return treeWalk != null;
+            git.commit()
+               .setMessage("Initial commit")
+               .call();
+        } catch (IOException | GitAPIException | JabRefException e) {
+            FileUtils.delete(repositoryPath.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
+            if (!gitignoreExisted) {
+                Files.deleteIfExists(gitignore);
             }
+            throw e;
         }
     }
 

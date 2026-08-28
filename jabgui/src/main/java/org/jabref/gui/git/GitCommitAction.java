@@ -14,7 +14,12 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GitCommitAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitCommitAction.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -62,7 +67,7 @@ public class GitCommitAction extends SimpleCommand {
                 Localization.lang("Git Commit"),
                 Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0 and commit %1?\nOther files in that folder stay untracked.", directory.toString(), bibFilePath.getFileName().toString()),
                 Localization.lang("Initialize"),
-                Localization.lang("Cancel"));
+                Localization.lang("Do not initialize"));
         if (!initialize) {
             return;
         }
@@ -72,10 +77,13 @@ public class GitCommitAction extends SimpleCommand {
                           return null;
                       })
                       .onSuccess(_ -> dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString())))
-                      .onFailure(e -> dialogService.showErrorDialogAndWait(
-                              Localization.lang("Git Commit"),
-                              Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
-                              e))
+                      .onFailure(e -> {
+                          LOGGER.error("Could not initialize a Git repository in {}", directory, e);
+                          dialogService.showErrorDialogAndWait(
+                                  Localization.lang("Git Commit"),
+                                  Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
+                                  e);
+                      })
                       .executeWith(taskExecutor);
     }
 
