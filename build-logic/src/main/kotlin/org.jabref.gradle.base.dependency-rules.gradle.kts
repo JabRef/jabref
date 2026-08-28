@@ -96,6 +96,12 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
 
+    listOf("org.apache.sshd:sshd-osgi", "org.apache.sshd:sshd-sftp").forEach { sshd ->
+        module(sshd) {
+            // sshd logs via slf4j directly; the declared JCL bridge conflicts with commons-logging (needed by pdfbox)
+            removeDependency("org.slf4j:jcl-over-slf4j")
+        }
+    }
     module("org.testfx:testfx-core") {
         removeDependency("org.osgi:org.osgi.core")
     }
@@ -282,12 +288,31 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.sshd:sshd-osgi", "org.apache.sshd.osgi") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("org.slf4j")
+        uses("org.apache.sshd.common.io.IoServiceFactoryFactory")
+    }
+    module("org.apache.sshd:sshd-sftp", "org.apache.sshd.sftp") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.slf4j")
+    }
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
         exportAllPackages()
         requires("org.slf4j")
         uses("org.eclipse.jgit.lib.SignerFactory")
         uses("org.eclipse.jgit.transport.SshSessionFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache", "org.eclipse.jgit.ssh.apache") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.apache.sshd.sftp")
+        requires("org.eclipse.jgit")
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.transport.sshd.agent.ConnectorFactory")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {

@@ -127,6 +127,7 @@ dependencies.constraints {
     api("org.bouncycastle:bcprov-jdk18on:1.85.2")
     api("org.controlsfx:controlsfx:11.2.4")
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
+    api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.7.1.202607240634-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.hk2:hk2-api:4.0.2")

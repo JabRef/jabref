@@ -290,6 +290,7 @@ open module org.jabref.jablib {
 
     // region: jgit
     requires transitive org.eclipse.jgit;
+    requires org.eclipse.jgit.ssh.apache;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
     // endregion
