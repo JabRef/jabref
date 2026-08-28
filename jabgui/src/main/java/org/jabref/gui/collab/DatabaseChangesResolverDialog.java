@@ -16,7 +16,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -51,17 +50,16 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private boolean areAllChangesAccepted;
     private boolean areAllChangesDenied;
 
-    @Inject private UndoManager undoManager;
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;
 
-    /// A dialog going through given `changes`, which are diffs to the provided `database`.
-    /// Each accepted change is written to the provided `database`.
+    /// A dialog going through the given `changes`, which are diffs to the provided `database`.
+    /// The dialog collects the user's accept, deny, or merge decisions so callers can apply the resolved changes afterward.
     ///
     /// @param changes  The list of changes
-    /// @param database The database to apply the changes to
+    /// @param database The database whose current state is compared and previewed
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {
         this.changes = changes;
         this.database = database;
@@ -88,6 +86,14 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     public boolean areAllChangesDenied() {
         return areAllChangesDenied;
+    }
+
+    public boolean resolvedChangesMatchDisk() {
+        return viewModel.resolvedChangesMatchDisk();
+    }
+
+    public List<DatabaseChange> getResolvedChanges() {
+        return viewModel.getResolvedChanges();
     }
 
     @FXML
