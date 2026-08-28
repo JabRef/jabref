@@ -123,6 +123,11 @@ jobs:
           # Push the resolved merge back to the PR branch. This is the whole point:
           # the push triggers a fresh run that then reports no conflicts (no comment).
           push-changes: true
+      # maven-flow/merge leaves the target branch checked out, so HEAD is the merge commit it pushed.
+      - name: Record pushed merge commit
+        id: merge_commit
+        if: steps.automerge.outcome == 'success'
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Handle merge conflict
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING'
@@ -130,6 +135,7 @@ jobs:
           AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
           APPROVED_AUTOMERGE: ${{ steps.pr_info.outputs.approved_automerge }}
           HEAD_REPO: ${{ steps.pr_info.outputs.head_repo }}
+          MERGE_COMMIT: ${{ steps.merge_commit.outputs.sha }}
           PAT: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,14 +153,17 @@ jobs:
               # The label triggers "On PR labeled", which approves again and re-enables auto-merge.
               # Needs the PAT: label events created with GITHUB_TOKEN do not trigger workflows.
               # "On PR labeled" only approves heads in JabRef/jabref; for forks, the label would be a dead promise.
-              if [ "$HEAD_REPO" = "JabRef/jabref" ]; then
+              if [ "$HEAD_REPO" != "JabRef/jabref" ]; then
+                echo "⚠️ Approved fork PR with auto-merge - approval must be renewed manually" >> $GITHUB_STEP_SUMMARY
+              elif [ "$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" != "$MERGE_COMMIT" ]; then
+                # A human commit landed after our push: it is not covered by the approval read above.
+                echo "⚠️ PR head moved past the merge commit - not re-approving" >> $GITHUB_STEP_SUMMARY
+              else
                 # Remove first: the label may still be attached from the original auto-merge request,
                 # and re-adding an attached label produces no "labeled" event.
                 gh pr edit "$PR_NUMBER" --remove-label automerge
                 GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
                 echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
-              else
-                echo "⚠️ Approved fork PR with auto-merge - approval must be renewed manually" >> $GITHUB_STEP_SUMMARY
               fi
             fi
             exit 0
