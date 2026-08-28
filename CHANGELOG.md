@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764]([https://github.com/JabRef/jabref/issues/16357](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764))
+- We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
 - We added a new "Primer" theme, based on [AtlantaFX](https://mkpaz.github.io/atlantafx/)'s Primer theme. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - The remote instance listener now answers the plain-text health check `JABREF/1 PING` with `JABREF/1 PONG jabref`, so external tools (e.g. browser extensions) can detect a running JabRef without speaking the Java serialization protocol. [#16654](https://github.com/JabRef/jabref/pull/16654)
 - We added some missing tooltips to buttons such as "Export Cited" and "Bibliography properties" in the OpenOffice/LibreOffice panel. [#16492](https://github.com/JabRef/jabref/pull/16492)
