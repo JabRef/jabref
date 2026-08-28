@@ -82,6 +82,13 @@ Git push must report a rejected remote update to the user.
 
 Needs: impl
 
+## Git commit previews changes in the current library
+`req~ux.git-commit.preview-current-library~1`
+
+Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
+
+Needs: impl
+
 ## Committing does not depend on the remote
 `req~ux.git-commit.remote-independent~1`
 
