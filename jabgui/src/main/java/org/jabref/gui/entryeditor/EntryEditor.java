@@ -43,7 +43,6 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -300,10 +299,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     public void openJumpToFieldDialog() {
         if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
             BaseDialog.bringToFront(jumpToFieldDialog);
-            return;
-        }
-        if (!focusUtils.isAllFieldsTabEnabled()) {
-            dialogService.notify(Localization.lang("Enable the Main tab in Preferences > Entry editor to use jump-to-field"));
             return;
         }
 

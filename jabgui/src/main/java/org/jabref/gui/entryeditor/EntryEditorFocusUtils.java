@@ -102,27 +102,19 @@ class EntryEditorFocusUtils {
     }
 
     private void addFieldViaAllFieldsTab(Field field) {
-        getAllFieldsTab()
-                .ifPresent(allFieldsTab -> {
-                    BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
-                    Field canonicalField = canonicalFieldForActiveMode(field, mode);
-                    if (!FieldFactory.getAllFieldsWithOutInternal().contains(canonicalField)) {
-                        return;
-                    }
-                    tabPane.getSelectionModel().select(allFieldsTab);
-                    allFieldsTab.addFieldAndFocus(canonicalField);
-                });
-    }
-
-    private Optional<AllFieldsTab> getAllFieldsTab() {
-        return tabPane.getTabs().stream()
-                      .filter(AllFieldsTab.class::isInstance)
-                      .map(AllFieldsTab.class::cast)
-                      .findFirst();
-    }
-
-    boolean isAllFieldsTabEnabled() {
-        return getAllFieldsTab().isPresent();
+        tabPane.getTabs().stream()
+               .filter(AllFieldsTab.class::isInstance)
+               .map(AllFieldsTab.class::cast)
+               .findFirst()
+               .ifPresent(allFieldsTab -> {
+                   BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                   Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                   if (!FieldFactory.getAllFieldsWithOutInternal().contains(canonicalField)) {
+                       return;
+                   }
+                   tabPane.getSelectionModel().select(allFieldsTab);
+                   allFieldsTab.addFieldAndFocus(canonicalField);
+               });
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
