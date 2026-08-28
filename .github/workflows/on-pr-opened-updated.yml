@@ -64,7 +64,8 @@ jobs:
             echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
           fi
 
-      # Once the conflict is resolved, drop the old comment. Otherwise, the next
+      # Once the conflict is resolved, drop the old comment (posted as jabref-machine by
+      # pr-comment.yml, or as github-actions by the dispatch path below). Otherwise, the next
       # conflict is silently skipped by the "Already commented" check below.
       - name: Remove stale conflict comments
         if: steps.check_mergeable.outputs.mergeable != 'CONFLICTING'
@@ -75,7 +76,7 @@ jobs:
         run: |
           set -exo pipefail
           gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
-            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("Conflicts with target branch"))) | .id' |
+            --jq '.[] | select((.user.login == "github-actions[bot]" or .user.login == "jabref-machine") and (.body | contains("Conflicts with target branch"))) | .id' |
           while read -r id; do
             gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
             echo "Removed stale conflict comment $id" >> $GITHUB_STEP_SUMMARY
