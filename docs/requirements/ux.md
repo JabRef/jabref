@@ -82,6 +82,13 @@ Git push must report a rejected remote update to the user.
 
 Needs: impl
 
+## Committing does not depend on the remote
+`req~ux.git-commit.remote-independent~1`
+
+Git commit must offer the uncommitted changes of the local library even when no remote is configured or the configured remote cannot be reached.
+
+Needs: impl
+
 ### Activating large libraries keeps entry previews responsive
 `req~ux.active-library.preview-responsiveness~1`
 
