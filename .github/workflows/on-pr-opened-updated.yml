@@ -197,6 +197,8 @@ jobs:
         run: |
           set -exo pipefail
           MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
-          if gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' | grep -qzF -- "$MARKER"; then
+          # File, not pipe: "grep -q" exits on the first match and would SIGPIPE "gh", which pipefail turns into a skip.
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' > comments.txt
+          if grep -qzF -- "$MARKER" comments.txt; then
             gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
           fi
