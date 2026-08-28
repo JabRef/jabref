@@ -87,22 +87,17 @@ loopback server cannot detect mid-request client disconnect, so cancellation
 flows via the provider-side fetch timeout (5 min). The spec explicitly permits
 this trade-off.
 
-## Merge with jabrefHost.py
+## Relationship to jabrefHost.py
 
-Both hosts **are** the one process. `jabext_host.py` folds in
-`jabgui/buildres/*/jabrefHost.py` (`{"status":"validate"}` → `JabRef --version`;
-`{"text": …}` → `JabRef --importBibtex`); `jabext_host.ps1` folds in
-`buildres/windows/JabRefHost.ps1` (validate → `Test-Path`; import → temp file +
-`JabRef.bat --importToOpen`). So a single host serves both the fulltext HTTP
-loopback and the import direction on one native-messaging connection, and a
-missing JabRef launcher replies with an error instead of taking the process
-down. `e2e_test.py` exercises the import round-trip against both hosts (a
-`JABEXT_FAKE_JABREF` env hook stands in for the launcher).
+This host serves the fulltext direction only. The import direction (browser →
+JabRef: send a BibTeX entry) is served by a separate native-messaging host,
+`org.jabref.jabref` (`jabgui/buildres/*/jabrefHost.py` and
+`buildres/windows/JabRefHost.ps1`), which the extension reaches one-shot.
 
-Remaining to fully retire the old hosts: the **extension** must send its import
-messages to `jabext_bridge` over the same `connectNative` connection (today it
-uses the separate `org.jabref.jabref` host); then `jabrefHost.py` /
-`JabRefHost.ps1` + their registration can be deleted.
+The two are deliberately kept separate: import is stateless and one-shot, while
+this host is a long-lived server owning a loopback port and a discovery file.
+See [ADR 0070](../docs/decisions/0070-separate-native-messaging-hosts-for-import-and-fulltext.md)
+for the trade-offs.
 
 ## Lifecycle
 

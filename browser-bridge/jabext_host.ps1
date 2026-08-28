@@ -42,10 +42,6 @@ function Ensure-Token {
 $Sync = [hashtable]::Synchronized(@{
     Pending = [hashtable]::Synchronized(@{}); Bearer = ''; Seq = 0
     Out = $null; OutLock = (New-Object object); Listener = $null; Done = $false
-    # import direction (folded-in JabRefHost.ps1): the JabRef launcher and a
-    # test hook that skips the real shell-out.
-    JabRefExe = (Join-Path $PSScriptRoot 'runtime\bin\JabRef.bat')
-    FakeJabRef = [bool]$env:JABEXT_FAKE_JABREF
 })
 
 function Write-Frame($obj) {                        # [FIDDLY] manual 4-byte len + json
@@ -151,9 +147,10 @@ function Handle-Context($ctx) {
     }
 }
 
-# Background runspace: blocking native-messaging read loop. Reads frames,
-# delivers fulltext replies, and handles the folded-in JabRefHost.ps1 import
-# commands so this one process serves both directions.
+# Background runspace: blocking native-messaging read loop. Reads frames and
+# delivers fulltext replies (correlated by requestId). Import is served by a
+# separate host (JabRefHost.ps1 / org.jabref.jabref, see ADR 0070), so messages
+# without a requestId are ignored here.
 $ReaderScript = {
     param($Sync)
     $stdin = [Console]::OpenStandardInput()
@@ -165,51 +162,12 @@ $ReaderScript = {
         while ($n -lt $len) { $r = $s.Read($buf, $n, $len - $n); if ($r -le 0) { return $null }; $n += $r }
         return [Text.Encoding]::UTF8.GetString($buf) | ConvertFrom-Json
     }
-    function WriteReply($Sync, $obj) {              # shares the stdout lock with Write-Frame
-        $data = [Text.Encoding]::UTF8.GetBytes(($obj | ConvertTo-Json -Compress -Depth 6))
-        [System.Threading.Monitor]::Enter($Sync.OutLock)
-        try {
-            $Sync.Out.Write([BitConverter]::GetBytes([int]$data.Length), 0, 4)
-            $Sync.Out.Write($data, 0, $data.Length); $Sync.Out.Flush()
-        } finally { [System.Threading.Monitor]::Exit($Sync.OutLock) }
-    }
-    function HandleImport($Sync, $msg) {           # JabRefHost.ps1 behaviour, folded in
-        if ($Sync.FakeJabRef) {                    # test hook: skip the real JabRef shell-out
-            if ($msg.status -eq 'validate') { WriteReply $Sync @{ message = 'jarFound' } }
-            elseif ($msg.text)              { WriteReply $Sync @{ message = 'ok'; output = 'imported (fake)' } }
-            return
-        }
-        $exe = $Sync.JabRefExe
-        if ($msg.status -eq 'validate') {
-            if (Test-Path -LiteralPath $exe) { WriteReply $Sync @{ message = 'jarFound' } }
-            else { WriteReply $Sync @{ message = 'jarNotFound'; path = $exe } }
-            return
-        }
-        if (-not $msg.text) { return }
-        if (-not (Test-Path -LiteralPath $exe)) {
-            WriteReply $Sync @{ message = 'jarNotFound'; output = "Unable to locate '$exe'." }; return
-        }
-        try {
-            $text = ([string]$msg.text).Replace("`n", " ").Replace("`r", " ")
-            $tmp = New-TemporaryFile
-            [IO.File]::WriteAllLines($tmp, $text)  # UTF-8 without BOM
-            $out = & $exe --importToOpen $tmp *>&1
-            Remove-Item $tmp -ErrorAction SilentlyContinue
-            WriteReply $Sync @{ message = 'ok'; output = "$out" }
-        } catch {
-            WriteReply $Sync @{ message = 'error'; output = "$($_.Exception.Message)" }
-        }
-    }
     while ($true) {
         $msg = ReadFrame $stdin
         if ($null -eq $msg) { break }               # stdin EOF: browser/extension gone
         if ($msg.PSObject.Properties.Name -contains 'requestId') {
             $slot = $Sync.Pending[$msg.requestId]
             if ($slot) { $slot.Reply = $msg; $slot.Event.Set() }
-        } else {
-            # Handled inline (unlike the .py, which threads it); an import briefly
-            # delays fulltext-reply delivery on this loop. Fine for infrequent imports.
-            HandleImport $Sync $msg
         }
     }
     $Sync.Done = $true

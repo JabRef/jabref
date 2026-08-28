@@ -1,7 +1,7 @@
 ---
 nav_order: 70
 parent: Decision Records
-status: proposed
+status: accepted
 date: 2026-08-28
 ---
 
