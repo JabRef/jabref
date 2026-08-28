@@ -188,6 +188,8 @@
         /* Group hit-count badge */
         -color-badge-bg: -color-neutral-emphasis;
         -color-badge-fg: -color-fg-emphasis;
+        /* Text on the green badge of a group that contains selected entries */
+        -color-badge-selected-fg: #FFFFFF;
 
         /* Scrim and drop shadows */
         -color-scrim: rgba(27, 31, 36, 0.75);
@@ -376,6 +378,8 @@
         /* Group hit-count badge */
         -color-badge-bg: -color-neutral-emphasis;
         -color-badge-fg: -color-fg-emphasis;
+        /* Text on the green badge of a group that contains selected entries */
+        -color-badge-selected-fg: #000000;
 
         /* Scrim and drop shadows */
         -color-scrim: rgba(1, 4, 9, 0.8);
