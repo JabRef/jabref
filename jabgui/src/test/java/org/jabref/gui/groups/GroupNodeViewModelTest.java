@@ -2,6 +2,9 @@ package org.jabref.gui.groups;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import javafx.beans.binding.IntegerBinding;
 import javafx.collections.FXCollections;
@@ -13,6 +16,7 @@ import org.jabref.gui.icon.JabRefSvgIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,7 +34,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GroupNodeViewModelTest {
@@ -316,6 +323,43 @@ class GroupNodeViewModelTest {
         databaseContext.getDatabase().removeEntry(firstEntry);
 
         assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreUpdatedWhenManyMatchingEntriesAreRemoved() {
+        List<BibEntry> entriesToRemove = IntStream.range(0, 11)
+                                                  .mapToObj(_ -> new BibEntry().withField(StandardField.TITLE, "search"))
+                                                  .toList();
+        BibEntry remainingEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(entriesToRemove);
+        databaseContext.getDatabase().insertEntry(remainingEntry);
+
+        viewModel.ensureMatchedEntriesLoaded();
+        assertEquals(12, viewModel.getHits().getValue().intValue());
+
+        databaseContext.getDatabase().removeEntries(entriesToRemove);
+
+        assertEquals(1, viewModel.getHits().getValue().intValue());
+    }
+
+    @Test
+    void clearingManyEntriesSchedulesGroupRefresh() {
+        TaskExecutor recordingTaskExecutor = mock(TaskExecutor.class);
+        new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                recordingTaskExecutor,
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false),
+                new CustomLocalDragboard(),
+                preferences);
+        List<BibEntry> entriesToRemove = IntStream.range(0, 11)
+                                                  .mapToObj(_ -> new BibEntry().withField(StandardField.TITLE, "search"))
+                                                  .toList();
+        databaseContext.getDatabase().insertEntries(entriesToRemove);
+
+        databaseContext.getDatabase().removeEntries(entriesToRemove);
+
+        verify(recordingTaskExecutor).schedule(any(BackgroundTask.class), eq(0L), eq(TimeUnit.MILLISECONDS));
     }
 
     @Test
