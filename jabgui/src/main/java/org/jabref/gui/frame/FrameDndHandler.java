@@ -268,15 +268,10 @@ public class FrameDndHandler {
         if (javafxTransferMode == null) {
             return org.jabref.model.TransferMode.NONE;
         }
-        switch (javafxTransferMode) {
-            case COPY -> {
-                return org.jabref.model.TransferMode.COPY;
-            }
-            case MOVE -> {
-                return org.jabref.model.TransferMode.MOVE;
-            }
-            default ->
-                    throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
-        }
+        return switch (javafxTransferMode) {
+            case COPY -> org.jabref.model.TransferMode.COPY;
+            case MOVE -> org.jabref.model.TransferMode.MOVE;
+            case LINK -> org.jabref.model.TransferMode.NONE;
+        };
     }
 }
