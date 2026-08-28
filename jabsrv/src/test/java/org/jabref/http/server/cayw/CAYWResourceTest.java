@@ -103,7 +103,6 @@ class CAYWResourceTest extends ServerTest {
     void unknownLibraryPathReturnsBadRequest() {
         Response response = target("/better-bibtex/cayw")
                 .queryParam("format", "biblatex")
-                .queryParam("selected", "1")
                 .queryParam("librarypath", "/tmp/not-served-library.bib")
                 .request()
                 .get();
@@ -117,7 +116,6 @@ class CAYWResourceTest extends ServerTest {
 
         Response response = target("/better-bibtex/cayw")
                 .queryParam("format", "biblatex")
-                .queryParam("selected", "1")
                 .queryParam("librarypath", "/tmp/not-served-library.bib")
                 .request()
                 .get();
