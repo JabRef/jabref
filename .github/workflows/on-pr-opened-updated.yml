@@ -17,6 +17,7 @@ jobs:
     name: Conflicts with target branch
     runs-on: ubuntu-slim
     permissions:
+      actions: write
       contents: write
       issues: write
       pull-requests: write
@@ -183,9 +184,11 @@ jobs:
 
           exit 1
 
-      # The conflict comment is the marker that "status: changes-required" came from this workflow
-      # and not from a reviewer - without it, labels are left alone.
-      - name: Restore labels after conflict resolved
+      # Only if this workflow had flagged a conflict (its comment is the marker), not on every push.
+      # "Comment on PR" then does the rest: ghprcomment deletes the conflict comment (no job of this
+      # run fails), and the status labels are re-evaluated with the full rule set - other bot
+      # comments, active Qodo threads, draft, review decision - instead of duplicating it here.
+      - name: Re-evaluate status labels after conflict resolved
         if: steps.check_mergeable.outputs.mergeable == 'MERGEABLE'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -193,26 +196,6 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -exo pipefail
-
-          COMMENT_IDS=$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
-            --jq '.[] | select(.body | contains("Conflicts with target branch")) | .id')
-          if [ -z "$COMMENT_IDS" ]; then
-            exit 0
-          fi
-          for id in $COMMENT_IDS; do
-            gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
-          done
-
-          # Same readiness rule as in "Comment on PR": a draft, a human "changes requested", or a PR
-          # already further in review must not be flipped back to ready-for-review.
-          READY=$(gh pr view "$PR_NUMBER" --json isDraft,reviewDecision,labels \
-            --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
-                     or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
-                  then "not-ready" else "ready" end')
-          if [ "$READY" = "ready" ]; then
-            gh issue edit "$PR_NUMBER" --remove-label "status: changes-required" --add-label "status: ready-for-review"
-            echo "✅ Conflict resolved - restored ready-for-review" >> $GITHUB_STEP_SUMMARY
-          else
-            gh issue edit "$PR_NUMBER" --remove-label "status: changes-required"
-            echo "✅ Conflict resolved - removed changes-required" >> $GITHUB_STEP_SUMMARY
+          if gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' | grep -q "Conflicts with target branch"; then
+            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
           fi
