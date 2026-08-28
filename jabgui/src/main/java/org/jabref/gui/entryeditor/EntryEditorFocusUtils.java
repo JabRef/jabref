@@ -82,7 +82,13 @@ class EntryEditorFocusUtils {
     void focusOrAddField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
-                () -> addFieldViaAllFieldsTab(field)
+                () -> {
+                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            () -> addFieldViaAllFieldsTab(field)
+                    );
+                }
         ));
     }
 
