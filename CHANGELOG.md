@@ -93,7 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where "File > Git > Commit" reported "Nothing to commit." in a repository without a configured remote. [#16704](https://github.com/JabRef/jabref/pull/16704)
+- We fixed an issue where "File > Git > Commit" reported "Nothing to commit." in a repository without a configured remote. TODO
 - We fixed the unreadable hit count on group badges that turn green because they contain selected entries. [#16700](https://github.com/JabRef/jabref/pull/16700)
 - We fixed an issue where resolving external library conflicts through the merge dialog could discard the merged result. [#16537](https://github.com/JabRef/jabref/issues/16537)
 - We fixed an issue where switching entries in the source tab could throw an exception or overwrite another entry. [#16534](https://github.com/JabRef/jabref/issues/16534)
