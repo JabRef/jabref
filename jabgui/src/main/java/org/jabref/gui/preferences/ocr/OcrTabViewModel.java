@@ -138,7 +138,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
                 BackgroundTask.wrap(() -> autoDetectDefaultEnginePath(selectionAtStart));
         String engineSelectionName = selectionAtStart.getDisplayName();
 
-        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of %0 path", engineSelectionName));
+        autoDetectTask.titleProperty().set(Localization.lang("Auto-detection of %0 path", engineSelectionName));
         autoDetectTask.showToUser(true);
         autoDetectTask.onSuccess(result -> {
             if (selectedEngine.get() != selectionAtStart) {
@@ -156,7 +156,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             if (selectedEngine.get() != selectionAtStart) {
                 return;
             }
-            dialogService.notify(Localization.lang("Auto detection of %0 path failed", engineSelectionName));
+            dialogService.notify(Localization.lang("Auto-detection of %0 path failed", engineSelectionName));
         });
         taskExecutor.execute(autoDetectTask);
     }
@@ -182,7 +182,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             return process.exitValue() == 0;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOGGER.debug("Auto detection of {} as engine's path was interrupted", path, e);
+            LOGGER.debug("Auto-detection of {} as engine's path was interrupted", path, e);
             return false;
         } catch (IOException e) {
             LOGGER.debug("{} is not available as engine's path: IOException occurred", path, e);
