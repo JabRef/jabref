@@ -3,6 +3,7 @@ package org.jabref.gui.git;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,9 +29,11 @@ class GitCommitActionTest {
     Path libraryDirectory;
 
     @Test
-    void committingLibraryOutsideRepositoryInitializesRepositoryAndAddsLibrary() throws Exception {
+    void committingLibraryOutsideRepositoryInitializesRepositoryAndAddsOnlyTheLibrary() throws Exception {
         Path libraryFile = libraryDirectory.resolve("library.bib");
         Files.writeString(libraryFile, "@Article{test,}");
+        Path unrelatedFile = libraryDirectory.resolve("notes.txt");
+        Files.writeString(unrelatedFile, "not part of the library");
 
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
@@ -46,7 +48,8 @@ class GitCommitActionTest {
 
         assertEquals(Optional.of(libraryDirectory.toAbsolutePath()), GitHandler.findRepositoryRoot(libraryFile));
         try (Git git = Git.open(libraryDirectory.toFile())) {
-            assertTrue(git.status().call().getUntracked().isEmpty());
+            // library.bib and the generated .gitignore are committed, everything else stays untracked
+            assertEquals(Set.of("notes.txt"), git.status().call().getUntracked());
         }
     }
 }

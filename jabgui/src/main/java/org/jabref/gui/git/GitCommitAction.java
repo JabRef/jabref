@@ -1,5 +1,6 @@
 package org.jabref.gui.git;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
@@ -11,6 +12,8 @@ import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitCommitAction extends SimpleCommand {
 
@@ -55,23 +58,22 @@ public class GitCommitAction extends SimpleCommand {
         Path directory = bibFilePath.toAbsolutePath().getParent();
         boolean initialize = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Git Commit"),
-                Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0?", directory.toString()),
+                Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0 and commit %1?\nOther files in that folder stay untracked.", directory.toString(), bibFilePath.getFileName().toString()),
                 Localization.lang("Initialize"),
                 Localization.lang("Cancel"));
         if (!initialize) {
             return;
         }
 
-        // Creates the repository including an initial commit containing the library file
-        gitHandlerRegistry.get(directory).initIfNeeded();
-
-        if (GitHandler.findRepositoryRoot(bibFilePath).isEmpty()) {
+        try {
+            gitHandlerRegistry.get(directory).initAndCommit(bibFilePath);
+            dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString()));
+        } catch (IOException | GitAPIException e) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Commit"),
-                    Localization.lang("Could not initialize a Git repository in %0", directory.toString()));
-            return;
+                    Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
+                    e);
         }
-        dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString()));
     }
 
     private boolean hasNothingToCommit(Path bibFilePath) {

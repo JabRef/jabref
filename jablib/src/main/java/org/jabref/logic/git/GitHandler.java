@@ -85,6 +85,32 @@ public class GitHandler {
         }
     }
 
+    /// Creates the repository if there is none yet and commits `fileToCommit` together with the generated
+    /// `.gitignore`. Unlike [#initIfNeeded()] this stages nothing else, so unrelated files in the directory
+    /// (PDFs, notes, other libraries) stay untracked until the user adds them deliberately.
+    public void initAndCommit(Path fileToCommit) throws IOException, GitAPIException {
+        if (isGitRepository()) {
+            return;
+        }
+        try (Git git = Git.init()
+                          .setDirectory(repositoryPathAsFile)
+                          .setInitialBranch("main")
+                          .call()) {
+            // "git" object is not used later, but we need to close it after initialization
+        }
+        setupGitIgnore();
+        try (Git git = Git.open(repositoryPathAsFile)) {
+            git.add()
+               .addFilepattern(repositoryPath.relativize(fileToCommit.toAbsolutePath()).toString())
+               .addFilepattern(".gitignore")
+               .call();
+            git.commit()
+               .setAllowEmpty(true)
+               .setMessage("Initial commit")
+               .call();
+        }
+    }
+
     private static Optional<String> currentRemoteUrl(Repository repo) {
         try {
             StoredConfig config = repo.getConfig();
