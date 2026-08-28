@@ -47,7 +47,7 @@ public final class DocumentReader {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, fileLink);
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, fileLink, pageNumber);
+                addContentIfNotEmpty(pdfDocument, newDocument, fileLink, resolvedPdfPath, pageNumber);
 
                 pages.add(newDocument);
             }
@@ -90,7 +90,9 @@ public final class DocumentReader {
         addStringField(newDocument, PAGE_NUMBER.toString(), String.valueOf(pageNumber));
     }
 
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, String fileLink, int pageNumber) {
+    /// @param fileLink the plain file link as stored in the bib entry (may be relative or a URL)
+    /// @param resolvedPath the absolute path on the file system where the file was found
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, String fileLink, Path resolvedPath, int pageNumber) {
         PDFTextStripper pdfTextStripper = new PDFTextStripper() {
             @Override
             protected void operatorException(Operator operator, List<COSBase> operands, IOException e) throws IOException {
