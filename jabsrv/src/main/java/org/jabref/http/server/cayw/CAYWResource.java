@@ -29,7 +29,6 @@ import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 
-import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
@@ -64,7 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-@AllowedToUseAwt("Requires java.awt.GraphicsEnvironment.isHeadless()")
 @jakarta.ws.rs.Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
