@@ -40,8 +40,10 @@ public class GitStatusChecker {
             SyncStatus syncStatus;
 
             if (remoteHead == null) {
-                boolean remoteEmpty = isRemoteEmpty(gitHandler);
-                if (remoteEmpty) {
+                if (!gitHandler.hasRemote("origin")) {
+                    LOGGER.debug("No origin remote configured -> UNKNOWN");
+                    syncStatus = SyncStatus.UNKNOWN;
+                } else if (isRemoteEmpty(gitHandler)) {
                     LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
                     syncStatus = SyncStatus.REMOTE_EMPTY;
                 } else {
