@@ -108,6 +108,7 @@ public class JabRefIconView extends Group {
         Paint color = iconColor.get();
         if ((color instanceof Color iconColorValue) && !getChildren().isEmpty()
                 && (getChildren().getFirst() instanceof JabRefSvgIcon svgIcon)) {
+            // FIXME: Inline style should be removed eventually.
             svgIcon.setStyle("-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(iconColorValue)));
         }
     }

@@ -15,6 +15,8 @@ pluginManagement {
         }
     }
     repositories {
+        // Same Maven Central mirror as in build-logic/build.gradle.kts (HTTP 429 workaround).
+        maven("https://maven-central.storage-download.googleapis.com/maven2/")
         gradlePluginPortal()
         maven("https://jitpack.io")
     }
