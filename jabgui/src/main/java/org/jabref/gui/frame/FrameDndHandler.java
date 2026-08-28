@@ -269,9 +269,12 @@ public class FrameDndHandler {
             return org.jabref.model.TransferMode.NONE;
         }
         return switch (javafxTransferMode) {
-            case COPY -> org.jabref.model.TransferMode.COPY;
-            case MOVE -> org.jabref.model.TransferMode.MOVE;
-            case LINK -> org.jabref.model.TransferMode.NONE;
+            case COPY ->
+                    org.jabref.model.TransferMode.COPY;
+            case MOVE ->
+                    org.jabref.model.TransferMode.MOVE;
+            case LINK ->
+                    org.jabref.model.TransferMode.NONE;
         };
     }
 }
