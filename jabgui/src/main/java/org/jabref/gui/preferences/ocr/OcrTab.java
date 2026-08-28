@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.ocr;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -82,16 +81,13 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
             }
         });
 
-items.stream()
+        items.stream()
              .filter(viewModel.selectedOcrLanguagesProperty()::contains)
              .forEach(languagesCombo.getCheckModel()::check);
 
-        languagesCombo.getCheckModel().getCheckedItems().addListener((InvalidationListener) _ ->
-                viewModel.selectedOcrLanguagesProperty().setAll(languagesCombo.getCheckModel().getCheckedItems()));
-                    );
-                    isSyncing[0] = false;
-                }
-        );
+        languagesCombo.getCheckModel().getCheckedItems().addListener((InvalidationListener) _ -> {
+            viewModel.selectedOcrLanguagesProperty().setAll(languagesCombo.getCheckModel().getCheckedItems());
+        });
 
         HBox.setHgrow(languagesCombo, Priority.ALWAYS);
         HBox row = new HBox(8.0, new Label(Localization.lang("OCR languages")), languagesCombo);

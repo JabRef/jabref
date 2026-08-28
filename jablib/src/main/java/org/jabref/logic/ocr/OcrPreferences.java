@@ -72,7 +72,7 @@ public class OcrPreferences {
         return ocrLanguages;
     }
 
-    public void setOcrLanguages(List<OcrLanguage> ocrLanguages) {
+    public void setOcrLanguages(ObservableList<OcrLanguage> ocrLanguages) {
         this.ocrLanguages.setAll(ocrLanguages);
     }
 

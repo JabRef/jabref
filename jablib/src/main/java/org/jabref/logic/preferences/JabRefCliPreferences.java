@@ -2175,12 +2175,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
-        List<String> savedLanguages = getStringList(OCR_LANGUAGES);
+        List<OcrLanguage> savedLanguages = getStringList(OCR_LANGUAGES).stream()
+                                                                       .map(OcrLanguage::safeValueOf)
+                                                                       .toList();
+
         List<OcrLanguage> ocrLanguagesToLoad = savedLanguages.isEmpty()
                                                ? defaultValues.getOcrLanguages()
-                                               : savedLanguages.stream()
-                                                               .map(OcrLanguage::safeValueOf)
-                                                               .toList();
+                                               : savedLanguages;
 
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),

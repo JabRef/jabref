@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -53,8 +54,8 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
-    private final ListProperty<OcrLanguage> ocrLanguageOptions = new SimpleListProperty<>(FXCollections.observableArrayList(OcrLanguage.values()));
-    private final ListProperty<OcrLanguage> selectedOcrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObservableList<OcrLanguage> ocrLanguageOptions = FXCollections.observableArrayList(OcrLanguage.values());
+    private final ObservableList<OcrLanguage> selectedOcrLanguages = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -78,6 +79,8 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             }
             autoDetectEnginePath();
         });
+
+        selectedOcrLanguages.setAll(ocrPreferences.getOcrLanguages());
     }
 
     @Override
@@ -118,11 +121,11 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         return pagesHaveTextOptions;
     }
 
-    public ListProperty<OcrLanguage> ocrLanguageOptionsProperty() {
+    public ObservableList<OcrLanguage> ocrLanguageOptionsProperty() {
         return ocrLanguageOptions;
     }
 
-    public ListProperty<OcrLanguage> selectedOcrLanguagesProperty() {
+    public ObservableList<OcrLanguage> selectedOcrLanguagesProperty() {
         return selectedOcrLanguages;
     }
 
