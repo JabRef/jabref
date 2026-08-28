@@ -196,6 +196,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -exo pipefail
-          if gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' | grep -q "Conflicts with target branch"; then
+          MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
+          if gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' | grep -qzF -- "$MARKER"; then
             gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
           fi
