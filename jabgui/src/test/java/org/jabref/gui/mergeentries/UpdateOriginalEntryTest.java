@@ -3,7 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -12,10 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class UpdateOriginalEntryTest {
@@ -25,7 +24,7 @@ class UpdateOriginalEntryTest {
 
     private BibEntry originalEntry;
     private DialogService dialogService;
-    private CountingUndoManager undoManager;
+    private UndoManager undoManager;
 
     @BeforeEach
     void setUp() {
@@ -33,7 +32,7 @@ class UpdateOriginalEntryTest {
                 .withField(StandardField.TITLE, "Original title")
                 .withField(StandardField.YEAR, "2020");
         dialogService = mock(DialogService.class);
-        undoManager = mock(CountingUndoManager.class);
+        undoManager = new UndoManager();
     }
 
     @Test
@@ -49,7 +48,7 @@ class UpdateOriginalEntryTest {
         assertEquals(Optional.of("Merged title"), originalEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("0378-5955"), originalEntry.getField(StandardField.ISSN));
         assertTrue(originalEntry.getField(StandardField.YEAR).isEmpty());
-        verify(undoManager).addEdit(any());
+        assertTrue(undoManager.canUndo());
         verify(dialogService).notify(SUCCESS_MESSAGE);
     }
 
@@ -62,7 +61,7 @@ class UpdateOriginalEntryTest {
 
         assertEquals(Optional.of("Original title"), originalEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("2020"), originalEntry.getField(StandardField.YEAR));
-        verify(undoManager, never()).addEdit(any());
+        assertFalse(undoManager.canUndo());
         verify(dialogService).notify("No information added");
     }
 
@@ -75,7 +74,7 @@ class UpdateOriginalEntryTest {
                 .update();
 
         assertEquals(StandardEntryType.Book, originalTypeOnlyEntry.getType());
-        verify(undoManager).addEdit(any());
+        assertTrue(undoManager.canUndo());
         verify(dialogService).notify(SUCCESS_MESSAGE);
     }
 
@@ -86,7 +85,7 @@ class UpdateOriginalEntryTest {
 
         assertEquals(Optional.of("Original title"), originalEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("2020"), originalEntry.getField(StandardField.YEAR));
-        verify(undoManager, never()).addEdit(any());
+        assertFalse(undoManager.canUndo());
         verify(dialogService).notify("Canceled merging entries");
     }
 }

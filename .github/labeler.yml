@@ -21,7 +21,7 @@
 
 "component: automatic-field-editor":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/edit/automaticfiededitor/**'
+      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/edit/automaticfieldeditor/**'
 
 "component: backup":
   - changed-files:
@@ -151,7 +151,6 @@
   - changed-files:
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/l10n/**'
-          - 'jablib/src/main/resources/l10n/**'
           - 'jabgui/src/**/org/jabref/gui/l10n/**'
 
 "component: JabKit [cli]":
