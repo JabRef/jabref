@@ -83,6 +83,7 @@ public record CSLStyleLoader(
                     }
                     boolean isNumeric = (boolean) info.get("isNumeric");
                     boolean hasBibliography = (boolean) info.get("hasBibliography");
+                    boolean hasBibliographySortOrder = (boolean) info.get("hasBibliographySortOrder");
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
 
                     // We use these metadata and just load the content instead of re-parsing for them
@@ -90,13 +91,23 @@ public record CSLStyleLoader(
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            // If cannot find styleId, then parse .csl to retrieve styleId
+                            // If cannot find styleId or styleClass, then parse .csl to retrieve them
                             if (styleId.isBlank() || styleClass.isBlank()) {
                                 Optional<CSLStyleUtils.StyleInfo> parsedStyleInfo = CSLStyleUtils.parseStyleInfo(path, source);
                                 styleId = styleId.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleId).orElse("") : styleId;
                                 styleClass = styleClass.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleClass).orElse("") : styleClass;
                             }
-                            CitationStyle style = new CitationStyle(path, styleId, styleClass, title, shortTitle, isNumeric, hasBibliography, usesHangingIndent, source, true);
+                            CitationStyle style = new CitationStyle(
+                                    path,
+                                    styleId,
+                                    styleClass,
+                                    title, shortTitle,
+                                    isNumeric,
+                                    hasBibliography,
+                                    hasBibliographySortOrder,
+                                    usesHangingIndent,
+                                    source,
+                                    true);    // isInternalStyle
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
