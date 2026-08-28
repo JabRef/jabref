@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
@@ -49,6 +50,8 @@ class GitHandlerTest {
     Path remoteRepoPath;
     @TempDir
     Path clonePath;
+    @TempDir
+    Path libraryPath;
     private GitHandler gitHandler;
 
     @BeforeEach
@@ -101,6 +104,30 @@ class GitHandlerTest {
         RepositoryCache.clear();
         // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
         WindowCache.reconfigure(new WindowCacheConfig());
+    }
+
+    @Test
+    void initAndCommitTracksOnlyTheGivenFile() throws Exception {
+        Path libraryFile = libraryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Files.writeString(libraryPath.resolve("notes.txt"), "unrelated");
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        handler.initAndCommit(libraryFile);
+
+        try (Git git = Git.open(libraryPath.toFile())) {
+            assertEquals(Set.of("notes.txt"), git.status().call().getUntracked());
+        }
+    }
+
+    @Test
+    void initAndCommitFailsWhenTheFileIsIgnored() throws Exception {
+        Path libraryFile = libraryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Files.writeString(libraryPath.resolve(".gitignore"), "*.bib");
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        assertThrows(JabRefException.class, () -> handler.initAndCommit(libraryFile));
     }
 
     @Test
