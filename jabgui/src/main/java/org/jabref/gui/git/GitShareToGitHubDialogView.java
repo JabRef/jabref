@@ -106,7 +106,15 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     @FXML
     private void shareToGitHub() {
-        viewModel.shareToGitHub(this::close);
+        viewModel.shareToGitHub(this::onShared);
+    }
+
+    /// The library is inside a Git repository only after it has been shared, so the scheduler
+    /// cannot have been started when the library was opened
+    private void onShared() {
+        stateManager.activeTabProperty().get().ifPresent(tab ->
+                GitPullScheduler.start(tab.getBibDatabaseContext(), dialogService, preferences, stateManager, taskExecutor, tab::isModified));
+        close();
     }
 
     @FXML

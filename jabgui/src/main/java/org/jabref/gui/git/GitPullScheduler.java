@@ -62,7 +62,7 @@ public class GitPullScheduler {
         }
     }
 
-    /// Starts the scheduler for the given library, if it is stored inside a Git repository.
+    /// Starts the scheduler for the given library, if it is stored inside a Git repository and has no scheduler yet.
     ///
     /// This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
     ///
@@ -76,6 +76,10 @@ public class GitPullScheduler {
 
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty() || GitHandler.findRepositoryRoot(databasePath.get()).isEmpty()) {
+            return;
+        }
+
+        if (RUNNING_INSTANCES.stream().anyMatch(instance -> instance.bibDatabaseContext == bibDatabaseContext)) {
             return;
         }
 
