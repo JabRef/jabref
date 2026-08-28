@@ -499,7 +499,7 @@ Run this loop only when the contributor asks for it:
      --jq '.[] | select(.body | startswith("<h3>Code Review by Qodo")) | .updated_at'
    ```
 
-   Poll every two minutes; give up and tell the contributor after 15 minutes. As soon as the review is in, convert the PR back to draft (`gh pr ready --undo <number>`) so nobody picks it up while findings are being worked through. The query below lists only the threads that still need a reply — active (not resolved, not outdated) Qodo threads without a comment by the PR author — with the comment id needed for replying:
+   Poll every two minutes; give up and tell the contributor after 15 minutes. The query below lists only the threads that still need a reply — active (not resolved, not outdated) Qodo threads without a comment by the PR author — with the comment id needed for replying:
 
    ```bash
    gh api graphql -F pr=<number> -f query='
@@ -522,7 +522,7 @@ Run this loop only when the contributor asks for it:
 
    Reply with `gh api repos/JabRef/jabref/pulls/<number>/comments/<id>/replies -f body="🤖 Generated with ... "` — the reply starts with the marker (see [Marking AI-generated text](#marking-ai-generated-text)).
    Every Qodo thread needs a reply from the PR author: the `status: changes-required` label stays until each active thread has one.
-4. Qodo reviews every push again. Repeat steps 2–3 until the query returns nothing *and* the last push on the branch was the agent's fix push — only then `gh pr ready <number>`. Any later review (Qodo or human) starts the loop over: draft, work through the threads, ready.
+4. Qodo reviews every push again. Repeat steps 2–3 until the query returns nothing.
 
 ### Marking AI-generated text
 
