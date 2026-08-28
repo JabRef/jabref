@@ -67,7 +67,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - The "Show diff" button in the Git commit dialog now appears in the same row as the other buttons. [#16730](https://github.com/JabRef/jabref/issues/16730)
 
-
 ### Changed
 
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)

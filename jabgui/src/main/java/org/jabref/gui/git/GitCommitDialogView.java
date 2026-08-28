@@ -48,7 +48,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        
         Button showDiff = (Button) this.getDialogPane().lookupButton(showDiffButton);
         showDiff.addEventFilter(ActionEvent.ACTION, event -> {
             event.consume();
