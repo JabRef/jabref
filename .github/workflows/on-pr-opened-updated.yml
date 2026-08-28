@@ -129,6 +129,7 @@ jobs:
         env:
           AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
           APPROVED_AUTOMERGE: ${{ steps.pr_info.outputs.approved_automerge }}
+          HEAD_REPO: ${{ steps.pr_info.outputs.head_repo }}
           PAT: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,8 +146,13 @@ jobs:
               # The pushed merge commit dismisses the approval and thereby stalls auto-merge.
               # The label triggers "On PR labeled", which approves again and re-enables auto-merge.
               # Needs the PAT: label events created with GITHUB_TOKEN do not trigger workflows.
-              GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
-              echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
+              # "On PR labeled" only approves heads in JabRef/jabref; for forks, the label would be a dead promise.
+              if [ "$HEAD_REPO" = "JabRef/jabref" ]; then
+                GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
+                echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "⚠️ Approved fork PR with auto-merge - approval must be renewed manually" >> $GITHUB_STEP_SUMMARY
+              fi
             fi
             exit 0
           fi
