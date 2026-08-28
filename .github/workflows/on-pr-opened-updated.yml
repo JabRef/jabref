@@ -24,6 +24,15 @@ jobs:
       - uses: actions/checkout@v7
         with:
           show-progress: 'false'
+      # A human push invalidates the bot's earlier approval; "automerge" must be granted again explicitly.
+      # The merge commit pushed by this workflow (as jabref-machine) is exempt, as it does not change the PR's content.
+      - name: Remove automerge label on push
+        if: github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR_NUMBER" --remove-label automerge
       - name: Get PR info
         id: pr_info
         env:
@@ -32,8 +41,9 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -ex
-          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,maintainerCanModify \
-            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nmaintainer_can_modify=\(.maintainerCanModify)"' \
+          # approved_automerge is read before the merge commit below is pushed: that push may dismiss the approval.
+          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,maintainerCanModify,reviewDecision,autoMergeRequest \
+            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nmaintainer_can_modify=\(.maintainerCanModify)\napproved_automerge=\(.reviewDecision == "APPROVED" and .autoMergeRequest != null)"' \
             >> $GITHUB_OUTPUT
       - name: Check PR mergeability
         id: check_mergeable
@@ -118,6 +128,8 @@ jobs:
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING'
         env:
           AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
+          APPROVED_AUTOMERGE: ${{ steps.pr_info.outputs.approved_automerge }}
+          PAT: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -127,8 +139,15 @@ jobs:
 
           if [ "$AUTOMERGE_OUTCOME" = "success" ]; then
             # CHANGELOG.md was the only conflicting file - main was merged and pushed.
-            # No comment, no label: the push triggers a new run, which then reports no conflicts.
+            # No comment: the push triggers a new run, which then reports no conflicts.
             echo "✅ Conflict in CHANGELOG.md only - resolved by merging main" >> $GITHUB_STEP_SUMMARY
+            if [ "$APPROVED_AUTOMERGE" = "true" ]; then
+              # The pushed merge commit dismisses the approval and thereby stalls auto-merge.
+              # The label triggers "On PR labeled", which approves again and re-enables auto-merge.
+              # Needs the PAT: label events created with GITHUB_TOKEN do not trigger workflows.
+              GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
+              echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
+            fi
             exit 0
           fi
 
