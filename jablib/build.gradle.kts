@@ -112,12 +112,12 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     dependsOn(tasks.named("generateGrammarSource"))
     version = jbangVersion
 
-    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
+    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java")
+    script = '"' + generatorScript.asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
+    inputs.file(generatorScript)
     outputs.file(generatedJournalFile)
-    val generatedJournalFileProv = generatedJournalFile
-    onlyIf { !generatedJournalFileProv.get().asFile.exists() }
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
@@ -127,13 +127,12 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     mustRunAfter(taskGenerateJournalListMV)
     version = jbangVersion
 
-    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
+    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java")
+    script = '"' + generatorScript.asFile.absolutePath + '"'
 
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
-    val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
-    outputs.file(cslCatalogJson)
-    val cslCatalogJsonProv = cslCatalogJson
-    onlyIf { !cslCatalogJsonProv.get().asFile.exists() }
+    inputs.file(generatorScript)
+    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
