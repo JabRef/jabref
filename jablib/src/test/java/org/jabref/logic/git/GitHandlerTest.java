@@ -106,6 +106,7 @@ class GitHandlerTest {
         WindowCache.reconfigure(new WindowCacheConfig());
     }
 
+    // [utest->req~ux.git-commit.initialize-repository~1]
     @Test
     void initAndCommitTracksOnlyTheGivenFile() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");

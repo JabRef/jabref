@@ -38,6 +38,7 @@ public class GitCommitAction extends SimpleCommand {
     }
 
     private void commit(Path bibFilePath) {
+        // [impl->req~ux.git-commit.initialize-repository~1]
         if (GitHandler.findRepositoryRoot(bibFilePath).isEmpty()) {
             initRepository(bibFilePath);
             return;
