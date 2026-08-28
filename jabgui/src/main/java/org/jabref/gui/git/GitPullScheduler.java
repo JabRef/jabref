@@ -79,7 +79,7 @@ public class GitPullScheduler {
             return;
         }
 
-        if (RUNNING_INSTANCES.stream().anyMatch(instance -> instance.bibDatabaseContext == bibDatabaseContext)) {
+        if (isRunning(bibDatabaseContext)) {
             return;
         }
 
@@ -95,6 +95,10 @@ public class GitPullScheduler {
                 preferences,
                 stateManager);
         RUNNING_INSTANCES.add(new GitPullScheduler(bibDatabaseContext, gitAutoSync, hasUnsavedChanges, intervalInMinutes));
+    }
+
+    static boolean isRunning(BibDatabaseContext bibDatabaseContext) {
+        return RUNNING_INSTANCES.stream().anyMatch(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
     /// Shuts down the scheduler which is associated with the given [BibDatabaseContext].
