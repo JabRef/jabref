@@ -151,8 +151,8 @@ public class SaveDatabaseAction {
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-        Optional<Path> databasePath = context.getDatabasePath();
-        if (databasePath.isPresent()) {
+        boolean managersShutDown = context.getDatabasePath().isPresent();
+        if (managersShutDown) {
             // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
@@ -185,6 +185,10 @@ public class SaveDatabaseAction {
             libraryTab.createSearchContext();
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
+        } else if (managersShutDown) {
+            // The library stays at its old path, so the managers shut down above have to come back for that file.
+            libraryTab.installAutosaveManagerAndBackupManager();
+            libraryTab.createSearchContext();
         }
         return saveResult == SaveResult.SUCCESS;
     }

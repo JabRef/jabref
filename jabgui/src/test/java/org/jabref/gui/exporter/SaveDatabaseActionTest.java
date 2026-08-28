@@ -122,12 +122,24 @@ class SaveDatabaseActionTest {
 
     @Test
     void saveAsDoesNotAdoptTheNewPathWhileASaveIsRunning() {
-        when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(libraryTab.isSaving()).thenReturn(true);
 
-        assertFalse(saveDatabaseAction.saveAs(file, SaveDatabaseAction.SaveDatabaseMode.SILENT));
+        assertFalse(saveDatabaseAction.saveAs(Path.of("other.bib"), SaveDatabaseAction.SaveDatabaseMode.SILENT));
         verify(dbContext, never()).setDatabasePath(any());
+    }
+
+    @Test
+    void unsuccessfulSaveAsBringsTheManagersOfTheOriginalLibraryBack() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
+        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        saveDatabaseAction.saveAs(Path.of("other.bib"), SaveDatabaseAction.SaveDatabaseMode.SILENT);
+
+        verify(libraryTab, times(1)).installAutosaveManagerAndBackupManager();
+        verify(libraryTab, times(1)).createSearchContext();
     }
 
     private SaveDatabaseAction createSaveDatabaseActionForBibDatabase(BibDatabase database) throws IOException {
