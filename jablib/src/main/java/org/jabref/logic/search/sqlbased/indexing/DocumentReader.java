@@ -92,7 +92,7 @@ public final class DocumentReader {
 
     /// Extracts text content from a single PDF page and adds it to the Lucene document.
     ///
-    /// @param fileLink the plain file link as stored in the bib entry (may be relative or a URL)
+    /// @param fileLink     the plain file link as stored in the bib entry (may be relative or a URL)
     /// @param resolvedPath the absolute path on the file system where the file was found
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, String fileLink, Path resolvedPath, int pageNumber) {
         PDFTextStripper pdfTextStripper = new PDFTextStripper() {
