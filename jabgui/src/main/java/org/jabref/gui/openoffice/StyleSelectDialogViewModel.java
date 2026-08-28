@@ -387,7 +387,16 @@ public class StyleSelectDialogViewModel {
                 return;
             }
 
-            BstStyle bstStyleToAdd = new BstStyle(stylePath);
+            BstStyle bstStyleToAdd;
+            try {
+                bstStyleToAdd = BstStyle.loadExternal(stylePath);
+            } catch (IOException e) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Invalid style selected"),
+                        Localization.lang("You must select a valid .bst style file.")
+                );
+                return;
+            }
 
             if (isDuplicate(bstStyleToAdd)) {
                 dialogService.showErrorDialogAndWait(
