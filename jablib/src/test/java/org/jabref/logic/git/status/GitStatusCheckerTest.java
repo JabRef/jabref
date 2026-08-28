@@ -225,6 +225,20 @@ class GitStatusCheckerTest {
     }
 
     @Test
+    void uncommittedChangesDetectedWhenRemoteIsUnreachable() throws Exception {
+        localGit.getRepository().getConfig().setString("remote", "origin", "url", "https://example.com");
+        localGit.getRepository().getConfig().unsetSection("branch", "main");
+        localGit.getRepository().getConfig().save();
+        Files.writeString(localLibrary, localUpdatedContent, StandardCharsets.UTF_8);
+
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
+        assertTrue(snapshot.uncommittedChanges());
+        assertEquals(SyncStatus.UNKNOWN, snapshot.syncStatus());
+    }
+
+    @Test
     void divergedStatusWhenBothSidesHaveCommits(@TempDir Path tempDir) throws Exception {
         commitFile(localGit, localUpdatedContent, "Local update");
 
