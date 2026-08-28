@@ -63,6 +63,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 
+### Fixed
+
+- The "Show diff" button in the Git commit dialog now appears in the same row as the other buttons. [#16730](https://github.com/JabRef/jabref/issues/16730)
+
+
 ### Changed
 
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
