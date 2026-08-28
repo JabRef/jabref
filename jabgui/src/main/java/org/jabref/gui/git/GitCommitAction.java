@@ -48,7 +48,7 @@ public class GitCommitAction extends SimpleCommand {
     @Override
     public void execute() {
         // Git operates on the file on disk, so in-memory changes would silently be left out of the commit.
-        if (!saveActiveLibrary()) {
+        if (!isLibrarySaved()) {
             return;
         }
 
@@ -62,10 +62,18 @@ public class GitCommitAction extends SimpleCommand {
         );
     }
 
-    private boolean saveActiveLibrary() {
+    private boolean isLibrarySaved() {
         LibraryTab libraryTab = tabSupplier.get();
         if (libraryTab == null || !libraryTab.isModified()) {
             return true;
+        }
+
+        if (!preferences.getLibraryPreferences().shouldAutoSave()) {
+            // Without autosave the user decides when the library is written, so the commit is left to them, too.
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Git Commit"),
+                    Localization.lang("The library has unsaved changes. Please save it before committing."));
+            return false;
         }
 
         SaveResult saveResult = new SaveDatabaseAction(

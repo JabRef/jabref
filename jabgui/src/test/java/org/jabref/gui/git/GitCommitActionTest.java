@@ -12,6 +12,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -38,6 +39,7 @@ class GitCommitActionTest {
     private final StateManager stateManager = mock(StateManager.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final LibraryTab libraryTab = mock(LibraryTab.class);
+    private final LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
 
     private GitCommitAction gitCommitAction;
 
@@ -46,6 +48,8 @@ class GitCommitActionTest {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
         // Without an active database the Git status check stops at "nothing to commit", so no dialog is built
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(true);
 
         gitCommitAction = new GitCommitAction(
                 () -> libraryTab,
@@ -80,6 +84,20 @@ class GitCommitActionTest {
 
             assertEquals(List.of(), saveDatabaseAction.constructed());
             verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    @Test
+    void modifiedLibraryWithoutAutosaveIsNotSavedAndAbortsCommit() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class)) {
+            gitCommitAction.execute();
+
+            assertEquals(List.of(), saveDatabaseAction.constructed());
+            verify(dialogService).showWarningDialogAndWait(any(), any());
+            verify(stateManager, never()).getActiveDatabase();
         }
     }
 
