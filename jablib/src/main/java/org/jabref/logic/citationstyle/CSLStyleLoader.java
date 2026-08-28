@@ -26,12 +26,11 @@ public record CSLStyleLoader(
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
-
     /// Keys written by `CitationStyleCatalogGenerator#generateCatalog`. Keep in sync when adding style metadata.
     private static final List<String> CATALOG_KEYS = List.of(
             "path", "title", "styleId", "styleClass", "shortTitle",
             "isNumeric", "hasBibliography", "hasBibliographySortOrder", "usesHangingIndent");
-    
+
     /// Placeholder returned when even the default style cannot be loaded. Not backed by a CSL source.
     private static final CitationStyle EMPTY_STYLE = new CitationStyle("", "", "", "Empty", "Empty", false, false, false, false, "", true);
 
@@ -75,10 +74,8 @@ public record CSLStyleLoader(
 
             if (!styleInfoList.isEmpty()) {
                 int styleCount = styleInfoList.size();
-                Map<String, Object> firstEntry = styleInfoList.getFirst();
-                CATALOG_KEYS.stream()
-                            .filter(key -> !firstEntry.containsKey(key))
-                            .forEach(key -> LOGGER.error("Citation style catalog has no '{}' entry. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.", key));
+                findMissingCatalogKeys(styleInfoList.getFirst())
+                        .forEach(key -> LOGGER.error("Citation style catalog has no '{}' entry. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.", key));
 
                 for (Map<String, Object> info : styleInfoList) {
                     @NonNull
@@ -135,6 +132,12 @@ public record CSLStyleLoader(
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
         }
+    }
+
+    static List<String> findMissingCatalogKeys(Map<String, Object> info) {
+        return CATALOG_KEYS.stream()
+                           .filter(key -> !info.containsKey(key))
+                           .toList();
     }
 
     /// Loads external CSL styles from the preferences.
