@@ -3,10 +3,12 @@ package org.jabref.logic.openoffice.style;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.bst.BstVM;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -26,45 +28,67 @@ public class BstStyle implements OOStyle {
     /// Filesystem path for external styles; `null` for internal styles.
     private final @Nullable Path filePath;
     private final String name;
+    private final String source;
+    /// Parsed executable program for this specific `.bst` style.
+    ///
+    /// [BstVM] is **not** style-agnostic: it represents the parsed program of one concrete `.bst`
+    /// file. We keep it on the style so repeated preview/citation/bibliography operations can reuse
+    /// the parsed program and avoid reparsing and reallocating a new [BstVM] on each operation.
+    private final BstVM bstVM;
+    private final boolean hasSortCommand;
 
-    /// Creates an external (user-supplied) style backed by a filesystem path.
-    public BstStyle(Path path) {
-        this.internal = false;
-        this.filePath = path;
-        this.resourcePath = null;
-        this.name = stripBstExtension(path.getFileName().toString());
+    private BstStyle(@Nullable String resourcePath, @Nullable Path filePath, boolean internal, String source, BstVM bstVM) {
+        this.internal = internal;
+        this.resourcePath = resourcePath;
+        this.filePath = filePath;
+        String filename = internal ? Path.of(resourcePath).getFileName().toString() : filePath.getFileName().toString();
+        this.name = stripBstExtension(filename);
+        this.source = source;
+        this.bstVM = bstVM;
+        this.hasSortCommand = bstVM.hasSortCommand();
     }
 
-    private BstStyle(String resourcePath) {
-        this.internal = true;
-        this.resourcePath = resourcePath;
-        this.filePath = null;
-        this.name = stripBstExtension(Path.of(resourcePath).getFileName().toString());
+    /// Creates an external (user-supplied) style backed by a filesystem path.
+    public static BstStyle loadExternal(Path path) throws IOException {
+        String source = Files.readString(path);
+        try {
+            return new BstStyle(null, path, false, source, new BstVM(path));
+        } catch (ParseCancellationException e) {
+            throw new IOException("Could not parse BST style: " + path, e);
+        }
     }
 
     /// Creates an internal style loaded from a classpath resource (e.g. `/resource/openoffice/IEEEtran.bst`).
-    public static BstStyle createInternal(String resourcePath) {
-        return new BstStyle(resourcePath);
-    }
-
-    /// Creates a [BstVM] for this style, reading from the filesystem or classpath as appropriate.
-    public BstVM createBstVM() throws IOException {
-        if (filePath != null) {
-            return new BstVM(filePath);
-        }
-        assert resourcePath != null;
+    public static BstStyle createInternal(String resourcePath) throws IOException {
         try (InputStream is = BstStyle.class.getResourceAsStream(resourcePath)) {
             if (is == null) {
                 throw new IOException("Internal BST resource not found: " + resourcePath);
             }
-            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            return new BstVM(content);
+            String source = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            try {
+                return new BstStyle(resourcePath, null, true, source, new BstVM(source));
+            } catch (ParseCancellationException e) {
+                throw new IOException("Could not parse internal BST style: " + resourcePath, e);
+            }
         }
+    }
+
+    /// Returns the parsed [BstVM] for this style.
+    public BstVM createBstVM() {
+        return bstVM;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    public boolean hasSortCommand() {
+        return hasSortCommand;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     @Override

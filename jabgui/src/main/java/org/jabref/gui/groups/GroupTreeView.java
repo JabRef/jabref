@@ -364,13 +364,17 @@ public class GroupTreeView extends BorderPane {
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
         node.getStyleClass().add("hits");
-        if (!group.isRoot()) {
-            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
-                    group.anySelectedEntriesMatchedProperty());
-            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ALLSELECTED,
-                    group.allSelectedEntriesMatchedProperty());
-        }
         Text text = new Text();
+        if (!group.isRoot()) {
+            // The text carries the pseudo-classes as well: JavaFX does not re-style a descendant when a
+            // custom pseudo-class flips on its ancestor, so ".hits:any-selected .text" would never match.
+            for (Node styled : List.of(node, text)) {
+                BindingsHelper.includePseudoClassWhen(styled, PSEUDOCLASS_ANYSELECTED,
+                        group.anySelectedEntriesMatchedProperty());
+                BindingsHelper.includePseudoClassWhen(styled, PSEUDOCLASS_ALLSELECTED,
+                        group.allSelectedEntriesMatchedProperty());
+            }
+        }
         EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(),
                 shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
