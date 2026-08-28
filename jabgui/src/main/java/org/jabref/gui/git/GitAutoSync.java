@@ -33,8 +33,9 @@ import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved
 
 /// Runs the Git operations configured in the library properties.
 ///
-/// Same operations as [GitCommitAction] and [GitPushAction], but started by a save instead of the user
-/// so failures are shown as notifications rather than modal dialogs
+/// Same operations as [GitCommitAction] and [GitPushAction], but started by a save or a timer
+/// instead of the user. Unattended operations report failures as notifications. a conflict on the
+/// pull before an auto-push prompts, because the user started that operation by saving
 @NullMarked
 public class GitAutoSync {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitAutoSync.class);

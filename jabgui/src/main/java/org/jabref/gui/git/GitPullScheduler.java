@@ -105,10 +105,13 @@ public class GitPullScheduler {
     ///
     /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        RUNNING_INSTANCES.stream()
-                         .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
-                         .forEach(GitPullScheduler::shutdown);
-        RUNNING_INSTANCES.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
+        RUNNING_INSTANCES.removeIf(instance -> {
+            if (instance.bibDatabaseContext != bibDatabaseContext) {
+                return false;
+            }
+            instance.executor.shutdown();
+            return true;
+        });
     }
 
     private void shutdown() {

@@ -1,5 +1,6 @@
 package org.jabref.gui.libraryproperties.git;
 
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
@@ -17,7 +18,7 @@ class GitPropertiesViewModelTest {
     @BeforeEach
     void setUp() {
         metaData = new MetaData();
-        viewModel = new GitPropertiesViewModel(new BibDatabaseContext(new org.jabref.model.database.BibDatabase(), metaData));
+        viewModel = new GitPropertiesViewModel(new BibDatabaseContext(new BibDatabase(), metaData));
     }
 
     @Test
