@@ -10,9 +10,11 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.jspecify.annotations.NullMarked;
@@ -34,6 +36,8 @@ class GitCommitDialogViewModelTest {
     private GitHandlerRegistry gitHandlerRegistry;
     private GitHandler gitHandler;
     private BibDatabaseContext databaseContext;
+    private ImportFormatPreferences importFormatPreferences;
+    private FileUpdateMonitor fileUpdateMonitor;
     private GitCommitDialogViewModel viewModel;
 
     @BeforeEach
@@ -43,6 +47,8 @@ class GitCommitDialogViewModelTest {
         gitHandlerRegistry = mock(GitHandlerRegistry.class);
         gitHandler = mock(GitHandler.class);
         databaseContext = mock(BibDatabaseContext.class);
+        importFormatPreferences = mock(ImportFormatPreferences.class);
+        fileUpdateMonitor = mock(FileUpdateMonitor.class);
 
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(Path.of("library.bib")));
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
@@ -51,7 +57,9 @@ class GitCommitDialogViewModelTest {
                 stateManager,
                 dialogService,
                 new CurrentThreadTaskExecutor(),
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                importFormatPreferences,
+                fileUpdateMonitor);
     }
 
     @Test
