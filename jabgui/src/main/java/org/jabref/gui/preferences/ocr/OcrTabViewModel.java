@@ -54,7 +54,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
-    private final ObservableList<OcrLanguage> ocrLanguageOptions = FXCollections.observableArrayList(OcrLanguage.values());
+    private final ListProperty<OcrLanguage> ocrLanguageOptions = new SimpleListProperty<>(FXCollections.observableArrayList(OcrLanguage.values()));
     private final ObservableList<OcrLanguage> selectedOcrLanguages = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
@@ -121,7 +121,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         return pagesHaveTextOptions;
     }
 
-    public ObservableList<OcrLanguage> ocrLanguageOptionsProperty() {
+    public ReadOnlyListProperty<OcrLanguage> ocrLanguageOptionsProperty() {
         return ocrLanguageOptions;
     }
 
