@@ -44,7 +44,6 @@ class GitCommitActionTest {
 
         assertEquals(Optional.of(libraryDirectory.toAbsolutePath()), GitHandler.findRepositoryRoot(libraryFile));
         try (Git git = Git.open(libraryDirectory.toFile())) {
-            // library.bib and the generated .gitignore are committed, everything else stays untracked
             assertEquals(Set.of("notes.txt"), git.status().call().getUntracked());
         }
     }

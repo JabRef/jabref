@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
@@ -106,13 +108,16 @@ public class GitHandler {
                           .setDirectory(repositoryPathAsFile)
                           .setInitialBranch("main")
                           .call()) {
-            setupGitIgnore();
+            copyGitIgnoreIfAbsent();
             git.add()
                .addFilepattern(pathInRepository)
                .addFilepattern(".gitignore")
                .call();
-            if (git.getRepository().readDirCache().findEntry(pathInRepository) < 0) {
-                throw new JabRefException(Localization.lang("Could not add %0 to the Git repository. Check the .gitignore file.", pathInRepository));
+            DirCache index = git.getRepository().readDirCache();
+            for (String path : List.of(pathInRepository, ".gitignore")) {
+                if (index.findEntry(path) < 0) {
+                    throw new JabRefException(Localization.lang("Could not add %0 to the Git repository. Check the .gitignore file.", path));
+                }
             }
             git.commit()
                .setMessage("Initial commit")
@@ -167,12 +172,18 @@ public class GitHandler {
     }
 
     void setupGitIgnore() {
-        Path gitignore = Path.of(repositoryPath.toString(), ".gitignore");
+        try {
+            copyGitIgnoreIfAbsent();
+        } catch (IOException e) {
+            LOGGER.error("Error occurred during copying of the gitignore file into the git repository.", e);
+        }
+    }
+
+    private void copyGitIgnoreIfAbsent() throws IOException {
+        Path gitignore = repositoryPath.resolve(".gitignore");
         if (!Files.exists(gitignore)) {
             try (InputStream inputStream = this.getClass().getResourceAsStream("git.gitignore")) {
                 Files.copy(inputStream, gitignore);
-            } catch (IOException e) {
-                LOGGER.error("Error occurred during copying of the gitignore file into the git repository.", e);
             }
         }
     }
