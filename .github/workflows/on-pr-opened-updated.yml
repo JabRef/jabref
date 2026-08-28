@@ -148,6 +148,9 @@ jobs:
               # Needs the PAT: label events created with GITHUB_TOKEN do not trigger workflows.
               # "On PR labeled" only approves heads in JabRef/jabref; for forks, the label would be a dead promise.
               if [ "$HEAD_REPO" = "JabRef/jabref" ]; then
+                # Remove first: the label may still be attached from the original auto-merge request,
+                # and re-adding an attached label produces no "labeled" event.
+                gh pr edit "$PR_NUMBER" --remove-label automerge
                 GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
                 echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
               else
