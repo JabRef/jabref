@@ -89,11 +89,20 @@ this trade-off.
 
 ## Merge with jabrefHost.py
 
-This host and `jabgui/buildres/*/jabrefHost.py` are both browser-launched
-native-messaging hosts for the same extension. The intent is to fold them into
-one process: `jabext_host.handle_import_message()` is the seam where the
-existing import dispatch lands, once the extension moves the import path to the
-same `connectNative` connection. Until then they run as two hosts.
+`jabext_host.py` already **is** the one process: `handle_import_message()`
+carries the full `jabgui/buildres/*/jabrefHost.py` logic (`{"status":"validate"}`
+→ `JabRef --version`; `{"text": …}` → `JabRef --importBibtex`), so a single host
+serves both the fulltext HTTP loopback and the import direction on one
+native-messaging connection. Import handling runs on its own thread and never
+exits the process, so a missing JabRef launcher can't take the HTTP server down.
+
+Remaining to fully retire the old hosts:
+
+- the **extension** must send its import messages to `jabext_bridge` over the
+  same `connectNative` connection (today it uses the separate `org.jabref.jabref`
+  host); then `jabrefHost.py` + its registration can be deleted;
+- the **Windows** mirror `jabext_host.ps1` still needs the same import fold
+  (it currently ignores import messages).
 
 ## Lifecycle
 

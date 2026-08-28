@@ -11,7 +11,7 @@ binary to build/bundle. Stdlib only.
 
 Run the self-check (no browser needed):  python3 jabext_host.py --selftest
 """
-import json, os, secrets, struct, sys, threading, platform
+import json, os, secrets, shlex, shutil, struct, subprocess, sys, threading, platform
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -218,8 +218,10 @@ def write_discovery(port: int, token_file: Path) -> Path:
 
 
 def nm_loop() -> None:
-    """Main read loop. Extension messages are either replies to pending HTTP
-    requests, or the existing jabrefHost import commands."""
+    """Main read loop. Each extension message is either a reply to a pending
+    HTTP request (has requestId) or a jabrefHost-style import command. Import
+    handling runs on its own thread so a slow `JabRef --importBibtex` cannot
+    stall delivery of fulltext replies on this loop."""
     while True:
         msg = read_frame(sys.stdin.buffer)
         if msg is None:
@@ -227,11 +229,68 @@ def nm_loop() -> None:
         if "requestId" in msg:
             PENDING.deliver(msg)
         else:
-            handle_import_message(msg)           # <-- existing jabrefHost.py logic lives here
+            threading.Thread(target=handle_import_message, args=(msg,), daemon=True).start()
+
+
+# ---- import direction: the folded-in jabrefHost.py logic ----
+_jabref_lock = threading.Lock()
+_jabref_cmd: list[str] | None = None
+_jabref_resolved = False
+
+def resolve_jabref() -> list[str] | None:
+    """Locate the JabRef launcher (jabrefHost.py's resolution), cached. Returns
+    the command prefix as a list, or None if not found. Never exits the process
+    — a missing launcher must not take down the fulltext HTTP server."""
+    global _jabref_cmd, _jabref_resolved
+    with _jabref_lock:
+        if _jabref_resolved:
+            return _jabref_cmd
+        _jabref_resolved = True
+        prefix = ["flatpak-spawn", "--host"] if os.environ.get("FLATPAK_ID") else []
+        override = os.environ.get("JABEXT_JABREF_CMD")          # test/CI hook
+        if override:
+            _jabref_cmd = prefix + shlex.split(override)
+            return _jabref_cmd
+        # portable install: <app>/bin/JabRef next to this script's parent; then
+        # lowercase (deb/rpm/snap), uppercase (AUR), flatpak export.
+        relpath = str(Path(__file__).resolve().parent.parent / "bin" / "JabRef")
+        for cand in (relpath, "jabref", "JabRef",
+                     "/var/lib/flatpak/exports/bin/org.jabref.jabref"):
+            found = shutil.which(cand) or (cand if Path(cand).exists() else None)
+            if found:
+                _jabref_cmd = prefix + [found]
+                return _jabref_cmd
+        _jabref_cmd = None
+        return _jabref_cmd
 
 def handle_import_message(msg: dict) -> None:
-    # Placeholder for jabrefHost.py's add_jabref_entry()/subprocess dispatch.
-    pass
+    """jabrefHost.py behaviour, folded in. Replies over native messaging."""
+    jabref = resolve_jabref()
+    if msg.get("status") == "validate":
+        if jabref is None:
+            write_frame({"message": "jarNotFound", "path": ""})
+            return
+        try:
+            subprocess.check_output(jabref + ["--version"], stderr=subprocess.STDOUT)
+            write_frame({"message": "jarFound"})
+        except (OSError, subprocess.CalledProcessError):
+            write_frame({"message": "jarNotFound", "path": " ".join(jabref)})
+        return
+
+    text = msg.get("text")
+    if not text:
+        return
+    if jabref is None:
+        write_frame({"message": "error", "output": "JabRef executable not found"})
+        return
+    try:
+        # send the entry as a literal to preserve special characters
+        out = subprocess.check_output(jabref + ["--importBibtex", text], stderr=subprocess.STDOUT)
+        write_frame({"message": "ok", "output": out.decode("utf-8", "replace")})
+    except subprocess.CalledProcessError as exc:
+        write_frame({"message": "error", "output": (exc.output or b"").decode("utf-8", "replace")})
+    except OSError as exc:
+        write_frame({"message": "error", "output": str(exc)})
 
 
 def main() -> int:

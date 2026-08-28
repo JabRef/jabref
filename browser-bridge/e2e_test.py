@@ -17,7 +17,7 @@ wherever `pwsh` exists. Same asserts for both ⇒ protocol parity.
 
     python3 e2e_test.py
 """
-import http.client, json, os, shutil, struct, subprocess, sys, tempfile, threading, time
+import http.client, json, os, queue, shutil, struct, subprocess, sys, tempfile, threading, time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -52,13 +52,28 @@ class HostRun:
     def __init__(self, name, argv, pdf_path):
         self.name, self.pdf = name, pdf_path
         self.config = Path(tempfile.mkdtemp(prefix=f"jabext-{name}-"))
-        env = {**os.environ, "JABEXT_CONFIG_BASE": str(self.config)}
+        # JABEXT_JABREF_CMD stands in for the JabRef launcher so the folded-in
+        # import path can run without a real JabRef install (echo exits 0).
+        env = {**os.environ, "JABEXT_CONFIG_BASE": str(self.config),
+               "JABEXT_JABREF_CMD": "echo"}
         self.proc = subprocess.Popen(argv, cwd=HERE, env=env,
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE)
         self.stderr = []
+        self._stdin_lock = threading.Lock()
+        self.import_replies = queue.Queue()      # host->extension frames with no requestId/type
         threading.Thread(target=self._drain_stderr, daemon=True).start()
         threading.Thread(target=self._extension_loop, daemon=True).start()
+
+    def _send(self, obj):
+        with self._stdin_lock:
+            write_frame(self.proc.stdin, obj)
+
+    def import_roundtrip(self, msg, timeout=10):
+        """Send an import command to the host (as the extension would) and
+        return the host's reply."""
+        self._send(msg)
+        return self.import_replies.get(timeout=timeout)
 
     def _drain_stderr(self):
         for line in self.proc.stderr:
@@ -84,9 +99,11 @@ class HostRun:
             elif msg.get("type") == "openMathSciNet":
                 reply = {"requestId": rid, "action": "opened", "tabId": 7}
             else:
+                # not a fulltext request => it's an import reply (jarFound / ok / error)
+                self.import_replies.put(msg)
                 continue
             try:
-                write_frame(self.proc.stdin, reply)
+                self._send(reply)
             except (OSError, ValueError):
                 break
 
@@ -162,12 +179,23 @@ def check(host_name, argv):
         s, _ = httpreq(port, "POST", "/v1/mathscinet/open", {}, auth)
         assert s == 400, f"no mrNumber -> {s}"
 
+        # import direction (folded-in jabrefHost.py): the SAME process also
+        # handles NM import commands. Only the .py host has this so far.
+        extra = 0
+        if host_name == "python":
+            r = run.import_roundtrip({"status": "validate"})
+            assert r["message"] == "jarFound", r
+            r = run.import_roundtrip({"text": "@article{k, title={T}}"})
+            assert r["message"] == "ok", r
+            extra = 2
+
         # clean shutdown on stdin EOF + discovery cleanup
         rc = run.close()
         assert rc == 0, f"exit code {rc}\n" + "\n".join(run.stderr)
         assert not disc["_file"].exists(), "discovery file not cleaned up"
-        print(f"  PASS {host_name}: 9 assertions (health, auth, origin, validation, "
-              f"fetch, error-prop, mathscinet, shutdown, cleanup)")
+        print(f"  PASS {host_name}: {9 + extra} assertions (health, auth, origin, validation, "
+              f"fetch, error-prop, mathscinet"
+              f"{', import(validate+add)' if extra else ''}, shutdown, cleanup)")
         return True
     except Exception as e:
         print(f"  FAIL {host_name}: {e}")
