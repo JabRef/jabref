@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 public class GroupNodeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupNodeViewModel.class);
+    private static final int BULK_CHANGE_THRESHOLD = 10;
 
     private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
@@ -300,7 +301,12 @@ public class GroupNodeViewModel {
             return;
         }
         while (change.next()) {
-            if (change.wasPermutated()) {
+            /// A replacement represents a bulk mutation, so recompute on the background executor
+            /// instead of matching every added entry on the JavaFX thread.
+            // [impl->req~ux.large-library.bulk-entry-removal~1]
+            if (change.wasReplaced() || change.getRemovedSize() > BULK_CHANGE_THRESHOLD) {
+                updateMatchedEntries();
+            } else if (change.wasPermutated()) {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
@@ -355,7 +361,7 @@ public class GroupNodeViewModel {
 
         matchedEntriesUpdateInProgress = true;
         BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
-                .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                .wrap(() -> databaseContext.getDatabase().getEntriesSnapshot().stream()
                                            .filter(e -> isMatchEffective(this, e))
                                            .toList())
                 .onSuccess(entries -> {
