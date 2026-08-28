@@ -36,7 +36,7 @@ public class BstUpdateBibliography {
                                        List<BibEntry> entries,
                                        BibDatabaseContext ctx)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException,
-            IOException, InterruptedException, WrappedTargetException {
+            IOException, InterruptedException, WrappedTargetException, MissingStyleDefinedCitationLabelException {
         LOGGER.debug("Starting BST bibliography rebuild");
 
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
@@ -83,7 +83,7 @@ public class BstUpdateBibliography {
                                            List<BibEntry> entries,
                                            BibDatabaseContext ctx)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException,
-            IOException, InterruptedException, WrappedTargetException {
+            IOException, InterruptedException, WrappedTargetException, MissingStyleDefinedCitationLabelException {
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
         if (sectionRange.isEmpty()) {
             throw new IllegalStateException("BST bibliography section not found when trying to populate");
