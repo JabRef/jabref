@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The command `jabkit pdf update --format=xmp` now writes XMP metadata to the linked PDF. [#16087](https://github.com/JabRef/jabref/issues/16087)
 - We now offer `jabkit` as a native binary (no Java runtime required, instant startup) for Linux (amd64/arm64) and macOS (Apple Silicon) as part of the binary distribution. [#16291](https://github.com/JabRef/jabref/pull/16291)
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#16151](https://github.com/JabRef/jabref/pull/16151)
+- We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
 - We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
@@ -93,10 +94,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed Git errors showing technical exception details instead of concise error messages. [#16703](https://github.com/JabRef/jabref/issues/16703)
+- We fixed the unreadable hit count on group badges that turn green because they contain selected entries. [#16700](https://github.com/JabRef/jabref/pull/16700)
+- We fixed an issue where resolving external library conflicts through the merge dialog could discard the merged result. [#16537](https://github.com/JabRef/jabref/issues/16537)
+- We fixed an issue where switching entries in the source tab could throw an exception or overwrite another entry. [#16534](https://github.com/JabRef/jabref/issues/16534)
 - We fixed an issue where a PDF imported as a new entry via the merge dialog lost its file link. [#16677](https://github.com/JabRef/jabref/pull/16677)
 - We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where changes made in the "Manage keywords" dialog could not be undone. [#16627](https://github.com/JabRef/jabref/pull/16627)
 - We fixed an issue where two JabRef instances saving the same library file could silently overwrite each other's changes. The instance finishing last now aborts its save and offers the usual review flow for the external changes instead. [#16646](https://github.com/JabRef/jabref/pull/16646)
+- We fixed an issue where deleting many entries from a large library could freeze the main table. [#8976](https://github.com/JabRef/jabref/issues/8976)
 - We fixed missed external-change detection while JabRef saves a library, so concurrent changes can be reviewed for resolution. [#16646](https://github.com/JabRef/jabref/pull/16646)
 - We fixed saving libraries with long file names, hard links, or file systems that do not support atomic moves. [#7718](https://github.com/JabRef/jabref/issues/7718)
 - We fixed an issue where the Control key could not be used when recording a new keyboard shortcut in the preferences on macOS. [#16604](https://github.com/JabRef/jabref/issues/16604)
@@ -165,6 +170,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
+- We fixed an issue where deleting an entry removed the group filter and defaulted to the home view. [#16036](https://github.com/JabRef/jabref/issues/16036)
 
 ### Removed
 

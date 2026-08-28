@@ -1,9 +1,6 @@
 package org.jabref.http.server.cayw;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +26,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -66,7 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
+@AllowedToUseAwt("Requires java.awt.GraphicsEnvironment.isHeadless()")
 @jakarta.ws.rs.Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
@@ -154,10 +152,17 @@ public class CAYWResource {
 
         // Clipboard parameter handling
         if (queryParams.isClipboard()) {
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Clipboard systemClipboard = toolkit.getSystemClipboard();
-            StringSelection strSel = new StringSelection(formattedResponse);
-            systemClipboard.setContents(strSel, null);
+            // JavaFX requires running clipboard handling on JavaFX application thread.
+            initializeGUI();
+            Platform.runLater(() -> {
+                ClipboardContent content = new ClipboardContent();
+                content.putString(formattedResponse);
+                javafx.scene.input.Clipboard.getSystemClipboard().setContent(content);
+            });
+            return Response.accepted()
+                           .header(X_CONTENT_TYPE_OPTIONS, NO_SNIFF)
+                           .header(CONTENT_SECURITY_POLICY, CAYW_CONTENT_SECURITY_POLICY)
+                           .build();
         }
 
         // Push to Application parameter handling

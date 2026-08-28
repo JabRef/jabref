@@ -104,4 +104,11 @@ Since inspecting a library file means parsing it completely, the inspection is s
 
 Needs: impl
 
+### Deleting many entries keeps the main table responsive
+`req~ux.large-library.bulk-entry-removal~1`
+
+When a user deletes many entries from a large library, JabRef must keep the main table responsive.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
