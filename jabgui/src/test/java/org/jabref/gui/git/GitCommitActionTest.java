@@ -12,6 +12,7 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
@@ -44,7 +45,7 @@ class GitCommitActionTest {
         DialogService dialogService = mock(DialogService.class);
         when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
 
-        new GitCommitAction(dialogService, stateManager, new GitHandlerRegistry(mock(GitPreferences.class))).execute();
+        new GitCommitAction(dialogService, stateManager, new GitHandlerRegistry(mock(GitPreferences.class)), new CurrentThreadTaskExecutor()).execute();
 
         assertEquals(Optional.of(libraryDirectory.toAbsolutePath()), GitHandler.findRepositoryRoot(libraryFile));
         try (Git git = Git.open(libraryDirectory.toFile())) {

@@ -1,6 +1,5 @@
 package org.jabref.gui.git;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
@@ -11,20 +10,22 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitCommitAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final TaskExecutor taskExecutor;
 
-    public GitCommitAction(DialogService dialogService, StateManager stateManager, GitHandlerRegistry gitHandlerRegistry) {
+    public GitCommitAction(DialogService dialogService, StateManager stateManager, GitHandlerRegistry gitHandlerRegistry, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
@@ -65,15 +66,16 @@ public class GitCommitAction extends SimpleCommand {
             return;
         }
 
-        try {
-            gitHandlerRegistry.get(directory).initAndCommit(bibFilePath);
-            dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString()));
-        } catch (IOException | GitAPIException e) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Git Commit"),
-                    Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
-                    e);
-        }
+        BackgroundTask.wrap(() -> {
+                          gitHandlerRegistry.get(directory).initAndCommit(bibFilePath);
+                          return null;
+                      })
+                      .onSuccess(_ -> dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString())))
+                      .onFailure(e -> dialogService.showErrorDialogAndWait(
+                              Localization.lang("Git Commit"),
+                              Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
+                              e))
+                      .executeWith(taskExecutor);
     }
 
     private boolean hasNothingToCommit(Path bibFilePath) {
