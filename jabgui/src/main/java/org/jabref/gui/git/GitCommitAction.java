@@ -18,16 +18,18 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.jspecify.annotations.Nullable;
+
 public class GitCommitAction extends SimpleCommand {
 
-    private final Supplier<LibraryTab> tabSupplier;
+    private final Supplier<@Nullable LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public GitCommitAction(Supplier<LibraryTab> tabSupplier,
+    public GitCommitAction(Supplier<@Nullable LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
                            GuiPreferences preferences,
