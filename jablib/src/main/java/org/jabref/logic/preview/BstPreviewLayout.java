@@ -24,6 +24,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -91,6 +92,9 @@ public final class BstPreviewLayout implements PreviewLayout {
         } catch (IOException e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
             error = Localization.lang("Error opening file '%0'", path.toString());
+        } catch (ParseCancellationException e) {
+            LOGGER.warn("Could not parse BST style for preview: {}", path.toAbsolutePath(), e);
+            error = Localization.lang("Error parsing file '%0'", path.toString());
         }
     }
 
@@ -115,6 +119,10 @@ public final class BstPreviewLayout implements PreviewLayout {
             LOGGER.error("Could not load internal BST style for preview: {}", resourcePath, e);
             return new BstPreviewLayout(Path.of(styleName), "", null,
                     Localization.lang("Error opening file '%0'", styleName));
+        } catch (ParseCancellationException e) {
+            LOGGER.warn("Could not parse internal BST style for preview: {}", resourcePath, e);
+            return new BstPreviewLayout(Path.of(styleName), "", null,
+                    Localization.lang("Error parsing file '%0'", styleName));
         }
     }
 

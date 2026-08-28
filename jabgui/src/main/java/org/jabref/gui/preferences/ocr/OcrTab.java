@@ -57,10 +57,12 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
         ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrEnginePathProperty());
         HBox.setHgrow(ocrEnginePath, Priority.ALWAYS);
 
+        Button autoDetectButton = ControlHelper.narrowIconButton(
+                IconTheme.JabRefIcons.SEARCH, Localization.lang("Auto-detect the engine's path"), viewModel::autoDetectEnginePath);
         Button browseButton = ControlHelper.narrowIconButton(
                 IconTheme.JabRefIcons.FOLDER, Localization.lang("Browse engine path"), viewModel::browseEnginePath);
 
-        HBox row = new HBox(8.0, new Label(Localization.lang("Engine path")), ocrEnginePath, browseButton);
+        HBox row = new HBox(8.0, new Label(Localization.lang("Engine path")), ocrEnginePath, browseButton, autoDetectButton);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
