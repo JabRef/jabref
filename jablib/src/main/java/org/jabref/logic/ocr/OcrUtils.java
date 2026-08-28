@@ -27,20 +27,14 @@ public final class OcrUtils {
     /// dialog. A verbose engine should not be able to grow this without bound.
     private static final int MAX_CAPTURED_OUTPUT_LENGTH = 3000;
 
-    /// Checks if the OCR engine is available for use.
-    ///
-    /// Reuses [#performOcr(ArrayList, String)] so a failed check carries the same command line and
-    /// captured output as any other OCR failure, instead of being reduced to a plain boolean. As a
-    /// result this check is bound by [#TIMEOUT_MINS] rather than the 10-second timeout used
-    /// previously; in practice `--version` returns almost instantly for an installed engine, so this
-    /// only matters when the configured path hangs instead of failing fast.
-    ///
-    /// @return an [OcrResult.Success] if the engine is available, or an [OcrResult.Failure] with the
-    /// command line and output captured while checking otherwise.
-    public static OcrResult isAvailable(OcrPreferences ocrPreferences) {
-        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--version");
-        return performOcr(command, "OCR engine availability check");
+    /// Maps a failed OCR result (e.g. from an engine's `--version` availability check) to
+    /// [OcrFailureReason#NOT_AVAILABLE], keeping the command line and output. A success is returned
+    /// unchanged. Shared so engines don't each duplicate this cast-and-rewrap.
+    public static OcrResult notAvailableIfFailed(OcrResult result) {
+        if (result instanceof OcrResult.Failure failure) {
+            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE, failure.commandLine(), failure.output());
+        }
+        return result;
     }
 
     /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
@@ -69,11 +63,9 @@ public final class OcrUtils {
                 return null;
             });
 
-            // A single wait, bounded by the real timeout. Once the gobbler task finishes, the
-            // process's output stream has closed, so the process has exited or is about to;
-            // process.waitFor() below then returns immediately. This replaces waiting twice
-            // (once on the process, once on the gobbler with its own separate timeout), which
-            // is also what left a window for outputBuilder to be read while still being written.
+            // Waiting on the gobbler, not the process, avoids reading outputBuilder while it's
+            // still being written; once the gobbler finishes, the process's output stream is
+            // closed, so it has already exited.
             try {
                 gobblerFuture.get(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             } catch (TimeoutException e) {
@@ -95,9 +87,7 @@ public final class OcrUtils {
             LOGGER.error("Error while running {}.", engineName, e);
             return OcrResult.failure(OcrFailureReason.IO_ERROR, commandLine, outputBuilder.toString());
         } catch (InterruptedException e) {
-            if (process != null) {
-                process.destroyForcibly();
-            }
+            process.destroyForcibly();
             Thread.currentThread().interrupt();
             LOGGER.error("{} process was interrupted.", engineName, e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED, commandLine, outputBuilder.toString());

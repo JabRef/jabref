@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrFailureReason;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
@@ -49,10 +48,11 @@ public class DoclingEngine implements OcrEngine {
 
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) throws IOException {
-        OcrResult availability = OcrUtils.isAvailable(ocrPreferences);
+        ArrayList<String> versionCommand = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        versionCommand.add("--version");
+        OcrResult availability = OcrUtils.notAvailableIfFailed(OcrUtils.performOcr(versionCommand, getName()));
         if (availability.isFailure()) {
-            OcrResult.Failure failure = (OcrResult.Failure) availability;
-            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE, failure.commandLine(), failure.output());
+            return availability;
         }
         Path outputDir = pdfPath.getParent();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.

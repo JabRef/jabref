@@ -32,10 +32,11 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// or [OcrResult.Failure] with an error message if OCR failed.
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) {
-        OcrResult availability = OcrUtils.isAvailable(ocrPreferences);
+        ArrayList<String> versionCommand = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        versionCommand.add("--version");
+        OcrResult availability = OcrUtils.notAvailableIfFailed(OcrUtils.performOcr(versionCommand, getName()));
         if (availability.isFailure()) {
-            OcrResult.Failure failure = (OcrResult.Failure) availability;
-            return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE, failure.commandLine(), failure.output());
+            return availability;
         }
         Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();

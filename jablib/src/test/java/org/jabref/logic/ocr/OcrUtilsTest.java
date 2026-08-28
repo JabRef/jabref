@@ -53,16 +53,23 @@ class OcrUtilsTest {
     }
 
     @Test
-    void isAvailableWithMissingEnginePathReturnsFailureWithCommandLine() {
-        OcrPreferences ocrPreferences = new OcrPreferences(
-                "this-command-does-not-exist-jabref-ocr-test",
-                PagesWithTextHandling.SKIP,
-                EngineSelection.OCRMYPDF);
+    void notAvailableIfFailedWrapsFailureReasonAsNotAvailable() {
+        OcrResult.Failure original = new OcrResult.Failure(OcrFailureReason.IO_ERROR, "engine --version", "some output");
 
-        OcrResult result = OcrUtils.isAvailable(ocrPreferences);
+        OcrResult result = OcrUtils.notAvailableIfFailed(original);
 
         OcrResult.Failure failure = assertInstanceOf(OcrResult.Failure.class, result);
-        assertEquals(OcrFailureReason.IO_ERROR, failure.reason());
-        assertEquals("this-command-does-not-exist-jabref-ocr-test --version", failure.commandLine());
+        assertEquals(OcrFailureReason.NOT_AVAILABLE, failure.reason());
+        assertEquals("engine --version", failure.commandLine());
+        assertEquals("some output", failure.output());
+    }
+
+    @Test
+    void notAvailableIfFailedReturnsSuccessUnchanged() {
+        OcrResult success = OcrResult.success(null);
+
+        OcrResult result = OcrUtils.notAvailableIfFailed(success);
+
+        assertTrue(result.isSuccess());
     }
 }
