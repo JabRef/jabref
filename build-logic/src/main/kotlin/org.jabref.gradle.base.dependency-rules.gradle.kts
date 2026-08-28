@@ -291,6 +291,9 @@ extraJavaModuleInfo {
     module("org.apache.sshd:sshd-osgi", "org.apache.sshd.osgi") {
         exportAllPackages()
         requires("java.logging")
+        requires("java.management") // Reason: ExceptionUtils unwraps javax.management exceptions
+        requires("java.rmi") // Reason: ExceptionUtils unwraps java.rmi exceptions
+        requires("java.security.jgss")
         requires("org.slf4j")
         uses("org.apache.sshd.common.io.IoServiceFactoryFactory")
     }
@@ -311,8 +314,17 @@ extraJavaModuleInfo {
         requires("org.apache.sshd.osgi")
         requires("org.apache.sshd.sftp")
         requires("org.eclipse.jgit")
+        requires("java.security.jgss")
         requires("org.slf4j")
         uses("org.eclipse.jgit.transport.sshd.agent.ConnectorFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent", "org.eclipse.jgit.ssh.apache.agent") {
+        exportAllPackages()
+        requires("com.sun.jna")
+        requires("com.sun.jna.platform")
+        requires("org.eclipse.jgit")
+        requires("org.eclipse.jgit.ssh.apache")
+        requires("org.slf4j")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
