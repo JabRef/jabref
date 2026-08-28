@@ -11,7 +11,7 @@ binary to build/bundle. Stdlib only.
 
 Run the self-check (no browser needed):  python3 jabext_host.py --selftest
 """
-import json, os, secrets, shlex, shutil, struct, subprocess, sys, threading, platform
+import json, os, secrets, shutil, struct, subprocess, sys, threading, platform
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -247,10 +247,6 @@ def resolve_jabref() -> list[str] | None:
             return _jabref_cmd
         _jabref_resolved = True
         prefix = ["flatpak-spawn", "--host"] if os.environ.get("FLATPAK_ID") else []
-        override = os.environ.get("JABEXT_JABREF_CMD")          # test/CI hook
-        if override:
-            _jabref_cmd = prefix + shlex.split(override)
-            return _jabref_cmd
         # portable install: <app>/bin/JabRef next to this script's parent; then
         # lowercase (deb/rpm/snap), uppercase (AUR), flatpak export.
         relpath = str(Path(__file__).resolve().parent.parent / "bin" / "JabRef")
@@ -265,6 +261,12 @@ def resolve_jabref() -> list[str] | None:
 
 def handle_import_message(msg: dict) -> None:
     """jabrefHost.py behaviour, folded in. Replies over native messaging."""
+    if os.environ.get("JABEXT_FAKE_JABREF"):        # test hook: skip the real JabRef shell-out
+        if msg.get("status") == "validate":
+            write_frame({"message": "jarFound"})
+        elif msg.get("text"):
+            write_frame({"message": "ok", "output": "imported (fake)"})
+        return
     jabref = resolve_jabref()
     if msg.get("status") == "validate":
         if jabref is None:

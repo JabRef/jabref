@@ -89,20 +89,20 @@ this trade-off.
 
 ## Merge with jabrefHost.py
 
-`jabext_host.py` already **is** the one process: `handle_import_message()`
-carries the full `jabgui/buildres/*/jabrefHost.py` logic (`{"status":"validate"}`
-→ `JabRef --version`; `{"text": …}` → `JabRef --importBibtex`), so a single host
-serves both the fulltext HTTP loopback and the import direction on one
-native-messaging connection. Import handling runs on its own thread and never
-exits the process, so a missing JabRef launcher can't take the HTTP server down.
+Both hosts **are** the one process. `jabext_host.py` folds in
+`jabgui/buildres/*/jabrefHost.py` (`{"status":"validate"}` → `JabRef --version`;
+`{"text": …}` → `JabRef --importBibtex`); `jabext_host.ps1` folds in
+`buildres/windows/JabRefHost.ps1` (validate → `Test-Path`; import → temp file +
+`JabRef.bat --importToOpen`). So a single host serves both the fulltext HTTP
+loopback and the import direction on one native-messaging connection, and a
+missing JabRef launcher replies with an error instead of taking the process
+down. `e2e_test.py` exercises the import round-trip against both hosts (a
+`JABEXT_FAKE_JABREF` env hook stands in for the launcher).
 
-Remaining to fully retire the old hosts:
-
-- the **extension** must send its import messages to `jabext_bridge` over the
-  same `connectNative` connection (today it uses the separate `org.jabref.jabref`
-  host); then `jabrefHost.py` + its registration can be deleted;
-- the **Windows** mirror `jabext_host.ps1` still needs the same import fold
-  (it currently ignores import messages).
+Remaining to fully retire the old hosts: the **extension** must send its import
+messages to `jabext_bridge` over the same `connectNative` connection (today it
+uses the separate `org.jabref.jabref` host); then `jabrefHost.py` /
+`JabRefHost.ps1` + their registration can be deleted.
 
 ## Lifecycle
 

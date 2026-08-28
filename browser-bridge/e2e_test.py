@@ -52,10 +52,10 @@ class HostRun:
     def __init__(self, name, argv, pdf_path):
         self.name, self.pdf = name, pdf_path
         self.config = Path(tempfile.mkdtemp(prefix=f"jabext-{name}-"))
-        # JABEXT_JABREF_CMD stands in for the JabRef launcher so the folded-in
-        # import path can run without a real JabRef install (echo exits 0).
+        # JABEXT_FAKE_JABREF lets the folded-in import path answer without a real
+        # JabRef install — cross-platform, same for both hosts.
         env = {**os.environ, "JABEXT_CONFIG_BASE": str(self.config),
-               "JABEXT_JABREF_CMD": "echo"}
+               "JABEXT_FAKE_JABREF": "1"}
         self.proc = subprocess.Popen(argv, cwd=HERE, env=env,
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE)
@@ -179,23 +179,19 @@ def check(host_name, argv):
         s, _ = httpreq(port, "POST", "/v1/mathscinet/open", {}, auth)
         assert s == 400, f"no mrNumber -> {s}"
 
-        # import direction (folded-in jabrefHost.py): the SAME process also
-        # handles NM import commands. Only the .py host has this so far.
-        extra = 0
-        if host_name == "python":
-            r = run.import_roundtrip({"status": "validate"})
-            assert r["message"] == "jarFound", r
-            r = run.import_roundtrip({"text": "@article{k, title={T}}"})
-            assert r["message"] == "ok", r
-            extra = 2
+        # import direction (folded-in jabrefHost): the SAME process also handles
+        # NM import commands — now on both hosts.
+        r = run.import_roundtrip({"status": "validate"})
+        assert r["message"] == "jarFound", r
+        r = run.import_roundtrip({"text": "@article{k, title={T}}"})
+        assert r["message"] == "ok", r
 
         # clean shutdown on stdin EOF + discovery cleanup
         rc = run.close()
         assert rc == 0, f"exit code {rc}\n" + "\n".join(run.stderr)
         assert not disc["_file"].exists(), "discovery file not cleaned up"
-        print(f"  PASS {host_name}: {9 + extra} assertions (health, auth, origin, validation, "
-              f"fetch, error-prop, mathscinet"
-              f"{', import(validate+add)' if extra else ''}, shutdown, cleanup)")
+        print(f"  PASS {host_name}: 11 assertions (health, auth, origin, validation, "
+              f"fetch, error-prop, mathscinet, import(validate+add), shutdown, cleanup)")
         return True
     except Exception as e:
         print(f"  FAIL {host_name}: {e}")
