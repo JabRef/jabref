@@ -82,30 +82,12 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
             }
         });
 
-        final boolean[] isSyncing = {false};
+items.stream()
+             .filter(viewModel.selectedOcrLanguagesProperty()::contains)
+             .forEach(languagesCombo.getCheckModel()::check);
 
-        viewModel.selectedOcrLanguagesProperty().addListener((InvalidationListener) _ -> {
-            if (isSyncing[0]) {
-                return;
-            }
-            Platform.runLater(() -> {
-                isSyncing[0] = true;
-                languagesCombo.getCheckModel().clearChecks();
-                items.stream()
-                     .filter(viewModel.selectedOcrLanguagesProperty()::contains)
-                     .forEach(languagesCombo.getCheckModel()::check);
-                isSyncing[0] = false;
-            });
-        });
-
-        languagesCombo.getCheckModel().getCheckedItems().addListener(
-                (InvalidationListener) _ -> {
-                    if (isSyncing[0]) {
-                        return;
-                    }
-                    isSyncing[0] = true;
-                    viewModel.selectedOcrLanguagesProperty().setAll(
-                            languagesCombo.getCheckModel().getCheckedItems()
+        languagesCombo.getCheckModel().getCheckedItems().addListener((InvalidationListener) _ ->
+                viewModel.selectedOcrLanguagesProperty().setAll(languagesCombo.getCheckModel().getCheckedItems()));
                     );
                     isSyncing[0] = false;
                 }
