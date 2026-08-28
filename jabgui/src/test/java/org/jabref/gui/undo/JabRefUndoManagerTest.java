@@ -149,6 +149,25 @@ class JabRefUndoManagerTest {
         assertFalse(undoRedoManager.canUndo());
     }
 
+    /// The twin of [#pushInsideABlockJoinsIt] for the applying entry point: called on the
+    /// manager rather than on the recorder, it still joins the step being collected instead of
+    /// becoming one of its own — and takes no lock on the way, since nothing reaches the stacks
+    /// until the block ends.
+    @Test
+    void applyingThroughTheManagerInsideABlockJoinsIt() {
+        undoRedoManager.addEdit("two fields", _ -> {
+            undoRedoManager.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+            undoRedoManager.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, null, "On the quantum theory"));
+        });
+
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+
+        undoRedoManager.undo();
+        assertFalse(undoRedoManager.canUndo(), "the two changes did not become one step");
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.TITLE));
+    }
+
     @Test
     void pushInsideABlockJoinsIt() {
         undoRedoManager.addEdit("outer", outer -> {
@@ -266,8 +285,8 @@ class JabRefUndoManagerTest {
         assertFalse(undoRedoManager.hasChanged());
     }
 
-    /// The defect P14 fixes: an edit balance returns to the saved value along a history that
-    /// never passes through the saved position, because pushing B discarded A.
+    /// An edit balance returns to the saved value along a history that never passes through the
+    /// saved position, because pushing B discarded A. Counting edits cannot tell the two apart.
     @Test
     void editingAfterUndoingTheSavedChangeReportsChanged() {
         // [utest->req~logic.undo.saved-position-identity~1]

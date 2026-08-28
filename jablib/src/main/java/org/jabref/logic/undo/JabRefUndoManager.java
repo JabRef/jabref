@@ -149,8 +149,9 @@ public class JabRefUndoManager implements UndoManager {
     /// change reaches the library at once while the step reaches the stack only when the block
     /// ends. What the thread-local recorder rules out is two threads writing one recorder, not
     /// an undo interleaving with a block's writes. A block that mutates off the JavaFX thread
-    /// therefore still races a concurrent undo, which is a defect this class cannot fix alone,
-    /// because only the command knows when its block ends — see P21 in the undo plan.
+    /// therefore still races a concurrent undo, which is a defect this class cannot fix alone:
+    /// only the command knows when its block ends, so reserving a command's writes against undo
+    /// and redo has to happen above this class, not inside it.
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
     public void applyEdit(BibChange change) {
