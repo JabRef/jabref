@@ -8,6 +8,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
+import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
@@ -64,17 +66,24 @@ public class GitCommitAction extends SimpleCommand {
             return true;
         }
 
-        boolean saved = new SaveDatabaseAction(
+        SaveResult saveResult = new SaveDatabaseAction(
                 libraryTab,
                 dialogService,
                 preferences,
                 entryTypesManager,
                 stateManager,
-                journalAbbreviationRepository).save();
-        if (!saved) {
-            dialogService.notify(Localization.lang("Unable to save library"));
+                journalAbbreviationRepository).saveWithResult(SaveDatabaseMode.NORMAL);
+        switch (saveResult) {
+            case SUCCESS -> {
+                return true;
+            }
+            // A save is still running (e.g. autosave), so the file on disk is not yet what the user sees.
+            case ALREADY_SAVING ->
+                    dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));
+            case FAILURE ->
+                    dialogService.notify(Localization.lang("Unable to save library"));
         }
-        return saved;
+        return false;
     }
 
     private boolean hasNothingToCommit() {

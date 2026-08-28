@@ -69,6 +69,12 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
+    /// `ALREADY_SAVING` reports that another thread is writing the very same library: nothing was written by this call,
+    /// and the file on disk is not yet the state the user sees.
+    public enum SaveResult {
+        SUCCESS, FAILURE, ALREADY_SAVING
+    }
+
     public SaveDatabaseAction(LibraryTab libraryTab,
                               DialogService dialogService,
                               GuiPreferences preferences,
@@ -84,10 +90,16 @@ public class SaveDatabaseAction {
     }
 
     public boolean save() {
-        return save(libraryTab.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
+        return save(SaveDatabaseMode.NORMAL);
     }
 
     public boolean save(SaveDatabaseMode mode) {
+        return saveWithResult(mode) != SaveResult.FAILURE;
+    }
+
+    /// Same as [#save(SaveDatabaseMode)], but distinguishes a completed save from one that was skipped
+    /// because another thread is already saving this library.
+    public SaveResult saveWithResult(SaveDatabaseMode mode) {
         return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
@@ -154,7 +166,7 @@ public class SaveDatabaseAction {
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
-        boolean saveResult = save(file, mode);
+        boolean saveResult = save(file, mode) != SaveResult.FAILURE;
 
         if (saveResult) {
             // we managed to successfully save the file
@@ -202,25 +214,25 @@ public class SaveDatabaseAction {
         return selectedPath;
     }
 
-    private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
+    private SaveResult save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            return savePath.filter(path -> saveAs(path, mode)).isPresent();
+            return savePath.filter(path -> saveAs(path, mode)).isPresent() ? SaveResult.SUCCESS : SaveResult.FAILURE;
         }
 
         return save(databasePath.get(), mode);
     }
 
-    private boolean save(Path targetPath, SaveDatabaseMode mode) {
+    private SaveResult save(Path targetPath, SaveDatabaseMode mode) {
         if (mode == SaveDatabaseMode.NORMAL && libraryTab.getBibDatabaseContext().getEntries().size() > 2_000) {
             dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
         synchronized (libraryTab) {
             if (libraryTab.isSaving()) {
-                // if another thread is saving, we do not need to save
-                return true;
+                // Another thread is already writing this library; that save is still in flight.
+                return SaveResult.ALREADY_SAVING;
             }
             libraryTab.setSaving(true);
         }
@@ -242,7 +254,7 @@ public class SaveDatabaseAction {
             libraryTab.getUndoManager().markUnchanged();
             libraryTab.resetChangedProperties(committedState);
             dialogService.notify(Localization.lang("Library saved"));
-            return true;
+            return SaveResult.SUCCESS;
         } catch (SaveException ex) {
             if (ex.getCause() instanceof FileChangedException) {
                 LOGGER.info("Library {} was modified by another program while saving; save aborted", targetPath, ex);
@@ -251,7 +263,7 @@ public class SaveDatabaseAction {
                 LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
-            return false;
+            return SaveResult.FAILURE;
         } finally {
             libraryTab.resumeChangeMonitor();
             // release panel from save status

@@ -112,6 +112,14 @@ class SaveDatabaseActionTest {
         verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
     }
 
+    @Test
+    void saveWithResultReportsRunningSaveInsteadOfSuccess() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        assertEquals(SaveDatabaseAction.SaveResult.ALREADY_SAVING, saveDatabaseAction.saveWithResult(SaveDatabaseAction.SaveDatabaseMode.SILENT));
+    }
+
     private SaveDatabaseAction createSaveDatabaseActionForBibDatabase(BibDatabase database) throws IOException {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();
