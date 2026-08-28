@@ -120,6 +120,16 @@ class SaveDatabaseActionTest {
         assertEquals(SaveDatabaseAction.SaveResult.ALREADY_SAVING, saveDatabaseAction.saveWithResult(SaveDatabaseAction.SaveDatabaseMode.SILENT));
     }
 
+    @Test
+    void saveAsDoesNotAdoptTheNewPathWhileASaveIsRunning() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
+        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        assertFalse(saveDatabaseAction.saveAs(file, SaveDatabaseAction.SaveDatabaseMode.SILENT));
+        verify(dbContext, never()).setDatabasePath(any());
+    }
+
     private SaveDatabaseAction createSaveDatabaseActionForBibDatabase(BibDatabase database) throws IOException {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();

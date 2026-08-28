@@ -166,9 +166,13 @@ public class SaveDatabaseAction {
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
-        boolean saveResult = save(file, mode) != SaveResult.FAILURE;
+        SaveResult saveResult = save(file, mode);
+        if (saveResult == SaveResult.ALREADY_SAVING) {
+            // Nothing was written to the new file, so the library has to keep pointing at the old one.
+            dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));
+        }
 
-        if (saveResult) {
+        if (saveResult == SaveResult.SUCCESS) {
             // we managed to successfully save the file
             // thus, we can store the path into the context
             context.setDatabasePath(file);
@@ -182,7 +186,7 @@ public class SaveDatabaseAction {
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }
-        return saveResult;
+        return saveResult == SaveResult.SUCCESS;
     }
 
     /// Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
