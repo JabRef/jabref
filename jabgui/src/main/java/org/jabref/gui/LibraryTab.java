@@ -814,7 +814,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService,
                 preferences,
                 undoManager,
-                stateManager));
+                stateManager,
+                this));
     }
 
     public void suspendChangeMonitor() {
