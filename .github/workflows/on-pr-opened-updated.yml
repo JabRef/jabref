@@ -67,8 +67,9 @@ jobs:
       # Once the conflict is resolved, drop the old comment (posted as jabref-machine by
       # pr-comment.yml, or as github-actions by the dispatch path below). Otherwise, the next
       # conflict is silently skipped by the "Already commented" check below.
+      # Requires an explicit MERGEABLE: after five retries the check may still report UNKNOWN.
       - name: Remove stale conflict comments
-        if: steps.check_mergeable.outputs.mergeable != 'CONFLICTING'
+        if: steps.check_mergeable.outputs.mergeable == 'MERGEABLE'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
