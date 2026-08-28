@@ -287,6 +287,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requires("org.slf4j")
         uses("org.eclipse.jgit.lib.SignerFactory")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
