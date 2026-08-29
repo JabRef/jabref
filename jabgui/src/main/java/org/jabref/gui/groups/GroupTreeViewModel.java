@@ -45,7 +45,6 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
@@ -243,19 +242,36 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 newSuggestedSubgroups.add(subGroup);
             }
 
-            Optional<GroupTreeNode> markingNodeOpt = rootNode.findGroupByName(Localization.lang("Marking and Grading"));
+            Optional<GroupTreeNode> markingNodeOpt = GroupsFactory.findMarkingNode(rootNode);
             if (markingNodeOpt.isEmpty()) {
-                GroupTreeNode markingNode = rootNode.addSubgroup(
-                        new ExplicitGroup(Localization.lang("Marking and Grading"),
-                                GroupHierarchyType.INCLUDING,
-                                preferences.getBibEntryPreferences().getKeywordSeparator()));
+                GroupTreeNode markingNode = GroupsFactory.createMarkingNode(
+                        preferences.getBibEntryPreferences().getKeywordSeparator());
+                rootNode.addChild(markingNode);
+                newSuggestedSubgroups.addAll(markingNode.getChildren());
+            } else {
+                GroupTreeNode markingNode = markingNodeOpt.get();
+                for (GroupsFactory.SuggestedGroupStructure structure : GroupsFactory.getSuggestedSubgroups()) {
+                    ExplicitGroup parentGroup = structure.parent();
+                    List<SearchGroup> subgroups = structure.subgroups();
 
-                addSuggestedSubgroup(markingNode, GroupsFactory.createRankParentGroup(), GroupsFactory.createRankSubgroups(), newSuggestedSubgroups);
-                addSuggestedSubgroup(markingNode, GroupsFactory.createRelevanceParentGroup(), GroupsFactory.createRelevanceSubgroups(), newSuggestedSubgroups);
-                addSuggestedSubgroup(markingNode, GroupsFactory.createQualityParentGroup(), GroupsFactory.createQualitySubgroups(), newSuggestedSubgroups);
-                addSuggestedSubgroup(markingNode, GroupsFactory.createPrintedParentGroup(), GroupsFactory.createPrintedSubgroups(), newSuggestedSubgroups);
-                addSuggestedSubgroup(markingNode, GroupsFactory.createPriorityParentGroup(), GroupsFactory.createPrioritySubgroups(), newSuggestedSubgroups);
-                addSuggestedSubgroup(markingNode, GroupsFactory.createReadStatusParentGroup(), GroupsFactory.createReadStatusSubgroups(), newSuggestedSubgroups);
+                    String parentDescription = parentGroup.getDescription().orElse("");
+                    Optional<GroupTreeNode> parentNodeOpt = GroupsFactory.findGroupByDescription(markingNode, parentDescription);
+                    if (parentNodeOpt.isEmpty()) {
+                        GroupTreeNode parentNode = markingNode.addSubgroup(parentGroup);
+                        subgroups.forEach(parentNode::addSubgroup);
+                        newSuggestedSubgroups.add(parentNode);
+                    } else {
+                        GroupTreeNode parentNode = parentNodeOpt.get();
+                        for (SearchGroup subgroup : subgroups) {
+                            String subgroupDescription = subgroup.getDescription().orElse("");
+                            Optional<GroupTreeNode> subgroupNodeOpt = GroupsFactory.findGroupByDescription(parentNode, subgroupDescription);
+                            if (subgroupNodeOpt.isEmpty()) {
+                                GroupTreeNode missingSubgroup = parentNode.addSubgroup(subgroup);
+                                newSuggestedSubgroups.add(missingSubgroup);
+                            }
+                        }
+                    }
+                }
             }
 
             selectedGroups.setAll(newSuggestedSubgroups
@@ -267,12 +283,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
         });
-    }
-
-    private void addSuggestedSubgroup(GroupTreeNode parentNode, AbstractGroup parentGroup, List<SearchGroup> subgroups, List<GroupTreeNode> newSuggestedSubgroups) {
-        GroupTreeNode childNode = parentNode.addSubgroup(parentGroup);
-        subgroups.forEach(childNode::addSubgroup);
-        newSuggestedSubgroups.add(childNode);
     }
 
     /// Check if it is necessary to show a group modified, reassign entry dialog <br>
