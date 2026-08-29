@@ -8,6 +8,7 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -129,7 +130,7 @@ class AtomicFileOutputStreamTest {
                     throw new AssertionError("The aborted save must not commit");
                 },
                 (source, target) -> {
-                    Files.copy(source, target);
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     // Simulate a concurrent writer hitting the target while the backup copy is running
                     Files.writeString(source, "changed during backup");
                 });
@@ -233,6 +234,20 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
+    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+    void abortedWriteDoesNotCommitPartialContent(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("aborted-write.txt");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile)) {
+            atomicFileOutputStream.write("partial content".getBytes());
+            atomicFileOutputStream.abort();
+        }
+
+        assertEquals(FIFTY_CHARS, Files.readString(targetFile));
+    }
+
+    @Test
     void abortDoesNotDeleteExistingBackup(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("abort.txt");
         AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(targetFile);
@@ -241,6 +256,33 @@ class AtomicFileOutputStreamTest {
         atomicFileOutputStream.abort();
 
         assertEquals(FIFTY_CHARS, Files.readString(atomicFileOutputStream.getBackup()));
+    }
+
+    @Test
+    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+    void failedBackupStagingDoesNotReplaceExistingBackup(@TempDir Path tempDir) throws IOException {
+        Path targetFile = tempDir.resolve("backup-staging.txt");
+        Path temporaryFile = tempDir.resolve("backup-staging.txt.tmp");
+        Files.writeString(targetFile, FIFTY_CHARS);
+
+        AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(
+                targetFile,
+                temporaryFile,
+                Files.newOutputStream(temporaryFile),
+                true,
+                (source, target) -> Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING),
+                (source, target) -> {
+                    Files.writeString(target, "partial backup");
+                    throw new IOException("Simulated interruption while creating backup");
+                });
+        Path backupFile = atomicFileOutputStream.getBackup();
+        try (atomicFileOutputStream) {
+            Files.writeString(atomicFileOutputStream.getBackup(), FIFTY_CHARS);
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(FIFTY_CHARS, Files.readString(backupFile));
+        assertEquals(FIVE_THOUSAND_CHARS, Files.readString(targetFile));
     }
 
     @Test

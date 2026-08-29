@@ -2,6 +2,7 @@ package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -30,6 +31,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -129,6 +131,51 @@ class BackupManagerTest {
         Files.setLastModifiedTime(target, FileTime.fromMillis(0));
 
         assertFalse(BackupManager.backupFileDiffers(changesBib, backupDir));
+    }
+
+    @Test
+    void latestBackupCanBeEmpty(@TempDir Path tempDir) throws IOException {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@article{existing}");
+        Path emptyBackup = BackupManager.getBackupPathForNewBackup(originalFile, backupDir);
+        Files.writeString(emptyBackup, "");
+
+        assertEquals(emptyBackup, BackupManager.getLatestBackupPath(originalFile, backupDir).orElseThrow());
+    }
+
+    @Test
+    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+    void restoringAnEmptyBackupLeavesTheOriginalFileUnchanged(@TempDir Path tempDir) throws IOException {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@article{existing}");
+        Path emptyBackup = BackupManager.getBackupPathForNewBackup(originalFile, backupDir);
+        Files.writeString(emptyBackup, "");
+
+        assertEquals(new BackupManager.RestoreResult.Empty(emptyBackup), BackupManager.restoreBackup(originalFile, backupDir));
+
+        assertEquals("@article{existing}", Files.readString(originalFile));
+    }
+
+    @Test
+    void missingBackupIncludesTheOriginalFilePath(@TempDir Path tempDir) {
+        Path originalFile = tempDir.resolve("library.bib");
+
+        assertEquals(new BackupManager.RestoreResult.NotFound(originalFile), BackupManager.restoreBackup(originalFile, backupDir));
+    }
+
+    @Test
+    void failedRestoreIncludesTheCause(@TempDir Path tempDir) throws IOException {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.createDirectory(originalFile);
+        Files.writeString(originalFile.resolve("existing-file"), "existing content");
+        Path backup = BackupManager.getBackupPathForNewBackup(originalFile, backupDir);
+        Files.writeString(backup, "@article{backup}");
+
+        BackupManager.RestoreResult result = BackupManager.restoreBackup(originalFile, backupDir);
+
+        BackupManager.RestoreResult.Failed failure = assertInstanceOf(BackupManager.RestoreResult.Failed.class, result);
+        assertEquals(backup, failure.backupPath());
+        assertInstanceOf(DirectoryNotEmptyException.class, failure.exception());
     }
 
     @Test

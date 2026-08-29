@@ -69,4 +69,9 @@ public class AtomicFileWriter extends OutputStreamWriter {
     public Set<Character> getEncodingProblems() {
         return Collections.unmodifiableSet(problemCharacters);
     }
+
+    /// Aborts the write without replacing the target file.
+    public void abort() {
+        outputStream.abort();
+    }
 }
