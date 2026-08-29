@@ -73,9 +73,9 @@ class GroupTreeViewModelTest {
         activeDb.setValue(Optional.of(databaseContext));
         when(stateManager.activeDatabaseProperty()).thenReturn(activeDb);
         when(stateManager.getSearchContext(databaseContext)).thenReturn(new SearchContext(
-                                                                                          new SimpleBooleanProperty(false),
-                                                                                          NoOpSearchBackend::new,
-                                                                                          NoOpSearchBackend::new));
+                new SimpleBooleanProperty(false),
+                NoOpSearchBackend::new,
+                NoOpSearchBackend::new));
         when(stateManager.getSelectedGroups(databaseContext)).thenReturn(FXCollections.emptyObservableList());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
 
@@ -84,18 +84,19 @@ class GroupTreeViewModelTest {
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferences.getLibraryPreferences()).thenReturn(new LibraryPreferences(
-                                                                                    databaseContext.getMode(),
-                                                                                    false,
-                                                                                    false,
-                                                                                    false,
-                                                                                    "Imported entries"));
+                databaseContext.getMode(),
+                false,
+                false,
+                false,
+                "Imported entries"
+        ));
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                                                                                  EnumSet.noneOf(GroupViewMode.class),
-                                                                                  true,
-                                                                                  true,
-                                                                                  false,
-                                                                                  GroupHierarchyType.INDEPENDENT,
-                                                                                  false));
+                EnumSet.noneOf(GroupViewMode.class),
+                true,
+                true,
+                false,
+                GroupHierarchyType.INDEPENDENT,
+                false));
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
@@ -198,9 +199,9 @@ class GroupTreeViewModelTest {
         model.addSuggestedGroups(rootGroup);
 
         Set<String> expectedGroupNames = Set.of(
-                                                Localization.lang("Entries without linked files"),
-                                                Localization.lang("Entries without groups"),
-                                                Localization.lang("Marking and Grading"));
+                Localization.lang("Entries without linked files"),
+                Localization.lang("Entries without groups"),
+                Localization.lang("Marking and Grading"));
         Set<String> actualGroupNames = rootGroup.getChildren().stream()
                                                 .map(GroupNodeViewModel::getDisplayName)
                                                 .collect(Collectors.toSet());
@@ -216,11 +217,11 @@ class GroupTreeViewModelTest {
 
     private static Stream<Arguments> initialTreeSetupProvider() {
         return Stream.of(
-                         Arguments.of(Named.of("no groups exist", (Consumer<GroupTreeNode>) root -> {
-                         })),
-                         Arguments.of(Named.of("only without files group exists", (Consumer<GroupTreeNode>) root -> root.addSubgroup(GroupsFactory.createWithoutFilesGroup()))),
-                         Arguments.of(Named.of("only without groups group exists", (Consumer<GroupTreeNode>) root -> root.addSubgroup(GroupsFactory.createWithoutGroupsGroup()))),
-                         Arguments.of(Named.of("only marking and grading group exists", (Consumer<GroupTreeNode>) root -> root.addChild(GroupsFactory.createMarkingNode(',')))));
+                Arguments.of(Named.of("no groups exist", (Consumer<GroupTreeNode>) root -> {
+                })),
+                Arguments.of(Named.of("only without files group exists", (Consumer<GroupTreeNode>) root -> root.addSubgroup(GroupsFactory.createWithoutFilesGroup()))),
+                Arguments.of(Named.of("only without groups group exists", (Consumer<GroupTreeNode>) root -> root.addSubgroup(GroupsFactory.createWithoutGroupsGroup()))),
+                Arguments.of(Named.of("only marking and grading group exists", (Consumer<GroupTreeNode>) root -> root.addChild(GroupsFactory.createMarkingNode(',')))));
     }
 
     @Test
