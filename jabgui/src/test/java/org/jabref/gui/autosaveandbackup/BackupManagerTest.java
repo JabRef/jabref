@@ -144,7 +144,7 @@ class BackupManagerTest {
     }
 
     @Test
-    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+        // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     void restoringAnEmptyBackupLeavesTheOriginalFileUnchanged(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@article{existing}");

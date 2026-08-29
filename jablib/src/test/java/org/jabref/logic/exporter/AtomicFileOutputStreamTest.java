@@ -234,7 +234,7 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
-    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+        // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     void abortedWriteDoesNotCommitPartialContent(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("aborted-write.txt");
         Files.writeString(targetFile, FIFTY_CHARS);
@@ -259,7 +259,7 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
-    // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
+        // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     void failedBackupStagingDoesNotReplaceExistingBackup(@TempDir Path tempDir) throws IOException {
         Path targetFile = tempDir.resolve("backup-staging.txt");
         Path temporaryFile = tempDir.resolve("backup-staging.txt.tmp");

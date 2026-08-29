@@ -21,6 +21,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -82,7 +83,7 @@ class BackupUIManagerTest extends ApplicationTest {
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, tempDir.resolve("backups"));
         Files.write(backupFile, new byte[2048]);
 
-        AtomicReference<String> dialogContent = new AtomicReference<>();
+        AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
         interact(() -> {
             BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
             HyperlinkLabel content = (HyperlinkLabel) dialog.getDialogPane().getContent();

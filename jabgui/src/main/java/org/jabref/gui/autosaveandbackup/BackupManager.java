@@ -192,7 +192,7 @@ public class BackupManager {
     }
 
     /// Restores the backup file by copying and overwriting the original one.
-    // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
+    /// [impl->req~jabgui.autosaveandbackup.complete-backup~1]
     ///
     /// @param originalPath Path to the file which should be equalized to the backup file.
     public static RestoreResult restoreBackup(Path originalPath, Path backupDir) {
