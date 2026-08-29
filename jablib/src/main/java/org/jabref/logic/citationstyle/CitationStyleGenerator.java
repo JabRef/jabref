@@ -96,4 +96,23 @@ public class CitationStyleGenerator {
             return Optional.empty();
         }
     }
+
+    public static Optional<List<String>> generateBibliographyEntryIds(List<BibEntry> bibEntries,
+                                                                      String style,
+                                                                      CitationStyleOutputFormat outputFormat,
+                                                                      BibDatabaseContext databaseContext,
+                                                                      BibEntryTypesManager entryTypesManager) {
+        try {
+            return Optional.of(CSL_ADAPTER.getBibliographyEntryIds(bibEntries, style, outputFormat, databaseContext, entryTypesManager));
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("The CSL engine could not determine bibliography entry IDs for your item.", e);
+            return Optional.empty();
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            LOGGER.error("Could not determine bibliography entry IDs", e);
+            return Optional.empty();
+        } catch (TokenMgrException e) {
+            LOGGER.error("Bad character inside BibEntry", e);
+            return Optional.empty();
+        }
+    }
 }

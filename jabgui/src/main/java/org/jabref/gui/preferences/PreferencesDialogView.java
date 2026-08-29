@@ -32,7 +32,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");
     @FXML private CustomTextField searchBox;
-    @FXML private ListView<PreferencesTab> preferenceTabList;
+    @FXML private ListView<PreferencesTab> preferencesTabList;
     @FXML private Label tabTitle;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
@@ -71,19 +71,17 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private void initialize() {
         viewModel = new PreferencesDialogViewModel(dialogService, preferences);
 
-        preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
-
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
-        preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
+        preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
-            preferenceTabList.getSelectionModel().clearSelection();
-            preferenceTabList.getSelectionModel().selectFirst();
+            preferencesTabList.getSelectionModel().clearSelection();
+            preferencesTabList.getSelectionModel().selectFirst();
         });
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
-        EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
+        EasyBind.subscribe(preferencesTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
                 tabTitle.setText("");
                 preferencesContainer.setContent(null);
@@ -99,18 +97,18 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
 
         if (this.preferencesTabToSelectClass != null) {
-            Optional<PreferencesTab> tabToSelectIfExist = preferenceTabList.getItems()
-                                                                           .stream()
-                                                                           .filter(prefTab -> prefTab.getClass().equals(preferencesTabToSelectClass))
-                                                                           .findFirst();
-            tabToSelectIfExist.ifPresent(preferencesTab -> preferenceTabList.getSelectionModel().select(preferencesTab));
+            Optional<PreferencesTab> tabToSelectIfExist = preferencesTabList.getItems()
+                                                                            .stream()
+                                                                            .filter(prefTab -> prefTab.getClass().equals(preferencesTabToSelectClass))
+                                                                            .findFirst();
+            tabToSelectIfExist.ifPresent(preferencesTab -> preferencesTabList.getSelectionModel().select(preferencesTab));
         } else {
-            preferenceTabList.getSelectionModel().selectFirst();
+            preferencesTabList.getSelectionModel().selectFirst();
         }
 
         new ViewModelListCellFactory<PreferencesTab>()
                 .withText(PreferencesTab::getTabName)
-                .install(preferenceTabList);
+                .install(preferencesTabList);
 
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
