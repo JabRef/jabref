@@ -70,23 +70,22 @@ class EntryEditorFocusUtils {
     // region — jump to field
 
     void setFocusToField(Field field) {
-        UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
-                tab -> selectTabAndField(tab, field),
-                () -> {
-                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
-                }
-        ));
+        focusField(field, () -> {
+        });
     }
 
     void focusOrAddField(Field field) {
+        focusField(field, () -> addFieldViaAllFieldsTab(field));
+    }
+
+    private void focusField(Field field, Runnable onNotFound) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
                     getTabContainingField(aliasField).ifPresentOrElse(
                             tab -> selectTabAndField(tab, aliasField),
-                            () -> addFieldViaAllFieldsTab(field)
+                            onNotFound
                     );
                 }
         ));
