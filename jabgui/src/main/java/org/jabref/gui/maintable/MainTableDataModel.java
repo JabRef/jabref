@@ -25,7 +25,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
@@ -48,7 +47,6 @@ import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
 
 public class MainTableDataModel {
     private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
-
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -174,10 +172,14 @@ public class MainTableDataModel {
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
-            boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
-            entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
+            applyGroupMatchesToAllEntries();
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    private void applyGroupMatchesToAllEntries() {
+        boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
+        boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
+        entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
     }
 
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
@@ -276,20 +278,6 @@ public class MainTableDataModel {
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
-        }
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            // When entries are removed, we need to refresh the search matches
-            // to ensure the filtered list is properly updated and doesn't show stale entries
-            BackgroundTask.wrap(() -> {
-                // Re-run the current search to update the filtered results
-                if (searchQueryProperty.get().isPresent()) {
-                    setSearchMatches(searchContext.search(searchQueryProperty.get().get()));
-                } else {
-                    clearSearchMatches();
-                }
-            }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
 }
