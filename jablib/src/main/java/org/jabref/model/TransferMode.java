@@ -4,6 +4,5 @@ public enum TransferMode {
     COPY,
     MOVE,
     NONE;
-
 }
 
