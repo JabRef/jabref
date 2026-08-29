@@ -27,7 +27,8 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      BibDatabaseContext oldDatabaseContext,
                                      BibDatabaseContext newDatabaseContext,
                                      GuiPreferences preferences,
-                                     BibEntryTypesManager entryTypesManager) {
+                                     BibEntryTypesManager entryTypesManager,
+                                     DiffHighlighter.BasicDiffMethod diffMethod) {
         Label committedVersion = new Label(Localization.lang("Committed version"));
         committedVersion.getStyleClass().add("lib-change-header");
         Label savedFile = new Label(Localization.lang("Saved file"));
@@ -35,7 +36,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
 
         StyleClassedTextArea oldSourceArea = createConfiguredTextArea(oldEntry, oldDatabaseContext, preferences, entryTypesManager);
         StyleClassedTextArea newSourceArea = createConfiguredTextArea(newEntry, newDatabaseContext, preferences, entryTypesManager);
-        new SplitDiffHighlighter(oldSourceArea, newSourceArea, DiffHighlighter.BasicDiffMethod.CHARS).highlight();
+        new SplitDiffHighlighter(oldSourceArea, newSourceArea, diffMethod).highlight();
 
         ScrollPane leftScrollPane = createScrollPane(oldSourceArea);
         ScrollPane rightScrollPane = createScrollPane(newSourceArea);
