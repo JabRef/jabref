@@ -32,7 +32,6 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
-import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
@@ -66,7 +65,6 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     private final BibDatabaseContext headDatabase;
     private final BibDatabaseContext workingTreeDatabase;
     private final Map<DatabaseChange, Node> detailsViewCache = new HashMap<>();
-
 
     public GitDiffDialogView(List<DatabaseChange> changes,
                              BibDatabaseContext headDatabase,
@@ -102,7 +100,7 @@ public class GitDiffDialogView extends BaseDialog<Void> {
             changesTableView.getSelectionModel().selectFirst();
         }
 
-        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable,oldValue,newValue)->{
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             detailsViewCache.clear();
             DatabaseChange selectedChange = changesTableView.getSelectionModel().getSelectedItem();
             if (selectedChange != null) {
