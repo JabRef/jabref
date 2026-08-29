@@ -8,7 +8,7 @@ import org.jabref.logic.openoffice.style.OOStyle;
 import org.jspecify.annotations.NonNull;
 
 /// Representation of a CitationStyle. Stores its name, the file path and the style itself.
-/// This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
+/// This is a pure model class. For loading/parsing functionality, see  [CSLStyleUtils] and [CSLStyleLoader].
 public class CitationStyle implements OOStyle {
 
     // Currently, we have support for only one alphanumeric style, so we hardcode it
@@ -21,6 +21,7 @@ public class CitationStyle implements OOStyle {
     private final String shortTitle;
     private final boolean isNumericStyle;
     private final boolean hasBibliography;
+    private final boolean hasBibliographySortOrder;
     private final boolean usesHangingIndent;
     private final String source;
     private final boolean isInternalStyle;
@@ -32,6 +33,7 @@ public class CitationStyle implements OOStyle {
                          @NonNull String shortTitle,
                          boolean isNumericStyle,
                          boolean hasBibliography,
+                         boolean hasBibliographySortOrder,
                          boolean usesHangingIndent,
                          @NonNull String source,
                          boolean isInternalStyle) {
@@ -42,48 +44,10 @@ public class CitationStyle implements OOStyle {
         this.shortTitle = shortTitle;
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
+        this.hasBibliographySortOrder = hasBibliography && hasBibliographySortOrder;
         this.usesHangingIndent = hasBibliography && usesHangingIndent;
         this.source = source;
         this.isInternalStyle = isInternalStyle;
-    }
-
-    public CitationStyle(@NonNull String filePath,
-                         @NonNull String title,
-                         @NonNull String shortTitle,
-                         boolean isNumericStyle,
-                         boolean hasBibliography,
-                         boolean usesHangingIndent,
-                         @NonNull String source,
-                         boolean isInternalStyle) {
-        this(
-                filePath,
-                "",                 // styleId
-                "",                 // styleClass
-                title,
-                shortTitle,
-                isNumericStyle,
-                hasBibliography,
-                usesHangingIndent,
-                source,
-                isInternalStyle);
-    }
-
-    /// Creates a new citation style with an auto-determined internal/external state.
-    public CitationStyle(@NonNull String filePath,
-                         @NonNull String title,
-                         @NonNull String shortTitle,
-                         boolean isNumericStyle,
-                         boolean hasBibliography,
-                         boolean usesHangingIndent,
-                         @NonNull String source) {
-        this(filePath,
-                title,
-                shortTitle,
-                isNumericStyle,
-                hasBibliography,
-                usesHangingIndent,
-                source,
-                !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {
@@ -108,6 +72,10 @@ public class CitationStyle implements OOStyle {
 
     public boolean hasBibliography() {
         return hasBibliography;
+    }
+
+    public boolean hasBibliographySortOrder() {
+        return hasBibliographySortOrder;
     }
 
     public boolean usesHangingIndent() {
