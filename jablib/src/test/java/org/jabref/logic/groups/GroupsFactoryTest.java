@@ -251,7 +251,7 @@ class GroupsFactoryTest {
                                                       .toList();
         assertEquals(expectedSubgroupNames, actualSubgroupNames);
 
-        assertEquals(5, markingNode.getChildren().get(0).getChildren().size());
+        assertEquals(5, markingNode.getChildren().getFirst().getChildren().size());
         assertEquals(2, markingNode.getChildren().get(1).getChildren().size());
         assertEquals(2, markingNode.getChildren().get(2).getChildren().size());
         assertEquals(2, markingNode.getChildren().get(3).getChildren().size());
