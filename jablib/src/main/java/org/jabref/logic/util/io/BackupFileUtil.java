@@ -20,10 +20,6 @@ public class BackupFileUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
 
-    /// Extension of the single backup next to the library, as written by JabRef 5.8 up to the 6.0 alphas when the backup directory was not available.
-    /// Before 5.8, `<library>.bak` was the copy of the previous content made on save (the automatic backup was `<library>.sav` then), which is a usable backup as well.
-    private static final String LEGACY_BACKUP_EXTENSION = ".bak";
-
     private BackupFileUtil() {
     }
 
@@ -72,14 +68,12 @@ public class BackupFileUtil {
     }
 
     /// Determines the most recent existing backup of the given library, see [#getExistingBackupFiles].
-    /// The single `.bak` backup of older JabRef versions next to the library only counts if no other backup exists,
-    /// because every timestamped backup was written later than it.
     public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, Path backupDir) {
         List<Path> backupFiles = getExistingBackupFiles(targetFile, backupDir);
-        if (!backupFiles.isEmpty()) {
-            return Optional.of(backupFiles.getLast());
+        if (backupFiles.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.of(FileUtil.addExtension(targetFile, LEGACY_BACKUP_EXTENSION)).filter(Files::exists);
+        return Optional.of(backupFiles.getLast());
     }
 
     private static Path getDirectoryOfLibrary(Path targetFile) {

@@ -66,16 +66,7 @@ class BackupFileUtilTest {
         String prefix = BackupFileUtil.getUniqueFilePrefix(library) + "--test.bib--";
         Files.writeString(tempDir.resolve(prefix + "2024-01-01--00.00.00.bib"), "");
         Path latestBackup = Files.writeString(tempDir.resolve(prefix + "2025-01-01--00.00.00.bib"), "");
-        Files.writeString(tempDir.resolve("test.bib.bak"), "");
 
         assertEquals(Optional.of(latestBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, tempDir.resolve("missing")));
-    }
-
-    @Test
-    void legacyBackupNextToLibraryIsFoundWhenNoOtherBackupExists(@TempDir Path tempDir) throws IOException {
-        Path library = tempDir.resolve("test.bib");
-        Path legacyBackup = Files.writeString(tempDir.resolve("test.bib.bak"), "");
-
-        assertEquals(Optional.of(legacyBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, tempDir.resolve("missing")));
     }
 }
