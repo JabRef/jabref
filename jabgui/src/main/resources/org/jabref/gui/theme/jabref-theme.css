@@ -93,6 +93,8 @@
         /* Group hit-count badge */
         -color-badge-bg: #6F6F6F;
         -color-badge-fg: #FFFFFF;
+        /* Text on the green badge of a group that contains selected entries */
+        -color-badge-selected-fg: #000000;
 
         /* Scrim used to dim the app behind the walkthrough spotlight, and drop shadows */
         -color-scrim: rgba(34, 47, 62, 0.75);
@@ -185,6 +187,8 @@
         /* Group hit-count badge */
         -color-badge-bg: #151924;
         -color-badge-fg: #E5E7EA;
+        /* Text on the green badge of a group that contains selected entries */
+        -color-badge-selected-fg: #000000;
 
         /* Scrim used to dim the app behind the walkthrough spotlight, and drop shadows */
         -color-scrim: rgba(0, 0, 0, 0.75);

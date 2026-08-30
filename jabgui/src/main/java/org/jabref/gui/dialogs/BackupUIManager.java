@@ -53,7 +53,31 @@ public class BackupUIManager {
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                switch (result) {
+                    case BackupManager.RestoreResult.Empty(
+                            Path backupPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
+                    case BackupManager.RestoreResult.Failed(
+                            Path backupPath,
+                            IOException exception
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("Could not restore the backup file '%0'.", backupPath),
+                                    exception);
+                    case BackupManager.RestoreResult.NotFound(
+                            Path missingOriginalPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
+                    case BackupManager.RestoreResult.Restored _ -> {
+                    }
+                }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);

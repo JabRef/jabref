@@ -30,13 +30,13 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +51,7 @@ public class RightClickMenu {
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      GuiPreferences preferences,
-                                     UndoManager undoManager,
+                                     GuiUndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,

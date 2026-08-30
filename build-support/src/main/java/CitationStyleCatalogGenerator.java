@@ -98,6 +98,7 @@ public class CitationStyleCatalogGenerator {
                                                             info.put("shortTitle", style.getShortTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
+                                                            info.put("hasBibliographySortOrder", style.hasBibliographySortOrder());
                                                             info.put("usesHangingIndent", style.usesHangingIndent());
                                                             return info;
                                                         })
