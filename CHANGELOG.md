@@ -66,7 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We sped up "Find duplicates" for large libraries: candidate pairs are now determined by a blocking stage instead of comparing every pair of entries. [#16579](https://github.com/JabRef/jabref/issues/16579)
+- We changed "Find duplicates" to complete much faster for libraries with more than 1000 entries. [#16579](https://github.com/JabRef/jabref/issues/16579)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - A custom theme (CSS file) is now applied on top of the selected theme instead of replacing it entirely. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - Custom themes now use the `-color-*` variables declared in the theme stylesheet (see `jabref-theme.css`); the previous `-jr-*` color variables (e.g. `-jr-theme`, `-jr-accent`) were removed, so existing custom CSS files that override them need to be adapted. [#15625](https://github.com/JabRef/jabref/issues/15625)
@@ -99,7 +99,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- Duplicate detection now recognizes two entries with the same DOI given in different forms (e.g., plain value and URL). [#16579](https://github.com/JabRef/jabref/issues/16579)
+- We fixed an issue where entries with the same DOI in different forms (plain value, URL) were not detected as duplicates. [#16579](https://github.com/JabRef/jabref/issues/16579)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed freezing while scrolling results in the Search for unlinked local files dialog. [#16696](https://github.com/JabRef/jabref/pull/16696)
 - We fixed an issue where "File > Git > Commit" refused to commit when the repository had no remote or the remote could not be reached. [#16720](https://github.com/JabRef/jabref/pull/16720)

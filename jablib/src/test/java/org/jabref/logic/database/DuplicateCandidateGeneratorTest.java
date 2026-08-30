@@ -33,7 +33,7 @@ public class DuplicateCandidateGeneratorTest {
                 new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Gamma"),
                 new BibEntry(StandardEntryType.Article));
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(entries);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(entries).toList();
 
         assertEquals(6, pairs.size());
     }
@@ -47,7 +47,7 @@ public class DuplicateCandidateGeneratorTest {
                 .withField(StandardField.TITLE, "Entirely different words here")
                 .withField(StandardField.DOI, "https://doi.org/10.1000/182");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(plainDoi, doiAsUrl), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(plainDoi, doiAsUrl), FORCE_BLOCKING).toList();
 
         assertTrue(containsPair(pairs, plainDoi, doiAsUrl));
     }
@@ -59,7 +59,7 @@ public class DuplicateCandidateGeneratorTest {
         BibEntry withTypo = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Inovation and Intellectual Property Rights");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(correct, withTypo), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(correct, withTypo), FORCE_BLOCKING).toList();
 
         assertTrue(containsPair(pairs, correct, withTypo));
     }
@@ -73,7 +73,7 @@ public class DuplicateCandidateGeneratorTest {
                 .withField(StandardField.AUTHOR, "John Smith")
                 .withField(StandardField.TITLE, "Completely other words");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING).toList();
 
         assertTrue(containsPair(pairs, one, two));
     }
@@ -89,7 +89,7 @@ public class DuplicateCandidateGeneratorTest {
                 .withField(StandardField.TITLE, "A serious paper about something")
                 .withField(StandardField.DOI, "10.1000/183");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING).toList();
 
         assertFalse(containsPair(pairs, one, two));
     }
@@ -103,7 +103,7 @@ public class DuplicateCandidateGeneratorTest {
                 .withField(StandardField.AUTHOR, "Smith, John")
                 .withField(StandardField.TITLE, "Innovation and Intellectual Property Rights");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(withoutKeys, regular), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(withoutKeys, regular), FORCE_BLOCKING).toList();
 
         assertTrue(containsPair(pairs, withoutKeys, regular));
     }
@@ -117,9 +117,36 @@ public class DuplicateCandidateGeneratorTest {
                 .withField(StandardField.AUTHOR, "Smith, J.")
                 .withField(StandardField.TITLE, "Innovation and Intellectual Property Rights");
 
-        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING);
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(one, two), FORCE_BLOCKING).toList();
 
         assertEquals(1, pairs.size());
+    }
+
+    @Test
+    public void sameIsbnWithDifferentCheckDigitCaseIsBlockedTogether() {
+        BibEntry upperCase = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.ISBN, "0-8044-2957-X");
+        BibEntry lowerCase = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.ISBN, "0-8044-2957-x");
+
+        List<CandidatePair> pairs = DuplicateCandidateGenerator.getCandidatePairs(List.of(upperCase, lowerCase), FORCE_BLOCKING).toList();
+
+        assertTrue(containsPair(pairs, upperCase, lowerCase));
+    }
+
+    /// A shared identifier alone makes a pair a duplicate, so identifier blocks must survive the
+    /// large-block safeguard.
+    @Test
+    public void oversizedIdentifierBlockIsNotDropped() {
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 150; i++) {
+            entries.add(new BibEntry(StandardEntryType.Misc)
+                    .withField(StandardField.DOI, "10.1000/shared"));
+        }
+
+        long pairCount = DuplicateCandidateGenerator.getCandidatePairs(entries, FORCE_BLOCKING).count();
+
+        assertEquals((150L * 149) / 2, pairCount);
     }
 
     /// Reports the candidate reduction for typical metadata shapes (guardrail from
@@ -128,6 +155,7 @@ public class DuplicateCandidateGeneratorTest {
     /// where all entries share the same journal and year.
     @Test
     public void blockingStaysFarBelowExhaustivePairCount() {
+        // [utest->req~logic.duplicates.candidate-blocking~1]
         int entryCount = 2000;
         long exhaustivePairs = ((long) entryCount * (entryCount - 1)) / 2;
         List<BibEntry> complete = new ArrayList<>();
@@ -149,15 +177,16 @@ public class DuplicateCandidateGeneratorTest {
                     .withField(StandardField.YEAR, "1999"));
         }
 
-        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(complete, FORCE_BLOCKING).size() < (exhaustivePairs / 100));
-        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(sparse, FORCE_BLOCKING).size() < (exhaustivePairs / 100));
-        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(commonFields, FORCE_BLOCKING).size() < (exhaustivePairs / 100));
+        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(complete, FORCE_BLOCKING).count() < (exhaustivePairs / 100));
+        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(sparse, FORCE_BLOCKING).count() < (exhaustivePairs / 100));
+        assertTrue(DuplicateCandidateGenerator.getCandidatePairs(commonFields, FORCE_BLOCKING).count() < (exhaustivePairs / 100));
     }
 
     /// Blocking must not lose pairs that [DuplicateCheck] classifies as duplicates:
     /// every duplicate pair found by the exhaustive search must also be a blocking candidate.
     @Test
     public void blockingRetainsAllDuplicatePairsFoundExhaustively() {
+        // [utest->req~logic.duplicates.candidate-blocking~1]
         List<BibEntry> entries = List.of(
                 new BibEntry(StandardEntryType.Article)
                         .withField(StandardField.AUTHOR, "Single Author")
@@ -184,7 +213,7 @@ public class DuplicateCandidateGeneratorTest {
                         .withField(StandardField.YEAR, "1992"));
 
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        List<CandidatePair> blockedPairs = DuplicateCandidateGenerator.getCandidatePairs(entries, FORCE_BLOCKING);
+        List<CandidatePair> blockedPairs = DuplicateCandidateGenerator.getCandidatePairs(entries, FORCE_BLOCKING).toList();
 
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {

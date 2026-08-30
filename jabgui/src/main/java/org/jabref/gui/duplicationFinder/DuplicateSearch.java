@@ -3,6 +3,7 @@ package org.jabref.gui.duplicationFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -106,11 +107,13 @@ public class DuplicateSearch extends SimpleCommand {
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
         DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
-        for (DuplicateCandidateGenerator.CandidatePair pair : DuplicateCandidateGenerator.getCandidatePairs(entries)) {
+        Iterator<DuplicateCandidateGenerator.CandidatePair> candidatePairs = DuplicateCandidateGenerator.getCandidatePairs(entries).iterator();
+        while (candidatePairs.hasNext()) {
             if (duplicateSearchCancelled.get() || Thread.interrupted()) {
                 return;
             }
 
+            DuplicateCandidateGenerator.CandidatePair pair = candidatePairs.next();
             if (duplicateCheck.isDuplicate(pair.first(), pair.second(), databaseMode)) {
                 duplicates.add(Arrays.asList(pair.first(), pair.second()));
                 duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
