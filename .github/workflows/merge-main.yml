@@ -64,8 +64,20 @@ jobs:
           git remote add upstream "https://github.com/JabRef/jabref.git" || true
           git fetch upstream main
 
+      # The workspace holds the PR head (possibly a fork), so a local "uses: ./..." would
+      # execute the PR's copy of the action with write credentials. Take the action's code
+      # from the trusted revision this workflow itself runs from instead.
+      - name: Checkout trusted merge action
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          path: trusted-actions
+          sparse-checkout: .github/actions/merge-upstream-main
+          persist-credentials: 'false'
+          show-progress: 'false'
+
       # Pushes the merge commit back to the PR branch (the reason this workflow exists).
       - name: Merge main
-        uses: ./.github/actions/merge-upstream-main
+        uses: ./trusted-actions/.github/actions/merge-upstream-main
         with:
           target-branch: ${{ steps.resolve.outputs.branch }}
