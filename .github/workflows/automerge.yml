@@ -76,7 +76,10 @@ jobs:
         # workflow (live label query) and on-pr-labeled.yml approve — skip if an
         # un-dismissed approval by jabref-machine already exists.
         run: |
-          if gh pr view "$PR_URL" --json reviews --jq '.reviews[] | select(.state == "APPROVED") | .author.login' | grep -qx 'jabref-machine'; then
+          # Separate query from test so a failed API call fails the step
+          # instead of being mistaken for "no approval yet".
+          approvers=$(gh pr view "$PR_URL" --json reviews --jq '.reviews[] | select(.state == "APPROVED") | .author.login')
+          if grep -qx 'jabref-machine' <<< "$approvers"; then
             echo "Already approved"
           else
             gh pr review --approve "$PR_URL"
