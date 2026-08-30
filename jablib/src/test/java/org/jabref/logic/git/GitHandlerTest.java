@@ -154,6 +154,22 @@ class GitHandlerTest {
 
     // [utest->req~ux.git-commit.initialize-repository~1]
     @Test
+    void initAndCommitKeepsAPreexistingGitignoreUncommitted() throws Exception {
+        Path libraryFile = libraryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Files.writeString(libraryPath.resolve(".gitignore"), "notes.txt");
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        handler.initAndCommit(libraryFile);
+
+        try (Git git = Git.open(libraryPath.toFile())) {
+            assertEquals(Set.of("library.bib"), committedPaths(git));
+            assertEquals(Set.of(".gitignore"), git.status().call().getUntracked());
+        }
+    }
+
+    // [utest->req~ux.git-commit.initialize-repository~1]
+    @Test
     void initAndCommitRemovesItsTracesWhenTheFileIsIgnored() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");
         Files.writeString(libraryFile, "@Article{test,}");

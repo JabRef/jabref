@@ -16,6 +16,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
@@ -126,12 +127,13 @@ public class GitHandler {
                           .setInitialBranch("main")
                           .call()) {
             copyGitIgnoreIfAbsent();
-            git.add()
-               .addFilepattern(pathInRepository)
-               .addFilepattern(".gitignore")
-               .call();
+            // A pre-existing .gitignore is user-owned: honor its rules, but do not commit it uninvited
+            List<String> pathsToCommit = gitignoreExisted ? List.of(pathInRepository) : List.of(pathInRepository, ".gitignore");
+            AddCommand add = git.add();
+            pathsToCommit.forEach(add::addFilepattern);
+            add.call();
             DirCache index = git.getRepository().readDirCache();
-            for (String path : List.of(pathInRepository, ".gitignore")) {
+            for (String path : pathsToCommit) {
                 if (index.findEntry(path) < 0) {
                     throw new JabRefException(Localization.lang("Could not add %0 to the Git repository. Check the .gitignore file.", path));
                 }
