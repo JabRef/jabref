@@ -82,7 +82,7 @@ public class GitCommitAction extends SimpleCommand {
                 preferences,
                 entryTypesManager,
                 stateManager,
-                journalAbbreviationRepository).saveWithResult(SaveDatabaseMode.NORMAL);
+                journalAbbreviationRepository).save(SaveDatabaseMode.NORMAL);
         switch (saveResult) {
             case SUCCESS -> {
                 return true;

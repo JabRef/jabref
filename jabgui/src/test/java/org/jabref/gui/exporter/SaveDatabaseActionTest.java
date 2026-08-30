@@ -113,11 +113,11 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveWithResultReportsRunningSaveInsteadOfSuccess() {
+    void saveReportsRunningSaveInsteadOfSuccess() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(libraryTab.isSaving()).thenReturn(true);
 
-        assertEquals(SaveDatabaseAction.SaveResult.ALREADY_SAVING, saveDatabaseAction.saveWithResult(SaveDatabaseAction.SaveDatabaseMode.SILENT));
+        assertEquals(SaveDatabaseAction.SaveResult.ALREADY_SAVING, saveDatabaseAction.save(SaveDatabaseAction.SaveDatabaseMode.SILENT));
     }
 
     @Test
@@ -197,8 +197,7 @@ class SaveDatabaseActionTest {
     @Test
     void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
-        boolean result = saveDatabaseAction.save();
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, saveDatabaseAction.save());
     }
 
     @Test
@@ -219,10 +218,10 @@ class SaveDatabaseActionTest {
                 });
         when(dialogService.showChoiceDialogAndWait(any(), any(), any(), any(), any())).thenReturn(Optional.of(StandardCharsets.UTF_8));
 
-        boolean result = saveDatabaseAction.save();
+        SaveDatabaseAction.SaveResult result = saveDatabaseAction.save();
 
         assertEquals("external content", Files.readString(file));
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
     }
 
     @Test
@@ -242,10 +241,10 @@ class SaveDatabaseActionTest {
                     return Optional.of(ignore);
                 });
 
-        boolean result = saveDatabaseAction.save();
+        SaveDatabaseAction.SaveResult result = saveDatabaseAction.save();
 
         assertEquals("external content", Files.readString(file));
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
         verify(libraryTab, never()).resetChangedProperties();
     }
 

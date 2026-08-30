@@ -673,7 +673,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (buttonType.equals(saveChanges)) {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
-                if (saveAction.save()) {
+                if (saveAction.save() != SaveDatabaseAction.SaveResult.FAILURE) {
                     return true;
                 }
                 // The action was either canceled or unsuccessful.

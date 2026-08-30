@@ -89,17 +89,11 @@ public class SaveDatabaseAction {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
-    public boolean save() {
+    public SaveResult save() {
         return save(SaveDatabaseMode.NORMAL);
     }
 
-    public boolean save(SaveDatabaseMode mode) {
-        return saveWithResult(mode) != SaveResult.FAILURE;
-    }
-
-    /// Same as [#save(SaveDatabaseMode)], but distinguishes a completed save from one that was skipped
-    /// because another thread is already saving this library.
-    public SaveResult saveWithResult(SaveDatabaseMode mode) {
+    public SaveResult save(SaveDatabaseMode mode) {
         return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
