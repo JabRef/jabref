@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.converter.ExtractionModeConverter;
 import org.jabref.toolkit.exception.ExportServiceException;
@@ -78,6 +79,10 @@ class PdfExtractReferences implements Callable<Integer> {
             System.err.println(Localization.lang("--output can only be used with a single input file; use --output-dir for multiple files."));
             return CommandLine.ExitCode.USAGE;
         }
+        if (outputFile != null && outputDir != null) {
+            System.err.println(Localization.lang("--output and --output-dir cannot be used together."));
+            return CommandLine.ExitCode.USAGE;
+        }
 
         CliPreferences preferences = pdf.argumentProcessor.cliPreferences;
         ExtractionMode effectiveMode = mode != null
@@ -92,6 +97,7 @@ class PdfExtractReferences implements Callable<Integer> {
         if (outputDir != null && !ensureDirectoryExists(outputDir)) {
             return CommandLine.ExitCode.SOFTWARE;
         }
+
         if (outputFile != null) {
             // An absolute file path has a parent unless it is a filesystem root, which no output file is.
             Path outputFileParent = outputFile.toAbsolutePath().getParent();
@@ -99,6 +105,9 @@ class PdfExtractReferences implements Callable<Integer> {
                 return CommandLine.ExitCode.SOFTWARE;
             }
         }
+
+        // In this mode stdout carries the extracted BibTeX, so progress must go to stderr.
+        boolean writeToStdOut = outputFile == null && outputDir == null && inputFiles.size() == 1;
 
         List<String> failed = new ArrayList<>();
         Set<Path> takenTargets = new HashSet<>();
@@ -120,7 +129,8 @@ class PdfExtractReferences implements Callable<Integer> {
             }
 
             if (!sharedOptions.porcelain) {
-                System.out.println(Localization.lang("Extracting references from %0 (mode: %1).", displayName(input), effectiveMode));
+                (writeToStdOut ? System.err : System.out)
+                        .println(Localization.lang("Extracting references from %0 (mode: %1).", displayName(input), effectiveMode));
             }
 
             ParserResult result = switch (effectiveMode) {
@@ -147,7 +157,7 @@ class PdfExtractReferences implements Callable<Integer> {
             if (outputFile != null) {
                 exportService.exportParserResultToFile(result, outputFile, outputFormat);
             } else if (outputDir != null) {
-                exportService.exportParserResultToFile(result, outputDirTarget(outputDir, inputFile, takenTargets), outputFormat);
+                exportService.exportParserResultToFile(result, outputDirTarget(outputDir, outputBaseName(input, inputFile), takenTargets), outputFormat);
             } else if (inputFiles.size() == 1) {
                 exportService.printDatabaseContextToStdOut(result.getDatabaseContext());
             } else {
@@ -166,7 +176,7 @@ class PdfExtractReferences implements Callable<Integer> {
             Files.createDirectories(directory);
             return true;
         } catch (IOException e) {
-            System.err.println(Localization.lang("Could not create output directory '%0': %1", directory, e.getLocalizedMessage()));
+            LOGGER.error("Could not create output directory {}", directory, e);
             return false;
         }
     }
@@ -174,20 +184,29 @@ class PdfExtractReferences implements Callable<Integer> {
     /// The input as shown to the user: URLs are redacted so that embedded credentials do not end up
     /// on the console or in the log.
     private static String displayName(String input) {
-        return InputOption.isUrl(input) ? FetcherException.getRedactedUrl(input) : input;
+        return URLUtil.isURL(input) ? FetcherException.getRedactedUrl(input) : input;
     }
 
     /// Target for the "one `.bib` next to each source PDF" default. A downloaded URL has no local
     /// source directory to sit next to, so its output goes into the working directory instead of
     /// silently into the temporary directory holding the download.
     private static Path defaultBibFile(String input, Path resolvedFile) {
-        return InputOption.isUrl(input)
-               ? Path.of(bibFileName(resolvedFile))
-               : resolvedFile.toAbsolutePath().getParent().resolve(bibFileName(resolvedFile));
+        String bibFileName = outputBaseName(input, resolvedFile) + ".bib";
+        return URLUtil.isURL(input)
+               ? Path.of(bibFileName)
+               : resolvedFile.toAbsolutePath().getParent().resolve(bibFileName);
     }
 
-    private static String bibFileName(Path inputFile) {
-        return FileUtil.getBaseName(inputFile) + ".bib";
+    /// Base name (without extension) for an input's output file. For a URL the name is taken from
+    /// the URL itself, not from the randomly named temporary file it was downloaded to, so that
+    /// output names are stable across runs.
+    private static String outputBaseName(String input, Path resolvedFile) {
+        if (!URLUtil.isURL(input)) {
+            return FileUtil.getBaseName(resolvedFile);
+        }
+        String urlPath = input.split("[?#]", 2)[0];
+        String lastSegment = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+        return lastSegment.isEmpty() ? "downloaded" : FileUtil.getBaseName(lastSegment);
     }
 
     /// Target inside `--output-dir` for one input. Inputs from different directories can share a file
@@ -196,8 +215,7 @@ class PdfExtractReferences implements Callable<Integer> {
     ///
     /// Only names taken within the same run are avoided: a batch that is run again replaces its own
     /// previous output rather than piling up numbered copies of it.
-    private static Path outputDirTarget(Path outputDir, Path inputFile, Set<Path> takenTargets) {
-        String baseName = FileUtil.getBaseName(inputFile);
+    private static Path outputDirTarget(Path outputDir, String baseName, Set<Path> takenTargets) {
         Path target = outputDir.resolve(baseName + ".bib");
 
         int copy = 1;

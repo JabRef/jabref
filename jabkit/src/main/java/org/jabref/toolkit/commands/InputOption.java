@@ -3,11 +3,11 @@ package org.jabref.toolkit.commands;
 import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.exception.ImportServiceException;
 
@@ -44,12 +44,6 @@ class InputOption {
                             : inputSource.optionInput);
     }
 
-    /// @return `true` if the given input argument is an `http(s)`/`ftp` URL rather than a local path
-    static boolean isUrl(String input) {
-        String lowerCaseInput = input.toLowerCase(Locale.ROOT);
-        return lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://");
-    }
-
     /// Resolves a single input argument to a local file: a URL is downloaded to a temporary file,
     /// anything else is taken as a (possibly Cygwin-style) local path.
     ///
@@ -61,7 +55,7 @@ class InputOption {
     // [impl->req~jabkit.cli.input-url~2]
     @ADR(65)
     static Path resolveInput(String input) throws ImportServiceException {
-        if (isUrl(input)) {
+        if (URLUtil.isURL(input)) {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
