@@ -3,7 +3,9 @@ package org.jabref.gui.git;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
@@ -29,6 +31,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
     @FXML private TextArea commitMessage;
     @FXML private ButtonType commitButton;
+    @FXML private ButtonType showDiffButton;
 
     private GitCommitDialogViewModel viewModel;
 
@@ -45,6 +48,11 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        Button showDiff = (Button) this.getDialogPane().lookupButton(showDiffButton);
+        showDiff.addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            showDiff();
+        });
     }
 
     @FXML
@@ -82,7 +90,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     }
 
     // [impl->req~ux.git-commit.preview-current-library~1]
-    @FXML
     private void showDiff() {
         viewModel.diffTask()
                  .onSuccess(this::openDiffDialog)
