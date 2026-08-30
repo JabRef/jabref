@@ -180,7 +180,10 @@ jobs:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
 
       - name: 'Adapt label "status: changes-required"'
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request_review' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        # Every workflow in this workflow's workflow_run trigger list is a label-relevant producer:
+        # the pending guard below defers evaluation to whichever of them finishes last, so each of
+        # their completion events must be allowed to run this step - not only Source Code Tests.
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request_review' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
           echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
