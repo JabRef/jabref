@@ -166,13 +166,19 @@ public enum KeyBinding {
     ///
     /// @return The default key binding for the current platform
     public String getDefaultKeyBinding() {
-        return getDefaultKeyBinding(OS.OS_X);
-    }
-
-    String getDefaultKeyBinding(boolean isMacOs) {
-        if (isMacOs) {
+        if (OS.OS_X) {
             return defaultMacBinding;
         }
+        return defaultBinding;
+    }
+
+    /// @return The default key binding on macOS, where `alt` plus a letter would insert a special character
+    String getDefaultMacKeyBinding() {
+        return defaultMacBinding;
+    }
+
+    /// @return The default key binding on all platforms except macOS
+    String getDefaultNonMacKeyBinding() {
         return defaultBinding;
     }
 
