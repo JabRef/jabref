@@ -155,9 +155,9 @@ public class DuplicateCandidateGenerator {
         // collide with the block pairs, and materializing them (worst case quadratic when most
         // entries are keyless) is not needed for de-duplication.
         Stream<CandidatePair> keylessPairs = entriesWithoutKeys.stream()
-                .flatMap(withoutKeys -> IntStream.range(0, entries.size())
-                        .filter(other -> (other > withoutKeys) || ((other != withoutKeys) && !entriesWithoutKeys.contains(other)))
-                        .mapToObj(other -> new CandidatePair(entries.get(Math.min(withoutKeys, other)), entries.get(Math.max(withoutKeys, other)))));
+                                                               .flatMap(withoutKeys -> IntStream.range(0, entries.size())
+                                                                                                .filter(other -> (other > withoutKeys) || ((other != withoutKeys) && !entriesWithoutKeys.contains(other)))
+                                                                                                .mapToObj(other -> new CandidatePair(entries.get(Math.min(withoutKeys, other)), entries.get(Math.max(withoutKeys, other)))));
         return Stream.concat(blockPairs.stream(), keylessPairs);
     }
 
