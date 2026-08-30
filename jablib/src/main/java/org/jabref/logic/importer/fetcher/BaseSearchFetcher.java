@@ -26,7 +26,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// [impl->req~import.fetcher.base~1]
+
 @NullMarked
 public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
@@ -38,6 +38,12 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
 
     private static final FetcherRateLimiter RATE_LIMITER =
             FetcherRateLimiter.ofRequestsPerSecond(FETCHER_NAME, 1.0);
+
+    private static final String TYPE_CODE_BOOK = "11";
+    private static final String TYPE_CODE_ARTICLE = "121";
+    private static final String TYPE_CODE_IN_PROCEEDINGS = "13";
+    private static final String TYPE_CODE_TECH_REPORT = "14";
+    private static final String TYPE_CODE_PHD_THESIS = "18";
 
     private final ImporterPreferences importerPreferences;
 
@@ -142,15 +148,15 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
         String code = typeNorm.getString(0);
 
         return switch (code) {
-            case String c when c.startsWith("18") ->
+            case String c when c.startsWith(TYPE_CODE_PHD_THESIS) ->
                     StandardEntryType.PhdThesis;
-            case String c when c.startsWith("13") ->
+            case String c when c.startsWith(TYPE_CODE_IN_PROCEEDINGS) ->
                     StandardEntryType.InProceedings;
-            case String c when c.startsWith("14") ->
+            case String c when c.startsWith(TYPE_CODE_TECH_REPORT) ->
                     StandardEntryType.TechReport;
-            case String c when c.startsWith("121") ->
+            case String c when c.startsWith(TYPE_CODE_ARTICLE) ->
                     StandardEntryType.Article;
-            case String c when c.startsWith("11") ->
+            case String c when c.startsWith(TYPE_CODE_BOOK) ->
                     StandardEntryType.Book;
             default ->
                     StandardEntryType.Misc;

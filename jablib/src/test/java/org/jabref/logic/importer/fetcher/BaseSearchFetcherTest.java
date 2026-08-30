@@ -27,6 +27,8 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// [utest->req~import.fetcher.base~1]
+
 @NullMarked
 @FetcherTest
 class BaseSearchFetcherTest {
@@ -194,6 +196,37 @@ class BaseSearchFetcherTest {
 
         assertEquals(1, entries.size());
         assertEquals(StandardEntryType.Misc, entries.getFirst().getType());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "11,  Book",
+            "121, Article",
+            "13,  InProceedings",
+            "14,  TechReport",
+            "18,  PhdThesis"
+    })
+    void parserMapsTypeCodeToCorrectEntryType(String typeCode, StandardEntryType expectedType) throws ParseException {
+        String json = """
+            {
+              "response": {
+                "result": {
+                  "docs": [
+                    {
+                      "dctitle": "Sample Title",
+                      "dctypenorm": ["%s"]
+                    }
+                  ]
+                }
+              }
+            }
+            """.formatted(typeCode);
+
+        InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
+        List<BibEntry> entries = fetcher.getParser().parseEntries(inputStream);
+
+        assertEquals(1, entries.size());
+        assertEquals(expectedType, entries.getFirst().getType());
     }
 
     @Test
