@@ -96,6 +96,17 @@ public class GitHandler {
         }
     }
 
+    /// Resolves symlinks so repository detection and repository-relative paths refer to the real file.
+    /// Falls back to the lexical absolute path when resolution fails (e.g. the file vanished meanwhile).
+    public static @NonNull Path resolveToRealPath(@NonNull Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            LOGGER.warn("Could not resolve the library path {} — using it as given", path, e);
+            return path.toAbsolutePath().normalize();
+        }
+    }
+
     /// Creates the repository and commits `fileToCommit` together with the generated `.gitignore`.
     /// Unlike [#initIfNeeded()] this stages nothing else, so unrelated files in the directory
     /// (PDFs, notes, other libraries) stay untracked until the user adds them deliberately.
@@ -108,19 +119,10 @@ public class GitHandler {
     /// interleave: the rollback below may only ever delete a `.git` directory this invocation created,
     /// which the entry check guarantees while the lock is held. The registry hands out one handler per
     /// repository path, so the lock covers all in-process callers.
-    /// Resolves symlinks so repository detection and repository-relative paths refer to the real file.
-    /// Falls back to the lexical absolute path when resolution fails (e.g. the file vanished meanwhile).
-    public static Path resolveToRealPath(@NonNull Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            LOGGER.warn("Could not resolve the library path {} — using it as given", path, e);
-            return path.toAbsolutePath().normalize();
-        }
-    }
-
     public synchronized void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
-        if (isGitRepository()) {
+        // NOFOLLOW_LINKS: a dangling .git symlink is invisible to isGitRepository() but is still a
+        // pre-existing user-owned entry — initializing over it would let rollback delete it
+        if (isGitRepository() || Files.exists(repositoryPath.resolve(Constants.DOT_GIT), LinkOption.NOFOLLOW_LINKS)) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
         }
         Path repositoryRoot = repositoryPath.toAbsolutePath().normalize();

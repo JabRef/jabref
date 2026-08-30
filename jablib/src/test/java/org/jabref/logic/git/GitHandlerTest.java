@@ -3,6 +3,7 @@ package org.jabref.logic.git;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,6 +33,8 @@ import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -150,6 +153,22 @@ class GitHandlerTest {
         try (Git git = Git.open(libraryPath.toFile())) {
             assertEquals(Set.of(".gitignore", "sub/library.bib"), committedPaths(git));
         }
+    }
+
+    // [utest->req~ux.git-commit.initialize-repository~1]
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    // creating symlinks requires elevated rights on Windows
+    void initAndCommitRefusesADanglingDotGitSymlink() throws Exception {
+        Path libraryFile = libraryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Path dotGit = libraryPath.resolve(".git");
+        Files.createSymbolicLink(dotGit, libraryPath.resolve("missing-target"));
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        assertThrows(JabRefException.class, () -> handler.initAndCommit(libraryFile));
+
+        assertTrue(Files.exists(dotGit, LinkOption.NOFOLLOW_LINKS));
     }
 
     // [utest->req~ux.git-commit.initialize-repository~1]
