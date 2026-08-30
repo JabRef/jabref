@@ -43,10 +43,9 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
-/// An intelligent {@link java.util.concurrent.ExecutorService} with a {@link java.util.concurrent.BlockingQueue} prevents a high load while making backups and
-/// rejects all redundant backup tasks. This class does not manage the .sav file which is created when saving a
-/// database.
+/// Backups the given bib database file from [BibDatabaseContext] on every [BibDatabaseContextChangedEvent].
+/// An intelligent [java.util.concurrent.ExecutorService] with a [java.util.concurrent.BlockingQueue] prevents a high load while making backups and
+/// rejects all redundant backup tasks. This class does not manage [org.jabref.logic.util.BackupFileType#SAVE] file.
 public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
