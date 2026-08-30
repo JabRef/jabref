@@ -112,6 +112,36 @@ class SaveDatabaseActionTest {
         verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
     }
 
+    @Test
+    void saveReportsRunningSaveInsteadOfSuccess() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        assertEquals(SaveDatabaseAction.SaveResult.ALREADY_SAVING, saveDatabaseAction.save(SaveDatabaseAction.SaveDatabaseMode.SILENT));
+    }
+
+    @Test
+    void saveAsDoesNotAdoptTheNewPathWhileASaveIsRunning() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
+        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        assertFalse(saveDatabaseAction.saveAs(Path.of("other.bib"), SaveDatabaseAction.SaveDatabaseMode.SILENT));
+        verify(dbContext, never()).setDatabasePath(any());
+    }
+
+    @Test
+    void unsuccessfulSaveAsBringsTheManagersOfTheOriginalLibraryBack() {
+        when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
+        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
+        when(libraryTab.isSaving()).thenReturn(true);
+
+        saveDatabaseAction.saveAs(Path.of("other.bib"), SaveDatabaseAction.SaveDatabaseMode.SILENT);
+
+        verify(libraryTab, times(1)).installAutosaveManagerAndBackupManager();
+        verify(libraryTab, times(1)).createSearchContext();
+    }
+
     private SaveDatabaseAction createSaveDatabaseActionForBibDatabase(BibDatabase database) throws IOException {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();
@@ -167,8 +197,7 @@ class SaveDatabaseActionTest {
     @Test
     void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
-        boolean result = saveDatabaseAction.save();
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, saveDatabaseAction.save());
     }
 
     @Test
@@ -189,10 +218,10 @@ class SaveDatabaseActionTest {
                 });
         when(dialogService.showChoiceDialogAndWait(any(), any(), any(), any(), any())).thenReturn(Optional.of(StandardCharsets.UTF_8));
 
-        boolean result = saveDatabaseAction.save();
+        SaveDatabaseAction.SaveResult result = saveDatabaseAction.save();
 
         assertEquals("external content", Files.readString(file));
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
     }
 
     @Test
@@ -212,10 +241,10 @@ class SaveDatabaseActionTest {
                     return Optional.of(ignore);
                 });
 
-        boolean result = saveDatabaseAction.save();
+        SaveDatabaseAction.SaveResult result = saveDatabaseAction.save();
 
         assertEquals("external content", Files.readString(file));
-        assertFalse(result);
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
         verify(libraryTab, never()).resetChangedProperties();
     }
 

@@ -196,7 +196,7 @@ public class MainMenu extends MenuBar {
 
                 // region: Sharing of the library
                 factory.createSubMenu(StandardActions.GIT,
-                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager, preferences.getGitPreferences())),
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, journalAbbreviationRepository)),
                         factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         new SeparatorMenuItem(),
