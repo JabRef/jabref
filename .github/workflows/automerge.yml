@@ -9,6 +9,12 @@ jobs:
   automerge:
     runs-on: ubuntu-slim
     if: github.repository == 'JabRef/jabref'
+    # Serialize with on-pr-labeled.yml's automerge job (same group) so the
+    # approve guard never races: the second run starts only after the first
+    # finished and its approval is visible.
+    concurrency:
+      group: automerge-pr-${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: false
     env:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       USER:      ${{ github.event.pull_request.user.login }}

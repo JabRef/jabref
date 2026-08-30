@@ -13,6 +13,11 @@ jobs:
       github.repository == 'JabRef/jabref' &&
       github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
     runs-on: ubuntu-slim
+    # Same concurrency group as automerge.yml's automerge job: serializes the
+    # two workflows per PR so the approve guard below cannot race.
+    concurrency:
+      group: automerge-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     steps:
       - name: Approve PR
         # Guard: automerge.yml (running for a push made just before the label was added)
