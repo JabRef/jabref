@@ -1,6 +1,7 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -204,9 +205,15 @@ class PdfExtractReferences implements Callable<Integer> {
         if (!URLUtil.isURL(input)) {
             return FileUtil.getBaseName(resolvedFile);
         }
-        String urlPath = input.split("[?#]", 2)[0];
-        String lastSegment = urlPath.substring(urlPath.lastIndexOf('/') + 1);
-        return lastSegment.isEmpty() ? "downloaded" : FileUtil.getBaseName(lastSegment);
+        try {
+            // URI#getPath drops query and fragment
+            String urlPath = URI.create(input).getPath();
+            Path lastSegment = (urlPath == null || urlPath.isEmpty()) ? null : Path.of(urlPath).getFileName();
+            return lastSegment == null ? "downloaded" : FileUtil.getBaseName(lastSegment);
+        } catch (IllegalArgumentException e) {
+            // Downloadable URL that is no strict URI (or whose path is no valid Path) - it carries no usable file name
+            return "downloaded";
+        }
     }
 
     /// Target inside `--output-dir` for one input. Inputs from different directories can share a file
