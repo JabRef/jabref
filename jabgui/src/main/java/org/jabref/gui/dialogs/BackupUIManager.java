@@ -56,21 +56,21 @@ public class BackupUIManager {
                 BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 switch (result) {
                     case BackupManager.RestoreResult.Empty(
-                            var backupPath
+                            Path backupPath
                     ) ->
                             dialogService.showErrorDialogAndWait(
                                     Localization.lang("Restore backup"),
                                     Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
                     case BackupManager.RestoreResult.Failed(
-                            var backupPath,
-                            var exception
+                            Path backupPath,
+                            IOException exception
                     ) ->
                             dialogService.showErrorDialogAndWait(
                                     Localization.lang("Restore backup"),
                                     Localization.lang("Could not restore the backup file '%0'.", backupPath),
                                     exception);
                     case BackupManager.RestoreResult.NotFound(
-                            var missingOriginalPath
+                            Path missingOriginalPath
                     ) ->
                             dialogService.showErrorDialogAndWait(
                                     Localization.lang("Restore backup"),
