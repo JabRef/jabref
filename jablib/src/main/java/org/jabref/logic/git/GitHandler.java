@@ -101,7 +101,12 @@ public class GitHandler {
     /// Fails with a [JabRefException] if there already is a repository, or if the file cannot be staged —
     /// an ignore rule excludes it from `git add` silently. Everything this call created is removed again
     /// on failure, so the user can fix the cause and retry, or clone into the directory instead.
-    public void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
+    ///
+    /// `synchronized` so that concurrent invocations (the GUI submits this as a background task) cannot
+    /// interleave: the rollback below may only ever delete a `.git` directory this invocation created,
+    /// which the entry check guarantees while the lock is held. The registry hands out one handler per
+    /// repository path, so the lock covers all in-process callers.
+    public synchronized void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
         if (isGitRepository()) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
         }
@@ -127,9 +132,14 @@ public class GitHandler {
                .setMessage("Initial commit")
                .call();
         } catch (IOException | GitAPIException | JabRefException e) {
-            FileUtils.delete(repositoryPath.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
-            if (!gitignoreExisted) {
-                Files.deleteIfExists(gitignore);
+            LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
+            try {
+                FileUtils.delete(repositoryPath.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
+                if (!gitignoreExisted) {
+                    Files.deleteIfExists(gitignore);
+                }
+            } catch (IOException cleanupException) {
+                e.addSuppressed(cleanupException);
             }
             throw e;
         }

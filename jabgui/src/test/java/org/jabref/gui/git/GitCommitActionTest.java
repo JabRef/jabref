@@ -71,6 +71,6 @@ class GitCommitActionTest {
         DialogService dialogService = mock(DialogService.class);
         when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(confirmInitialization);
 
-        new GitCommitAction(dialogService, stateManager, new GitHandlerRegistry(mock(GitPreferences.class)), new CurrentThreadTaskExecutor()).execute();
+        new GitCommitAction(dialogService, stateManager, new CurrentThreadTaskExecutor(), new GitHandlerRegistry(mock(GitPreferences.class))).execute();
     }
 }

@@ -14,19 +14,21 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GitCommitAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitCommitAction.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final GitHandlerRegistry gitHandlerRegistry;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
-    public GitCommitAction(DialogService dialogService, StateManager stateManager, GitHandlerRegistry gitHandlerRegistry, TaskExecutor taskExecutor) {
+    public GitCommitAction(DialogService dialogService, StateManager stateManager, TaskExecutor taskExecutor, GitHandlerRegistry gitHandlerRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.gitHandlerRegistry = gitHandlerRegistry;
