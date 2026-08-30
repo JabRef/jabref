@@ -30,8 +30,12 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GitCommitDialogViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitCommitDialogViewModel.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -72,13 +76,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     dialogService.notify(Localization.lang("Committed successfully"));
                     onSuccess.run();
                 })
-                .onFailure(ex ->
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Git Commit Failed"),
-                                ex.getMessage(),
-                                ex
-                        )
-                )
+                // [impl->req~git.graceful-error-handling~1]
+                .onFailure(ex -> {
+                    LOGGER.warn("Git commit failed", ex);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Git Commit Failed"),
+                            Localization.lang("Could not create the Git commit. Please check the repository and try again.")
+                    );
+                })
                 .executeWith(taskExecutor);
     }
 

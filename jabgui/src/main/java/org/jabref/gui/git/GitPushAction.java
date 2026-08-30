@@ -105,32 +105,29 @@ public class GitPushAction extends SimpleCommand {
         return result;
     }
 
+    // [impl->req~git.graceful-error-handling~1]
     private void showPushError(Throwable ex) {
         LOGGER.warn("Git push failed", ex);
         switch (ex) {
             case JabRefException e ->
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Git Push Failed"),
-                            e.getLocalizedMessage(),
-                            e
+                            e.getLocalizedMessage()
                     );
             case GitAPIException e ->
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Git Push Failed"),
-                            Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage()),
-                            e
+                            Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage())
                     );
             case IOException e ->
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Git Push Failed"),
-                            Localization.lang("I/O error: %0", e.getLocalizedMessage()),
-                            e
+                            Localization.lang("I/O error: %0", e.getLocalizedMessage())
                     );
             default ->
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Git Push Failed"),
-                            Localization.lang("Unexpected error: %0", ex.getMessage()),
-                            ex
+                            Localization.lang("Unexpected error: %0", ex.getMessage())
                     );
         }
     }
