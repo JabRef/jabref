@@ -1,6 +1,5 @@
 package org.jabref.gui.git;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
@@ -48,13 +47,7 @@ public class GitCommitAction extends SimpleCommand {
     private void commit(Path bibFilePath) {
         // A library opened through a symlink must be handled as its real file: repository detection on
         // the link path would misclassify it, and staging the link would commit only the symlink.
-        Path libraryFile;
-        try {
-            libraryFile = bibFilePath.toRealPath();
-        } catch (IOException e) {
-            LOGGER.warn("Could not resolve the library path {} — using it as given", bibFilePath, e);
-            libraryFile = bibFilePath.toAbsolutePath().normalize();
-        }
+        Path libraryFile = GitHandler.resolveToRealPath(bibFilePath);
 
         // [impl->req~ux.git-commit.initialize-repository~1]
         if (GitHandler.findRepositoryRoot(libraryFile).isEmpty()) {

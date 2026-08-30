@@ -108,6 +108,17 @@ public class GitHandler {
     /// interleave: the rollback below may only ever delete a `.git` directory this invocation created,
     /// which the entry check guarantees while the lock is held. The registry hands out one handler per
     /// repository path, so the lock covers all in-process callers.
+    /// Resolves symlinks so repository detection and repository-relative paths refer to the real file.
+    /// Falls back to the lexical absolute path when resolution fails (e.g. the file vanished meanwhile).
+    public static Path resolveToRealPath(@NonNull Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            LOGGER.warn("Could not resolve the library path {} — using it as given", path, e);
+            return path.toAbsolutePath().normalize();
+        }
+    }
+
     public synchronized void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
         if (isGitRepository()) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
@@ -149,6 +160,7 @@ public class GitHandler {
                     Files.deleteIfExists(gitignore);
                 }
             } catch (IOException cleanupException) {
+                LOGGER.warn("Could not clean up after failed Git repository initialization at {}", repositoryPath, cleanupException);
                 e.addSuppressed(cleanupException);
             }
             throw e;

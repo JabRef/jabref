@@ -30,12 +30,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GitCommitDialogViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitCommitDialogViewModel.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -147,14 +143,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
 
-        Path bibFilePath;
-        try {
-            // Resolve symlinks so root detection and repository-relative paths refer to the real file
-            bibFilePath = bibFilePathOpt.get().toRealPath();
-        } catch (IOException e) {
-            LOGGER.warn("Could not resolve the library path {} — using it as given", bibFilePathOpt.get(), e);
-            bibFilePath = bibFilePathOpt.get().toAbsolutePath().normalize();
-        }
+        Path bibFilePath = GitHandler.resolveToRealPath(bibFilePathOpt.get());
         Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRootOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
