@@ -1,7 +1,6 @@
 package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn;
 
@@ -40,6 +40,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,21 @@ public class BackupManager {
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
+
+    @NullMarked
+    public sealed interface RestoreResult {
+        record Restored() implements RestoreResult {
+        }
+
+        record Empty(Path backupPath) implements RestoreResult {
+        }
+
+        record Failed(Path backupPath, IOException exception) implements RestoreResult {
+        }
+
+        record NotFound(Path originalPath) implements RestoreResult {
+        }
+    }
 
     private static final Set<BackupManager> RUNNING_INSTANCES = new HashSet<>();
 
@@ -176,18 +192,25 @@ public class BackupManager {
     }
 
     /// Restores the backup file by copying and overwriting the original one.
+    /// [impl->req~jabgui.autosaveandbackup.complete-backup~1]
     ///
     /// @param originalPath Path to the file which should be equalized to the backup file.
-    public static void restoreBackup(Path originalPath, Path backupDir) {
+    public static RestoreResult restoreBackup(Path originalPath, Path backupDir) {
         Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
         if (backupPath.isEmpty()) {
             LOGGER.error("There is no backup file");
-            return;
+            return new RestoreResult.NotFound(originalPath);
         }
         try {
+            if (Files.size(backupPath.get()) == 0) {
+                LOGGER.warn("Backup file {} is empty and will not be restored", backupPath.get());
+                return new RestoreResult.Empty(backupPath.get());
+            }
             Files.copy(backupPath.get(), originalPath, StandardCopyOption.REPLACE_EXISTING);
+            return new RestoreResult.Restored();
         } catch (IOException e) {
             LOGGER.error("Error while restoring the backup file.", e);
+            return new RestoreResult.Failed(backupPath.get(), e);
         }
     }
 
@@ -255,21 +278,27 @@ public class BackupManager {
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
         // Example: What happens if one hard powers off the machine (or kills the jabref process) during writing of the backup?
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
-        try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
+        try (AtomicFileWriter writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibDatabaseWriter(
-                    bibWriter,
-                    saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager)
-                    // we save the clone to prevent the original database (and thus the UI) from being changed
-                    .writeDatabase(bibDatabaseContextClone);
-            backupFilesQueue.add(backupPath);
+            try {
+                new BibDatabaseWriter(
+                        bibWriter,
+                        saveConfiguration,
+                        preferences.getFieldPreferences(),
+                        preferences.getCitationKeyPatternPreferences(),
+                        entryTypesManager)
+                        // we save the clone to prevent the original database (and thus the UI) from being changed
+                        .writeDatabase(bibDatabaseContextClone);
+                backupFilesQueue.add(backupPath);
 
-            // We wrote the file successfully
-            // Thus, we currently do not need any new backup
-            this.needsBackup = false;
+                // We wrote the file successfully
+                // Thus, we currently do not need any new backup
+                this.needsBackup = false;
+                // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
+            } catch (IOException e) {
+                writer.abort();
+                throw e;
+            }
         } catch (IOException e) {
             LOGGER.error("Error while saving to file {}", backupPath, e);
         }
@@ -317,11 +346,11 @@ public class BackupManager {
         bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
             // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
             final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
-            try {
-                List<Path> allSavFiles = Files.list(backupDir)
-                                              // just list the .sav belonging to the given targetFile
-                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                              .sorted().toList();
+            try (Stream<Path> backupFiles = Files.list(backupDir)) {
+                List<Path> allSavFiles = backupFiles
+                        // just list the .sav belonging to the given targetFile
+                        .filter(p -> p.getFileName().toString().startsWith(prefix))
+                        .sorted().toList();
                 backupFilesQueue.addAll(allSavFiles);
             } catch (IOException e) {
                 LOGGER.error("Could not determine most recent file", e);
