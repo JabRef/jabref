@@ -69,7 +69,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // Note: Normalizing for the .bib file is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
                         String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
                         if (!newValue.equals(oldValue)) {
-                            undoManager.apply(new UndoableFieldChange(entry, field, oldValue, newValue));
+                            undoManager.applyEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }
                     }
                 });
