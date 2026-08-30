@@ -496,6 +496,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
 - **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
 - Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
+- Within the section, sort the entry in next to existing entries about the same component or feature (e.g. a jabkit fix goes next to the other jabkit fixes) instead of appending it at the end.
 - Do not add extra blank lines in CHANGELOG.md
 - Do not reorder or reword existing entries, and do not create a new version heading.
 - CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
