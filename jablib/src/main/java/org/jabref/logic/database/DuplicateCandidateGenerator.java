@@ -112,8 +112,9 @@ public class DuplicateCandidateGenerator {
 
         // Safeguard against unusually large blocks: a key shared by a large part of the library
         // (e.g., all titles starting with "The") carries no identifying information, but would emit
-        // quadratically many pairs. Entries in such a block still meet through their other keys.
-        int maximumBlockSize = Math.max(200, entries.size() / 10);
+        // quadratically many pairs. True duplicates share several aligned words, so the pair still
+        // meets through its other, more discriminative keys.
+        int maximumBlockSize = Math.max(100, entries.size() / 50);
 
         List<CandidatePair> result = new ArrayList<>();
         Set<Long> seenPairs = new HashSet<>();
