@@ -36,7 +36,6 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,7 +226,7 @@ public class ScholarFetcher implements FulltextFetcher, PagedSearchBasedFetcher,
     }
 
     @Override
-    public boolean isValidKey(@NonNull String apiKey) {
+    public boolean isValidKey(String apiKey) {
         try {
             URLDownload urlDownload = new URLDownload(getTestUrl());
             urlDownload.addHeader("X-API-Key", apiKey);
