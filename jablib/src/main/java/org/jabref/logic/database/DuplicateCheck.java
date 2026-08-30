@@ -25,6 +25,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -81,7 +82,13 @@ public class DuplicateCheck {
                                         .map(content -> {
                                             String oneValue = one.getField(field).orElseThrow();
                                             if (field == StandardField.DOI) {
-                                                return oneValue.equalsIgnoreCase(content);
+                                                if (oneValue.equalsIgnoreCase(content)) {
+                                                    return true;
+                                                }
+                                                // DOI values may be given as plain DOI, URL, or contain LaTeX escapes
+                                                return DOI.parse(oneValue)
+                                                          .flatMap(first -> DOI.parse(content).map(second -> first.asString().equalsIgnoreCase(second.asString())))
+                                                          .orElse(false);
                                             }
                                             return oneValue.equals(content);
                                         })

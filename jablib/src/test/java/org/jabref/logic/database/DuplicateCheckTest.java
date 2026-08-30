@@ -378,6 +378,22 @@ public class DuplicateCheckTest {
     }
 
     @Test
+    void twoUnrelatedEntriesWithSameDoiAsPlainValueAndUrlAreDuplicates() {
+        simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(StandardField.DOI, "https://doi.org/10.1016/j.is.2004.02.002");
+
+        assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void twoUnrelatedEntriesWithDifferentDoisAsPlainValueAndUrlAreNoDuplicates() {
+        simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(StandardField.DOI, "https://doi.org/10.1016/j.is.2004.02.00X");
+
+        assertFalse(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
     void twoUnrelatedEntriesWithEqualPmidAreDuplicates() {
         simpleArticle.setField(StandardField.PMID, "12345678");
         unrelatedArticle.setField(StandardField.PMID, "12345678");
