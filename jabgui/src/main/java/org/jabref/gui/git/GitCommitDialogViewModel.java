@@ -74,7 +74,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                 })
                 .onFailure(ex ->
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("Git Commit Failed"),
+                                Localization.lang("Git commit failed"),
                                 ex.getMessage(),
                                 ex
                         )

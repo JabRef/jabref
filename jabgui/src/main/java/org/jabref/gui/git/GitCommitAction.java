@@ -99,7 +99,7 @@ public class GitCommitAction extends SimpleCommand {
     private void initRepository(Path libraryFile) {
         Path directory = libraryFile.getParent();
         boolean initialize = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Git Commit"),
+                Localization.lang("Git commit"),
                 Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0 and commit %1?\nOther files in that folder stay untracked.", directory.toString(), libraryFile.getFileName().toString()),
                 Localization.lang("Initialize"),
                 Localization.lang("Do not initialize"));
@@ -115,7 +115,7 @@ public class GitCommitAction extends SimpleCommand {
                       .onFailure(e -> {
                           LOGGER.error("Could not initialize a Git repository in {}", directory, e);
                           dialogService.showErrorDialogAndWait(
-                                  Localization.lang("Git Commit"),
+                                  Localization.lang("Git commit"),
                                   Localization.lang("Could not initialize a Git repository in %0.", directory.toString()),
                                   e);
                       })
@@ -131,7 +131,7 @@ public class GitCommitAction extends SimpleCommand {
         if (!preferences.getLibraryPreferences().shouldAutoSave()) {
             // Without autosave the user decides when the library is written, so the commit is left to them, too.
             dialogService.showWarningDialogAndWait(
-                    Localization.lang("Git Commit"),
+                    Localization.lang("Git commit"),
                     Localization.lang("The library has unsaved changes. Please save it before committing."));
             return false;
         }
