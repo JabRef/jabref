@@ -13,6 +13,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -193,7 +194,7 @@ class DatabaseChangeMonitorTest {
         EntryChange mergedChange = new EntryChange(oldEntry, mergedEntry, databaseContext);
         mergedChange.accept();
 
-        UndoManager undoManager = new UndoManager();
+        JabRefUndoManager undoManager = new JabRefUndoManager();
         undoManager.markUnchanged();
         LibraryTab libraryTab = mock(LibraryTab.class);
         DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
@@ -225,7 +226,7 @@ class DatabaseChangeMonitorTest {
         EntryChange diskChange = new EntryChange(oldEntry, diskEntry, databaseContext);
         diskChange.accept();
 
-        UndoManager undoManager = new UndoManager();
+        JabRefUndoManager undoManager = new JabRefUndoManager();
         undoManager.markUnchanged();
         LibraryTab libraryTab = mock(LibraryTab.class);
         DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(

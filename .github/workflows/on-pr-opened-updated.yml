@@ -69,6 +69,7 @@ jobs:
           done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
           echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
+          echo "head_sha=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" >> $GITHUB_OUTPUT
 
           if [ "$MERGEABLE" != "CONFLICTING" ]; then
             echo "✅ No merge conflicts"
@@ -250,11 +251,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          HEAD_SHA: ${{ steps.check_mergeable.outputs.head_sha }}
         run: |
           set -exo pipefail
           MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
           # File, not pipe: "grep -q" exits on the first match and would SIGPIPE "gh", which pipefail turns into a skip.
           gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' > comments.txt
           if grep -qzF -- "$MARKER" comments.txt; then
-            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
+            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID" --field head_sha="$HEAD_SHA"
           fi

@@ -19,6 +19,9 @@ on:
       workflow_run_id:
         description: 'Workflow run id'
         required: true
+      head_sha:
+        description: 'PR head SHA the dispatching run evaluated; the run does nothing if the PR moved on or conflicts again'
+        required: false
 
 jobs:
   comment:
@@ -168,14 +171,50 @@ jobs:
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
+          # A dispatched cleanup runs asynchronously; a newer push may have made the PR conflicting
+          # again in the meantime, and a stale run must not remove that conflict's comment or labels.
+          # Checked here, right before mutating, so the setup steps above leave no stale-check window.
+          # Fail closed: only a confirmed MERGEABLE state at the dispatched head SHA may proceed.
+          if [ -n "$HEAD_SHA" ]; then
+            # Retry a few times until mergeable != UNKNOWN
+            # See https://github.com/cli/cli/discussions/8020#discussioncomment-7057040 for details
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
           jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
 
       - name: 'Adapt label "status: changes-required"'
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
+          # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
+          # this step's own mutations (ghprcomment may have run for a while in between).
+          if [ -n "$HEAD_SHA" ]; then
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
+
           echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
           REPO="${{ github.repository }}"
@@ -235,3 +274,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
