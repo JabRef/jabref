@@ -11,16 +11,18 @@ import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 
 /// Builds the {@link EntryEditorTab} controls shown in the {@link EntryEditor}.
 ///
@@ -39,11 +41,12 @@ public class EntryEditorTabFactory {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileMonitor;
     private final DirectoryMonitor directoryMonitor;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final KeyBindingRepository keyBindingRepository;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
+    private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public EntryEditorTabFactory(PreviewPanel previewPanel,
                                  UndoAction undoAction,
@@ -55,11 +58,12 @@ public class EntryEditorTabFactory {
                                  StateManager stateManager,
                                  FileUpdateMonitor fileMonitor,
                                  DirectoryMonitor directoryMonitor,
-                                 CountingUndoManager undoManager,
+                                 UndoManager undoManager,
                                  BibEntryTypesManager bibEntryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
-                                 SearchCitationsRelationsService searchCitationsRelationsService) {
+                                 SearchCitationsRelationsService searchCitationsRelationsService,
+                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.previewPanel = previewPanel;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -75,6 +79,7 @@ public class EntryEditorTabFactory {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.keyBindingRepository = keyBindingRepository;
         this.searchCitationsRelationsService = searchCitationsRelationsService;
+        this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
     }
 
     /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
@@ -104,6 +109,18 @@ public class EntryEditorTabFactory {
                                                   : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
+            // Custom tabs have no preference-driven visibility gate: they exist exactly while configured,
+            // and hide themselves via content-driven visibility when their patterns resolve to no fields.
+            case EntryEditorTabModel.CustomizedFieldsTab customTab ->
+                    new UserDefinedFieldsTab(
+                            customTab,
+                            undoManager,
+                            undoAction,
+                            redoAction,
+                            preferences,
+                            journalAbbreviationRepository,
+                            stateManager,
+                            previewPanel);
         };
     }
 
@@ -142,7 +159,9 @@ public class EntryEditorTabFactory {
                             dialogService,
                             bibEntryTypesManager,
                             keyBindingRepository,
-                            stateManager);
+                            stateManager,
+                            bibTeXSyntaxHighlighter
+                    );
             case FULLTEXT_SEARCH_RESULTS ->
                     new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor);
         };

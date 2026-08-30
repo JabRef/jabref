@@ -1,7 +1,9 @@
 package org.jabref.gui.groups;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -10,12 +12,12 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
@@ -69,6 +71,7 @@ import org.slf4j.LoggerFactory;
 public class GroupNodeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupNodeViewModel.class);
+    private static final int BULK_CHANGE_THRESHOLD = 10;
 
     private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
@@ -76,8 +79,17 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
+    /// Internal cache of matched entry IDs.
+    ///
+    /// Kept as a plain `Set` instead of an `ObservableSet`, because group refreshes and search-index updates can
+    /// overlap while the UI stays responsive (for example inside modal dialogs). Exposing collection change events
+    /// for this cache made bulk refreshes re-entrant and could trigger `ConcurrentModificationException`.
     @ADR(38)
-    private final ObservableSet<String> matchedEntries = FXCollections.observableSet();
+    private final Set<String> matchedEntries = new HashSet<>();
+    /// Guards both the matched-entry cache and the derived hit-count property so readers observe a consistent pair.
+    private final Object matchedEntriesLock = new Object();
+    /// UI-facing count derived from [#matchedEntries]. The sidebar binds to this property instead of the cache itself.
+    private final ReadOnlyIntegerWrapper matchedEntriesCount = new ReadOnlyIntegerWrapper(0);
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -208,7 +220,7 @@ public class GroupNodeViewModel {
     }
 
     public IntegerBinding getHits() {
-        return Bindings.size(matchedEntries);
+        return Bindings.createIntegerBinding(matchedEntriesCount::get, matchedEntriesCount.getReadOnlyProperty());
     }
 
     void ensureMatchedEntriesLoaded() {
@@ -235,6 +247,12 @@ public class GroupNodeViewModel {
 
     @Override
     public String toString() {
+        Set<String> matchedEntriesSnapshot;
+        // Snapshot under the same lock used by writers so debug output never iterates the live set mid-mutation.
+        synchronized (matchedEntriesLock) {
+            matchedEntriesSnapshot = Set.copyOf(matchedEntries);
+        }
+
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
@@ -242,7 +260,7 @@ public class GroupNodeViewModel {
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
-                ", matchedEntries=" + matchedEntries +
+                ", matchedEntries=" + matchedEntriesSnapshot +
                 '}';
     }
 
@@ -263,7 +281,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return IconTheme.findJabRefIcon(iconCode)
+        return IconTheme.findGroupIcon(iconCode)
                         .map(icon -> icon.withColor(getColor()));
     }
 
@@ -283,27 +301,32 @@ public class GroupNodeViewModel {
             return;
         }
         while (change.next()) {
-            if (change.wasPermutated()) {
+            /// A replacement represents a bulk mutation, so recompute on the background executor
+            /// instead of matching every added entry on the JavaFX thread.
+            // [impl->req~ux.large-library.bulk-entry-removal~1]
+            if (change.wasReplaced() || change.getRemovedSize() > BULK_CHANGE_THRESHOLD) {
+                updateMatchedEntries();
+            } else if (change.wasPermutated()) {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (isMatchEffective(this, changedEntry)) {
                         // ADR-0038
-                        matchedEntries.add(changedEntry.getId());
+                        addMatchedEntry(changedEntry.getId());
                     } else {
                         // ADR-0038
-                        matchedEntries.remove(changedEntry.getId());
+                        removeMatchedEntry(changedEntry.getId());
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
                     // ADR-0038
-                    matchedEntries.remove(removedEntry.getId());
+                    removeMatchedEntry(removedEntry.getId());
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (isMatchEffective(this, addedEntry)) {
                         // ADR-0038
-                        matchedEntries.add(addedEntry.getId());
+                        addMatchedEntry(addedEntry.getId());
                     }
                 }
             }
@@ -327,7 +350,7 @@ public class GroupNodeViewModel {
             // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
             // and clear now so rebinding never briefly shows the outdated number
             matchedEntriesInitialized = false;
-            matchedEntries.clear();
+            clearMatchedEntries();
             return;
         }
 
@@ -338,13 +361,11 @@ public class GroupNodeViewModel {
 
         matchedEntriesUpdateInProgress = true;
         BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
-                .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                .wrap(() -> databaseContext.getDatabase().getEntriesSnapshot().stream()
                                            .filter(e -> isMatchEffective(this, e))
                                            .toList())
                 .onSuccess(entries -> {
-                    matchedEntries.clear();
-                    // ADR-0038
-                    entries.forEach(entry -> matchedEntries.add(entry.getId()));
+                    replaceMatchedEntries(entries);
                     matchedEntriesInitialized = true;
                     completeMatchedEntriesUpdate();
                 })
@@ -362,6 +383,41 @@ public class GroupNodeViewModel {
         if (matchedEntriesUpdatePending) {
             matchedEntriesUpdatePending = false;
             updateMatchedEntries();
+        }
+    }
+
+    private void addMatchedEntry(String entryId) {
+        synchronized (matchedEntriesLock) {
+            if (matchedEntries.add(entryId)) {
+                matchedEntriesCount.set(matchedEntries.size());
+            }
+        }
+    }
+
+    private void removeMatchedEntry(String entryId) {
+        synchronized (matchedEntriesLock) {
+            if (matchedEntries.remove(entryId)) {
+                matchedEntriesCount.set(matchedEntries.size());
+            }
+        }
+    }
+
+    private void clearMatchedEntries() {
+        synchronized (matchedEntriesLock) {
+            if (!matchedEntries.isEmpty()) {
+                matchedEntries.clear();
+                matchedEntriesCount.set(0);
+            }
+        }
+    }
+
+    private void replaceMatchedEntries(List<BibEntry> entries) {
+        synchronized (matchedEntriesLock) {
+            matchedEntries.clear();
+            entries.stream()
+                   .map(BibEntry::getId)
+                   .forEach(matchedEntries::add);
+            matchedEntriesCount.set(matchedEntries.size());
         }
     }
 
@@ -408,7 +464,7 @@ public class GroupNodeViewModel {
         //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
 
         getGroupNode().moveTo(target.getGroupNode());
-        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange).toChangeSet());
         // panel.markBaseChanged();
         // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }
@@ -692,9 +748,9 @@ public class GroupNodeViewModel {
                 }).onFinished(() -> {
                     for (BibEntry entry : event.entries()) {
                         if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
-                            matchedEntries.add(entry.getId());
+                            addMatchedEntry(entry.getId());
                         } else {
-                            matchedEntries.remove(entry.getId());
+                            removeMatchedEntry(entry.getId());
                         }
                     }
                     databaseContext.getMetaData().groupsBinding().invalidate();
@@ -707,7 +763,7 @@ public class GroupNodeViewModel {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 for (BibEntry entry : event.entries()) {
                     searchGroup.updateMatches(entry, false);
-                    matchedEntries.remove(entry.getId());
+                    removeMatchedEntry(entry.getId());
                 }
                 databaseContext.getMetaData().groupsBinding().invalidate();
             }

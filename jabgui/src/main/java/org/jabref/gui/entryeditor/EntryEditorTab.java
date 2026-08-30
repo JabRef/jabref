@@ -70,6 +70,10 @@ public abstract class EntryEditorTab extends Tab {
 
     protected abstract void bindToEntry(BibEntry entry);
 
+    /// Releases listeners owned by this tab before it is discarded.
+    protected void dispose() {
+    }
+
     /// Override to perform a special action on focus (like selecting the first field in the editor).
     protected void handleFocus() {
     }
@@ -77,9 +81,9 @@ public abstract class EntryEditorTab extends Tab {
     public void notifyAboutFocus(BibEntry entry) {
         // currentEntry is bound to the view model and updates on its own; rebuild content only when the
         // entry or its type actually changed (intentionally lazy: not on every push to the property).
-        if (!entry.equals(renderedEntry) || !entry.getType().equals(renderedEntryType)) {
+        if ((entry != renderedEntry) || !entry.getType().equals(renderedEntryType)) {
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
-            LOGGER.trace("Different entry: {}", !entry.equals(renderedEntry));
+            LOGGER.trace("Different entry: {}", entry != renderedEntry);
             LOGGER.trace("Different entry type: {}", !entry.getType().equals(renderedEntryType));
             renderedEntry = entry;
             renderedEntryType = entry.getType();

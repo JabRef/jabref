@@ -66,17 +66,17 @@ At the core,
   * `referenceMarkNameForLinking` is optional: can be used to crosslink to the citation marker from the bibliography.
 * `CitationGroups` represents the collection of citation groups.\
   Processing starts with creating a `CitationGroups` instance from the data stored in the document.
-* `CitedKey` represents a cited source, with ordered back references (using `CitationPath`) to the corresponding citations.
-* `CitedKeys` is just an order-preserving collection of `CitedKeys` that also supports lookup by `citationKey`. While producing citation markers, we also create a corresponding `CitedKeys` instance, and store it in `CitationGroups.bibliography`. This is already sorted, its entries have `uniqueLetter` or `number` assigned, but not converted to markup yet.
+* `CitedReference` represents a cited source, with ordered back references (using `CitationPath`) to the corresponding citations.
+* `CitedReferences` is just an order-preserving collection of `CitedReference` values that also supports lookup by `citationKey`. While producing citation markers, we also create a corresponding `CitedReferences` instance, and store it in `CitationGroups.bibliography`. This is already sorted, its entries have `uniqueLetter` or `number` assigned, but not converted to markup yet.
 
 Common processing steps:
 
 * We need `globalOrder` for the citation groups (provided externally) `CitationGroups.setGlobalOrder()`
 * We need to look up each citationKey in the bibliography databases:
-  * `CitationGroups.lookupCitations` collects the cited keys, looks up each, then distributes the results to the citations. Uses a temporary `CitedKeys` instance, based on unsorted citations and citation groups.
+  * `CitationGroups.lookupCitations` collects the cited keys, looks up each, then distributes the results to the citations. Uses a temporary `CitedReferences` instance, based on unsorted citations and citation groups.
 * `CitationGroups.imposeLocalOrder` fills `localOrder` in each `CitationGroup`
 * Now we have order of appearance for the citations (`globalOrder` and `localOrder`).\
-  We can create a `CitedKeys` instance (`bibliography`) according to this order.
+  We can create a `CitedReferences` instance (`bibliography`) according to this order.
 * For citations numbered in order of first appearance we number the sources and distribute the numbers to the corresponding citations.
 * For citations numbered in order of bibliography, we sort the bibliography, number, distribute.
 * For author-year citations we have to decide on the letters `uniqueLetter` used to distinguish sources. This needs order of first appearance of the sources and recognizing clashing citation markers. This is done in logic, in `OOProcessAuthorYearMarkers.createUniqueLetters()`

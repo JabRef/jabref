@@ -2,7 +2,7 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,11 +25,13 @@ import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.rangesort.RangeSort;
 import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.UnoDispatch;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
 
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -45,6 +47,7 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +60,10 @@ public class CSLReferenceMarkManager {
     private static final String FORMATTED_CITATION_TEXT_PROPERTY_PREFIX = "JabRef_formatted_citation_text:";
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]*>");
+    private static final Pattern FULL_SUPERSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sup>.*</sup>(?:</span>)?$");
+    private static final Pattern FULL_SUBSCRIPT_PATTERN = Pattern.compile("^(?:<span[^>]*>)?<sub>.*</sub>(?:</span>)?$");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
     private final Map<String, CSLReferenceMark> marksByName = new HashMap<>();
@@ -69,7 +75,8 @@ public class CSLReferenceMarkManager {
     private boolean isNumberUpdateRequired;
     private CSLCitationType citationType;
 
-    public CSLReferenceMarkManager(XTextDocument document) {
+    public CSLReferenceMarkManager(XTextDocument document, XComponentContext componentContext) {
+        this.componentContext = componentContext;
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
@@ -131,7 +138,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int convertReferenceMarks(OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                     List<BibDatabaseContext> bibDatabaseContexts,
+                                     List<BibDatabase> selectedDatabases,
                                      BibEntryTypesManager entryTypesManager) throws Exception, CreationException {
         sortMarksInOrder();
         Map<String, String> zoteroUriByCitationKey = getZoteroUriByCitationKey();
@@ -145,7 +152,7 @@ public class CSLReferenceMarkManager {
             Optional<String> convertedName = buildConvertedReferenceMarkName(
                     mark,
                     referenceMarkFormat,
-                    bibDatabaseContexts,
+                    selectedDatabases,
                     entryTypesManager,
                     zoteroUriByCitationKey);
             if (convertedName.isEmpty()) {
@@ -173,7 +180,7 @@ public class CSLReferenceMarkManager {
 
     private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
                                                              OpenOfficeReferenceMarkFormat referenceMarkFormat,
-                                                             List<BibDatabaseContext> bibDatabaseContexts,
+                                                             List<BibDatabase> selectedDatabases,
                                                              BibEntryTypesManager entryTypesManager,
                                                              Map<String, String> zoteroUriByCitationKey) {
         return switch (referenceMarkFormat) {
@@ -184,15 +191,15 @@ public class CSLReferenceMarkManager {
                             mark.getUniqueId(),
                             mark.getCitationType()));
             case ZOTERO_COMPATIBLE ->
-                    buildZoteroReferenceMarkName(mark, bibDatabaseContexts, entryTypesManager, zoteroUriByCitationKey);
+                    buildZoteroReferenceMarkName(mark, selectedDatabases, entryTypesManager, zoteroUriByCitationKey);
         };
     }
 
     private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
-                                                          List<BibDatabaseContext> bibDatabaseContexts,
+                                                          List<BibDatabase> selectedDatabases,
                                                           BibEntryTypesManager entryTypesManager,
                                                           Map<String, String> zoteroUriByCitationKey) {
-        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), bibDatabaseContexts);
+        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), selectedDatabases);
         if (entries.isEmpty()) {
             return Optional.empty();
         }
@@ -212,10 +219,10 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
-                                                               List<BibDatabaseContext> bibDatabaseContexts) {
+                                                               List<BibDatabase> selectedDatabases) {
         List<BibEntry> entries = new ArrayList<>();
         for (String citationKey : citationKeys) {
-            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, bibDatabaseContexts);
+            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, selectedDatabases);
             if (entry.isEmpty()) {
                 return Optional.empty();
             }
@@ -225,12 +232,35 @@ public class CSLReferenceMarkManager {
     }
 
     private Optional<BibEntry> findEntryByCitationKey(String citationKey,
-                                                      List<BibDatabaseContext> bibDatabaseContexts) {
-        return bibDatabaseContexts.stream()
-                                  .map(BibDatabaseContext::getDatabase)
-                                  .map(database -> database.getEntryByCitationKey(citationKey))
-                                  .flatMap(Optional::stream)
-                                  .findFirst();
+                                                      List<BibDatabase> selectedDatabases) {
+        return selectedDatabases.stream()
+                                .map(database -> database.getEntryByCitationKey(citationKey))
+                                .flatMap(Optional::stream)
+                                .findFirst();
+    }
+
+    private void restoreEscapementFormattingIfNeeded(String text, XTextCursor cursor) {
+        XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        if (propertySet == null) {
+            return;
+        }
+
+        try {
+            if (FULL_SUPERSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) 33);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            } else if (FULL_SUBSCRIPT_PATTERN.matcher(text).matches()) {
+                propertySet.setPropertyValue("CharEscapement", (short) -10);
+                propertySet.setPropertyValue("CharEscapementHeight", (byte) 58);
+                propertySet.setPropertyValue("CharAutoEscapement", false);
+            }
+        } catch (com.sun.star.beans.UnknownPropertyException
+                 | com.sun.star.beans.PropertyVetoException
+                 | com.sun.star.lang.WrappedTargetException
+                 | com.sun.star.uno.RuntimeException exception) {
+            LOGGER.warn("Could not restore escapement formatting for rewritten citation text", exception);
+        }
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
@@ -293,9 +323,15 @@ public class CSLReferenceMarkManager {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
+
+        if (containsEscapementMarkup(ooText.toString())) {
+            OOTextIntoOO.removeEscapementFormatting(position);
+        } else if (!insertSpaceAfter) {
+            UnoDispatch.resetAttributesAtRangeEnd(doc, componentContext, endRange);
+        }
     }
 
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
@@ -305,7 +341,6 @@ public class CSLReferenceMarkManager {
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
-        Set<String> existingReferenceMarkUniqueIds = new HashSet<>();
 
         for (String name : marks.getElementNames()) {
             if (ReferenceMark.isReferenceMarkName(name)) {
@@ -322,7 +357,6 @@ public class CSLReferenceMarkManager {
 
                 if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
-                    existingReferenceMarkUniqueIds.add(referenceMark.getUniqueId());
                     String storageKey = FORMATTED_CITATION_TEXT_PROPERTY_PREFIX + referenceMark.getUniqueId();
                     UnoUserDefinedProperty.getStringValue(document, storageKey)
                                           .map(OOText::fromString)
@@ -339,10 +373,16 @@ public class CSLReferenceMarkManager {
             }
         }
 
+        LOGGER.debug("Read {} existing marks", marksByName.size());
+    }
+
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        readExistingMarks();
+        Set<String> existingReferenceMarkUniqueIds = marksInOrder.stream()
+                                                                 .map(CSLReferenceMark::getUniqueId)
+                                                                 .collect(Collectors.toSet());
         removeUnusedFormattedCitationTextProperties(existingReferenceMarkUniqueIds);
         rebuildCitationNumberState();
-
-        LOGGER.debug("Read {} existing marks", marksByName.size());
 
         if (isNumberUpdateRequired) {
             try {
@@ -428,9 +468,13 @@ public class CSLReferenceMarkManager {
     }
 
     private void updateAllCitationNumbers() throws Exception, CreationException {
+        updateAllCitationNumbers(Map.of());
+    }
+
+    public void updateAllCitationNumbers(Map<String, Integer> preferredCitationKeyToNumber) throws Exception, CreationException {
         sortMarksInOrder();
-        Map<String, Integer> newCitationKeyToNumber = new HashMap<>();
-        int currentNumber = 1;
+        Map<String, Integer> newCitationKeyToNumber = new LinkedHashMap<>(preferredCitationKeyToNumber);
+        int currentNumber = newCitationKeyToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
 
         for (CSLReferenceMark mark : marksInOrder) {
             List<String> citationKeys = mark.getCitationKeys();
@@ -500,6 +544,11 @@ public class CSLReferenceMarkManager {
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
+        if (updatedName.equals(mark.getName()) && updatedText.equals(currentText)) {
+            mark.setCitationNumbers(newNumbers);
+            return;
+        }
+
         updateMarkAndText(mark, updatedText, updatedName);
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
@@ -509,6 +558,16 @@ public class CSLReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> {
+                    if (!containsEscapementMarkup(updatedText)) {
+                        UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor);
+                    }
+                });
+    }
+
+    private static boolean containsEscapementMarkup(String text) {
+        return text.contains("<sup>") || text.contains("<sub>");
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
@@ -568,6 +627,7 @@ public class CSLReferenceMarkManager {
             // Move cursor to wrap the entire inserted content
             cursor.gotoRange(startRange, false);
             cursor.gotoRange(endRange, true);
+            restoreEscapementFormattingIfNeeded(newText, cursor);
 
             // Create and attach DocumentAnnotation
             DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, markName, cursor, true);
@@ -638,6 +698,10 @@ public class CSLReferenceMarkManager {
 
         for (CSLReferenceMark mark : marksInOrder) {
             XTextRange range = mark.getTextContent().getAnchor();
+            if (range == null) {
+                LOGGER.debug("Skipping dangling reference mark without anchor: {}", mark.getName());
+                continue;
+            }
             sortEntries.add(new RangeSortEntry<>(range, 0, mark));
         }
 

@@ -19,7 +19,8 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
     private final LinkedFileIngestor linkedFileIngestor;
 
     public GenerateEmbeddingsTask(
-            GenerateEmbeddingsTaskRequest request
+            GenerateEmbeddingsTaskRequest request,
+            boolean showToUser
     ) {
         this.request = request;
         this.linkedFileIngestor = new LinkedFileIngestor(
@@ -30,11 +31,11 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
                 request.documentSplitter()
         );
 
-        configure();
+        configure(showToUser);
     }
 
-    private void configure() {
-        showToUser(true);
+    private void configure(boolean showToUser) {
+        showToUser(showToUser);
         titleProperty().set(Localization.lang("Generating embeddings for file '%0'", request.linkedFile().getLink()));
     }
 

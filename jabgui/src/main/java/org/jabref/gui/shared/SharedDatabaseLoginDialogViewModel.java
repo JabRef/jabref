@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -31,10 +29,12 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
@@ -50,7 +50,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -90,9 +89,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -109,9 +109,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -122,6 +123,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
         EasyBind.subscribe(useSSL, selected -> {
@@ -238,8 +240,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             libraryTab,
                             dialogService,
                             preferences,
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                            stateManager
+                            entryTypesManager,
+                            stateManager,
+                            journalAbbreviationRepository
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);

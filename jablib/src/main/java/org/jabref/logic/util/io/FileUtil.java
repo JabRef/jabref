@@ -35,6 +35,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -71,6 +72,16 @@ public class FileUtil {
     // @formatter:on
 
     private FileUtil() {
+    }
+
+    /// Returns the human-readable size of a file, or an empty optional if it cannot be determined.
+    public static Optional<String> getFileSize(@NonNull Path path) {
+        try {
+            return Optional.of(FileUtils.byteCountToDisplaySize(Files.size(path)));
+        } catch (IOException e) {
+            LOGGER.debug("Could not determine size of file {}", path, e);
+            return Optional.empty();
+        }
     }
 
     /// Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
@@ -527,12 +538,12 @@ public class FileUtil {
                    .replace('\\', '/');
     }
 
-    /// Test if the file is a bib file by simply checking the extension to be ".bib"
+    /// Test if the file is a bib file by simply checking the extension to be ".bib" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter("bib"::equals).isPresent();
+        return getFileExtension(file).filter("bib"::equalsIgnoreCase).isPresent();
     }
 
     /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)
@@ -580,13 +591,12 @@ public class FileUtil {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
-    /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
+    /// Test if the file is a pdf file by simply checking the extension to be ".pdf" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
-        Optional<String> extension = FileUtil.getFileExtension(file);
-        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
+        return getFileExtension(file).filter("pdf"::equalsIgnoreCase).isPresent();
     }
 
     /// @return Path of current panel database directory or the standard working directory in case the database was not saved yet

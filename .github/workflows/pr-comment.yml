@@ -19,6 +19,9 @@ on:
       workflow_run_id:
         description: 'Workflow run id'
         required: true
+      head_sha:
+        description: 'PR head SHA the dispatching run evaluated; the run does nothing if the PR moved on or conflicts again'
+        required: false
 
 jobs:
   comment:
@@ -138,21 +141,80 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Setup JBang (included at setup-gralde)
-      - uses: ./.github/actions/setup-gradle
+      # No setup-gradle here: this job never runs Gradle, it only needs a JDK and JBang.
+      - uses: actions/setup-java@v6
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        with:
+          distribution: 'corretto'
+          java-version: '25'
+      - name: Generate JBang cache key
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: cache-key
+        run: echo "cache_key=jbang-ghprcomment-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Cache JBang
+        # Own key: ghprcomment pulls different dependencies than the other JBang jobs.
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: actions/cache@v6
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-ghprcomment-
+      - name: Resolve //DEPS into the cached directory
+        # JBang resolves script dependencies into ~/.m2, which is not cached here.
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
+      - name: Setup JBang
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
 
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
+          # A dispatched cleanup runs asynchronously; a newer push may have made the PR conflicting
+          # again in the meantime, and a stale run must not remove that conflict's comment or labels.
+          # Checked here, right before mutating, so the setup steps above leave no stale-check window.
+          # Fail closed: only a confirmed MERGEABLE state at the dispatched head SHA may proceed.
+          if [ -n "$HEAD_SHA" ]; then
+            # Retry a few times until mergeable != UNKNOWN
+            # See https://github.com/cli/cli/discussions/8020#discussioncomment-7057040 for details
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
           jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
 
       - name: 'Adapt label "status: changes-required"'
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
+          # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
+          # this step's own mutations (ghprcomment may have run for a while in between).
+          if [ -n "$HEAD_SHA" ]; then
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
+
           echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
           REPO="${{ github.repository }}"
@@ -193,10 +255,23 @@ jobs:
             gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
-            echo "No bot comments - removing label changes-required and adding no-bot-comments"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: no-bot-comments"
-            echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
+            # A PR without bot comments is ready for review unless it is a draft, a human requested changes,
+            # or it already progressed further in the review process.
+            PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision,labels \
+              --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
+                       or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
+                    then "not-ready" else "ready" end')
+            if [ "$PR_STATE" = "ready" ]; then
+              echo "No bot comments and PR is ready for review - adding label ready-for-review"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: no-bot-comments" --add-label "status: ready-for-review"
+              echo "No bot comments - removed label changes-required and added ready-for-review" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - adding label no-bot-comments"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review" --add-label "status: no-bot-comments"
+              echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}

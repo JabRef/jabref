@@ -2,7 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
 <?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
@@ -18,6 +20,12 @@
 
     <Label styleClass="sectionHeader" text="%Save actions"/>
     <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
+
+    <Label styleClass="sectionHeader" text="%Journal abbreviation on save"/>
+    <HBox spacing="8.0" alignment="CENTER_LEFT">
+        <Label text="%Abbreviation style"/>
+        <ComboBox fx:id="journalAbbreviationOnSave"/>
+    </HBox>
     <padding>
         <Insets bottom="12.0" />
     </padding>
