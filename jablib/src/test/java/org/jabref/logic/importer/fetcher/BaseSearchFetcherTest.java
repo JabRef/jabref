@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 @NullMarked
 @FetcherTest
 class BaseSearchFetcherTest {
@@ -208,19 +207,19 @@ class BaseSearchFetcherTest {
     })
     void parserMapsTypeCodeToCorrectEntryType(String typeCode, StandardEntryType expectedType) throws ParseException {
         String json = """
-            {
-              "response": {
-                "result": {
-                  "docs": [
-                    {
-                      "dctitle": "Sample Title",
-                      "dctypenorm": ["%s"]
+                {
+                  "response": {
+                    "result": {
+                      "docs": [
+                        {
+                          "dctitle": "Sample Title",
+                          "dctypenorm": ["%s"]
+                        }
+                      ]
                     }
-                  ]
+                  }
                 }
-              }
-            }
-            """.formatted(typeCode);
+                """.formatted(typeCode);
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         List<BibEntry> entries = fetcher.getParser().parseEntries(inputStream);
