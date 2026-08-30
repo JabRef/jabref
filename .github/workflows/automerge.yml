@@ -66,7 +66,15 @@ jobs:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Approve PR
         if: steps.shouldrun.outputs.shouldrun == 'true'
-        run: gh pr review --approve "$PR_URL"
+        # Guard: a push directly followed by adding the "automerge" label makes both this
+        # workflow (live label query) and on-pr-labeled.yml approve — skip if an
+        # un-dismissed approval by jabref-machine already exists.
+        run: |
+          if gh pr view "$PR_URL" --json reviews --jq '.reviews[] | select(.state == "APPROVED") | .author.login' | grep -qx 'jabref-machine'; then
+            echo "Already approved"
+          else
+            gh pr review --approve "$PR_URL"
+          fi
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
