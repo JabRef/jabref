@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 
 /// @implNote Cannot be sorted alphabetically, as [KeyBindingRepository#getKeyCombination(KeyBinding)] iterates over the enum in order and returns the first match.
 /// Use `shortcut` for OS independent mapping of `ctrl` on Windows and `cmd`(meta)` on macOS
@@ -64,7 +65,7 @@ public enum KeyBinding {
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "shortcut+UP", KeyBindingCategory.VIEW),
     FIND_UNLINKED_FILES("Search for unlinked local files", Localization.lang("Search for unlinked local files"), "shift+F7", KeyBindingCategory.QUALITY),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt+1", KeyBindingCategory.VIEW),
-    FOCUS_GROUP_LIST("Focus group list", Localization.lang("Focus group list"), "alt+s", KeyBindingCategory.VIEW),
+    FOCUS_GROUP_LIST("Focus group list", Localization.lang("Focus group list"), "alt+s", "shortcut+alt+G", KeyBindingCategory.VIEW),
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_LIBRARY("Import into current library...", Localization.lang("Import into current library..."), "shortcut+I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_LIBRARY("Import into new library...", Localization.lang("Import into new library..."), "shortcut+alt+I", KeyBindingCategory.FILE),
@@ -128,18 +129,27 @@ public enum KeyBinding {
     SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT),
     GROUP_RENAME("Rename group", Localization.lang("Rename group"), "F2", KeyBindingCategory.EDIT),
     MERGE_WITH_FETCHED_ENTRY("Get bibliographic data from %0, \"DOI/ISBN/...\"", Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), "F5", KeyBindingCategory.EDIT),
-    LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "alt+F", KeyBindingCategory.EDIT),
+    LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "alt+F", "shortcut+alt+F", KeyBindingCategory.EDIT),
     RENAME_FILE_TO_NAME("Rename file(s) to configured filename format pattern", Localization.lang("Rename file(s) to configured filename format pattern"), "shortcut+P", KeyBindingCategory.EDIT);
 
     private final String constant;
     private final String localization;
     private final String defaultBinding;
+    private final String defaultMacBinding;
     private final KeyBindingCategory category;
 
     KeyBinding(String constantName, String localization, String defaultKeyBinding, KeyBindingCategory category) {
+        this(constantName, localization, defaultKeyBinding, defaultKeyBinding, category);
+    }
+
+    /// On macOS, `alt` (option) plus a letter inserts a special character (e.g. `⌥F` inserts `ƒ`),
+    /// so such a combination triggers the action _and_ inserts text into a focused text field.
+    /// Bindings affected by this use a `shortcut`-based macOS default instead.
+    KeyBinding(String constantName, String localization, String defaultKeyBinding, String defaultMacKeyBinding, KeyBindingCategory category) {
         this.constant = constantName;
         this.localization = localization;
         this.defaultBinding = defaultKeyBinding;
+        this.defaultMacBinding = defaultMacKeyBinding;
         this.category = category;
     }
 
@@ -154,8 +164,15 @@ public enum KeyBinding {
 
     /// This method returns the default key binding, the key(s) which are assigned
     ///
-    /// @return The default key binding
+    /// @return The default key binding for the current platform
     public String getDefaultKeyBinding() {
+        return getDefaultKeyBinding(OS.OS_X);
+    }
+
+    String getDefaultKeyBinding(boolean isMacOs) {
+        if (isMacOs) {
+            return defaultMacBinding;
+        }
         return defaultBinding;
     }
 
