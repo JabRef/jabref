@@ -1,0 +1,50 @@
+name: "Merge upstream main"
+description: "Merges upstream/main into the current branch, resolving CHANGELOG.md conflicts semantically, and pushes the merge commit. The changelog merge driver is run from source via jbang, so driver fixes apply without waiting for a maven-flow/merge release."
+
+inputs:
+  target-branch:
+    description: "Branch to push the merge commit to"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Some runners (e.g. ubuntu-slim) do not provide Java, which jbang needs
+    - name: Setup Java
+      uses: actions/setup-java@v6
+      with:
+        distribution: 'temurin'
+        java-version: '25'
+
+    - name: Setup JBang
+      uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
+
+    # jbang builds the driver from source at the driver repo's HEAD. Keying the cache on
+    # that commit makes a driver update a cache miss (fresh build); everything else hits.
+    - name: Determine changelog-merge-driver revision
+      id: driver-rev
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: echo "sha=$(gh api repos/maven-flow/changelog-merge-driver/commits/HEAD --jq .sha)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache JBang
+      uses: actions/cache@v6
+      with:
+        path: ~/.jbang
+        key: jbang-changelog-merge-driver-${{ steps.driver-rev.outputs.sha }}
+
+    - name: Merge upstream/main
+      shell: bash
+      env:
+        TARGET_BRANCH: ${{ inputs.target-branch }}
+      run: |
+        set -ex
+        jbang trust add https://github.com/maven-flow/changelog-merge-driver/
+        git config merge.changelog.driver "jbang changelog-merge-driver@maven-flow/changelog-merge-driver %A %O %B --rebase"
+        # Overrides the checked-in "CHANGELOG.md merge=union" without dirtying the working tree
+        echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+        git merge --no-ff --no-edit upstream/main
+        git push origin "HEAD:refs/heads/$TARGET_BRANCH"
