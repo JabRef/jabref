@@ -133,13 +133,19 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
 
-            // if we have utf8 with 100 confidence we assume that the file is in utf8, more likely
-            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
-                return defaultCharSet;
-            }
-
             if (matches[0] != null) {
-                return Charset.forName(matches[0].getName());
+                /// ICU orders candidates by confidence. UTF-16 input can still produce a lower-confidence ASCII
+                /// candidate because of its alternating zero bytes, so a UTF-16 top candidate must take precedence.
+                String topMatch = matches[0].getName();
+                if ("UTF-16BE".equals(topMatch) || "UTF-16LE".equals(topMatch)) {
+                    return Charset.forName(topMatch);
+                }
+
+                // If we have UTF-8 with 100 confidence or any ASCII candidate, UTF-8 is the safer fallback.
+                if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
+                    return defaultCharSet;
+                }
+                return Charset.forName(topMatch);
             }
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);

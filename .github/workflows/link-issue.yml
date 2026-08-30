@@ -2,7 +2,7 @@ name: Link PR to Issue
 
 on:
   pull_request_target:
-    types: [ opened, reopened, edited ]
+    types: [ opened, reopened, edited, synchronize ]
 
 jobs:
   determine_issue_number:
@@ -24,6 +24,7 @@ jobs:
       contents: read
     outputs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+      allow_missing_issue_link: ${{ steps.allow_missing_issue_link.outputs.allowed }}
     steps:
       - name: echo PR data
         env:
@@ -49,14 +50,39 @@ jobs:
           bodyRegexFlags: 'i'
           outputOnly: true
       - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
+      - name: Allow missing issue link for maintainers using `Closes NA`
+        id: allow_missing_issue_link
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          TICKET_NUMBER: ${{ steps.get_issue_number.outputs.ticketNumber }}
+        run: |
+          set -euo pipefail
+
+          echo "allowed=false" >> "$GITHUB_OUTPUT"
+
+          if [ "$TICKET_NUMBER" != '-1' ]; then
+            exit 0
+          fi
+
+          if printf '%s\n' "$PR_BODY" | grep -Eiq '^[[:space:]]*closes[[:space:]]+na[[:space:]]*$'; then
+            case "$PR_AUTHOR_ASSOCIATION" in
+              OWNER|MEMBER|COLLABORATOR)
+                echo "Maintainer '$PR_AUTHOR' used 'Closes NA'; allowing missing issue link."
+                echo "allowed=true" >> "$GITHUB_OUTPUT"
+                ;;
+            esac
+          fi
       - name: Issue number present
-        if: steps.get_issue_number.outputs.ticketNumber == '-1'
+        if: steps.get_issue_number.outputs.ticketNumber == '-1' && steps.allow_missing_issue_link.outputs.allowed != 'true'
         run: |
           echo "No valid ticket number found!"
           exit 1
 
   move_issue:
     name: Mark issue as in progress
+    if: needs.determine_issue_number.outputs.issue_number != '-1'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-slim
@@ -88,7 +114,7 @@ jobs:
 
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
-    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref' && needs.determine_issue_number.outputs.issue_number != '-1'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-slim

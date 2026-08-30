@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -120,7 +121,14 @@ public class BibtexImporter extends Importer {
     /// reader manually to the metadata
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        normalizeKeywordDelimiters(result);
+        return result;
+    }
+
+    /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
+    private void normalizeKeywordDelimiters(ParserResult result) {
+        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences());
     }
 
     @Override

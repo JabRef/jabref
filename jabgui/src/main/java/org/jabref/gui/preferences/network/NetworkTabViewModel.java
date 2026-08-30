@@ -20,6 +20,7 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -27,9 +28,9 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -62,7 +63,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty gitPersistPatProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final FilePreferences filePreferences;
 
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
@@ -75,12 +76,16 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService,
-                               CliPreferences preferences) {
+                               ProxyPreferences proxyPreferences,
+                               GitPreferences gitPreferences,
+                               InternalPreferences internalPreferences,
+                               SSLPreferences sslPreferences,
+                               FilePreferences filePreferences) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.proxyPreferences = preferences.getProxyPreferences();
-        this.gitPreferences = preferences.getGitPreferences();
-        this.internalPreferences = preferences.getInternalPreferences();
+        this.filePreferences = filePreferences;
+        this.proxyPreferences = proxyPreferences;
+        this.gitPreferences = gitPreferences;
+        this.internalPreferences = internalPreferences;
 
         backupProxyPreferences = new ProxyPreferences(
                 proxyPreferences.shouldUseProxy(),
@@ -123,7 +128,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
 
-        this.trustStoreManager = new TrustStoreManager(preferences.getSSLPreferences().getTruststorePath());
+        this.trustStoreManager = new TrustStoreManager(sslPreferences.getTruststorePath());
     }
 
     @Override
@@ -338,7 +343,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(new FileChooser.ExtensionFilter(Localization.lang("SSL certificate file"), "*.crt", "*.cer"))
                 .withDefaultExtension(Localization.lang("SSL certificate file"), StandardFileType.CER)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {

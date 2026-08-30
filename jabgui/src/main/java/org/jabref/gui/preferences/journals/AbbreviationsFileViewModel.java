@@ -56,7 +56,7 @@ public class AbbreviationsFileViewModel {
 
     /// This method will write all abbreviations of this abbreviation file to the file on the file system.
     /// It essentially will check if the current file is a builtin list and if not it will call
-    /// {@link AbbreviationWriter#writeOrCreate}.
+    /// [AbbreviationWriter#writeOrCreate].
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
             List<Abbreviation> actualAbbreviations =

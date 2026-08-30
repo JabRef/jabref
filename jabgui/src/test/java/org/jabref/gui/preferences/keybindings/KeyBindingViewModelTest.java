@@ -32,7 +32,7 @@ class KeyBindingViewModelTest {
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         Injector.setModelOrService(CliPreferences.class, preferences);
 
-        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
+        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class));
         KeyBinding binding = KeyBinding.MERGE_ENTRIES;
 
         KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
@@ -57,18 +57,14 @@ class KeyBindingViewModelTest {
     @Test
     @DisabledOnCIServer("locally runs fine")
     void verifyStoreSettingsWritesChanges() {
-        KeyBindingRepository uiRepo = new KeyBindingRepository();
-        GuiPreferences preferences = mock(GuiPreferences.class);
-        KeyBindingRepository prefsRepo = new KeyBindingRepository();
-
-        when(preferences.getKeyBindingRepository()).thenReturn(prefsRepo);
+        KeyBindingRepository liveRepo = new KeyBindingRepository();
 
         KeyBindingsTabViewModel viewModel =
-                new KeyBindingsTabViewModel(uiRepo, mock(DialogService.class), preferences);
+                new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
 
         KeyBinding binding = KeyBinding.CLOSE_DATABASE;
 
-        KeyBindingViewModel selectedVM = new KeyBindingViewModel(uiRepo, binding, binding.getDefaultKeyBinding());
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
         viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
 
         KeyEvent event = new KeyEvent(
@@ -86,7 +82,7 @@ class KeyBindingViewModelTest {
 
         viewModel.storeSettings();
 
-        Optional<String> saved = prefsRepo.get(binding);
+        Optional<String> saved = liveRepo.get(binding);
         assertEquals(Optional.of("shortcut+shift+L"), saved);
     }
 }

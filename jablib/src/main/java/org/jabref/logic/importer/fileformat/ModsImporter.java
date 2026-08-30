@@ -59,10 +59,8 @@ public class ModsImporter extends Importer implements Parser {
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
         keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
         xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // Not supported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
     }
 
     @Override
