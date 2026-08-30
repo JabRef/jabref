@@ -25,6 +25,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolve
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.database.DuplicateCandidateGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -104,19 +105,15 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
-        for (int i = 0; i < (entries.size() - 1); i++) {
-            for (int j = i + 1; j < entries.size(); j++) {
-                if (duplicateSearchCancelled.get() || Thread.interrupted()) {
-                    return;
-                }
+        DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
+        for (DuplicateCandidateGenerator.CandidatePair pair : DuplicateCandidateGenerator.getCandidatePairs(entries)) {
+            if (duplicateSearchCancelled.get() || Thread.interrupted()) {
+                return;
+            }
 
-                BibEntry first = entries.get(i);
-                BibEntry second = entries.get(j);
-
-                if (new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)) {
-                    duplicates.add(Arrays.asList(first, second));
-                    duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
-                }
+            if (duplicateCheck.isDuplicate(pair.first(), pair.second(), databaseMode)) {
+                duplicates.add(Arrays.asList(pair.first(), pair.second()));
+                duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
             }
         }
         libraryAnalyzed.set(true);
