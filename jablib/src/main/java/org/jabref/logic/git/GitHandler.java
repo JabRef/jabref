@@ -42,6 +42,10 @@ import org.slf4j.LoggerFactory;
 public class GitHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
 
+    static {
+        SshAgentConnectorFactory.install();
+    }
+
     final Path repositoryPath;
 
     final File repositoryPathAsFile;
