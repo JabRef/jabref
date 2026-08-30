@@ -50,14 +50,14 @@ import static org.mockito.Mockito.when;
 
 class GitCommitActionTest {
 
+    @TempDir
+    Path libraryDirectory;
+
     private final DialogService dialogService = mock(DialogService.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final LibraryTab libraryTab = mock(LibraryTab.class);
     private final LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
-
-    @TempDir
-    Path libraryDirectory;
 
     private GitCommitAction gitCommitAction;
 
