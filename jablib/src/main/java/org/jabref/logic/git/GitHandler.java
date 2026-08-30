@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -116,7 +117,8 @@ public class GitHandler {
             throw new IllegalArgumentException("%s is not inside the repository root %s".formatted(fileInRepository, repositoryRoot));
         }
         Path gitignore = repositoryRoot.resolve(".gitignore");
-        boolean gitignoreExisted = Files.exists(gitignore);
+        // NOFOLLOW_LINKS: a dangling .gitignore symlink is still a pre-existing user-owned entry that rollback must not delete
+        boolean gitignoreExisted = Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS);
         // The Git index always uses forward slashes, independent of the platform
         String pathInRepository = repositoryRoot.relativize(fileInRepository).toString().replace('\\', '/');
         try (Git git = Git.init()
@@ -201,7 +203,7 @@ public class GitHandler {
 
     private void copyGitIgnoreIfAbsent() throws IOException {
         Path gitignore = repositoryPath.resolve(".gitignore");
-        if (!Files.exists(gitignore)) {
+        if (!Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS)) {
             try (InputStream inputStream = this.getClass().getResourceAsStream("git.gitignore")) {
                 Files.copy(inputStream, gitignore);
             }

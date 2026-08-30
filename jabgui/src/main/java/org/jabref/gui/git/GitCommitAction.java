@@ -1,5 +1,6 @@
 package org.jabref.gui.git;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
@@ -64,10 +65,23 @@ public class GitCommitAction extends SimpleCommand {
     /// Offers to put a library that is not under version control into a fresh repository.
     /// Cancelling is a valid choice: the user may want to clone an existing repository into that folder instead.
     private void initRepository(Path bibFilePath) {
-        Path directory = bibFilePath.toAbsolutePath().getParent();
+        Path libraryFile;
+        try {
+            // A library opened through a symlink must be committed as its real file — staging the
+            // link path would put only the symlink into the repository, not the bibliography.
+            libraryFile = bibFilePath.toRealPath();
+        } catch (IOException e) {
+            LOGGER.error("Could not resolve the library path {}", bibFilePath, e);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Git Commit"),
+                    Localization.lang("Could not initialize a Git repository in %0.", bibFilePath.toAbsolutePath().getParent().toString()),
+                    e);
+            return;
+        }
+        Path directory = libraryFile.getParent();
         boolean initialize = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Git Commit"),
-                Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0 and commit %1?\nOther files in that folder stay untracked.", directory.toString(), bibFilePath.getFileName().toString()),
+                Localization.lang("This library is not under Git version control.\nInitialize a Git repository in %0 and commit %1?\nOther files in that folder stay untracked.", directory.toString(), libraryFile.getFileName().toString()),
                 Localization.lang("Initialize"),
                 Localization.lang("Do not initialize"));
         if (!initialize) {
@@ -75,15 +89,15 @@ public class GitCommitAction extends SimpleCommand {
         }
 
         BackgroundTask.wrap(() -> {
-                          gitHandlerRegistry.get(directory).initAndCommit(bibFilePath);
+                          gitHandlerRegistry.get(directory).initAndCommit(libraryFile);
                           return null;
                       })
-                      .onSuccess(_ -> dialogService.notify(Localization.lang("Initialized Git repository in %0", directory.toString())))
+                      .onSuccess(_ -> dialogService.notify(Localization.lang("Initialized Git repository in %0.", directory.toString())))
                       .onFailure(e -> {
                           LOGGER.error("Could not initialize a Git repository in {}", directory, e);
                           dialogService.showErrorDialogAndWait(
                                   Localization.lang("Git Commit"),
-                                  Localization.lang("Could not initialize a Git repository in %0", directory.toString()),
+                                  Localization.lang("Could not initialize a Git repository in %0.", directory.toString()),
                                   e);
                       })
                       .executeWith(taskExecutor);
