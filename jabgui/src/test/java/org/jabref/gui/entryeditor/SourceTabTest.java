@@ -4,27 +4,32 @@ import java.util.List;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
-import org.fxmisc.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -33,6 +38,8 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +51,9 @@ class SourceTabTest {
     private CodeArea area;
     private TabPane pane;
     private SourceTab sourceTab;
+    private FieldPreferences fieldPreferences;
+    private BibEntryTypesManager entryTypesManager;
+    private KeyBindingRepository keyBindingRepository;
 
     @Start
     public void onStart(Stage stage) {
@@ -53,19 +63,21 @@ class SourceTabTest {
         when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.searchQueryProperty()).thenReturn(mock(StringProperty.class));
         when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
-        KeyBindingRepository keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
+        keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
+        keyBindingRepository.put(KeyBinding.SAVE_LIBRARY, "Ctrl+S");
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        entryTypesManager = mock(BibEntryTypesManager.class);
 
         sourceTab = new SourceTab(
-                new CountingUndoManager(),
+                new UndoManager(),
                 fieldPreferences,
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),
                 mock(DialogService.class),
-                mock(BibEntryTypesManager.class),
+                entryTypesManager,
                 keyBindingRepository,
                 stateManager,
                 new BibTeXSyntaxHighlighter()
@@ -112,6 +124,35 @@ class SourceTabTest {
     }
 
     @Test
+    void replacingLongSourceWithShortSourceDoesNotThrowException(FxRobot robot) {
+        BibEntry longEntry = new BibEntry()
+                .withField(new UnknownField("author"), "Author")
+                .withField(new UnknownField("title"), "Title")
+                .withField(new UnknownField("year"), "2026")
+                .withField(new UnknownField("publisher"), "Publisher");
+        BibEntry shortEntry = new BibEntry().withField(new UnknownField("title"), "Short title");
+
+        robot.interact(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(longEntry);
+            sourceTab.notifyAboutFocus(longEntry);
+        });
+        robot.interrupt(100);
+
+        robot.interact(() -> {
+            sourceTab.currentEntryProperty().set(shortEntry);
+            sourceTab.notifyAboutFocus(shortEntry);
+        });
+        robot.interrupt(100);
+
+        robot.interact(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            assertTrue(sourceArea.getText().contains("title = {Short title}"));
+            assertFalse(sourceArea.getText().contains("publisher = {Publisher}"));
+        });
+    }
+
+    @Test
     void updatingPreviouslyBoundEntryDoesNotResetCurrentSource(FxRobot robot) {
         BibEntry firstEntry = new BibEntry().withField(new UnknownField("title"), "First entry");
         BibEntry secondEntry = new BibEntry().withField(new UnknownField("title"), "Second entry");
@@ -124,13 +165,59 @@ class SourceTabTest {
             sourceTab.currentEntryProperty().set(secondEntry);
             sourceTab.notifyAboutFocus(secondEntry);
 
-            jfx.incubator.scene.control.richtext.CodeArea sourceArea =
-                    (jfx.incubator.scene.control.richtext.CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
             sourceArea.clear();
             sourceArea.appendText("Unsaved source for the second entry");
 
             firstEntry.setField(new UnknownField("author"), "Author");
             assertEquals("Unsaved source for the second entry", sourceArea.getText());
+        });
+    }
+
+    @Test
+    void saveKeybindingWritesBackToRenderedEntryInsteadOfCurrentSelection(FxRobot robot) {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "First entry");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Second entry");
+
+        robot.interact(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(firstEntry);
+            sourceTab.notifyAboutFocus(firstEntry);
+        });
+        robot.interrupt(100);
+
+        robot.interact(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
+            sourceArea.clear();
+            sourceArea.appendText(editedSource);
+
+            // Simulate the selection model having advanced before the deferred tab refresh runs.
+            sourceTab.currentEntryProperty().set(secondEntry);
+            Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "s", "S", KeyCode.S, false, true, false, false));
+
+            assertEquals("Edited first entry", firstEntry.getField(StandardField.TITLE).orElseThrow());
+            assertEquals("Second entry", secondEntry.getField(StandardField.TITLE).orElseThrow());
+        });
+    }
+
+    @Test
+    void switchingToEqualContentEntryRebindsByIdentity(FxRobot robot) {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "Same title");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Same title");
+
+        robot.interact(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(firstEntry);
+            sourceTab.notifyAboutFocus(firstEntry);
+
+            sourceTab.currentEntryProperty().set(secondEntry);
+            sourceTab.notifyAboutFocus(secondEntry);
+            secondEntry.setField(StandardField.AUTHOR, "Author");
+
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            assertTrue(sourceArea.getText().contains("author = {Author}"));
+            assertTrue(sourceArea.getText().contains("title  = {Same title}"));
         });
     }
 }

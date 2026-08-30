@@ -28,7 +28,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.edit.ReplaceStringAction;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
+import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorAction;
 import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
@@ -78,7 +78,7 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
@@ -91,6 +91,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -110,7 +111,8 @@ public class MainMenu extends MenuBar {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final UndoManager undoManager;
+    private final GuiUndoManager guiUndoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
@@ -129,7 +131,8 @@ public class MainMenu extends MenuBar {
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
-                    CountingUndoManager undoManager,
+                    UndoManager undoManager,
+                    GuiUndoManager guiUndoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
@@ -149,6 +152,7 @@ public class MainMenu extends MenuBar {
         this.abbreviationRepository = abbreviationRepository;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
+        this.guiUndoManager = guiUndoManager;
         this.clipBoardManager = clipBoardManager;
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.aiService = aiService;
@@ -217,8 +221,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, guiUndoManager, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -315,7 +319,7 @@ public class MainMenu extends MenuBar {
 
                 // region file-related
                 factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(stateManager))
                 // endregion
         );
 
