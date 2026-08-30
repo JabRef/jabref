@@ -48,6 +48,6 @@ Details of the chosen design (implemented in `DuplicateCandidateGenerator`):
 
 ## More Information
 
-* Blocking as a technique: [Sample et al., Science Advances 2021](https://doi.org/10.1126/sciadv.abi8021)
+* Blocking as a technique: Sample et al., Science Advances 2021, `doi:10.1126/sciadv.abi8021`
 * Blocking rule references: [ASySD](https://github.com/camaradesuk/ASySD), [bib-dedupe](https://github.com/CoLRev-Environment/bib-dedupe) (evidence only; not ported)
 * Requirement: `req~logic.duplicates.candidate-blocking~1` in [docs/requirements/duplicates.md](../requirements/duplicates.md)

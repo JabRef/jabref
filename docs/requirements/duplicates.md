@@ -19,6 +19,6 @@ The number of candidate pairs stays far below the exhaustive `n * (n - 1) / 2`, 
 - Entries without any blocking key are compared with every other entry.
 - Libraries with at most 1000 entries keep the exhaustive all-pairs search and thus unchanged recall.
 
-Needs: impl
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
