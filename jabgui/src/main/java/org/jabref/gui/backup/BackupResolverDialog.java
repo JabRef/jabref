@@ -14,6 +14,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.logic.util.io.FileUtil;
 
 import org.controlsfx.control.HyperlinkLabel;
 import org.slf4j.Logger;
@@ -34,7 +35,11 @@ public class BackupResolverDialog extends FXDialog {
 
         Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
         String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));
+        String librarySize = FileUtil.getFileSize(originalPath).orElse(Localization.lang("Unknown"));
+        String backupSize = backupPathOpt.flatMap(FileUtil::getFileSize).orElse(Localization.lang("Unknown"));
         String content = Localization.lang("A backup file for '%0' was found at [%1]", originalPath.getFileName().toString(), backupFilename) + "\n" +
+                Localization.lang("Current library size: %0", librarySize) + "\n" +
+                Localization.lang("Backup size: %0", backupSize) + "\n" +
                 Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
                 Localization.lang("Do you want to recover the library from the backup file?");
         setContentText(content);
