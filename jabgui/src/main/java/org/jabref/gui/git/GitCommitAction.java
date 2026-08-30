@@ -46,13 +46,23 @@ public class GitCommitAction extends SimpleCommand {
     }
 
     private void commit(Path bibFilePath) {
+        // A library opened through a symlink must be handled as its real file: repository detection on
+        // the link path would misclassify it, and staging the link would commit only the symlink.
+        Path libraryFile;
+        try {
+            libraryFile = bibFilePath.toRealPath();
+        } catch (IOException e) {
+            LOGGER.warn("Could not resolve the library path {} — using it as given", bibFilePath, e);
+            libraryFile = bibFilePath.toAbsolutePath().normalize();
+        }
+
         // [impl->req~ux.git-commit.initialize-repository~1]
-        if (GitHandler.findRepositoryRoot(bibFilePath).isEmpty()) {
-            initRepository(bibFilePath);
+        if (GitHandler.findRepositoryRoot(libraryFile).isEmpty()) {
+            initRepository(libraryFile);
             return;
         }
 
-        if (hasNothingToCommit(bibFilePath)) {
+        if (hasNothingToCommit(libraryFile)) {
             dialogService.notify(Localization.lang("Nothing to commit."));
             return;
         }
@@ -64,20 +74,7 @@ public class GitCommitAction extends SimpleCommand {
 
     /// Offers to put a library that is not under version control into a fresh repository.
     /// Cancelling is a valid choice: the user may want to clone an existing repository into that folder instead.
-    private void initRepository(Path bibFilePath) {
-        Path libraryFile;
-        try {
-            // A library opened through a symlink must be committed as its real file — staging the
-            // link path would put only the symlink into the repository, not the bibliography.
-            libraryFile = bibFilePath.toRealPath();
-        } catch (IOException e) {
-            LOGGER.error("Could not resolve the library path {}", bibFilePath, e);
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Git Commit"),
-                    Localization.lang("Could not initialize a Git repository in %0.", bibFilePath.toAbsolutePath().getParent().toString()),
-                    e);
-            return;
-        }
+    private void initRepository(Path libraryFile) {
         Path directory = libraryFile.getParent();
         boolean initialize = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Git Commit"),

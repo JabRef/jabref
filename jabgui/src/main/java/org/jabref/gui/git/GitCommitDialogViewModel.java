@@ -143,7 +143,13 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
 
-        Path bibFilePath = bibFilePathOpt.get();
+        Path bibFilePath;
+        try {
+            // Resolve symlinks so root detection and repository-relative paths refer to the real file
+            bibFilePath = bibFilePathOpt.get().toRealPath();
+        } catch (IOException e) {
+            bibFilePath = bibFilePathOpt.get().toAbsolutePath().normalize();
+        }
         Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRootOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));

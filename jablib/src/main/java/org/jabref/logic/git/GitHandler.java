@@ -114,7 +114,7 @@ public class GitHandler {
         Path repositoryRoot = repositoryPath.toAbsolutePath().normalize();
         Path fileInRepository = fileToCommit.toAbsolutePath().normalize();
         if (!fileInRepository.startsWith(repositoryRoot)) {
-            throw new IllegalArgumentException("%s is not inside the repository root %s".formatted(fileInRepository, repositoryRoot));
+            throw new JabRefException("%s is not inside the repository root %s".formatted(fileInRepository, repositoryRoot));
         }
         Path gitignore = repositoryRoot.resolve(".gitignore");
         // NOFOLLOW_LINKS: a dangling .gitignore symlink is still a pre-existing user-owned entry that rollback must not delete

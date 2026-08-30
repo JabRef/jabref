@@ -128,6 +128,18 @@ class GitHandlerTest {
 
     // [utest->req~ux.git-commit.initialize-repository~1]
     @Test
+    void initAndCommitRejectsAFileOutsideTheRepository(@TempDir Path otherDirectory) throws Exception {
+        Path libraryFile = otherDirectory.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        assertThrows(JabRefException.class, () -> handler.initAndCommit(libraryFile));
+
+        assertFalse(Files.exists(libraryPath.resolve(".git")));
+    }
+
+    // [utest->req~ux.git-commit.initialize-repository~1]
+    @Test
     void initAndCommitTracksANestedFile() throws Exception {
         Path libraryFile = Files.createDirectory(libraryPath.resolve("sub")).resolve("library.bib");
         Files.writeString(libraryFile, "@Article{test,}");
