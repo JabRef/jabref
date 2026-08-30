@@ -94,13 +94,14 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, "Review Backup"
+                        originalDatabase, Localization.lang("Review backup")
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
-                        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
-                if (allChangesResolved.get()) {
+                if (allChangesResolved.orElse(false)) {
+                    List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
+                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                    undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                            resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();

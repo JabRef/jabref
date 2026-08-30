@@ -30,6 +30,7 @@ import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
+import org.jabref.logic.openoffice.oocsltext.MissingStyleDefinedCitationLabelException;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -810,6 +811,8 @@ public class OOBibBase {
                 try {
                     bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
                     return OOVoidResult.ok();
+                } catch (MissingStyleDefinedCitationLabelException e) {
+                    return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
                 } catch (CreationException | com.sun.star.uno.Exception e) {
                     return OOVoidResult.error(OOError.fromMisc(e));
                 }
@@ -1162,6 +1165,8 @@ public class OOBibBase {
             try {
                 bstUpdateBibliography.rebuildBstBibliography(
                         doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
+            } catch (MissingStyleDefinedCitationLabelException e) {
+                return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
             } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));

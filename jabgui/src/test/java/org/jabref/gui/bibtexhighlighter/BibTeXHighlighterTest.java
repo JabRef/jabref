@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -82,5 +83,24 @@ class BibTeXHighlighterTest {
 
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1");
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1\nline2");
+    }
+
+    @Test
+    void createRichParagraphIgnoresStaleParagraphAfterClearingTheModel() {
+        when(model.size()).thenReturn(5);
+        for (int index = 0; index < 5; index++) {
+            when(model.getPlainText(index)).thenReturn("line" + index);
+        }
+        when(syntaxHighlighter.computeHighlightRegions("line0\nline1\nline2\nline3\nline4")).thenReturn(List.of());
+
+        highlighter.createRichParagraph(model, 4);
+
+        when(model.size()).thenReturn(1);
+        when(model.getPlainText(0)).thenReturn("");
+        when(model.getPlainText(4)).thenThrow(new AssertionError("Stale paragraph access should be guarded"));
+        when(syntaxHighlighter.computeHighlightRegions("")).thenReturn(List.of());
+        highlighter.handleChange(model, null, null, 0, 0, 0);
+
+        assertDoesNotThrow(() -> highlighter.createRichParagraph(model, 4));
     }
 }
