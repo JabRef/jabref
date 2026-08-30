@@ -128,6 +128,20 @@ class GitHandlerTest {
 
     // [utest->req~ux.git-commit.initialize-repository~1]
     @Test
+    void initAndCommitTracksANestedFile() throws Exception {
+        Path libraryFile = Files.createDirectory(libraryPath.resolve("sub")).resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        GitHandler handler = new GitHandler(libraryPath, mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        handler.initAndCommit(libraryFile);
+
+        try (Git git = Git.open(libraryPath.toFile())) {
+            assertEquals(Set.of(".gitignore", "sub/library.bib"), committedPaths(git));
+        }
+    }
+
+    // [utest->req~ux.git-commit.initialize-repository~1]
+    @Test
     void initAndCommitRemovesItsTracesWhenTheFileIsIgnored() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");
         Files.writeString(libraryFile, "@Article{test,}");

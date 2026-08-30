@@ -110,9 +110,15 @@ public class GitHandler {
         if (isGitRepository()) {
             throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
         }
-        Path gitignore = repositoryPath.resolve(".gitignore");
+        Path repositoryRoot = repositoryPath.toAbsolutePath().normalize();
+        Path fileInRepository = fileToCommit.toAbsolutePath().normalize();
+        if (!fileInRepository.startsWith(repositoryRoot)) {
+            throw new IllegalArgumentException("%s is not inside the repository root %s".formatted(fileInRepository, repositoryRoot));
+        }
+        Path gitignore = repositoryRoot.resolve(".gitignore");
         boolean gitignoreExisted = Files.exists(gitignore);
-        String pathInRepository = repositoryPath.relativize(fileToCommit.toAbsolutePath()).toString();
+        // The Git index always uses forward slashes, independent of the platform
+        String pathInRepository = repositoryRoot.relativize(fileInRepository).toString().replace('\\', '/');
         try (Git git = Git.init()
                           .setDirectory(repositoryPathAsFile)
                           .setInitialBranch("main")
@@ -134,7 +140,7 @@ public class GitHandler {
         } catch (IOException | GitAPIException | JabRefException e) {
             LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
             try {
-                FileUtils.delete(repositoryPath.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
+                FileUtils.delete(repositoryRoot.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
                 if (!gitignoreExisted) {
                     Files.deleteIfExists(gitignore);
                 }
