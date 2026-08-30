@@ -533,7 +533,10 @@ public class GroupNodeViewModel {
 
     public boolean hasAllSuggestedGroups() {
         return hasSimilarSearchGroup(GroupsFactory.createWithoutFilesGroup())
-                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup());
+                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup())
+                && GroupsFactory.findMarkingNode(getGroupNode())
+                                .map(GroupsFactory::hasAllSuggestedSubgroups)
+                                .orElse(false);
     }
 
     public boolean canAddEntriesIn() {

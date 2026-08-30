@@ -242,6 +242,38 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 newSuggestedSubgroups.add(subGroup);
             }
 
+            Optional<GroupTreeNode> markingNodeOpt = GroupsFactory.findMarkingNode(rootNode);
+            if (markingNodeOpt.isEmpty()) {
+                GroupTreeNode markingNode = GroupsFactory.createMarkingNode(
+                        preferences.getBibEntryPreferences().getKeywordSeparator());
+                rootNode.addChild(markingNode);
+                newSuggestedSubgroups.addAll(markingNode.getChildren());
+            } else {
+                GroupTreeNode markingNode = markingNodeOpt.get();
+                for (GroupsFactory.SuggestedGroupStructure structure : GroupsFactory.getSuggestedSubgroups()) {
+                    ExplicitGroup parentGroup = structure.parent();
+                    List<SearchGroup> subgroups = structure.subgroups();
+
+                    String parentDescription = parentGroup.getDescription().orElse("");
+                    Optional<GroupTreeNode> parentNodeOpt = GroupsFactory.findGroupByDescription(markingNode, parentDescription);
+                    if (parentNodeOpt.isEmpty()) {
+                        GroupTreeNode parentNode = markingNode.addSubgroup(parentGroup);
+                        subgroups.forEach(parentNode::addSubgroup);
+                        newSuggestedSubgroups.add(parentNode);
+                    } else {
+                        GroupTreeNode parentNode = parentNodeOpt.get();
+                        for (SearchGroup subgroup : subgroups) {
+                            String subgroupDescription = subgroup.getDescription().orElse("");
+                            Optional<GroupTreeNode> subgroupNodeOpt = GroupsFactory.findGroupByDescription(parentNode, subgroupDescription);
+                            if (subgroupNodeOpt.isEmpty()) {
+                                GroupTreeNode missingSubgroup = parentNode.addSubgroup(subgroup);
+                                newSuggestedSubgroups.add(missingSubgroup);
+                            }
+                        }
+                    }
+                }
+            }
+
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
                     .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
