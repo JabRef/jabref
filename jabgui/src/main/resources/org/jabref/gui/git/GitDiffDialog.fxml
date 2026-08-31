@@ -30,11 +30,10 @@
                                 <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </padding>
-                                <RadioButton fx:id="highlightWordsRadioButton" mnemonicParsing="false" selected="true" text="%Highlight words">
-                                    <toggleGroup>
-                                        <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
-                                    </toggleGroup>
-                                </RadioButton>
+                                <fx:define>
+                                    <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
+                                </fx:define>
+                                <RadioButton fx:id="highlightWordsRadioButton" mnemonicParsing="false" selected="true" text="%Highlight words" toggleGroup="$diffHighlightingMethodToggleGroup" />
                                 <RadioButton fx:id="highlightCharactersRadioButton" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
                             </HBox>
                         </top>
