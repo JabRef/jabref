@@ -29,6 +29,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
     @FXML private TextArea commitMessage;
     @FXML private ButtonType commitButton;
+    @FXML private ButtonType commitAndPushButton;
 
     private GitCommitDialogViewModel viewModel;
 
@@ -63,7 +64,11 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
-                viewModel.commit(this::close);
+                if (button == commitAndPushButton) {
+                    viewModel.commitAndPush(this::close);
+                } else {
+                    viewModel.commit(this::close);
+                }
             }
             return null;
         });
