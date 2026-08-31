@@ -73,6 +73,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
@@ -85,6 +87,8 @@ import org.jspecify.annotations.Nullable;
 /// field-name box at the bottom adds arbitrary fields.
 @NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
     /// (instead of the JavaFX TextArea default of 10).
@@ -233,17 +237,21 @@ public class AllFieldsTab extends FieldsEditorTab {
                 guiPreferences.getExternalApplicationsPreferences(),
                 guiPreferences.getFilePreferences(),
                 guiPreferences.getAutoLinkPreferences());
+        Optional<String> keyAtProbeStart = entry.getCitationKey();
         BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
                       .onSuccess(foundFiles -> {
                           // subscribedEntry is cleared on dispose() and replaced on entry switch,
-                          // so this also invalidates callbacks that outlive the tab.
+                          // so this also invalidates callbacks that outlive the tab. The citation
+                          // key comparison drops results of probes started for a stale key.
                           if (!foundFiles.isEmpty()
                                   && subscribedEntry.filter(current -> current == entry).isPresent()
+                                  && entry.getCitationKey().equals(keyAtProbeStart)
                                   && !editors.containsKey(StandardField.FILE)) {
                               userAddedFields.add(StandardField.FILE);
                               rebuildPanel(databaseContext, entry);
                           }
                       })
+                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(""), exception))
                       .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 

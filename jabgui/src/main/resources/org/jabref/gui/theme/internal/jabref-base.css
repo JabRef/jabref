@@ -344,7 +344,7 @@
    Deliberately not -color-warning-subtle: orange signals "linked but not found".
    -color-selection-inactive is a neutral gray that stays readable in dark themes,
    where a translucent black fill would sink into the panel background. */
-.file-row:auto-found {
+.linked-files-list .list-cell:auto-found {
     -fx-background-color: -color-selection-inactive;
     -fx-background-radius: 4px;
 }

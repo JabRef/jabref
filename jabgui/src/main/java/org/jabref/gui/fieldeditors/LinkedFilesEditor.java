@@ -158,6 +158,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withPseudoClass(PseudoClass.getPseudoClass("auto-found"), LinkedFileViewModel::isAutomaticallyFoundProperty)
                 .withGraphic(this::createFileDisplay)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -309,9 +310,6 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         HBox container = new HBox(2);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        container.getStyleClass().add("file-row");
-        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(),
-                found -> container.pseudoClassStateChanged(PseudoClass.getPseudoClass("auto-found"), found));
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
