@@ -56,15 +56,21 @@ public final class LocalFulltextAttacher {
         // shouldMove=true, shouldRenameToFilenamePattern=true — same fate a successful HTTP download
         // would have via DownloadLinkedFileAction.
         BackgroundTask
-                .wrap(() -> {
-                    handler.copyOrMoveToDefaultDirectory(true, true);
-                    return linkedFile;
+                .wrap(() -> handler.copyOrMoveToDefaultDirectory(true, true))
+                .onSuccess(moved -> {
+                    if (moved) {
+                        entry.addFile(linkedFile);
+                    } else {
+                        // No library file directory, or the source file could not be located: the link
+                        // would point at the un-moved absolute path, so do not persist a broken link.
+                        LOGGER.warn("Could not move fetcher-returned file {} into the library directory", sourcePath);
+                        notificationService.notify(Localization.lang("Could not move file '%0'.", sourcePath.toString()));
+                    }
                 })
-                .onSuccess(entry::addFile)
                 .onFailure(e -> {
                     LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
                             sourcePath, e);
-                    entry.addFile(linkedFile);
+                    notificationService.notify(Localization.lang("Could not move file '%0'.", sourcePath.toString()));
                 })
                 .executeWith(taskExecutor);
     }
