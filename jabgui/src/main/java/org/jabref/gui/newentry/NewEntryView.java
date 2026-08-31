@@ -389,6 +389,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
         // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
+        // [impl->req~ux.textdialogs.focus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (URLUtil.isURL(clipboardText)) {
             // [impl->req~ux.textdialogs.autopaste~1]
@@ -401,6 +402,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
+        // [impl->req~ux.textdialogs.focus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
