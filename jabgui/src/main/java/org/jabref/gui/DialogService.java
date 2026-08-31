@@ -235,8 +235,13 @@ public interface DialogService extends NotificationService {
     /// Shows a new file open dialog. The method doesn't return until the
     /// displayed open dialog is dismissed.
     ///
+    /// Use this overload when the file chooser is opened from a dialog other than the main
+    /// window: with the main window as owner, closing the chooser returns focus to the main
+    /// window instead of the calling dialog (observed on macOS), hiding the dialog behind it.
+    ///
     /// @param fileDialogConfiguration configuration for the file open dialog
-    /// @param owner                   the window that owns the file open dialog
+    /// @param owner                   the window that owns the file open dialog and regains
+    ///                                focus after it closes; typically the calling dialog's window
     /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner);
 
