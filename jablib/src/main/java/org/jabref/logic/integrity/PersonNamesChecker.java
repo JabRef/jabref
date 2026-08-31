@@ -26,7 +26,10 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        String valueTrimmedAndLowerCase = value.trim().toLowerCase(Locale.ROOT);
+        // Stored field values may be wrapped over several lines; the wrapping whitespace is not part of the names
+        String normalizedValue = value.trim().replaceAll("\\s+", " ");
+
+        String valueTrimmedAndLowerCase = normalizedValue.toLowerCase(Locale.ROOT);
         if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
             return Optional.of(Localization.lang("should start with a name"));
         } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
@@ -34,12 +37,12 @@ public class PersonNamesChecker implements ValueChecker {
         }
 
         // Check format with brackets first to support protected institutional authors
-        if (isStandardFormat(value)) {
+        if (isStandardFormat(normalizedValue)) {
             return Optional.empty();
         }
 
         // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
-        String valueWithoutBrackets = new RemoveBrackets().format(value);
+        String valueWithoutBrackets = new RemoveBrackets().format(normalizedValue);
 
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...

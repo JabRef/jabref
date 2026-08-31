@@ -50,7 +50,9 @@ class PersonNamesCheckerTest {
                 "{JabRef} and Stefan Kolb",         // mixed corporate name with name
                 "{JabRef} and Kolb, Stefan",
 
-                "hugo Para{\\~n}os"                 // tilde in name
+                "hugo Para{\\~n}os",                // tilde in name
+
+                "Kolb, Stefan\n               and Harrer, Simon" // value wrapped over several lines
         );
     }
 
@@ -82,12 +84,12 @@ class PersonNamesCheckerTest {
         return Stream.of(
                 "",
                 "Knuth",
-                "Donald E. Knuth and Kurt Cobain and A. Einstein");
+                "Donald E. Knuth and Kurt Cobain and A. Einstein",
+                "   Knuth, Donald E. ");
     }
 
     private static Stream<String> provideIncorrectFormats() {
         return Stream.of(
-                "   Knuth, Donald E. ",
                 "Knuth, Donald E. and Kurt Cobain and A. Einstein",
                 ", and Kurt Cobain and A. Einstein",
                 "Donald E. Knuth and Kurt Cobain and ,",
