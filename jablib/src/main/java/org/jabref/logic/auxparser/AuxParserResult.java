@@ -9,6 +9,9 @@ import java.util.Set;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class AuxParserResult {
 
     private final BibDatabase masterDatabase;

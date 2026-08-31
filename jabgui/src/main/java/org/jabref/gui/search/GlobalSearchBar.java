@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -53,12 +51,14 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
@@ -171,12 +171,12 @@ public class GlobalSearchBar extends HBox {
             searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
         });
 
-        regexButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
-        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
-        fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
-        openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
-        keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
-        filterModeButton = IconTheme.JabRefIcons.FILTER.asToggleButton();
+        regexButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.REG_EX);
+        caseSensitiveButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.CASE_SENSITIVE);
+        fulltextButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.FULLTEXT);
+        openGlobalSearchButton = ControlHelper.iconButton(IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH);
+        keepSearchString = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.KEEP_SEARCH_STRING);
+        filterModeButton = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.FILTER);
 
         initSearchModifierButtons();
 

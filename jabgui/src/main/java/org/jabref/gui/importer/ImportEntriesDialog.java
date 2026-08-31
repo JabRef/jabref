@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -35,10 +33,12 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -46,21 +46,26 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.richtext.CodeArea;
+import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML private HBox paginationBox;
@@ -86,6 +91,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final Optional<SearchBasedFetcher> searchBasedFetcher;
     private final Optional<String> query;
 
+    /// Optional group the imported entries should be assigned to (e.g. supplied via the REST
+    /// `?group=` parameter). It pre-selects the matching group in the picker and acts as the
+    /// fallback when the user does not pick an explicit group: in that case the import creates the
+    /// group (if missing) and assigns the entries. An explicit selection in the picker overrides it.
+    /// The group is only ever created on confirm, so cancelling imports nothing.
+    private final @Nullable String targetGroup;
+
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
@@ -93,6 +105,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     /// Creates an import dialog for entries from file sources.
     /// This constructor is used for importing entries from local files, BibTeX files,
@@ -101,8 +114,20 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     /// @param database the database to import into
     /// @param task     the task executed for parsing the selected files(s).
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
+        this(database, task, null);
+    }
+
+    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and
+    /// assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()}
+    /// / {@link #getImportTarget()}).
+    ///
+    /// @param database    the database to import into
+    /// @param task        the task executed for parsing the selected files(s).
+    /// @param targetGroup name of the group to pre-select, or {@code null} for none
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup) {
         this.database = database;
         this.task = task;
+        this.targetGroup = targetGroup;
         this.searchBasedFetcher = Optional.empty();
         this.query = Optional.empty();
 
@@ -119,6 +144,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;
+        this.targetGroup = null;
         this.searchBasedFetcher = Optional.of(fetcher);
         this.query = Optional.of(query);
 
@@ -170,7 +196,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
                 .withGraphic(entry -> {
-                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
                     EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
                         if (selected) {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
@@ -262,6 +288,15 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             groupListView.getItems().add(noGroup);
             groupListView.getSelectionModel().select(noGroup);
         }
+
+        // Pre-select an existing group matching the requested name (e.g. REST `?group=`). A group
+        // that does not exist yet is created by the caller on confirm, so there is nothing to select.
+        if (StringUtil.isNotBlank(targetGroup)) {
+            groupListView.getItems().stream()
+                         .filter(node -> node.getName().equalsIgnoreCase(targetGroup))
+                         .findFirst()
+                         .ifPresent(groupListView.getSelectionModel()::select);
+        }
     }
 
     private void collectGroupsFromTree(GroupTreeNode parent, List<GroupTreeNode> groupList) {
@@ -287,14 +322,23 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == importButton) {
-                if (groupListView.getItems().size() > 1) {
-                    // 1 is the "All entries" group, so if more than 1, we have groups defined
-                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(stateManager.getActiveDatabase().orElse(null)).getFirst();
-                    stateManager.setSelectedGroups(libraryListView.getSelectionModel().getSelectedItem(), List.of(groupListView.getSelectionModel().getSelectedItem()));
-                    viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
-                    stateManager.setSelectedGroups(stateManager.getActiveDatabase().orElse(null), List.of(prevSelectedGroup));
+                List<BibEntry> selectedEntries = viewModel.getCheckedEntries().stream().toList();
+                GroupTreeNode selectedGroup = groupListView.getSelectionModel().getSelectedItem();
+                if (selectedGroup != null && selectedGroup.getGroup() instanceof ExplicitGroup) {
+                    // The user picked an existing explicit group; assign to it via the selected-groups
+                    // mechanism. An explicit pick overrides any REST-requested group.
+                    // Use the dialog's selected library (the one entries are imported into), not the
+                    // active database: getSelectedGroups/setSelectedGroups dereference the context, so
+                    // it must be non-null and must match the library whose selection we restore.
+                    BibDatabaseContext selectedDatabaseContext = libraryListView.getSelectionModel().getSelectedItem();
+                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(selectedDatabaseContext).getFirst();
+                    stateManager.setSelectedGroups(selectedDatabaseContext, List.of(selectedGroup));
+                    viewModel.importEntries(selectedEntries, downloadLinkedOnlineFiles.isSelected());
+                    stateManager.setSelectedGroups(selectedDatabaseContext, List.of(prevSelectedGroup));
                 } else {
-                    viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
+                    // No explicit group picked: fall back to the REST-requested group, creating it
+                    // (top-level) if it does not exist yet. Null/blank means "no group".
+                    viewModel.importEntries(selectedEntries, downloadLinkedOnlineFiles.isSelected(), targetGroup);
                 }
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
@@ -409,8 +453,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
-            bibTeXData.moveTo(0);
-            bibTeXData.requestFollowCaret();
+            bibTeXData.moveDocumentStart();
         } else {
             bibTeXData.clear();
         }
@@ -424,6 +467,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
+        bibTeXData.setSyntaxDecorator(new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter));
     }
 
     public void unselectAll() {

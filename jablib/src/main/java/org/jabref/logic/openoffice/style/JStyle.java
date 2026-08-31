@@ -35,6 +35,7 @@ import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
 import org.jspecify.annotations.NonNull;
@@ -595,7 +596,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// The String to add between author names except the last two:
-    /// "[Smith{, }Jones and Brown]"
+    /// `"[Smith{, }Jones and Brown]"`
     protected String getAuthorSeparator() {
         return getStringCitProperty(JStyle.AUTHOR_SEPARATOR);
     }
@@ -676,7 +677,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// @return The text for the citation.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
@@ -684,14 +685,14 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// For some tests we need to override minGroupingCount.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
                                         int minGroupingCount) {
-        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
 
     /// Format a number-based bibliography label for the given number.
     public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
-        return JStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
+        return JStyleGetNumericCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
@@ -722,6 +723,18 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         return JStyleGetCitationMarker.createCitationMarker(this,
                 citationMarkerEntries,
                 inParenthesis,
+                nonUniqueCitationMarkerHandling);
+    }
+
+    /// As [#createCitationMarker(List, boolean, NonUniqueCitationMarker)], but takes the
+    /// presentation from the citation type of the group, so that the partial and bracket-less
+    /// citation types of <https://github.com/JabRef/jabref/issues/7861> are handled as well.
+    public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
+                                       CitationType citationType,
+                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+        return JStyleGetCitationMarker.createCitationMarker(this,
+                citationMarkerEntries,
+                citationType,
                 nonUniqueCitationMarkerHandling);
     }
 

@@ -35,6 +35,10 @@ public class EditorTextField extends TextField implements Initializable, Context
 
         // Always fill out all the available space
         setPrefHeight(Double.POSITIVE_INFINITY);
+        // Detach the reported preferred width from the current text's length (JavaFX's default
+        // TextField.computePrefWidth grows with content) so Hgrow/fillWidth fill the available
+        // space instead of growing the field - and its containers - to fit long values.
+        setPrefWidth(1);
         HBox.setHgrow(this, Priority.ALWAYS);
 
         ClipBoardManager.addX11Support(this);

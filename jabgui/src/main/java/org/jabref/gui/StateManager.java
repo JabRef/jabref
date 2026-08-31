@@ -10,14 +10,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.SrvStateManager;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,6 +26,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBinding;
+import org.jspecify.annotations.NonNull;
 
 /// This class manages the GUI-state of JabRef, including:
 ///
@@ -52,7 +53,7 @@ public interface StateManager extends SrvStateManager {
 
     IntegerProperty searchResultSize(SearchType type);
 
-    void setIndexManager(BibDatabaseContext database, IndexManager indexManager);
+    void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
 
     void setSelectedEntries(List<BibEntry> newSelectedEntries);
 
@@ -63,6 +64,8 @@ public interface StateManager extends SrvStateManager {
     void clearSelectedGroups(BibDatabaseContext context);
 
     void setActiveDatabase(BibDatabaseContext database);
+
+    void replaceActiveDatabase(@NonNull BibDatabaseContext database);
 
     OptionalObjectProperty<Node> focusOwnerProperty();
 
@@ -88,7 +91,11 @@ public interface StateManager extends SrvStateManager {
 
     void clearSearchHistory();
 
-    List<AiChatWindow> getAiChatWindows();
+    Optional<AiGroupChatWindow> getAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow);
+
+    void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
 
     BooleanProperty getEditorShowing();
 

@@ -19,20 +19,24 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
+import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,7 +53,6 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 
 import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.data.message.ChatMessage;
 import org.jspecify.annotations.NonNull;
 
 public class GroupTreeViewModel extends AbstractViewModel {
@@ -60,7 +63,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final AiService aiService;
     private final GuiPreferences preferences;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final BibEntryTypesManager entryTypesManager;
@@ -90,7 +92,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull GuiPreferences preferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
-                              @NonNull AdaptVisibleTabs adaptVisibleTabs,
                               @NonNull CustomLocalDragboard localDragboard,
                               @NonNull TaskExecutor taskExecutor
     ) {
@@ -100,7 +101,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.adaptVisibleTabs = adaptVisibleTabs;
         this.localDragboard = localDragboard;
         this.taskExecutor = taskExecutor;
 
@@ -196,11 +196,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
                 selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                // panel.getUndoManager().addEdit(undo);
+                // panel.getUndoManager().addEdit(undo.toChangeSet());
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
@@ -282,7 +283,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
-            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) newGroup;
 
             return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
                     && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
@@ -408,13 +409,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // AbstractUndoableEdit undoAddPreviousEntries = null;
                 // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 // if (undoAddPreviousEntries == null) {
-                //    panel.getUndoManager().addEdit(undo);
+                //    panel.getUndoManager().push(undo.toChangeSet());
                 // } else {
-                //    NamedCompound nc = new NamedCompound("Modify Group");
-                //    nc.addEdit(undo);
-                //    nc.addEdit(undoAddPreviousEntries);
-                //    nc.end();/
-                //      panel.getUndoManager().addEdit(nc);
+                //    Compound compound = new Compound("Modify Group");
+                //    compound.addEdit(undo);
+                //    compound.addEdit(undoAddPreviousEntries);
+                //    compound.end();/
+                //      panel.getUndoManager().push(compound.toChangeSet());
                 // }
                 // if (!addChange.isEmpty()) {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
@@ -431,48 +432,36 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void chatWithGroup(GroupNodeViewModel group) {
         assert currentDatabase.isPresent();
 
-        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
+        BibDatabaseContext context = currentDatabase.get();
+        String groupName = group.getGroupNode().getGroup().getName();
 
-        // We localize the name here, because it is used as the title of the window.
-        // See documentation for {@link AiChatGuardedComponent#name}.
-        StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
-        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
-
-        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(currentDatabase.get(), group.getGroupNode());
-        ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
-
-        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
-    }
-
-    private void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
-        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+        Optional<AiGroupChatWindow> existingWindow = stateManager.getAiChatWindowForGroup(context, groupName);
 
         if (existingWindow.isPresent()) {
-            existingWindow.get().requestFocus();
-        } else {
-            AiChatWindow aiChatWindow = new AiChatWindow(
-                    entryTypesManager,
-                    preferences.getAiPreferences(),
-                    fieldPreferences,
-                    preferences.getExternalApplicationsPreferences(),
-                    aiService,
-                    dialogService,
-                    adaptVisibleTabs,
-                    taskExecutor
-            );
-
-            aiChatWindow.setOnCloseRequest(event ->
-                    stateManager.getAiChatWindows().remove(aiChatWindow)
-            );
-
-            stateManager.getAiChatWindows().add(aiChatWindow);
-            dialogService.showCustomWindow(aiChatWindow);
-            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
-            aiChatWindow.requestFocus();
+            BaseDialog.bringToFront(existingWindow.get());
+            return;
         }
+
+        AiGroupChatWindow aiChatWindow = new AiGroupChatWindow();
+        aiChatWindow.databaseContextProperty().set(context);
+        aiChatWindow.groupNodeProperty().set(group);
+
+        aiChatWindow.getDialogPane().getScene().getWindow().addEventHandler(
+                WindowEvent.WINDOW_CLOSE_REQUEST,
+                _ -> stateManager.removeAiChatWindowForGroup(context, groupName)
+        );
+
+        stateManager.setAiChatWindowForGroup(context, groupName, aiChatWindow);
+
+        dialogService.showCustomDialogModal(aiChatWindow);
+        BaseDialog.bringToFront(aiChatWindow);
     }
 
     public void generateEmbeddings(GroupNodeViewModel groupNode) {
+        if (!preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
+            return;
+        }
+
         assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
@@ -486,16 +475,27 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .flatMap(entry -> entry.getFiles().stream())
                 .toList();
 
-        aiService.getIngestionService().ingest(
-                group.nameProperty(),
-                linkedFiles,
-                currentDatabase.get()
-        );
+        aiService.getIngestionTaskAggregator()
+                 .start(new GenerateEmbeddingsForSeveralTaskRequest(
+                         preferences.getFilePreferences(),
+                         aiService.getIngestedDocumentsRepository(),
+                         aiService.getEmbeddingsStore(),
+                         aiService.getCurrentEmbeddingModel(),
+                         aiService.getCurrentDocumentSplitter(),
+                         currentDatabase.get(),
+                         group.nameProperty(),
+                         linkedFiles,
+                         taskExecutor
+                 ));
 
         dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
     }
 
     public void generateSummaries(GroupNodeViewModel groupNode) {
+        if (!preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
+            return;
+        }
+
         assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
@@ -508,10 +508,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .filter(group::isMatch)
                 .toList();
 
-        aiService.getSummariesService().summarize(
-                group.nameProperty(),
-                entries,
-                currentDatabase.get()
+        entries.forEach(entry ->
+                aiService.getSummarizationTaskAggregator().start(
+                        new GenerateSummaryTaskRequest(
+                                preferences.getFilePreferences(),
+                                aiService.getCurrentChatModel(),
+                                aiService.getCurrentSummarizator(),
+                                new FullBibEntry(currentDatabase.get(), entry),
+                                false
+                        )
+                )
         );
 
         dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
@@ -524,7 +530,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmation) {
             // TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
             for (GroupNodeViewModel child : group.getChildren()) {
                 removeGroupsAndSubGroupsFromEntries(child);
             }
@@ -551,7 +557,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -589,7 +595,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().push(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -624,7 +630,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_WITHOUT_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
+            // panel.getUndoManager().addEdit(undo.toChangeSet());
 
             List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
@@ -672,7 +678,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // TODO: Add undo
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
         // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
-        // panel.getUndoManager().addEdit(undoAll);
+        // panel.getUndoManager().addEdit(undoAll.toChangeSet());
 
         // TODO Display massages
         // if (undo == null) {
@@ -680,7 +686,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         //            node.getGroup().getName()));
         //    return;
         // }
-        // panel.getUndoManager().addEdit(undo);
+        // panel.getUndoManager().addEdit(undo.toChangeSet());
         // final String groupName = node.getGroup().getName();
         // if (assignedEntries == 1) {
         //    frame.output(Localization.lang("Assigned 1 entry to group \"%0\".", groupName));
@@ -699,7 +705,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // TODO: Add undo
         // if (!undo.isEmpty()) {
-        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo).toChangeSet());
     }
 
     public void clearGroup(GroupNodeViewModel group) {

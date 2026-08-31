@@ -48,7 +48,7 @@ public class LspLauncher extends Thread {
     }
 
     public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, int port) {
-        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), cliPreferences.getCustomEntryTypesRepository(), port);
+        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getAbbreviationPreferences()), cliPreferences.getCustomEntryTypesRepository(), port);
     }
 
     public LspLauncher(JabRefCliPreferences instance, Integer port) {
@@ -83,8 +83,7 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager);
-        clientHandler.setStandalone(standalone);
+        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, true);
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();

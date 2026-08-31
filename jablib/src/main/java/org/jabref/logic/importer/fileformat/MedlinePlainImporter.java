@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.medline.MeshHeading;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
@@ -96,6 +97,7 @@ public class MedlinePlainImporter extends Importer {
             StringBuilder editor = new StringBuilder();
             StringBuilder comment = new StringBuilder();
             Map<Field, String> fieldConversionMap = new HashMap<>();
+            String keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
 
             String[] lines = entry1.split("\n");
 
@@ -190,14 +192,14 @@ public class MedlinePlainImporter extends Importer {
                          "IR",
                          "FIR" ->
                             fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
-                    case "MH",
-                         "OT" -> {
-                        if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
-                            fieldConversionMap.put(StandardField.KEYWORDS, value);
-                        } else {
-                            fieldConversionMap.compute(StandardField.KEYWORDS, (k, kw) -> kw + importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " " + value);
-                        }
+                    case "MH" -> {
+                        String meshString = String.join(keywordSeparator, parseMeshTerm(value));
+                        fieldConversionMap.merge(StandardField.KEYWORDS, meshString,
+                                (existing, newVal) -> existing + keywordSeparator + newVal);
                     }
+                    case "OT" ->
+                            fieldConversionMap.merge(StandardField.KEYWORDS, value,
+                                    (existing, newVal) -> existing + keywordSeparator + newVal);
                     case "CON",
                          "CIN",
                          "EIN",
@@ -394,6 +396,28 @@ public class MedlinePlainImporter extends Importer {
         } else if ("MHDA".equals(lab) && isCreateDateFormat(val)) {
             hm.put(new UnknownField("mesh-date"), val);
         }
+    }
+
+    /// Parses a MeSH term from MEDLINE plain format (e.g. {@code *Kidney Diseases/diagnosis/epidemiology})
+    /// into a {@link MeshHeading} and renders it as individual keywords
+    /// (e.g. {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}).
+    private List<String> parseMeshTerm(String meshTerm) {
+        String term = meshTerm.trim();
+        boolean descriptorMajor = term.startsWith("*");
+        if (descriptorMajor) {
+            term = term.substring(1);
+        }
+        String[] parts = term.split("/");
+        List<MeshHeading.QualifierName> qualifiers = new ArrayList<>();
+        for (int i = 1; i < parts.length; i++) {
+            String qualifier = parts[i];
+            boolean qualifierMajor = qualifier.startsWith("*");
+            if (qualifierMajor) {
+                qualifier = qualifier.substring(1);
+            }
+            qualifiers.add(new MeshHeading.QualifierName(qualifier, qualifierMajor));
+        }
+        return new MeshHeading(parts[0], descriptorMajor, qualifiers).toKeywords();
     }
 
     private boolean isCreateDateFormat(String value) {

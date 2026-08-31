@@ -86,7 +86,10 @@ public class DeleteFileAction extends SimpleCommand {
 
         int numberOfLinkedFiles = filesToDelete.size();
 
-        dialogDescription = Localization.lang("How should these files be handled?");
+        // Undo covers the bibliography, not the file system: it can put the link back, and the
+        // file it points at stays wherever this dialog leaves it.
+        dialogDescription = Localization.lang("How should these files be handled?")
+                + "\n" + Localization.lang("Undo does not restore files removed from disk.");
         if (numberOfLinkedFiles != 1) {
             dialogTitle = Localization.lang("Delete %0 files", numberOfLinkedFiles);
         } else {
@@ -140,9 +143,7 @@ public class DeleteFileAction extends SimpleCommand {
         warning.setGlyphSize(24.0);
         Label header = new Label(description, warning);
         header.setWrapText(true);
-        header.setStyle("""
-                -fx-padding: 10px;
-                -fx-background-color: -fx-background;""");
+        header.getStyleClass().add("delete-files-dialog");
 
         ListView<LinkedFileViewModel> filesToDeleteList = new ListView<>(FXCollections.observableArrayList(filesToDelete));
         new ViewModelListCellFactory<LinkedFileViewModel>()

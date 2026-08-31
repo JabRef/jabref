@@ -52,6 +52,7 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final int BATCH_REPLACEMENT_THRESHOLD = 10;
 
     /// State attributes
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
@@ -113,6 +114,11 @@ public class BibDatabase {
 
     public ObservableList<BibEntry> getEntries() {
         return FXCollections.unmodifiableObservableList(entries);
+    }
+
+    /// Returns an immutable, stable snapshot of the current entries.
+    public synchronized List<BibEntry> getEntriesSnapshot() {
+        return List.copyOf(entries);
     }
 
     /// Returns a set of Strings, that contains all field names that are visible. This means that the fields
@@ -208,9 +214,11 @@ public class BibDatabase {
     ///
     /// @param toBeDeleted Entry to delete
     /// @param eventSource Source the event is sent from
+    // [impl->req~ux.large-library.bulk-entry-removal~1]
     public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
+        boolean useBatchReplacement = toBeDeleted.size() > BATCH_REPLACEMENT_THRESHOLD;
         Collection<String> idsToBeDeleted;
-        if (toBeDeleted.size() > 10) {
+        if (useBatchReplacement) {
             idsToBeDeleted = new HashSet<>();
         } else {
             idsToBeDeleted = new ArrayList<>(toBeDeleted.size());
@@ -220,15 +228,23 @@ public class BibDatabase {
             idsToBeDeleted.add(entry.getId());
         }
 
-        List<BibEntry> newEntries = new ArrayList<>(entries);
-        newEntries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
-
         toBeDeleted.forEach(entry -> {
             entriesId.remove(entry.getId());
             removeEntryFromIndex(entry);
         });
 
-        entries.setAll(newEntries);
+        if (useBatchReplacement) {
+            List<BibEntry> entriesAfterDeletion = entries.stream()
+                                                         .filter(entry -> !idsToBeDeleted.contains(entry.getId()))
+                                                         .toList();
+            if ((entries.size() - entriesAfterDeletion.size()) > BATCH_REPLACEMENT_THRESHOLD) {
+                entries.setAll(entriesAfterDeletion);
+            } else {
+                entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+            }
+        } else {
+            entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+        }
         eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
     }
 
@@ -331,8 +347,8 @@ public class BibDatabase {
     }
 
     /// Returns the string with the given id.
-    public BibtexString getString(String id) {
-        return bibtexStrings.get(id);
+    public Optional<BibtexString> getString(String id) {
+        return Optional.ofNullable(bibtexStrings.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -649,7 +665,7 @@ public class BibDatabase {
     /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
-    public int indexOf(BibEntry bibEntry) {
+    public int indexOf(@NonNull BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
         if (index >= 0) {
             return index;
@@ -658,8 +674,8 @@ public class BibDatabase {
         return -1;
     }
 
-    public BibEntry getEntryById(String id) {
-        return entriesId.get(id);
+    public Optional<BibEntry> getEntryById(String id) {
+        return Optional.ofNullable(entriesId.get(id));
     }
 
     @Override

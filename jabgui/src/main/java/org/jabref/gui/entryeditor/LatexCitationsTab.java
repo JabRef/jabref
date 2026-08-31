@@ -28,8 +28,6 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
-    public static final String NAME = "LaTeX citations";
-
     private final StateManager stateManager;
 
     private final LatexCitationsTabViewModel viewModel;
@@ -53,7 +51,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         this.progressIndicator = new ProgressIndicator();
         this.citationsDisplay = new CitationsDisplay();
 
-        setText(Localization.lang("LaTeX citations"));
+        setText(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS.displayName());
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());
         setSearchPane();
@@ -154,10 +152,5 @@ public class LatexCitationsTab extends EntryEditorTab {
             LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
             viewModel.bindToEntry(libraryTab, entry);
         }
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return viewModel.shouldShow();
     }
 }

@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -22,7 +20,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -35,6 +33,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
@@ -69,7 +68,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
 
@@ -80,7 +79,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager,
+                              GuiUndoManager undoManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
@@ -166,6 +165,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public void openFiles(List<Path> filesToOpen) {
         // Resolve any shortcuts to their targets and filter to only .bib files.
         // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).
+        Path baseDirectoryPath = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
         List<Path> resolvedFiles = filesToOpen.stream()
                                               .map(FileUtil::resolveIfShortcut)
                                               .filter(FileUtil::isBibFile)
@@ -174,6 +174,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         LibraryTab toRaise = null;
         int initialCount = resolvedFiles.size();
         int removed = 0;
+
+        FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
 
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
@@ -198,11 +200,20 @@ public class OpenDatabaseAction extends SimpleCommand {
         // locking until the file is loaded.
         if (!resolvedFiles.isEmpty()) {
             assert fileUpdateMonitor != null;
-            FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
             resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
-                fileHistory.newFile(theFile);
+                Path file = theFile;
+
+                if (Files.exists(theFile) && preferences.getInternalPreferences().isMemoryStickMode()) {
+                    try {
+                        file = baseDirectoryPath.relativize(file).normalize();
+                    } catch (IllegalArgumentException e) {
+                        file = theFile.normalize();
+                    }
+                }
+
+                fileHistory.newFile(file);
             });
         } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
@@ -302,7 +313,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          UndoManager undoManager,
+                                          GuiUndoManager undoManager,
                                           ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {

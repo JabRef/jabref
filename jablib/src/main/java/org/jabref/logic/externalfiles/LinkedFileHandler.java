@@ -43,6 +43,10 @@ public class LinkedFileHandler {
         return copyOrMoveToDefaultDirectory(true, false);
     }
 
+    public void moveToExactDirectory(Path targetDirectory) throws IOException {
+        copyOrMoveToExactDirectory(targetDirectory, true, false);
+    }
+
     /// @return true if the file was copied/moved or the same file exists in the target directory
     public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);
@@ -50,14 +54,6 @@ public class LinkedFileHandler {
             LOGGER.warn("No existing file directory found");
             return false;
         }
-        Path databaseFileDirectory = databaseFileDirectoryOpt.get();
-
-        Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
-        if (sourcePathOpt.isEmpty()) {
-            LOGGER.warn("Could not find file {}", linkedFile.getLink());
-            return false;
-        }
-        Path sourcePath = sourcePathOpt.get();
 
         String targetDirectoryName = "";
         if (!filePreferences.getFileDirectoryPattern().isEmpty()) {
@@ -67,7 +63,18 @@ public class LinkedFileHandler {
                     filePreferences.getFileDirectoryPattern());
         }
 
-        Path targetDirectory = databaseFileDirectory.resolve(targetDirectoryName);
+        Path targetDirectory = databaseFileDirectoryOpt.get().resolve(targetDirectoryName);
+        return copyOrMoveToExactDirectory(targetDirectory, shouldMove, shouldRenameToFilenamePattern);
+    }
+
+    private boolean copyOrMoveToExactDirectory(Path targetDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
+        Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
+        if (sourcePathOpt.isEmpty()) {
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
+            return false;
+        }
+        Path sourcePath = sourcePathOpt.get();
+
         // Ensure that this directory exists
         Files.createDirectories(targetDirectory);
 
@@ -133,7 +140,7 @@ public class LinkedFileHandler {
                 LOGGER.debug("The file {} would have been copied/moved to {}. However, there exists already a file with that name so we do nothing.", sourcePath, targetPath);
                 return new GetTargetPathResult(true, false, targetPath);
             }
-            Integer count = 1;
+            int count = 1;
             boolean exists = false;
             // @formatter:off
             do {

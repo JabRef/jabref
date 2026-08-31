@@ -3,15 +3,39 @@ parent: Requirements
 ---
 # CLI
 
-## Unified `--input` option across all commands
-`req~jabkit.cli.input-flag~1`
+## Remote server health check
+`req~jabref.remote.health-check~1`
 
-All `jabkit` commands that need a file input must have the `--input` option to specify the input file.
-See [ADR 45](../decisions/0045-use-input-flag-always-for-input-files.md) for more details.
+The remote listener accepts the versioned plain-text request `JABREF/1 PING` and responds with
+`JABREF/1 PONG jabref`. This check identifies a running JabRef instance without requiring clients
+to implement the Java serialization protocol. Existing serialized remote-operation requests remain
+supported.
 
 Needs: impl
 
-<!-- markdownlint-disable-file MD022 -->
+## Input file as positional argument across all commands
+`req~jabkit.cli.input-flag~2`
+
+All `jabkit` commands that need a file input must accept it as a positional `FILE` argument.
+For backward compatibility, the `--input` option is also accepted as an alias.
+Exactly one of the two forms must be supplied.
+See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more details.
+
+Needs: impl
+
+## Input file argument accepts an http(s)/ftp URL
+`req~jabkit.cli.input-url~2`
+
+The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
+`https://`, or `ftp://` URL. This holds for every input a `jabkit` command reads, including
+each argument of a command taking several of them.
+The URL is downloaded to a local temporary file before use; a download failure is reported
+as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+For a command reading several inputs, an unusable input is skipped and the remaining ones are
+still processed, with the command exiting non-zero afterwards.
+See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
+
+Needs: impl
 
 ## Banner shown only at `--help`
 `req~jabkit.cli.banner-shown~1`
@@ -22,3 +46,38 @@ Meaning: If there is no command given (falling back to help) or explicitly `--he
 This increases the accessibility. Source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)
 
 Needs: impl
+
+## Machine-readable output of the `check` commands
+`req~jabkit.cli.check-errorformat-output~1`
+
+The `jabkit check` subcommands emit their findings in a line-oriented
+`file:line:column:citationKey[:field]: message` format, suitable for editors and CI tooling.
+
+Entry-level findings (for example, on the citation key itself) carry only the citation key.
+Field-level findings additionally carry the affected field name.
+
+Needs: impl
+
+## Standard output conversion format
+`req~jabkit.cli.convert-stdout-format~1`
+
+When `jabkit convert` writes to standard output, it uses the exporter selected by
+`--output-format`. Progress messages are written to standard error so standard output
+contains only the exported data.
+
+Needs: impl
+
+## GitHub Actions output of the `check` commands
+`req~jabkit.cli.check-github-actions-output~1`
+
+The `jabkit check` subcommands support an additional `github-actions` output format
+that emits each finding as a [GitHub Actions workflow command](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message)
+of the shape `::error file=<file>,line=<line>,col=<col>,title=<title>::<message>`.
+
+The `file`, `line`, `col`, and `title` property values are URL-encoded so that
+Windows-style paths (containing `:`) and titles (containing `:` between citation key and field name)
+are parsed correctly by the GitHub Actions runner.
+
+Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->

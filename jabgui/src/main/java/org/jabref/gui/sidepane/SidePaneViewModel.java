@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -19,9 +17,9 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
@@ -39,7 +37,6 @@ public class SidePaneViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final SidePaneContentFactory sidePaneContentFactory;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final DialogService dialogService;
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
@@ -47,16 +44,14 @@ public class SidePaneViewModel extends AbstractViewModel {
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
-                             AdaptVisibleTabs adaptVisibleTabs,
                              DialogService dialogService,
                              AiService aiService,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
-                             UndoManager undoManager) {
+                             GuiUndoManager undoManager) {
         this.preferences = preferences;
         this.stateManager = stateManager;
-        this.adaptVisibleTabs = adaptVisibleTabs;
         this.dialogService = dialogService;
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
@@ -66,7 +61,6 @@ public class SidePaneViewModel extends AbstractViewModel {
                 dialogService,
                 aiService,
                 stateManager,
-                adaptVisibleTabs,
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,

@@ -290,12 +290,8 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // the transformer stores the min and max year
         transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
-        if (!transformedQuery.isBlank()) {
-            uriBuilder.addParameter("querytext", transformedQuery);
-        }
-        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        URL baseUrl = buildSearchURL(transformedQuery, pageNumber);
+        URIBuilder uriBuilder = new URIBuilder(baseUrl.toURI());
         // Currently not working as part of the query string
         if (transformer.getJournal().isPresent()) {
             uriBuilder.addParameter("publication_title", transformer.getJournal().get());
@@ -309,8 +305,30 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         if (transformer.getArticleNumber().isPresent()) {
             uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
         }
-        // Starts to index at 1 for the first entry
-        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
+        return uriBuilder.build().toURL();
+    }
+
+    /// Builds the IEEE search URL for a raw, catalog-native query, sent verbatim as the `querytext` parameter.
+    /// Resets `transformer` so [#getParser()] applies no year filtering to raw results.
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        transformer = new IEEEQueryTransformer();
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the IEEE search API URL for the given raw query string and page number.
+    /// The caller is responsible for setting `transformer` before invoking `getParser()`.
+    ///
+    /// @param rawQuery   the query string to pass directly as the `querytext` parameter
+    /// @param pageNumber zero based page number; converted to a one based `start_record` value.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
+        if (!rawQuery.isBlank()) {
+            uriBuilder.addParameter("querytext", rawQuery);
+        }
+        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber + 1));
 
         return uriBuilder.build().toURL();
     }

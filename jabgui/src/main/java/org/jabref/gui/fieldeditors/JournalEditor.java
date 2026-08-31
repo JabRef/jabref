@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -17,6 +15,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -54,8 +53,10 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 fieldCheckers,
                 taskExecutor,
                 dialogService,
+                preferences,
                 undoManager);
 
+        textField.setId(field.getName());
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textField.initContextMenu(new DefaultMenu(textField), keyBindingRepository);
         AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);

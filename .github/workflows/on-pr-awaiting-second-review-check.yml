@@ -1,0 +1,95 @@
+name: Await second review
+
+on:
+  # PR-level runs are unconditional stamps: GitHub requires every required check
+  # to report success on the current PR head SHA before the PR can enter the
+  # merge queue. Types are the GitHub defaults, listed explicitly on purpose:
+  # "synchronize" is critical (each push creates a new head SHA needing a stamp).
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  # Enforcement happens here, where label and review state are settled.
+  merge_group:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  require-second-approval:
+    name: Require second approval
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check whether a second approval is required
+        uses: actions/github-script@v9
+        with:
+          script: |
+            if (context.eventName !== 'merge_group') {
+              // Stamp only. Carries no state, so it can never be stale or wrong.
+              return;
+            }
+
+            // gh-readonly-queue/<base>/pr-<N>-<sha>, same parsing as on-pr-merge-queued.yml.
+            // The commit message is deliberately not used as a fallback: it can carry
+            // unrelated "#123" references and would then enforce against the wrong PR.
+            const refName = process.env.GITHUB_REF_NAME ?? '';
+            const headRef = context.payload.merge_group?.head_ref ?? '';
+            const match = refName.match(/(?:^|\/)pr-(\d+)-/) ?? headRef.match(/(?:^|\/)pr-(\d+)-/);
+            if (!match) {
+              core.setFailed(`Could not determine PR number from merge group (GITHUB_REF_NAME: "${refName}", head_ref: "${headRef}").`);
+              return;
+            }
+            const pullNumber = Number(match[1]);
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const requiredLabel = 'status: awaiting-second-review';
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pullNumber,
+            });
+
+            if (!pullRequest.labels.some((label) => label.name === requiredLabel)) {
+              core.info(`PR #${pullNumber}: label "${requiredLabel}" not present, nothing to enforce.`);
+              return;
+            }
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number: pullNumber,
+              per_page: 100,
+            });
+
+            // The loop below is last-write-wins, so the order has to be oldest-first.
+            // Review ids increase with submission time and are always set, unlike
+            // submitted_at. The API happens to return this order already; relying on
+            // that would make the approval count depend on undocumented behaviour.
+            reviews.sort((a, b) => a.id - b.id);
+
+            const latestOpinionatedReviewStateByUser = new Map();
+            for (const review of reviews) {
+              const login = review.user?.login;
+              if (!login || login === pullRequest.user.login) {
+                continue;
+              }
+              if (['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
+                latestOpinionatedReviewStateByUser.set(login, review.state);
+              }
+            }
+
+            const approvers = [...latestOpinionatedReviewStateByUser.entries()]
+              .filter(([, state]) => state === 'APPROVED')
+              .map(([login]) => login);
+
+            core.info(`PR #${pullNumber}: approvers: ${approvers.join(', ') || 'none'}`);
+
+            if (approvers.length < 2) {
+              core.setFailed(`PR #${pullNumber} has label "${requiredLabel}" but only ${approvers.length} approval(s). It will be removed from the merge queue.`);
+            }
+    

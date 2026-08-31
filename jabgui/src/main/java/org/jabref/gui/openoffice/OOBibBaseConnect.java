@@ -15,6 +15,7 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoTextDocument;
 import org.jabref.model.openoffice.util.OOResult;
+import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.sun.star.bridge.XBridge;
 import com.sun.star.bridge.XBridgeFactory;
@@ -23,6 +24,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.frame.XDesktop;
+import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
@@ -40,6 +42,7 @@ public class OOBibBaseConnect {
 
     private final DialogService dialogService;
     private final XDesktop xDesktop;
+    private final XComponentContext componentContext;
 
     /// Created when connected to a document.
     ///
@@ -52,16 +55,14 @@ public class OOBibBaseConnect {
             CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
-        this.xDesktop = simpleBootstrap(loPath);
+        this.componentContext = Bootstrap.bootstrap(loPath);
+        this.xDesktop = createDesktop(componentContext);
     }
 
-    private XDesktop simpleBootstrap(Path loPath)
+    private XDesktop createDesktop(XComponentContext context)
             throws
-            CreationException,
-            BootstrapException, IOException, InterruptedException {
+            CreationException {
 
-        // Get the office component context:
-        XComponentContext context = Bootstrap.bootstrap(loPath);
         XMultiComponentFactory sem = context.getServiceManager();
 
         // Create the desktop, which is the root frame of the
@@ -73,6 +74,10 @@ public class OOBibBaseConnect {
             throw new CreationException(e.getMessage());
         }
         return UnoCast.cast(XDesktop.class, desktop).get();
+    }
+
+    XComponentContext getComponentContext() {
+        return componentContext;
     }
 
     /// Close any open office connection, if none exists does nothing
@@ -167,28 +172,30 @@ public class OOBibBaseConnect {
     /// After successful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
     ///
     /// Finally initializes this.xTextDocument with the selected document and parts extracted.
-    public void selectDocument(boolean autoSelectForSingle)
-            throws
-            NoDocumentFoundException,
-            NoSuchElementException,
-            WrappedTargetException {
+    public OOVoidResult<OOError> selectDocument(boolean autoSelectForSingle) {
+        try {
+            XTextDocument selected;
+            List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
+            if (textDocumentList.isEmpty()) {
+                return OOVoidResult.error(OOError.from(new NoDocumentFoundException()));
+            } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
+                selected = textDocumentList.getFirst(); // Get the only one
+            } else { // Bring up a dialog
+                selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
+                        this.dialogService);
+            }
 
-        XTextDocument selected;
-        List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
-        if (textDocumentList.isEmpty()) {
-            throw new NoDocumentFoundException("No Writer documents found");
-        } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
-            selected = textDocumentList.getFirst(); // Get the only one
-        } else { // Bring up a dialog
-            selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
-                    this.dialogService);
+            if (selected == null) {
+                return OOVoidResult.ok();
+            }
+
+            this.xTextDocument = selected;
+            return OOVoidResult.ok();
+        } catch (DisposedException e) {
+            return OOVoidResult.error(OOError.from(e).setTitle(Localization.lang("Problem connecting")));
+        } catch (NoSuchElementException | WrappedTargetException e) {
+            return OOVoidResult.error(OOError.fromMisc(e).setTitle(Localization.lang("Problem connecting")));
         }
-
-        if (selected == null) {
-            return;
-        }
-
-        this.xTextDocument = selected;
     }
 
     /// Mark the current document as missing.

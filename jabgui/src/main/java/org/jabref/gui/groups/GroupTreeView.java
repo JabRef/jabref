@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -54,7 +52,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -69,6 +66,7 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -100,7 +98,6 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -133,7 +130,6 @@ public class GroupTreeView extends BorderPane {
                          AiService aiService,
                          UndoManager undoManager,
                          FileUpdateMonitor fileUpdateMonitor,
-                         AdaptVisibleTabs adaptVisibleTabs,
                          TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
@@ -142,7 +138,6 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
@@ -212,7 +207,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
+        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, dialogService, aiService, localDragboard, taskExecutor);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -278,8 +273,8 @@ public class GroupTreeView extends BorderPane {
 
         // "Add subgroup" button shown on row hover
         addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        addSubgroupColumn.setCellFactory(col -> {
-            Button button = IconTheme.JabRefIcons.ADD.asButton();
+        addSubgroupColumn.setCellFactory(_ -> {
+            Button button = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD);
             button.setVisible(false);
             button.managedProperty().bind(button.visibleProperty());
             StackPane pane = new StackPane(button);
@@ -369,13 +364,17 @@ public class GroupTreeView extends BorderPane {
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
         node.getStyleClass().add("hits");
-        if (!group.isRoot()) {
-            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
-                    group.anySelectedEntriesMatchedProperty());
-            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ALLSELECTED,
-                    group.allSelectedEntriesMatchedProperty());
-        }
         Text text = new Text();
+        if (!group.isRoot()) {
+            // The text carries the pseudo-classes as well: JavaFX does not re-style a descendant when a
+            // custom pseudo-class flips on its ancestor, so ".hits:any-selected .text" would never match.
+            for (Node styled : List.of(node, text)) {
+                BindingsHelper.includePseudoClassWhen(styled, PSEUDOCLASS_ANYSELECTED,
+                        group.anySelectedEntriesMatchedProperty());
+                BindingsHelper.includePseudoClassWhen(styled, PSEUDOCLASS_ALLSELECTED,
+                        group.allSelectedEntriesMatchedProperty());
+            }
+        }
         EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(),
                 shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
@@ -384,6 +383,7 @@ public class GroupTreeView extends BorderPane {
                     }
 
                     if (shouldDisplayGroupCount) {
+                        group.ensureMatchedEntriesLoaded();
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
@@ -514,8 +514,9 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
+    // [impl->req~ux.groups.create-explicit-from-selection~1]
     private void selectNode(GroupNodeViewModel value) {
-        selectNode(value, false);
+        selectNode(value, true);
     }
 
     private void selectNode(GroupNodeViewModel value, boolean expandParents) {
@@ -662,7 +663,7 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
-        if (preferences.getAiPreferences().getEnableAi()) {
+        if (preferences.getAiPreferences().getAiFeaturesEnabled() && preferences.getGroupsPreferences().showAiChatButton()) {
             contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
         }
 

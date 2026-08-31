@@ -1,6 +1,7 @@
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 }
 
@@ -10,12 +11,19 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
+mainModuleInfo {
+    annotationProcessor("info.picocli.codegen")
+}
+
 testModuleInfo {
+    requires("mockwebserver3")
+    requires("okhttp3")
+    requires("okio")
+    requires("org.apache.pdfbox")
     requires("org.jabref.testsupport")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("com.google.common")
 }
 
 tasks.withType<Test>().configureEach {
@@ -30,7 +38,7 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
+        "--enable-native-access=com.sun.jna,javafx.graphics,jkeychain,org.apache.lucene.core",
 
         // "-XX:+UseZGC", "-XX:+ZUncommit",
         // "-XX:+UseG1GC",
@@ -72,5 +80,17 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     classpath = sourceSets.main.get().runtimeClasspath
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
-    args("--debug", "check-consistency", "--input=empty.bib")
+    args("--debug", "check", "consistency", "empty.bib")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            resources {
+                includedPatterns.add("build\\.properties")
+            }
+            imageName.set("jabkit")
+            mainClass.set("org.jabref.toolkit.JabKitLauncher")
+        }
+    }
 }

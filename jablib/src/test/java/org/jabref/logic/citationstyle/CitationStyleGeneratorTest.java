@@ -113,6 +113,62 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
+    void defaultBibliographyMultipleEntriesKeepsInputOrderForNumericStyle() {
+        BibDatabaseContext testEntryContextMultipleEntries = new BibDatabaseContext(new BibDatabase(List.of(testEntry2, testEntry)));
+        testEntryContextMultipleEntries.setMode(BibDatabaseMode.BIBLATEX);
+
+        List<String> citations = CitationStyleGenerator.generateBibliography(
+                List.of(testEntry2, testEntry),
+                DEFAULT_STYLE,
+                TEXT_OUTPUT_FORMAT,
+                testEntryContextMultipleEntries,
+                ENTRY_TYPES_MANAGER);
+
+        assertEquals(List.of(
+                "[1]S. Harrer, J. Lenhard, and L. Dietz, Java by Comparison. Raleigh, NC: Pragmatic Bookshelf, 2018.\n",
+                "[2]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n"
+        ), citations);
+    }
+
+    @Test
+    void springerLncsAlphabeticalBibliographyEntryIdsFollowBibliographySortOrder() {
+        CitationStyle style = STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science (sorted alphabetically)".equals(e.getTitle())).findAny().get();
+
+        BibEntry keen = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("keen2001")
+                .withField(StandardField.AUTHOR, "Keen, C. L.")
+                .withField(StandardField.TITLE, "Chocolate")
+                .withField(StandardField.JOURNAL, "Journal of the American College of Nutrition")
+                .withField(StandardField.YEAR, "2001");
+        BibEntry tokede = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("tokede2011")
+                .withField(StandardField.AUTHOR, "Tokede, O. A.")
+                .withField(StandardField.TITLE, "Effects of cocoa products")
+                .withField(StandardField.JOURNAL, "European Journal of Clinical Nutrition")
+                .withField(StandardField.YEAR, "2011");
+        BibEntry cooper = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("cooper2007")
+                .withField(StandardField.AUTHOR, "Cooper, K. A.")
+                .withField(StandardField.TITLE, "Cocoa and health")
+                .withField(StandardField.JOURNAL, "British Journal of Nutrition")
+                .withField(StandardField.YEAR, "2007");
+
+        List<BibEntry> entries = List.of(keen, tokede, cooper);
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(entries));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+
+        assertEquals(
+                List.of("cooper2007", "keen2001", "tokede2011"),
+                CitationStyleGenerator.generateBibliographyEntryIds(
+                                              entries,
+                                              style.getSource(),
+                                              HTML_OUTPUT_FORMAT,
+                                              bibDatabaseContext,
+                                              ENTRY_TYPES_MANAGER)
+                                      .orElseThrow());
+    }
+
+    @Test
     void aCMBibliography() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();

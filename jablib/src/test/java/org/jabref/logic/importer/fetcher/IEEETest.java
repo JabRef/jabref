@@ -16,6 +16,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -168,6 +169,12 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(List.of(IGOR_NEWCOMERS), fetchedEntries);
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertEquals(List.of(), result.getContent());
     }
 
     @Override

@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
@@ -85,7 +85,7 @@ jobs:
             bibengine: biber
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4

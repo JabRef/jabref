@@ -5,6 +5,9 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,9 +43,20 @@ class OpenAlexTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "https://example.com/W4408614692",
-            "not-a-url"
+            "not-a-url",
+            ""
     })
     void returnsEmptyForInvalid(String url) {
         assertEquals(Optional.empty(), fetcher.extractOpenAlexId(url));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
+    void parserKeepsDefaultTypeForBlankOpenAlexType(String openAlexType) throws ParseException {
+        BibEntry entry = fetcher.getParser().parseEntries("""
+                {"type":"%s"}
+                """.formatted(openAlexType)).getFirst();
+
+        assertEquals(StandardEntryType.Misc, entry.getType());
     }
 }

@@ -2,9 +2,9 @@
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.jspecify:jspecify:1.0.0
-//DEPS org.slf4j:slf4j-api:2.0.17
-//DEPS org.slf4j:slf4j-simple:2.0.17
-//DEPS tools.jackson.core:jackson-databind:3.1.3
+//DEPS org.slf4j:slf4j-api:2.0.18
+//DEPS org.slf4j:slf4j-simple:2.0.18
+//DEPS tools.jackson.core:jackson-databind:3.2.0
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
@@ -51,10 +51,10 @@ public class CitationStyleCatalogGenerator {
 
     public static void generateCitationStyleCatalog() {
         try {
-            // JBang's gradle plugin has a strange path handling. If "application->run" is started from the IDE, the path ends with "jabgui"
+            // JBang's gradle plugin has a strange path handling. If "application->run" is started from the IDE, the path ends with a module directory (e.g. "jabgui")
+            // Do not rely on the repository directory name (e.g. "jabref"), as forks may check out under a different name (e.g. "jabref-koppor")
             Path root = Path.of(".").toAbsolutePath().normalize();
-            String rootFilename = root.getFileName().toString();
-            if (!"jabref".equalsIgnoreCase(rootFilename) && rootFilename.startsWith("jab")) {
+            if (!Files.exists(root.resolve(STYLES_ROOT).resolve(DEFAULT_STYLE)) && (root.getParent() != null)) {
                 LOGGER.info("Running from IDE, adjusting path to styles root");
                 root = root.getParent();
             }
@@ -92,10 +92,13 @@ public class CitationStyleCatalogGenerator {
                                                             Path stylePath = Path.of(style.getFilePath());
                                                             Path relativePath = stylesRoot.toAbsolutePath().relativize(stylePath.toAbsolutePath());
                                                             info.put("path", relativePath.toString());
+                                                            info.put("styleId", style.getStyleId());
+                                                            info.put("styleClass", style.getStyleClass());
                                                             info.put("title", style.getTitle());
                                                             info.put("shortTitle", style.getShortTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
+                                                            info.put("hasBibliographySortOrder", style.hasBibliographySortOrder());
                                                             info.put("usesHangingIndent", style.usesHangingIndent());
                                                             return info;
                                                         })

@@ -1,7 +1,37 @@
-.zenflow/
 # AI tooling
 
-.claude/
+.agents
+
+.codegraph/
+.code-review-graph/
+
+CLAUDE.md
+.mcp.json
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+memory/*
+
+.cursorrules
+
+.gemini
+GEMINI.md
+
+.github/code-review-graph.instruction.md
+
+.kiro
+
+.opencode.json
+
+.qoder
+QODER.md
+
+skills-lock.json
+
+.windsurfrules
+
+.zenflow
+
 
 # no generated files in version control
 src/main/gen/
@@ -594,3 +624,6 @@ CHANGELOG.html
 
 # some strange gradle/IntelliJ extension
 extension 'reporting' property 'baseDirectory'
+
+# junie stuff
+.junie

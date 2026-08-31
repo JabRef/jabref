@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.util.MarkdownTextFlow;
+import org.jabref.gui.util.component.MarkdownTextFlow;
 import org.jabref.gui.walkthrough.declarative.richtext.ArbitraryJFXBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
@@ -19,7 +19,6 @@ import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
-import org.jabref.logic.l10n.Localization;
 
 /// Renders walkthrough steps and content blocks into JavaFX nodes.
 public class WalkthroughRenderer {
@@ -179,8 +178,9 @@ public class WalkthroughRenderer {
         return contentBox;
     }
 
+    /// @param text the already localized button text
     private Button makeButton(String text, String styleClass, Runnable beforeNavigate, Runnable navigationAction) {
-        Button button = new Button(Localization.lang(text));
+        Button button = new Button(text);
         button.getStyleClass().add(styleClass);
         button.setOnAction(_ -> {
             beforeNavigate.run();

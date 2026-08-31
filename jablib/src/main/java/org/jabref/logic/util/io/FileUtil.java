@@ -35,6 +35,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -73,17 +74,32 @@ public class FileUtil {
     private FileUtil() {
     }
 
+    /// Returns the human-readable size of a file, or an empty optional if it cannot be determined.
+    public static Optional<String> getFileSize(@NonNull Path path) {
+        try {
+            return Optional.of(FileUtils.byteCountToDisplaySize(Files.size(path)));
+        } catch (IOException e) {
+            LOGGER.debug("Could not determine size of file {}", path, e);
+            return Optional.empty();
+        }
+    }
+
     /// Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
     ///
     /// In case the filename starts with a "." and only has one ".", the part after the dot is NOT the extension
     ///
     /// @return the extension (without leading dot), trimmed and in lowercase.
     public static Optional<String> getFileExtension(@NonNull String fileName) {
-        Path realFileName = Path.of(fileName.trim()).getFileName();
-        if (realFileName == null) {
-            return Optional.empty();
+        String realFileNameString;
+        try {
+            Path realFileName = Path.of(fileName.trim()).getFileName();
+            if (realFileName == null) {
+                return Optional.empty();
+            }
+            realFileNameString = realFileName.toString();
+        } catch (InvalidPathException e) {
+            realFileNameString = FilenameUtils.getName(fileName.trim());
         }
-        String realFileNameString = realFileName.toString();
         String extension = FilenameUtils.getExtension(realFileNameString);
         if (StringUtil.isNullOrEmpty(extension)) {
             return Optional.empty();
@@ -114,7 +130,7 @@ public class FileUtil {
         try {
             path = Path.of(fileName.trim());
         } catch (InvalidPathException e) {
-            return fileName;
+            return FilenameUtils.getBaseName(FilenameUtils.getName(fileName.trim()));
         }
         String realFileName = path.getFileName().toString();
         String baseName = FilenameUtils.getBaseName(realFileName);
@@ -173,15 +189,22 @@ public class FileUtil {
         String nameWithoutExtension = getBaseName(fileName);
 
         nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);
+        final String cleanedName = nameWithoutExtension;
 
-        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
-            Optional<String> extension = getFileExtension(fileName);
-            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info("Truncated the too long filename '{}' ({}} characters) to '{}'.", fileName, fileName.length(), shortName);
+        Optional<String> extension = getFileExtension(fileName);
+        String fullCleanedName = extension.map(s -> cleanedName + "." + s).orElse(cleanedName);
+        // Fix: check FULL filename length (name + extension), not just name alone
+        if (fullCleanedName.length() > MAXIMUM_FILE_NAME_LENGTH) {
+            int maxBaseLen = MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0);
+            if (maxBaseLen <= 0) {
+                return fullCleanedName.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            }
+            String shortName = nameWithoutExtension.substring(0, maxBaseLen);
+            LOGGER.info("Truncated the too long filename '{}' ({} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
-        return fileName;
+        return fullCleanedName;
     }
 
     /// Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
@@ -515,12 +538,12 @@ public class FileUtil {
                    .replace('\\', '/');
     }
 
-    /// Test if the file is a bib file by simply checking the extension to be ".bib"
+    /// Test if the file is a bib file by simply checking the extension to be ".bib" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter("bib"::equals).isPresent();
+        return getFileExtension(file).filter("bib"::equalsIgnoreCase).isPresent();
     }
 
     /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)
@@ -568,13 +591,12 @@ public class FileUtil {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
-    /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
+    /// Test if the file is a pdf file by simply checking the extension to be ".pdf" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
-        Optional<String> extension = FileUtil.getFileExtension(file);
-        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
+        return getFileExtension(file).filter("pdf"::equalsIgnoreCase).isPresent();
     }
 
     /// @return Path of current panel database directory or the standard working directory in case the database was not saved yet

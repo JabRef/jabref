@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -16,6 +14,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.icore.ConferenceRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -56,6 +55,7 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
                 conferenceRepository
         );
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         lookupICORERankButton.setTooltip(

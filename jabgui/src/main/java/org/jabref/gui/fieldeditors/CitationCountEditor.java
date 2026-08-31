@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -22,6 +20,7 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -63,6 +62,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchCitationCountButton.setTooltip(

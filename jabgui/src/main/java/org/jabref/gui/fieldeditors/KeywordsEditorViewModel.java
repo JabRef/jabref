@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -13,7 +11,8 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -33,13 +32,13 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
     public KeywordsEditorViewModel(Field field,
                                    SuggestionProvider<?> suggestionProvider,
                                    FieldCheckers fieldCheckers,
-                                   CliPreferences preferences,
+                                   BibEntryPreferences preferences,
                                    UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         keywordListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
+        this.keywordSeparator = preferences.getKeywordSeparator();
         this.suggestionProvider = suggestionProvider;
 
         BindingsHelper.bindContentBidirectional(

@@ -34,8 +34,7 @@ Usage: jabkit [-dhpv] [COMMAND]
   -p, --porcelain   Enable script-friendly output
   -v, --version     display version info
 Commands:
-  check-consistency       Check consistency of the library.
-  check-integrity         Check integrity of the database.
+  check                   Check the integrity and consistency of a library.
   convert                 Convert between bibliography formats.
   doi-to-bibtex           Converts a DOI to BibTeX
   fetch                   Fetch entries from a provider.
@@ -49,9 +48,20 @@ Commands:
   search                  Search in a library.
 ```
 
-> [!NOTE]`
+> [!NOTE]
 > Due to the high development pace, `--fresh` is used to update `org.jabref:jablib:6.0-SNAPSHOT`.
 > As soon as JabRef 6.0 is released, this won't be required any more.
+
+> [!NOTE]
+> The scripts depend on the published `org.jabref:jablib:6.0-SNAPSHOT`.
+> When testing local, unmerged `jablib` changes, publish them to your local Maven repository first:
+>
+> ```console
+> ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+> ```
+>
+> `-PprojVersion=6.0` is required: without it the artifact is published as `0.1.0-SNAPSHOT` and JBang will not pick it up.
+> The `mavenlocal` repository is listed first in the scripts, so the locally published `jablib` takes precedence.
 
 ### Installing and Running `JabKit` with JBang
 

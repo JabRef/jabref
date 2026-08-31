@@ -25,11 +25,11 @@ jobs:
     # Does not work on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - name: Run linkspector
-        uses: umbrelladocs/action-linkspector@v1
+        uses: umbrelladocs/action-linkspector@v1.5.5
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review

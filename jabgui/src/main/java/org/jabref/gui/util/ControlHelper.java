@@ -12,7 +12,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
+
+import org.jabref.gui.icon.JabRefIcon;
 
 public class ControlHelper {
 
@@ -22,6 +26,48 @@ public class ControlHelper {
     private static PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
 
     public enum EllipsisPosition { BEGINNING, CENTER, ENDING }
+
+    public static Button iconButton(JabRefIcon icon) {
+        Button button = new Button();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().add("icon-button");
+        return button;
+    }
+
+    /// An icon button that also carries its label, as used in the button rows under the editable
+    /// tables ("Add", "Modify", "Remove", ...).
+    public static Button labelledIconButton(JabRefIcon icon, String text, Runnable action) {
+        Button button = new Button(text);
+        button.setGraphic(icon.getGraphicNode());
+        button.setOnAction(_ -> action.run());
+        return button;
+    }
+
+    /// A {@link #labelledIconButton} forced to `prefWidth`, so that the buttons of one row come out
+    /// uniformly wide however long their individual captions are.
+    public static Button labelledIconButton(JabRefIcon icon, String text, double prefWidth, Runnable action) {
+        Button button = labelledIconButton(icon, text, action);
+        button.setPrefWidth(prefWidth);
+        return button;
+    }
+
+    /// The compact 20x20 icon button used next to fields and lists (browse, reset, reorder, ...).
+    public static Button narrowIconButton(JabRefIcon icon, String tooltip, Runnable action) {
+        Button button = new Button();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().addAll("icon-button", "narrow");
+        button.setPrefSize(20.0, 20.0);
+        button.setTooltip(new Tooltip(tooltip));
+        button.setOnAction(_ -> action.run());
+        return button;
+    }
+
+    public static ToggleButton iconToggleButton(JabRefIcon icon) {
+        ToggleButton button = new ToggleButton();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().add("icon-button");
+        return button;
+    }
 
     public static void setAction(ButtonType buttonType, DialogPane dialogPane, Consumer<Event> consumer) {
         Button button = (Button) dialogPane.lookupButton(buttonType);

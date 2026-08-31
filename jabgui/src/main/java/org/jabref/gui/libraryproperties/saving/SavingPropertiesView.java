@@ -1,26 +1,28 @@
 package org.jabref.gui.libraryproperties.saving;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
+import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
     @FXML private CheckBox protect;
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
-
-    @Inject private CliPreferences preferences;
+    @FXML private ComboBox<AbbreviationType> journalAbbreviationOnSave;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -36,7 +38,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferences);
+        this.viewModel = new SavingPropertiesViewModel(databaseContext, CleanupPreferences.getDefault().getFieldFormatterCleanups());
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
@@ -49,5 +51,33 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
 
         fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
+
+        journalAbbreviationOnSave.setItems(FXCollections.observableArrayList(
+                null, AbbreviationType.DEFAULT, AbbreviationType.DOTLESS,
+                AbbreviationType.SHORTEST_UNIQUE, AbbreviationType.LTWA));
+        journalAbbreviationOnSave.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(AbbreviationType type) {
+                if (type == null) {
+                    return Localization.lang("None (use global setting)");
+                }
+                return switch (type) {
+                    case DEFAULT ->
+                            Localization.lang("Abbreviate (default)");
+                    case DOTLESS ->
+                            Localization.lang("Abbreviate (dotless)");
+                    case SHORTEST_UNIQUE ->
+                            Localization.lang("Abbreviate (shortest unique)");
+                    case LTWA ->
+                            Localization.lang("Abbreviate (LTWA)");
+                };
+            }
+
+            @Override
+            public AbbreviationType fromString(String string) {
+                return null;
+            }
+        });
+        journalAbbreviationOnSave.valueProperty().bindBidirectional(viewModel.journalAbbreviationOnSaveProperty());
     }
 }

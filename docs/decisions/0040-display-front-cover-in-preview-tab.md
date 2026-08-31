@@ -27,7 +27,7 @@ Place the book cover in:
 
 ## Decision Outcome
 
-Chosen option: "The PreviewPanel of the EntryEditor".
+Chosen option: "The PreviewPanel of the EntryEditor", because it would not be obtrusive or distracting.
 
 ## Pros and Cons of the Options
 

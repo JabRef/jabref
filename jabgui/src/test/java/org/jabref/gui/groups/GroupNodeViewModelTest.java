@@ -2,14 +2,21 @@ package org.jabref.gui.groups;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
+import javafx.beans.binding.IntegerBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.JabRefSvgIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,7 +34,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GroupNodeViewModelTest {
@@ -49,7 +59,9 @@ class GroupNodeViewModelTest {
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
-                GroupHierarchyType.INDEPENDENT
+                false,
+                GroupHierarchyType.INDEPENDENT,
+                false
         ));
 
         viewModel = getViewModelForGroup(
@@ -176,6 +188,58 @@ class GroupNodeViewModelTest {
         assertEquals(groupName, entry.getField(StandardField.GROUPS).get());
     }
 
+    @Test
+    void getIconPrefersJabRefSvgIcon() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("example_svg_star");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+        Node graphicNode = model.getIcon().getGraphicNode();
+
+        assertEquals("EXAMPLE_SVG_STAR", model.getIcon().name());
+        assertEquals(JabRefSvgIcon.class, graphicNode.getClass());
+    }
+
+    @Test
+    void getIconResolvesPersistedLowerCaseJabRefIconName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("close");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("CLOSE_CIRCLE", model.getIcon().name());
+    }
+
+    @Test
+    void getIconResolvesLegacyPersistedIkonliName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("close_circle");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("CLOSE_CIRCLE", model.getIcon().name());
+    }
+
+    @Test
+    void getIconResolvesPersistedProviderIkonliName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("TRENDING_UP");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("TRENDING_UP", model.getIcon().name());
+    }
+
+    @Test
+    void getIconResolvesPersistedProviderIkonliDescription() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("mdi2m-math-integral-box");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("MATH_INTEGRAL_BOX", model.getIcon().name());
+    }
+
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }
@@ -200,6 +264,7 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INCLUDING: automatic root sums direct matches and those of its children -> expect 2.
         assertEquals(2, vm.getHits().getValue().intValue());
@@ -219,8 +284,100 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INDEPENDENT: automatic root has no direct matches -> expect 0.
         assertEquals(0, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreRecomputedWhenGroupCountIsReenabledAfterSkippedRefresh() {
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.TITLE, "search"));
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(1, vm.getHits().getValue().intValue());
+
+        // A refresh arriving while counts are disabled is skipped, but must invalidate the cache
+        preferences.getGroupsPreferences().setDisplayGroupCount(false);
+        vm.updateMatchedEntries();
+        assertEquals(0, vm.getHits().getValue().intValue());
+
+        // Re-enabling counts (what GroupTreeView's number cell does) recomputes instead of showing the stale cache
+        preferences.getGroupsPreferences().setDisplayGroupCount(true);
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreUpdatedWhenMatchingEntryIsRemoved() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(firstEntry, secondEntry);
+
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(2, vm.getHits().getValue().intValue());
+
+        databaseContext.getDatabase().removeEntry(firstEntry);
+
+        assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreUpdatedWhenManyMatchingEntriesAreRemoved() {
+        List<BibEntry> entriesToRemove = IntStream.range(0, 11)
+                                                  .mapToObj(_ -> new BibEntry().withField(StandardField.TITLE, "search"))
+                                                  .toList();
+        BibEntry remainingEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(entriesToRemove);
+        databaseContext.getDatabase().insertEntry(remainingEntry);
+
+        viewModel.ensureMatchedEntriesLoaded();
+        assertEquals(12, viewModel.getHits().getValue().intValue());
+
+        databaseContext.getDatabase().removeEntries(entriesToRemove);
+
+        assertEquals(1, viewModel.getHits().getValue().intValue());
+    }
+
+    @Test
+    void clearingManyEntriesSchedulesGroupRefresh() {
+        TaskExecutor recordingTaskExecutor = mock(TaskExecutor.class);
+        new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                recordingTaskExecutor,
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false),
+                new CustomLocalDragboard(),
+                preferences);
+        List<BibEntry> entriesToRemove = IntStream.range(0, 11)
+                                                  .mapToObj(_ -> new BibEntry().withField(StandardField.TITLE, "search"))
+                                                  .toList();
+        databaseContext.getDatabase().insertEntries(entriesToRemove);
+
+        databaseContext.getDatabase().removeEntries(entriesToRemove);
+
+        verify(recordingTaskExecutor).schedule(any(BackgroundTask.class), eq(0L), eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void refreshingMatchedEntriesHandlesReentrantDatabaseChange() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "search");
+        databaseContext.getDatabase().insertEntries(firstEntry, secondEntry);
+
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        IntegerBinding hits = vm.getHits();
+        assertEquals(2, hits.getValue().intValue());
+
+        hits.addListener(_ -> databaseContext.getDatabase().removeEntry(secondEntry));
+
+        vm.updateMatchedEntries();
+
+        assertEquals(2, hits.getValue().intValue());
     }
 }

@@ -4,6 +4,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public record IntegrityMessage(
         String message,
         BibEntry entry,

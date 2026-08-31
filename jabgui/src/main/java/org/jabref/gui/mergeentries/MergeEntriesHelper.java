@@ -4,15 +4,18 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,34 +32,55 @@ public final class MergeEntriesHelper {
 
     /// Merges two BibEntry objects with undo support.
     ///
-    /// @param entryFromFetcher  The entry containing new information (source, from the fetcher)
-    /// @param entryFromLibrary  The entry to be updated (target, from the library)
-    /// @param namedCompoundEdit Compound edit to collect undo information
-    public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
+    /// @param entryFromFetcher The entry containing new information (source, from the fetcher)
+    /// @param entryFromLibrary The entry to be updated (target, from the library)
+    /// @param compoundEdit     Compound edit to collect undo information
+    /// @param keywordSeparator Separator character used for union-merging the groups field
+    public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit, char keywordSeparator) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
         LOGGER.debug("Entry from library: {}", entryFromLibrary);
 
-        boolean typeChanged = mergeEntryType(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
-        boolean fieldsChanged = mergeFields(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
-        boolean fieldsRemoved = removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, namedCompoundEdit);
+        boolean typeChanged = mergeEntryType(entryFromFetcher, entryFromLibrary, compoundEdit);
+        boolean fieldsChanged = mergeFields(entryFromFetcher, entryFromLibrary, compoundEdit, keywordSeparator);
+        boolean fieldsRemoved = removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, compoundEdit);
+        boolean citationKeyChanged = mergeCitationKey(entryFromFetcher, entryFromLibrary, compoundEdit);
 
-        return typeChanged || fieldsChanged || fieldsRemoved;
+        return typeChanged || fieldsChanged || fieldsRemoved || citationKeyChanged;
     }
 
-    private static boolean mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
+    /// Adopts the fetcher-provided citation key (e.g. an INSPIRE texkey) onto the library entry,
+    /// but only if the library entry doesn't already have one — an existing, possibly user-chosen
+    /// key is never overwritten by this merge.
+    private static boolean mergeCitationKey(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit) {
+        if (entryFromLibrary.getCitationKey().isPresent()) {
+            return false;
+        }
+
+        return entryFromFetcher.getCitationKey()
+                               .filter(key -> !key.isBlank())
+                               .map(key -> {
+                                   LOGGER.debug("Adopting citation key from fetcher: {}", key);
+                                   Optional<FieldChange> change = entryFromLibrary.setCitationKey(key);
+                                   change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
+                                   return true;
+                               })
+                               .orElse(false);
+    }
+
+    private static boolean mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit) {
         EntryType fetcherType = entryFromFetcher.getType();
         EntryType libraryType = entryFromLibrary.getType();
 
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
             entryFromLibrary.setType(fetcherType);
-            namedCompoundEdit.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
+            compoundEdit.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
             return true;
         }
         return false;
     }
 
-    private static boolean mergeFields(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
+    private static boolean mergeFields(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit, char keywordSeparator) {
         Set<Field> allFields = new LinkedHashSet<>();
         allFields.addAll(entryFromFetcher.getFields());
         allFields.addAll(entryFromLibrary.getFields());
@@ -67,24 +91,34 @@ public final class MergeEntriesHelper {
             Optional<String> fetcherValue = entryFromFetcher.getField(field);
             Optional<String> libraryValue = entryFromLibrary.getField(field);
 
-            if (fetcherValue.isPresent() && shouldUpdateField(field, fetcherValue.get(), libraryValue)) {
+            if (field == StandardField.GROUPS && fetcherValue.isPresent()) {
+                // Always union-merge groups so no source group is ever lost
+                String merged = KeywordList.merge(libraryValue.orElse(""), fetcherValue.get(), keywordSeparator)
+                                           .getAsString(keywordSeparator);
+                if (!merged.equals(libraryValue.orElse(""))) {
+                    LOGGER.debug("Union-merging groups: {} + {} -> {}", libraryValue.orElse(""), fetcherValue.get(), merged);
+                    entryFromLibrary.setField(field, merged);
+                    compoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), merged));
+                    anyFieldsChanged = true;
+                }
+            } else if (fetcherValue.isPresent() && shouldUpdateField(field, fetcherValue.get(), libraryValue)) {
                 LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), fetcherValue.get());
                 entryFromLibrary.setField(field, fetcherValue.get());
-                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
+                compoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
                 anyFieldsChanged = true;
             }
         }
         return anyFieldsChanged;
     }
 
-    private static boolean removeFieldsNotPresentInFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
+    private static boolean removeFieldsNotPresentInFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, CompoundEdit compoundEdit) {
         Set<Field> obsoleteFields = new LinkedHashSet<>(entryFromLibrary.getFields());
         obsoleteFields.removeAll(entryFromFetcher.getFields());
 
         boolean anyFieldsRemoved = false;
 
         for (Field field : obsoleteFields) {
-            if (FieldFactory.isInternalField(field)) {
+            if (FieldFactory.isInternalField(field) || field == StandardField.GROUPS) {
                 continue;
             }
 
@@ -92,7 +126,7 @@ public final class MergeEntriesHelper {
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
                 entryFromLibrary.clearField(field);
-                namedCompoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
+                compoundEdit.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
                 anyFieldsRemoved = true;
             }
         }

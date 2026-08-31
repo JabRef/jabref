@@ -27,10 +27,12 @@ import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -48,6 +50,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +74,9 @@ public class BibDatabaseWriter {
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
+
+    @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
+    private boolean useFJournalField;
 
     public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
@@ -168,6 +174,12 @@ public class BibDatabaseWriter {
         return Collections.unmodifiableList(saveActionsFieldChanges);
     }
 
+    public BibDatabaseWriter withJournalAbbreviationRepository(@NonNull JournalAbbreviationRepository repository, boolean useFJournalField) {
+        this.journalAbbreviationRepository = repository;
+        this.useFJournalField = useFJournalField;
+        return this;
+    }
+
     /// Saves the complete database.
     public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
@@ -205,6 +217,17 @@ public class BibDatabaseWriter {
         //        The cleanup should be done before the write operation
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
         saveActionsFieldChanges.addAll(saveActionChanges);
+
+        if (journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
+            bibDatabaseContext.getMetaData().getLibraryAbbreviationType().ifPresent(abbreviationType -> {
+                AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
+                        bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournalField);
+                for (BibEntry entry : sortedEntries) {
+                    saveActionsFieldChanges.addAll(cleanup.cleanup(entry));
+                }
+            });
+        }
+
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
@@ -310,6 +333,7 @@ public class BibDatabaseWriter {
         List<BibtexString> strings = database.getStringKeySet()
                                              .stream()
                                              .map(database::getString)
+                                             .flatMap(Optional::stream)
                                              .sorted(new BibtexStringComparator(true))
                                              .toList();
         // First, make a Map of all entries:

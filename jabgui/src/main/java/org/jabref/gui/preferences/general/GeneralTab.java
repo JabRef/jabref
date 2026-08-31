@@ -2,26 +2,16 @@ package org.jabref.gui.preferences.general;
 
 import java.util.regex.Pattern;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.theme.ThemeTypes;
-import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
+import org.jabref.gui.util.URLs;
 import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
@@ -32,66 +22,31 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.model.database.BibDatabaseMode;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
-import org.controlsfx.control.SearchableComboBox;
+import com.airhacks.afterburner.injection.Injector;
 
-public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
+public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
 
-    @Inject private HttpServerManager httpServerManager;
-    @Inject private LanguageServerController languageServerController;
-    @Inject private UiMessageHandler uiMessageHandler;
-    @Inject private OAuthSessionRegistry oAuthSessionRegistry;
-    @Inject private RemoteListenerServerManager remoteListenerServerManager;
-    @Inject private StateManager stateManager;
-
-    @FXML private SearchableComboBox<Language> language;
-    @FXML private ComboBox<ThemeTypes> theme;
-    @FXML private CheckBox themeSyncOs;
-    @FXML private TextField customThemePath;
-    @FXML private Button customThemeBrowse;
-    @FXML private CheckBox fontOverride;
-    @FXML private Spinner<Integer> fontSize;
-    @FXML private CheckBox openLastStartup;
-    @FXML private CheckBox showAdvancedHints;
-
-    @FXML private CheckBox confirmDelete;
-    @FXML private CheckBox shouldAskForIncludingCrossReferences;
-    @FXML private CheckBox confirmHideTabBar;
-    @FXML private CheckBox donationNeverShow;
-    @FXML private ComboBox<BibDatabaseMode> biblatexMode;
-    @FXML private CheckBox alwaysReformatBib;
-    @FXML private CheckBox autosaveLocalLibraries;
-    @FXML private Button autosaveLocalLibrariesHelp;
-    @FXML private CheckBox createBackup;
-    @FXML private TextField backupDirectory;
-    @FXML private CheckBox remoteServer;
-    @FXML private TextField remotePort;
-    @FXML private CheckBox enableHttpServer;
-    @FXML private TextField httpServerPort;
-    @FXML private CheckBox directHttpImport;
-    @FXML private CheckBox enableLanguageServer;
-    @FXML private TextField languageServerPort;
-    @FXML private Button remoteHelp;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
-    // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
+    // Formats the font-size input so that only integers can be entered.
     private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9,
-            c -> {
-                if (Pattern.matches("\\d*", c.getText())) {
-                    return c;
+            change -> {
+                if (Pattern.matches("\\d*", change.getText())) {
+                    return change;
                 }
-                c.setText("0");
-                return c;
+                change.setText("0");
+                return change;
             });
 
     public GeneralTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new GeneralTabViewModel(
+                dialogService,
+                preferences,
+                Injector.instantiateModelOrService(HttpServerManager.class),
+                Injector.instantiateModelOrService(LanguageServerController.class),
+                Injector.instantiateModelOrService(UiMessageHandler.class),
+                Injector.instantiateModelOrService(OAuthSessionRegistry.class),
+                Injector.instantiateModelOrService(RemoteListenerServerManager.class),
+                Injector.instantiateModelOrService(StateManager.class));
+        buildView();
     }
 
     @Override
@@ -99,105 +54,88 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         return Localization.lang("General");
     }
 
-    public void initialize() {
-        this.viewModel = new GeneralTabViewModel(
-                dialogService,
-                preferences,
-                httpServerManager,
-                languageServerController,
-                uiMessageHandler,
-                oAuthSessionRegistry,
-                remoteListenerServerManager,
-                stateManager);
+    private void buildView() {
+        setContent(form()
 
-        new ViewModelListCellFactory<Language>()
-                .withText(Language::getDisplayName)
-                .install(language);
-        language.itemsProperty().bind(viewModel.languagesListProperty());
-        language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
+                .section(Localization.lang("Appearance"), appearance -> appearance
+                                .searchableCombo(Localization.lang("Language"),
+                                        viewModel.languagesListProperty(),
+                                        viewModel.selectedLanguageProperty(),
+                                        Language::getDisplayName)
+                                .combo(Localization.lang("Theme"),
+                                        viewModel.themesListProperty(),
+                                        viewModel.selectedThemeProperty(),
+                                        ThemePreset::getLocalizedName,
+                                        theme -> theme.validate(viewModel.themeValidationStatus()))
+                                .combo(Localization.lang("Color scheme"),
+                                        viewModel.colorSchemeListProperty(),
+                                        viewModel.selectedThemeColorSchemeProperty(),
+                                        ThemeColorScheme::getLocalizedName,
+                                        colorScheme -> colorScheme.validate(viewModel.themeColorSchemeValidationStatus()))
+                                .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
+                                        path -> path
+                                                .browse(viewModel::importCSSFile)
+                                                .disableWhen(viewModel.customThemeEnabledProperty().not())
+                                                .grow())
+                                .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
+                                .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
+                                .field(Localization.lang("Size"), buildFontSizeSpinner(),
+                                        size -> size.validate(viewModel.fontSizeValidationStatus())),
+                        appearance -> appearance.help(URLs.CUSTOM_THEME_DOC))
 
-        fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
+                .section(Localization.lang("User interface"), userInterface -> userInterface
+                        .checkbox(Localization.lang("Open last edited libraries on startup"), viewModel.openLastStartupProperty())
+                        .checkbox(Localization.lang("Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"), viewModel.showAdvancedHintsProperty())
+                        .checkbox(Localization.lang("Show confirmation dialog when deleting entries"), viewModel.confirmDeleteProperty())
+                        .checkbox(Localization.lang("Ask whether to include cross-references when copying to another library"), viewModel.shouldAskForIncludingCrossReferences())
+                        .checkbox(Localization.lang("Hide tab bar when single library is present"), viewModel.confirmHideTabBarProperty())
+                        .checkbox(Localization.lang("Do not show donation prompt again"), viewModel.donationNeverShowProperty())
+                        .checkbox(Localization.lang("Experimental search (Postgres)"), viewModel.usePostgresSearchProperty()))
 
-        // Spinner does neither support alignment nor disableProperty in FXML
-        fontSize.disableProperty().bind(fontOverride.selectedProperty().not());
-        fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
+                .section(Localization.lang("Single instance"), singleInstance -> singleInstance
+                        .checkWithField(Localization.lang("Enforce single JabRef instance (and allow remote operations) using port"),
+                                viewModel.remoteServerProperty(), viewModel.remotePortProperty(),
+                                port -> port.validate(viewModel.remotePortValidationStatus())
+                                            .help(HelpFile.REMOTE)))
+
+                .section(Localization.lang("HTTP Server"), httpServer -> httpServer
+                        .checkWithField(Localization.lang("Enable HTTP Server (e.g., for JabMap) on port"),
+                                viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
+                                port -> port.validate(viewModel.httpPortValidationStatus()))
+                        .checkbox(Localization.lang("Skip import dialog for entries received from browser extensions"), viewModel.directHttpImportProperty()))
+
+                .section(Localization.lang("LSP Server"), lspServer -> lspServer
+                        .checkWithField(Localization.lang("Enable LSP Server on port"),
+                                viewModel.enableLanguageServerProperty(), viewModel.languageServerPortProperty(),
+                                port -> port.validate(viewModel.languageServerPortValidationStatus())))
+
+                .section(Localization.lang("Libraries"), libraries -> libraries
+                        .combo(Localization.lang("Default library mode"),
+                                viewModel.biblatexModeListProperty(), viewModel.selectedBiblatexModeProperty(), BibDatabaseMode::getFormattedName))
+
+                .section(Localization.lang("Saving"), saving -> saving
+                        .checkbox(Localization.lang("Always reformat library on save and export"), viewModel.alwaysReformatBibProperty())
+                        .checkbox(Localization.lang("Autosave local libraries"), viewModel.autosaveLocalLibrariesProperty(),
+                                autosave -> autosave.help(HelpFile.AUTOSAVE))
+                        .checkbox(Localization.lang("Create backup"), viewModel.createBackupProperty())
+                        .stringField(null, viewModel.backupDirectoryProperty(),
+                                directory -> directory
+                                        .browse(viewModel::backupFileDirBrowse)
+                                        .disableWhen(viewModel.createBackupProperty().not())))
+
+                .build());
+    }
+
+    private Spinner<Integer> buildFontSizeSpinner() {
+        Spinner<Integer> fontSize = new Spinner<>();
         fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);
+        fontSize.getStyleClass().add("fontsizeSpinner");
+        fontSize.setEditable(true);
+        fontSize.setMaxWidth(100.0);
+        fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
-
-        new ViewModelListCellFactory<ThemeTypes>()
-                .withText(ThemeTypes::getDisplayName)
-                .install(theme);
-        theme.itemsProperty().bind(viewModel.themesListProperty());
-        theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
-        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
-        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
-        EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == ThemeTypes.CUSTOM;
-            customThemePath.disableProperty().set(!isCustomTheme);
-            customThemeBrowse.disableProperty().set(!isCustomTheme);
-        });
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-
-        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
-        showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
-        confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
-        shouldAskForIncludingCrossReferences.selectedProperty().bindBidirectional(viewModel.shouldAskForIncludingCrossReferences());
-        confirmHideTabBar.selectedProperty().bindBidirectional(viewModel.confirmHideTabBarProperty());
-        donationNeverShow.selectedProperty().bindBidirectional(viewModel.donationNeverShowProperty());
-
-        new ViewModelListCellFactory<BibDatabaseMode>()
-                .withText(BibDatabaseMode::getFormattedName)
-                .install(biblatexMode);
-        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
-        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
-
-        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
-        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
-        ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);
-
-        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
-        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
-        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
-
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
-            validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
-            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
-            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
-            validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
-            validationVisualizer.initVisualization(viewModel.themeValidationStatus(), theme);
-        });
-
-        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
-        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
-        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
-
-        enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
-        httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());
-        httpServerPort.disableProperty().bind(enableHttpServer.selectedProperty().not());
-
-        directHttpImport.selectedProperty().bindBidirectional(viewModel.directHttpImportProperty());
-
-        enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
-        languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());
-        languageServerPort.disableProperty().bind(enableLanguageServer.selectedProperty().not());
-    }
-
-    @FXML
-    void importTheme() {
-        viewModel.importCSSFile();
-    }
-
-    public void backupFileDirBrowse() {
-        viewModel.backupFileDirBrowse();
-    }
-
-    @FXML
-    public void openBrowser() {
-        viewModel.openBrowser();
+        fontSize.disableProperty().bind(viewModel.fontOverrideProperty().not());
+        return fontSize;
     }
 }

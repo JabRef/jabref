@@ -202,6 +202,11 @@ Since JabRef is driven by volunteers in their spare time, reviews may take more 
 The pull request may be approved immediately, or a reviewer may request changes and/or have discussions regarding your approach.
 In that case, you are expected to answer any questions and implement the requested changes.
 
+> [!IMPORTANT]
+> Do **not** resolve review discussions yourself after addressing the feedback.
+> Resolving a conversation is reserved for the maintainer who started it, so they can verify the fix.
+> As a contributor, reply to the comment to indicate it has been addressed, then leave the conversation open.
+
 Please – **never ever close a pull request and open a new one** -
 This causes unnecessary work on our side, and is not in the style of the GitHub Open Source community.
 You can push any changes you need to make to the branch your pull request is *from*.

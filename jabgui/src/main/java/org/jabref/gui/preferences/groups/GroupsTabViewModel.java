@@ -13,6 +13,8 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty groupViewModeUnionProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoIncludeSelectedEntriesProperty = new SimpleBooleanProperty();
+    private final BooleanProperty showAiChatButtonProperty = new SimpleBooleanProperty();
 
     private final GroupsPreferences groupsPreferences;
 
@@ -31,6 +33,8 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         }
         autoAssignGroupProperty.setValue(groupsPreferences.shouldAutoAssignGroup());
         displayGroupCountProperty.setValue(groupsPreferences.shouldDisplayGroupCount());
+        autoIncludeSelectedEntriesProperty.setValue(groupsPreferences.shouldAutoIncludeSelectedEntries());
+        showAiChatButtonProperty.setValue(groupsPreferences.showAiChatButton());
     }
 
     @Override
@@ -38,6 +42,8 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, groupViewModeIntersectionProperty.getValue());
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
+        groupsPreferences.setAutoIncludeSelectedEntries(autoIncludeSelectedEntriesProperty.getValue());
+        groupsPreferences.setShowAiChatButton(showAiChatButtonProperty.getValue());
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {
@@ -54,5 +60,13 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty displayGroupCount() {
         return displayGroupCountProperty;
+    }
+
+    public BooleanProperty autoIncludeSelectedEntriesProperty() {
+        return autoIncludeSelectedEntriesProperty;
+    }
+
+    public BooleanProperty showAiChatButtonProperty() {
+        return showAiChatButtonProperty;
     }
 }

@@ -1,19 +1,20 @@
 package org.jabref.logic.layout.format;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /// This formatter takes two arguments and examines the field text.
-/// If the field text represents multiple individuals, that is it contains the string "and"
-/// then the field text is replaced with the first argument, otherwise it is replaced with the second.
-/// For example:
+/// If the field text represents multiple individuals (i.e., it contains the string ` and ` - "and" with surrounding spaces),
+/// then the field text is replaced with the first argument,
+/// otherwise it is replaced with the second.
 ///
-///
-/// \format[IfPlural(Eds.,Ed.)]{\editor}
-///
-/// Should expand to 'Eds.' if the document has more than one editor and 'Ed.' if it only has one.
+/// For example, `\format[IfPlural(Eds.,Ed.)]{\editor}`
+/// should expand to `Eds.` if the document has more than one editor and `Ed.` if it only has one.
 public class IfPlural extends AbstractParamLayoutFormatter {
+
+    private static final Pattern AND_PATTERN = Pattern.compile("\\sand\\s");
 
     private String pluralText;
     private String singularText;
@@ -34,7 +35,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null)) {
             return ""; // TODO: argument missing or invalid. Print an error message here?
         }
-        if (fieldText.matches(".*\\sand\\s.*")) {
+        if (AND_PATTERN.matcher(fieldText).find()) {
             return pluralText;
         } else {
             return singularText;

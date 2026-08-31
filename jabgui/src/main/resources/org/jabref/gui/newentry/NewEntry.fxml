@@ -115,7 +115,7 @@
                                     StackPane.alignment="CENTER_RIGHT"
                                     text="%Jump to entry"
                                     visible="false"
-                                    style="-fx-padding: 0 15 0 0;"/>
+                                    styleClass="padding-right-15"/>
                         </StackPane>
                     </HBox>
                     <VBox spacing="5.0">
@@ -168,6 +168,44 @@
                             </font>
                         </Label>
                     </VBox>
+                </VBox>
+            </Tab>
+
+            <Tab fx:id="tabEnterUrl"
+                 text="%Enter URL"
+                 closable="false">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
+                    <Label text="%Enter a URL to create a new entry for that link.">
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
+                    </Label>
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="10.0">
+                        <Label text="%URL"/>
+                        <TextField
+                                fx:id="urlText"
+                                prefHeight="30.0"
+                                HBox.hgrow="ALWAYS">
+                            <tooltip>
+                                <Tooltip text="%Specify the URL to create an entry for."/>
+                            </tooltip>
+                        </TextField>
+                    </HBox>
+                    <Label fx:id="urlErrorInvalidText"
+                           text="%You must provide a valid URL.">
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                    </Label>
                 </VBox>
             </Tab>
 

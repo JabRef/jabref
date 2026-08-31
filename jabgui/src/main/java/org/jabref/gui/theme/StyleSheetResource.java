@@ -6,18 +6,14 @@ final class StyleSheetResource extends StyleSheet {
 
     private final URL url;
 
-    StyleSheetResource(URL url) {
+    StyleSheetResource(String name, URL url) {
+        super(name);
         this.url = url;
     }
 
     @Override
     URL getSceneStylesheet() {
         return url;
-    }
-
-    @Override
-    public String getWebEngineStylesheet() {
-        return url.toExternalForm();
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This thread wrapper is required to be able to interrupt the http server, e.g. when JabRef is closing down the http server should shutdown as well.
+/// Used by the GUI only
 @NullMarked
 public class HttpServerThread extends Thread {
 
@@ -25,14 +26,12 @@ public class HttpServerThread extends Thread {
     private final SrvStateManager srvStateManager;
     private final URI uri;
 
-    @Nullable
     private final UiMessageHandler uiMessageHandler;
 
     @Nullable
     private HttpServer httpServer;
 
-    /// @param uiMessageHandler - non-null for GUI usage
-    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, OAuthSessionRegistry oAuthSessionRegistry, URI uri) {
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, UiMessageHandler uiMessageHandler, OAuthSessionRegistry oAuthSessionRegistry, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uiMessageHandler = uiMessageHandler;
         this.uri = uri;

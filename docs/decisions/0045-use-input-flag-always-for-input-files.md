@@ -1,4 +1,13 @@
+---
+nav_order: 45
+parent: Decision Records
+status: "superseded by ADR-0057"
+---
 # Use `--input` Flag Consistently for Reading Input Files
+
+> [!NOTE]
+> This decision is **superseded by [ADR-0057](0057-allow-positional-input-file-argument.md)**.
+> The positional `FILE` argument is now the preferred form for passing the input file; `--input` is retained only as a backward-compatible alias.
 
 ## Context and Problem Statement
 
@@ -57,9 +66,9 @@ jabkit format --input references.bib
 ### Use specialized syntax tailored to each subcommand
 
 * Good, because "intuitive" command-line options for each subcommand
-* Bad, becauuse inconsistency
-* Bad, becauuse increased cognitive load
-* Bad, becauuse more complex parsing logic
+* Bad, because inconsistency
+* Bad, because increased cognitive load
+* Bad, because more complex parsing logic
 
 ## Links
 

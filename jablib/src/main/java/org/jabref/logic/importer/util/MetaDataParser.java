@@ -20,6 +20,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.strings.StringUtil;
@@ -133,6 +134,12 @@ public class MetaDataParser {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
+            } else if (MetaData.LIBRARY_ABBREVIATION_TYPE.equals(entry.getKey())) {
+                try {
+                    metaData.setLibraryAbbreviationType(AbbreviationType.valueOf(getSingleItem(values)));
+                } catch (IllegalArgumentException e) {
+                    LOGGER.debug("Unknown library abbreviation type: {}", getSingleItem(values), e);
+                }
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
                 defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
@@ -150,6 +157,8 @@ public class MetaDataParser {
                 metaData.setGroupSearchSyntaxVersion(version);
             } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {
                 metaData.setVersionDBStructure(getSingleItem(values));
+            } else if (MetaData.AI_LIBRARY_ID.equals(entry.getKey())) {
+                metaData.setAiLibraryId(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), values);

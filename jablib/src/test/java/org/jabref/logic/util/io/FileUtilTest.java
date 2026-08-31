@@ -72,6 +72,19 @@ class FileUtilTest {
     }
 
     @Test
+    void getFileSizeReturnsHumanReadableSize(@TempDir Path tempDir) throws IOException {
+        Path file = tempDir.resolve("library.bib");
+        Files.write(file, new byte[1024]);
+
+        assertEquals(Optional.of("1 KB"), FileUtil.getFileSize(file));
+    }
+
+    @Test
+    void getFileSizeReturnsEmptyForMissingFile(@TempDir Path tempDir) {
+        assertEquals(Optional.empty(), FileUtil.getFileSize(tempDir.resolve("missing.bib")));
+    }
+
+    @Test
     void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
         assertEquals(Path.of("tmp", "demo.bib.bak"),
                 FileUtil.addExtension(Path.of("tmp", "demo.bib"), ".bak"));
@@ -398,6 +411,27 @@ class FileUtilTest {
     }
 
     @Test
+    void validFilenameShouldBeTruncatedWhenNameAloneFitsButNamePlusExtensionExceeds255() {
+        String longerThanLimitWithExtension = "1".repeat(252) + ".pdf";
+        String expectedTruncated = "1".repeat(251) + ".pdf";
+        assertEquals(255, expectedTruncated.length());
+        assertEquals(256, longerThanLimitWithExtension.length());
+        assertEquals(expectedTruncated, FileUtil.getValidFileName(longerThanLimitWithExtension));
+    }
+
+    @Test
+    void getValidFileNameDoesNotThrowForInvalidPathCharacters() {
+        String result = FileUtil.getValidFileName("a:b.pdf");
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void getValidFileNameDoesNotDuplicateExtensionForInvalidPath() {
+        String result = FileUtil.getValidFileName("invalid<>path.pdf");
+        assertFalse(result.endsWith(".pdf.pdf"));
+    }
+
+    @Test
     void getLinkedDirNameDefaultFullTitle() {
         String fileDirPattern = "PDF/[year]/[auth]/[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
@@ -423,13 +457,33 @@ class FileUtilTest {
     @Test
     void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        Path bibUpperFile = Files.createFile(rootDir.resolve("test_upper.BIB"));
+        Path bibMixedFile = Files.createFile(rootDir.resolve("test_mixed.Bib"));
         assertTrue(FileUtil.isBibFile(bibFile));
+        assertTrue(FileUtil.isBibFile(bibUpperFile));
+        assertTrue(FileUtil.isBibFile(bibMixedFile));
     }
 
     @Test
     void isNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    void isPDFFile() throws IOException {
+        Path pdfFile = Files.createFile(rootDir.resolve("test.pdf"));
+        Path pdfUpperFile = Files.createFile(rootDir.resolve("test_upper.PDF"));
+        Path pdfMixedFile = Files.createFile(rootDir.resolve("test_mixed.Pdf"));
+        assertTrue(FileUtil.isPDFFile(pdfFile));
+        assertTrue(FileUtil.isPDFFile(pdfUpperFile));
+        assertTrue(FileUtil.isPDFFile(pdfMixedFile));
+    }
+
+    @Test
+    void isNotPDFFile() throws IOException {
+        Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        assertFalse(FileUtil.isPDFFile(bibFile));
     }
 
     @Test

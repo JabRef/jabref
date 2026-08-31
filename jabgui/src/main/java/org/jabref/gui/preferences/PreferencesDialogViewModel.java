@@ -32,6 +32,8 @@ import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.ocr.OcrTab;
+import org.jabref.gui.preferences.openoffice.OpenOfficeTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
@@ -39,6 +41,7 @@ import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -51,6 +54,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
+    /// Memory-stick mode is deliberately not part of any tab: it belongs to the portable-preferences
+    /// concern (import/export/reset) and is therefore a footer toggle of the dialog itself,
+    /// loaded in [#setValues()] and stored in [#storeAllSettings()] alongside the tabs.
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
@@ -61,15 +67,16 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        // This enables passing unsaved preference values from the AI tab to the "web search" tab.
-        AiTab aiTab = new AiTab();
+        // Dialog-scoped working copy of the AI preferences: the AI tab edits it and flushes it to
+        // the live preferences on save; the web search tab observes its master switch meanwhile.
+        AiPreferences workingAiPreferences = AiPreferences.copyOf(preferences.getAiPreferences());
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(aiTab.aiEnabledProperty()),
-                aiTab,
+                new WebSearchTab(workingAiPreferences),
+                new AiTab(workingAiPreferences),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
@@ -77,6 +84,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomEntryTypesTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
+                new OcrTab(),
+                new OpenOfficeTab(),
                 new ExportTab(),
                 new AutoCompletionTab(),
                 new ProtectedTermsTab(),
@@ -164,7 +173,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /// Checks if all tabs are valid
-    public boolean validSettings() {
+    private boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return false;
@@ -173,9 +182,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return true;
     }
 
-    public void storeAllSettings() {
+    /// @return true if the settings were valid and have been stored
+    public boolean storeAllSettings() {
         if (!validSettings()) {
-            return;
+            return false;
         }
 
         // Store settings
@@ -196,6 +206,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         dialogService.notify(Localization.lang("Preferences recorded."));
+        return true;
     }
 
     /// Inserts the preference values into the Properties of the ViewModel

@@ -8,11 +8,11 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.edit.automaticfieldeditor.editfieldcontent.EditFieldContentViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.CompoundEdit;
 
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
@@ -63,7 +63,7 @@ class EditFieldContentTabViewModelTest {
         editFieldContentViewModel = new EditFieldContentViewModel(
                 bibDatabase,
                 List.of(entryA, entryB),
-                mock(NamedCompoundEdit.class),
+                mock(CompoundEdit.class),
                 dialogService,
                 stateManager);
     }

@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.undo.CompoundEdit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +23,12 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEntryMergeTask.class);
 
-    private final NamedCompoundEdit compoundEdit;
+    private final CompoundEdit compoundEdit;
     private final List<BibEntry> entries;
     private final MergingIdBasedFetcher fetcher;
     private final UndoManager undoManager;
     private final NotificationService notificationService;
+    private final char keywordSeparator;
 
     private int processedEntries;
     private int successfulUpdates;
@@ -36,13 +36,15 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
     public BatchEntryMergeTask(List<BibEntry> entries,
                                MergingIdBasedFetcher fetcher,
                                UndoManager undoManager,
-                               NotificationService notificationService) {
+                               NotificationService notificationService,
+                               char keywordSeparator) {
         this.entries = entries;
         this.fetcher = fetcher;
         this.undoManager = undoManager;
         this.notificationService = notificationService;
+        this.keywordSeparator = keywordSeparator;
 
-        this.compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
+        this.compoundEdit = new CompoundEdit(StandardActions.MERGE_ENTRIES.getText());
         this.processedEntries = 0;
         this.successfulUpdates = 0;
 
@@ -107,7 +109,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         return fetcher.fetchEntry(entry)
                       .filter(MergingIdBasedFetcher.FetcherResult::hasChanges)
                       .flatMap(result -> {
-                          boolean changesApplied = MergeEntriesHelper.mergeEntries(result.mergedEntry(), entry, compoundEdit);
+                          boolean changesApplied = MergeEntriesHelper.mergeEntries(result.mergedEntry(), entry, compoundEdit, keywordSeparator);
                           if (changesApplied) {
                               successfulUpdates++;
                               return entry.getCitationKey();
@@ -118,8 +120,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private void updateUndoManager(List<String> updatedEntries) {
         if (!updatedEntries.isEmpty()) {
-            compoundEdit.end();
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
     }
 

@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
+
+import javafx.collections.ListChangeListener;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -21,7 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -88,6 +90,28 @@ class BibDatabaseTest {
     }
 
     @Test
+    void removeEntryNotifiesOnlyAboutTheRemovedEntry() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        database.insertEntries(entry1, entry2, entry3);
+
+        List<List<BibEntry>> addedEntries = new ArrayList<>();
+        List<List<BibEntry>> removedEntries = new ArrayList<>();
+        database.getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                addedEntries.add(List.copyOf(change.getAddedSubList()));
+                removedEntries.add(List.copyOf(change.getRemoved()));
+            }
+        });
+
+        database.removeEntry(entry2);
+
+        assertEquals(List.of(List.of()), addedEntries);
+        assertEquals(List.of(List.of(entry2)), removedEntries);
+    }
+
+    @Test
     void removeAllEntriesRemovesAllEntriesFromEntriesList() {
         List<BibEntry> allEntries = new ArrayList<>();
         BibEntry entry1 = new BibEntry();
@@ -102,6 +126,41 @@ class BibDatabaseTest {
         assertFalse(database.containsEntryWithId(entry1.getId()));
         assertFalse(database.containsEntryWithId(entry2.getId()));
         assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    void removeManyEntriesReplacesEntriesList() {
+        List<BibEntry> entriesToDelete = IntStream.range(0, 11)
+                                                  .mapToObj(_ -> new BibEntry())
+                                                  .toList();
+        BibEntry remainingEntry = new BibEntry();
+        database.insertEntries(entriesToDelete);
+        database.insertEntry(remainingEntry);
+
+        List<Boolean> replacementChanges = new ArrayList<>();
+        database.getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                replacementChanges.add(change.wasReplaced());
+            }
+        });
+
+        database.removeEntries(entriesToDelete);
+
+        assertEquals(List.of(true), replacementChanges);
+        assertEquals(List.of(remainingEntry), database.getEntries());
+    }
+
+    @Test
+    void getEntriesSnapshotRemainsStableAfterEntriesAreRemoved() {
+        BibEntry entryToDelete = new BibEntry();
+        BibEntry remainingEntry = new BibEntry();
+        database.insertEntries(entryToDelete, remainingEntry);
+
+        List<BibEntry> entriesSnapshot = database.getEntriesSnapshot();
+        database.removeEntry(entryToDelete);
+
+        assertEquals(List.of(entryToDelete, remainingEntry), entriesSnapshot);
+        assertEquals(List.of(remainingEntry), database.getEntries());
     }
 
     @Test
@@ -162,7 +221,7 @@ class BibDatabaseTest {
     void stringIsNotModifiedAfterInsertion() {
         database.addString(bibtexString);
 
-        assertEquals(bibtexString, database.getString(bibtexString.getId()));
+        assertEquals(Optional.of(bibtexString), database.getString(bibtexString.getId()));
     }
 
     @Test
@@ -212,10 +271,10 @@ class BibDatabaseTest {
     @Test
     void databaseReturnsNullForRemovedString() {
         database.addString(bibtexString);
-        assertEquals(bibtexString, database.getString(bibtexString.getId()));
+        assertEquals(Optional.of(bibtexString), database.getString(bibtexString.getId()));
 
         database.removeString(bibtexString.getId());
-        assertNull(database.getString(bibtexString.getId()));
+        assertTrue(database.getString(bibtexString.getId()).isEmpty());
     }
 
     @Test

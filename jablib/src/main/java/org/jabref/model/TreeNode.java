@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents a node in a tree.
 ///
@@ -35,7 +36,10 @@ public abstract class TreeNode<T extends TreeNode<T>> {
 
     /// Array of children, may be empty if this node has no children (but never null)
     private final ObservableList<T> children;
+    /// Cached read-only view of `children` to avoid allocating a new wrapper on every `getChildren()` call.
+    private final ObservableList<T> unmodifiableChildren;
     /// This node's parent, or null if this node has no parent
+    @Nullable
     private T parent;
     /// The function which is invoked when something changed in the subtree.
     private Consumer<T> onDescendantChanged = t -> {
@@ -48,6 +52,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
+        unmodifiableChildren = FXCollections.unmodifiableObservableList(children);
 
         if (!derivingClass.isInstance(this)) {
             throw new UnsupportedOperationException("The class extending TreeNode<T> has to derive from T");
@@ -222,7 +227,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// from the old parent. You should probably call moveTo or remove to change the tree.
     ///
     /// @param parent the new parent
-    protected void setParent(T parent) {
+    protected void setParent(@Nullable T parent) {
         this.parent = parent;
     }
 
@@ -343,7 +348,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     ///
     /// @return a list of this node's children
     public ObservableList<T> getChildren() {
-        return FXCollections.unmodifiableObservableList(children);
+        return unmodifiableChildren;
+    }
+
+    protected ObservableList<T> getChildrenInternal() {
+        return children;
     }
 
     /// Removes the given child from this node's child list, giving it an empty parent.
@@ -529,6 +538,6 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     }
 
     public Stream<T> iterateOverTree() {
-        return Stream.concat(Stream.of((T) this), getChildren().stream().flatMap(TreeNode::iterateOverTree));
+        return Stream.concat(Stream.of((T) this), getChildrenInternal().stream().flatMap(TreeNode::iterateOverTree));
     }
 }

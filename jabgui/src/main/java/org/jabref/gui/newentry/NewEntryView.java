@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -91,8 +92,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private AiService aiService;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private AiService aiService;
 
     private final ControlsFxVisualizer visualizer;
 
@@ -102,6 +103,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TabPane tabs;
     @FXML private Tab tabAddEntry;
     @FXML private Tab tabLookupIdentifier;
+    @FXML private Tab tabEnterUrl;
     @FXML private Tab tabInterpretCitations;
     @FXML private Tab tabSpecifyBibtex;
 
@@ -122,6 +124,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
+
+    @FXML private TextField urlText;
+    @FXML private Label urlErrorInvalidText;
 
     @FXML private TextArea interpretText;
     @FXML private ComboBox<PlainCitationParserChoice> interpretParser;
@@ -198,6 +203,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 tabs.getSelectionModel().select(tabLookupIdentifier);
                 switchLookupIdentifier();
                 break;
+            case NewEntryDialogTab.ENTER_URL:
+                tabs.getSelectionModel().select(tabEnterUrl);
+                switchEnterUrl();
+                break;
             case NewEntryDialogTab.INTERPRET_CITATIONS:
                 tabs.getSelectionModel().select(tabInterpretCitations);
                 switchInterpretCitations();
@@ -210,13 +219,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         tabAddEntry.setOnSelectionChanged(_ -> switchAddEntry());
         tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
+        tabEnterUrl.setOnSelectionChanged(_ -> switchEnterUrl());
         tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
         tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
     }
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
 
@@ -232,6 +242,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         initializeAddEntry();
         initializeLookupIdentifier();
+        initializeEnterUrl();
         initializeInterpretCitations();
         initializeSpecifyBibTeX();
     }
@@ -369,6 +380,23 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
+    private void initializeEnterUrl() {
+        urlText.setPromptText(Localization.lang("Enter the URL to create an entry for."));
+        urlText.textProperty().bindBidirectional(viewModel.urlTextProperty());
+
+        // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
+        // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
+        // [impl->req~textinput.clipboard.autofocus~1]
+        final String clipboardText = ClipBoardManager.getContents().trim();
+        if (URLUtil.isURL(clipboardText)) {
+            urlText.setText(clipboardText);
+            urlText.selectAll();
+        }
+
+        urlErrorInvalidText.visibleProperty().bind(viewModel.urlTextValidatorProperty().not());
+        urlErrorInvalidText.managedProperty().bind(viewModel.urlTextValidatorProperty().not());
+    }
+
     private void initializeInterpretCitations() {
         // [impl->req~textinput.clipboard.autofocus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
@@ -436,6 +464,29 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     @FXML
+    private void switchEnterUrl() {
+        if (!tabEnterUrl.isSelected()) {
+            return;
+        }
+
+        currentApproach = NewEntryDialogTab.ENTER_URL;
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_URL);
+
+        if (urlText != null) {
+            Platform.runLater(() -> {
+                if (tabEnterUrl.isSelected()) {
+                    urlText.requestFocus();
+                }
+            });
+        }
+
+        if (generateButton != null) {
+            generateButton.disableProperty().bind(viewModel.urlTextValidatorProperty().not());
+            generateButton.setText(Localization.lang("Create"));
+        }
+    }
+
+    @FXML
     private void switchInterpretCitations() {
         if (!tabInterpretCitations.isSelected()) {
             return;
@@ -498,6 +549,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 generateButton.setText(Localization.lang("Searching..."));
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
+                break;
+            case NewEntryDialogTab.ENTER_URL:
+                generateButton.setText(Localization.lang("Fetching..."));
+                viewModel.executeEnterUrl();
+                switchEnterUrl();
                 break;
             case NewEntryDialogTab.INTERPRET_CITATIONS:
                 generateButton.setText(Localization.lang("Parsing..."));

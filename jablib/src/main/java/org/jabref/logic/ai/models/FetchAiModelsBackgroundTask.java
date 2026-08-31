@@ -2,9 +2,10 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -16,8 +17,7 @@ public class FetchAiModelsBackgroundTask extends BackgroundTask<List<String>> {
     private final AiModelService aiModelService;
     private final AiProvider aiProvider;
     private final String apiBaseUrl;
-    @Nullable
-    private final String apiKey;
+    private final @Nullable String apiKey;
 
     public FetchAiModelsBackgroundTask(AiModelService aiModelService, AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         this.aiModelService = aiModelService;
@@ -30,13 +30,13 @@ public class FetchAiModelsBackgroundTask extends BackgroundTask<List<String>> {
 
     private void configure() {
         showToUser(false);
-        titleProperty().set(Localization.lang("Fetching models for %0", aiProvider.getLabel()));
+        titleProperty().set(Localization.lang("Fetching models for %0", AiNamingUtils.getDisplayName(aiProvider)));
         willBeRecoveredAutomatically(true);
     }
 
     @Override
     public List<String> call() {
-        return aiModelService.fetchModelsSynchronously(
+        return aiModelService.getAvailableModels(
                 aiProvider,
                 apiBaseUrl,
                 apiKey

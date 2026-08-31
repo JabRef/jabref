@@ -4,13 +4,12 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Langid;
@@ -32,7 +31,7 @@ public class LanguageEditorViewModelTest {
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         FilePreferences filePreferences = mock(FilePreferences.class);
         JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, filePreferences, abbreviationRepository, false, CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, filePreferences, abbreviationRepository, false, CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS);
         SuggestionProvider<?> suggestionProvider = mock(SuggestionProvider.class);
 
         languageEditorViewModel = new LanguageEditorViewModel(
@@ -40,7 +39,7 @@ public class LanguageEditorViewModelTest {
                 suggestionProvider,
                 BibDatabaseMode.BIBLATEX,
                 fieldCheckers,
-                new UndoManager()
+                new JabRefUndoManager()
         );
     }
 

@@ -1,8 +1,8 @@
 package org.jabref.logic.net;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
@@ -35,15 +35,17 @@ class URLDownloadTest {
 
     @Test
     void fileDownload() throws IOException, FetcherException {
-        File destination = File.createTempFile("jabref-test", ".html");
+        Path destination = Files.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
-            dl.toFile(destination.toPath());
-            assertTrue(destination.exists(), "file must exist");
+            dl.toFile(destination);
+            assertTrue(Files.exists(destination), "file must exist");
         } finally {
             // cleanup
-            if (!destination.delete()) {
-                LOGGER.error("Cannot delete downloaded file");
+            try {
+                Files.delete(destination);
+            } catch (IOException e) {
+                LOGGER.error("Cannot delete downloaded file", e);
             }
         }
     }
@@ -65,10 +67,12 @@ class URLDownloadTest {
 
     @Test
     void downloadToTemporaryFileKeepsName() throws MalformedURLException, FetcherException {
-        URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
-
-        String path = google.toTemporaryFile().toString();
-        assertTrue(path.contains("LICENSE"), path);
+        URLDownload urlDownload = new URLDownload(
+                URLUtil.create("https://files.jabref.org/download-test.txt"));
+        Path path = urlDownload.toTemporaryFile();
+        String fileName = path.getFileName().toString();
+        // fileName is something like jabref-download-test8822989014397910829.txt; thus we cannot use assertEquals
+        assertTrue(fileName.contains("download-test"));
     }
 
     @Test
@@ -121,13 +125,13 @@ class URLDownloadTest {
 
     @Test
     void test503ErrorThrowsFetcherServerException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
     void test429ErrorThrowsFetcherClientException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 }

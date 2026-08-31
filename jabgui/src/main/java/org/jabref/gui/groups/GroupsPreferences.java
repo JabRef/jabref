@@ -19,19 +19,25 @@ public class GroupsPreferences {
     private final SetProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
+    private final BooleanProperty shouldAutoIncludeSelectedEntries;
     private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext;
+    private final BooleanProperty showAiChatButton;
 
     public GroupsPreferences(boolean viewModeIntersection,
                              boolean viewModeFilter,
                              boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
-                             GroupHierarchyType defaultHierarchicalContext) {
+                             boolean shouldAutoIncludeSelectedEntries,
+                             GroupHierarchyType defaultHierarchicalContext,
+                             boolean showAiChatButton) {
 
         this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.shouldAutoIncludeSelectedEntries = new SimpleBooleanProperty(shouldAutoIncludeSelectedEntries);
         this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
+        this.showAiChatButton = new SimpleBooleanProperty(showAiChatButton);
 
         if (viewModeIntersection) {
             this.groupViewMode.add(GroupViewMode.INTERSECTION);
@@ -51,7 +57,9 @@ public class GroupsPreferences {
                 false,                            // Default view mode invert
                 true,                             // Default auto assign group
                 true,                             // Default display group content
-                GroupHierarchyType.INDEPENDENT    // Default hierarchical context
+                true,                             // Default include selected entries in new explicit groups
+                GroupHierarchyType.INDEPENDENT,   // Default hierarchical context
+                true                              // Default view mode for the AI chat button
         );
     }
 
@@ -59,22 +67,19 @@ public class GroupsPreferences {
     public GroupsPreferences(EnumSet<GroupViewMode> groupViewMode,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
-                             GroupHierarchyType defaultHierarchicalContext) {
+                             boolean shouldAutoIncludeSelectedEntries,
+                             GroupHierarchyType defaultHierarchicalContext,
+                             boolean showAiChatButton) {
         this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet(groupViewMode));
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.shouldAutoIncludeSelectedEntries = new SimpleBooleanProperty(shouldAutoIncludeSelectedEntries);
         this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
+        this.showAiChatButton = new SimpleBooleanProperty(showAiChatButton);
     }
 
     public static GroupsPreferences getDefault() {
         return new GroupsPreferences();
-    }
-
-    public void setAll(GroupsPreferences preferences) {
-        this.groupViewMode.set(preferences.groupViewMode);
-        this.shouldAutoAssignGroup.set(preferences.shouldAutoAssignGroup());
-        this.shouldDisplayGroupCount.set(preferences.shouldDisplayGroupCount());
-        this.defaultHierarchicalContext.set(preferences.getDefaultHierarchicalContext());
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {
@@ -120,6 +125,18 @@ public class GroupsPreferences {
         this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
     }
 
+    public boolean shouldAutoIncludeSelectedEntries() {
+        return shouldAutoIncludeSelectedEntries.getValue();
+    }
+
+    public BooleanProperty autoIncludeSelectedEntriesProperty() {
+        return shouldAutoIncludeSelectedEntries;
+    }
+
+    public void setAutoIncludeSelectedEntries(boolean shouldAutoIncludeSelectedEntries) {
+        this.shouldAutoIncludeSelectedEntries.set(shouldAutoIncludeSelectedEntries);
+    }
+
     public GroupHierarchyType getDefaultHierarchicalContext() {
         return defaultHierarchicalContext.get();
     }
@@ -130,5 +147,17 @@ public class GroupsPreferences {
 
     public void setDefaultHierarchicalContext(GroupHierarchyType defaultHierarchicalContext) {
         this.defaultHierarchicalContext.set(defaultHierarchicalContext);
+    }
+
+    public boolean showAiChatButton() {
+        return showAiChatButton.getValue();
+    }
+
+    public BooleanProperty showAiChatButtonProperty() {
+        return showAiChatButton;
+    }
+
+    public void setShowAiChatButton(boolean showAiChatButton) {
+        this.showAiChatButton.set(showAiChatButton);
     }
 }

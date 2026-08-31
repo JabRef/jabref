@@ -26,6 +26,14 @@ public record CSLStyleLoader(
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
+    /// Keys written by `CitationStyleCatalogGenerator#generateCatalog`. Keep in sync when adding style metadata.
+    private static final List<String> CATALOG_KEYS = List.of(
+            "path", "title", "styleId", "styleClass", "shortTitle",
+            "isNumeric", "hasBibliography", "hasBibliographySortOrder", "usesHangingIndent");
+
+    /// Placeholder returned when even the default style cannot be loaded. Not backed by a CSL source.
+    private static final CitationStyle EMPTY_STYLE = new CitationStyle("", "", "", "Empty", "Empty", false, false, false, false, "", true);
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
 
     public CSLStyleLoader(@NonNull OpenOfficePreferences openOfficePreferences) {
@@ -35,7 +43,7 @@ public record CSLStyleLoader(
 
     /// Returns a list of all available citation styles (both internal and external).
     public static List<CitationStyle> getStyles() {
-        List<CitationStyle> result = new ArrayList<>(INTERNAL_STYLES);
+        List<CitationStyle> result = new ArrayList<>(getInternalStyles());
         result.addAll(EXTERNAL_STYLES);
         return result;
     }
@@ -46,7 +54,7 @@ public record CSLStyleLoader(
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> CSLStyleUtils.createCitationStyleFromFile(DEFAULT_STYLE)
-                                                            .orElse(new CitationStyle("", "Empty", "Empty", false, false, false, "", true)));
+                                                            .orElse(EMPTY_STYLE));
     }
 
     /// Loads the internal (built-in) CSL styles from the catalog generated at build-time.
@@ -66,27 +74,50 @@ public record CSLStyleLoader(
 
             if (!styleInfoList.isEmpty()) {
                 int styleCount = styleInfoList.size();
+                findMissingCatalogKeys(styleInfoList.getFirst())
+                        .forEach(key -> LOGGER.error("Citation style catalog has no '{}' entry. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.", key));
+
                 for (Map<String, Object> info : styleInfoList) {
                     @NonNull
                     String path = (String) info.get("path");
                     @NonNull
                     String title = (String) info.get("title");
+                    @NonNull
+                    String styleId = Optional.ofNullable((String) info.get("styleId")).orElse("");
+                    @NonNull
+                    String styleClass = Optional.ofNullable((String) info.get("styleClass")).orElse("");
                     @Nullable
                     String shortTitle = (String) info.get("shortTitle");
                     if (shortTitle == null) {
-                        LOGGER.error("JabRef added support of shortTitle in August, 2025. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.");
                         shortTitle = title;
                     }
-                    boolean isNumeric = (boolean) info.get("isNumeric");
-                    boolean hasBibliography = (boolean) info.get("hasBibliography");
-                    boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
+                    boolean isNumeric = Boolean.TRUE.equals(info.get("isNumeric"));
+                    boolean hasBibliography = Boolean.TRUE.equals(info.get("hasBibliography"));
+                    boolean hasBibliographySortOrder = Boolean.TRUE.equals(info.get("hasBibliographySortOrder"));
+                    boolean usesHangingIndent = Boolean.TRUE.equals(info.get("usesHangingIndent"));
 
                     // We use these metadata and just load the content instead of re-parsing for them
                     // These are located in the resources directly; therefore it is enough to use the class itself for loading
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, shortTitle, isNumeric, hasBibliography, usesHangingIndent, source, true);
+                            // If cannot find styleId or styleClass, then parse .csl to retrieve them
+                            if (styleId.isBlank() || styleClass.isBlank()) {
+                                Optional<CSLStyleUtils.StyleInfo> parsedStyleInfo = CSLStyleUtils.parseStyleInfo(path, source);
+                                styleId = styleId.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleId).orElse("") : styleId;
+                                styleClass = styleClass.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleClass).orElse("") : styleClass;
+                            }
+                            CitationStyle style = new CitationStyle(
+                                    path,
+                                    styleId,
+                                    styleClass,
+                                    title, shortTitle,
+                                    isNumeric,
+                                    hasBibliography,
+                                    hasBibliographySortOrder,
+                                    usesHangingIndent,
+                                    source,
+                                    true);    // isInternalStyle
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
@@ -101,6 +132,12 @@ public record CSLStyleLoader(
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
         }
+    }
+
+    static List<String> findMissingCatalogKeys(Map<String, Object> info) {
+        return CATALOG_KEYS.stream()
+                           .filter(key -> !info.containsKey(key))
+                           .toList();
     }
 
     /// Loads external CSL styles from the preferences.

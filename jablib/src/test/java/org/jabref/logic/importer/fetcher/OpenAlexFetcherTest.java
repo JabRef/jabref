@@ -34,16 +34,10 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class OpenAlexFetcherTest {
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey);
+    // Mirror getApiKey: a blank (unsubstituted) key is absent, so offline tests see the keyless URL.
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey).filter(key -> !key.isBlank());
 
     private OpenAlex fetcher;
-
-    private final BibEntry NERF = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Haithem Turki and Deva Ramanan and Mahadev Satyanarayanan")
-            .withField(StandardField.YEAR, "2022")
-            .withField(StandardField.DOI, "10.1109/cvpr52688.2022.01258")
-            .withField(StandardField.TITLE, "Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs")
-            .withField(StandardField.URL, "https://openalex.org/W4313031684");
 
     @BeforeEach
     void setUp() {
@@ -71,8 +65,8 @@ class OpenAlexFetcherTest {
                 "\"type\":\"article\"," +
                 "\"title\":\"Sample Title\"," +
                 "\"publication_year\":2020," +
-                "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
                 "\"id\":\"https://openalex.org/W12345\"," +
+                "\"ids\":{\"doi\":\"https://doi.org/10.1234/ABC.5678\"}," +
                 "\"authorships\":[{" +
                 "\"author\":{\"display_name\":\"Alice\"}}," +
                 "{\"author\":{\"display_name\":\"Bob\"}}]," +
@@ -104,8 +98,8 @@ class OpenAlexFetcherTest {
                     "type":"article",
                     "title":"Single Title",
                     "publication_year":2019,
-                    "doi":"https://doi.org/10.5555/xyz",
                     "id":"https://openalex.org/W999",
+                    "ids":{"doi":"https://doi.org/10.5555/xyz"},
                     "authorships":[{"author":{"display_name":"Carol"}}],
                     "biblio":{"first_page":"1","last_page":"10"}
                 }
@@ -163,11 +157,11 @@ class OpenAlexFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws FetcherException {
-        BibEntry master = new BibEntry(StandardEntryType.Article)
+        BibEntry master = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Matthew Tancik and Vincent Casser and Xinchen Yan and Sabeek Pradhan and Ben Mildenhall and Pratul P. Srinivasan and Jonathan T. Barron and Henrik Kretzschmar")
                 .withField(StandardField.TITLE, "Block-NeRF: Scalable Large Scene Neural View Synthesis")
-                .withField(StandardField.YEAR, "2022")
                 .withField(StandardField.DOI, "10.1109/cvpr52688.2022.00807")
+                .withField(StandardField.DATE, "2022-06-01")
                 .withField(StandardField.URL, "https://openalex.org/W4312280420");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Block-NeRF: Scalable Large Scene Neural View Synthesis");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
@@ -183,10 +177,17 @@ class OpenAlexFetcherTest {
 
     @Test
     void searchByQuotedQueryFindsEntry() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Haithem Turki and Deva Ramanan and Mahadev Satyanarayanan")
+                .withField(StandardField.DATE, "2022-06-01")
+                .withField(StandardField.DOI, "10.1109/cvpr52688.2022.01258")
+                .withField(StandardField.TITLE, "Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs")
+                .withField(StandardField.URL, "https://openalex.org/W4313031684");
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs\"");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.PAGES));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.KEYWORDS));
-        assertEquals(NERF, fetchedEntries.getFirst());
+        assertEquals(expected, fetchedEntries.getFirst());
     }
 }

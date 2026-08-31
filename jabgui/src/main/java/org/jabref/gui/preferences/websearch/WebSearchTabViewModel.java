@@ -37,7 +37,6 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BackgroundTask;
@@ -80,13 +79,20 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
-    public WebSearchTabViewModel(CliPreferences preferences, ReadOnlyBooleanProperty refAiEnabled, TaskExecutor taskExecutor) {
-        this.importerPreferences = preferences.getImporterPreferences();
-        this.grobidPreferences = preferences.getGrobidPreferences();
-        this.doiPreferences = preferences.getDOIPreferences();
-        this.filePreferences = preferences.getFilePreferences();
-        this.importFormatPreferences = preferences.getImportFormatPreferences();
-        this.libraryPreferences = preferences.getLibraryPreferences();
+    public WebSearchTabViewModel(ImporterPreferences importerPreferences,
+                                 GrobidPreferences grobidPreferences,
+                                 DOIPreferences doiPreferences,
+                                 FilePreferences filePreferences,
+                                 ImportFormatPreferences importFormatPreferences,
+                                 LibraryPreferences libraryPreferences,
+                                 ReadOnlyBooleanProperty refAiEnabled,
+                                 TaskExecutor taskExecutor) {
+        this.importerPreferences = importerPreferences;
+        this.grobidPreferences = grobidPreferences;
+        this.doiPreferences = doiPreferences;
+        this.filePreferences = filePreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.libraryPreferences = libraryPreferences;
         this.taskExecutor = taskExecutor;
 
         this.refAiEnabled = refAiEnabled;
@@ -96,12 +102,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setupPlainCitationParsers() {
+        // [pp->feat~ai.citation-parsing~1]
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
 
         refAiEnabled.addListener((_, _, newValue) -> {
             if (newValue) {
+                // [impl->feat~ai.citation-parsing~1]
                 plainCitationParsers.add(PlainCitationParserChoice.LLM);
             } else {
                 PlainCitationParserChoice oldChoice = defaultPlainCitationParser.get();
@@ -252,6 +260,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                      .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
                                                      .toList();
 
+        // Must be set before keys are set
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         importerPreferences.getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {

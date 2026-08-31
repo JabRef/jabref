@@ -2,11 +2,10 @@ package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
@@ -20,6 +19,7 @@ import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -33,6 +33,7 @@ import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
 import static org.jabref.model.entry.field.StandardField.ISSN;
+import static org.jabref.model.entry.field.StandardField.MR_NUMBER;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -41,6 +42,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button shortenDOIButton;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
+    @FXML private ToggleButton syncWithBrowserToggle;
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
@@ -66,6 +68,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+            case MR_NUMBER ->
+                    this.viewModel = new MathSciNetIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
 
             // TODO: Add support for PMID
             case null,
@@ -79,7 +83,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
+        syncWithBrowserToggle.setSelected(viewModel.getSyncWithBrowser());
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get bibliographic data from %0", FieldTextMapper.getDisplayName(field))));
@@ -128,5 +134,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML
     private void shortenID() {
         viewModel.shortenID();
+    }
+
+    @FXML
+    private void toggleSyncWithBrowser() {
+        viewModel.setSyncWithBrowser(syncWithBrowserToggle.isSelected());
     }
 }

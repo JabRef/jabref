@@ -15,14 +15,12 @@ import javafx.scene.control.MenuItem;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.Streams;
 import com.sun.javafx.scene.NodeHelper;
 import com.sun.javafx.scene.control.LabeledText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 /// Resolves nodes from a Scene
 @FunctionalInterface
@@ -67,7 +65,7 @@ public interface NodeResolver {
                     }
                     Node graphic = button.getGraphic();
                     return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                            (graphic instanceof FontIcon fontIcon) && fontIcon.getIconCode() == glyph.getIkon();
+                            glyph.matches(graphic);
                 })
                 .findFirst();
     }
@@ -150,11 +148,11 @@ public interface NodeResolver {
                 )).findFirst();
     }
 
-    /// Creates a resolver that finds a menu item by its language key.
+    /// Creates a resolver that finds a menu item by its text.
     ///
-    /// @param key the language key of the menu item
-    /// @return a resolver that finds the menu item by language key
-    static NodeResolver menuItem(@NonNull String key) {
+    /// @param text the already localized text of the menu item
+    /// @return a resolver that finds the menu item by text
+    static NodeResolver menuItem(@NonNull String text) {
         return scene -> {
             if (!(scene.getWindow() instanceof ContextMenu menu)) {
                 return Optional.empty();
@@ -168,7 +166,7 @@ public interface NodeResolver {
                        .filter(item -> NodeResolver.isVisible(item.getStyleableNode()))
                        .filter(item -> Optional
                                .ofNullable(item.getText())
-                               .map(str -> str.contains(Localization.lang(key)))
+                               .map(str -> str.contains(text))
                                .orElse(false))
                        .map(MenuItem::getStyleableNode).findFirst();
         };

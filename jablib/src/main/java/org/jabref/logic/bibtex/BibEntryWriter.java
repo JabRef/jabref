@@ -29,6 +29,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.util.Range;
 
 import io.github.adr.linked.ADR;
+import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,17 +164,24 @@ public class BibEntryWriter {
     /// @param field the field
     /// @throws IOException In case of an IO error
     private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
-        Optional<String> value = entry.getField(field);
-        // only write field if it is not empty
-        // field.ifPresent does not work as an IOException may be thrown
-        if (value.isPresent() && !value.get().isBlank()) {
-            out.write("  ");
-            out.write(getFormattedFieldName(field, indent));
-            int start = out.getCurrentPosition();
-            out.write(fieldWriter.write(field, value.get()));
-            int end = out.getCurrentPosition();
-            fieldPositions.put(field, new Range(start, end));
-            out.writeLine(",");
+        try {
+            entry.getField(field)
+                 .filter(value -> !value.isBlank())
+                 .ifPresent(Unchecked.consumer(value -> {
+                     out.write("  ");
+                     out.write(getFormattedFieldName(field, indent));
+                     int start = out.getCurrentPosition();
+                     out.write(fieldWriter.write(field, value));
+                     int end = out.getCurrentPosition();
+                     fieldPositions.put(field, new Range(start, end));
+                     out.writeLine(",");
+                 }));
+        } catch (RuntimeException e) {
+            // Unchecked.consumer wraps a thrown IOException into a RuntimeException; unwrap and rethrow it
+            if (e.getCause() instanceof IOException ioException) {
+                throw ioException;
+            }
+            throw e;
         }
     }
 

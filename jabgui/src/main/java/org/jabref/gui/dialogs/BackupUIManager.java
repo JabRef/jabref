@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
@@ -20,13 +18,12 @@ import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -55,7 +52,31 @@ public class BackupUIManager {
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                switch (result) {
+                    case BackupManager.RestoreResult.Empty(
+                            Path backupPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
+                    case BackupManager.RestoreResult.Failed(
+                            Path backupPath,
+                            IOException exception
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("Could not restore the backup file '%0'.", backupPath),
+                                    exception);
+                    case BackupManager.RestoreResult.NotFound(
+                            Path missingOriginalPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
+                    case BackupManager.RestoreResult.Restored _ -> {
+                    }
+                }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
@@ -87,7 +108,7 @@ public class BackupUIManager {
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
@@ -96,15 +117,14 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, "Review Backup"
+                        originalDatabase, Localization.lang("Review backup")
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
-                CE.end();
-                undoManager.addEdit(CE);
-                if (allChangesResolved.get()) {
+                if (allChangesResolved.orElse(false)) {
+                    List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
+                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                    undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                            resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();

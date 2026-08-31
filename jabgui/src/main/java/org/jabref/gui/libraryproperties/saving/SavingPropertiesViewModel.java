@@ -7,16 +7,17 @@ import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -49,16 +50,19 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> cleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
 
+    // Journal abbreviation on save
+    private final ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty = new SimpleObjectProperty<>();
+
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrder saveOrder;
-    private final CliPreferences preferences;
+    private final FieldFormatterCleanupActions defaultSaveActions;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
+    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, FieldFormatterCleanupActions defaultSaveActions) {
         this.databaseContext = databaseContext;
-        this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();
         this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
+        this.defaultSaveActions = defaultSaveActions;
     }
 
     @Override
@@ -97,10 +101,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
-            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
+            cleanupsDisableProperty.setValue(!defaultSaveActions.isEnabled());
+            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultSaveActions.getConfiguredActions()));
         });
+
+        journalAbbreviationOnSaveProperty.setValue(initialMetaData.getLibraryAbbreviationType().orElse(null));
     }
 
     @Override
@@ -138,6 +143,13 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             } else {
                 newMetaData.setSaveOrder(newSaveOrder);
             }
+        }
+
+        AbbreviationType abbreviationType = journalAbbreviationOnSaveProperty.getValue();
+        if (abbreviationType != null) {
+            newMetaData.setLibraryAbbreviationType(abbreviationType);
+        } else {
+            newMetaData.clearLibraryAbbreviationType();
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -181,5 +193,9 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
         return cleanupsProperty;
+    }
+
+    public ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty() {
+        return journalAbbreviationOnSaveProperty;
     }
 }

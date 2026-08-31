@@ -8,15 +8,16 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.net.URLDownload;
@@ -47,23 +48,27 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private final ImportFormatPreferences importFormatPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final GrobidPreferences grobidPreferences;
-    private final AiService aiService;
+    private final AiPreferences aiPreferences;
+    private final ChatModel chatModel;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private CrossRef crossRefForDoi = new CrossRef();
+    private final CrossRef crossRefForDoi;
 
     public CrossRefCitationFetcher(
             ImporterPreferences importerPreferences,
             ImportFormatPreferences importFormatPreferences,
             CitationKeyPatternPreferences citationKeyPatternPreferences,
             GrobidPreferences grobidPreferences,
-            AiService aiService) {
+            AiPreferences aiPreferences,
+            ChatModel chatModel) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.grobidPreferences = grobidPreferences;
-        this.aiService = aiService;
+        this.aiPreferences = aiPreferences;
+        this.chatModel = chatModel;
+        this.crossRefForDoi = new CrossRef(importerPreferences);
     }
 
     @Override
@@ -84,7 +89,10 @@ public class CrossRefCitationFetcher implements CitationFetcher {
             return List.of();
         }
 
-        final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(importerPreferences.getDefaultPlainCitationParser(), citationKeyPatternPreferences, grobidPreferences, importFormatPreferences, aiService);
+        PlainCitationParserChoice parserChoice = importerPreferences.getDefaultPlainCitationParser();
+        final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
+                                           ? PlainCitationParserFactory.getLlmPlainCitationParser(importFormatPreferences, aiPreferences, chatModel)
+                                           : PlainCitationParserFactory.getPlainCitationParser(parserChoice, citationKeyPatternPreferences, grobidPreferences, importFormatPreferences);
 
         try (InputStream stream = new URLDownload(uri.get().toString()).asInputStream()) {
             JsonNode node = mapper.readTree(stream);
@@ -106,9 +114,9 @@ public class CrossRefCitationFetcher implements CitationFetcher {
                                                  .withField(StandardField.NOTE, "Could not retrieve reference information from CrossRef")
                                                  .withChanged(true);
                                      }
-                                     return getBibEntryFromText(parser, unstructured.asText());
+                                     return getBibEntryFromText(parser, unstructured.asString());
                                  } else {
-                                     return getBibEntryFromDoi(doiNode.asText(), unstructured);
+                                     return getBibEntryFromDoi(doiNode.asString(), unstructured);
                                  }
                              }))
                              .toList();
@@ -140,7 +148,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private void setField(BibEntry bibEntry, Field field, JsonNode reference, String path) {
         JsonNode node = reference.at(path);
         if (!node.isMissingNode()) {
-            bibEntry.setField(field, node.asText());
+            bibEntry.setField(field, node.asString());
         }
     }
 
@@ -188,9 +196,8 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     // Clone of org.jabref.logic.importer.FulltextFetchers.findDoiForEntry
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            WebFetchers.getIdFetcherForIdentifier(DOI.class)
-                       .findIdentifier(clonedEntry)
-                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
+            crossRefForDoi.findIdentifier(clonedEntry)
+                          .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }
