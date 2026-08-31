@@ -294,9 +294,9 @@ public abstract class NativeDesktop {
         try {
             uri = URLUtil.createUri(url);
         } catch (IllegalArgumentException e) {
-            // Not URI-parseable (e.g. unencoded spaces); the platform openers accept the raw string
-            LoggerFactory.getLogger(NativeDesktop.class).debug("Could not parse {} as URI, falling back to platform opener", url, e);
-            get().openFile(url, "html", externalApplicationsPreferences);
+            // Not URI-parseable (e.g. unencoded spaces); the OS URL handlers accept the raw string
+            LoggerFactory.getLogger(NativeDesktop.class).debug("Could not parse {} as URI, falling back to the OS URL handler", url, e);
+            get().openUrlWithSystemHandler(url);
             return;
         }
         // Desktop.browse rejects relative URIs, which createUri also produces; those go to the platform opener
@@ -306,18 +306,16 @@ public abstract class NativeDesktop {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).warn("Desktop.browse failed for {}, falling back to platform opener", url, e);
+                    LoggerFactory.getLogger(NativeDesktop.class).warn("Desktop.browse failed for {}, falling back to the OS URL handler", url, e);
                     try {
-                        get().openFile(url, "html", externalApplicationsPreferences);
+                        get().openUrlWithSystemHandler(url);
                     } catch (IOException e2) {
                         LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e2);
                     }
                 }
             });
         } else {
-            // Headless or BROWSE unsupported: the platform openers pass the string through to
-            // xdg-open/open/explorer, which are URL-aware
-            get().openFile(url, "html", externalApplicationsPreferences);
+            get().openUrlWithSystemHandler(url);
         }
     }
 
@@ -355,6 +353,11 @@ public abstract class NativeDesktop {
     }
 
     public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException;
+
+    /// Hands the URL string, unmodified, to the OS's URL-aware handler.
+    /// Used when `Desktop.browse` is unsupported, not applicable, or failed;
+    /// the URL must never be run through `Path.of`, which mangles it.
+    public abstract void openUrlWithSystemHandler(String url) throws IOException;
 
     /// Opens a file on an Operating System, using the given application.
     ///

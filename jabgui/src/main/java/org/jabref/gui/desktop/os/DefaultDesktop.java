@@ -26,6 +26,11 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        throw new IOException("No URL handler known for this platform, cannot open " + url);
+    }
+
+    @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
         Desktop.getDesktop().open(Path.of(filePath).toFile());
     }

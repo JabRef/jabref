@@ -37,6 +37,12 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        // quote String so explorer handles URL query strings correctly
+        new ProcessBuilder("explorer.exe", "\"" + url + "\"").start();
+    }
+
+    @Override
     public Path getApplicationDirectory() {
         String programDir = System.getenv("ProgramFiles");
 
