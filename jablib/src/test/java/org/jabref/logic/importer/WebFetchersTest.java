@@ -52,6 +52,7 @@ class WebFetchersTest {
             "org.jabref.logic.importer.fetcher.ArXivFetcher$ArXiv",
             "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel",
             "org.jabref.logic.importer.FulltextFetchersTest$TrustedFileFetcher",
+            "org.jabref.logic.importer.FulltextFetchersTest$FallbackFileFetcher",
             "org.jabref.logic.importer.SearchBasedFetcherTest$StubSearchBasedFetcher");
 
     private ImportFormatPreferences importFormatPreferences;
@@ -168,6 +169,7 @@ class WebFetchersTest {
 
             // Remove interfaces
             expected.remove(FileSchemeFulltextFetcher.class);
+            expected.remove(FallbackFulltextFetcher.class);
 
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
