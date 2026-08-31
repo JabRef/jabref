@@ -21,7 +21,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-/// Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
+/// Reading is done at [org.jabref.logic.importer.util.MetaDataParser]
 public class MetaDataSerializer {
 
     private MetaDataSerializer() {

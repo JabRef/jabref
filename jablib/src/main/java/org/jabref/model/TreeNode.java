@@ -423,7 +423,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         }
     }
 
-    /// Sorts the list of children according to the order induced by the specified {@link Comparator}.
+    /// Sorts the list of children according to the order induced by the specified [Comparator].
     ///
     /// All children must be mutually comparable using the specified comparator
     /// (that is, `c.compare(e1, e2)` must not throw a `ClassCastException`
@@ -502,6 +502,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Adds the given function to the list of subscribers which are notified when something changes in the subtree.
     ///
     /// The following events are supported (the text in parentheses specifies which node is passed as the source):
+    ///
     /// - addChild (new parent)
     /// - removeChild (old parent)
     /// - move (old parent and new parent)

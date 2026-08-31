@@ -295,7 +295,7 @@ public class GroupNodeViewModel {
 
     /// Gets invoked if an entry in the current database changes.
     ///
-    /// @implNote Search groups are updated in {@link SearchIndexListener}.
+    /// @implNote Search groups are updated in [SearchIndexListener].
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
@@ -445,10 +445,10 @@ public class GroupNodeViewModel {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
-    /// Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+    /// Decides if the content stored in the given [Dragboard] can be dropped on the given target row. Currently, the following sources are allowed:
     ///
     /// - another group (will be added as subgroup on drop)
-    /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    /// - entries if the group implements [GroupEntryChanger] (will be assigned to group on drop)
     ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant

@@ -135,7 +135,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /// Gets invoked if the user selects a different group.
-    /// We need to notify the {@link StateManager} about this change so that the main table gets updated.
+    /// We need to notify the [StateManager] about this change so that the main table gets updated.
     private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
         if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Switch of database occurred -> do nothing
