@@ -1,5 +1,7 @@
 package org.jabref.logic.importer;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Marker interface for {@link FulltextFetcher}s that are trusted to return local `file:` URLs.
 ///
 /// A `file:` result triggers a local file read and the GUI's move/attach pipeline, so it must only
@@ -9,5 +11,6 @@ package org.jabref.logic.importer;
 ///
 /// {@link FulltextFetchers} rejects any `file:` URL returned by a fetcher that does not implement
 /// this interface.
+@NullMarked
 public interface FileSchemeFulltextFetcher extends FulltextFetcher {
 }
