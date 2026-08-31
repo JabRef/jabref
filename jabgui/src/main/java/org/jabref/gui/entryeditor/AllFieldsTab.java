@@ -47,6 +47,7 @@ import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
@@ -330,7 +331,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         ObservableValue<Optional<String>> fieldValue = entry.getFieldBinding(field);
         Button removeButton = new Button();
         removeButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
-        removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
+        removeButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
+        removeButton.getStyleClass().add("field-remove-button");
         removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
         removeButton.setFocusTraversable(false);
         removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));

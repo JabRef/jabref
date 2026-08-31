@@ -35,6 +35,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
@@ -235,7 +236,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createWelcomeStartBox() {
         Label header = new Label(Localization.lang("Start"));
-        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         Hyperlink newLibraryLink = createActionLink(Localization.lang("New empty library"),
                 () -> new NewDatabaseAction(tabContainer, preferences).execute());
@@ -264,7 +265,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createWelcomeRecentBox() {
         Label header = new Label(Localization.lang("Recent"));
-        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         updateWelcomeRecentLibraries();
         fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
@@ -325,7 +326,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createCommunityBox() {
         Label header = new Label(Localization.lang("Community"));
-        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
         HBox versionContainer = createVersionContainer();

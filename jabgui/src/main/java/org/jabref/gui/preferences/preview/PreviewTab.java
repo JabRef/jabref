@@ -33,6 +33,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -160,7 +161,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         readOnlyLabel = new Label(Localization.lang("Read only"));
         resetDefaultButton = new Button();
         resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
-        resetDefaultButton.getStyleClass().addAll("icon-button", "narrow");
+        resetDefaultButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         resetDefaultButton.setPrefSize(20.0, 20.0);
         resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
         resetDefaultButton.setOnAction(_ -> resetDefaultButtonAction());
@@ -190,7 +191,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     private Label sectionLabel(String text) {
         Label label = new Label(text);
-        label.getStyleClass().addAll("h4", "padding-top-12");
+        label.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         return label;
     }
 

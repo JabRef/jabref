@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -117,7 +118,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
 
         Button addField = new Button();
         addField.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
-        addField.getStyleClass().addAll("icon-button", "narrow");
+        addField.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         addField.setPrefSize(25.0, 25.0);
         addField.setTooltip(new Tooltip(Localization.lang("Add field to filter list")));
         addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());

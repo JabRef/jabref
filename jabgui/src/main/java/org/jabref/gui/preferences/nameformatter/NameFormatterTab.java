@@ -18,6 +18,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -87,7 +88,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
                 help);
 
         Button add = new Button();
-        add.getStyleClass().addAll("icon-button", "narrow");
+        add.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         add.setPrefSize(25.0, 25.0);
         add.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
         add.setTooltip(new Tooltip(Localization.lang("Add formatter to list")));

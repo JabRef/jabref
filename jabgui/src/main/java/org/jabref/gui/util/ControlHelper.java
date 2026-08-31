@@ -17,6 +17,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.theme.StyleClasses;
 
 public class ControlHelper {
 
@@ -55,7 +56,7 @@ public class ControlHelper {
     public static Button narrowIconButton(JabRefIcon icon, String tooltip, Runnable action) {
         Button button = new Button();
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().addAll("icon-button", "narrow");
+        button.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         button.setPrefSize(20.0, 20.0);
         button.setTooltip(new Tooltip(tooltip));
         button.setOnAction(_ -> action.run());

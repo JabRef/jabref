@@ -11,6 +11,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.l10n.Localization;
 
@@ -32,7 +33,7 @@ public class Walkthroughs extends VBox {
         getStyleClass().addAll("spacing-12", "align-top-left");
 
         header = new Label(Localization.lang("Walkthroughs"));
-        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         enableScroll();
     }
 

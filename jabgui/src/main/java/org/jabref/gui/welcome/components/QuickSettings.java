@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
 import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
 import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
@@ -37,7 +38,7 @@ public class QuickSettings extends VBox {
         getStyleClass().addAll("spacing-12", "align-top-left");
 
         header = new Label(Localization.lang("Quick settings"));
-        header.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         enableScroll();
     }
 

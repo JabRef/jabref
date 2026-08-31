@@ -31,7 +31,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
-        header.getStyleClass().addAll("h4", "padding-top-12");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         container.getChildren().add(header);
 
         // Add views for each detected difference

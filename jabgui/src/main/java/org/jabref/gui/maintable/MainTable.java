@@ -54,6 +54,7 @@ import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -209,7 +210,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         importPdfsButton.setOnAction(_ -> importPdfs());
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
-        noContentLabel.getStyleClass().addAll("welcome-header-label", "h3", "bold");
+        noContentLabel.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
