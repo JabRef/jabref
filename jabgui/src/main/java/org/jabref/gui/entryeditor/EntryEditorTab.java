@@ -20,21 +20,21 @@ public abstract class EntryEditorTab extends Tab {
 
     private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
 
-    /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel}.
+    /// The entry currently being edited in the editor. Bound by [EntryEditorViewModel].
     private final ObjectProperty<@Nullable BibEntry> currentEntry = new SimpleObjectProperty<>();
 
     /// The entry (and its type) the tab content was last rendered for.
-    /// Tab is lazily rebuild in {@link #notifyAboutFocus(BibEntry)}.
+    /// Tab is lazily rebuild in [#notifyAboutFocus(BibEntry)].
     private @Nullable BibEntry renderedEntry;
     private @Nullable EntryType renderedEntryType;
 
-    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory}.
+    /// User-controlled visibility gate, injected by [EntryEditorTabFactory].
     private ObservableValue<Boolean> preferenceDrivenVisibility = ALWAYS_VISIBLE;
 
     /// Content-driven visibility gate for tabs that only make sense for certain entries.
     private ObservableValue<Boolean> contentDrivenVisibility = ALWAYS_VISIBLE;
 
-    /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
+    /// Lazily built combination of [#preferenceDrivenVisibility] and [#contentDrivenVisibility].
     private @Nullable ObservableValue<Boolean> combinedVisibility;
 
     public void setPreferenceDrivenVisibility(ObservableValue<Boolean> preferenceDrivenVisibility) {

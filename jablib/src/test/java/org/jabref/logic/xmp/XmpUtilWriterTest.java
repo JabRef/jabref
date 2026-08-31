@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to {@link org.jabref.logic.exporter.XmpExporterTest}
+/// This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to [org.jabref.logic.exporter.XmpExporterTest]
 @Execution(ExecutionMode.SAME_THREAD)
 class XmpUtilWriterTest {
 

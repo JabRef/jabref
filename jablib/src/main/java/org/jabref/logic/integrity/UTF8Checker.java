@@ -18,6 +18,7 @@ public class UTF8Checker implements EntryChecker {
 
     /// Creates a UTF8Checker that,
     /// <ol>
+    ///
     /// - decode a String into a bytes array
     /// - attempts to decode the bytes array to a character array using the UTF-8 Charset
     /// </ol>

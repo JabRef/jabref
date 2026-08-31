@@ -15,7 +15,7 @@ import org.apache.commons.csv.CSVPrinter;
 
 /// Outputs the findings as CSV.
 ///
-/// The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
+/// The symbols from [BibliographyConsistencyCheckResultWriter] are used.
 public class BibliographyConsistencyCheckResultCsvWriter extends BibliographyConsistencyCheckResultWriter {
 
     private CSVPrinter csvPrinter;
