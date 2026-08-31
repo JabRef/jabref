@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +124,13 @@ public final class BrowserExtensionProviderDiscovery {
             LOGGER.warn("Skipping fulltext-provider {} declaring out-of-range port {}", parsed.name(), port);
             return Optional.empty();
         }
-        Path tokenFile = Path.of(parsed.tokenFile());
+        Path tokenFile;
+        try {
+            tokenFile = Path.of(parsed.tokenFile());
+        } catch (InvalidPathException e) {
+            LOGGER.warn("Skipping fulltext-provider {} declaring invalid tokenFile {}", parsed.name(), parsed.tokenFile(), e);
+            return Optional.empty();
+        }
         if (!tokenFile.isAbsolute()) {
             LOGGER.warn("Skipping fulltext-provider {} declaring non-absolute tokenFile {}", parsed.name(), parsed.tokenFile());
             return Optional.empty();

@@ -129,6 +129,27 @@ class BrowserExtensionProviderDiscoveryTest {
     }
 
     @Test
+    void discoverInSkipsInvalidTokenFilePathAndKeepsValidFiles(@TempDir Path tempDir) throws IOException {
+        // A NUL character makes Path.of throw InvalidPathException (unchecked) on every platform;
+        // discovery must skip the file rather than abort the whole enumeration.
+        String invalidTokenPath = """
+                {
+                  "name": "broken",
+                  "displayName": "Broken",
+                  "port": 17893,
+                  "tokenFile": "/invalid/\\u0000/token",
+                  "protocolVersion": 1
+                }
+                """;
+        Files.writeString(tempDir.resolve("invalid.json"), invalidTokenPath);
+        Files.writeString(tempDir.resolve("good.json"), discoveryJson(tempDir.resolve("token")));
+
+        List<BrowserExtensionProvider> providers = BrowserExtensionProviderDiscovery.discoverIn(tempDir);
+        assertEquals(1, providers.size());
+        assertEquals("example", providers.getFirst().name());
+    }
+
+    @Test
     void discoverInIgnoresNonJsonFiles(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("notes.txt"), "ignored");
         Files.writeString(tempDir.resolve("good.json"), discoveryJson(tempDir.resolve("token")));

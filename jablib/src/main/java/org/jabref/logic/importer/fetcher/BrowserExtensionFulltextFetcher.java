@@ -11,6 +11,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -219,7 +220,13 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             LOGGER.debug("Provider {} returned 200 without a path field: {}", provider.name(), body);
             return Optional.empty();
         }
-        Path filePath = Path.of(parsed.path());
+        Path filePath;
+        try {
+            filePath = Path.of(parsed.path());
+        } catch (InvalidPathException e) {
+            LOGGER.debug("Provider {} returned an invalid path: {}", provider.name(), parsed.path(), e);
+            return Optional.empty();
+        }
         if (!filePath.isAbsolute()) {
             LOGGER.debug("Provider {} returned a non-absolute path: {}", provider.name(), parsed.path());
             return Optional.empty();
