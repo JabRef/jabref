@@ -411,6 +411,12 @@
     -fx-opacity: 0.4;
 }
 
+/* Selected state is signalled by the icon color alone (set in code), not by a background. */
+.addEntryButton:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -color-selection;
+}
+
 
 .icon-button.no-space-bottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
@@ -1125,10 +1131,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-danger;
 }
 
-#entryEditor .latex-citations-error-label {
-    -fx-text-fill: -color-accent-subtle;
-}
-
 /* ErrorConsole */
 #errorConsole .button-bar {
     -fx-padding: 1em 0em 0em 0em;
@@ -1179,11 +1181,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ImportEntriesDialog */
-
-#importEntriesDialog .addEntryButton:selected {
-    -fx-background-color: transparent;
-    -fx-fill: -color-selection;
-}
 
 /* MultiMergeEntries */
 
@@ -1464,12 +1461,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* CitationRelationsTab */
 
-#citationRelationsTab .addEntryButton:selected {
-    -fx-background-color: transparent;
-    -fx-fill: -color-selection;
-}
-
-.journalInfo .info-heading,
 .journalInfo .info-label {
     -fx-text-fill: -color-accent;
 }

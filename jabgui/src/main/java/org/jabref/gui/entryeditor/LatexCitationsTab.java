@@ -139,7 +139,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.getStyleClass().addAll("latex-citations-error-label", "h3", "bold");
+        titleLabel.getStyleClass().addAll("text-danger", "h3", "bold");
         Text errorMessageText = new Text();
         errorMessageText.textProperty().bind(viewModel.searchErrorProperty());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);

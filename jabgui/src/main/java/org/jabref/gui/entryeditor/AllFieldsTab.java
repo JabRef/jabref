@@ -274,12 +274,9 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
 
-        // Main section rows go into the (already cleared) inherited gridPane
-        if (!gridPane.getStyleClass().contains("all-fields-list")) {
-            // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
-            gridPane.getStyleClass().remove("padding-4");
-            gridPane.getStyleClass().addAll("all-fields-list", "padding-0");
-        }
+        // Main section rows go into the (already cleared) inherited gridPane.
+        // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
+        gridPane.getStyleClass().remove("padding-4");
         addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));

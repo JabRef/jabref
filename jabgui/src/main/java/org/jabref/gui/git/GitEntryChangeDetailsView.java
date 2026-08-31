@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -29,9 +30,9 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      GuiPreferences preferences,
                                      BibEntryTypesManager entryTypesManager) {
         Label committedVersion = new Label(Localization.lang("Committed version"));
-        committedVersion.getStyleClass().addAll("h4", "padding-2");
+        committedVersion.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
         Label savedFile = new Label(Localization.lang("Saved file"));
-        savedFile.getStyleClass().addAll("h4", "padding-2");
+        savedFile.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         StyleClassedTextArea oldSourceArea = createConfiguredTextArea(oldEntry, oldDatabaseContext, preferences, entryTypesManager);
         StyleClassedTextArea newSourceArea = createConfiguredTextArea(newEntry, newDatabaseContext, preferences, entryTypesManager);
@@ -46,7 +47,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
         splitPane.setDividerPositions(0.5);
 
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
-        legendLabel.getStyleClass().addAll("font-size-090", "text-subtle", "padding-4");
+        legendLabel.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_LEGEND);
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
         resultContainer.setSpacing(5);
