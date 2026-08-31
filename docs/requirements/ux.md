@@ -118,6 +118,15 @@ Since inspecting a library file means parsing it completely, the inspection is s
 
 Needs: impl
 
+### Committing a library that is not under version control
+`req~ux.git-commit.initialize-repository~1`
+
+When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.
+Only the library file and the generated `.gitignore` are committed, so unrelated files in that directory stay untracked.
+Declining the offer must leave the directory unchanged, because the user may want to clone an existing repository into it instead.
+
+Needs: impl, utest
+
 ### Deleting many entries keeps the main table responsive
 `req~ux.large-library.bulk-entry-removal~1`
 

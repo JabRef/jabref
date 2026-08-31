@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
 
-/// @param relatedEntriesByFile keyed by {@link #normalizePath(Path)}
+/// @param relatedEntriesByFile keyed by [#normalizePath(Path)]
 @NullMarked
 record UnlinkedFilesSearchResult(FileNodeViewModel treeRoot, Map<Path, List<BibEntry>> relatedEntriesByFile) {
     List<BibEntry> relatedEntries(Path file) {

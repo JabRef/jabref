@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Rules:
 /// <ol>
+///
 /// - If the response contains no ``` fences → return the string stripped of
 /// leading/trailing whitespace.
 /// - If one or more ``` fences exist → find the *last* complete block,
