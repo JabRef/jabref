@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Articles in the medline format can be downloaded from http://www.ncbi.nlm.nih.gov/pubmed/.
 /// <ol>
+///
 /// - Search for a term and make sure you have selected the **PubMed** database.
 /// - Select the results you want to export by checking their checkboxes.
 /// - Press on the **'Send to'** drop down menu on top of the search results.

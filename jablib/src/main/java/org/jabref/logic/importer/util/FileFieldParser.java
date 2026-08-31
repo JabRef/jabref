@@ -151,7 +151,7 @@ public class FileFieldParser {
     /// SIDE EFFECT: The given entry list is cleared upon completion
     ///
     /// Expected format is: description:link:fileType:sourceURL
-    /// fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
+    /// fileType is an [org.jabref.gui.externalfiletype.ExternalFileType], which contains a name and a mime type
     ///
     /// @param entry the list of elements in the linked file textual representation
     /// @return a LinkedFile object

@@ -1,7 +1,5 @@
 package org.jabref.gui.maintable;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -32,6 +30,7 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -52,7 +51,7 @@ public class RightClickMenu {
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      GuiPreferences preferences,
-                                     UndoManager undoManager,
+                                     GuiUndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,

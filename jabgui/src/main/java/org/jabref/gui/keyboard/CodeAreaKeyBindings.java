@@ -201,8 +201,8 @@ public class CodeAreaKeyBindings {
         }
     }
 
-    /// Converts a flat document offset (as used by {@link StringManipulator}) into a
-    /// paragraph/column based {@link TextPos}, by walking the paragraphs of the model.
+    /// Converts a flat document offset (as used by [StringManipulator]) into a
+    /// paragraph/column based [TextPos], by walking the paragraphs of the model.
     /// Assumes a single-character line separator (matches JabRef's BibTeX source usage).
     private static TextPos offsetToTextPos(CodeArea codeArea, int offset) {
         int remaining = offset;
@@ -218,7 +218,7 @@ public class CodeAreaKeyBindings {
         return codeArea.getDocumentEnd();
     }
 
-    /// Inverse of {@link #offsetToTextPos(CodeArea, int)}.
+    /// Inverse of [#offsetToTextPos(CodeArea, int)].
     private static int textPosToOffset(CodeArea codeArea, TextPos pos) {
         int offset = 0;
         for (int i = 0; i < pos.index(); i++) {
