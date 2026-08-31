@@ -3,17 +3,16 @@ package org.jabref.gui.fieldeditors;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import com.tobiasdiez.easybind.EasyObservableValue;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -63,8 +62,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // Note: Normalizing for the .bib file is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
                         String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
                         if (!newValue.equals(oldValue)) {
-                            entry.setField(field, newValue);
-                            undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                            undoManager.applyEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }
                     }
                 });

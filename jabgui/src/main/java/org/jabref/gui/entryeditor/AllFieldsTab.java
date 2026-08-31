@@ -13,8 +13,6 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
@@ -54,6 +52,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -210,6 +209,15 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+    }
+
+    @Override
+    protected void dispose() {
+        // The entry's event bus holds listeners strongly; without unregistering, a discarded tab
+        // instance would be retained (and keep reacting) for as long as the entry lives.
+        subscribedEntry.ifPresent(entry -> entry.unregisterListener(this));
+        subscribedEntry = Optional.empty();
+        super.dispose();
     }
 
     /// Refreshes the list when a field is set or unset from outside this tab
@@ -413,6 +421,37 @@ public class AllFieldsTab extends FieldsEditorTab {
         VBox content = new VBox();
         content.getStyleClass().add("all-fields-section-content");
 
+        Runnable populateContent = () -> populateSectionContent(
+                content,
+                type,
+                shownFields,
+                labelForField,
+                bibDatabaseContext,
+                entry);
+
+        TitledPane pane = new TitledPane(type.header().orElseThrow(), content);
+        pane.getStyleClass().add("all-fields-section-pane");
+        pane.setCollapsible(true);
+        pane.setAnimated(false);
+        pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
+        pane.expandedProperty().addListener((_, _, expanded) -> {
+            sectionExpandOverrides.put(type, expanded);
+            if (expanded && content.getChildren().isEmpty()) {
+                populateContent.run();
+            }
+        });
+        if (pane.isExpanded()) {
+            populateContent.run();
+        }
+        return pane;
+    }
+
+    private void populateSectionContent(VBox content,
+                                        FieldListSections.SectionType type,
+                                        SequencedSet<Field> shownFields,
+                                        Map<Field, Label> labelForField,
+                                        BibDatabaseContext bibDatabaseContext,
+                                        BibEntry entry) {
         if (!shownFields.isEmpty()) {
             GridPane sectionGrid = new GridPane();
             sectionGrid.setHgap(10);
@@ -428,14 +467,6 @@ public class AllFieldsTab extends FieldsEditorTab {
             chipFields.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
             content.getChildren().add(chips);
         }
-
-        TitledPane pane = new TitledPane(type.header().orElseThrow(), content);
-        pane.getStyleClass().add("all-fields-section-pane");
-        pane.setCollapsible(true);
-        pane.setAnimated(false);
-        pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
-        pane.expandedProperty().addListener((_, _, expanded) -> sectionExpandOverrides.put(type, expanded));
-        return pane;
     }
 
     /// All member fields of a section offered as add-chips; the comments section offers the
@@ -498,10 +529,15 @@ public class AllFieldsTab extends FieldsEditorTab {
     private Node createFreeFormAddRow(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ComboBox<String> fieldNameBox = new ComboBox<>();
         fieldNameBox.setEditable(true);
-        fieldNameBox.getItems().addAll(FieldFactory.getAllFieldsWithOutInternal().stream()
-                                                   .map(Field::getName)
-                                                   .sorted()
-                                                   .toList());
+        fieldNameBox.setOnShowing(_ -> {
+            if (fieldNameBox.getItems().isEmpty()) {
+                fieldNameBox.getItems().setAll(
+                        FieldFactory.getAllFieldsWithOutInternal().stream()
+                                    .map(Field::getName)
+                                    .sorted()
+                                    .toList());
+            }
+        });
         fieldNameBox.setPromptText(Localization.lang("Field name"));
         Button addButton = new Button(Localization.lang("Add"));
         Runnable addAction = () -> addFreeFormField(bibDatabaseContext, entry, fieldNameBox.getEditor().getText());

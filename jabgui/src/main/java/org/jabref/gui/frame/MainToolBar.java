@@ -26,7 +26,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
@@ -54,7 +54,7 @@ public class MainToolBar extends ToolBar {
     private final ClipBoardManager clipBoardManager;
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
-    private final CountingUndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
@@ -72,7 +72,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       CountingUndoManager undoManager,
+                       GuiUndoManager undoManager,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -107,7 +107,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
 
                 leftSpacer,
 

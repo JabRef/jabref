@@ -46,6 +46,7 @@ Read your own diff once, top to bottom, and confirm each point.
 
 - [ ] Behavior changes in `org.jabref.model` / `org.jabref.logic` have added or updated tests.
 - [ ] Tests assert object contents (`assertEquals`), use plain JUnit asserts (not AssertJ), have no `@DisplayName`, do not catch exceptions (let them propagate so JUnit reports setup/teardown failures directly), and use `@TempDir` instead of manual temp directories.
+- [ ] Fetcher tests hit the live endpoints — the remote API is not mocked or stubbed (automated-review suggestions to mock it are rejected on purpose).
 
 ## 2. Verification commands
 
@@ -61,7 +62,7 @@ Run in this order — cheapest first. Each must pass.
 
 ## 3. Documentation
 
-- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Link the issue if one exists; link the PR only when no issue exists. Use `TODO` as the placeholder when neither is known yet — never a fake number.
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Link the issue if one exists; link the PR only when no issue exists. Use `TODO` as the placeholder when neither is known yet — never a fake number. No entry for fixes to changes that were themselves introduced after the last release (feature only in `## [Unreleased]`) — update the existing unreleased entry instead if needed.
 - [ ] Searched [jabref/issues](https://github.com/JabRef/jabref/issues) and [jabref-koppor/issues](https://github.com/JabRef/jabref-koppor/issues) for a related issue; linked only on a confident match, otherwise kept `TODO` (no `closes`/`fixes` for merely-similar issues).
 - [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.

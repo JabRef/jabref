@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
@@ -39,6 +37,7 @@ import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
@@ -97,10 +96,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return FileFieldWriter.getStringRepresentation(filesToSerialize);
     }
 
-    /// Creates an instance of {@link LinkedFile} based on the given file.
+    /// Creates an instance of [LinkedFile] based on the given file.
     /// We try to guess the file type and relativize the path against the given file directories.
     ///
-    /// TODO: Move this method to {@link LinkedFile} as soon as {@link org.jabref.gui.externalfiletype.CustomExternalFileType} lives in model.
+    /// TODO: Move this method to [LinkedFile] as soon as [org.jabref.gui.externalfiletype.CustomExternalFileType] lives in model.
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)

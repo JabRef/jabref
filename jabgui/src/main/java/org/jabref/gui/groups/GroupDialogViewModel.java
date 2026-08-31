@@ -90,6 +90,11 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeEntryTypeProperty = new SimpleBooleanProperty();
 
+    // Explicit Groups
+    private final BooleanProperty explicitIncludeSelectedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty editingGroupProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty selectedEntriesAvailableProperty = new SimpleBooleanProperty(false);
+
     // Option Groups
     private ConstrainedStringProperty<ValidationMessage> keywordGroupSearchTermProperty;
     private ConstrainedStringProperty<ValidationMessage> keywordGroupSearchFieldProperty;
@@ -288,10 +293,15 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             if (Boolean.TRUE.equals(typeExplicitProperty.getValue())) {
-                resultingGroup = new ExplicitGroup(
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
+                ExplicitGroup explicitGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
                         preferences.getBibEntryPreferences().getKeywordSeparator());
+                if (Boolean.TRUE.equals(explicitIncludeSelectedProperty.getValue())) {
+                    explicitGroup.add(stateManager.getSelectedEntries());
+                }
+                resultingGroup = explicitGroup;
             } else if (Boolean.TRUE.equals(typeKeywordsProperty.getValue())) {
                 if (Boolean.TRUE.equals(keywordGroupRegexProperty.getValue())) {
                     resultingGroup = new RegexKeywordGroup(
@@ -395,6 +405,7 @@ public class GroupDialogViewModel {
 
     public void setValues() {
         groupHierarchyListProperty.setValue(FXCollections.observableArrayList(GroupHierarchyType.values()));
+        selectedEntriesAvailableProperty.set(!stateManager.getSelectedEntries().isEmpty());
 
         if (editedGroup == null) {
             // creating new group -> defaults!
@@ -410,6 +421,7 @@ public class GroupDialogViewModel {
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
+            explicitIncludeSelectedProperty.setValue(selectedEntriesAvailableProperty.get() && preferences.getGroupsPreferences().shouldAutoIncludeSelectedEntries());
             groupHierarchySelectedProperty.setValue(preferences.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
 
@@ -418,6 +430,7 @@ public class GroupDialogViewModel {
             dateGroupOptionProperty.setValue(DateGranularity.YEAR);
             dateGroupIncludeEmptyProperty.setValue(false);
         } else {
+            editingGroupProperty.set(true);
             nameProperty.setValue(editedGroup.getName());
             colorUseProperty.setValue(editedGroup.getColor().isPresent());
             colorProperty.setValue(editedGroup.getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR));
@@ -569,6 +582,18 @@ public class GroupDialogViewModel {
 
     public BooleanProperty typeEntryTypeProperty() {
         return typeEntryTypeProperty;
+    }
+
+    public BooleanProperty explicitIncludeSelectedProperty() {
+        return explicitIncludeSelectedProperty;
+    }
+
+    public BooleanProperty editingGroupProperty() {
+        return editingGroupProperty;
+    }
+
+    public BooleanProperty selectedEntriesAvailableProperty() {
+        return selectedEntriesAvailableProperty;
     }
 
     public ConstrainedStringProperty<ValidationMessage> keywordGroupSearchTermProperty() {

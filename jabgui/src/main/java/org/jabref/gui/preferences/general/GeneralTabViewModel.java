@@ -28,8 +28,9 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
-import org.jabref.gui.theme.Theme;
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.validation.ValidationConstraints;
@@ -65,35 +66,30 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
 
-    private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
-    private final ConstrainedObjectProperty<ThemeTypes, ValidationMessage> selectedThemeProperty = new SimpleConstrainedObjectProperty<>(
-            (ThemeTypes) null,
+    private final ReadOnlyListProperty<ThemePreset> themesListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemePreset.values()));
+    private final ConstrainedObjectProperty<ThemePreset, ValidationMessage> selectedThemeProperty = new SimpleConstrainedObjectProperty<>(
+            (ThemePreset) null,
             ValidationConstraints.predicate(
                     Objects::nonNull,
                     ValidationMessage.error("%s > %s %n %n %s".formatted(
                             Localization.lang("General"),
-                            Localization.lang("Visual theme"),
+                            Localization.lang("Appearance"),
                             Localization.lang("Please set a theme.")))));
 
-    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty() {
-        @Override
-        protected void invalidated() {
-            if (themeSyncOsProperty.get()) {
-                selectedThemeProperty.set(null);
-            }
-        }
-    };
-
-    // init with empty string to avoid npe in accessing
-    private final ConstrainedStringProperty<ValidationMessage> customPathToThemeProperty = new SimpleConstrainedStringProperty<>(
-            "",
+    private final ReadOnlyListProperty<ThemeColorScheme> colorSchemeListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeColorScheme.values()));
+    private final ConstrainedObjectProperty<ThemeColorScheme, ValidationMessage> selectedThemeColorSchemeProperty = new SimpleConstrainedObjectProperty<>(
+            (ThemeColorScheme) null,
             ValidationConstraints.predicate(
-                    input -> !StringUtil.isNullOrEmpty(input),
+                    Objects::nonNull,
                     ValidationMessage.error("%s > %s %n %n %s".formatted(
                             Localization.lang("General"),
-                            Localization.lang("Visual theme"),
-                            Localization.lang("Please specify a css theme file.")))));
+                            Localization.lang("Appearance"),
+                            Localization.lang("Please set a color scheme.")))));
+
+    private final BooleanProperty customThemeEnabled = new SimpleBooleanProperty(false);
+    private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final ConstrainedStringProperty<ValidationMessage> fontSizeProperty = new SimpleConstrainedStringProperty<>(
@@ -193,19 +189,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         selectedLanguageProperty.setValue(workspacePreferences.getLanguage());
 
-        switch (workspacePreferences.getTheme().getType()) {
-            case LIGHT ->
-                    selectedThemeProperty.setValue(ThemeTypes.LIGHT);
-            case DARK ->
-                    selectedThemeProperty.setValue(ThemeTypes.DARK);
-            case CUSTOM -> {
-                selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
-                customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
-            }
-            case SYSTEM ->
-                    selectedThemeProperty.setValue(null);
-        }
-        themeSyncOsProperty.setValue(workspacePreferences.shouldThemeSyncOs());
+        selectedThemeProperty.setValue(workspacePreferences.getTheme());
+        selectedThemeColorSchemeProperty.setValue(workspacePreferences.getColorScheme());
+        customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
+        customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
 
         fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));
@@ -251,20 +238,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
         workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
-        boolean themeSyncOs = themeSyncOsProperty.getValue();
-        workspacePreferences.setThemeSyncOs(themeSyncOs);
+        workspacePreferences.setTheme(selectedThemeProperty.get());
+        workspacePreferences.setColorScheme(selectedThemeColorSchemeProperty.get());
 
-        if (themeSyncOs) {
-            workspacePreferences.setTheme(Theme.system());
+        String customTheme = customPathToThemeProperty.getValue();
+        if (customThemeEnabled.get() && !StringUtil.isBlank(customTheme)) {
+            workspacePreferences.setCustomTheme(StyleSheet.create(customTheme));
         } else {
-            switch (selectedThemeProperty.get()) {
-                case LIGHT ->
-                        workspacePreferences.setTheme(Theme.light());
-                case DARK ->
-                        workspacePreferences.setTheme(Theme.dark());
-                case CUSTOM ->
-                        workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
-            }
+            workspacePreferences.setCustomTheme(Optional.empty());
         }
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
@@ -341,6 +322,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         List<ReadOnlyConstrainedProperty<?, ValidationMessage>> fieldsToCheck = new ArrayList<>();
+        fieldsToCheck.add(selectedThemeProperty);
+        fieldsToCheck.add(selectedThemeColorSchemeProperty);
         if (remoteServerProperty.getValue()) {
             fieldsToCheck.add(remotePortProperty);
         }
@@ -352,12 +335,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         }
         if (fontOverrideProperty.getValue()) {
             fieldsToCheck.add(fontSizeProperty);
-        }
-        if (selectedThemeProperty.getValue() == ThemeTypes.CUSTOM) {
-            fieldsToCheck.add(customPathToThemeProperty);
-        }
-        if (!themeSyncOsProperty.get() && selectedThemeProperty.getValue() == null) {
-            fieldsToCheck.add(selectedThemeProperty);
         }
 
         for (ReadOnlyConstrainedProperty<?, ValidationMessage> field : fieldsToCheck) {
@@ -382,20 +359,28 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.selectedLanguageProperty;
     }
 
-    public ReadOnlyListProperty<ThemeTypes> themesListProperty() {
+    public ReadOnlyListProperty<ThemePreset> themesListProperty() {
         return this.themesListProperty;
     }
 
-    public ConstrainedObjectProperty<ThemeTypes, ValidationMessage> selectedThemeProperty() {
-        return this.selectedThemeProperty;
+    public ConstrainedObjectProperty<ThemePreset, ValidationMessage> selectedThemeProperty() {
+        return selectedThemeProperty;
     }
 
-    public BooleanProperty themeSyncOsProperty() {
-        return this.themeSyncOsProperty;
+    public ReadOnlyListProperty<ThemeColorScheme> colorSchemeListProperty() {
+        return colorSchemeListProperty;
     }
 
-    public ConstrainedStringProperty<ValidationMessage> customPathToThemeProperty() {
+    public ConstrainedObjectProperty<ThemeColorScheme, ValidationMessage> selectedThemeColorSchemeProperty() {
+        return selectedThemeColorSchemeProperty;
+    }
+
+    public StringProperty customPathToThemeProperty() {
         return customPathToThemeProperty;
+    }
+
+    public BooleanProperty customThemeEnabledProperty() {
+        return customThemeEnabled;
     }
 
     public void importCSSFile() {

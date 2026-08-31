@@ -119,6 +119,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  CROSSREF_EMAIL: ${{ secrets.CROSSREF_EMAIL }}
 
 
 concurrency:
@@ -175,6 +176,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
           LABEL_NAME: ${{ github.event.label.name }}
+          HAS_DEV_BINARIES_LABEL_FROM_EVENT: "${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'dev: binaries') || 'false' }}"
           NON_WORKFLOW_CHANGES: ${{ steps.changed-non-workflow-files.outputs.any_changed }}
           BINARIES_WORKFLOW_CHANGED: ${{ steps.changed-binaries-workflow.outputs.any_changed }}
           BINARIES_RESOURCE_MARKDOWN_CHANGED: ${{ steps.changed-binaries-resource-markdown.outputs.any_changed }}
@@ -184,22 +186,47 @@ jobs:
           set -x
           PS4='+ ${LINENO}: '
 
+          HAS_DEV_BINARIES_LABEL="$HAS_DEV_BINARIES_LABEL_FROM_EVENT"
+
           if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "automerge" && "$LABEL_NAME" != "dev: binaries" ]]; then
             echo "⊘ build should be skipped"
             echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" != "true" && "${{ github.event_name }}" == "pull_request" && "$NON_WORKFLOW_CHANGES" != "true" && "$BINARIES_WORKFLOW_CHANGED" != "true" && "$BINARIES_RESOURCE_MARKDOWN_CHANGED" != "true" ]]; then
             echo "⊘ no build-relevant files changed – skipping build"
             echo "⊘ no build-relevant files changed – skipping build" >> "$GITHUB_STEP_SUMMARY"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
+            echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+            echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
+            echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "📦 build enabled"
-          echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
+            echo "📦 build forced by label 'dev: binaries'"
+            echo "📦 build forced by label 'dev: binaries'" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "📦 build enabled"
+            echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "should-build=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
@@ -299,9 +326,7 @@ jobs:
             exit 0
           fi
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
-
-          if echo "$LABELS" | grep -q "^dev: binaries$"; then
+          if [[ "$HAS_DEV_BINARIES_LABEL" == "true" ]]; then
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -317,23 +342,20 @@ jobs:
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
-      - name: No upload
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
-        shell: bash
-        run: |
-          echo "⊘ no upload – skipping upload"
-          echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
-          echo "available=false" >> "$GITHUB_OUTPUT"
-      - name: Setup SSH key
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         id: diskspace
         shell: bash
         run: |
+          if [[ "${{ needs.conditions.outputs.upload-to-builds-jabref-org }}" != "true" ]]; then
+            echo "⊘ no upload – skipping upload"
+            echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+
           PR_NUMBER="${{ github.event.pull_request.number }}"
           if [[ -z "$PR_NUMBER" ]]; then
             echo "☁️ Not a pull request event – skipping disk space check – will upload"
@@ -849,6 +871,9 @@ jobs:
             archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
           - os: macos-15
             displayName: macOS-silicon
+            # native-image on the macOS arm runner is by far the slowest job; runOnPullRequest=false
+            # skips it on pull_request AND merge_group, so it only builds where the binary is shipped
+            # (push to main/main-release, tags, workflow_dispatch)
             runOnPullRequest: false
             javaPackage: jdk+fx
             archiveNative: "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
@@ -856,10 +881,10 @@ jobs:
     name: ${{ matrix.displayName }} jabkit native binary
     steps:
       - name: Skip native binary build because it is not needed for this event
-        if: needs.conditions.outputs.should-build != 'true' || (github.event_name == 'pull_request' && matrix.runOnPullRequest != true)
+        if: needs.conditions.outputs.should-build != 'true' || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && matrix.runOnPullRequest != true)
         run: echo "Skipping native binary build because it is not needed for this event."
       - name: Checkout
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
@@ -867,10 +892,10 @@ jobs:
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
 
       - name: Setup macOS key chain for app id cert
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -880,7 +905,7 @@ jobs:
       # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'liberica'
@@ -889,14 +914,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabKit native binary
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         run: gradle :jabkit:nativeCompile
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       - name: Install clitest
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         uses: ethanjli/cached-download-action@v0.1.4
         with:
           # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
@@ -904,23 +929,23 @@ jobs:
           destination: /tmp/clitest
 
       - name: Make clitest executable
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         run: chmod +x /tmp/clitest
 
       - name: Run JabKit offline smoke tests
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
       - name: Run JabKit PDF native smoke test (Linux only)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && runner.os == 'Linux' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && runner.os == 'Linux' }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
 
       - name: Run JabKit online smoke tests
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && inputs.run-jabkit-online-tests }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && inputs.run-jabkit-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
       - name: Package JabKit native binary
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true)
         shell: bash
         run: |
           set -eo pipefail
@@ -936,7 +961,7 @@ jobs:
           ${{ matrix.archiveNative }}
 
       - name: Upload jabkit native to GitHub artifacts store
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         uses: actions/upload-artifact@v7
         with:
           name: jabkit-native (${{ matrix.displayName }})
@@ -944,7 +969,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
@@ -953,15 +978,15 @@ jobs:
           compression-level: 0 # no compression
 
       - name: Setup SSH key
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Upload jabkit native to builds.jabref.org
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && ((github.event_name != 'pull_request' && github.event_name != 'merge_group') || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
@@ -1119,6 +1144,8 @@ jobs:
           if-no-files-found: error
 
   upload-pr-nnumber:
+    needs: conditions
+    if: ${{ github.event_name == 'pull_request' && needs.conditions.outputs.should-build == 'true' }}
     runs-on: ubuntu-slim
     permissions:
       contents: read

@@ -9,13 +9,18 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-/// Writer that similar to the built-in {@link java.io.FileWriter} but uses the {@link AtomicFileOutputStream} as the
+import org.jabref.logic.util.io.FileSnapshot;
+
+import org.jspecify.annotations.Nullable;
+
+/// Writer that similar to the built-in [java.io.FileWriter] but uses the [AtomicFileOutputStream] as the
 /// underlying output stream. In this way, we make sure that the errors during the write process do not destroy the
 /// contents of the target file.
 /// Moreover, this writer checks if the chosen encoding supports all text that is written. Characters whose encoding
-/// was problematic can be retrieved by {@link #getEncodingProblems()}.
+/// was problematic can be retrieved by [#getEncodingProblems()].
 public class AtomicFileWriter extends OutputStreamWriter {
 
+    private final AtomicFileOutputStream outputStream;
     private final CharsetEncoder encoder;
     private final Set<Character> problemCharacters = new TreeSet<>();
 
@@ -24,8 +29,24 @@ public class AtomicFileWriter extends OutputStreamWriter {
     }
 
     public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup) throws IOException {
-        super(new AtomicFileOutputStream(file, keepBackup), encoding);
+        this(file, encoding, keepBackup, null);
+    }
+
+    /// @param expectedState see [AtomicFileOutputStream#AtomicFileOutputStream(Path,boolean,FileSnapshot)]
+    public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup, @Nullable FileSnapshot expectedState) throws IOException {
+        this(new AtomicFileOutputStream(file, keepBackup, expectedState), encoding);
+    }
+
+    private AtomicFileWriter(AtomicFileOutputStream outputStream, Charset encoding) {
+        super(outputStream, encoding);
+        this.outputStream = outputStream;
         encoder = encoding.newEncoder();
+    }
+
+    /// See [AtomicFileOutputStream#getCommittedTargetFileState()]; remains accessible after [#close()].
+    @Nullable
+    public FileSnapshot getCommittedTargetFileState() {
+        return outputStream.getCommittedTargetFileState();
     }
 
     @Override
@@ -47,5 +68,10 @@ public class AtomicFileWriter extends OutputStreamWriter {
 
     public Set<Character> getEncodingProblems() {
         return Collections.unmodifiableSet(problemCharacters);
+    }
+
+    /// Aborts the write without replacing the target file.
+    public void abort() {
+        outputStream.abort();
     }
 }

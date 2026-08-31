@@ -58,7 +58,7 @@ _____
    <!--
    DISCLOSE every AI tool used to produce this PR, including the exact model.
    Example: "Claude Code (model claude-opus-4-7)", "GitHub Copilot (GPT-4o)".
-   Write "none" if no AI tool was used.
+   Categorize the use by the [AI Influence Level](https://danielmiessler.com/blog/ai-influence-level-ail). E.g., `AIL0` means no AI involved at all.
 
    IF AN AI TOOL WAS USED:
      The AI MUST go through CHECKLIST.md one item at a time, verify each
@@ -91,6 +91,5 @@ _____
 - [.] I manually tested my changes in running JabRef (always required)
 - [.] I added JUnit tests for changes (if applicable)
 - [.] I added screenshots in the PR description (if change is visible to the user)
-- [.] I added a screenshot in the PR description showing a library with a single entry with me as author and as title the issue number
-- [.] I described the change in `CHANGELOG.md` in a way that can be understood by the average user (if change is visible to the user)
+- [.] I added **one sentence (max 20 words)** to `CHANGELOG.md` describing the change from the user's point of view (if the change is visible to the user)
 - [.] I checked the [user documentation](https://docs.jabref.org/) for up to dateness and submitted a pull request to our [user documentation repository](https://github.com/JabRef/user-documentation/tree/main/en)

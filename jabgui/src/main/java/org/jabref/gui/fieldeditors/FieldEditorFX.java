@@ -26,7 +26,7 @@ public interface FieldEditorFX {
 
     void bindToEntry(BibEntry entry);
 
-    /// @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, {@link org.jabref.gui.DialogService} and {@link org.jabref.gui.StateManager} to the method.
+    /// @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, [org.jabref.gui.DialogService] and [org.jabref.gui.StateManager] to the method.
     default void establishBinding(TextInputControl textInputControl, Property<String> viewModelTextProperty, KeyBindingRepository keyBindingRepository, UndoAction undoAction, RedoAction redoAction) {
         Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 

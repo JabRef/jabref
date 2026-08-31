@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -15,7 +17,7 @@ public final class OcrUtils {
 
     public static final String OCR_PDF_PREFIX = "_ocr.pdf";
     public static final int TIMEOUT_MINS = 10;
-    public static final int CHECKING_TIMEOUT = 5;
+    public static final int CHECKING_TIMEOUT = 10;
     public static final Logger LOGGER = LoggerFactory.getLogger(OcrUtils.class);
 
     /// Checks if the OCR engine is available for use.
@@ -42,6 +44,40 @@ public final class OcrUtils {
             Thread.currentThread().interrupt();
             LOGGER.error("Checking OCR engine availability was interrupted", e);
             return false;
+        }
+    }
+
+    /// Helper method to abstract the common logic of running an OCR engine command and handling its output.
+    public static OcrResult performOcr(ArrayList<String> command, String engineName) {
+        Process process = null;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectErrorStream(true);
+            process = processBuilder.start();
+
+            // Get the output and the errors of the process
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+
+            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
+            if (!finished) {
+                process.destroyForcibly();
+                return OcrResult.failure(OcrFailureReason.TIMEOUT);
+            }
+
+            if (process.exitValue() == 0) {
+                return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
+            } else {
+                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while running {}.", engineName, e);
+            return OcrResult.failure(OcrFailureReason.IO_ERROR);
+        } catch (InterruptedException e) {
+            process.destroyForcibly();
+            Thread.currentThread().interrupt();
+            LOGGER.error("{} process was interrupted.", engineName, e);
+            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
         }
     }
 

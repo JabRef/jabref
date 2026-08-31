@@ -1,12 +1,9 @@
 package org.jabref.logic.ocr;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
-import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -32,8 +29,8 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// Example: document.pdf -> document_ocr.pdf.
     ///
     /// @param pdfPath the file to perform OCR on.
-    /// @return {@link OcrResult.Success} containing the path to the searchable PDF,
-    /// or {@link OcrResult.Failure} with an error message if OCR failed.
+    /// @return [OcrResult.Success] containing the path to the searchable PDF,
+    /// or [OcrResult.Failure] with an error message if OCR failed.
     @Override
     public OcrResult performOcrAndEmbedText(Path pdfPath) {
         if (!OcrUtils.isAvailable(ocrPreferences)) {
@@ -52,37 +49,20 @@ public class OcrMyPdfEngine implements OcrEngine {
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
         command.add(ocrCommand);
+        List<String> languages = ocrPreferences.getOcrLanguages().stream()
+                                               .map(OcrLanguage::getCode)
+                                               .toList();
+        if (!languages.isEmpty()) {
+            command.add("-l");
+            command.add(String.join("+", languages));
+        }
         command.add(pdfPath.toString());
         command.add(outputFile);
-        Process process = null;
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            process = processBuilder.start();
-
-            // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-
-            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
-            if (!finished) {
-                process.destroyForcibly();
-                return OcrResult.failure(OcrFailureReason.TIMEOUT);
-            }
-
-            if (process.exitValue() == 0) {
-                return OcrResult.success(outputPath);
-            } else {
-                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while running OCRmyPDF.", e);
-            return OcrResult.failure(OcrFailureReason.IO_ERROR);
-        } catch (InterruptedException e) {
-            process.destroyForcibly();
-            Thread.currentThread().interrupt();
-            LOGGER.error("OCRmyPDF process was interrupted.", e);
-            return OcrResult.failure(OcrFailureReason.INTERRUPTED);
+        OcrResult ocrResult = OcrUtils.performOcr(command, getName());
+        if (ocrResult.isSuccess()) {
+            return OcrResult.success(outputPath);
+        } else {
+            return ocrResult;
         }
     }
 }

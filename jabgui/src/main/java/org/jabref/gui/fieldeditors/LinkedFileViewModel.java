@@ -246,9 +246,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
         Path oldFilePath = Path.of(oldFile);
+        // The rename happens on disk; only the link is journalled. Undoing afterwards restores the
+        // old link, which then points at a name no file has any more.
         Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(
                 Localization.lang("Rename file"),
-                Localization.lang("New Filename"),
+                Localization.lang("New Filename")
+                        + "\n" + Localization.lang("Undo restores the link, not the file name."),
                 oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
@@ -463,7 +466,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    /// @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
+    /// @implNote Similar method [org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing]
     public void redownload() {
         LOGGER.info("Redownloading file from {}", linkedFile.getSourceUrl());
         if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {

@@ -12,11 +12,11 @@ import org.jabref.model.entry.BibEntry;
 
 /// Deduplicates summarization tasks across the application lifetime.
 ///
-/// Exactly one {@link GenerateSummaryTask} is created per {@link BibEntry} object reference
-/// ({@link BibEntry#getId()} is the tree key). A second call for the same entry while a task is
+/// Exactly one [GenerateSummaryTask] is created per [BibEntry] object reference
+/// ([BibEntry#getId()] is the tree key). A second call for the same entry while a task is
 /// still running returns the existing task — no duplicate generation.
 ///
-/// When a task completes successfully, the result is written to the {@link InMemorySummaryCache}
+/// When a task completes successfully, the result is written to the [InMemorySummaryCache]
 /// so that callers who were not listening at that moment can still retrieve it. The task is then
 /// removed from the internal map.
 ///
@@ -35,31 +35,35 @@ public class SummarizationTaskAggregator {
         this.inMemoryCache = inMemoryCache;
     }
 
-    /// Starts a {@link GenerateSummaryTask} for the entry in `request`, or returns the
+    /// Starts a [GenerateSummaryTask] for the entry in `request`, or returns the
     /// already-running task if one exists for that entry.
     ///
     /// `computeIfAbsent` is the deduplication mechanism — only one task per entry at a time.
     ///
     /// **Important:** if you attach a status listener to the returned task, also check
-    /// {@link org.jabref.logic.ai.util.TrackedBackgroundTask#getStatus()} immediately after
+    /// [org.jabref.logic.ai.util.TrackedBackgroundTask#getStatus()] immediately after
     /// attaching, in case the task already finished before the listener was registered.
     public synchronized GenerateSummaryTask start(GenerateSummaryTaskRequest request) {
+        return start(request, true);
+    }
+
+    public synchronized GenerateSummaryTask start(GenerateSummaryTaskRequest request, boolean showToUser) {
         Optional<GenerateSummaryTask> task = getTask(request.fullEntry().entry());
 
         if (task.isEmpty()) {
-            return startNewTask(request);
+            return startNewTask(request, showToUser);
         }
 
         if (task.get().getStatus() == TrackedBackgroundTask.Status.CANCELLED && request.regenerate()) {
             tasks.remove(request.fullEntry().entry());
-            return startNewTask(request);
+            return startNewTask(request, showToUser);
         }
 
         return task.get();
     }
 
-    private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request) {
-        GenerateSummaryTask task = new GenerateSummaryTask(request);
+    private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request, boolean showToUser) {
+        GenerateSummaryTask task = new GenerateSummaryTask(request, showToUser);
 
         task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
 

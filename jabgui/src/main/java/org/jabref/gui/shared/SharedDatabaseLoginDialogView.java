@@ -1,7 +1,5 @@
 package org.jabref.gui.shared;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,10 +14,12 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
@@ -58,9 +58,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private UndoManager undoManager;
+    @Inject private GuiUndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -101,7 +102,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 fileUpdateMonitor,
                 undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                journalAbbreviationRepository);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 

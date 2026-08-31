@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors.identifier;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -12,6 +10,7 @@ import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -41,7 +40,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     @Override
     public void lookupIdentifier(BibEntry bibEntry) {
-        CrossRef doiFetcher = new CrossRef();
+        CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
                       .onRunning(() -> identifierLookupInProgress.setValue(true))
