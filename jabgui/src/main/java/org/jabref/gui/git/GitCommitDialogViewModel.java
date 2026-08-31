@@ -88,7 +88,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                 .onFailure(ex ->
                         dialogService.showErrorDialogAndWait(
                                 ex instanceof PushFailedException
-                                ? Localization.lang("Git Push Failed")
+                                ? Localization.lang("Git push failed")
                                 : Localization.lang("Git commit failed"),
                                 ex.getMessage(),
                                 ex
@@ -257,7 +257,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
         private static String causeMessage(Throwable cause) {
             String message = cause.getLocalizedMessage();
-            return message != null ? message : Localization.lang("Git Push Failed");
+            return message != null ? message : Localization.lang("Git push failed");
         }
     }
 }
