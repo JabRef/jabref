@@ -115,6 +115,9 @@ public sealed interface EntryEditorTabModel
 
         private static final String LOCALIZED_NAME_PREFIX = "%";
 
+        /// The localization keys the classic tabs are stored under; only these are translated on display.
+        private static final Set<String> CLASSIC_TAB_KEYS = Set.of("General", "Abstract", "Comments");
+
         /// A pattern without any regex metacharacter is a plain field name.
         private static final Pattern PLAIN_FIELD_NAME = Pattern.compile("[^\\\\^$.|?*+()\\[\\]{}]+");
 
@@ -137,9 +140,6 @@ public sealed interface EntryEditorTabModel
                     new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Abstract", List.of(StandardField.ABSTRACT.getName())),
                     new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Comments", List.of(StandardField.COMMENT.getName(), "comment-.*")));
         }
-
-        /// The localization keys the classic tabs are stored under; only these are translated on display.
-        private static final Set<String> CLASSIC_TAB_KEYS = Set.of("General", "Abstract", "Comments");
 
         /// The name shown in the UI. Names of the [#classicTabs()] are stored as `%<localization key>` and
         /// translated here, so they follow a language change. Any other name — a `%`-prefixed one a user
