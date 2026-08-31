@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -284,24 +284,52 @@ class GuiPreferencesMigrationsTest {
     @Test
     void upgradeThemeMigratesOldDarkCssToDarkTheme() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
+        when(preferences.get("fxTheme", null)).thenReturn("Dark.css");
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
 
-        verify(workspacePreferences).setTheme(Theme.dark());
+        verify(workspacePreferences).setColorScheme(ThemeColorScheme.DARK);
+        verify(preferences).deleteKey("fxTheme");
     }
 
     @Test
     void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme", "")).thenReturn("");
-        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
+        when(preferences.get("fxTheme", null)).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", true)).thenReturn(false);
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
 
-        verify(workspacePreferences).setTheme(Theme.light());
+        verify(workspacePreferences).setColorScheme(ThemeColorScheme.LIGHT);
+    }
+
+    @Test
+    void upgradeThemeKeepsDefaultsWhenThemeSyncOsWasEnabled() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", null)).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", true)).thenReturn(true);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences, never()).setTheme(any());
+        verify(workspacePreferences, never()).setColorScheme(any());
+    }
+
+    @Test
+    void upgradeThemeDoesNothingWhenOldPreferenceIsAbsent() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", null)).thenReturn(null);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(preferences, never()).deleteKey(anyString());
+        verify(workspacePreferences, never()).setTheme(any());
+        verify(workspacePreferences, never()).setColorScheme(any());
+        verify(workspacePreferences, never()).setCustomTheme(any());
     }
 
     @Test
@@ -374,5 +402,23 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
 
         verify(preferences, never()).put(eq("entryEditorCustomTabs"), anyString());
+    }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXConvertsLegacySpaceFormat() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl A", "shift B"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("shortcut+A", "shift+B"));
+    }
+
+    @Test
+    void upgradeKeyBindingsToJavaFXDoesNotRewriteExistingCtrlBinding() {
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of("ctrl+A"));
+
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
     }
 }

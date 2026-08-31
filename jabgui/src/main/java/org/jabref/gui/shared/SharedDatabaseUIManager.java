@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -19,7 +17,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -38,6 +36,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
@@ -52,7 +51,7 @@ public class SharedDatabaseUIManager {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
@@ -63,7 +62,7 @@ public class SharedDatabaseUIManager {
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
-                                   UndoManager undoManager,
+                                   GuiUndoManager undoManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
