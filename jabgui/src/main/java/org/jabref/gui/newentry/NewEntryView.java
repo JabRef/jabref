@@ -182,6 +182,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     if (idText != null) {
                         idText.setText(clipboardText);
                         idText.selectAll();
+                        // [impl->req~ux.textdialogs.focus~1]
                         Platform.runLater(() -> idText.requestFocus());
                     }
                 } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
@@ -386,7 +387,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
         // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
-        // [impl->req~textinput.clipboard.autofocus~1]
+        // [impl->req~ux.textdialogs.focus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (URLUtil.isURL(clipboardText)) {
             urlText.setText(clipboardText);
@@ -398,7 +399,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
-        // [impl->req~textinput.clipboard.autofocus~1]
+        // [impl->req~ux.textdialogs.focus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
@@ -454,6 +455,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
 
         if (idText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> idText.requestFocus());
         }
 
@@ -475,6 +477,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (urlText != null) {
             Platform.runLater(() -> {
                 if (tabEnterUrl.isSelected()) {
+                    // [impl->req~ux.textdialogs.focus~1]
                     urlText.requestFocus();
                 }
             });
@@ -495,8 +498,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
-        // [impl->req~textinput.clipboard.autofocus~1]
         if (interpretText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> interpretText.requestFocus());
         }
 
@@ -516,6 +519,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> bibtexText.requestFocus());
         }
 
