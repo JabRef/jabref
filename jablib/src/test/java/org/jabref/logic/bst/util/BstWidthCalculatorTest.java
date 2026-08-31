@@ -9,11 +9,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /// How to create these test using Bibtex:
-/// <p/>
+///
 /// Execute this charWidth.bst with the following charWidth.aux:
-/// <p/>
-/// <p/>
-/// <code>
+///
+/// ```
 /// ENTRY{}{}{}
 /// FUNCTION{test}
 /// {
@@ -25,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /// }
 /// READ
 /// EXECUTE{test}
-/// </code>
-/// <p/>
-/// <code>
+/// ```
+///
+/// ```
 /// \bibstyle{charWidth}
 /// \citation{canh05}
 /// \bibdata{test}
 /// \bibcite{canh05}{CMM{$^{+}$}05}
-/// </code>
+/// ```
 class BstWidthCalculatorTest {
 
     @ParameterizedTest

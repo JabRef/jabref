@@ -97,7 +97,7 @@ import static java.util.function.Predicate.not;
 /// - citation key --&gt; contained in [#fields] using they hashmap key `KEY_FIELD`
 /// - fields --&gt; contained in [#fields]
 ///
-/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
+/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to `false`. In case `changed`, use [#withChanged(boolean)].
 ///
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry {

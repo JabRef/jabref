@@ -520,7 +520,7 @@ public class StringUtil {
 
     /// @param buffer    String to be tokenized
     /// @param delimiter Delimiter string
-    /// @return list      [java.util.List] of <tt>String</tt>
+    /// @return list      [java.util.List] of `String`
     public static List<String> tokenizeToList(String buffer, String delimiter) {
         // delimiter is a set of characters, so it is turned into a character class.
         // \Q...\E keeps any regex metacharacter inside the class literal.
