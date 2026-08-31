@@ -141,7 +141,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     ///
     /// @param entries    List of [BibEntry] to search for
     /// @param requireAll Whether to return only groups that must contain all entries
-    /// @return List of [GroupTreeNode] containing the matches. [AllEntriesGroup] is always contained}
+    /// @return List of [GroupTreeNode] containing the matches. [AllEntriesGroup] is always contained
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
         List<GroupTreeNode> groups = new ArrayList<>();
 

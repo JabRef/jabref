@@ -182,7 +182,7 @@ public class FileUtil {
 
     /// Returns a valid filename for most operating systems.
     ///
-    /// It uses [FileNameCleaner#cleanFileName(String)] to remove illegal characters.} and then truncates the length to 255 chars, see [#MAXIMUM_FILE_NAME_LENGTH].
+    /// It uses [FileNameCleaner#cleanFileName(String)] to remove illegal characters and then truncates the length to 255 chars, see [#MAXIMUM_FILE_NAME_LENGTH].
     ///
     /// For "real" cleaning, [FileNameCleaner#cleanFileName(String)] should be used.
     public static String getValidFileName(String fileName) {
