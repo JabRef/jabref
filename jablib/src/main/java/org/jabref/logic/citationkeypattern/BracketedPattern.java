@@ -921,7 +921,7 @@ public class BracketedPattern {
     /// Gets the first part of the last name of the first author/editor, and appends the last name initial of the
     /// remaining authors/editors. Maximum 5 characters
     ///
-    /// @param authorList an <[AuthorList]
+    /// @param authorList an [AuthorList]
     /// @return the surname of all authors/editors
     static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {

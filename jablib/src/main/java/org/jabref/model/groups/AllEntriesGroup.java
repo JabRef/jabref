@@ -23,7 +23,7 @@ public class AllEntriesGroup extends AbstractGroup {
 
     /// Always returns true for any BibEntry!
     ///
-    /// @param entry The @[BibEntry] to check
+    /// @param entry The [BibEntry] to check
     /// @return Always returns true
     @Override
     public boolean contains(BibEntry entry) {
