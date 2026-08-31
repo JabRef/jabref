@@ -28,6 +28,7 @@ import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
@@ -49,15 +50,19 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 
+import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
+    private MetaData observedMetaData;
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -118,6 +123,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
     }
 
+    /// Rebuilds the displayed group tree when the group root was replaced underneath it -
+    /// e.g. applied from a shared database (see `DBMSSynchronizer#synchronizeLocalMetaData`).
+    /// Local edits only mutate nodes below the existing root, which the view models observe
+    /// themselves - rebuilding on those would reset selection and expansion state.
+    @Subscribe
+    public void listen(GroupUpdatedEvent event) {
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            GroupNodeViewModel currentRoot = rootGroup.get();
+            boolean rootReplaced = (currentRoot == null)
+                    || (event.getMetaData().getGroups().orElse(null) != currentRoot.getGroupNode());
+            if (rootReplaced) {
+                refresh();
+            }
+        });
+    }
+
     public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
         return rootGroup;
     }
@@ -164,6 +185,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
         currentDatabase = newDatabase;
+        MetaData newMetaData = newDatabase.map(BibDatabaseContext::getMetaData).orElse(null);
+        if (newMetaData != observedMetaData) {
+            if (observedMetaData != null) {
+                observedMetaData.unregisterListener(this);
+            }
+            observedMetaData = newMetaData;
+            if (observedMetaData != null) {
+                observedMetaData.registerListener(this);
+            }
+        }
         if (newDatabase.isEmpty()) {
             rootGroup.setValue(null);
             return;

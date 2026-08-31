@@ -62,6 +62,14 @@ On first connect, JabRef copies version-1 data into the version-2 tables (only w
 The old tables are kept, so older JabRef versions can still work with them; they can be dropped manually once the migration is verified.
 The structure version in use is recorded in the `metadata` table under the key `VersionDBStructure`.
 
+### Entry identity
+
+`entry.shared_id` is a database-assigned `SERIAL` (32-bit int, allocated per insert attempt) - a deliberate bridge, not the end state:
+
+* The int range (~2.1 billion ids) is not a practical limitation for bibliographies, so widening to `BIGSERIAL` would be churn without benefit.
+* The planned structure version 3 switches to client-generated [CUID2](https://github.com/paralleldrive/cuid2) strings (full length, not the short form used for processor ids). The motivation is not the id range but *who mints identity*: a client-generated id exists before any database round-trip, which makes inserts idempotent upserts, lets notifications reference brand-new entries, and enables offline-first synchronization (JabDrive). It is also safe in JSON/JavaScript, where 64-bit integers lose precision.
+* `SharedBibEntryData` already models this future: `sharedIdAsString` is the leading representation, `sharedIdAsInt` the bridge for the current `SERIAL` implementation. Existing numeric ids migrate either as their decimal string or by minting fresh CUID2s.
+
 ```mermaid
 erDiagram
     ENTRY ||--o{ FIELD : contains
