@@ -84,7 +84,7 @@ The `shared_id` and `version` are handled in [`org.jabref.model.entry.SharedBibE
 
 PostgreSQL supports to register listeners on the database on changes.
 (MySQL does not).
-The listening is implemented at [`org.jabref.logic.shared.notifications.NotificationListener`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/shared/notifications/NotificationListener.java).
+The listening is implemented at `org.jabref.logic.shared.notifications.NotificationListener`.
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.
 

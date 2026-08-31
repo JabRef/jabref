@@ -12,4 +12,5 @@ public record FieldChange(
         String field,
         String oldValue,
         String newValue,
-        int version) {}
+        int version) {
+}

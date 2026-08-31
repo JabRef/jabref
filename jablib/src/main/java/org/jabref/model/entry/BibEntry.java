@@ -889,7 +889,6 @@ public class BibEntry {
         return sharedBibEntryData;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

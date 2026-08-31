@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -250,7 +249,7 @@ public class DBMSProcessor {
     /// @param bibEntry [BibEntry] to be inserted.
     @VisibleForTesting
     public void insertEntry(BibEntry bibEntry) {
-        insertEntries(Collections.singletonList(bibEntry));
+        insertEntries(List.of(bibEntry));
     }
 
     public void insertEntries(List<BibEntry> bibEntries) {
@@ -498,8 +497,8 @@ public class DBMSProcessor {
             return;
         }
         String query = "DELETE FROM ENTRY WHERE SHARED_ID IN (" +
-                       "?, ".repeat(bibEntries.size() - 1) +
-                       "?)";
+                "?, ".repeat(bibEntries.size() - 1) +
+                "?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (int j = 0; j < bibEntries.size(); j++) {
@@ -591,14 +590,14 @@ public class DBMSProcessor {
             }
         } catch (SQLException e) {
             LOGGER.error("Executed >{}< and got an error", query, e);
-            return Collections.emptyList();
+            return List.of();
         }
 
         return sharedEntries;
     }
 
     public List<BibEntry> getSharedEntries() {
-        return getSharedEntries(Collections.emptyList());
+        return getSharedEntries(List.of());
     }
 
     /// Retrieves a mapping between the columns SHARED_ID and VERSION.
