@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
 ///
 /// These are the post-processing steps applied to the original fetch from ArXiv's API:
 /// <ol>
+///
 /// - Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
 /// - Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
 /// - Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).

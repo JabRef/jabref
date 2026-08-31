@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 /// Ensures that each Git repository (identified by its root path) has a single `GitHandler` instance shared across the application.
 ///
 /// Usage:
+///
 /// - [#get(Path)] — for known repository root paths (must contain a .git folder).
 /// - [#fromAnyPath(Path)] — for arbitrary paths inside a Git repo; will locate the repo root first.
 public class GitHandlerRegistry {

@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
 /// <ol>
+///
 /// -  'author field' is a sequence of tokens;
 ///
 /// -  tokens are separated by sequences of whitespaces (<CODE>Character.isWhitespace(c)==true</CODE>),

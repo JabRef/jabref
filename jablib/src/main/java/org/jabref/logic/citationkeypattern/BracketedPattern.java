@@ -1214,6 +1214,7 @@ public class BracketedPattern {
     ///
     /// Each part is examined separately:
     /// <ol>
+    ///
     /// - We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
     /// (ltd., co., ...) and which first character is lowercase (of, on, di, ...).
     /// - We detect the types of the part: university, technology institute,

@@ -164,6 +164,7 @@ public final class ConferenceUtils {
     /// The normalization process performs the following steps:
     ///
     /// <ol>
+    ///
     /// - Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
     /// - Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
     /// regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,

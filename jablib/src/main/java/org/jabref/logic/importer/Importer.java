@@ -90,6 +90,7 @@ public abstract class Importer implements Comparable<Importer> {
     ///
     /// If your format is binary-based (PDF, ZIP-based, or others), then you should not solely override this method.
     /// For binary formats do this:
+    ///
     /// 1. Throw [UnsupportedOperationException] in this method.
     /// 2. Override the method [Importer#importDatabase(Path)].
     /// Example of this workaround is in: [org.jabref.logic.importer.fileformat.pdf.PdfImporter].

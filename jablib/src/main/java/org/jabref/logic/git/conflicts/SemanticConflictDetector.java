@@ -28,6 +28,7 @@ import static com.google.common.collect.Sets.union;
 /// by applying the diff between base and remote onto local (`result := local + remoteDiff`).
 ///
 /// Caveats:
+///
 /// - Only entries with the same citation key are considered matching.
 /// - Entries without citation keys are currently ignored.
 /// - Changing a citation key is not supported and is treated as deletion + addition.
@@ -261,6 +262,7 @@ public class SemanticConflictDetector {
     /// and the value is the corresponding BibEntryDiff.
     ///
     /// Notes:
+    ///
     /// - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
     /// - Entries that represent additions (base == null) or deletions (new == null) are also included.
     /// - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.

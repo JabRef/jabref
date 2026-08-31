@@ -331,6 +331,7 @@ public final class ChatHistoryMigrationV1 {
     /// Reads raw Java-serialized bytes from MVStore's binary page format without invoking
     /// Java deserialization. MVStore's ObjectDataType stores each serializable value as:
     /// <ol>
+    ///
     /// - 1 byte: type identifier — `19` (TYPE_SERIALIZED_OBJECT in H2 2.3.232)
     /// - VarInt: byte length of the serialized payload
     /// - N bytes: the raw Java-serialized payload

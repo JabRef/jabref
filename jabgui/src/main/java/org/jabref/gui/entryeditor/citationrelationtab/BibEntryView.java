@@ -91,6 +91,7 @@ public class BibEntryView {
     ///
     /// @param text The summary text content
     /// @return Node with either:
+    ///
     /// - ScrollPane (for RTL text)
     /// - TextFlowLimited (for LTR text)
     private static Node createSummary(String text) {
@@ -110,6 +111,7 @@ public class BibEntryView {
     ///
     /// @param text The label text content
     /// @return Node with either:
+    ///
     /// - ScrollPane (for RTL text)
     /// - Wrapped Label (for LTR text)
     private static Node createLabel(String text) {

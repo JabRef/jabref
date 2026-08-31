@@ -339,6 +339,7 @@ public class PdfContentImporter extends PdfImporter {
     /// the different lines are joined into one and thereby separated by " "
     ///
     /// This method follows the structure typically found in academic paper PDFs:
+    ///
     /// - First, it attempts to detect the title by font size, if available, or by text position.
     /// - Authors are then processed line-by-line until reaching the next section.
     /// - Abstract and keywords, if found, are extracted as they appear on the page.

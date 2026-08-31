@@ -502,6 +502,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Adds the given function to the list of subscribers which are notified when something changes in the subtree.
     ///
     /// The following events are supported (the text in parentheses specifies which node is passed as the source):
+    ///
     /// - addChild (new parent)
     /// - removeChild (old parent)
     /// - move (old parent and new parent)

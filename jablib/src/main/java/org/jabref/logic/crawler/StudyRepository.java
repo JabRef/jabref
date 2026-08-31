@@ -234,6 +234,7 @@ public class StudyRepository {
     /// Persists the result locally and remotely by following the steps:
     /// Precondition: Currently checking out work branch
     /// <ol>
+    ///
     /// - Update the work and search branch
     /// - Persist the results on the search branch
     /// - Manually patch the diff of the search branch onto the work branch (as the merging will not work in

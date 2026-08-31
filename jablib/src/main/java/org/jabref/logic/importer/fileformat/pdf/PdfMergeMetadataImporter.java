@@ -82,6 +82,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// Makes [BibEntry] out of PDF file via merging results of several PDF analysis steps ([PdfImporter]).
     ///
     /// Algorithm:
+    ///
     /// 1. Store all candidates (possible [BibEntry]ies) in a list. First elements in this list will have higher
     /// priority for merging, which means that more fields will be stored for first entries, rather than last.
     /// 2. Run [PdfImporter]s, and store extracted candidates in the list.

@@ -13,6 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 /// Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:
+///
 /// 1. Open a URL based on the entry
 /// 2. Parse the response to get a list of [BibEntry]
 /// 3. Post-process fetched entries

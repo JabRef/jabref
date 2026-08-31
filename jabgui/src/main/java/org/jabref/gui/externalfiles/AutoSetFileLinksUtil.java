@@ -89,10 +89,12 @@ public class AutoSetFileLinksUtil {
     }
 
     /// Source of associated not linked files:
+    ///
     ///   - Part A. match file name with CitationKey, (START, EXACT, REGEX) configured by user
     ///   - Part B. match file name with broken linked file names, currently silently happen
     ///
     /// The auto-link process:
+    ///
     ///   - Prolog: we only consider the file with a unique name
     ///       - if a file's name is found multiple times in Part A, we do not consider it in Step 1
     ///       - if a file's name is found multiple times in Part B, we do not consider it in Step 2
@@ -206,6 +208,7 @@ public class AutoSetFileLinksUtil {
     /// Related: [org.jabref.gui.externalfiles.UnlinkedFilesCrawler] for scanning files missing at all entries
     ///
     /// NOTE:
+    ///
     /// 1. This method does not check if the file is already linked to another entry.
     /// 2. This method does not guarantee how the returned files are ordered. Order by how they appear in BibEntry does
     ///    not work since findAssociatedFilesByBrokenLinkedFile may return multiple files (with the same name) for one

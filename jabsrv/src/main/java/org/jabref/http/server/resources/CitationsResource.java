@@ -151,6 +151,7 @@ public class CitationsResource {
     /// the reader lands on a new page we extract every citation link's
     /// extracted bibliography text in one shot, fire one POST, and paint the
     /// returned per-citation `matchScope` as in-PDF dots. Single round-trip
+    ///
     /// + JabRef-side [CitationCacheService#getByText] hits mean repeat
     /// scans of the same page are O(1) per citation with no LLM cost.
     @POST

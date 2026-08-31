@@ -153,6 +153,7 @@ public class ConferenceRepository {
     /// While searching, the function computes Levenshtein similarity and LCS similarity between the query and the current conference
     /// title (also normalized) and prioritizes them in the following order:
     /// <ol>
+    ///
     /// - Whenever LCS similarity returns `1.0`, i.e., a conference title is found entirely as a substring in the query.
     /// - Whenever Levenshtein similarity exceeds the threshold defined by the `LEVENSHTEIN_THRESHOLD` constant.
     /// - The combined weighted score of both LCS and Levenshtein similarities exceeds the `COMBINED_LCS_LEV_THRESHOLD`.
