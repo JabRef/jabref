@@ -91,33 +91,12 @@ public class DoiResolution implements FulltextFetcher {
                 return embeddedLink;
             }
 
-            // scan for PDF
-            Elements hrefElements = html.body().select("a[href]");
-
-            List<URL> links = new ArrayList<>();
-            for (Element element : hrefElements) {
-                String href = element.attr("abs:href").toLowerCase(Locale.ENGLISH);
-                String hrefText = element.text().toLowerCase(Locale.ENGLISH);
-                // Only check if pdf is included in the link or inside the text
-                // ACM uses tokens without PDF inside the link
-                // See https://github.com/lehner/LocalCopy for more scrape ideas
-                // link with "PDF" in title tag
-                if (element.attr("title").toLowerCase(Locale.ENGLISH).contains("pdf") && new URLDownload(href).isPdf()) {
-                    return Optional.of(URLUtil.create(href));
-                }
-
-                if (href.contains("pdf") || hrefText.contains("pdf") && new URLDownload(href).isPdf()) {
-                    links.add(URLUtil.create(href));
-                }
-            }
-
-            // return if only one link was found (high accuracy)
-            if (links.size() == 1) {
+            // scan the page's anchors for a PDF link
+            Optional<URL> anchorLink = findPdfLinkInAnchors(html);
+            if (anchorLink.isPresent()) {
                 LOGGER.info("Fulltext PDF found @ {}", doiLink);
-                return Optional.of(links.getFirst());
             }
-            // return if links are equal
-            return findDistinctLinks(links);
+            return anchorLink;
         } catch (UnsupportedMimeTypeException type) {
             // this might be the PDF already as we follow redirects
             if (type.getMimeType().startsWith("application/pdf")) {
@@ -129,6 +108,37 @@ public class DoiResolution implements FulltextFetcher {
         }
 
         return Optional.empty();
+    }
+
+    /// Scan the page's `<a href>` anchors for a single PDF link. Package-private for testing the
+    /// parsing/selection without a live fetch.
+    Optional<URL> findPdfLinkInAnchors(Document html) throws MalformedURLException {
+        List<URL> links = new ArrayList<>();
+        for (Element element : html.body().select("a[href]")) {
+            // Keep the original-case URL for the result and the download; a case-sensitive
+            // path or query (e.g. an id or token) must survive. Match "pdf" case-insensitively
+            // on a lowercased copy only.
+            String href = element.attr("abs:href");
+            String hrefLower = href.toLowerCase(Locale.ENGLISH);
+            String hrefText = element.text().toLowerCase(Locale.ENGLISH);
+            // Only check if pdf is included in the link or inside the text
+            // ACM uses tokens without PDF inside the link
+            // See https://github.com/lehner/LocalCopy for more scrape ideas
+            // link with "PDF" in title tag
+            if (element.attr("title").toLowerCase(Locale.ENGLISH).contains("pdf") && new URLDownload(href).isPdf()) {
+                return Optional.of(URLUtil.create(href));
+            }
+
+            if (hrefLower.contains("pdf") || hrefText.contains("pdf") && new URLDownload(href).isPdf()) {
+                links.add(URLUtil.create(href));
+            }
+        }
+
+        // high accuracy only when exactly one link was found, or all found links are equal
+        if (links.size() == 1) {
+            return Optional.of(links.getFirst());
+        }
+        return findDistinctLinks(links);
     }
 
     /// Scan for `<meta name="citation_pdf_url">`.

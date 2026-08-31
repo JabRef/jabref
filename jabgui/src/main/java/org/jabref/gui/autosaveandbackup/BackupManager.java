@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn;
 
@@ -44,10 +43,9 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
-/// An intelligent {@link java.util.concurrent.ExecutorService} with a {@link java.util.concurrent.BlockingQueue} prevents a high load while making backups and
-/// rejects all redundant backup tasks. This class does not manage the .bak file which is created when opening a
-/// database.
+/// Backups the given bib database file from [BibDatabaseContext] on every [BibDatabaseContextChangedEvent].
+/// An intelligent [java.util.concurrent.ExecutorService] with a [java.util.concurrent.BlockingQueue] prevents a high load while making backups and
+/// rejects all redundant backup tasks. This class does not manage [org.jabref.logic.util.BackupFileType#SAVE] file.
 public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
@@ -101,7 +99,7 @@ public class BackupManager {
 
     /// Determines the most recent existing backup file name
     static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
-        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
+        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
     }
 
     /// Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
@@ -340,22 +338,8 @@ public class BackupManager {
     }
 
     private void fillQueue(Path backupDir) {
-        if (!Files.exists(backupDir)) {
-            return;
-        }
-        bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
-            // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
-            try (Stream<Path> backupFiles = Files.list(backupDir)) {
-                List<Path> allSavFiles = backupFiles
-                        // just list the .sav belonging to the given targetFile
-                        .filter(p -> p.getFileName().toString().startsWith(prefix))
-                        .sorted().toList();
-                backupFilesQueue.addAll(allSavFiles);
-            } catch (IOException e) {
-                LOGGER.error("Could not determine most recent file", e);
-            }
-        });
+        bibDatabaseContext.getDatabasePath().ifPresent(databasePath ->
+                backupFilesQueue.addAll(BackupFileUtil.getExistingBackupFiles(databasePath, backupDir)));
     }
 
     /// Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
