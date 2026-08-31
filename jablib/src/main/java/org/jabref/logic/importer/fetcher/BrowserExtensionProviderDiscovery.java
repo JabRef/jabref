@@ -45,6 +45,7 @@ public final class BrowserExtensionProviderDiscovery {
     }
 
     /// Returns the absolute path of the discovery directory for the current platform.
+    // [impl->req~bxf.discovery-dir~1]
     public static Path discoveryDirectory() {
         if (OS.WINDOWS) {
             String appData = System.getenv("APPDATA");
@@ -90,6 +91,7 @@ public final class BrowserExtensionProviderDiscovery {
         return List.copyOf(providers);
     }
 
+    // [impl->req~bxf.discovery-schema~1]
     private static Optional<BrowserExtensionProvider> parseProvider(Path file) {
         DiscoveryFile parsed;
         try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {

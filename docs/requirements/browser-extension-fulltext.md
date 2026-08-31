@@ -21,63 +21,6 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 All request and response bodies are UTF-8 encoded JSON. Clients and providers MUST set `Content-Type: application/json` on every request and response that carries a body. A provider MUST reject a request whose body is not well-formed JSON with `400 bad-request`. Unknown JSON fields are ignored per [Versioning](#versioning), so that backwards-compatible additions do not break existing peers.
 
-## Happy-path flow
-
-```mermaid
-sequenceDiagram
-    actor User
-
-    box rgba(59,130,246,0.25) JabRef
-        participant J as JabGui
-        participant F as BrowserExtensionFulltextFetcher
-    end
-
-    participant D as Discovery dir<br/>(filesystem)
-
-    box rgba(234,179,8,0.35) Provider — browser-extension companion
-        participant H as Loopback HTTP server
-        participant E as Browser extension
-        participant T as Browser tab
-    end
-
-    participant P as Publisher site
-
-    User->>J: Get fulltext for entry
-    J->>F: findFullText(entry)
-    F->>D: list *.json
-    D-->>F: providers + tokenFile paths
-    F->>D: read each tokenFile
-    D-->>F: bearer tokens
-
-    par race providers
-        F->>H: POST /v1/fulltext<br/>{doi, url}<br/>Authorization: Bearer ...
-    end
-
-    H->>H: resolve DOI -> publisher URL<br/>pick adapter (publisher / generic)
-    H->>E: fetchFulltext (native messaging)<br/>{requestId, url, contentScriptName}
-    E->>E: enqueue (global cap 3, per-host cap 1)
-    E->>T: tabs.create({url, active: false})
-    T->>P: GET publisher URL (with cookies)
-    P-->>T: rendered page
-    E->>T: scripting.executeScript(adapter)
-    T-->>E: PDF URL
-    E->>P: downloads.download(pdfUrl)
-    P-->>E: PDF bytes -> downloads/[provider]/[id].pdf
-    E->>T: tabs.remove
-    E-->>H: {requestId, id, path, sourceUrl}
-    H-->>F: 200 {id, path, sourceUrl}
-
-    F-->>J: Optional[URL] (file:// path)
-    J->>J: copy/move into library dir,<br/>rename per pattern
-    J-->>User: PDF linked to entry
-```
-
-Notes:
-
-- The race step fans out one HTTP request per discovered provider. The first `200` wins; losing requests are cancelled by closing their TCP connections (see [`req~bxf.cancellation~1`](#cancellation-via-connection-close)).
-- Adapter selection (publisher-specific vs generic fallback) and the per-publisher concurrency cap both live on the provider side; JabRef does not know which publisher adapters a provider supports.
-- The provider returns a local file path; JabRef wraps it as a `file://` URL so its existing attach pipeline copies the PDF into the library's file directory and renames it per the configured pattern.
-
 ## Discovery directory
 `req~bxf.discovery-dir~1`
 
@@ -90,6 +33,8 @@ JabRef enumerates provider discovery files from a well-known directory at fetche
 | macOS    | `~/Library/Application Support/JabRef/fulltext-providers/*.json`                                     |
 
 Each provider drops exactly one JSON file at install time. The filename is provider-chosen (for example `<provider-name>.json`) and MUST be unique across providers. Files with parse errors are skipped and logged at warn level; they do not abort the enumeration.
+
+Needs: impl
 
 ## Discovery file schema
 `req~bxf.discovery-schema~1`
@@ -116,6 +61,8 @@ Each discovery file contains a single JSON object with these fields:
 
 The discovery file is provider-managed. The provider rewrites it whenever the port changes and removes it on uninstall. JabRef treats the values as authoritative; it does not cache them across sessions.
 
+Needs: impl
+
 ## Loopback binding
 `req~bxf.loopback-bind~1`
 
@@ -127,6 +74,8 @@ Every endpoint binds `127.0.0.1` only. Providers MUST NOT expose the HTTP server
 Every request carries an `Authorization: Bearer <token>` header. The token value is the contents of the `tokenFile` named in the discovery JSON. JabRef reads the file at fetcher init and re-reads on token failure (401) once before treating the provider as unreachable.
 
 Providers MUST reject requests with a missing or wrong token with HTTP `401`. The token file MUST be created with user-only filesystem permissions (`0600` on POSIX; current-user-only ACL on Windows).
+
+Needs: impl
 
 ## Origin check
 `req~bxf.origin-check~1`
@@ -183,6 +132,8 @@ Success response (HTTP `200`):
 
 The file at `path` MUST be a readable PDF (not an HTML error page) when the response is sent. JabRef copies or moves it into the library's file directory via its existing attach pipeline.
 
+Needs: impl
+
 ## Endpoint: error responses
 `req~bxf.fetch-errors~1`
 
@@ -207,6 +158,8 @@ Defined short codes:
 
 The HTTP status is advisory. Because JabRef treats every non-`200` response as a soft miss, the machine-readable `error` code — not the status line — is the authoritative failure discriminator; the status codes above are chosen for correct HTTP semantics rather than to drive client control flow. JabRef logs the `error` and `message` and proceeds to the next fetcher in `FulltextFetchers`. Specifically, JabRef does **not** retry `503 busy` (see [`req~bxf.sync-hold~1`](#sync-hold-no-retry)).
 
+Needs: impl
+
 ## Endpoint: DELETE /v1/fulltext/{id} (optional cleanup)
 `req~bxf.cleanup~1`
 
@@ -230,6 +183,8 @@ Clients (JabRef) issue a single synchronous `POST /v1/fulltext` per fetch attemp
 
 JabRef races multiple registered providers in parallel via separate concurrent HTTP requests and uses the first successful response, cancelling the rest by closing their connections.
 
+Needs: impl
+
 ## Safety valve: 503 busy
 `req~bxf.safety-valve~1` <a id="safety-valve"></a>
 
@@ -241,6 +196,8 @@ JabRef races multiple registered providers in parallel via separate concurrent H
 Cancellation flows out-of-band. When JabRef closes the TCP connection (the losing fetchers in `FulltextFetchers#findFullTextPDF` after a winner is chosen), the provider MUST treat the closed connection as a signal to abort the underlying browser tab if the fetch has not finished and dequeue any pending work tied to that connection.
 
 Implementations that cannot detect mid-request client disconnect (for example `HttpListener` on .NET) MAY rely on the provider-side safety-valve timer to fire abort instead; this satisfies the requirement at the cost of higher abort latency.
+
+Needs: impl
 
 ## Security model
 `req~bxf.security~1`
@@ -265,3 +222,62 @@ This section is informational and carries no `req~` identifier.
 
 - **JabRef-side consumer** — `BrowserExtensionFulltextFetcher.java` (registered in `WebFetchers#getFullTextFetchers`) consumes this protocol on JabRef's behalf.
 - **Provider implementations** — each provider repository keeps a verbatim copy of this file for cross-repo tracing and tracks its own derived obligations there.
+
+
+<!-- OFT / OpenFastTrace does not recognise ```mermaid as a code-fence opener, so a mermaid block placed before any `req~...` marker makes its bare closing fence read as an *opening* fence and silently swallows the next requirements. Keep this diagram at the end, after the last requirement. See traceRequirements. -->
+## Happy-path flow
+
+```mermaid
+sequenceDiagram
+    actor User
+
+    box rgba(59,130,246,0.25) JabRef
+        participant J as JabGui
+        participant F as BrowserExtensionFulltextFetcher
+    end
+
+    participant D as Discovery dir<br/>(filesystem)
+
+    box rgba(234,179,8,0.35) Provider — browser-extension companion
+        participant H as Loopback HTTP server
+        participant E as Browser extension
+        participant T as Browser tab
+    end
+
+    participant P as Publisher site
+
+    User->>J: Get fulltext for entry
+    J->>F: findFullText(entry)
+    F->>D: list *.json
+    D-->>F: providers + tokenFile paths
+    F->>D: read each tokenFile
+    D-->>F: bearer tokens
+
+    par race providers
+        F->>H: POST /v1/fulltext<br/>{doi, url}<br/>Authorization: Bearer ...
+    end
+
+    H->>H: resolve DOI -> publisher URL<br/>pick adapter (publisher / generic)
+    H->>E: fetchFulltext (native messaging)<br/>{requestId, url, contentScriptName}
+    E->>E: enqueue (global cap 3, per-host cap 1)
+    E->>T: tabs.create({url, active: false})
+    T->>P: GET publisher URL (with cookies)
+    P-->>T: rendered page
+    E->>T: scripting.executeScript(adapter)
+    T-->>E: PDF URL
+    E->>P: downloads.download(pdfUrl)
+    P-->>E: PDF bytes -> downloads/[provider]/[id].pdf
+    E->>T: tabs.remove
+    E-->>H: {requestId, id, path, sourceUrl}
+    H-->>F: 200 {id, path, sourceUrl}
+
+    F-->>J: Optional[URL] (file:// path)
+    J->>J: copy/move into library dir,<br/>rename per pattern
+    J-->>User: PDF linked to entry
+```
+
+Notes:
+
+- The race step fans out one HTTP request per discovered provider. The first `200` wins; losing requests are cancelled by closing their TCP connections (see [`req~bxf.cancellation~1`](#cancellation-via-connection-close)).
+- Adapter selection (publisher-specific vs generic fallback) and the per-publisher concurrency cap both live on the provider side; JabRef does not know which publisher adapters a provider supports.
+- The provider returns a local file path; JabRef wraps it as a `file://` URL so its existing attach pipeline copies the PDF into the library's file directory and renames it per the configured pattern.

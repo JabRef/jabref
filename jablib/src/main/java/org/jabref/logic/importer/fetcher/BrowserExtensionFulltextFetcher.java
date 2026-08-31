@@ -125,7 +125,8 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
         // interrupts the blocking HttpClient#send in tryProvider, which
         // together with the try-with-resources on HttpClient closes the
         // underlying socket — the cancellation-via-connection-close signal
-        // the wire spec expects (req~bxf.cancellation~1).
+        // the wire spec expects.
+        // [impl->req~bxf.cancellation~1]
         winner.thenRun(() -> tasks.forEach(f -> f.cancel(true)));
 
         // Fallback: if every task finishes without a hit, resolve empty.
@@ -164,6 +165,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
     private Optional<URL> tryProvider(BrowserExtensionProvider provider,
                                       String requestBody,
                                       ExecutorService executor) {
+        // [impl->req~bxf.auth-bearer~1]
         @Nullable String token = readToken(provider);
         if (token == null) {
             return Optional.empty();
@@ -176,6 +178,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             LOGGER.debug("Could not build endpoint URI for provider {}", provider.name(), e);
             return Optional.empty();
         }
+        // [impl->req~bxf.fetch~1]
         HttpRequest request = HttpRequest.newBuilder(endpoint)
                                          .timeout(socketTimeout)
                                          .header("Content-Type", "application/json")
@@ -187,7 +190,9 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
                                            .connectTimeout(CONNECT_TIMEOUT)
                                            .executor(executor)
                                            .build()) {
+            // [impl->req~bxf.sync-hold~1]
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8));
+            // [impl->req~bxf.fetch-errors~1]
             if (response.statusCode() != 200) {
                 LOGGER.debug("Provider {} returned HTTP {}: {}", provider.name(), response.statusCode(), response.body());
                 return Optional.empty();
