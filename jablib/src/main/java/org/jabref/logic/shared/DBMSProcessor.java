@@ -60,7 +60,6 @@ public class DBMSProcessor {
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
-    // TODO: We need to migrate data - or ask the user to recreate, #Liquibase
     private int CURRENT_VERSION_DB_STRUCT = 2;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
@@ -142,18 +141,11 @@ public class DBMSProcessor {
     ///
     /// @throws SQLException in case of error
     public void setUp() throws SQLException {
-        if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
-            // checkTableAvailability does not distinguish if same table name exists in different schemas
-            // VERSION_DB_STRUCT_DEFAULT must be forced
-            VERSION_DB_STRUCT_DEFAULT = 0;
-        }
-
-        // TODO: Before a release, fix the names (and migrate data to the new names)
-        //       Think of using Flyway or Liquibase instead of manual migration
+        // TODO: Think of using Flyway or Liquibase instead of manual migration
         //       Liquibase:
         //         - https://contribute.liquibase.com/extensions-integrations/directory/integration-docs/gradle
         //         - https://forum.liquibase.org/t/adding-liquibase-to-an-existing-project/6076
-        // If changed, also adjust {@link org.jabref.logic.shared.TestManager.clearTables}
+        // If the schema name is changed, also adjust [TestManager#clearTables]
         connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
         connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
 
@@ -183,6 +175,8 @@ public class DBMSProcessor {
                     )
                 """);
         connection.createStatement().executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS idx_metadata_key ON METADATA (key);");
+
+        migrateFromOldStructure();
 
         Map<String, String> metadata = getSharedMetaData();
 
@@ -225,23 +219,53 @@ public class DBMSProcessor {
         connection.createStatement().executeUpdate(upsertMetadata);
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
-            // We can migrate data from old tables in new table
-            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
-                LOGGER.info("Migrating from VersionDBStructure == 0");
-                connection.createStatement().executeUpdate("INSERT INTO ENTRY SELECT * FROM \"ENTRY\"");
-                connection.createStatement().executeUpdate("INSERT INTO FIELD SELECT * FROM \"FIELD\"");
-                connection.createStatement().executeUpdate("INSERT INTO METADATA SELECT * FROM \"METADATA\"");
-                connection.createStatement().execute("SELECT setval(\'\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from \"ENTRY\"))");
-                metadata = getSharedMetaData();
-            }
-
             metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
             setSharedMetaData(metadata);
         }
+    }
 
-        // TODO: implement migration of changes from version 1 to 2
-        // - "TYPE" is now called entrytype (to be consistent with org.jabref.model.entry.field.InternalField.TYPE_HEADER)
-        // - table names and field names now lower case
+    /// Copies the data of a shared database created by earlier JabRef versions into the current
+    /// table structure: quoted upper-case tables in the schema `jabref` (structure version 1,
+    /// JabRef 5.x/6.0-alpha) or in the default schema (structure version 0, JabRef < 5).
+    /// `"TYPE"` became `entrytype`, all other names only changed case.
+    ///
+    /// The old tables are kept untouched, so older JabRef versions can still work with them.
+    private void migrateFromOldStructure() throws SQLException {
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT EXISTS (SELECT 1 FROM entry)")) {
+            resultSet.next();
+            if (resultSet.getBoolean(1)) {
+                // Only a freshly created database is migrated into - never one that is already used
+                return;
+            }
+        }
+
+        Optional<String> oldSchema = findOldSchema();
+        if (oldSchema.isEmpty()) {
+            return;
+        }
+
+        LOGGER.info("Migrating shared database from old structure in schema \"{}\"", oldSchema.get());
+        connection.createStatement().executeUpdate(
+                "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", \"TYPE\", \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
+        connection.createStatement().executeUpdate(
+                "INSERT INTO field (entry_shared_id, name, value) SELECT \"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\" FROM %s.\"FIELD\"".formatted(oldSchema.get()));
+        connection.createStatement().executeUpdate(
+                "INSERT INTO metadata (key, value) SELECT \"KEY\", \"VALUE\" FROM %s.\"METADATA\"".formatted(oldSchema.get()));
+        // The serial has to continue after the copied ids
+        connection.createStatement().execute(
+                "SELECT setval(pg_get_serial_sequence('entry', 'shared_id'), COALESCE((SELECT MAX(shared_id) FROM entry), 0) + 1, false)");
+    }
+
+    private Optional<String> findOldSchema() throws SQLException {
+        for (String schema : List.of("jabref", "public")) {
+            try (ResultSet resultSet = connection.createStatement().executeQuery(
+                    "SELECT to_regclass('%s.\"ENTRY\"')".formatted(schema))) {
+                if (resultSet.next() && (resultSet.getString(1) != null)) {
+                    return Optional.of(schema);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     int getCURRENT_VERSION_DB_STRUCT() {

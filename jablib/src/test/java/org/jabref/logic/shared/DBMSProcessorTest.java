@@ -1,5 +1,6 @@
 package org.jabref.logic.shared;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -112,6 +113,55 @@ class DBMSProcessorTest {
                 assertFalse(fieldResultSet.next());
             }
         }
+    }
+
+    @Test
+    void migrationFromV1Structure() throws SQLException {
+        // Recreate the structure of JabRef 5.x/6.0-alpha (structure version 1) with one entry
+        Connection connection = dbmsConnection.getConnection();
+        connection.createStatement().executeUpdate("CREATE SCHEMA jabref");
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE jabref."ENTRY" (
+                        "SHARED_ID" SERIAL PRIMARY KEY,
+                        "TYPE" VARCHAR,
+                        "VERSION" INTEGER DEFAULT 1
+                    )
+                """);
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE jabref."FIELD" (
+                        "ENTRY_SHARED_ID" INTEGER,
+                        "NAME" VARCHAR,
+                        "VALUE" TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE jabref."METADATA" (
+                        "KEY" VARCHAR,
+                        "VALUE" TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("INSERT INTO jabref.\"ENTRY\" (\"TYPE\", \"VERSION\") VALUES ('article', 3)");
+        connection.createStatement().executeUpdate("INSERT INTO jabref.\"FIELD\" VALUES (1, 'author', 'Ada Lovelace')");
+        connection.createStatement().executeUpdate("INSERT INTO jabref.\"METADATA\" VALUES ('databaseType', 'bibtex;')");
+
+        // The database set up by @BeforeEach is still empty, so setting up again migrates
+        dbmsProcessor.setupSharedDatabase();
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ada Lovelace");
+        expectedEntry.getSharedBibEntryData().setSharedId(1);
+        expectedEntry.getSharedBibEntryData().setVersion(3);
+        assertEquals(List.of(expectedEntry), dbmsProcessor.getSharedEntries());
+        assertEquals("bibtex;", dbmsProcessor.getSharedMetaData().get("databaseType"));
+
+        // New entries continue after the migrated ids
+        BibEntry newEntry = getBibEntryExample();
+        dbmsProcessor.insertEntry(newEntry);
+        assertEquals(2, newEntry.getSharedBibEntryData().getSharedIdAsInt());
+
+        // A reconnect does not migrate again into the used database
+        dbmsProcessor.setupSharedDatabase();
+        assertEquals(2, dbmsProcessor.getSharedEntries().size());
     }
 
     private static BibEntry getBibEntryExample() {
