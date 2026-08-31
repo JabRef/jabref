@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.util.Callback;
 
@@ -152,9 +153,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     setOnMouseEntered(event -> {
                         int rowIndex = getTableRow().getIndex();
                         int totalItems = getTableView().getItems().size();
-                        // tooltip is != null even for empty lines. Not easy to fix, therefore, there is a check if the current line is a real entry
-                        if (tooltip != null && rowIndex < totalItems) {
+                        // tooltip is != null even for empty lines. Not easy to fix, therefore, there is a check if the current line is a real entry.
+                        // Additionally, the tooltip is only shown if the cell's text is actually truncated; otherwise a stale tooltip is cleared.
+                        if (tooltip != null && rowIndex < totalItems && isCellTextTruncated()) {
                             setTooltip(tooltip.apply(rowItem, item));
+                        } else if (tooltip != null) {
+                            setTooltip(null);
                         }
                     });
 
@@ -182,6 +186,24 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         visibleProperty().bind(toVisibleExpression.apply(item));
                     }
                 }
+            }
+
+            /// Checks whether the currently displayed text is wider than the space available in the cell,
+            /// i.e. whether the text is truncated and a tooltip should be shown.
+            private boolean isCellTextTruncated() {
+                String cellText = getText();
+                if (cellText == null || cellText.isEmpty()) {
+                    return false;
+                }
+                Text measuringText = new Text(cellText);
+                measuringText.setFont(getFont());
+                double textWidth = measuringText.getLayoutBounds().getWidth();
+                double availableWidth = getWidth() - getPadding().getLeft() - getPadding().getRight();
+                Node graphic = getGraphic();
+                if (graphic != null) {
+                    availableWidth -= graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
+                }
+                return textWidth > availableWidth + 1.0; // added +1.0 to avoid false positives in case the text barely fits
             }
         };
     }
