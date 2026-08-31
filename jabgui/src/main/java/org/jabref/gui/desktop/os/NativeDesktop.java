@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -18,6 +19,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
@@ -282,6 +284,15 @@ public abstract class NativeDesktop {
     ///
     /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        openBrowser(url, externalApplicationsPreferences, e -> LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e));
+    }
+
+    /// Opens the given URL using the system browser
+    ///
+    /// @param url            the URL to open
+    /// @param onAsyncFailure invoked (from a background thread) when opening fails after this
+    ///                                             method has already returned; synchronous failures throw instead
+    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
         if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
             // The user configured a custom browser; hand it the URL string unmodified
@@ -310,7 +321,7 @@ public abstract class NativeDesktop {
                     try {
                         get().openUrlWithSystemHandler(url);
                     } catch (IOException e2) {
-                        LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e2);
+                        onAsyncFailure.accept(e2);
                     }
                 }
             });
@@ -328,17 +339,22 @@ public abstract class NativeDesktop {
     /// @param url the URL to open
     public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         try {
-            openBrowser(url, externalApplicationsPreferences);
+            openBrowser(url, externalApplicationsPreferences,
+                    exception -> UiTaskExecutor.runInJavaFXThread(() -> showManualOpenPopup(url, dialogService, exception)));
         } catch (IOException exception) {
-            ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
-            clipBoardManager.setContent(url);
-            LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser", exception);
-            String couldNotOpenBrowser = Localization.lang("Could not open browser.");
-            String openManually = Localization.lang("Please open %0 manually.", url);
-            String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            dialogService.notify(couldNotOpenBrowser);
-            dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
+            showManualOpenPopup(url, dialogService, exception);
         }
+    }
+
+    private static void showManualOpenPopup(String url, DialogService dialogService, IOException exception) {
+        ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+        clipBoardManager.setContent(url);
+        LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser", exception);
+        String couldNotOpenBrowser = Localization.lang("Could not open browser.");
+        String openManually = Localization.lang("Please open %0 manually.", url);
+        String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
+        dialogService.notify(couldNotOpenBrowser);
+        dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
     }
 
     public static NativeDesktop get() {
