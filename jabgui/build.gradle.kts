@@ -21,6 +21,9 @@ version = providers.gradleProperty("projVersion")
 testModuleInfo {
     requires("org.jabref.testsupport")
 
+    // Local HTTP stub server for tests exercising download code hermetically
+    requires("jdk.httpserver")
+
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
