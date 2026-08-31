@@ -34,12 +34,16 @@ import org.slf4j.LoggerFactory;
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
-    // Timeout in seconds. Set generously so fetchers that bounce through
-    // an institutional SSO chain or a slow publisher CDN have a chance
-    // to complete; the browser-extension companion fetcher in particular
-    // may open a tab, navigate through a SeamlessAccess redirect, and
-    // download the PDF, which can easily exceed the older 10 s cap.
+    // Timeout in seconds for the regular (direct HTTP) fetchers. Set generously so
+    // fetchers that bounce through an institutional SSO chain or a slow publisher CDN
+    // have a chance to complete.
     private static final int FETCHER_TIMEOUT = 120;
+
+    // Timeout for the fallback fetchers. The browser-extension companion opens a tab,
+    // navigates through SSO, and downloads the PDF; it holds the connection for its own
+    // socket timeout (5 minutes). The outer race must not cancel it earlier, otherwise a
+    // slow authenticated browser flow always returns as a miss.
+    private static final int FALLBACK_FETCHER_TIMEOUT = 330;
 
     private final Set<FulltextFetcher> fetchers;
     private final ImporterPreferences importerPreferences;
@@ -116,19 +120,19 @@ public class FulltextFetchers {
             }
         }
 
-        Optional<FetcherResult> result = race(clonedEntry, primaryFetchers);
+        Optional<FetcherResult> result = race(clonedEntry, primaryFetchers, FETCHER_TIMEOUT);
         if (result.isEmpty()) {
-            result = race(clonedEntry, fallbackFetchers);
+            result = race(clonedEntry, fallbackFetchers, FALLBACK_FETCHER_TIMEOUT);
         }
         return result;
     }
 
     /// Runs the given fetchers in parallel and returns the result of the most trusted fetcher, if any.
-    private Optional<FetcherResult> race(BibEntry entry, Set<FulltextFetcher> fetchersToRace) {
+    private Optional<FetcherResult> race(BibEntry entry, Set<FulltextFetcher> fetchersToRace, int timeoutSeconds) {
         if (fetchersToRace.isEmpty()) {
             return Optional.empty();
         }
-        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(entry, fetchersToRace), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(entry, fetchersToRace), timeoutSeconds, TimeUnit.SECONDS);
 
         return result.stream()
                      .map(FulltextFetchers::getResults)

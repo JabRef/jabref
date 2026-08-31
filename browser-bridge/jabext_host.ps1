@@ -157,7 +157,7 @@ $ReaderScript = {
     function ReadFrame($s) {
         $head = New-Object byte[] 4; $n = 0
         while ($n -lt 4) { $r = $s.Read($head, $n, 4 - $n); if ($r -le 0) { return $null }; $n += $r }
-        $len = [BitConverter]::ToInt32($head, 0); if ($len -le 0) { return $null }
+        $len = [BitConverter]::ToInt32($head, 0); if ($len -le 0 -or $len -gt 1048576) { return $null }  # cap at 1 MiB
         $buf = New-Object byte[] $len; $n = 0
         while ($n -lt $len) { $r = $s.Read($buf, $n, $len - $n); if ($r -le 0) { return $null }; $n += $r }
         return [Text.Encoding]::UTF8.GetString($buf) | ConvertFrom-Json
@@ -196,9 +196,12 @@ function Main {
 
     New-Item -ItemType Directory -Force -Path $DiscoveryDir | Out-Null
     $discovery = Join-Path $DiscoveryDir "$ProviderName.json"
+    # Publish atomically (write temp, then replace) so JabRef never reads a partial file.
+    $discoveryTmp = "$discovery.$PID.tmp"
     @{ name = $ProviderName; displayName = $DisplayName; port = $port
        tokenFile = $tf; protocolVersion = $ProtocolVersion } |
-        ConvertTo-Json -Compress | Set-Content $discovery -NoNewline
+        ConvertTo-Json -Compress | Set-Content $discoveryTmp -NoNewline
+    Move-Item -Force -Path $discoveryTmp -Destination $discovery
 
     try {
         while (-not $Sync.Done) {
@@ -207,7 +210,12 @@ function Main {
             Handle-Context $ctx
         }
     } finally {
-        Remove-Item $discovery -ErrorAction SilentlyContinue
+        # Only remove the discovery record if it still points at this instance's port;
+        # a newer concurrent host may have taken ownership.
+        try {
+            $cur = Get-Content -Raw $discovery -ErrorAction Stop | ConvertFrom-Json
+            if ($cur.port -eq $port) { Remove-Item $discovery -ErrorAction SilentlyContinue }
+        } catch { }
         if ($listener.IsListening) { $listener.Stop() }
         $ps.EndInvoke($async); $ps.Dispose()
     }

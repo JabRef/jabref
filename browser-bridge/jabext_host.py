@@ -212,10 +212,15 @@ def start_http() -> ThreadingHTTPServer:
 def write_discovery(port: int, token_file: Path) -> Path:
     DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
     f = DISCOVERY_DIR / f"{PROVIDER_NAME}.json"
-    f.write_text(json.dumps({
+    payload = json.dumps({
         "name": PROVIDER_NAME, "displayName": PROVIDER_DISPLAY_NAME,
         "port": port, "tokenFile": str(token_file), "protocolVersion": PROTOCOL_VERSION,
-    }), "utf-8")
+    })
+    # Publish atomically: write to a temp file and rename, so JabRef never reads a
+    # truncated/partial discovery document during startup or restart.
+    tmp = f.with_name(f"{f.name}.{os.getpid()}.tmp")
+    tmp.write_text(payload, "utf-8")
+    os.replace(tmp, f)
     return f
 
 
@@ -240,8 +245,14 @@ def main() -> int:
     try:
         nm_loop()
     finally:
-        try: discovery.unlink()
-        except OSError: pass
+        # Only remove the discovery record if it still points at this instance's
+        # port. A newer concurrent host (another browser/profile) may have taken
+        # ownership; deleting its record would strand the surviving provider.
+        try:
+            if json.loads(discovery.read_text("utf-8")).get("port") == srv.server_address[1]:
+                discovery.unlink()
+        except (OSError, ValueError):
+            pass
         srv.shutdown()
     return 0
 
