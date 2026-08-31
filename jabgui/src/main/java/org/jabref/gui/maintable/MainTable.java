@@ -15,12 +15,15 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -503,6 +506,44 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         getSelectionModel().clearSelection();
         getSelectionModel().selectLast();
         scrollTo(getItems().size() - 1);
+    }
+
+    /// Scrolls the table so that the currently selected entry is centered vertically among the visible rows.
+    /// If no entry is selected, nothing happens. When the selection is within half a screen of the top or bottom,
+    /// it is placed as close to the center as scrolling allows.
+    // [impl->req~maintable.center-selected~1]
+    public void centerSelectedEntry() {
+        int selectedIndex = getSelectionModel().getSelectedIndex();
+        if (selectedIndex < 0) {
+            return;
+        }
+        int targetTopIndex = Math.max(0, selectedIndex - (getVisibleRowCount() / 2));
+        scrollTo(targetTopIndex);
+    }
+
+    /// Determines how many rows are currently visible in the viewport by inspecting the table's [VirtualFlow].
+    /// Returns `0` when the flow is not available yet (for example, before the table has been rendered).
+    private int getVisibleRowCount() {
+        return getVirtualFlow()
+                .map(flow -> {
+                    int firstIndex = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
+                    int lastIndex = Optional.ofNullable(flow.getLastVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
+                    if ((firstIndex < 0) || (lastIndex < 0)) {
+                        return 0;
+                    }
+                    return (lastIndex - firstIndex) + 1;
+                })
+                .orElse(0);
+    }
+
+    private Optional<? extends VirtualFlow<?>> getVirtualFlow() {
+        if (getSkin() instanceof TableViewSkin<?> tableViewSkin) {
+            return tableViewSkin.getChildren().stream()
+                                .filter(VirtualFlow.class::isInstance)
+                                .map(node -> (VirtualFlow<?>) node)
+                                .findFirst();
+        }
+        return Optional.empty();
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

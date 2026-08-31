@@ -101,6 +101,7 @@ public enum KeyBinding {
     PREVIOUS_LIBRARY("Previous library", Localization.lang("Previous library"), "shortcut+PAGE_UP", KeyBindingCategory.VIEW),
     SCROLL_TO_NEXT_MATCH_CATEGORY("Scroll to next match category", Localization.lang("Scroll to next match category"), "right", KeyBindingCategory.VIEW),
     SCROLL_TO_PREVIOUS_MATCH_CATEGORY("Scroll to previous match category", Localization.lang("Scroll to previous match category"), "left", KeyBindingCategory.VIEW),
+    CENTER_SELECTED_ENTRY("Center selected entry", Localization.lang("Center selected entry"), "shortcut+alt+L", KeyBindingCategory.VIEW),
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "shortcut+L", KeyBindingCategory.TOOLS),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "shortcut+Q", KeyBindingCategory.FILE),
     REDO("Redo", Localization.lang("Redo"), "shortcut+Y", KeyBindingCategory.EDIT),

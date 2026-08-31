@@ -13,6 +13,15 @@ This provides immediate keyboard interaction capabilities (such as Ctrl+V for pa
 
 Needs: impl
 
+### Center Selected Entry in Main Table
+`req~maintable.center-selected~1`
+
+Provides a function that scrolls the main table so that the selected entry is centered vertically among the visible rows.
+When the selection is within half a screen of the top or bottom, it is placed as close to the center as scrolling allows.
+This lets users bring a selected entry that has scrolled out of view back into sight immediately, regardless of the direction it moved.
+
+Needs: impl
+
 ### Automatic Identifier Detection and Focus in New Entry Dialog
 `req~newentry.clipboard.autofocus~1`
 
