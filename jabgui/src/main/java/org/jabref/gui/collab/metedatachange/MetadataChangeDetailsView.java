@@ -20,6 +20,13 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
     public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
+        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"));
+    }
+
+    public MetadataChangeDetailsView(MetadataChange metadataChange,
+                                     GlobalCitationKeyPatterns globalCitationKeyPatterns,
+                                     String leftLabelText,
+                                     String rightLabelText) {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
@@ -28,7 +35,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
         // Add views for each detected difference
         for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {
-            addDifferenceView(container, diff, metadataChange);
+            addDifferenceView(container, diff, metadataChange, leftLabelText, rightLabelText);
         }
 
         this.setAllAnchorsAndAttachChild(container);
@@ -40,14 +47,18 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /// @param container      The parent container to add the difference view to
     /// @param diff           The metadata difference to display
     /// @param metadataChange The metadata change object containing all changes
-    private void addDifferenceView(VBox container, MetaDataDiff.Difference diff, MetadataChange metadataChange) {
+    private void addDifferenceView(VBox container,
+                                   MetaDataDiff.Difference diff,
+                                   MetadataChange metadataChange,
+                                   String leftLabelText,
+                                   String rightLabelText) {
         Label typeLabel = new Label(getDifferenceString(diff.differenceType()));
         typeLabel.getStyleClass().add("diff-type-label");
         container.getChildren().add(typeLabel);
 
         // Show appropriate view based on difference type
         if (diff.differenceType() == MetaDataDiff.DifferenceType.GROUPS) {
-            container.getChildren().add(createGroupDiffSplitPane(metadataChange));
+            container.getChildren().add(createGroupDiffSplitPane(metadataChange, leftLabelText, rightLabelText));
         } else {
             container.getChildren().add(createDefaultDiffScrollPane(diff));
         }
@@ -73,7 +84,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     ///
     /// @param metadataChange The metadata change containing groups differences
     /// @return Configured SplitPane showing groups differences
-    private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange) {
+    private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange, String leftLabelText, String rightLabelText) {
         StyleClassedTextArea jabrefTextArea = createConfiguredTextArea();
         StyleClassedTextArea diskTextArea = createConfiguredTextArea();
 
@@ -93,9 +104,9 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         ScrollPane leftScrollPane = createScrollPane(jabrefTextArea);
         ScrollPane rightScrollPane = createScrollPane(diskTextArea);
 
-        Label inJabRef = new Label(Localization.lang("In JabRef"));
+        Label inJabRef = new Label(leftLabelText);
         inJabRef.getStyleClass().addAll("h4", "padding-2");
-        Label onDisk = new Label(Localization.lang("On disk"));
+        Label onDisk = new Label(rightLabelText);
         onDisk.getStyleClass().addAll("h4", "padding-2");
 
         VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
@@ -124,6 +135,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("lib-change-scroll-pane");
         setAllAnchorsAndAttachChild(scrollPane);
         return scrollPane;
     }
@@ -136,6 +148,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         textArea.setEditable(false);
         textArea.setWrapText(false);
         textArea.setAutoHeight(true);
+        textArea.getStyleClass().add("lib-change-text-area");
         return textArea;
     }
 

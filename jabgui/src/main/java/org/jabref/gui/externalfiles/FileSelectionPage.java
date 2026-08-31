@@ -25,6 +25,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -36,6 +37,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.documentviewer.PdfDocumentViewer;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -85,19 +87,20 @@ public class FileSelectionPage extends WizardPane {
     private @Nullable BackgroundTask<?> currentMetadataTask;
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
-    private ProgressIndicator progressIndicator;
-    private Label progressLabel;
     private Label fileCountLabel;
     private VBox progressPane;
     private VBox contentPane;
     private CheckBox enablePreviewCheckBox;
     private TextArea metadataPreview;
     private PdfDocumentViewer pdfPreview;
+    private SplitPane splitPane;
+    private TitledPane previewPane;
 
     private Button selectAllButton;
     private Button unselectAllButton;
     private Button expandAllButton;
     private Button collapseAllButton;
+    private Button showPreviewButton;
     private boolean nextButtonBound = false;
 
     public FileSelectionPage(StateManager stateManager,
@@ -126,10 +129,10 @@ public class FileSelectionPage extends WizardPane {
         progressPane = new VBox(10);
         progressPane.getStyleClass().addAll("align-center", "padding-20");
 
-        progressIndicator = new ProgressIndicator();
+        ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.progressProperty().bind(viewModel.progressValueProperty());
 
-        progressLabel = new Label();
+        Label progressLabel = new Label();
         progressLabel.textProperty().bind(viewModel.progressTextProperty());
 
         progressPane.getChildren().addAll(progressIndicator, progressLabel);
@@ -161,13 +164,22 @@ public class FileSelectionPage extends WizardPane {
         metadataPreview.setPrefRowCount(8);
         metadataPreview.setText(Localization.lang("Preview disabled"));
 
-        VBox previewContent = new VBox(8, enablePreviewCheckBox, pdfPreview, metadataLabel, metadataPreview);
+        Button closePreviewButton = new Button();
+        closePreviewButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
+        closePreviewButton.getStyleClass().add("icon-button");
+        closePreviewButton.setTooltip(new Tooltip(Localization.lang("Close PDF preview")));
+        closePreviewButton.setOnAction(_ -> hidePreviewPane());
+
+        HBox previewControls = new HBox(8, enablePreviewCheckBox, closePreviewButton);
+        HBox.setHgrow(enablePreviewCheckBox, Priority.ALWAYS);
+
+        VBox previewContent = new VBox(8, previewControls, pdfPreview, metadataLabel, metadataPreview);
         previewContent.setPadding(new Insets(8));
-        TitledPane previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
+        previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
         previewPane.setExpanded(true);
         previewPane.setCollapsible(false);
 
-        SplitPane splitPane = new SplitPane(treePane, previewPane);
+        splitPane = new SplitPane(treePane, previewPane);
         splitPane.setDividerPositions(0.58);
         VBox.setVgrow(splitPane, Priority.ALWAYS);
 
@@ -184,7 +196,12 @@ public class FileSelectionPage extends WizardPane {
         collapseAllButton = new Button(Localization.lang("Collapse all"));
         collapseAllButton.setOnAction(e -> expandTree(unlinkedFilesList.getRoot(), false));
 
-        buttonBar.getChildren().addAll(selectAllButton, unselectAllButton, expandAllButton, collapseAllButton);
+        showPreviewButton = new Button(Localization.lang("Show PDF preview"));
+        showPreviewButton.setManaged(false);
+        showPreviewButton.setVisible(false);
+        showPreviewButton.setOnAction(_ -> showPreviewPane());
+
+        buttonBar.getChildren().addAll(selectAllButton, unselectAllButton, expandAllButton, collapseAllButton, showPreviewButton);
 
         contentPane.getChildren().addAll(fileCountLabel, splitPane, buttonBar);
 
@@ -229,6 +246,10 @@ public class FileSelectionPage extends WizardPane {
     }
 
     private void refreshPreviewForCurrentSelection() {
+        if (!isPreviewPaneVisible()) {
+            return;
+        }
+
         if (!isPreviewActive()) {
             showPreviewDisabledState(Localization.lang("Preview disabled"));
             return;
@@ -272,6 +293,33 @@ public class FileSelectionPage extends WizardPane {
 
     private boolean isPreviewActive() {
         return enablePreviewCheckBox.isSelected();
+    }
+
+    private boolean isPreviewPaneVisible() {
+        return splitPane.getItems().contains(previewPane);
+    }
+
+    /// [impl->req~jabgui.externalfiles.unlinked-files.preview.close~1]
+    private void hidePreviewPane() {
+        if (!splitPane.getItems().remove(previewPane)) {
+            return;
+        }
+
+        showPreviewButton.setManaged(true);
+        showPreviewButton.setVisible(true);
+        showPreviewDisabledState(Localization.lang("Preview disabled"));
+    }
+
+    private void showPreviewPane() {
+        if (isPreviewPaneVisible()) {
+            return;
+        }
+
+        splitPane.getItems().add(previewPane);
+        splitPane.setDividerPositions(0.58);
+        showPreviewButton.setManaged(false);
+        showPreviewButton.setVisible(false);
+        refreshPreviewForCurrentSelection();
     }
 
     private void showPreviewDisabledState(String metadataText) {
@@ -318,8 +366,7 @@ public class FileSelectionPage extends WizardPane {
 
     /// Cancels any in-flight preview work.
     public void cancelPreviewTasks() {
-        previewThrottler.cancel();
-        cancelCurrentMetadataTask();
+        showPreviewDisabledState(Localization.lang("Preview disabled"));
     }
 
     /// Cancels in-flight preview work and stops the preview throttler.

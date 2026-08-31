@@ -101,6 +101,7 @@
                             <Label text="%Citation format"/>
                             <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
                             <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>
+                            <RadioButton fx:id="styleDefinedFormatButton" text="%Style-defined"/>
                         </HBox>
                         <VBox spacing="4.0">
                             <Label text="%Preview" styleClass="h4,padding-top-12"/>

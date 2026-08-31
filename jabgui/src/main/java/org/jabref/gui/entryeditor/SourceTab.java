@@ -169,8 +169,8 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus && (getCurrentEntry() != null)) {
-                storeSource(getCurrentEntry(), codeArea.getText());
+            if (!onFocus) {
+                storeVisibleSource();
             }
         });
 
@@ -183,16 +183,23 @@ public class SourceTab extends EntryEditorTab {
                 setupSourceEditor();
             }
 
+            if (previousEntry == null) {
+                codeArea.setEditable(false);
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), "");
+                return;
+            }
+
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                // [impl->req~entry-editor.source-tab.atomic-replacement~1]
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
+                        getSourceString(previousEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }
@@ -203,9 +210,7 @@ public class SourceTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (previousEntry != null) {
             removeEntryListeners(previousEntry);
-            if (codeArea != null) {
-                storeSource(previousEntry, codeArea.getText());
-            }
+            storeVisibleSource();
         }
         this.previousEntry = entry;
 
@@ -228,6 +233,15 @@ public class SourceTab extends EntryEditorTab {
     private void removeEntryListeners(BibEntry entry) {
         entry.typeProperty().removeListener(entryTypeListener);
         entry.getFieldsObservable().removeListener(entryFieldsListener);
+    }
+
+    // [impl->req~entry-editor.source-tab.atomic-replacement~1] — keep the visible source paired with the entry it was rendered from even while selection changes are still settling
+    private void storeVisibleSource() {
+        if (codeArea == null) {
+            return;
+        }
+
+        storeSource(previousEntry, codeArea.getText());
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -292,7 +306,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
             }
         }
 
@@ -310,13 +324,13 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.apply(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.apply(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
         undoManager.addEdit(compound.toChangeSet());
 
@@ -336,7 +350,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(getCurrentEntry(), codeArea.getText());
+                        storeVisibleSource();
             }
         });
     }
