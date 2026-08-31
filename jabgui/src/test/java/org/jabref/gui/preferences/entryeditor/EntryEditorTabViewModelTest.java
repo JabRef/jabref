@@ -75,6 +75,7 @@ class EntryEditorTabViewModelTest {
 
     @Test
     @ResourceLock(Resources.LOCALE)
+    @ResourceLock("Localization.lang")
     void classicTabStoredUnderAnotherLanguageIsNotAddedAgain() {
         viewModel.setValues();
         EditorTabViewModel german = viewModel.addCustomTab("Allgemein").orElseThrow();
