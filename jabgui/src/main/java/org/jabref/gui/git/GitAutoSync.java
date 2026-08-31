@@ -14,6 +14,7 @@ import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.model.BookkeepingResult;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -151,10 +152,24 @@ public class GitAutoSync {
             dialogService.notify(Localization.lang("Detected conflicting changes during pull."));
             return;
         }
-        applyAutoPlan(databaseContext, pullPlan.autoPlan());
+        MergePlan autoPlan = pullPlan.autoPlan();
+        applyAutoPlan(databaseContext, autoPlan);
         writeAndFinalize(bibFilePath, databaseContext, pullPlan)
+                .onSuccess(bookkeepingResult -> showPullResult(bookkeepingResult, autoPlan))
                 .onFailure(this::showPullError)
                 .executeWith(taskExecutor);
+    }
+
+    /// Reports what a scheduled pull changed, and stays quiet when it changed nothing.
+    private void showPullResult(BookkeepingResult bookkeepingResult, MergePlan autoPlan) {
+        if (bookkeepingResult.isFastForward()) {
+            dialogService.notify(Localization.lang("Fast-forwarded to remote."));
+        } else if (!autoPlan.isEmpty()) {
+            dialogService.notify(Localization.lang("Auto-applied changes: %0 new, %1 modified, %2 deleted.",
+                    String.valueOf(autoPlan.newEntries().size()),
+                    String.valueOf(autoPlan.fieldPatches().size()),
+                    String.valueOf(autoPlan.deletedEntryKeys().size())));
+        }
     }
 
     private GitSyncService syncService() {
