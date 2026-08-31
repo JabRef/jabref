@@ -341,9 +341,11 @@
 }
 
 /* File found in the file directory but not (yet) linked in the entry.
-   Deliberately not -color-warning-subtle: orange signals "linked but not found". */
+   Deliberately not -color-warning-subtle: orange signals "linked but not found".
+   -color-selection-inactive is a neutral gray that stays readable in dark themes,
+   where a translucent black fill would sink into the panel background. */
 .file-row:auto-found {
-    -fx-background-color: -color-shadow-subtle;
+    -fx-background-color: -color-selection-inactive;
     -fx-background-radius: 4px;
 }
 

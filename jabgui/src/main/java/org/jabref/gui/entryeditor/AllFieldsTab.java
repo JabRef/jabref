@@ -235,8 +235,10 @@ public class AllFieldsTab extends FieldsEditorTab {
                 guiPreferences.getAutoLinkPreferences());
         BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
                       .onSuccess(foundFiles -> {
+                          // subscribedEntry is cleared on dispose() and replaced on entry switch,
+                          // so this also invalidates callbacks that outlive the tab.
                           if (!foundFiles.isEmpty()
-                                  && (getCurrentEntry() == entry)
+                                  && subscribedEntry.filter(current -> current == entry).isPresent()
                                   && !editors.containsKey(StandardField.FILE)) {
                               userAddedFields.add(StandardField.FILE);
                               rebuildPanel(databaseContext, entry);
@@ -283,6 +285,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         boolean entryTypeChanged = InternalField.TYPE_HEADER == event.getField();
         if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
+        }
+        // A changed citation key can make files in the file directory match this entry,
+        // so the suggestions must be re-discovered without switching entries.
+        if (InternalField.KEY_FIELD == event.getField()) {
+            showFileFieldIfAutoLinkFindsFiles(entry);
         }
     }
 
