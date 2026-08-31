@@ -138,7 +138,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 backupFileCopyOperation);
     }
 
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) {
         this(path,
                 pathOfTemporaryFile,
                 Channels.newOutputStream(temporaryFileChannel),
@@ -158,17 +158,17 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) {
         this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation) throws IOException {
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation) {
         this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, fileMoveOperation, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) {
         this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, null, fileMoveOperation, backupFileCopyOperation);
     }
 
@@ -179,7 +179,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                                    boolean keepBackup,
                                    @Nullable FileSnapshot expectedState,
                                    FileMoveOperation fileMoveOperation,
-                                   FileCopyOperation backupFileCopyOperation) throws IOException {
+                                   FileCopyOperation backupFileCopyOperation) {
         super(temporaryFileOutputStream);
         this.targetFile = path;
         this.temporaryFile = pathOfTemporaryFile;
@@ -372,16 +372,44 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     private boolean createBackup() {
+        // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
         if (!Files.exists(targetFile)) {
             return false;
         }
 
+        Path temporaryBackupFile = null;
         try {
-            backupFileCopyOperation.copy(targetFile, backupFile);
+            temporaryBackupFile = createTemporaryFile(backupFile);
+            backupFileCopyOperation.copy(targetFile, temporaryBackupFile);
+            forceFileToDisk(temporaryBackupFile);
+            moveBackupFileIntoPlace(temporaryBackupFile);
             return true;
         } catch (IOException exception) {
             LOGGER.warn("Could not create backup file {} (backup created: false)", backupFile, exception);
             return false;
+        } finally {
+            if (temporaryBackupFile != null) {
+                try {
+                    Files.deleteIfExists(temporaryBackupFile);
+                } catch (IOException exception) {
+                    LOGGER.debug("Unable to delete temporary backup file {}", temporaryBackupFile, exception);
+                }
+            }
+        }
+    }
+
+    private static void forceFileToDisk(Path file) throws IOException {
+        try (FileChannel fileChannel = FileChannel.open(file, StandardOpenOption.WRITE)) {
+            fileChannel.force(true);
+        }
+    }
+
+    private void moveBackupFileIntoPlace(Path temporaryBackupFile) throws IOException {
+        try {
+            Files.move(temporaryBackupFile, backupFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException exception) {
+            LOGGER.debug("Atomic move is not supported for backup file {}. Falling back to a non-atomic move.", backupFile, exception);
+            Files.move(temporaryBackupFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

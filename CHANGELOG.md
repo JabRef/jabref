@@ -56,16 +56,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
+- We added a `jabkit pdf extract-references` command that extracts the references from the end of one or more PDFs and outputs them as BibTeX, mirroring the GUI's "Extract references" action. Each PDF can be given as a local file or as an http(s)/ftp URL. [#16186](https://github.com/JabRef/jabref/pull/16186)
 - We added a PDF preview with extracted metadata in the unlinked files dialog. [#16159](https://github.com/JabRef/jabref/issues/16159)
 - We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
 - We added autofocus and clipboard prefill to the commit message field in the Git Commit dialog. [#16340](https://github.com/JabRef/jabref/issues/16340)
 - We added OCR engine selection to the OCR preferences, allowing users to choose the engine they want to use. [#16455](https://github.com/JabRef/jabref/pull/16455)
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
+- We added an offer to initialize a Git repository when committing a library that is not yet version controlled. [#16722](https://github.com/JabRef/jabref/pull/16722)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
 
 ### Changed
 
+- We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
+- We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - A custom theme (CSS file) is now applied on top of the selected theme instead of replacing it entirely. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - Custom themes now use the `-color-*` variables declared in the theme stylesheet (see `jabref-theme.css`); the previous `-jr-*` color variables (e.g. `-jr-theme`, `-jr-accent`) were removed, so existing custom CSS files that override them need to be adapted. [#15625](https://github.com/JabRef/jabref/issues/15625)
@@ -98,6 +102,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- "Git commit" now saves a modified library first (if autosave is enabled) or asks to save it, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
+- We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
+- We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed freezing while scrolling results in the Search for unlinked local files dialog. [#16696](https://github.com/JabRef/jabref/pull/16696)
 - We fixed an issue where "File > Git > Commit" refused to commit when the repository had no remote or the remote could not be reached. [#16720](https://github.com/JabRef/jabref/pull/16720)

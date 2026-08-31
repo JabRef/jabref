@@ -35,6 +35,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -71,6 +72,16 @@ public class FileUtil {
     // @formatter:on
 
     private FileUtil() {
+    }
+
+    /// Returns the human-readable size of a file, or an empty optional if it cannot be determined.
+    public static Optional<String> getFileSize(@NonNull Path path) {
+        try {
+            return Optional.of(FileUtils.byteCountToDisplaySize(Files.size(path)));
+        } catch (IOException e) {
+            LOGGER.debug("Could not determine size of file {}", path, e);
+            return Optional.empty();
+        }
     }
 
     /// Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
