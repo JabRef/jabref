@@ -297,7 +297,7 @@ public class MainTableColumnFactory {
         return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
-    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like [#createExtraFileColumn(MainTableColumnModel)] createExtraFileColumn} does, this creates one single column collecting all file links.
+    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like [createExtraFileColumn][#createExtraFileColumn(MainTableColumnModel)] does, this creates one single column collecting all file links.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
