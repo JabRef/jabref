@@ -49,10 +49,18 @@ Following methods account for synchronization modes:
 
 ## Database structure
 
-The following examples base on PostgreSQL.
-Other databases work similar.
+The database structure is created at `org.jabref.logic.shared.DBMSProcessor#setUp`.
 
-The database structure is created at [org.jabref.logic.shared.PostgreSQLProcessor#setUp](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/shared/PostgreSQLProcessor.java#L37-L37).
+All tables live in the schema `jabref`. Since the table rework, two generations coexist in that schema:
+
+| Tables | Structure version | Role |
+| ------ | ----------------- | ---- |
+| `entry`, `field`, `metadata` (lower case) | 2 | The live tables used by JabRef |
+| `"ENTRY"`, `"FIELD"`, `"METADATA"` (quoted upper case) | 1 (JabRef ≤ 6.0-alpha) | Read once for migration, then left untouched |
+
+On first connect, JabRef copies version-1 data into the version-2 tables (only while these are still empty).
+The old tables are kept, so older JabRef versions can still work with them; they can be dropped manually once the migration is verified.
+The structure version in use is recorded in the `metadata` table under the key `VersionDBStructure`.
 
 ```mermaid
 erDiagram
