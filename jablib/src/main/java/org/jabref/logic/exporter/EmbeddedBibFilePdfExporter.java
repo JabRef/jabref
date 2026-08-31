@@ -92,61 +92,65 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         // Read from another file
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
-            PDEmbeddedFilesNameTreeNode efTree;
-            Map<String, PDComplexFileSpecification> names;
+        Path newFile = FileUtil.createTempFileForReplacement(path);
+        try {
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
+                PDEmbeddedFilesNameTreeNode efTree;
+                Map<String, PDComplexFileSpecification> names;
 
-            if (nameDictionary == null) {
-                efTree = new PDEmbeddedFilesNameTreeNode();
-                names = new HashMap<>();
-                nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
-                nameDictionary.setEmbeddedFiles(efTree);
-                document.getDocumentCatalog().setNames(nameDictionary);
-            } else {
-                efTree = nameDictionary.getEmbeddedFiles();
-                if (efTree == null) {
+                if (nameDictionary == null) {
                     efTree = new PDEmbeddedFilesNameTreeNode();
-                    nameDictionary.setEmbeddedFiles(efTree);
-                }
-                names = efTree.getNames();
-                if (names == null) {
                     names = new HashMap<>();
-                    efTree.setNames(names);
-                }
-            }
-
-            PDComplexFileSpecification fileSpecification;
-            if (names.containsKey(EMBEDDED_FILE_NAME)) {
-                fileSpecification = names.get(EMBEDDED_FILE_NAME);
-            } else {
-                fileSpecification = new PDComplexFileSpecification();
-            }
-            if (efTree != null) {
-                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
-                fileSpecification.setFile(EMBEDDED_FILE_NAME);
-                PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
-                embeddedFile.setSubtype("text/x-bibtex");
-                embeddedFile.setSize(bibTeX.length());
-                fileSpecification.setEmbeddedFile(embeddedFile);
-
-                if (!names.containsKey(EMBEDDED_FILE_NAME)) {
-                    try {
-                        names.put(EMBEDDED_FILE_NAME, fileSpecification);
-                    } catch (UnsupportedOperationException e) {
-                        throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
+                    nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
+                    nameDictionary.setEmbeddedFiles(efTree);
+                    document.getDocumentCatalog().setNames(nameDictionary);
+                } else {
+                    efTree = nameDictionary.getEmbeddedFiles();
+                    if (efTree == null) {
+                        efTree = new PDEmbeddedFilesNameTreeNode();
+                        nameDictionary.setEmbeddedFiles(efTree);
+                    }
+                    names = efTree.getNames();
+                    if (names == null) {
+                        names = new HashMap<>();
+                        efTree.setNames(names);
                     }
                 }
 
-                efTree.setNames(names);
-                nameDictionary.setEmbeddedFiles(efTree);
-                document.getDocumentCatalog().setNames(nameDictionary);
+                PDComplexFileSpecification fileSpecification;
+                if (names.containsKey(EMBEDDED_FILE_NAME)) {
+                    fileSpecification = names.get(EMBEDDED_FILE_NAME);
+                } else {
+                    fileSpecification = new PDComplexFileSpecification();
+                }
+                if (efTree != null) {
+                    InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
+                    fileSpecification.setFile(EMBEDDED_FILE_NAME);
+                    PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
+                    embeddedFile.setSubtype("text/x-bibtex");
+                    embeddedFile.setSize(bibTeX.length());
+                    fileSpecification.setEmbeddedFile(embeddedFile);
+
+                    if (!names.containsKey(EMBEDDED_FILE_NAME)) {
+                        try {
+                            names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                        } catch (UnsupportedOperationException e) {
+                            throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
+                        }
+                    }
+
+                    efTree.setNames(names);
+                    nameDictionary.setEmbeddedFiles(efTree);
+                    document.getDocumentCatalog().setNames(nameDictionary);
+                }
+                document.save(newFile.toFile());
             }
-            document.save(newFile.toFile());
-            FileUtil.copyFile(newFile, path, true);
+            // Replace only after the document (and thus its read handle on the original) is closed
+            FileUtil.replaceFileAtomically(newFile, path);
+        } finally {
+            Files.deleteIfExists(newFile);
         }
-        Files.delete(newFile);
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {

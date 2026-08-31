@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -306,6 +307,32 @@ public class FileUtil {
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
+        }
+    }
+
+    /// Creates a temporary file intended to atomically replace `target` via [#replaceFileAtomically(Path, Path)].
+    /// Preferably created in the same directory as `target` so the subsequent move stays on one filesystem
+    /// (and thus can be atomic); falls back to the system temporary directory if that directory is not writable.
+    public static Path createTempFileForReplacement(Path target) throws IOException {
+        Path parent = target.getParent();
+        if (parent != null) {
+            try {
+                return Files.createTempFile(parent, ".jabref-", ".pdf.tmp");
+            } catch (IOException e) {
+                LOGGER.debug("Could not create temporary file next to {}, falling back to the system temporary directory", target, e);
+            }
+        }
+        return Files.createTempFile("JabRef", "pdf");
+    }
+
+    /// Replaces `target` with `source`, atomically where the filesystem supports it, so concurrent readers
+    /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
+    public static void replaceFileAtomically(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

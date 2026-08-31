@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,9 +26,11 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -211,5 +214,19 @@ class EmbeddedBibFilePdfExporterTest {
         List<BibEntry> importedEntries = importer.importDatabase(path).getDatabase().getEntries();
 
         assertEquals(expectedEntries, importedEntries);
+    }
+
+    @Test
+    void exportLeavesLoadablePdfAndNoTempFiles() throws IOException {
+        Path pdfFile = tempDir.resolve("existing.pdf").toAbsolutePath();
+
+        exporter.export(databaseContext, pdfFile, List.of(olly2018));
+
+        try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
+            assertEquals(1, document.getNumberOfPages());
+        }
+        try (Stream<Path> files = Files.list(tempDir)) {
+            assertEquals(List.of(), files.filter(file -> file.getFileName().toString().endsWith(".tmp")).toList());
+        }
     }
 }

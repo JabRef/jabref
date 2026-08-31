@@ -274,28 +274,31 @@ public class XmpUtilWriter {
         // Read from another file
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            if (document.isEncrypted()) {
-                throw new EncryptedPdfsNotSupportedException();
-            }
+        Path newFile = FileUtil.createTempFileForReplacement(path);
+        try {
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                if (document.isEncrypted()) {
+                    throw new EncryptedPdfsNotSupportedException();
+                }
 
-            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            if (!resolvedEntries.isEmpty()) {
-                writeDocumentInformation(document, resolvedEntries.getFirst(), null);
-                writeDublinCore(document, resolvedEntries, null);
-            }
+                // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+                if (!resolvedEntries.isEmpty()) {
+                    writeDocumentInformation(document, resolvedEntries.getFirst(), null);
+                    writeDublinCore(document, resolvedEntries, null);
+                }
 
-            // Save updates to original file
-            try {
-                document.save(newFile.toFile());
-                FileUtil.copyFile(newFile, path, true);
-            } catch (IOException e) {
-                LOGGER.debug("Could not write XMP metadata", e);
-                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                try {
+                    document.save(newFile.toFile());
+                } catch (IOException e) {
+                    LOGGER.debug("Could not write XMP metadata", e);
+                    throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                }
             }
+            // Replace only after the document (and thus its read handle on the original) is closed
+            FileUtil.replaceFileAtomically(newFile, path);
+        } finally {
+            Files.deleteIfExists(newFile);
         }
-        Files.delete(newFile);
     }
 
     /// Removes all XMP metadata associated with the given PDF file.
@@ -307,21 +310,24 @@ public class XmpUtilWriter {
         // Read from another file
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        FileUtil.copyFile(path, newFile, true);
-        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
-            if (document.isEncrypted()) {
-                throw new EncryptedPdfsNotSupportedException();
+        Path newFile = FileUtil.createTempFileForReplacement(path);
+        try {
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                if (document.isEncrypted()) {
+                    throw new EncryptedPdfsNotSupportedException();
+                }
+                PDDocumentCatalog catalog = document.getDocumentCatalog();
+                if (catalog.getMetadata() != null) {
+                    catalog.setMetadata(null);
+                }
+                document.save(newFile.toFile());
+            } catch (IOException e) {
+                LOGGER.debug("Could not remove XMP metadata", e);
+                throw new TransformerException(
+                        "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
             }
-            PDDocumentCatalog catalog = document.getDocumentCatalog();
-            if (catalog.getMetadata() != null) {
-                catalog.setMetadata(null);
-            }
-            document.save(path.toFile());
-        } catch (IOException e) {
-            LOGGER.debug("Could not remove XMP metadata", e);
-            throw new TransformerException(
-                    "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
+            // Replace only after the document (and thus its read handle on the original) is closed
+            FileUtil.replaceFileAtomically(newFile, path);
         } finally {
             try {
                 Files.deleteIfExists(newFile);
