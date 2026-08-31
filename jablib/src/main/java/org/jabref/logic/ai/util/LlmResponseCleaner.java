@@ -6,16 +6,13 @@ import org.jspecify.annotations.Nullable;
 /// fenced code block (``` ... ```) if present, or simply trimming whitespace.
 ///
 /// Rules:
-/// <ol>
-///
-/// - If the response contains no ``` fences → return the string stripped of
+/// 1. If the response contains no ``` fences → return the string stripped of
 /// leading/trailing whitespace.
-/// - If one or more ``` fences exist → find the *last* complete block,
+/// 2. If one or more ``` fences exist → find the *last* complete block,
 /// strip the optional language label on the opening fence (e.g. ````json`,
 /// ````markdown`), and return the inner content trimmed.
-/// - If the last fence is unclosed (no matching closing `````) → treat
+/// 3. If the last fence is unclosed (no matching closing `````) → treat
 /// everything after the opening fence line as the content.
-/// </ol>
 public final class LlmResponseCleaner {
     private static final String FENCE = "```";
 

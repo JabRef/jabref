@@ -20,102 +20,93 @@ import org.jspecify.annotations.Nullable;
 /// Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
 ///
 /// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
-/// <ol>
-///
-/// -  'author field' is a sequence of tokens;
-///
-/// -  tokens are separated by sequences of whitespaces (<CODE>Character.isWhitespace(c)==true</CODE>),
-/// commas (,), dashes (-), and tildas (~);
-/// -  every comma separates tokens, while sequences of other separators are
-/// equivalent to a single separator; for example: "a - b" consists of 2 tokens
-/// ("a" and "b"), while "a,-,b" consists of 3 tokens ("a", "", and "b")
-/// -  anything enclosed in braces belongs to a single token; for example:
-/// "abc x{a,b,-~ c}x" consists of 2 tokens, while "abc xa,b,-~ cx" consists of 4
-/// tokens ("abc", "xa","b", and "cx");
-/// -  a token followed immediately by a dash is "dash-terminated" token, and
-/// all other tokens are "space-terminated" tokens; for example: in "a-b- c - d"
-/// tokens "a" and "b" are dash-terminated and "c" and "d" are space-terminated;
-/// -  for the purposes of splitting of 'author name' into parts and
-/// construction of abbreviation of first name, one needs definitions of first
-/// letter of a token, case of a token, and abbreviation of a token:
-///
-/// -  'first letter' of a token is the first letter character (<CODE>Character.isLetter(c)==true</CODE>)
-/// that does not belong to a sequence of letters that immediately follows "\"
-/// character, with one exception: if "\" is followed by "aa", "AA", "ae", "AE",
-/// "l", "L", "o", "O", "oe", "OE", "i", or "j" followed by non-letter, the
-/// 'first letter' of a token is a letter that follows "\"; for example: in
-/// "a{x}b" 'first letter' is "a", in "{\"{U}}bel" 'first letter' is "U", in
-/// "{\noopsort{\"o}}xyz" 'first letter' is "o", in "{\AE}x" 'first letter' is
-/// "A", in "\aex\ijk\Oe\j" 'first letter' is "j"; if there is no letter
-/// satisfying the above rule, 'first letter' is undefined;
-/// -  token is "lower-case" token if its first letter is defined and is
-/// lower-case (<CODE>Character.isLowerCase(c)==true</CODE>), and token is
-/// "upper-case" token otherwise;
-/// -  'abbreviation' of a token is the shortest prefix of the token that (a)
-/// contains 'first letter' and (b) is braces-balanced; if 'first letter' is
-/// undefined, 'abbreviation' is the token itself; in the above examples,
-/// 'abbreviation's are "a", "{\"{U}}", "{\noopsort{\"o}}", "{\AE}",
-/// "\aex\ijk\Oe\j";
-///
-/// -  the behavior based on the above definitions will be erroneous only in
-/// one case: if the first-name-token is "{\noopsort{A}}john", we abbreviate it
-/// as "{\noopsort{A}}.", while BiBTeX produces "j."; fixing this problem,
-/// however, requires processing of the preabmle;
-///
-/// -  'author names' in 'author field' are subsequences of tokens separated by
-/// token "and" ("and" is case-insensitive); if 'author name' is an empty
-/// sequence of tokens, it is ignored; for examle, both "John Smith and Peter
-/// Black" and "and and John Smith and and Peter Black" consists of 2 'author
-/// name's "Johm Smith" and "Peter Black" (in erroneous situations, this is a bit
-/// different from BiBTeX behavior);
-/// -  'author name' consists of 'first-part', 'von-part', 'last-part', and
-/// 'junior-part', each of which is a sequence of tokens; how a sequence of
-/// tokens has to be split into these parts, depends the number of commas:
-///
-/// -  no commas, all tokens are upper-case: 'junior-part' and 'von-part' are
-/// empty, 'last-part' consist of the last token, 'first-part' consists of all
-/// other tokens ('first-part' is empty if 'author name' consists of a single
-/// token); for example, in "John James Smith", 'last-part'="Smith" and
-/// 'first-part'="John James";
-/// -  no commas, there exists lower-case token: 'junior-part' is empty,
-/// 'first-part' consists of all upper-case tokens before the first lower-case
-/// token, 'von-part' consists of lower-case tokens starting the first lower-case
-/// token and ending the lower-case token that is followed by upper-case token,
-/// 'last-part' consists of the rest of tokens; note that both 'first-part' and
-/// 'latst-part' may be empty and 'last-part' may contain lower-case tokens; for
-/// example: in "von der", 'first-part'='last-part'="", 'von-part'="von der"; in
-/// "Charles Louis Xavier Joseph de la Vall{\'e}e la Poussin",
-/// 'first-part'="Charles Louis Xavier Joseph", 'von-part'="de la",
-/// 'last-part'="Vall{\'e}e la Poussin";
-/// -  one comma: 'junior-part' is empty, 'first-part' consists of all tokens
-/// after comma, 'von-part' consists of the longest sequence of lower-case tokens
-/// in the very beginning, 'last-part' consists of all tokens after 'von-part'
-/// and before comma; note that any part can be empty; for example: in "de la
-/// Vall{\'e}e la Poussin, Charles Louis Xavier Joseph", 'first-part'="Charles
-/// Louis Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la
-/// Poussin"; in "Joseph de la Vall{\'e}e la Poussin, Charles Louis Xavier",
-/// 'first-part'="Charles Louis Xavier", 'von-part'="", 'last-part'="Joseph de la
-/// Vall{\'e}e la Poussin";
-/// -  two or more commas (any comma after the second one is ignored; it merely
-/// separates tokens): 'junior-part' consists of all tokens between first and
-/// second commas, 'first-part' consists of all tokens after the second comma,
-/// tokens before the first comma are split into 'von-part' and 'last-part'
-/// similarly to the case of one comma; for example: in "de la Vall{\'e}e
-/// Poussin, Jr., Charles Louis Xavier Joseph", 'first-part'="Charles Louis
-/// Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la Poussin", and
-/// 'junior-part'="Jr.";
-///
-/// -  when 'first-part', 'last-part', 'von-part', or 'junior-part' is
-/// reconstructed from tokens, tokens in a part are separated either by space or
-/// by dash, depending on whether the token before the separator was
-/// space-terminated or dash-terminated; for the last token in a part it does not
-/// matter whether it was dash- or space-terminated;
-/// -  when 'first-part' is abbreviated, each token is replaced by its
-/// abbreviation followed by a period; separators are the same as in the case of
-/// non-abbreviated name; for example: in "Heinrich-{\"{U}}bel Kurt von Minich",
-/// 'first-part'="Heinrich-{\"{U}}bel Kurt", and its abbreviation is "H.-{\"{U}}.
-/// K."
-/// </ol>
+/// 1. 'author field' is a sequence of tokens;
+///     - tokens are separated by sequences of whitespaces (<CODE>Character.isWhitespace(c)==true</CODE>),
+///       commas (,), dashes (-), and tildas (~);
+///     - every comma separates tokens, while sequences of other separators are
+///       equivalent to a single separator; for example: "a - b" consists of 2 tokens
+///       ("a" and "b"), while "a,-,b" consists of 3 tokens ("a", "", and "b")
+///     - anything enclosed in braces belongs to a single token; for example:
+///       "abc x{a,b,-~ c}x" consists of 2 tokens, while "abc xa,b,-~ cx" consists of 4
+///       tokens ("abc", "xa","b", and "cx");
+///     - a token followed immediately by a dash is "dash-terminated" token, and
+///       all other tokens are "space-terminated" tokens; for example: in "a-b- c - d"
+///       tokens "a" and "b" are dash-terminated and "c" and "d" are space-terminated;
+///     - for the purposes of splitting of 'author name' into parts and
+///       construction of abbreviation of first name, one needs definitions of first
+///       letter of a token, case of a token, and abbreviation of a token:
+///         - 'first letter' of a token is the first letter character (<CODE>Character.isLetter(c)==true</CODE>)
+///           that does not belong to a sequence of letters that immediately follows "\"
+///           character, with one exception: if "\" is followed by "aa", "AA", "ae", "AE",
+///           "l", "L", "o", "O", "oe", "OE", "i", or "j" followed by non-letter, the
+///           'first letter' of a token is a letter that follows "\"; for example: in
+///           "a{x}b" 'first letter' is "a", in "{\"{U}}bel" 'first letter' is "U", in
+///           "{\noopsort{\"o}}xyz" 'first letter' is "o", in "{\AE}x" 'first letter' is
+///           "A", in "\aex\ijk\Oe\j" 'first letter' is "j"; if there is no letter
+///           satisfying the above rule, 'first letter' is undefined;
+///         - token is "lower-case" token if its first letter is defined and is
+///           lower-case (<CODE>Character.isLowerCase(c)==true</CODE>), and token is
+///           "upper-case" token otherwise;
+///         - 'abbreviation' of a token is the shortest prefix of the token that (a)
+///           contains 'first letter' and (b) is braces-balanced; if 'first letter' is
+///           undefined, 'abbreviation' is the token itself; in the above examples,
+///           'abbreviation's are "a", "{\"{U}}", "{\noopsort{\"o}}", "{\AE}",
+///           "\aex\ijk\Oe\j";
+///     - the behavior based on the above definitions will be erroneous only in
+///       one case: if the first-name-token is "{\noopsort{A}}john", we abbreviate it
+///       as "{\noopsort{A}}.", while BiBTeX produces "j."; fixing this problem,
+///       however, requires processing of the preabmle;
+/// 2. 'author names' in 'author field' are subsequences of tokens separated by
+///    token "and" ("and" is case-insensitive); if 'author name' is an empty
+///    sequence of tokens, it is ignored; for examle, both "John Smith and Peter
+///    Black" and "and and John Smith and and Peter Black" consists of 2 'author
+///    name's "Johm Smith" and "Peter Black" (in erroneous situations, this is a bit
+///    different from BiBTeX behavior);
+/// 3. 'author name' consists of 'first-part', 'von-part', 'last-part', and
+///    'junior-part', each of which is a sequence of tokens; how a sequence of
+///    tokens has to be split into these parts, depends the number of commas:
+///     - no commas, all tokens are upper-case: 'junior-part' and 'von-part' are
+///       empty, 'last-part' consist of the last token, 'first-part' consists of all
+///       other tokens ('first-part' is empty if 'author name' consists of a single
+///       token); for example, in "John James Smith", 'last-part'="Smith" and
+///       'first-part'="John James";
+///     - no commas, there exists lower-case token: 'junior-part' is empty,
+///       'first-part' consists of all upper-case tokens before the first lower-case
+///       token, 'von-part' consists of lower-case tokens starting the first lower-case
+///       token and ending the lower-case token that is followed by upper-case token,
+///       'last-part' consists of the rest of tokens; note that both 'first-part' and
+///       'latst-part' may be empty and 'last-part' may contain lower-case tokens; for
+///       example: in "von der", 'first-part'='last-part'="", 'von-part'="von der"; in
+///       "Charles Louis Xavier Joseph de la Vall{\'e}e la Poussin",
+///       'first-part'="Charles Louis Xavier Joseph", 'von-part'="de la",
+///       'last-part'="Vall{\'e}e la Poussin";
+///     - one comma: 'junior-part' is empty, 'first-part' consists of all tokens
+///       after comma, 'von-part' consists of the longest sequence of lower-case tokens
+///       in the very beginning, 'last-part' consists of all tokens after 'von-part'
+///       and before comma; note that any part can be empty; for example: in "de la
+///       Vall{\'e}e la Poussin, Charles Louis Xavier Joseph", 'first-part'="Charles
+///       Louis Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la
+///       Poussin"; in "Joseph de la Vall{\'e}e la Poussin, Charles Louis Xavier",
+///       'first-part'="Charles Louis Xavier", 'von-part'="", 'last-part'="Joseph de la
+///       Vall{\'e}e la Poussin";
+///     - two or more commas (any comma after the second one is ignored; it merely
+///       separates tokens): 'junior-part' consists of all tokens between first and
+///       second commas, 'first-part' consists of all tokens after the second comma,
+///       tokens before the first comma are split into 'von-part' and 'last-part'
+///       similarly to the case of one comma; for example: in "de la Vall{\'e}e
+///       Poussin, Jr., Charles Louis Xavier Joseph", 'first-part'="Charles Louis
+///       Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la Poussin", and
+///       'junior-part'="Jr.";
+/// 4. when 'first-part', 'last-part', 'von-part', or 'junior-part' is
+///    reconstructed from tokens, tokens in a part are separated either by space or
+///    by dash, depending on whether the token before the separator was
+///    space-terminated or dash-terminated; for the last token in a part it does not
+///    matter whether it was dash- or space-terminated;
+/// 5. when 'first-part' is abbreviated, each token is replaced by its
+///    abbreviation followed by a period; separators are the same as in the case of
+///    non-abbreviated name; for example: in "Heinrich-{\"{U}}bel Kurt von Minich",
+///    'first-part'="Heinrich-{\"{U}}bel Kurt", and its abbreviation is "H.-{\"{U}}.
+///    K."
 @AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList implements Iterable<Author> {
     private static final int AUTHOR_CACHE_SIZE = 50_000;

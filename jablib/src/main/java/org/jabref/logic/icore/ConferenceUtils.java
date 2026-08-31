@@ -163,17 +163,14 @@ public final class ConferenceUtils {
     ///
     /// The normalization process performs the following steps:
     ///
-    /// <ol>
-    ///
-    /// - Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
-    /// - Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
+    /// 1. Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
+    /// 2. Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
     /// regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,
     /// `3\textsuperscript{rd`} or `17\textsuperscript{th`}).
-    /// - Splits the input into alphanumeric tokens, discarding stopwords found in the `TITLE_STOPWORDS` set
+    /// 3. Splits the input into alphanumeric tokens, discarding stopwords found in the `TITLE_STOPWORDS` set
     /// (which includes months, or other common stopwords like `proceedings`, `papers`, etc.)
-    /// - Concatenates the remaining tokens into a normalized string without delimiters.
-    /// - Removes leading false-start tokens like `"ofthe"`, `"of"`, or `"the"`.
-    /// </ol>
+    /// 4. Concatenates the remaining tokens into a normalized string without delimiters.
+    /// 5. Removes leading false-start tokens like `"ofthe"`, `"of"`, or `"the"`.
     ///
     /// Note that the input is expected to already be lowercased before calling this method.
     ///

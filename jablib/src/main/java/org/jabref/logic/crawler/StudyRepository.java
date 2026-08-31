@@ -233,15 +233,12 @@ public class StudyRepository {
 
     /// Persists the result locally and remotely by following the steps:
     /// Precondition: Currently checking out work branch
-    /// <ol>
-    ///
-    /// - Update the work and search branch
-    /// - Persist the results on the search branch
-    /// - Manually patch the diff of the search branch onto the work branch (as the merging will not work in
+    /// 1. Update the work and search branch
+    /// 2. Persist the results on the search branch
+    /// 3. Manually patch the diff of the search branch onto the work branch (as the merging will not work in
     /// certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
     /// context sensitive. So we can just prepend the patch without checking the "context" lines.
-    /// - Update the remote tracking branches of the work and search branch
-    /// </ol>
+    /// 4. Update the remote tracking branches of the work and search branch
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();
 

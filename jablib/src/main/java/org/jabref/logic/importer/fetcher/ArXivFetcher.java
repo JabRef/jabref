@@ -63,12 +63,9 @@ import org.xml.sax.SAXException;
 /// Fetcher for ArXiv that merges fields from arXiv-issued DOIs (and user-issued ones when applicable) to get more information overall.
 ///
 /// These are the post-processing steps applied to the original fetch from ArXiv's API:
-/// <ol>
-///
-/// - Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
-/// - Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
-/// - Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
-/// </ol>
+/// 1. Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
+/// 2. Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
+/// 3. Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
 ///
 /// @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
 /// @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
