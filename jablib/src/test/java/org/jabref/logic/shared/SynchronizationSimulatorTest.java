@@ -10,6 +10,8 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -113,6 +115,33 @@ class SynchronizationSimulatorTest {
             Thread.sleep(100);
         }
         assertEquals(expected, clientContextB.getMetaData().getMode());
+    }
+
+    @Test
+    void simulateFlushedMicroEditsPropagation() throws Exception {
+        BibEntry bibEntryOfClientA = getBibEntryExample(1);
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        // Simulate a micro-edit: change the value silently and hand the synchronizer the
+        // filtered event, as CoarseChangeFilter would
+        bibEntryOfClientA.setField(StandardField.YEAR, "2030", EntriesEventSource.SHARED);
+        FieldChangedEvent filteredEvent = new FieldChangedEvent(bibEntryOfClientA, StandardField.YEAR, "1991", "2030");
+        filteredEvent.setFiltered(true);
+        ((DBMSSynchronizer) clientContextA.getDBMSSynchronizer()).listen(filteredEvent);
+
+        // The next major change flushes the buffered entry and asks other clients to pull
+        bibEntryOfClientA.setField(StandardField.TITLE, "Flush trigger");
+
+        Optional<String> expectedYear = Optional.of("2030");
+        Optional<String> expectedTitle = Optional.of("Flush trigger");
+        for (int i = 0; (i < 100) && !(expectedYear.equals(bibEntryOfClientB.getField(StandardField.YEAR))
+                && expectedTitle.equals(bibEntryOfClientB.getField(StandardField.TITLE))); i++) {
+            Thread.sleep(100);
+        }
+        assertEquals(expectedYear, bibEntryOfClientB.getField(StandardField.YEAR));
+        assertEquals(expectedTitle, bibEntryOfClientB.getField(StandardField.TITLE));
     }
 
     @Test

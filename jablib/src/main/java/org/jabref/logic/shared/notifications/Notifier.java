@@ -40,12 +40,22 @@ public class Notifier {
     }
 
     public void notifyAboutChangedField(FieldChangedEvent event) {
-        String payload = gson.toJson(createPayload(event));
+        send(createPayload(event));
+    }
+
+    /// Asks all other clients to pull. Used when changes reached the database without a single
+    /// field-change event describing them - e.g. flushed micro-edits, which are written as a
+    /// whole entry.
+    public void notifyClientsToPull() {
+        send(withoutContent());
+    }
+
+    private void send(FieldChange payload) {
         try (PreparedStatement statement = connection.prepareStatement("SELECT pg_notify('" + CHANNEL + "', ?)")) {
-            statement.setString(1, payload);
+            statement.setString(1, gson.toJson(payload));
             statement.execute();
         } catch (SQLException e) {
-            LOGGER.error("Could not notify clients about changed field", e);
+            LOGGER.error("Could not notify clients", e);
         }
     }
 

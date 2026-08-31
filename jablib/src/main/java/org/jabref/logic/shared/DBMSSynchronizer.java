@@ -372,6 +372,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private void pullWithLastEntry() {
         if (entryWithPendingChanges.isPresent() && isPresentLocalBibEntry(entryWithPendingChanges.get())) {
             synchronizeSharedEntry(entryWithPendingChanges.get());
+            // The flush writes the whole entry without a describing field-change event,
+            // so other clients have to pull
+            notifier.notifyClientsToPull();
         }
         entryWithPendingChanges = Optional.empty();
     }
