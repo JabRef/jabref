@@ -1,5 +1,5 @@
 ---
-nav_order: 70
+nav_order: 71
 parent: Decision Records
 status: accepted
 date: 2026-08-28

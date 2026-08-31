@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Merged JabRef native-messaging host — sketch.
+"""JabRef browser-extension fulltext native-messaging host.
 
-Folds the browser-extension *fulltext bridge* (JabExtBridge.java, req~bxf.*~1)
-into the existing Python NM host (jabrefHost.py). One process the browser
-launches via connectNative; it serves the loopback HTTP protocol AND (where
-noted) the existing import-to-JabRef stdio commands.
+Implements the provider side of the Browser-Extension Fulltext Protocol
+(req~bxf.*~1). The browser launches it via connectNative; it runs a loopback
+HTTP server for JabRef and forwards each fetch to the extension over native
+messaging. The import direction (browser -> JabRef) is a separate host
+(jabrefHost.py / org.jabref.jabref); see ADR 0071.
 
 Ships as source like jabrefHost.py: no GraalVM, no JBang, no mise, no per-OS
 binary to build/bundle. Stdlib only.
@@ -220,7 +221,7 @@ def write_discovery(port: int, token_file: Path) -> Path:
 def nm_loop() -> None:
     """Main read loop: each extension message is a reply to a pending fulltext
     request, correlated by requestId. Import is served by a separate host
-    (jabrefHost.py / org.jabref.jabref, see ADR 0070), so anything without a
+    (jabrefHost.py / org.jabref.jabref, see ADR 0071), so anything without a
     requestId is ignored here."""
     while True:
         msg = read_frame(sys.stdin.buffer)

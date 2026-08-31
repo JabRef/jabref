@@ -1,9 +1,8 @@
-# Merged JabRef native-messaging host — Windows mirror.
+# JabRef browser-extension fulltext native-messaging host — Windows mirror.
 #
-# Same protocol as jabext_host.py (req~bxf.*~1). This is the "second
-# implementation to maintain" the Python route costs on Windows, where the
-# NM host is PowerShell (JabRefHost.bat -> .ps1), not Python. Drivable by the
-# same e2e harness (e2e_test.py) as the Python host.
+# Same protocol as jabext_host.py (req~bxf.*~1); on Windows the native-messaging
+# host is PowerShell, launched via jabext_host.bat. Drivable by the same e2e
+# harness (e2e_test.py) as the Python host.
 #
 # Structure: the HTTP listener loop runs on the main thread (it needs the rich
 # helpers); a small background runspace owns the blocking stdin native-messaging
@@ -149,7 +148,7 @@ function Handle-Context($ctx) {
 
 # Background runspace: blocking native-messaging read loop. Reads frames and
 # delivers fulltext replies (correlated by requestId). Import is served by a
-# separate host (JabRefHost.ps1 / org.jabref.jabref, see ADR 0070), so messages
+# separate host (JabRefHost.ps1 / org.jabref.jabref, see ADR 0071), so messages
 # without a requestId are ignored here.
 $ReaderScript = {
     param($Sync)
