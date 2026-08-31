@@ -122,8 +122,8 @@ public sealed interface EntryEditorTabModel
             fieldPatterns = List.copyOf(fieldPatterns);
         }
 
-        /// The former default tabs "General" and "Abstract" of JabRef 5, for users who prefer these fields
-        /// split off from the "Main" tab (which then omits them from its remaining-fields list).
+        /// The former default tabs "General", "Abstract", and "Comments" of JabRef 5, for users who prefer
+        /// these fields split off from the "Main" tab (which then omits them from its remaining-fields list).
         public static List<CustomizedFieldsTab> classicTabs() {
             List<String> generalFields = Stream.concat(
                                                        Stream.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF,
@@ -134,7 +134,8 @@ public sealed interface EntryEditorTabModel
                                                .toList();
             return List.of(
                     new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "General", generalFields),
-                    new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Abstract", List.of(StandardField.ABSTRACT.getName())));
+                    new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Abstract", List.of(StandardField.ABSTRACT.getName())),
+                    new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Comments", List.of(StandardField.COMMENT.getName(), "comment-.*")));
         }
 
         /// The name shown in the UI. Names of the [#classicTabs()] are stored as `%<localization key>` and

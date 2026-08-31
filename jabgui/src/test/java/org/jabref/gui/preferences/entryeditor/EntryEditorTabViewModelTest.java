@@ -50,7 +50,7 @@ class EntryEditorTabViewModelTest {
         viewModel.addClassicTabs();
 
         List<String> names = viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList();
-        assertEquals(List.of(Localization.lang("Main"), Localization.lang("General"), Localization.lang("Abstract")), names.subList(0, 3));
+        assertEquals(List.of(Localization.lang("Main"), Localization.lang("General"), Localization.lang("Abstract"), Localization.lang("Comments")), names.subList(0, 4));
         assertEquals(1, names.stream().filter(Localization.lang("General")::equals).count());
     }
 
@@ -61,11 +61,11 @@ class EntryEditorTabViewModelTest {
 
         viewModel.storeSettings();
 
-        assertEquals(List.of("%General", "%Abstract"), entryEditorPreferences.getTabModels().stream()
-                                                                             .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
-                                                                             .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
-                                                                             .map(EntryEditorTabModel.CustomizedFieldsTab::name)
-                                                                             .toList());
+        assertEquals(List.of("%General", "%Abstract", "%Comments"), entryEditorPreferences.getTabModels().stream()
+                                                                                          .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                                                                                          .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                                                                                          .map(EntryEditorTabModel.CustomizedFieldsTab::name)
+                                                                                          .toList());
     }
 
     @Test

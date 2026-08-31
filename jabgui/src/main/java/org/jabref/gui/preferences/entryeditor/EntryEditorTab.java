@@ -102,7 +102,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         VBox.setVgrow(columns, Priority.ALWAYS);
 
         Button classicTabsButton = new Button(Localization.lang("Add classic 5.x tabs"));
-        classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\" and \"Abstract\" known from JabRef 5.")));
+        classicTabsButton.setTooltip(new Tooltip(Localization.lang("Adds the tabs \"General\", \"Abstract\", and \"Comments\" known from JabRef 5.")));
         classicTabsButton.setOnAction(_ -> viewModel.addClassicTabs());
 
         Button resetButton = new Button(Localization.lang("Reset to default tabs"));

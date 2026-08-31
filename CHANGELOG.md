@@ -63,7 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added BibTeX syntax highlighting to the Source tab and Import entries dialog. [#15897](https://github.com/JabRef/jabref/issues/15897)
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
-- We added a button "Add classic 5.x tabs" to the entry editor preferences, which adds the tabs "General" and "Abstract" known from JabRef 5. [#16672](https://github.com/JabRef/jabref/pull/16672)
+- We added a button "Add classic 5.x tabs" to the entry editor preferences, which adds the tabs "General", "Abstract", and "Comments" known from JabRef 5. [#16672](https://github.com/JabRef/jabref/pull/16672)
 
 ### Changed
 
