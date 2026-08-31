@@ -45,6 +45,41 @@ class BSTFormatUtilsTest {
     }
 
     @Test
+    void convertInlineLatexFormattingToHtmlConvertsTextsc() {
+        String latex = "\\textsc{Dinga, E.~L., Ding, X.} and more";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("<span style=\"font-variant: small-caps\">Dinga, E.~L., Ding, X.</span> and more", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlConvertsScSwitch() {
+        String latex = "{\\sc Dinga, E.~L., Ding, X.} and more";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("<span style=\"font-variant: small-caps\">Dinga, E.~L., Ding, X.</span> and more", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlConvertsSuperscript() {
+        String latex = "Proceedings of the 9\\textsuperscript{th} symposium";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("Proceedings of the 9<sup>th</sup> symposium", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlConvertsSubscript() {
+        String latex = "H\\textsubscript{2}O";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("H<sub>2</sub>O", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlKeepsItalicBoldAndPlainTextUnchanged() {
+        String latex = "A \\emph{journal} with \\textbf{volume} and plain text.";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("A \\emph{journal} with \\textbf{volume} and plain text.", html);
+    }
+
+    @Test
     void mapsPandocSmallcapsStyleToOO() {
         String html = "<p><span style=\"font-variant: small-caps\">Name</span></p>";
         String mapped = BSTFormatUtils.mapPandocInlineToOO(html);

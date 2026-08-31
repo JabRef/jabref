@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.openoffice.bst.BSTFormatUtils;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,11 +47,9 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern EMPH_PATTERN = Pattern.compile("\\\\emph\\{([^}]*?)}");
     private static final Pattern TEXTIT_PATTERN = Pattern.compile("\\\\textit\\{([^}]*?)}");
     private static final Pattern TEXTBF_PATTERN = Pattern.compile("\\\\textbf\\{([^}]*?)}");
-    private static final Pattern TEXTSC_PATTERN = Pattern.compile("\\\\textsc\\{([^}]*?)}");
     private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
     private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
     private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
-    private static final Pattern GROUP_SC_PATTERN = Pattern.compile("\\{\\\\sc\\s+([^}]*?)}");
 
     /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
     /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
@@ -155,6 +154,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
         // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
         result = result.replace("#2}}", "");
+        result = BSTFormatUtils.convertInlineLatexFormattingToHtml(result);
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");

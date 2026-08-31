@@ -18,6 +18,10 @@ public final class BSTFormatUtils {
     private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
     private static final Pattern BRACED_ETALCHAR_PATTERN = Pattern.compile("\\{\\\\etalchar\\{([^}]*)}}");
     private static final Pattern ETALCHAR_PATTERN = Pattern.compile("\\\\etalchar\\{([^}]*)}");
+    private static final Pattern TEXTSC_PATTERN = Pattern.compile("\\\\textsc\\{([^}]*?)}");
+    private static final Pattern GROUP_SC_PATTERN = Pattern.compile("\\{\\\\sc\\s+([^}]*?)}");
+    private static final Pattern TEXTSUPERSCRIPT_PATTERN = Pattern.compile("\\\\textsuperscript\\{([^}]*?)}");
+    private static final Pattern TEXTSUBSCRIPT_PATTERN = Pattern.compile("\\\\textsubscript\\{([^}]*?)}");
 
     private BSTFormatUtils() {
     }
@@ -74,6 +78,23 @@ public final class BSTFormatUtils {
     public static String normalizeBibItemLabel(String label) {
         String normalized = BRACED_ETALCHAR_PATTERN.matcher(label).replaceAll("$1");
         return ETALCHAR_PATTERN.matcher(normalized).replaceAll("$1");
+    }
+
+    public static String convertInlineLatexFormattingToHtml(String latex) {
+        String html = replaceInlineLatexFormatting(TEXTSC_PATTERN, latex, "<span style=\"font-variant: small-caps\">", "</span>");
+        html = replaceInlineLatexFormatting(GROUP_SC_PATTERN, html, "<span style=\"font-variant: small-caps\">", "</span>");
+        html = replaceInlineLatexFormatting(TEXTSUPERSCRIPT_PATTERN, html, "<sup>", "</sup>");
+        return replaceInlineLatexFormatting(TEXTSUBSCRIPT_PATTERN, html, "<sub>", "</sub>");
+    }
+
+    private static String replaceInlineLatexFormatting(Pattern pattern, String input, String openingTag, String closingTag) {
+        Matcher matcher = pattern.matcher(input);
+        StringBuilder converted = new StringBuilder();
+        while (matcher.find()) {
+            matcher.appendReplacement(converted, Matcher.quoteReplacement(openingTag + matcher.group(1) + closingTag));
+        }
+        matcher.appendTail(converted);
+        return converted.toString();
     }
 
     private static String replaceLegacySwitch(String input, String legacy, String modern) {
