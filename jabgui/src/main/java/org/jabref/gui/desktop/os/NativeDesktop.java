@@ -299,7 +299,8 @@ public abstract class NativeDesktop {
             get().openFile(url, "html", externalApplicationsPreferences);
             return;
         }
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        // Desktop.browse rejects relative URIs, which createUri also produces; those go to the platform opener
+        if (uri.isAbsolute() && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             // Desktop.browse may block on some Linux desktops, so keep it off the JavaFX thread
             HeadlessExecutorService.INSTANCE.execute(() -> {
                 try {
