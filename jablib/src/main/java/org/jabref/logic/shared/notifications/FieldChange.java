@@ -1,5 +1,6 @@
 package org.jabref.logic.shared.notifications;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Payload of a `jabrefLiveUpdate` notification.
@@ -8,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 /// send) and receivers pull from the database instead.
 ///
 /// @param version the entry's version after the change, as assigned by the database
+@NullMarked
 public record FieldChange(
         String sourceProcessorId,
         @Nullable String bibEntryId,

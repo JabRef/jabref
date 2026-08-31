@@ -13,9 +13,11 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Updates references of citation keys if the citation key of an entry is changed.
+@NullMarked
 public class CitationKeyListener {
 
     private final BibDatabase database;

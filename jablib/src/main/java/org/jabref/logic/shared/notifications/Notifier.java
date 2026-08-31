@@ -11,10 +11,12 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Notifies the other clients connected to the same database about changes.
+@NullMarked
 public class Notifier {
 
     /// Used as string argument to `pg_notify`, which - unlike the `LISTEN` command - does not

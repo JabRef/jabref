@@ -7,12 +7,14 @@ import org.jabref.logic.shared.DBMSSynchronizer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.jspecify.annotations.NullMarked;
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// A listener for PostgreSQL database notifications.
+@NullMarked
 public class NotificationListener implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationListener.class);
