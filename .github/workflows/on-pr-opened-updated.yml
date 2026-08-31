@@ -121,27 +121,16 @@ jobs:
           set -ex
           git remote add upstream "https://github.com/JabRef/jabref.git" || true
           git fetch upstream main
-      # The workspace holds the untrusted PR head, so a local "uses: ./..." would execute
-      # the PR's copy of the action with write credentials. Take the action's code from
-      # the trusted revision this workflow itself runs from instead.
-      - name: Checkout trusted merge action
-        id: checkout_trusted_action
-        if: steps.fetch_upstream.outcome == 'success'
-        continue-on-error: true
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.sha }}
-          path: trusted-actions
-          sparse-checkout: .github/actions/merge-upstream-main
-          persist-credentials: 'false'
-          show-progress: 'false'
       # Pushes the resolved merge back to the PR branch. This is the whole point:
       # the push triggers a fresh run that then reports no conflicts (no comment).
+      # "$/" resolves the action from this workflow's own (trusted) commit, not from the
+      # workspace - the workspace holds the untrusted PR head, whose copy of the action
+      # must never run with write credentials.
       - name: Merge main into PR branch
         id: automerge
-        if: steps.checkout_trusted_action.outcome == 'success'
+        if: steps.fetch_upstream.outcome == 'success'
         continue-on-error: true
-        uses: ./trusted-actions/.github/actions/merge-upstream-main
+        uses: $/.github/actions/merge-upstream-main
         with:
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
       # After the merge, HEAD is the merge commit that was pushed.
