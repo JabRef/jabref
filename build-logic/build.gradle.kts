@@ -8,14 +8,16 @@ repositories {
     // to repo.maven.apache.org, which enforces consumption limits since 2026.
     // See https://central.sonatype.org/faq/429-error/ and gradle/gradle#37880.
     maven { url = uri("https://maven-central.storage-download.googleapis.com/maven2/") }
-
     gradlePluginPortal()
+
+    mavenCentral()
+
     maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
-    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.18.0")
+    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.19.1")
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.15.0")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:9.6.1")
     implementation("de.undercouch.download:de.undercouch.download.gradle.plugin:5.7.0")

@@ -33,6 +33,8 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -90,7 +92,7 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static UndoManager undoManager;
+    private static GuiUndoManager undoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
@@ -122,6 +124,8 @@ public class JabRefGUI extends Application {
 
         try {
             this.mainStage = stage;
+            // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
+            setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
 
             initialize();
@@ -238,8 +242,11 @@ public class JabRefGUI extends Application {
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
-        JabRefGUI.undoManager = new UndoManager();
+        JabRefGUI.undoManager = new JabRefGuiUndoManager();
+        // Two keys, one instance: almost everything asks for the recording interface, while the
+        // classes that build the undo UI ask for the one that can drive the stacks and be bound to.
         Injector.setModelOrService(UndoManager.class, undoManager);
+        Injector.setModelOrService(GuiUndoManager.class, undoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -380,7 +387,7 @@ public class JabRefGUI extends Application {
         installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

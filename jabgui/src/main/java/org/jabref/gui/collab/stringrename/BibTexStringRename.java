@@ -32,7 +32,7 @@ public final class BibTexStringRename extends DatabaseChange {
             LOGGER.info("Cannot rename string '{}' to '{}' because the name is already in use", oldString.getName(), newString.getName());
         }
 
-        undoEdit.apply(new UndoableStringChange(oldString, UndoableStringChange.Part.NAME, oldString.getName(), newString.getName()));
+        undoEdit.applyEdit(new UndoableStringChange(oldString, UndoableStringChange.Part.NAME, oldString.getName(), newString.getName()));
     }
 
     public BibtexString getOldString() {
