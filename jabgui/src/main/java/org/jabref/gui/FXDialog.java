@@ -15,7 +15,7 @@ import com.airhacks.afterburner.injection.Injector;
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
 /// To create a custom JavaFX dialog one should create an instance of this class and set a dialog
-/// pane through the inherited [javafx.scene.control.Dialog#setDialogPane(Dialojavafx.scene.control.DialogPanegPane)] method.
+/// pane through the inherited [javafx.scene.control.Dialog#setDialogPane(javafx.scene.control.DialogPane)] method.
 /// The dialog can be shown via [javafx.scene.control.Dialog#show()] or [javafx.scene.control.Dialog#showAndWait()].
 ///
 /// The layout of the pane should be defined in an external fxml file and loaded it via the
