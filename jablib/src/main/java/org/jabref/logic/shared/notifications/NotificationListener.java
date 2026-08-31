@@ -2,9 +2,11 @@ package org.jabref.logic.shared.notifications;
 
 import java.sql.SQLException;
 
-import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.slf4j.Logger;
@@ -17,11 +19,14 @@ public class NotificationListener implements Runnable {
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
+    private final String processorId;
+    private final Gson gson = new GsonBuilder().create();
     private volatile boolean stop;
 
-    public NotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
+    public NotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection, String processorId) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
+        this.processorId = processorId;
     }
 
     @Override
@@ -34,9 +39,11 @@ public class NotificationListener implements Runnable {
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
-                        // The payload is the PROCESSOR_ID of the sender - skip our own notifications
-                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getParameter())) {
-                            dbmsSynchronizer.pullChanges();
+                        try {
+                            handleNotification(notification.getParameter());
+                        } catch (RuntimeException e) {
+                            // The listener thread has to survive a single failing notification
+                            LOGGER.error("Error while handling notification", e);
                         }
                     }
                 }
@@ -47,6 +54,25 @@ public class NotificationListener implements Runnable {
                 LOGGER.error("Error while listening for updates to PostgresSQL", exception);
             }
         }
+    }
+
+    private void handleNotification(String payload) {
+        FieldChange fieldChange;
+        try {
+            fieldChange = gson.fromJson(payload, FieldChange.class);
+        } catch (JsonSyntaxException e) {
+            LOGGER.warn("Could not parse notification payload, pulling changes instead: {}", payload);
+            fieldChange = null;
+        }
+        if (fieldChange == null) {
+            dbmsSynchronizer.pullChanges();
+            return;
+        }
+        if (processorId.equals(fieldChange.sourceProcessorId())) {
+            // Own notification
+            return;
+        }
+        dbmsSynchronizer.applyRemoteFieldChange(fieldChange);
     }
 
     public void stop() {

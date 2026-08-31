@@ -1,6 +1,7 @@
 package org.jabref.logic.shared;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -75,6 +76,26 @@ class SynchronizationSimulatorTest {
         clientContextA.getDBMSSynchronizer().closeSharedDatabase();
         clientContextB.getDBMSSynchronizer().closeSharedDatabase();
         connectorTest.close();
+    }
+
+    @Test
+    void simulateLiveFieldChangePropagation() throws Exception {
+        BibEntry bibEntryOfClientA = getBibEntryExample(1);
+        // client A inserts an entry
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        // client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        // client A changes a field; the notification carries the change and client B's listener applies it without pulling
+        bibEntryOfClientA.setField(StandardField.YEAR, "2026");
+
+        Optional<String> expected = Optional.of("2026");
+        for (int i = 0; (i < 100) && !expected.equals(bibEntryOfClientB.getField(StandardField.YEAR)); i++) {
+            Thread.sleep(100);
+        }
+        assertEquals(expected, bibEntryOfClientB.getField(StandardField.YEAR));
+        assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), bibEntryOfClientB.getSharedBibEntryData().getVersion());
     }
 
     @Test

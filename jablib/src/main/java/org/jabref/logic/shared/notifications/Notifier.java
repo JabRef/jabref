@@ -1,36 +1,75 @@
 package org.jabref.logic.shared.notifications;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Objects;
 
-import org.jabref.logic.shared.DBMSProcessor;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Notifies the other clients connected to the same database about changes.
-///
-/// TODO: Send the change itself (see [FieldChange]) so receivers can apply it without pulling.
-///       For sizes > 8000 bytes, use a table for exchange.
 public class Notifier {
+
+    /// Used as string argument to `pg_notify`, which - unlike the `LISTEN` command - does not
+    /// case-fold its channel argument. Both sides therefore use this constant verbatim
+    /// (the listener quotes it in `LISTEN`).
+    public static final String CHANNEL = "jabrefLiveUpdate";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Notifier.class);
 
-    private final Connection connection;
+    // Keep safely below PostgreSQL's 8000 byte NOTIFY payload limit
+    private static final int MAX_PAYLOAD_BYTES = 7000;
 
-    public Notifier(Connection connection) {
+    private final Connection connection;
+    private final String processorId;
+    private final Gson gson = new GsonBuilder().create();
+
+    public Notifier(Connection connection, String processorId) {
         this.connection = connection;
+        this.processorId = processorId;
     }
 
     public void notifyAboutChangedField(FieldChangedEvent event) {
-        // The payload identifies the sender, so receivers can skip their own notifications
-        try (PreparedStatement statement = connection.prepareStatement("SELECT pg_notify('jabrefLiveUpdate', ?)")) {
-            statement.setString(1, DBMSProcessor.PROCESSOR_ID);
+        String payload = gson.toJson(createPayload(event));
+        try (PreparedStatement statement = connection.prepareStatement("SELECT pg_notify('" + CHANNEL + "', ?)")) {
+            statement.setString(1, payload);
             statement.execute();
         } catch (SQLException e) {
             LOGGER.error("Could not notify clients about changed field", e);
         }
+    }
+
+    private FieldChange createPayload(FieldChangedEvent event) {
+        BibEntry bibEntry = event.getBibEntry();
+        // Content is only sent if the entry's current state still matches the event: a change that
+        // did not reach the database (e.g. a refused update overwritten by the following pull, or a
+        // type change, which is not readable via getField) must not be propagated as content.
+        if (!Objects.equals(bibEntry.getField(event.getField()).orElse(null), event.getNewValue())) {
+            return withoutContent();
+        }
+        FieldChange payload = new FieldChange(
+                processorId,
+                bibEntry.getSharedBibEntryData().getSharedIdAsString(),
+                event.getField().getName(),
+                event.getOldValue(),
+                event.getNewValue(),
+                bibEntry.getSharedBibEntryData().getVersion());
+        if (gson.toJson(payload).getBytes(StandardCharsets.UTF_8).length > MAX_PAYLOAD_BYTES) {
+            // TODO: use a table for exchanging oversized values
+            return withoutContent();
+        }
+        return payload;
+    }
+
+    /// A payload without content makes receivers pull the changes from the database instead
+    private FieldChange withoutContent() {
+        return new FieldChange(processorId, null, null, null, null, 0);
     }
 }

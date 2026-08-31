@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,6 +29,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -319,6 +323,38 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         synchronizeLocalMetaData();
     }
 
+    /// Applies a field change received from another client. Any state that does not exactly
+    /// match the received change (content-less payload, unknown entry, diverged field value)
+    /// falls back to pulling everything from the database.
+    public void applyRemoteFieldChange(FieldChange fieldChange) {
+        if (fieldChange.field() == null) {
+            // The sender could not include the change content
+            pullChanges();
+            return;
+        }
+        Optional<BibEntry> localEntry = bibDatabase.getEntries().stream()
+                                                   .filter(entry -> fieldChange.bibEntryId().equals(entry.getSharedBibEntryData().getSharedIdAsString()))
+                                                   .findFirst();
+        if (localEntry.isEmpty()) {
+            // Entry unknown locally - e.g. inserted remotely after our last pull
+            pullChanges();
+            return;
+        }
+        BibEntry bibEntry = localEntry.get();
+        Field field = FieldFactory.parseField(fieldChange.field());
+        if (!Objects.equals(bibEntry.getField(field).orElse(null), fieldChange.oldValue())) {
+            // Local state diverged from the sender's sanity-check value
+            pullChanges();
+            return;
+        }
+        if (fieldChange.newValue() == null) {
+            bibEntry.clearField(field, EntriesEventSource.SHARED);
+        } else {
+            bibEntry.setField(field, fieldChange.newValue(), EntriesEventSource.SHARED);
+        }
+        bibEntry.getSharedBibEntryData().setVersion(fieldChange.version());
+    }
+
     /// Synchronizes local BibEntries only if last entry changes still remain
     public void pullLastEntryChanges() {
         if (lastEntryChanged_REMOVEME.isPresent()) {
@@ -371,8 +407,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.notifier = new Notifier(currentConnection);
         this.dbmsProcessor = new DBMSProcessor(connection);
+        this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
         initializeDatabases();
     }
 

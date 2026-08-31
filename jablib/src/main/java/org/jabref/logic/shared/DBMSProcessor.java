@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.notifications.NotificationListener;
+import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -40,7 +41,10 @@ import org.slf4j.LoggerFactory;
 /// Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
 public class DBMSProcessor {
 
-    public static final String PROCESSOR_ID = CUID.randomCUID2(8).toString();
+    // Identifies this processor among all clients connected to the same database.
+    // Deliberately per instance, not static: two synchronizers in the same JVM (two open shared
+    // libraries) must not mistake each other's notifications for their own.
+    private final String processorId = CUID.randomCUID2(8).toString();
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
@@ -59,6 +63,10 @@ public class DBMSProcessor {
 
     // TODO: We need to migrate data - or ask the user to recreate, #Liquibase
     private int CURRENT_VERSION_DB_STRUCT = 2;
+
+    public String getProcessorId() {
+        return processorId;
+    }
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.dbmsConnection = dbmsConnection;
@@ -655,8 +663,8 @@ public class DBMSProcessor {
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         try {
             listenerConnection = dbmsConnection.openNewConnection();
-            listenerConnection.createStatement().execute("LISTEN jabrefLiveUpdate");
-            listener = new NotificationListener(dbmsSynchronizer, listenerConnection.unwrap(PGConnection.class));
+            listenerConnection.createStatement().execute("LISTEN \"" + Notifier.CHANNEL + "\"");
+            listener = new NotificationListener(dbmsSynchronizer, listenerConnection.unwrap(PGConnection.class), processorId);
             HeadlessExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
             LOGGER.error("SQL Error during starting the notification listener", e);
