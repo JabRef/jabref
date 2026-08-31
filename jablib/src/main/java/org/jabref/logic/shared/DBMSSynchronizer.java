@@ -256,7 +256,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            // Perform possibly existing save actions
+            // Save actions here used to cause cursor jumping while typing (issue #5904, fixed in
+            // PR #11282 by taking whitespace normalization out of the write path). A save action
+            // that actually changes the value still rewrites the edited field - as in JabRef 5.x.
+            // Micro-edit buffering keeps this sync path out of continuous typing anyway.
             BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences);
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
