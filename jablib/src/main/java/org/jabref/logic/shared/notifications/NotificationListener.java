@@ -64,6 +64,7 @@ public class NotificationListener implements Runnable {
         }
     }
 
+    // [impl->req~shared-database.live-propagation~1]
     private void handleNotification(String payload) {
         FieldChange fieldChange;
         try {

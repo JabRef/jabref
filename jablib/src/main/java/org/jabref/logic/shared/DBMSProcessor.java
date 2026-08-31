@@ -231,6 +231,7 @@ public class DBMSProcessor {
     /// `"TYPE"` became `entrytype`, all other names only changed case.
     ///
     /// The old tables are kept untouched, so older JabRef versions can still work with them.
+    // [impl->req~shared-database.migration~1]
     private void migrateFromOldStructure() throws SQLException {
         try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT EXISTS (SELECT 1 FROM entry)")) {
             resultSet.next();

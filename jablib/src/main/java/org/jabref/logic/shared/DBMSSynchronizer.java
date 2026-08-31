@@ -325,6 +325,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Applies a field change received from another client. Any state that does not exactly
     /// match the received change (content-less payload, unknown entry, diverged field value)
     /// falls back to pulling everything from the database.
+    // [impl->req~shared-database.change-content-in-notification~1]
     public synchronized void applyRemoteFieldChange(FieldChange fieldChange) {
         if (fieldChange.field() == null) {
             // The sender could not include the change content
@@ -368,6 +369,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Synchronizes local BibEntries and pulls remaining last entry changes
+    // [impl->req~shared-database.micro-edit-batching~1]
     private void pullWithLastEntry() {
         if (entryWithPendingChanges.isPresent() && isPresentLocalBibEntry(entryWithPendingChanges.get())) {
             synchronizeSharedEntry(entryWithPendingChanges.get());
