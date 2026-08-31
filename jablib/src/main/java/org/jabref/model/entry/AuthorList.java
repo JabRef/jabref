@@ -15,7 +15,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/// This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
+/// This is an immutable class representing information of either `author` or `editor` field in bibtex record.
 ///
 /// Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
 ///
@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// -  'author field' is a sequence of tokens;
 ///
-/// -  tokens are separated by sequences of whitespaces (<CODE>Character.isWhitespace(c)==true</CODE>),
+/// -  tokens are separated by sequences of whitespaces (`Character.isWhitespace(c)==true`),
 /// commas (,), dashes (-), and tildas (~);
 /// -  every comma separates tokens, while sequences of other separators are
 /// equivalent to a single separator; for example: "a - b" consists of 2 tokens
@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
 /// construction of abbreviation of first name, one needs definitions of first
 /// letter of a token, case of a token, and abbreviation of a token:
 ///
-/// -  'first letter' of a token is the first letter character (<CODE>Character.isLetter(c)==true</CODE>)
+/// -  'first letter' of a token is the first letter character (`Character.isLetter(c)==true`)
 /// that does not belong to a sequence of letters that immediately follows "\"
 /// character, with one exception: if "\" is followed by "aa", "AA", "ae", "AE",
 /// "l", "L", "o", "O", "oe", "OE", "i", or "j" followed by non-letter, the
@@ -49,7 +49,7 @@ import org.jspecify.annotations.Nullable;
 /// "A", in "\aex\ijk\Oe\j" 'first letter' is "j"; if there is no letter
 /// satisfying the above rule, 'first letter' is undefined;
 /// -  token is "lower-case" token if its first letter is defined and is
-/// lower-case (<CODE>Character.isLowerCase(c)==true</CODE>), and token is
+/// lower-case (`Character.isLowerCase(c)==true`), and token is
 /// "upper-case" token otherwise;
 /// -  'abbreviation' of a token is the shortest prefix of the token that (a)
 /// contains 'first letter' and (b) is braces-balanced; if 'first letter' is
@@ -253,17 +253,17 @@ public class AuthorList implements Iterable<Author> {
         return authors.isEmpty();
     }
 
-    /// Returns the <CODE>Author</CODE> object for the i-th author.
+    /// Returns the `Author` object for the i-th author.
     ///
-    /// @param i Index of the author (from 0 to <CODE>size()-1</CODE>).
-    /// @return the <CODE>Author</CODE> object.
+    /// @param i Index of the author (from 0 to `size()-1`).
+    /// @return the `Author` object.
     public Author getAuthor(int i) {
         return authors.get(i);
     }
 
-    /// Returns the list of <CODE>Author</CODE> objects.
+    /// Returns the list of `Author` objects.
     ///
-    /// @return the <CODE>List&lt;Author></CODE> object.
+    /// @return the `List<Author>` object.
     public List<Author> getAuthors() {
         return authors;
     }
