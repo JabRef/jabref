@@ -117,7 +117,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             case PUSHED ->
                     Localization.lang("Pushed successfully.");
             case NOTHING_TO_PUSH ->
-                    Localization.lang("Nothing to commit.");
+                    Localization.lang("Nothing to push. Local branch is up to date.");
         };
     }
 
@@ -195,7 +195,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             }
             return committedNow ? CommitOutcome.COMMITTED_AND_PUSHED : CommitOutcome.PUSHED;
         } catch (JabRefException | GitAPIException | IOException e) {
-            throw new PushFailedException(e);
+            throw new PushFailedException(e, committedNow);
         }
     }
 
@@ -247,8 +247,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     private static class PushFailedException extends JabRefException {
-        PushFailedException(Throwable cause) {
-            super(Localization.lang("The commit was saved locally, but the push failed: %0", causeMessage(cause)), cause);
+        /// Claiming "the commit was saved" is only honest when this attempt actually created one:
+        /// the push may also fail with nothing newly committed (e.g. retrying after a failed push).
+        PushFailedException(Throwable cause, boolean committedNow) {
+            super(committedNow
+                  ? Localization.lang("The commit was saved locally, but the push failed: %0", causeMessage(cause))
+                  : Localization.lang("Push failed: %0", causeMessage(cause)), cause);
         }
 
         private static String causeMessage(Throwable cause) {
