@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
@@ -30,7 +31,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         container.getChildren().add(header);
 
         // Add views for each detected difference
@@ -105,9 +106,9 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         ScrollPane rightScrollPane = createScrollPane(diskTextArea);
 
         Label inJabRef = new Label(leftLabelText);
-        inJabRef.getStyleClass().add("lib-change-header");
+        inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
         Label onDisk = new Label(rightLabelText);
-        onDisk.getStyleClass().add("lib-change-header");
+        onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
         VBox rightContainer = new VBox(5, onDisk, rightScrollPane);
@@ -117,7 +118,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         splitPane.setDividerPositions(0.5);
 
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
-        legendLabel.getStyleClass().add("lib-change-legend");
+        legendLabel.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_LEGEND);
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
         resultContainer.setSpacing(5);

@@ -14,7 +14,7 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.PushApplicationDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container">
+        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
             <HBox alignment="CENTER_LEFT" spacing="4.0">
                 <Label text="%Configure external applications to push citations to. Detected applications are highlighted. Applications that are not detected can be set manually by specifying the path to the executable."
                        wrapText="true" HBox.hgrow="ALWAYS"/>

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
@@ -37,7 +38,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private Callback<T, Node> toGraphic;
     private Callback<T, Tooltip> toTooltip;
     private BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent;
-    private Callback<T, String> toStyleClass;
+    private Supplier<List<String>> styleClassSupplier;
     private Callback<T, ContextMenu> toContextMenu;
     private BiConsumer<T, ? super MouseEvent> toOnDragDetected;
     private BiConsumer<T, ? super DragEvent> toOnDragDropped;
@@ -95,8 +96,12 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withStyleClass(Callback<T, String> toStyleClass) {
-        this.toStyleClass = toStyleClass;
+    /// Supplies styleClasses that are set on the cell right after creation, only once.
+    ///
+    /// @param styleClassSupplier the supplier that is called only once on the cell
+    /// @return the factory
+    public ViewModelListCellFactory<T> withStyleClasses(Supplier<List<String>> styleClassSupplier) {
+        this.styleClassSupplier = styleClassSupplier;
         return this;
     }
 
@@ -156,7 +161,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
     @Override
     public ListCell<T> call(ListView<T> param) {
-        return new ListCell<>() {
+        ListCell<T> listCell = new ListCell<>() {
             final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override
@@ -183,9 +188,6 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(event -> toOnMouseClickedEvent.accept(viewModel, event));
-                    }
-                    if (toStyleClass != null) {
-                        getStyleClass().setAll(toStyleClass.call(viewModel));
                     }
                     if (toTooltip != null) {
                         setTooltip(toTooltip.call(viewModel));
@@ -251,5 +253,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                 }
             }
         };
+        if (styleClassSupplier != null) {
+            listCell.getStyleClass().setAll(styleClassSupplier.get());
+        }
+        return listCell;
     }
 }

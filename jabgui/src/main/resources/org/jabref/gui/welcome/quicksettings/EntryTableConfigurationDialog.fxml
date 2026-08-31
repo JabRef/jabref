@@ -10,7 +10,7 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container">
+        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
             <HBox alignment="CENTER_LEFT" spacing="4">
                 <Label text="%Configure which columns are displayed in the entry table. The citation key column can be toggled to show or hide citation keys."
                        wrapText="true" HBox.hgrow="ALWAYS"/>

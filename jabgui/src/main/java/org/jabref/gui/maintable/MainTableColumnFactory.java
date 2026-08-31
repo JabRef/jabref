@@ -166,7 +166,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
-        header.getStyleClass().add("mainTable-header");
+        header.getStyleClass().add("text-muted");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
         column.getStyleClass().add("align-center-right");

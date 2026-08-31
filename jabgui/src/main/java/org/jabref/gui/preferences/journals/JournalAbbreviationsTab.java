@@ -30,6 +30,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -99,7 +100,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private Button toolButton(IconTheme.JabRefIcons icon, String tooltip, Runnable action) {
         Button button = new Button();
-        button.getStyleClass().addAll("icon-button", "narrow");
+        button.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         button.setGraphic(icon.getGraphicNode());
         Tooltip tip = new Tooltip(tooltip);
         tip.setAutoHide(true);

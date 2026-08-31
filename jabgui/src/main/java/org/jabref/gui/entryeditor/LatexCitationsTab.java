@@ -77,6 +77,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         searchPane.getColumnConstraints().setAll(column);
         searchPane.getRowConstraints().setAll(mainRow, bottomRow);
         searchPane.setId("citationsPane");
+        searchPane.getStyleClass().add("padding-0");
         setContent(searchPane);
 
         HBox latexDirectoryBox = getLatexDirectoryBox();
@@ -108,7 +109,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text latexDirectoryText = new Text(Localization.lang("Current search directory:"));
         Text latexDirectoryPath = new Text();
         latexDirectoryPath.textProperty().bind(viewModel.directoryProperty().asString());
-        latexDirectoryPath.getStyleClass().add("latex-citations-directory-path");
+        latexDirectoryPath.getStyleClass().addAll("font-monospace", "bold");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
@@ -126,23 +127,23 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private VBox getNotFoundPane() {
         Label titleLabel = new Label(Localization.lang("No citations found"));
-        titleLabel.getStyleClass().add("heading");
+        titleLabel.getStyleClass().addAll("h3", "bold");
 
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
-        notFoundText.getStyleClass().add("description");
+        notFoundText.getStyleClass().add("italic");
 
         VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
-        notFoundBox.getStyleClass().add("latex-citations-message-box");
+        notFoundBox.getStyleClass().add("padding-32");
         return notFoundBox;
     }
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.getStyleClass().add("latex-citations-error-label");
+        titleLabel.getStyleClass().addAll("text-danger", "h3", "bold");
         Text errorMessageText = new Text();
         errorMessageText.textProperty().bind(viewModel.searchErrorProperty());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("latex-citations-message-box");
+        errorMessageBox.getStyleClass().add("padding-32");
         return errorMessageBox;
     }
 
