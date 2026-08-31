@@ -180,6 +180,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     if (idText != null) {
+                        // [impl->req~ux.textdialogs.autopaste~1]
                         idText.setText(clipboardText);
                         idText.selectAll();
                         // [impl->req~ux.textdialogs.focus~1]
@@ -348,6 +349,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         Optional<Identifier> identifier = Identifier.from(clipboard);
 
         if (identifier.isPresent()) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             idText.setText(clipboard);
             idText.selectAll();
 
@@ -390,6 +392,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // [impl->req~ux.textdialogs.focus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (URLUtil.isURL(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             urlText.setText(clipboardText);
             urlText.selectAll();
         }
@@ -403,6 +406,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             interpretText.setText(clipboardText);
             interpretText.selectAll();
         }
@@ -424,6 +428,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (!StringUtil.isBlank(clipboardText)) {
             // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
             // supported Bib(La)TeX source format.
+            // [impl->req~ux.textdialogs.autopaste~1]
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
