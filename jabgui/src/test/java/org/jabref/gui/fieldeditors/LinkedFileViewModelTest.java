@@ -34,6 +34,7 @@ import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -268,8 +269,9 @@ class LinkedFileViewModelTest {
         assertEquals("URL", actual);
     }
 
-    // We cannot use "@FetcherTest" annotation, because a @FetcherTest does not fire up a GUI environment (which is needed for this test)
-    // @FetcherTest
+    // Needs both network access and a GUI environment, so it is excluded from the default test task
+    // and runs via :jabgui:fetcherTest (under xvfb) in the fetcher-tests CI workflow instead
+    @Tag("FetcherTest")
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {

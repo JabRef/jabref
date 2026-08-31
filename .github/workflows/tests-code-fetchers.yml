@@ -14,6 +14,8 @@ on:
       - '.github/workflows/tests-code-fetchers.yml'
       - '.github/actions/setup-gradle/action.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/build.gradle.kts'
+      - 'jabgui/src/test/java/org/jabref/gui/fieldeditors/LinkedFileViewModelTest.java'
   pull_request:
     paths:
       - 'jablib/src/main/java/org/jabref/logic/importer/fetcher/**'
@@ -25,6 +27,8 @@ on:
       - '.github/actions/setup-gradle/action.yml'
       - '.github/workflows/tests-code-fetchers.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/build.gradle.kts'
+      - 'jabgui/src/test/java/org/jabref/gui/fieldeditors/LinkedFileViewModelTest.java'
   schedule:
     # run on each Monday
     - cron: '2 3 * * 1'
@@ -61,6 +65,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run fetcher tests
-        run: gradle fetcherTest
+        # xvfb needed for :jabgui:fetcherTest (TestFX-based fetcher tests)
+        run: xvfb-run --auto-servernum gradle fetcherTest
         env:
           CI: "true"
