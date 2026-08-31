@@ -203,6 +203,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
+    // [utest->req~logic.xmp.atomic-pdf-write~1]
     void writeAndRemoveLeaveLoadablePdfAndNoTempFiles(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_atomic.pdf", tempDir);
 

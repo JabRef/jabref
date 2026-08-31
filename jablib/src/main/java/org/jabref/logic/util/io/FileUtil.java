@@ -327,6 +327,7 @@ public class FileUtil {
 
     /// Replaces `target` with `source`, atomically where the filesystem supports it, so concurrent readers
     /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
+    // [impl->req~logic.xmp.atomic-pdf-write~1]
     public static void replaceFileAtomically(Path source, Path target) throws IOException {
         try {
             Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
