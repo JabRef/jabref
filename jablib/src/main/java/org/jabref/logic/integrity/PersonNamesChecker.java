@@ -2,6 +2,7 @@ package org.jabref.logic.integrity;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.RemoveBrackets;
@@ -13,6 +14,8 @@ import org.jabref.model.entry.AuthorList;
 import org.jspecify.annotations.Nullable;
 
 public class PersonNamesChecker implements ValueChecker {
+
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     private final BibDatabaseMode bibMode;
 
@@ -27,7 +30,7 @@ public class PersonNamesChecker implements ValueChecker {
         }
 
         // Stored field values may be wrapped over several lines; the wrapping whitespace is not part of the names
-        String normalizedValue = value.trim().replaceAll("\\s+", " ");
+        String normalizedValue = WHITESPACE.matcher(value.trim()).replaceAll(" ");
 
         String valueTrimmedAndLowerCase = normalizedValue.toLowerCase(Locale.ROOT);
         if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
