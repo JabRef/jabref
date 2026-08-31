@@ -64,13 +64,11 @@ jobs:
           git remote add upstream "https://github.com/JabRef/jabref.git" || true
           git fetch upstream main
 
+      # Pushes the merge commit back to the PR branch (the reason this workflow exists).
+      # "$/" resolves the action from this workflow's own commit, not from the workspace -
+      # the workspace holds the PR head (possibly a fork), whose copy of the action must
+      # never run with write credentials.
       - name: Merge main
-        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
+        uses: $/.github/actions/merge-upstream-main
         with:
-          changelog-file: CHANGELOG.md
-          changelog-rebase: true
-          pom-file: 'match-nothing.txt'
-          source-branch: 'upstream/main'
           target-branch: ${{ steps.resolve.outputs.branch }}
-          # Push the merge commit back to the PR branch (the reason this workflow exists).
-          push-changes: true
