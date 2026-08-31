@@ -11,7 +11,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -47,7 +47,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
                                  ? libraryTab.getSelectedEntries()
                                  : libraryTab.getDatabase().getEntries();
         AtomicInteger replacements = new AtomicInteger();
-        libraryTab.getUndoManager().addEdit(Localization.lang("Replace string"), edit ->
+        libraryTab.getUndoManager().addEdit(StandardActions.REPLACE_ALL.getText(), edit ->
                 entries.forEach(entry -> replacements.addAndGet(replaceItem(entry, edit))));
         return replacements.get();
     }
