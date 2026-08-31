@@ -236,7 +236,7 @@ public interface DialogService extends NotificationService {
     /// displayed open dialog is dismissed.
     ///
     /// @param fileDialogConfiguration configuration for the file open dialog
-    /// @param owner the window that owns the file open dialog
+    /// @param owner                   the window that owns the file open dialog
     /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner);
 
