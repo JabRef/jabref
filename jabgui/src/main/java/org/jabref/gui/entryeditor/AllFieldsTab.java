@@ -222,7 +222,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Only set fields get an editor, so an entry without a file field has no
     /// [LinkedFilesEditor] — whose view model is what searches the file directories and
-    /// shows not-yet-linked files as auto-found suggestions (issue #16737). Probe for such
+    /// shows not-yet-linked files as auto-found suggestions
+    /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
     /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
     /// the search and renders the suggestion rows.
     // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
