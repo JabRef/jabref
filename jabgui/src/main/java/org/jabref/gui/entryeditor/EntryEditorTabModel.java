@@ -123,7 +123,7 @@ public sealed interface EntryEditorTabModel
         }
 
         /// The former default tabs "General" and "Abstract" of JabRef 5, for users who prefer these fields
-        /// split off from the "Main" tab (which shows them as well).
+        /// split off from the "Main" tab (which then omits them from its remaining-fields list).
         public static List<CustomizedFieldsTab> classicTabs() {
             List<String> generalFields = Stream.concat(
                                                        Stream.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF,

@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -18,6 +19,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
 
@@ -105,6 +108,17 @@ public class EntryEditorPreferences {
 
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return tabModels;
+    }
+
+    /// All fields the configured custom tabs show for the given entry. The Main tab omits these from its
+    /// remaining-fields list (fields defined by the entry type always stay in the Main tab), mirroring the
+    /// JabRef 5 "Other fields" tab.
+    public Set<Field> getFieldsOnCustomTabs(BibEntry entry) {
+        return tabModels.stream()
+                        .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                        .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                        .flatMap(tab -> tab.resolveFields(entry).stream())
+                        .collect(Collectors.toSet());
     }
 
     public boolean isTabVisible(EntryEditorTabModel.BuiltIn key) {

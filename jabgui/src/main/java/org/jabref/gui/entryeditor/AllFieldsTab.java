@@ -158,7 +158,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
-    /// fields sorted by name, then still-empty user-added fields.
+    /// fields sorted by name (omitting fields shown on a custom tab), then still-empty
+    /// user-added fields.
     // [impl->req~entry-editor.main-tab.single-list~1]
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
@@ -185,7 +186,11 @@ public class AllFieldsTab extends FieldsEditorTab {
                      .filter(setFields::contains)
                      .forEach(fields::add);
         });
+        // As in the JabRef 5 "Other fields" tab: fields shown on a custom tab appear only there, while
+        // fields the entry type defines (possibly required by a publisher) always stay in the Main tab.
+        Set<Field> fieldsOnCustomTabs = guiPreferences.getEntryEditorPreferences().getFieldsOnCustomTabs(entry);
         setFields.stream()
+                 .filter(field -> !fieldsOnCustomTabs.contains(field))
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
