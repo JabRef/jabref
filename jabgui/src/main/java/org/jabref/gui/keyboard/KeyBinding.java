@@ -1,5 +1,7 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Optional;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 
@@ -170,6 +172,14 @@ public enum KeyBinding {
             return defaultMacBinding;
         }
         return defaultBinding;
+    }
+
+    /// Returns the macOS default when `binding` is the former cross-platform default.
+    public Optional<String> getMacDefaultReplacement(String binding) {
+        if (defaultBinding.equals(binding) && !defaultMacBinding.equals(binding)) {
+            return Optional.of(defaultMacBinding);
+        }
+        return Optional.empty();
     }
 
     /// @return The default key binding on macOS, where `alt` plus a letter would insert a special character
