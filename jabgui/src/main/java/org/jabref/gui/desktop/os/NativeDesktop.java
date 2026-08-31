@@ -290,7 +290,14 @@ public abstract class NativeDesktop {
         }
         // A URL must be opened via a URL-aware API: the file-open path runs it through
         // Path.of(...), which collapses "https://" to "https:/" and yields a bogus filesystem path
-        URI uri = URLUtil.createUri(url);
+        URI uri;
+        try {
+            uri = URLUtil.createUri(url);
+        } catch (IllegalArgumentException e) {
+            // Not URI-parseable (e.g. unencoded spaces); the platform openers accept the raw string
+            get().openFile(url, "html", externalApplicationsPreferences);
+            return;
+        }
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             // Desktop.browse may block on some Linux desktops, so keep it off the JavaFX thread
             HeadlessExecutorService.INSTANCE.execute(() -> {
