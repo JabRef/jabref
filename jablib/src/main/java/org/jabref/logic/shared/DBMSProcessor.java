@@ -40,16 +40,16 @@ import org.slf4j.LoggerFactory;
 /// Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
 public class DBMSProcessor {
 
-    // Identifies this processor among all clients connected to the same database.
-    // Deliberately per instance, not static: two synchronizers in the same JVM (two open shared
-    // libraries) must not mistake each other's notifications for their own.
-    private final String processorId = CUID.randomCUID2(8).toString();
-
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
     protected final Connection connection;
 
     protected DatabaseConnectionProperties connectionProperties;
+
+    // Identifies this processor among all clients connected to the same database.
+    // Deliberately per instance, not static: two synchronizers in the same JVM (two open shared
+    // libraries) must not mistake each other's notifications for their own.
+    private final String processorId = CUID.randomCUID2(8).toString();
 
     private final DatabaseConnection dbmsConnection;
 
@@ -63,14 +63,14 @@ public class DBMSProcessor {
     // TODO: We need to migrate data - or ask the user to recreate, #Liquibase
     private int CURRENT_VERSION_DB_STRUCT = 2;
 
-    public String getProcessorId() {
-        return processorId;
-    }
-
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.dbmsConnection = dbmsConnection;
         this.connection = dbmsConnection.getConnection();
         this.connectionProperties = dbmsConnection.getProperties();
+    }
+
+    public String getProcessorId() {
+        return processorId;
     }
 
     /// Scans the database for required tables.
