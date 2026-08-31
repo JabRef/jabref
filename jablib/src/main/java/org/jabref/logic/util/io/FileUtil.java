@@ -7,6 +7,7 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileSystemException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -55,6 +56,8 @@ public class FileUtil {
     private static final String ELLIPSIS = "...";
     private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
     private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();
+    private static final int REPLACE_MOVE_ATTEMPTS = 5;
+    private static final long REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS = 20;
     private static final String CYGDRIVE_PREFIX = "/cygdrive/";
     private static final String MNT_PREFIX = "/mnt/";
     private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile("^/[a-zA-Z]/.*");
@@ -315,6 +318,10 @@ public class FileUtil {
     /// Preferably created in the same directory as `target` so the subsequent move stays on one filesystem
     /// (and thus can be atomic); falls back to the system temporary directory if that directory is not writable.
     public static Path createTempFileForReplacement(Path target) throws IOException {
+        if (Files.isSymbolicLink(target)) {
+            // Stage on the referent's filesystem so the later move can be atomic
+            target = target.toRealPath();
+        }
         Path parent = target.getParent();
         if (parent != null) {
             try {
@@ -328,6 +335,9 @@ public class FileUtil {
 
     /// Replaces `target` with `source`, atomically where the filesystem supports it, so concurrent readers
     /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
+    ///
+    /// Exception: a target with multiple hard links is overwritten in place (non-atomically), since an atomic
+    /// move would detach it from its sibling links — the same trade-off [org.jabref.logic.exporter.AtomicFileOutputStream] makes.
     // [impl->req~logic.xmp.atomic-pdf-write~1]
     public static void replaceFileAtomically(Path source, Path target) throws IOException {
         if (Files.isSymbolicLink(target)) {
@@ -350,12 +360,30 @@ public class FileUtil {
             Files.delete(source);
             return;
         }
-        try {
-            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (AtomicMoveNotSupportedException e) {
-            // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
-            LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
-            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        // On Windows, another process briefly holding the file open (editor, anti-virus, indexer) causes a
+        // sharing violation; retrying with backoff clears virtually all of these collisions.
+        // Same policy as AtomicFileOutputStream#moveTemporaryFileToTargetFile.
+        for (int attempt = 1; ; attempt++) {
+            try {
+                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                return;
+            } catch (AtomicMoveNotSupportedException e) {
+                // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
+                LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
+                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+                return;
+            } catch (FileSystemException e) {
+                if (attempt == REPLACE_MOVE_ATTEMPTS) {
+                    throw e;
+                }
+                LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, REPLACE_MOVE_ATTEMPTS, source, target, e);
+                try {
+                    Thread.sleep(REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
         }
     }
 
