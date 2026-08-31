@@ -759,4 +759,49 @@ class FileUtilTest {
     void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
         assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
     }
+
+    @Test
+        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    void replaceFileAtomicallyReplacesContentAndRemovesSource(@TempDir Path tempDir) throws IOException {
+        Path target = tempDir.resolve("target.txt");
+        Path source = tempDir.resolve("source.txt");
+        Files.writeString(target, "old");
+        Files.writeString(source, "new");
+
+        FileUtil.replaceFileAtomically(source, target);
+
+        assertEquals("new", Files.readString(target));
+        assertFalse(Files.exists(source));
+    }
+
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symbolic links require elevated rights on Windows")
+    @Test
+    void replaceFileAtomicallyKeepsSymbolicLinkIntact(@TempDir Path tempDir) throws IOException {
+        Path realFile = tempDir.resolve("real.txt");
+        Path link = tempDir.resolve("link.txt");
+        Path source = tempDir.resolve("source.txt");
+        Files.writeString(realFile, "old");
+        Files.createSymbolicLink(link, realFile);
+        Files.writeString(source, "new");
+
+        FileUtil.replaceFileAtomically(source, link);
+
+        assertTrue(Files.isSymbolicLink(link));
+        assertEquals("new", Files.readString(realFile));
+    }
+
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Hard-link count check is POSIX-only")
+    @Test
+    void replaceFileAtomicallyKeepsSiblingHardLinksUpdated(@TempDir Path tempDir) throws IOException {
+        Path target = tempDir.resolve("target.txt");
+        Path sibling = tempDir.resolve("sibling.txt");
+        Path source = tempDir.resolve("source.txt");
+        Files.writeString(target, "old");
+        Files.createLink(sibling, target);
+        Files.writeString(source, "new");
+
+        FileUtil.replaceFileAtomically(source, target);
+
+        assertEquals("new", Files.readString(sibling));
+    }
 }

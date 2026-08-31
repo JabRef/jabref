@@ -1,6 +1,7 @@
 package org.jabref.logic.xmp;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -27,7 +28,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -203,7 +206,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    // [utest->req~logic.xmp.atomic-pdf-write~1]
+        // [utest->req~logic.xmp.atomic-pdf-write~1]
     void writeAndRemoveLeaveLoadablePdfAndNoTempFiles(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_atomic.pdf", tempDir);
 
@@ -217,6 +220,22 @@ class XmpUtilWriterTest {
             assertEquals(1, document.getNumberOfPages());
         }
 
+        try (Stream<Path> files = Files.list(tempDir)) {
+            assertEquals(List.of(pdfFile), files.toList());
+        }
+    }
+
+    @Test
+        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    void failedWriteLeavesOriginalUntouchedAndNoTempFiles(@TempDir Path tempDir) throws IOException, URISyntaxException {
+        Path pdfFile = tempDir.resolve("encrypted.pdf");
+        Files.copy(Path.of(XmpUtilWriterTest.class.getResource("/pdfs/encrypted.pdf").toURI()), pdfFile);
+        byte[] originalBytes = Files.readAllBytes(pdfFile);
+
+        assertThrows(IOException.class,
+                () -> new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(olly2018), null));
+
+        assertArrayEquals(originalBytes, Files.readAllBytes(pdfFile));
         try (Stream<Path> files = Files.list(tempDir)) {
             assertEquals(List.of(pdfFile), files.toList());
         }

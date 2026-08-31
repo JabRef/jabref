@@ -297,7 +297,11 @@ public class XmpUtilWriter {
             // Replace only after the document (and thus its read handle on the original) is closed
             FileUtil.replaceFileAtomically(newFile, path);
         } finally {
-            Files.deleteIfExists(newFile);
+            try {
+                Files.deleteIfExists(newFile);
+            } catch (IOException e) {
+                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
+            }
         }
     }
 

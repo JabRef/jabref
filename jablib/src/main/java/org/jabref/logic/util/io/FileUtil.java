@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -329,11 +330,44 @@ public class FileUtil {
     /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
     // [impl->req~logic.xmp.atomic-pdf-write~1]
     public static void replaceFileAtomically(Path source, Path target) throws IOException {
+        if (Files.isSymbolicLink(target)) {
+            // Replace the referent, not the link, so the link stays intact
+            target = target.toRealPath();
+        }
+        if (IS_POSIX_COMPLIANT && Files.exists(target)) {
+            try {
+                Files.setPosixFilePermissions(source, Files.getPosixFilePermissions(target));
+            } catch (IOException | UnsupportedOperationException e) {
+                LOGGER.warn("Could not carry over file permissions of {}", target, e);
+            }
+        }
+        if (hasMultipleHardLinks(target)) {
+            // A move (or Files.copy with REPLACE_EXISTING, which deletes and recreates the target) would detach
+            // the target from its sibling hard links; write into the existing inode to keep them
+            try (OutputStream out = Files.newOutputStream(target)) {
+                Files.copy(source, out);
+            }
+            Files.delete(source);
+            return;
+        }
         try {
             Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (AtomicMoveNotSupportedException e) {
             // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
+            LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
             Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private static boolean hasMultipleHardLinks(Path file) {
+        if (!IS_POSIX_COMPLIANT || !Files.exists(file)) {
+            return false;
+        }
+        try {
+            return ((Number) Files.getAttribute(file, "unix:nlink")).longValue() > 1;
+        } catch (IllegalArgumentException | UnsupportedOperationException | IOException e) {
+            LOGGER.debug("Could not determine hard-link count for {}", file, e);
+            return false;
         }
     }
 

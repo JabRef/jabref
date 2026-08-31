@@ -40,8 +40,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -225,6 +227,20 @@ class EmbeddedBibFilePdfExporterTest {
         try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
             assertEquals(1, document.getNumberOfPages());
         }
+        try (Stream<Path> files = Files.list(tempDir)) {
+            assertEquals(List.of(), files.filter(file -> file.getFileName().toString().endsWith(".tmp")).toList());
+        }
+    }
+
+    @Test
+    void failedExportLeavesOriginalUntouchedAndNoTempFiles() throws IOException {
+        Path corruptPdf = tempDir.resolve("corrupt.pdf");
+        Files.writeString(corruptPdf, "not a pdf");
+        byte[] originalBytes = Files.readAllBytes(corruptPdf);
+
+        assertThrows(IOException.class, () -> exporter.export(databaseContext, corruptPdf, List.of(olly2018)));
+
+        assertArrayEquals(originalBytes, Files.readAllBytes(corruptPdf));
         try (Stream<Path> files = Files.list(tempDir)) {
             assertEquals(List.of(), files.filter(file -> file.getFileName().toString().endsWith(".tmp")).toList());
         }
