@@ -96,7 +96,11 @@ public class DoiResolution implements FulltextFetcher {
 
             List<URL> links = new ArrayList<>();
             for (Element element : hrefElements) {
-                String href = element.attr("abs:href").toLowerCase(Locale.ENGLISH);
+                // Keep the original-case URL for the result and the download; a case-sensitive
+                // path or query (e.g. an id or token) must survive. Match "pdf" case-insensitively
+                // on a lowercased copy only.
+                String href = element.attr("abs:href");
+                String hrefLower = href.toLowerCase(Locale.ENGLISH);
                 String hrefText = element.text().toLowerCase(Locale.ENGLISH);
                 // Only check if pdf is included in the link or inside the text
                 // ACM uses tokens without PDF inside the link
@@ -106,7 +110,7 @@ public class DoiResolution implements FulltextFetcher {
                     return Optional.of(URLUtil.create(href));
                 }
 
-                if (href.contains("pdf") || hrefText.contains("pdf") && new URLDownload(href).isPdf()) {
+                if (hrefLower.contains("pdf") || hrefText.contains("pdf") && new URLDownload(href).isPdf()) {
                     links.add(URLUtil.create(href));
                 }
             }
