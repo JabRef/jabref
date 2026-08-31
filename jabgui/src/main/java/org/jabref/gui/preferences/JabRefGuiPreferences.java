@@ -101,6 +101,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region keybindings - public because needed for pref migration
     public static final String BIND_NAMES = "bindNames";
     public static final String BINDINGS = "bindings";
+    public static final String MACOS_KEY_BINDING_DEFAULTS_MIGRATED = "macOSKeyBindingDefaultsMigrated";
     // endregion
 
     // region column names
