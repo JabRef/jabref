@@ -158,4 +158,10 @@ public class URLUtil {
             return false;
         }
     }
+
+    /// @return true if the URL uses an HTTP or HTTPS scheme
+    public static boolean isHttpUrl(@NonNull URL url) {
+        String protocol = url.getProtocol();
+        return "http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol);
+    }
 }
