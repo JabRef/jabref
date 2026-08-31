@@ -895,7 +895,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
         addEntriesWithFeedback(
-                clipBoardManager.getJabRefClipboardTransferData(),
+                clipBoardManager.getJabRefClipboardTransferData().orElse(null),
                 entriesToAdd,
                 bibDatabaseContext,
                 params -> Localization.lang("Pasted %0 entry(s) to %1", params),
