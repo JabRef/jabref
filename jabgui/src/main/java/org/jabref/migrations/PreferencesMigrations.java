@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -27,7 +26,6 @@ import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.l10n.Language;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
@@ -49,8 +47,27 @@ public class PreferencesMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
-    /// The "Review" default tab (JabRef ≤ 4.x) in every translation it shipped in; the l10n key is gone,
-    /// so the historical translations are inlined (empty translations fell back to English "Review").
+    /// The names the default tabs were stored under, in every translation shipped between JabRef 3.8.2 and
+    /// the 6.0 alphas (harvested from the v3.8.2, v4.3.1, and v5.15 tags plus the current bundles), lower-cased.
+    /// Inlined instead of read from the current bundles: translations change and languages get dropped (the
+    /// "Review" l10n key is already gone), which would silently stop the migration from recognizing names
+    /// stored by old versions. Untranslated languages fell back to the English name.
+    private static final Set<String> LEGACY_GENERAL_TAB_NAMES = Set.of(
+            "algemeen", "allgemein", "allmänt", "genel", "general", "generale", "generellt", "generelt",
+            "geral", "général", "ogólne", "pangkalahatan", "tổng quát", "umum", "yleinen", "γενικά",
+            "общие", "一般", "基本设置", "通用", "일반");
+
+    private static final Set<String> LEGACY_ABSTRACT_TAB_NAMES = Set.of(
+            "abstract", "abstrak", "abstrakt", "resumen", "resumo", "résumé", "sammanfattning",
+            "sammendrag", "sommario", "tóm tắt", "zusammenfassung", "özet", "περίληψη", "абстракція",
+            "резюме", "الملخص", "چکیده", "摘要", "概要", "개요");
+
+    private static final Set<String> LEGACY_COMMENTS_TAB_NAMES = Set.of(
+            "comentarios", "comentários", "commentaires", "commenti", "comments", "komentar",
+            "komentarze", "komento", "kommentare", "kommentarer", "kommentit", "nhận xét",
+            "opmerkingen", "yorumlar", "σχόλια", "коментарі", "комментарии", "تعليقات", "نظرات",
+            "コメント", "注释", "註解", "코멘트");
+
     private static final Set<String> LEGACY_REVIEW_TAB_NAMES = Set.of(
             "review", "gözden geçir", "kommentarer", "mag balig-aral", "periksa ulang", "recensie",
             "remarques", "revisar", "rivedi", "überprüfung", "xem xét lại", "просмотр", "論評", "评论");
@@ -136,29 +153,15 @@ public class PreferencesMigrations {
         // Locale.ROOT: a Turkish UI locale would fold "I" to a dotless "ı" and break the comparison.
         Set<String> stored = fields.stream().map(field -> field.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
         if (stored.equals(Set.of(StandardField.ABSTRACT.getName()))) {
-            return legacyTabNames("Abstract").contains(normalizedName);
+            return LEGACY_ABSTRACT_TAB_NAMES.contains(normalizedName);
         }
         if (stored.equals(Set.of(StandardField.COMMENT.getName()))) {
-            return legacyTabNames("Comments").contains(normalizedName);
+            return LEGACY_COMMENTS_TAB_NAMES.contains(normalizedName);
         }
         if (stored.equals(Set.of(StandardField.REVIEW.getName()))) {
             return LEGACY_REVIEW_TAB_NAMES.contains(normalizedName);
         }
-        return legacyGeneralFieldSets().contains(stored) && legacyTabNames("General").contains(normalizedName);
-    }
-
-    /// The translations of the given tab name in every language JabRef ships, lower-cased.
-    private static Set<String> legacyTabNames(String key) {
-        Set<String> names = new HashSet<>();
-        for (Language language : Language.values()) {
-            Language.convertToSupportedLocale(language).ifPresent(locale -> {
-                ResourceBundle bundle = ResourceBundle.getBundle("l10n/JabRef", locale);
-                if (bundle.containsKey(key)) {
-                    names.add(bundle.getString(key).toLowerCase(Locale.ROOT));
-                }
-            });
-        }
-        return names;
+        return legacyGeneralFieldSets().contains(stored) && LEGACY_GENERAL_TAB_NAMES.contains(normalizedName);
     }
 
     /// The "General" default field set as shipped over time: `comment` variant (JabRef ≤ 4.0), `groups`
