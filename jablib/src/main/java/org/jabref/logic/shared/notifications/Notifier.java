@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -64,7 +64,7 @@ public class Notifier {
         // Content is only sent if the entry's current state still matches the event: a change that
         // did not reach the database (e.g. a refused update overwritten by the following pull, or a
         // type change, which is not readable via getField) must not be propagated as content.
-        if (!Objects.equals(bibEntry.getField(event.getField()).orElse(null), event.getNewValue())) {
+        if (!bibEntry.getField(event.getField()).equals(Optional.ofNullable(event.getNewValue()))) {
             return withoutContent();
         }
         FieldChange payload = new FieldChange(

@@ -131,7 +131,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         UiTaskExecutor.runInJavaFXThread(() -> {
             GroupNodeViewModel currentRoot = rootGroup.get();
             boolean rootReplaced = (currentRoot == null)
-                    || (event.getMetaData().getGroups().orElse(null) != currentRoot.getGroupNode());
+                    || event.getMetaData().getGroups().filter(root -> root == currentRoot.getGroupNode()).isEmpty();
             if (rootReplaced) {
                 refresh();
             }

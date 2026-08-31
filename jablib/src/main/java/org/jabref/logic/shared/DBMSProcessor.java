@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -34,6 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.postgresql.PGConnection;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,7 +185,7 @@ public class DBMSProcessor {
             try {
                 // replace semicolon so we can parse it
                 VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] is not an Integer.");
             }
         } else {
@@ -520,8 +520,7 @@ public class DBMSProcessor {
     /// Removes the shared bibEntry.
     ///
     /// @param bibEntries [BibEntry] to be deleted
-    public void removeEntries(List<BibEntry> bibEntries) {
-        Objects.requireNonNull(bibEntries);
+    public void removeEntries(@NonNull List<BibEntry> bibEntries) {
         if (bibEntries.isEmpty()) {
             return;
         }
@@ -567,9 +566,7 @@ public class DBMSProcessor {
     /// Queries the database for shared entries. Optionally, they are filtered by the given list of sharedIds
     ///
     /// @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
-    public List<BibEntry> getSharedEntries(List<Integer> sharedIDs) {
-        Objects.requireNonNull(sharedIDs);
-
+    public List<BibEntry> getSharedEntries(@NonNull List<Integer> sharedIDs) {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder()

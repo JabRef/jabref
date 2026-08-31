@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -342,7 +341,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         BibEntry bibEntry = localEntry.get();
         Field field = FieldFactory.parseField(fieldChange.field());
-        if (!Objects.equals(bibEntry.getField(field).orElse(null), fieldChange.oldValue())) {
+        if (!bibEntry.getField(field).equals(Optional.ofNullable(fieldChange.oldValue()))) {
             // Local state diverged from the sender's sanity-check value
             pullChanges();
             return;
