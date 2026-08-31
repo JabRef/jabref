@@ -517,23 +517,32 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (selectedIndex < 0) {
             return;
         }
-        int targetTopIndex = Math.max(0, selectedIndex - (getVisibleRowCount() / 2));
-        scrollTo(targetTopIndex);
+        Optional<? extends VirtualFlow<?>> virtualFlow = getVirtualFlow();
+        int visibleRowCount = virtualFlow.map(this::getVisibleRowCount).orElse(0);
+        int targetTopIndex = getCenteredTopIndex(selectedIndex, visibleRowCount, getItems().size());
+        virtualFlow.ifPresentOrElse(
+                flow -> flow.scrollToTop(targetTopIndex),
+                () -> scrollTo(targetTopIndex));
     }
 
     /// Determines how many rows are currently visible in the viewport by inspecting the table's [VirtualFlow].
     /// Returns `0` when the flow is not available yet (for example, before the table has been rendered).
-    private int getVisibleRowCount() {
-        return getVirtualFlow()
-                .map(flow -> {
-                    int firstIndex = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
-                    int lastIndex = Optional.ofNullable(flow.getLastVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
-                    if ((firstIndex < 0) || (lastIndex < 0)) {
-                        return 0;
-                    }
-                    return (lastIndex - firstIndex) + 1;
-                })
-                .orElse(0);
+    private int getVisibleRowCount(VirtualFlow<?> flow) {
+        int firstIndex = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
+        int lastIndex = Optional.ofNullable(flow.getLastVisibleCell()).map(IndexedCell::getIndex).orElse(-1);
+        if ((firstIndex < 0) || (lastIndex < 0)) {
+            return 0;
+        }
+        return (lastIndex - firstIndex) + 1;
+    }
+
+    static int getCenteredTopIndex(int selectedIndex, int visibleRowCount, int itemCount) {
+        if ((visibleRowCount <= 0) || (itemCount <= visibleRowCount)) {
+            return 0;
+        }
+        int highestTopIndex = itemCount - visibleRowCount;
+        int centeredTopIndex = selectedIndex - (visibleRowCount / 2);
+        return Math.clamp(centeredTopIndex, 0, highestTopIndex);
     }
 
     private Optional<? extends VirtualFlow<?>> getVirtualFlow() {
