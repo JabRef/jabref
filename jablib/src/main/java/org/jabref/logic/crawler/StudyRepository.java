@@ -236,8 +236,8 @@ public class StudyRepository {
     /// 1. Update the work and search branch
     /// 2. Persist the results on the search branch
     /// 3. Manually patch the diff of the search branch onto the work branch (as the merging will not work in
-    /// certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
-    /// context sensitive. So we can just prepend the patch without checking the "context" lines.
+    ///    certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
+    ///    context sensitive. So we can just prepend the patch without checking the "context" lines.
     /// 4. Update the remote tracking branches of the work and search branch
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();

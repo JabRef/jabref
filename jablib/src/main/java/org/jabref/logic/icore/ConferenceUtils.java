@@ -165,10 +165,10 @@ public final class ConferenceUtils {
     ///
     /// 1. Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
     /// 2. Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
-    /// regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,
-    /// `3\textsuperscript{rd`} or `17\textsuperscript{th`}).
+    ///    regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,
+    ///    `3\textsuperscript{rd`} or `17\textsuperscript{th`}).
     /// 3. Splits the input into alphanumeric tokens, discarding stopwords found in the `TITLE_STOPWORDS` set
-    /// (which includes months, or other common stopwords like `proceedings`, `papers`, etc.)
+    ///    (which includes months, or other common stopwords like `proceedings`, `papers`, etc.)
     /// 4. Concatenates the remaining tokens into a normalized string without delimiters.
     /// 5. Removes leading false-start tokens like `"ofthe"`, `"of"`, or `"the"`.
     ///

@@ -7,12 +7,12 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Rules:
 /// 1. If the response contains no ``` fences → return the string stripped of
-/// leading/trailing whitespace.
+///    leading/trailing whitespace.
 /// 2. If one or more ``` fences exist → find the *last* complete block,
-/// strip the optional language label on the opening fence (e.g. ````json`,
-/// ````markdown`), and return the inner content trimmed.
+///    strip the optional language label on the opening fence (e.g. ````json`,
+///    ````markdown`), and return the inner content trimmed.
 /// 3. If the last fence is unclosed (no matching closing `````) → treat
-/// everything after the opening fence line as the content.
+///    everything after the opening fence line as the content.
 public final class LlmResponseCleaner {
     private static final String FENCE = "```";
 
