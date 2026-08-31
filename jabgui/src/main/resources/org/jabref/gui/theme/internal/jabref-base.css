@@ -340,6 +340,12 @@
     -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
+/* File found in the file directory but not (yet) linked in the entry */
+.file-row:auto-found {
+    -fx-background-color: -color-warning-subtle;
+    -fx-background-radius: 4px;
+}
+
 /* Sidepane */
 
 .sidePaneComponent {

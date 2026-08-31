@@ -41,6 +41,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
@@ -53,6 +54,8 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -66,6 +69,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -209,6 +213,35 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+        showFileFieldIfAutoLinkFindsFiles(entry);
+    }
+
+    /// Only set fields get an editor, so an entry without a file field has no
+    /// [LinkedFilesEditor] — whose view model is what searches the file directories and
+    /// shows not-yet-linked files as auto-found suggestions (issue #16737). Probe for such
+    /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
+    /// the search and renders the suggestion rows.
+    private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
+        if (editors.containsKey(StandardField.FILE)
+                || !guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabaseContext();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                guiPreferences.getExternalApplicationsPreferences(),
+                guiPreferences.getFilePreferences(),
+                guiPreferences.getAutoLinkPreferences());
+        BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
+                      .onSuccess(foundFiles -> {
+                          if (!foundFiles.isEmpty()
+                                  && (getCurrentEntry() == entry)
+                                  && !editors.containsKey(StandardField.FILE)) {
+                              userAddedFields.add(StandardField.FILE);
+                              rebuildPanel(databaseContext, entry);
+                          }
+                      })
+                      .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 
     @Override
