@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.1")
+    api("com.dlsc.gemsfx:gemsfx:4.4.4")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
