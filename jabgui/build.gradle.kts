@@ -21,6 +21,9 @@ version = providers.gradleProperty("projVersion")
 testModuleInfo {
     requires("org.jabref.testsupport")
 
+    // Local HTTP stub server for tests exercising download code hermetically
+    requires("jdk.httpserver")
+
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
@@ -282,37 +285,20 @@ tasks.named("check") {
     dependsOn(verifyJpackageJavaOptions)
 }
 
-val testJvmArgs = listOf(
-    "-javaagent:${configurations.mockitoAgent.get().asPath}",
-
-    // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
-    "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
-
-    "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-    "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-    "--enable-native-access=javafx.graphics,com.sun.jna"
-
-    // "--add-reads", "org.mockito=java.prefs",
-    // "--add-reads", "org.jabref=wiremock"
-) + useLibericaJdkFullJvmArgs
-
 tasks.test {
-    useJUnitPlatform {
-        excludeTags("FetcherTest")
-    }
-    jvmArgs = testJvmArgs
+    jvmArgs = listOf(
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
-    maxParallelForks = 1
-}
+        // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
 
-// Tests needing both network access and a GUI environment; run in the fetcher-tests CI workflow under xvfb
-tasks.register<Test>("fetcherTest") {
-    group = LifecycleBasePlugin.VERIFICATION_GROUP
-    testClassesDirs = sourceSets.test.get().output.classesDirs
-    classpath = sourceSets.test.get().runtimeClasspath
-    useJUnitPlatform {
-        includeTags("FetcherTest")
-    }
-    jvmArgs = testJvmArgs
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,com.sun.jna"
+
+        // "--add-reads", "org.mockito=java.prefs",
+        // "--add-reads", "org.jabref=wiremock"
+    ) + useLibericaJdkFullJvmArgs
+
     maxParallelForks = 1
 }
