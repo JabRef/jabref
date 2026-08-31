@@ -36,6 +36,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.entry.field.StandardField.PDF;
@@ -291,12 +292,17 @@ public abstract class NativeDesktop {
     ///
     /// @param url            the URL to open
     /// @param onAsyncFailure invoked (from a background thread) when opening fails after this
-    ///                                             method has already returned; synchronous failures throw instead
+    ///                                                                   method has already returned; synchronous failures throw instead
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure) throws IOException {
+        openBrowser(url, externalApplicationsPreferences, onAsyncFailure, get());
+    }
+
+    @VisibleForTesting
+    static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure, NativeDesktop desktop) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
         if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
             // The user configured a custom browser; hand it the URL string unmodified
-            get().openFileWithApplication(url, fileType.get().getOpenWithApplication());
+            desktop.openFileWithApplication(url, fileType.get().getOpenWithApplication());
             return;
         }
         // A URL must be opened via a URL-aware API: the file-open path runs it through
@@ -307,27 +313,37 @@ public abstract class NativeDesktop {
         } catch (IllegalArgumentException e) {
             // Not URI-parseable (e.g. unencoded spaces); the OS URL handlers accept the raw string
             LoggerFactory.getLogger(NativeDesktop.class).debug("Could not parse {} as URI, falling back to the OS URL handler", url, e);
-            get().openUrlWithSystemHandler(url);
+            desktop.openUrlWithSystemHandler(url);
             return;
         }
         // Desktop.browse rejects relative URIs, which createUri also produces; those go to the platform opener
-        if (uri.isAbsolute() && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        if (uri.isAbsolute() && desktop.supportsDesktopBrowse()) {
             // Desktop.browse may block on some Linux desktops, so keep it off the JavaFX thread
             HeadlessExecutorService.INSTANCE.execute(() -> {
                 try {
-                    Desktop.getDesktop().browse(uri);
+                    desktop.desktopBrowse(uri);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).warn("Desktop.browse failed for {}, falling back to the OS URL handler", url, e);
                     try {
-                        get().openUrlWithSystemHandler(url);
+                        desktop.openUrlWithSystemHandler(url);
                     } catch (IOException e2) {
                         onAsyncFailure.accept(e2);
                     }
                 }
             });
         } else {
-            get().openUrlWithSystemHandler(url);
+            desktop.openUrlWithSystemHandler(url);
         }
+    }
+
+    /// Whether the AWT desktop integration can open URLs. Overridable for tests.
+    boolean supportsDesktopBrowse() {
+        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
+    }
+
+    /// Opens the URI via the AWT desktop integration. Overridable for tests.
+    void desktopBrowse(URI uri) throws IOException {
+        Desktop.getDesktop().browse(uri);
     }
 
     public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
