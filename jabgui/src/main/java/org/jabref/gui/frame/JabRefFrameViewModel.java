@@ -316,6 +316,7 @@ public class JabRefFrameViewModel {
     /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
     ///
     /// Paths:
+    ///
     ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
     ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
     ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)

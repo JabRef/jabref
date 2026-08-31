@@ -90,9 +90,10 @@ public abstract class Importer implements Comparable<Importer> {
     ///
     /// If your format is binary-based (PDF, ZIP-based, or others), then you should not solely override this method.
     /// For binary formats do this:
-    /// 1. Throw {@link UnsupportedOperationException} in this method.
-    /// 2. Override the method {@link Importer#importDatabase(Path)}.
-    /// Example of this workaround is in: {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}.
+    ///
+    /// 1. Throw [UnsupportedOperationException] in this method.
+    /// 2. Override the method [Importer#importDatabase(Path)].
+    /// Example of this workaround is in: [org.jabref.logic.importer.fileformat.pdf.PdfImporter].
     ///
     /// @param input the input to read from - there is no reset done. "BufferedReader" is only a convenience for the implementation
     public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
@@ -156,7 +157,7 @@ public abstract class Importer implements Comparable<Importer> {
     /// Parse the database in the specified string.
     ///
     /// Importer having the facilities to detect the correct encoding of a string should overwrite this method, determine
-    /// the encoding and then call {@link #importDatabase(BufferedReader)}.
+    /// the encoding and then call [#importDatabase(BufferedReader)].
     ///
     /// @param data the string which should be imported
     /// @return the parsed result
@@ -205,14 +206,14 @@ public abstract class Importer implements Comparable<Importer> {
     /// -
     /// what kind of entries from what sources and based on what specification it is able to import
     /// -
-    /// by what criteria it {@link #isRecognizedFormat(BufferedReader)} recognizes an import format
+    /// by what criteria it [#isRecognizedFormat(BufferedReader)] recognizes an import format
     ///
     /// @return description of the import format
     public abstract String getDescription();
 
     /// Returns the type of files that this importer can read
     ///
-    /// @return {@link FileType} corresponding to the importer
+    /// @return [FileType] corresponding to the importer
     public abstract FileType getFileType();
 
     @Override

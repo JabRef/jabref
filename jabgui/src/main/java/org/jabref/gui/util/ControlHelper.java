@@ -43,7 +43,7 @@ public class ControlHelper {
         return button;
     }
 
-    /// A {@link #labelledIconButton} forced to `prefWidth`, so that the buttons of one row come out
+    /// A [#labelledIconButton] forced to `prefWidth`, so that the buttons of one row come out
     /// uniformly wide however long their individual captions are.
     public static Button labelledIconButton(JabRefIcon icon, String text, double prefWidth, Runnable action) {
         Button button = labelledIconButton(icon, text, action);

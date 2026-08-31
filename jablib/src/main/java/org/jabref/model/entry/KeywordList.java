@@ -50,7 +50,7 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
-    /// Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+    /// Parses the keyword list and uses [Keyword#DEFAULT_HIERARCHICAL_DELIMITER] as hierarchical delimiter.
     ///
     /// @param keywordString a String of keywordChains
     /// @param delimiter     The delimiter used for separating the keywords
