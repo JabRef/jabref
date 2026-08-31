@@ -23,6 +23,8 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -281,7 +283,28 @@ public abstract class NativeDesktop {
     /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
-        openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
+        if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
+            // The user configured a custom browser; hand it the URL string unmodified
+            get().openFileWithApplication(url, fileType.get().getOpenWithApplication());
+            return;
+        }
+        // A URL must be opened via a URL-aware API: the file-open path runs it through
+        // Path.of(...), which collapses "https://" to "https:/" and yields a bogus filesystem path
+        URI uri = URLUtil.createUri(url);
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            // Desktop.browse may block on some Linux desktops, so keep it off the JavaFX thread
+            HeadlessExecutorService.INSTANCE.execute(() -> {
+                try {
+                    Desktop.getDesktop().browse(uri);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e);
+                }
+            });
+        } else {
+            // Headless or BROWSE unsupported: the platform openers pass the string through to
+            // xdg-open/open/explorer, which are URL-aware
+            get().openFile(url, "html", externalApplicationsPreferences);
+        }
     }
 
     public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {

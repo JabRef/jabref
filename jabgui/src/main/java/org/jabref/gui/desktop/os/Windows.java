@@ -64,7 +64,8 @@ public class Windows extends NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder(Path.of(application).toString(), Path.of(filePath).toString()).start();
+        // filePath may be a URL; Path.of would throw on query characters and mangle the scheme
+        new ProcessBuilder(Path.of(application).toString(), filePath).start();
     }
 
     @Override
