@@ -174,7 +174,7 @@ public class FulltextFetchers {
         };
     }
 
-    /// Rejects local `file:` URLs unless the fetcher is explicitly trusted via {@link FileSchemeFulltextFetcher}.
+    /// Rejects local `file:` URLs unless the fetcher is explicitly trusted via [FileSchemeFulltextFetcher].
     /// A `file:` result triggers a local file read and the GUI move/attach pipeline, so an untrusted
     /// fetcher (e.g. one parsing remote HTML) must not be able to point JabRef at an arbitrary file.
     private static boolean isAllowedScheme(FulltextFetcher fetcher, URL url) {
