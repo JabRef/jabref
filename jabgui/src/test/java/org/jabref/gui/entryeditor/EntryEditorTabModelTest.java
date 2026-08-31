@@ -62,5 +62,7 @@ class EntryEditorTabModelTest {
         assertEquals("%General", general.name());
         assertEquals(Localization.lang("General"), general.displayName());
         assertEquals("General", new EntryEditorTabModel.CustomizedFieldsTab("General", List.of()).displayName());
+        // a user-typed %-prefixed name is not a classic-tab key and stays verbatim
+        assertEquals("%My tab", new EntryEditorTabModel.CustomizedFieldsTab("%My tab", List.of()).displayName());
     }
 }

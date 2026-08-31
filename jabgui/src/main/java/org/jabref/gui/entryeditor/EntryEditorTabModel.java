@@ -138,11 +138,15 @@ public sealed interface EntryEditorTabModel
                     new CustomizedFieldsTab(LOCALIZED_NAME_PREFIX + "Comments", List.of(StandardField.COMMENT.getName(), "comment-.*")));
         }
 
+        /// The localization keys the classic tabs are stored under; only these are translated on display.
+        private static final Set<String> CLASSIC_TAB_KEYS = Set.of("General", "Abstract", "Comments");
+
         /// The name shown in the UI. Names of the [#classicTabs()] are stored as `%<localization key>` and
-        /// translated here, so they follow a language change; user-typed names are shown as stored.
+        /// translated here, so they follow a language change. Any other name — a `%`-prefixed one a user
+        /// typed included — is shown verbatim, so the prefix carries no meaning outside [#CLASSIC_TAB_KEYS].
         @ADR(23)
         public static String localizedName(String name) {
-            if (!name.startsWith(LOCALIZED_NAME_PREFIX)) {
+            if (!name.startsWith(LOCALIZED_NAME_PREFIX) || !CLASSIC_TAB_KEYS.contains(name.substring(1))) {
                 return name;
             }
             ResourceBundle messages = Localization.getMessages();
