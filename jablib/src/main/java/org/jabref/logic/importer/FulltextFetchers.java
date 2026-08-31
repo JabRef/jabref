@@ -102,7 +102,33 @@ public class FulltextFetchers {
             findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, fetchers), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        // Regular fetchers are cheap HTTP lookups and race in parallel. Fallback fetchers
+        // (e.g. the browser-extension companion, which opens a browser tab) are consulted
+        // only when the regular fetchers find nothing, so the browser session is reserved
+        // for PDFs JabRef cannot download directly.
+        Set<FulltextFetcher> primaryFetchers = new HashSet<>();
+        Set<FulltextFetcher> fallbackFetchers = new HashSet<>();
+        for (FulltextFetcher fetcher : fetchers) {
+            if (fetcher instanceof FallbackFulltextFetcher) {
+                fallbackFetchers.add(fetcher);
+            } else {
+                primaryFetchers.add(fetcher);
+            }
+        }
+
+        Optional<FetcherResult> result = race(clonedEntry, primaryFetchers);
+        if (result.isEmpty()) {
+            result = race(clonedEntry, fallbackFetchers);
+        }
+        return result;
+    }
+
+    /// Runs the given fetchers in parallel and returns the result of the most trusted fetcher, if any.
+    private Optional<FetcherResult> race(BibEntry entry, Set<FulltextFetcher> fetchersToRace) {
+        if (fetchersToRace.isEmpty()) {
+            return Optional.empty();
+        }
+        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(entry, fetchersToRace), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
         return result.stream()
                      .map(FulltextFetchers::getResults)

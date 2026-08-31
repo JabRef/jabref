@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.logic.util.URLUtil;
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +38,13 @@ class FulltextFetchersTest {
 
     /// A fetcher trusted to return local `file:` URLs (marker interface).
     private interface TrustedFileFetcher extends FileSchemeFulltextFetcher {
+        default TrustLevel getTrustLevel() {
+            return TrustLevel.PUBLISHER;
+        }
+    }
+
+    /// A fallback fetcher that is also trusted to return local `file:` URLs (marker interfaces).
+    private interface FallbackFileFetcher extends FallbackFulltextFetcher, FileSchemeFulltextFetcher {
         default TrustLevel getTrustLevel() {
             return TrustLevel.PUBLISHER;
         }
@@ -124,5 +134,41 @@ class FulltextFetchersTest {
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(expectedHeaders), fetchers.findFullTextPDF(entry).map(FetcherResult::headers));
+    }
+
+    @Test
+    void fallbackFetcherNotConsultedWhenRegularFetcherFindsPdf(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("primary.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+        AtomicBoolean fallbackCalled = new AtomicBoolean(false);
+
+        TrustedFileFetcher primary = e -> Optional.of(fileUrl);
+        FallbackFileFetcher fallback = e -> {
+            fallbackCalled.set(true);
+            return Optional.of(fileUrl);
+        };
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(primary, fallback));
+
+        assertEquals(Optional.of(fileUrl), fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+        assertFalse(fallbackCalled.get(), "Fallback fetcher must not run when a regular fetcher already found a PDF");
+    }
+
+    @Test
+    void fallbackFetcherConsultedWhenRegularFetchersFindNothing(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("fallback.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+        AtomicBoolean fallbackCalled = new AtomicBoolean(false);
+
+        FulltextFetcherWithTrustLevel primary = e -> Optional.empty();
+        FallbackFileFetcher fallback = e -> {
+            fallbackCalled.set(true);
+            return Optional.of(fileUrl);
+        };
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(primary, fallback));
+
+        assertEquals(Optional.of(fileUrl), fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+        assertTrue(fallbackCalled.get(), "Fallback fetcher must run when the regular fetchers find nothing");
     }
 }

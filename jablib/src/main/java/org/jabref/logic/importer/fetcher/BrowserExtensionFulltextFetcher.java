@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import org.jabref.logic.importer.FallbackFulltextFetcher;
 import org.jabref.logic.importer.FileSchemeFulltextFetcher;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /// soft miss — there is no retry and no polling. See
 /// `docs/requirements/browser-extension-fulltext.md` for the wire spec.
 @NullMarked
-public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetcher {
+public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetcher, FallbackFulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserExtensionFulltextFetcher.class);
     private static final Gson GSON = new Gson();
