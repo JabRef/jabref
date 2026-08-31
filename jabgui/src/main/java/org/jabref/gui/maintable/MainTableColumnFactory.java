@@ -151,7 +151,7 @@ public class MainTableColumnFactory {
 
     /// Creates a column for the match category.
     /// This column is always hidden but is used for sorting the table
-    /// in the floating mode. The order of the {@link MatchCategory} enum constants
+    /// in the floating mode. The order of the [MatchCategory] enum constants
     /// determines the sorting order.
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
@@ -286,7 +286,7 @@ public class MainTableColumnFactory {
         return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
-    /// Creates a column that displays a {@link SpecialField}
+    /// Creates a column that displays a [SpecialField]
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
         return new SpecialFieldColumn(columnModel, preferences, undoManager);
     }
@@ -297,8 +297,7 @@ public class MainTableColumnFactory {
         return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
-    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
-    /// #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
+    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like [#createExtraFileColumn(MainTableColumnModel)] createExtraFileColumn} does, this creates one single column collecting all file links.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,

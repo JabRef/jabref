@@ -103,7 +103,7 @@ public class ConferenceRepository {
     /// @param bookTitle the string to search, must not be `null`
     /// @return an `Optional` conference entry, if found
     /// or `Optional.empty()` if no conference entry is found
-    /// @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
+    /// @implNote see [ConferenceRepository#fuzzySearchConferenceTitles] for more details on matching
     public Optional<ConferenceEntry> getConferenceFromBookTitle(@NonNull String bookTitle) {
         String query = bookTitle.strip().toLowerCase();
         ConferenceEntry conference;
@@ -144,9 +144,9 @@ public class ConferenceRepository {
     }
 
     /// Searches the conference data for the given query string using a combination of Levenshtein similarity
-    /// {@link StringSimilarity#similarity} and Longest Common Substring (LCS) similarity {@link StringSimilarity#LCSSimilarity}.
+    /// [StringSimilarity#similarity] and Longest Common Substring (LCS) similarity [StringSimilarity#LCSSimilarity].
     ///
-    /// The input query is first fed through the normalizer at {@link ConferenceUtils#normalize} which strips away much of the
+    /// The input query is first fed through the normalizer at [ConferenceUtils#normalize] which strips away much of the
     /// noise.
     ///
     ///

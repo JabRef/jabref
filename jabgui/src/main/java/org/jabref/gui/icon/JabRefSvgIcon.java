@@ -134,7 +134,7 @@ public class JabRefSvgIcon extends SvgNode {
         getStyleClass().addAll("glyph-icon", "ikonli-font-icon");
     }
 
-    /// Applies the CSS-resolved size, preferring an explicit {@code -fx-icon-size} over an em {@code -fx-font-size}.
+    /// Applies the CSS-resolved size, preferring an explicit `-fx-icon-size` over an em `-fx-font-size`.
     /// When neither is set by CSS, the constructor/programmatic size is left untouched.
     private void updateSize() {
         Number size = iconSize.get() != null ? iconSize.get() : glyphSize.get() != null ? glyphSize.get() : fontSize.get();
@@ -144,7 +144,7 @@ public class JabRefSvgIcon extends SvgNode {
     }
 
     /// Sets the icon color directly (user origin). Overrides any color coming from a stylesheet, so it is the
-    /// right entry point for an explicit, programmatic color (e.g. {@link SvgIcon#withColor}).
+    /// right entry point for an explicit, programmatic color (e.g. [SvgIcon#withColor]).
     public void setIconColor(Paint color) {
         iconColor.set(color);
     }

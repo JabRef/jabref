@@ -178,7 +178,7 @@ public class SemanticConflictDetector {
     ///
     /// @param base   The base version of the database.
     /// @param remote The remote version to be merged.
-    /// @return A {@link MergePlan} describing how to update the local copy with remote changes.
+    /// @return A [MergePlan] describing how to update the local copy with remote changes.
     public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         EntryTriples triples = EntryTriples.from(base, local, remote);
 

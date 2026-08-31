@@ -22,9 +22,9 @@ public class BibEntryView {
     public static final EnumSet<StandardEntryType> CROSS_REF_TYPES = EnumSet.of(StandardEntryType.InBook,
             StandardEntryType.InProceedings, StandardEntryType.InCollection);
 
-    /// Creates a layout for a given {@link BibEntry} to be displayed in a List
+    /// Creates a layout for a given [BibEntry] to be displayed in a List
     ///
-    /// @param entry {@link BibEntry} to display
+    /// @param entry [BibEntry] to display
     /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
@@ -57,10 +57,10 @@ public class BibEntryView {
         return entryContainer;
     }
 
-    /// Gets the correct Icon for a given {@link EntryType}
+    /// Gets the correct Icon for a given [EntryType]
     ///
-    /// @param type {@link EntryType} to get Icon for
-    /// @return Icon corresponding to {@link EntryType}
+    /// @param type [EntryType] to get Icon for
+    /// @return Icon corresponding to [EntryType]
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
         if (type instanceof StandardEntryType standardEntry) {
             if (standardEntry == StandardEntryType.Book) {

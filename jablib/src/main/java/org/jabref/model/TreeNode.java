@@ -423,7 +423,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         }
     }
 
-    /// Sorts the list of children according to the order induced by the specified {@link Comparator}.
+    /// Sorts the list of children according to the order induced by the specified [Comparator].
     ///
     /// All children must be mutually comparable using the specified comparator
     /// (that is, `c.compare(e1, e2)` must not throw a `ClassCastException`

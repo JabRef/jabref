@@ -11,10 +11,10 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 
-/// Converts {@link BibWarning}s into {@link IntegrityMessage}s for integration with the existing integrity check UI.
+/// Converts [BibWarning]s into [IntegrityMessage]s for integration with the existing integrity check UI.
 ///
 /// Notes:
-/// - The current IntegrityMessage interface expects a {@link BibEntry} and a {@link Field},
+/// - The current IntegrityMessage interface expects a [BibEntry] and a [Field],
 ///   but .blg warnings come from a different source and may not include a field.
 /// - For now, we map missing fields to a placeholder (InternalField.KEY_FIELD) to make it compatible with the UI.
 /// - This is a minimal MVP solution to reuse the Integrity tab without changing the UI structure.

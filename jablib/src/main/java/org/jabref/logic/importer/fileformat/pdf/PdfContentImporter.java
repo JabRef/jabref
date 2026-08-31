@@ -41,10 +41,10 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 ///
 /// Currently, Springer, and IEEE formats are supported.
 ///
-/// In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
-/// please see {@link RuleBasedBibliographyPdfImporter}.
+/// In case one wants to have a list of [BibEntry] matching the bibliography of a PDF,
+/// please see [RuleBasedBibliographyPdfImporter].
 ///
-/// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
+/// If several PDF importers should be tried, use [PdfMergeMetadataImporter].
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");

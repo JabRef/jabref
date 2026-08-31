@@ -203,7 +203,7 @@ public class AutoSetFileLinksUtil {
 
     /// Scans for missing files which should be linked to the given entry.
     ///
-    /// Related: {@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} for scanning files missing at all entries
+    /// Related: [org.jabref.gui.externalfiles.UnlinkedFilesCrawler] for scanning files missing at all entries
     ///
     /// NOTE:
     /// 1. This method does not check if the file is already linked to another entry.

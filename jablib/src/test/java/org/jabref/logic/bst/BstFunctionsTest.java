@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// For additional tests see for
 ///
-/// -  purify: {@link org.jabref.logic.bst.util.BstPurifierTest}
-/// -  width: {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
-/// -  format.name: {@link org.jabref.logic.bst.util.BstNameFormatterTest}
-/// -  change.case: {@link org.jabref.logic.bst.util.BstCaseChangersTest}
-/// -  prefix: {@link org.jabref.logic.bst.util.BstTextPrefixerTest}
+/// -  purify: [org.jabref.logic.bst.util.BstPurifierTest]
+/// -  width: [org.jabref.logic.bst.util.BstWidthCalculatorTest]
+/// -  format.name: [org.jabref.logic.bst.util.BstNameFormatterTest]
+/// -  change.case: [org.jabref.logic.bst.util.BstCaseChangersTest]
+/// -  prefix: [org.jabref.logic.bst.util.BstTextPrefixerTest]
 ///
 class BstFunctionsTest {
     @Test
@@ -593,7 +593,7 @@ class BstFunctionsTest {
         assertEquals(0, vm.getContext().stack().size());
     }
 
-    /// See also {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
+    /// See also [org.jabref.logic.bst.util.BstWidthCalculatorTest]
     @Test
     void width() throws RecognitionException {
         BstVM vm = new BstVM("""

@@ -357,7 +357,7 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
-    /// Returns a list of authors separated with "and". The first author is formatted with {@link Author#getFamilyGiven(boolean)} and each subsequent author is formatted with {@link Author#getGivenFamily(boolean)}.
+    /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
     ///
     /// @param abbreviate first names.
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
