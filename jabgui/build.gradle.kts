@@ -1,5 +1,6 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.EmbeddedPostgresBinaries
+import org.jabref.gradle.VerifyJpackageJavaOptions
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -257,9 +258,28 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(binary.moduleName)
         // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
-        javaOptions.add("--add-modules=${binary.moduleName}")
+        // add will siply replace the existing args!
+        javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
+}
+
+val verifyJpackageJavaOptions = tasks.register<VerifyJpackageJavaOptions>("verifyJpackageJavaOptions") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Verifies that packaged launchers retain application JVM options"
+    mismatches.set(embeddedPostgresBinaryByJpackageTask.mapNotNull { (taskName, binary) ->
+        val actualOptions = tasks.named<Jpackage>(taskName).get().javaOptions.get()
+        val expectedOptions = application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}"
+        if (actualOptions == expectedOptions) {
+            null
+        } else {
+            "$taskName expected $expectedOptions, but got $actualOptions"
+        }
+    })
+}
+
+tasks.named("check") {
+    dependsOn(verifyJpackageJavaOptions)
 }
 
 tasks.test {

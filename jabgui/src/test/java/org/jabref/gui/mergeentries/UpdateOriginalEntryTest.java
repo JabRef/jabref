@@ -3,7 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -24,7 +24,7 @@ class UpdateOriginalEntryTest {
 
     private BibEntry originalEntry;
     private DialogService dialogService;
-    private UndoManager undoManager;
+    private JabRefUndoManager undoManager;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,7 @@ class UpdateOriginalEntryTest {
                 .withField(StandardField.TITLE, "Original title")
                 .withField(StandardField.YEAR, "2020");
         dialogService = mock(DialogService.class);
-        undoManager = new UndoManager();
+        undoManager = new JabRefUndoManager();
     }
 
     @Test

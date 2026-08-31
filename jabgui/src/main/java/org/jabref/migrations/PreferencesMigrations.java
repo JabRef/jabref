@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -56,6 +57,7 @@ public class PreferencesMigrations {
         upgradeImportFileAndDirePatterns(preferences);
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
+        upgradeMacKeyBindingDefaults(preferences, OS.OS_X);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
@@ -301,6 +303,36 @@ public class PreferencesMigrations {
         List<String> keys = new ArrayList<>(prefs.getStringList(JabRefGuiPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefGuiPreferences.BINDINGS, keys);
+    }
+
+    /// Updates unchanged key bindings in snapshots persisted before macOS-specific defaults were introduced.
+    static void upgradeMacKeyBindingDefaults(JabRefCliPreferences prefs, boolean isMacOs) {
+        if (!isMacOs || prefs.getBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, false)) {
+            return;
+        }
+
+        List<String> bindNames = prefs.getStringList(JabRefGuiPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefGuiPreferences.BINDINGS);
+        if (bindNames.isEmpty() || bindNames.size() != bindings.size()) {
+            return;
+        }
+
+        List<String> migratedBindings = new ArrayList<>(bindings);
+        for (int i = 0; i < bindNames.size(); i++) {
+            String bindingName = bindNames.get(i);
+            String persistedBinding = bindings.get(i);
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                if (keyBinding.getConstant().equals(bindingName)) {
+                    int index = i;
+                    keyBinding.getMacDefaultReplacement(persistedBinding)
+                              .ifPresent(replacement -> migratedBindings.set(index, replacement));
+                    break;
+                }
+            }
+        }
+
+        prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
+        prefs.putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {

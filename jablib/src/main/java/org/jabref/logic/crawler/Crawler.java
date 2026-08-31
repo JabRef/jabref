@@ -55,6 +55,7 @@ public class Crawler {
     ///
     /// The whole process works as follows:
     /// <ol>
+    ///
     /// - Then the search is executed
     /// - The repository changes to the search branch
     /// - Afterwards, the results are persisted on the search branch.
