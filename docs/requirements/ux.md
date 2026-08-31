@@ -82,6 +82,13 @@ Git push must report a rejected remote update to the user.
 
 Needs: impl
 
+## Git commit previews changes in the current library
+`req~ux.git-commit.preview-current-library~1`
+
+Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
+
+Needs: impl
+
 ## Committing does not depend on the remote
 `req~ux.git-commit.remote-independent~1`
 
@@ -110,6 +117,15 @@ When JabRef saves a library, it must keep observing filesystem changes, defer ch
 Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
 
 Needs: impl
+
+### Committing a library that is not under version control
+`req~ux.git-commit.initialize-repository~1`
+
+When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.
+Only the library file and the generated `.gitignore` are committed, so unrelated files in that directory stay untracked.
+Declining the offer must leave the directory unchanged, because the user may want to clone an existing repository into it instead.
+
+Needs: impl, utest
 
 ### Deleting many entries keeps the main table responsive
 `req~ux.large-library.bulk-entry-removal~1`

@@ -12,19 +12,21 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
+import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -40,7 +42,8 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final GuiPreferences guiPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final StringProperty commitMessage = new SimpleStringProperty("");
     private final BooleanProperty amend = new SimpleBooleanProperty(false);
@@ -52,12 +55,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             DialogService dialogService,
             TaskExecutor taskExecutor,
             GitHandlerRegistry gitHandlerRegistry,
-            GuiPreferences guiPreferences) {
+            ImportFormatPreferences importFormatPreferences,
+            FileUpdateMonitor fileUpdateMonitor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
-        this.guiPreferences = guiPreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
                 commitMessage,
@@ -84,7 +89,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                         dialogService.showErrorDialogAndWait(
                                 ex instanceof PushFailedException
                                 ? Localization.lang("Git Push Failed")
-                                : Localization.lang("Git Commit Failed"),
+                                : Localization.lang("Git commit failed"),
                                 ex.getMessage(),
                                 ex
                         )
@@ -129,29 +134,32 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return StringUtil.isBlank(message) ? Localization.lang("Update references") : message;
     }
 
+    public BackgroundTask<DiffDatabases> diffTask() {
+        return BackgroundTask.wrap(this::computeDiffDatabases);
+    }
+
+    private DiffDatabases computeDiffDatabases() throws JabRefException, IOException {
+        TrackedFile trackedFile = getTrackedBibFile();
+        Path repositoryRoot = trackedFile.gitHandler().getRepositoryPathAsFile().toPath();
+        Path relativeFilePath = repositoryRoot.relativize(trackedFile.bibFilePath());
+
+        BibDatabaseContext headDatabase = GitDiffChecker.checkDiffAgainstLastCommit(
+                trackedFile.gitHandler(), relativeFilePath, importFormatPreferences, fileUpdateMonitor);
+        BibDatabaseContext workingTreeDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(
+                trackedFile.bibFilePath(), importFormatPreferences, fileUpdateMonitor);
+        return new DiffDatabases(headDatabase, workingTreeDatabase);
+    }
+
+    public record DiffDatabases(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase) {
+    }
+
     private void doCommit() throws JabRefException, GitAPIException, IOException {
         commitOn(resolveRepository());
     }
 
     private ResolvedRepository resolveRepository() throws JabRefException {
-        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
-        if (activeDatabaseOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("No library open"));
-        }
-
-        BibDatabaseContext dbContext = activeDatabaseOpt.get();
-        Optional<Path> bibFilePathOpt = dbContext.getDatabasePath();
-        if (bibFilePathOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
-        }
-
-        Path bibFilePath = bibFilePathOpt.get();
-        Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
-        if (repoRootOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
-        }
-
-        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());
+        TrackedFile trackedFile = getTrackedBibFile();
+        GitHandler gitHandler = trackedFile.gitHandler();
 
         GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
         if (!status.tracking()) {
@@ -161,7 +169,10 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
         }
 
-        return new ResolvedRepository(dbContext, bibFilePath, gitHandler);
+        // getTrackedBibFile() already ensured an active database exists.
+        BibDatabaseContext dbContext = stateManager.getActiveDatabase()
+                                                   .orElseThrow(() -> new JabRefException(Localization.lang("No library open")));
+        return new ResolvedRepository(dbContext, trackedFile.bibFilePath(), gitHandler);
     }
 
     private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
@@ -177,7 +188,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
         try {
-            PushResult result = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry)
+            PushResult result = GitSyncService.create(importFormatPreferences, gitHandlerRegistry)
                                               .push(repository.database(), repository.bibFilePath());
             if (result.noop() && !committedNow) {
                 return CommitOutcome.NOTHING_TO_PUSH;
@@ -186,6 +197,30 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         } catch (JabRefException | GitAPIException | IOException e) {
             throw new PushFailedException(e);
         }
+    }
+
+    private TrackedFile getTrackedBibFile() throws JabRefException {
+        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
+        if (activeDatabaseOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("No library open"));
+        }
+
+        Optional<Path> bibFilePathOpt = activeDatabaseOpt.get().getDatabasePath();
+        if (bibFilePathOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
+        }
+
+        Path bibFilePath = GitHandler.resolveToRealPath(bibFilePathOpt.get());
+        Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
+        if (repoRootOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
+        }
+
+        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());
+        return new TrackedFile(gitHandler, bibFilePath);
+    }
+
+    private record TrackedFile(GitHandler gitHandler, Path bibFilePath) {
     }
 
     public StringProperty commitMessageProperty() {

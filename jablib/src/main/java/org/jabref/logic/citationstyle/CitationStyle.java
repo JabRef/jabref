@@ -50,46 +50,6 @@ public class CitationStyle implements OOStyle {
         this.isInternalStyle = isInternalStyle;
     }
 
-    public CitationStyle(@NonNull String filePath,
-                         @NonNull String title,
-                         @NonNull String shortTitle,
-                         boolean isNumericStyle,
-                         boolean hasBibliography,
-                         boolean usesHangingIndent,
-                         @NonNull String source,
-                         boolean isInternalStyle) {
-        this(
-                filePath,
-                "",                 // styleId
-                "",                 // styleClass
-                title,
-                shortTitle,
-                isNumericStyle,
-                hasBibliography,
-                false,              // bibliography sort order metadata is only available for parsed CSL sources
-                usesHangingIndent,
-                source,
-                isInternalStyle);
-    }
-
-    /// Creates a new citation style with an auto-determined internal/external state.
-    public CitationStyle(@NonNull String filePath,
-                         @NonNull String title,
-                         @NonNull String shortTitle,
-                         boolean isNumericStyle,
-                         boolean hasBibliography,
-                         boolean usesHangingIndent,
-                         @NonNull String source) {
-        this(filePath,
-                title,
-                shortTitle,
-                isNumericStyle,
-                hasBibliography,
-                usesHangingIndent,
-                source,
-                !Path.of(filePath).isAbsolute());
-    }
-
     public String getTitle() {
         return title;
     }

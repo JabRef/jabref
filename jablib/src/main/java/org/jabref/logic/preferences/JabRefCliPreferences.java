@@ -37,6 +37,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -79,6 +80,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.EngineSelection;
+import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -417,6 +419,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
+    private static final String OCR_LANGUAGES = "ocrLanguages";
     // endregion
 
     // region Push to application preferences
@@ -1754,7 +1757,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
                 getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
-                // Backups should sit in the data directory, because a ".bak" file should survive cache cleanups
+                // Backups should sit in the data directory, because a backup file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, defaultValues.getBackupDirectory()),
                 getBoolean(FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile()),
                 // Use fallback method in case AWT is not initialized in headless (JabKit) mode
@@ -2172,14 +2175,28 @@ public class JabRefCliPreferences implements CliPreferences {
 
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
+        List<OcrLanguage> savedLanguages = getStringList(OCR_LANGUAGES).stream()
+                                                                       .map(OcrLanguage::safeValueOf)
+                                                                       .toList();
+
+        List<OcrLanguage> ocrLanguagesToLoad = savedLanguages.isEmpty()
+                                               ? defaultValues.getOcrLanguages()
+                                               : savedLanguages;
+
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
-                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
+                ocrLanguagesToLoad);
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+
+        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) _ ->
+                putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()
+                                                           .map(OcrLanguage::getCode)
+                                                           .toList()));
 
         return ocrPreferences;
     }

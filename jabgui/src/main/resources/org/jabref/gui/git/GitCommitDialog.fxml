@@ -6,6 +6,8 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
 <DialogPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
@@ -17,6 +19,10 @@
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
+
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="showDiffButton" text="%Show diff" onAction="#showDiff"/>
+            </HBox>
 
             <TextArea fx:id="commitMessage"
                       prefRowCount="6"

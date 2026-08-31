@@ -24,7 +24,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -53,7 +52,31 @@ public class BackupUIManager {
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                switch (result) {
+                    case BackupManager.RestoreResult.Empty(
+                            Path backupPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
+                    case BackupManager.RestoreResult.Failed(
+                            Path backupPath,
+                            IOException exception
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("Could not restore the backup file '%0'.", backupPath),
+                                    exception);
+                    case BackupManager.RestoreResult.NotFound(
+                            Path missingOriginalPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
+                    case BackupManager.RestoreResult.Restored _ -> {
+                    }
+                }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
@@ -85,7 +108,7 @@ public class BackupUIManager {
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
