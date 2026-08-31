@@ -6,7 +6,7 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.NullMarked;
 
-/// "Twin" interface: {@link org.jabref.logic.util.FileType}
+/// "Twin" interface: [org.jabref.logic.util.FileType]
 @NullMarked
 public interface ExternalFileType {
     String getName();

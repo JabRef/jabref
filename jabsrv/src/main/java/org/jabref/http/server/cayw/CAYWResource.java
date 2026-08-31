@@ -195,6 +195,7 @@ public class CAYWResource {
     }
 
     /// Filter strategy:
+    ///
     /// - Empty input → return everything.
     /// - Valid Search.g4 expression → grammar-based filter via [InMemoryLibrarySearcher].
     /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain

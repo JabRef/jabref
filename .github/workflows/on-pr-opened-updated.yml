@@ -96,8 +96,8 @@ jobs:
           done
 
       # In case of a conflict, try to resolve it automatically by merging main:
-      # maven-flow/merge resolves conflicts in CHANGELOG.md semantically and lets "git merge"
-      # fail on any other conflict - then, nothing is pushed.
+      # the changelog merge driver resolves conflicts in CHANGELOG.md semantically and lets
+      # "git merge" fail on any other conflict - then, nothing is pushed.
       # Thus, a merge commit is pushed if and only if CHANGELOG.md is the only conflicting file.
       # Pushing is possible for branches in JabRef/jabref and for forks allowing maintainer edits.
       # All steps use continue-on-error; if anything fails, the conflict is reported as before.
@@ -121,30 +121,19 @@ jobs:
           set -ex
           git remote add upstream "https://github.com/JabRef/jabref.git" || true
           git fetch upstream main
-      # ubuntu-slim does not provide Java, which is required by the changelog merge driver
-      - name: Setup Java
-        id: setup_java
-        if: steps.fetch_upstream.outcome == 'success'
-        continue-on-error: true
-        uses: actions/setup-java@v6
-        with:
-          distribution: 'temurin'
-          java-version: '25'
+      # Pushes the resolved merge back to the PR branch. This is the whole point:
+      # the push triggers a fresh run that then reports no conflicts (no comment).
+      # "$/" resolves the action from this workflow's own (trusted) commit, not from the
+      # workspace - the workspace holds the untrusted PR head, whose copy of the action
+      # must never run with write credentials.
       - name: Merge main into PR branch
         id: automerge
-        if: steps.setup_java.outcome == 'success'
+        if: steps.fetch_upstream.outcome == 'success'
         continue-on-error: true
-        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
+        uses: $/.github/actions/merge-upstream-main
         with:
-          changelog-file: CHANGELOG.md
-          changelog-rebase: true
-          pom-file: 'match-nothing.txt'
-          source-branch: 'upstream/main'
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
-          # Push the resolved merge back to the PR branch. This is the whole point:
-          # the push triggers a fresh run that then reports no conflicts (no comment).
-          push-changes: true
-      # maven-flow/merge leaves the target branch checked out, so HEAD is the merge commit it pushed.
+      # After the merge, HEAD is the merge commit that was pushed.
       - name: Record pushed merge commit
         id: merge_commit
         if: steps.automerge.outcome == 'success'

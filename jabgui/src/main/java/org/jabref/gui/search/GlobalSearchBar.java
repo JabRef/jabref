@@ -401,7 +401,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    /// The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
+    /// The popup has private access in [AutoCompletionBinding], so we use reflection to access it.
     @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {
