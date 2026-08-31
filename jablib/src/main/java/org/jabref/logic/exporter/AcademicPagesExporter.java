@@ -41,7 +41,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jspecify.annotations.NullMarked;
 
 /// Exports JabRef entries to the [academicpages](https://academicpages.github.io) Jekyll template format.
-/// Each {@link BibEntry} is written as a separate Markdown file under {@code _publications/}.
+/// Each [BibEntry] is written as a separate Markdown file under `_publications/`.
 /// YAML front matter is rendered via JabRef's layout engine; file management and computed fields are handled in Java.
 @NullMarked
 public class AcademicPagesExporter extends Exporter {

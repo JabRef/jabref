@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class PlainCitationParserFactory {
 
     /// Creates a parser for any choice that does not require AI dependencies.
-    /// For {@link PlainCitationParserChoice#LLM} use {@link #getLlmPlainCitationParser}.
+    /// For [PlainCitationParserChoice#LLM] use [#getLlmPlainCitationParser].
     public static PlainCitationParser getPlainCitationParser(PlainCitationParserChoice parserChoice,
                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                                                              GrobidPreferences grobidPreferences,

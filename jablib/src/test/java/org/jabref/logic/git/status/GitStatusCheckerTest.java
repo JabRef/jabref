@@ -207,6 +207,38 @@ class GitStatusCheckerTest {
     }
 
     @Test
+    void uncommittedChangesDetectedWhenNoRemoteConfigured(@TempDir Path tempDir) throws Exception {
+        Path repoDir = tempDir.resolve("noRemote");
+        try (Git git = Git.init().setInitialBranch("main").setDirectory(repoDir.toFile()).call()) {
+            Path file = repoDir.resolve("library.bib");
+            Files.writeString(file, baseContent, StandardCharsets.UTF_8);
+            git.add().addFilepattern("library.bib").call();
+            git.commit().setAuthor(author).setMessage("Initial commit").call();
+            Files.writeString(file, localUpdatedContent, StandardCharsets.UTF_8);
+        }
+
+        GitHandler gitHandler = gitHandlerRegistry.get(repoDir);
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
+        assertTrue(snapshot.uncommittedChanges());
+        assertEquals(SyncStatus.UNKNOWN, snapshot.syncStatus());
+    }
+
+    @Test
+    void uncommittedChangesDetectedWhenRemoteIsUnreachable() throws Exception {
+        localGit.getRepository().getConfig().setString("remote", "origin", "url", "https://example.com");
+        localGit.getRepository().getConfig().unsetSection("branch", "main");
+        localGit.getRepository().getConfig().save();
+        Files.writeString(localLibrary, localUpdatedContent, StandardCharsets.UTF_8);
+
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
+        assertTrue(snapshot.uncommittedChanges());
+        assertEquals(SyncStatus.UNKNOWN, snapshot.syncStatus());
+    }
+
+    @Test
     void divergedStatusWhenBothSidesHaveCommits(@TempDir Path tempDir) throws Exception {
         commitFile(localGit, localUpdatedContent, "Local update");
 

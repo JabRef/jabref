@@ -16,6 +16,7 @@ env:
   MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  ScholarApiKey: ${{ secrets.SCHOLARAPIKEY_FOR_TESTS }}
   CROSSREF_EMAIL: ${{ secrets.CROSSREF_EMAIL_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
@@ -73,6 +74,19 @@ jobs:
         with:
           files: |
             .github/workflows/tests-code.yml
+      - id: changed-submodules
+        if: github.event_name == 'pull_request'
+        # `.gitmodules` sets `ignore = all`, which hides submodule pointer bumps from `git diff` and thus from
+        # tj-actions/changed-files. Without this step, a submodule bump skips all tests at PR level and fails
+        # only in the merge queue.
+        shell: bash
+        run: |
+          submodules=$(git config --file .gitmodules --get-regexp '\.path$' | awk '{print $2}')
+          if git diff --quiet --ignore-submodules=none "origin/${{ github.base_ref }}" HEAD -- $submodules; then
+            echo "any_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Determine whether Gradle jobs should run
         id: determine
         shell: bash
@@ -80,7 +94,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "merge_group" ]]; then
             echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
             echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" || "${{ steps.changed-non-workflow-non-markdown-files.outputs.any_changed }}" == "true" ]]; then
+          elif [[ "${{ steps.changed-tests-code-workflow.outputs.any_changed }}" == "true" || "${{ steps.changed-non-workflow-non-markdown-files.outputs.any_changed }}" == "true" || "${{ steps.changed-submodules.outputs.any_changed }}" == "true" ]]; then
             echo "run-gradle-ci-requirements=true" >> "$GITHUB_OUTPUT"
             echo "run-gradle-ci-full=true" >> "$GITHUB_OUTPUT"
           elif [[ "${{ steps.changed-requirements-docs.outputs.any_changed }}" == "true" ]]; then
@@ -134,7 +148,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -253,7 +267,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -602,7 +616,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: 'corretto'

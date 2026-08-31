@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
 /// <ol>
+///
 /// -  'author field' is a sequence of tokens;
 ///
 /// -  tokens are separated by sequences of whitespaces (<CODE>Character.isWhitespace(c)==true</CODE>),
@@ -357,7 +358,7 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
-    /// Returns a list of authors separated with "and". The first author is formatted with {@link Author#getFamilyGiven(boolean)} and each subsequent author is formatted with {@link Author#getGivenFamily(boolean)}.
+    /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
     ///
     /// @param abbreviate first names.
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {

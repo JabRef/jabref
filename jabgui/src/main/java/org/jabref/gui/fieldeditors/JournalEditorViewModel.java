@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
@@ -9,6 +7,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
@@ -44,9 +43,8 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         final String name = StringUtil.ignoreCurlyBracket(text.get());
 
         journalAbbreviationRepository.getNextAbbreviation(name).ifPresent(nextAbbreviation -> {
+            // Recorded on the undo stack by the binding installed in AbstractEditorViewModel#bindToEntry.
             text.set(nextAbbreviation);
-            // TODO: Add undo
-            // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
         });
     }
 

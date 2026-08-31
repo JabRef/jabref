@@ -1,5 +1,6 @@
 open module org.jabref.jablib {
     exports org.jabref.model;
+    exports org.jabref.model.undo;
     exports org.jabref.logic;
 
     exports org.jabref.search;
@@ -157,8 +158,10 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.summarization.util;
     exports org.jabref.logic.msc;
     exports org.jabref.logic.ai.models;
+    exports org.jabref.logic.git.diff;
     exports org.jabref.logic.ocr.docling;
     exports org.jabref.model.ocr.docling;
+    exports org.jabref.logic.undo;
     // endregion
 
     requires java.base;
@@ -288,6 +291,9 @@ open module org.jabref.jablib {
 
     // region: jgit
     requires transitive org.eclipse.jgit;
+    requires transitive org.eclipse.jgit.ssh.apache;
+    // ssh-agent / Pageant / Windows OpenSSH agent support, discovered by ssh.apache as a service
+    requires /*runtime*/ org.eclipse.jgit.ssh.apache.agent;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
     // endregion

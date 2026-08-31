@@ -50,10 +50,10 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 ///
 /// Currently, Springer, and IEEE formats are supported.
 ///
-/// In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
-/// please see {@link RuleBasedBibliographyPdfImporter}.
+/// In case one wants to have a list of [BibEntry] matching the bibliography of a PDF,
+/// please see [RuleBasedBibliographyPdfImporter].
 ///
-/// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
+/// If several PDF importers should be tried, use [PdfMergeMetadataImporter].
 @NullMarked
 public class PdfContentImporter extends PdfImporter {
 
@@ -362,6 +362,7 @@ public class PdfContentImporter extends PdfImporter {
     /// the different lines are joined into one and thereby separated by " "
     ///
     /// This method follows the structure typically found in academic paper PDFs:
+    ///
     /// - First, it attempts to detect the title by font size, if available, or by text position.
     /// - Authors are then processed line-by-line until reaching the next section.
     /// - Abstract and keywords, if found, are extracted as they appear on the page.
