@@ -197,7 +197,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
 - We removed the [CiteSeerX](https://en.wikipedia.org/wiki/CiteSeerX) fetcher, because the service is defunct and its links now redirect to the Wayback Machine. [#16299](https://github.com/JabRef/jabref/issues/16299)
 
-## [6.0-alpha.6] – 2026-05-14
+## [6.0-alpha.6] - 2026-05-14
 
 ### Added
 
@@ -308,7 +308,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed GPT4All as AI-provider as this project is currently unmaintained and does not receive any security updates. [#15439](https://github.com/JabRef/jabref/pull/15439)
 
-## [6.0-alpha.5] – 2026-02-20
+## [6.0-alpha.5] - 2026-02-20
 
 ### Added
 
@@ -382,7 +382,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed keyboard shortcuts for toggling journal abbreviation (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>). [#14850](https://github.com/JabRef/jabref/pull/14850)
 
-## [6.0-alpha.4] – 2025-12-25
+## [6.0-alpha.4] - 2025-12-25
 
 ### Added
 
@@ -454,7 +454,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. ([#14361](https://github.com/JabRef/jabref/issues/14361), [#14500](https://github.com/JabRef/jabref/pull/14500))
 
-## [6.0-alpha.3] – 2025-10-30
+## [6.0-alpha.3] - 2025-10-30
 
 ### Added
 
@@ -612,7 +612,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed support for MySQL/MariaDB and Oracle. [#12990](https://github.com/JabRef/jabref/pull/12990)
 - We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations). [#12990](https://github.com/JabRef/jabref/pull/12990)
 
-## [6.0-alpha2] – 2025-04-27
+## [6.0-alpha2] - 2025-04-27
 
 ### Added
 
@@ -731,7 +731,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [JabRef/abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
 
-## [6.0-alpha] – 2024-12-23
+## [6.0-alpha] - 2024-12-23
 
 ### Added
 
@@ -860,7 +860,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 - We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
 
-## [5.15] – 2024-07-10
+## [5.15] - 2024-07-10
 
 ### Added
 
@@ -873,7 +873,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed detection for `soffice.exe` on Windows. [#11478](https://github.com/JabRef/jabref/pull/11478)
 - We fixed an issue where saving preferences when importing preferences on first run in a snap did not work [forum#4399](https://discourse.jabref.org/t/how-to-report-problems-in-the-distributed-version-5-14-ensuring-that-one-can-no-longer-work-with-jabref/4399/5)
 
-## [5.14] – 2024-07-08
+## [5.14] - 2024-07-08
 
 ### Added
 
@@ -925,7 +925,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the misleading message "Doing a cleanup for X entries" when opening the Cleanup entries dialog. [#11463](https://github.com/JabRef/jabref/pull/11463)
 
-## [5.13] – 2024-04-01
+## [5.13] - 2024-04-01
 
 ### Added
 
@@ -1013,7 +1013,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the predatory journal checks due to a high rate of false positives. [#11066](https://github.com/JabRef/jabref/pull/11066)
 
-## [5.12] – 2023-12-24
+## [5.12] - 2023-12-24
 
 ### Added
 
@@ -1051,7 +1051,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed duplicate filtering and sorting operations in the MainTable when editing BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
 
-## [5.11] – 2023-10-22
+## [5.11] - 2023-10-22
 
 ### Added
 
@@ -1103,7 +1103,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified. [#10336](https://github.com/JabRef/jabref/issues/10336)
 - We fixed an issue where middle-button paste in X not always worked. [#7905](https://github.com/JabRef/jabref/issues/7905)
 
-## [5.10] – 2023-09-02
+## [5.10] - 2023-09-02
 
 ### Added
 
@@ -1242,7 +1242,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the 'File' tab in the preferences and moved its contents to the 'Export' tab. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We removed the "[Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)" fetcher the websits is no longer available. [#6638](https://github.com/JabRef/jabref/issues/6638)
 
-## [5.9] – 2023-01-06
+## [5.9] - 2023-01-06
 
 ### Added
 
@@ -1274,7 +1274,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087](https://github.com/JabRef/jabref/issues/9087)
 - We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281](https://github.com/JabRef/jabref/issues/9281)
 
-## [5.8] – 2022-12-18
+## [5.8] - 2022-12-18
 
 ### Added
 
@@ -1366,7 +1366,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed "last-search-date" from the systematic literature review feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
 - We removed the [CiteseerX](https://docs.jabref.org/collect/import-using-online-bibliographic-database#citeseerx) fetcher, because the API used by JabRef is sundowned. [#9466](https://github.com/JabRef/jabref/pull/9466)
 
-## [5.7] – 2022-08-05
+## [5.7] - 2022-08-05
 
 ### Added
 
@@ -1432,7 +1432,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the social media buttons for our Twitter and Facebook pages. [#8774](https://github.com/JabRef/jabref/issues/8774)
 
-## [5.6] – 2022-04-25
+## [5.6] - 2022-04-25
 
 ### Added
 
@@ -1492,7 +1492,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these have not been working since a long time and are no longer supported in the external library used for processing the styles. [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We removed the option to configure the default encoding. The default encoding is now hard-coded to the modern UTF-8 encoding.
 
-## [5.5] – 2022-01-17
+## [5.5] - 2022-01-17
 
 ### Changed
 
@@ -1518,7 +1518,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where folder creation during systemic literature review failed due to an illegal fetcher name. [#8552](https://github.com/JabRef/jabref/pull/8552)
 
-## [5.4] – 2021-12-20
+## [5.4] - 2021-12-20
 
 ### Added
 
@@ -1601,7 +1601,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed two orphaned preferences options. [#8164](https://github.com/JabRef/jabref/pull/8164)
 - We removed the functionality of the `--debug` commandline options. Use the java command line switch `-Dtinylog.level=debug` for debug output instead. [#8226](https://github.com/JabRef/jabref/pull/8226)
 
-## [5.3] – 2021-07-05
+## [5.3] - 2021-07-05
 
 ### Added
 
@@ -1720,7 +1720,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed add group button beside the filter group tab. [#4682](https://github.com/JabRef/jabref/issues/4682)
 
-## [5.2] – 2020-12-24
+## [5.2] - 2020-12-24
 
 ### Added
 
@@ -1801,7 +1801,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the menu entry "Manage external file types" because it's already in 'Preferences' dialog. [#6991](https://github.com/JabRef/jabref/issues/6991)
 - We removed the integrity check "Abbreviation detected" for the field journal/journaltitle in the entry editor. [#3925](https://github.com/JabRef/jabref/issues/3925)
 
-## [5.1] – 2020-08-30
+## [5.1] - 2020-08-30
 
 ### Added
 
@@ -1912,7 +1912,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/advanced/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
 - We removed the built-in list of IEEE journal abbreviations using BibTeX strings. If you still want to use them, you have to download them separately from <https://abbrv.jabref.org>.
 
-## [5.0] – 2020-03-06
+## [5.0] - 2020-03-06
 
 ### Changed
 
@@ -1964,7 +1964,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Ampersands are no longer escaped by default in the `bib` file. If you want to keep the current behaviour, you can use the new "Escape Ampersands" formatter as a save action. [#5869](https://github.com/JabRef/jabref/issues/5869)
 - The "Merge Entries" entry was removed from the Quality Menu. Users should use the right-click menu instead. [#6021](https://github.com/JabRef/jabref/pull/6021)
 
-## [5.0-beta] – 2019-12-15
+## [5.0-beta] - 2019-12-15
 
 ### Changed
 
@@ -2039,7 +2039,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed an internal step in the [ISBN-to-BibTeX fetcher](https://docs.jabref.org/collect/add-entry-using-an-id#isbn): The [ISBN to BibTeX Converter](https://manas.tungare.name/software/isbn-to-bibtex) by [@manastungare](https://github.com/manastungare) is not used anymore, because it is offline: "people using this tool have not been generating enough sales for Amazon."
 - We removed the option to control the default drag and drop behaviour. You can use the modifier keys (like CtrL or Alt) instead.
 
-## [5.0-alpha] – 2019-08-25
+## [5.0-alpha] - 2019-08-25
 
 ### Changed
 
