@@ -59,6 +59,12 @@ python3 e2e_test.py                 # spawns the host as a subprocess, drives th
 host wherever `pwsh` is on `PATH` — the same assertions for both prove protocol
 parity. CI runs it on `ubuntu-latest` + `windows-latest`.
 
+For a real browser round-trip, register the host (see [Installing](#installing)),
+load the JabRef Browser Extension, and in JabRef run **Lookup → Search full text
+documents online** on an entry with `doi = 10.1371/journal.pmed.0020124` — an
+open-access PLOS article whose landing page exposes a PDF link, so no login is
+needed.
+
 ## Installing
 
 ```sh
