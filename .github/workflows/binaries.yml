@@ -525,13 +525,13 @@ jobs:
       - name: Install GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: pre-gitversion
-        uses: gittools/actions/gitversion/setup@v3.2.1
+        uses: gittools/actions/gitversion/setup@v4.7.0
         with:
           versionSpec: "6.x"
       - name: Run GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3.2.1
+        uses: gittools/actions/gitversion/execute@v4.7.0
       - name: Normalize branch name
         if: needs.conditions.outputs.should-build == 'true'
         id: normalize
