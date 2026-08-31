@@ -50,9 +50,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
-import org.jabref.model.groups.event.GroupUpdatedEvent;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 
 import com.google.common.eventbus.Subscribe;
