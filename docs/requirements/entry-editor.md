@@ -80,7 +80,7 @@ Needs: impl
 
 When "Automatically search and show unlinked files in the entry editor" is enabled and files in the file directory match the entry but are not linked in it, the file editor is shown in the files and links section even if the entry has no file field, listing those files as suggestions with a gray background and an accept button. This matches the file editor's behavior for entries that already have linked files.
 
-Needs: impl
+Needs: impl, utest
 
 ## Custom tabs show a user-defined list of field patterns
 `req~entry-editor.custom-tabs~1`
