@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 /// Stores the save order config for a library
 ///
-/// Format: &lt;choice> ([OrderType], a pair of [Field] + descending (boolean)
+/// Format: &lt;choice> ([OrderType], a pair of [Field] + descending (boolean))
 ///
 ///
 /// Note that [OrderType#TABLE] can only be used as "intermediate" setting. When passing `SaveOrder`

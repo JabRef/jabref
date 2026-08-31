@@ -344,7 +344,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
     }
 
-    /// Get the path from the root of the tree as a string (every group name is separated by [#PATH_DELIMITER].
+    /// Get the path from the root of the tree as a string (every group name is separated by [#PATH_DELIMITER]).
     ///
     /// The name of the root is not included.
     public String getPath() {
