@@ -1000,17 +1000,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         );
     }
 
+    /// Copies the selection to the clipboard, then removes it from the library. The delete is
+    /// reached only once the copy has succeeded, so a cut that cannot reach the clipboard leaves
+    /// the entries where they are — there is no half-done cut to compensate for.
     public void cutEntry() {
-        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
-        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
+        List<BibEntry> selectedEntries = getSelectedEntries();
 
-        if (entriesCopied == entriesDeleted) {
-            dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesCopied));
-        } else {
-            dialogService.notify(Localization.lang("Cut failed", entriesCopied));
-            undoManager.undo();
-            clipBoardManager.setContent("");
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, selectedEntries);
+        if (entriesCopied < 0) {
+            // Nothing to clean up: the clipboard is written only after the entries have been
+            // serialized, so a failure leaves it holding whatever the user put there earlier.
+            dialogService.notify(Localization.lang("Cut failed"));
+            return;
         }
+
+        int entriesDeleted = doDeleteEntry(StandardActions.CUT, selectedEntries);
+        dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesDeleted));
     }
 
     /// Removes the selected entries and files linked to selected entries from the database
