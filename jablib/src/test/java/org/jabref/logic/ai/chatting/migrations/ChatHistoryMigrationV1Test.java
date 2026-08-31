@@ -32,11 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/// Tests that {@link ChatHistoryMigrationV1} correctly migrates every v1 chat-history MVStore
-/// found under {@code src/test/resources/…/chatting/migrations/} into the v2 repository.
+/// Tests that [ChatHistoryMigrationV1] correctly migrates every v1 chat-history MVStore
+/// found under `src/test/resources/…/chatting/migrations/` into the v2 repository.
 ///
 /// Entries (database path + citation key) are discovered dynamically from the MVStore map names,
-/// so adding {@code historiesN.mv} alongside its matching {@code historiesN.json} is enough
+/// so adding `historiesN.mv` alongside its matching `historiesN.json` is enough
 /// to add a new test case without touching this class.
 ///
 /// The fixed library ID acts as the new identifier created during v1 → v2 migration.

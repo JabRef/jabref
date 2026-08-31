@@ -28,7 +28,7 @@ import org.jabref.model.database.BibDatabaseContext;
 ///   <li>Whether the current file is inside a Git repository</li>
 ///   <li>Whether the file is tracked by Git</li>
 ///   <li>Whether there are unresolved merge conflicts</li>
-///   <li>The current sync status (e.g., {@code UP_TO_DATE}, {@code DIVERGED}, etc.)</li>
+///   <li>The current sync status (e.g., `UP_TO_DATE`, `DIVERGED`, etc.)</li>
 /// </ul>
 public class GitStatusViewModel extends AbstractViewModel {
     private final StateManager stateManager;
