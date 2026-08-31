@@ -251,7 +251,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                               rebuildPanel(databaseContext, entry);
                           }
                       })
-                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(""), exception))
+                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(entry.getAuthorTitleYear()), exception))
                       .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 
