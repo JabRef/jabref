@@ -26,11 +26,10 @@ on:
   # It submits a review when done - that is the signal to re-evaluate the status labels.
   pull_request_review:
     types: [ submitted ]
-  # Addressing a Qodo thread (resolving it, or the PR author replying in it) changes the label
-  # outcome but completes no workflow - listen to these events directly. Deleting the author's
-  # last reply flips a thread back to unaddressed, so deletions count as well.
-  pull_request_review_thread:
-    types: [ resolved, unresolved ]
+  # The PR author replying in a Qodo thread changes the label outcome but completes no
+  # workflow - listen to this event directly. Deleting the author's last reply flips a
+  # thread back to unaddressed, so deletions count as well. (Thread resolve/unresolve has
+  # no workflow trigger event; those are only picked up on the next triggering event.)
   pull_request_review_comment:
     types: [ created, deleted ]
 
