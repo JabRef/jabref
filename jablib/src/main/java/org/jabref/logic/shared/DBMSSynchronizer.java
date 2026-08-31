@@ -37,7 +37,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Synchronizes the shared or local databases with their opposite side. Local changes are pushed by {@link EntriesEvent}
+/// Synchronizes the shared or local databases with their opposite side. Local changes are pushed by [EntriesEvent]
 /// using Google's Guava EventBus.
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
@@ -82,7 +82,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.userAndHost = userAndHost;
     }
 
-    /// Listening method. Inserts a new {@link BibEntry} into shared database.
+    /// Listening method. Inserts a new [BibEntry] into shared database.
     @Subscribe
     public void listen(EntriesAddedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
@@ -100,7 +100,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    /// Listening method. Updates an existing shared {@link BibEntry}.
+    /// Listening method. Updates an existing shared [BibEntry].
     ///
     /// In JabRef (UI), the field is modified
     @Subscribe
@@ -122,7 +122,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         notifier.notifyAboutChangedField(event);
     }
 
-    /// Listening method. Deletes the given list of {@link BibEntry} from shared database.
+    /// Listening method. Deletes the given list of [BibEntry] from shared database.
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
@@ -135,7 +135,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    /// Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
+    /// Listening method. Synchronizes the shared [MetaData] and applies them locally.
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
@@ -146,7 +146,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
     ///
-    /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ({@link DBMSProcessor}).
+    /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ([DBMSProcessor]).
     public void initializeDatabases() throws DatabaseNotSupportedException {
         try {
             if (!dbmsProcessor.checkBaseIntegrity()) {
@@ -171,7 +171,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
-    /// {@link BibEntry}.
+    /// [BibEntry].
     @Override
     public void synchronizeLocalDatabase() {
         if (!checkCurrentConnection()) {
@@ -225,7 +225,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Removes all local entries which are not present on shared database.
     ///
-    /// @param localEntries List of {@link BibEntry} the entries should be removed from
+    /// @param localEntries List of [BibEntry] the entries should be removed from
     /// @param sharedIDs    Set of all IDs which are present on shared database
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =
@@ -239,7 +239,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    /// Synchronizes the shared {@link BibEntry} with the local one.
+    /// Synchronizes the shared [BibEntry] with the local one.
     @Override
     public void synchronizeSharedEntry(BibEntry bibEntry) {
         if (!checkCurrentConnection()) {
@@ -286,7 +286,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    /// Applies the {@link MetaData} on all local and shared BibEntries.
+    /// Applies the [MetaData] on all local and shared BibEntries.
     public void applyMetaData() {
         if (!checkCurrentConnection()) {
             return;
@@ -340,8 +340,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         lastEntryChanged_REMOVEME = Optional.empty();
     }
 
-    /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new {@link
-    /// ConnectionLostEvent} is going to be sent.
+    /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new [ConnectionLostEvent] is going to be sent.
     ///
     /// @return `true` if the connection is valid, else `false`.
     public boolean checkCurrentConnection() {
@@ -358,10 +357,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
+    /// Checks whether the [EntriesEventSource] of an [EntriesEvent] is crucial for this class.
     ///
-    /// @param event An {@link EntriesEvent}
-    /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
+    /// @param event An [EntriesEvent]
+    /// @return `true` if the event is able to trigger operations in [DBMSSynchronizer], else
     /// `false`
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();

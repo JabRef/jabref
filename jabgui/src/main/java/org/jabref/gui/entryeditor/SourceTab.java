@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -27,10 +25,6 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -40,16 +34,21 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
@@ -65,6 +64,10 @@ public class SourceTab extends EntryEditorTab {
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
+    private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
+    private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
+    private final Subscription activeTabSubscription;
+    private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -77,7 +80,7 @@ public class SourceTab extends EntryEditorTab {
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
-    public SourceTab(CountingUndoManager undoManager,
+    public SourceTab(UndoManager undoManager,
                      FieldPreferences fieldPreferences,
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
@@ -97,7 +100,7 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
+        activeTabSubscription = EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
             if (library.isEmpty()) {
                 this.setText(Localization.lang("Source"));
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
@@ -108,7 +111,7 @@ public class SourceTab extends EntryEditorTab {
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
             }
         });
-        EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
@@ -166,8 +169,8 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus && (getCurrentEntry() != null)) {
-                storeSource(getCurrentEntry(), codeArea.getText());
+            if (!onFocus) {
+                storeVisibleSource();
             }
         });
 
@@ -180,16 +183,23 @@ public class SourceTab extends EntryEditorTab {
                 setupSourceEditor();
             }
 
+            if (previousEntry == null) {
+                codeArea.setEditable(false);
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), "");
+                return;
+            }
+
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                // [impl->req~entry-editor.source-tab.atomic-replacement~1]
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
+                        getSourceString(previousEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }
@@ -198,15 +208,40 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if ((previousEntry != null) && (codeArea != null)) {
-            storeSource(previousEntry, codeArea.getText());
+        if (previousEntry != null) {
+            removeEntryListeners(previousEntry);
+            storeVisibleSource();
         }
         this.previousEntry = entry;
 
         updateCodeArea();
 
-        entry.typeProperty().addListener(_ -> updateCodeArea());
-        entry.getFieldsObservable().addListener((InvalidationListener) _ -> updateCodeArea());
+        entry.typeProperty().addListener(entryTypeListener);
+        entry.getFieldsObservable().addListener(entryFieldsListener);
+    }
+
+    @Override
+    protected void dispose() {
+        if (previousEntry != null) {
+            removeEntryListeners(previousEntry);
+            previousEntry = null;
+        }
+        activeTabSubscription.unsubscribe();
+        searchQuerySubscription.unsubscribe();
+    }
+
+    private void removeEntryListeners(BibEntry entry) {
+        entry.typeProperty().removeListener(entryTypeListener);
+        entry.getFieldsObservable().removeListener(entryFieldsListener);
+    }
+
+    // [impl->req~entry-editor.source-tab.atomic-replacement~1] — keep the visible source paired with the entry it was rendered from even while selection changes are still settling
+    private void storeVisibleSource() {
+        if (codeArea == null) {
+            return;
+        }
+
+        storeSource(previousEntry, codeArea.getText());
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -258,7 +293,7 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
+        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
         newEntry.getCitationKey()
                 .ifPresentOrElse(
@@ -271,8 +306,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
-                outOfFocusEntry.clearField(fieldName);
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
             }
         }
 
@@ -290,18 +324,15 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
-                outOfFocusEntry.setField(fieldName, newValue);
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
-            outOfFocusEntry.setType(newEntry.getType());
+            compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
-        compound.end();
-        undoManager.addEdit(compound);
+        undoManager.addEdit(compound.toChangeSet());
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {
@@ -319,7 +350,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(getCurrentEntry(), codeArea.getText());
+                        storeVisibleSource();
             }
         });
     }
@@ -348,4 +379,3 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 }
-

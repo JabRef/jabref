@@ -35,6 +35,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -71,6 +72,16 @@ public class FileUtil {
     // @formatter:on
 
     private FileUtil() {
+    }
+
+    /// Returns the human-readable size of a file, or an empty optional if it cannot be determined.
+    public static Optional<String> getFileSize(@NonNull Path path) {
+        try {
+            return Optional.of(FileUtils.byteCountToDisplaySize(Files.size(path)));
+        } catch (IOException e) {
+            LOGGER.debug("Could not determine size of file {}", path, e);
+            return Optional.empty();
+        }
     }
 
     /// Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
@@ -171,9 +182,9 @@ public class FileUtil {
 
     /// Returns a valid filename for most operating systems.
     ///
-    /// It uses {@link FileNameCleaner#cleanFileName(String)} to remove illegal characters.} and then truncates the length to 255 chars, see {@link #MAXIMUM_FILE_NAME_LENGTH}.
+    /// It uses [FileNameCleaner#cleanFileName(String)] to remove illegal characters and then truncates the length to 255 chars, see [#MAXIMUM_FILE_NAME_LENGTH].
     ///
-    /// For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
+    /// For "real" cleaning, [FileNameCleaner#cleanFileName(String)] should be used.
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
 
@@ -527,12 +538,12 @@ public class FileUtil {
                    .replace('\\', '/');
     }
 
-    /// Test if the file is a bib file by simply checking the extension to be ".bib"
+    /// Test if the file is a bib file by simply checking the extension to be ".bib" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter("bib"::equals).isPresent();
+        return getFileExtension(file).filter("bib"::equalsIgnoreCase).isPresent();
     }
 
     /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)
@@ -580,13 +591,12 @@ public class FileUtil {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
-    /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
+    /// Test if the file is a pdf file by simply checking the extension to be ".pdf" (case-insensitive)
     ///
     /// @param file The file to check
     /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
-        Optional<String> extension = FileUtil.getFileExtension(file);
-        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
+        return getFileExtension(file).filter("pdf"::equalsIgnoreCase).isPresent();
     }
 
     /// @return Path of current panel database directory or the standard working directory in case the database was not saved yet
@@ -681,6 +691,7 @@ public class FileUtil {
     /// Converts a Cygwin-style file path to a Windows-style path if the operating system is Windows.
     ///
     /// Supported formats:
+    ///
     /// - /cygdrive/c/Users/... → C:\Users\...
     /// - /mnt/c/Users/...      → C:\Users\...
     /// - /c/Users/...          → C:\Users\...

@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.swing.undo.UndoManager;
-
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.css.PseudoClass;
@@ -36,6 +35,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
@@ -70,6 +70,9 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedTag = Optional.empty();
+    private long tagOrderUpdateGeneration;
+    private boolean tagOrderUpdateScheduled;
+    private boolean updatingTagOrder;
 
     protected TagsEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
@@ -120,17 +123,6 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-        // Preserve alphabetical order when tags are added programmatically,
-        // but stop auto-sorting once the user reorders tags manually via drag-and-drop
-        tagListProperty.addListener((_, _, _) -> {
-            if (tagsField.getTags().size() < 2) {
-                isSortedTagsField = false;
-            } else if (Comparators.isInOrder(tagsField.getTags(), Comparator.comparing(Keyword::get)) || isSortedTagsField) {
-                isSortedTagsField = true;
-                tagsField.getTags().sort(Comparator.comparing(Keyword::get));
-            }
-        });
-
         tagsField.getEditor().setOnKeyPressed(event -> {
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
                 String clipboardText = ClipBoardManager.getContents();
@@ -144,6 +136,55 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
         });
 
         Bindings.bindContentBidirectional(tagsField.getTags(), tagListProperty);
+
+        /// Preserve alphabetical order when tags are added programmatically,
+        /// but stop auto-sorting once the user reorders tags manually via drag-and-drop.
+        /// Sorting during the list change would mutate the list while the bidirectional binding
+        /// is still applying that change.
+        tagListProperty.addListener((_, _, _) -> {
+            if (!updatingTagOrder) {
+                scheduleTagOrderUpdate();
+            }
+        });
+    }
+
+    private void scheduleTagOrderUpdate() {
+        long scheduledGeneration = ++tagOrderUpdateGeneration;
+        if (tagOrderUpdateScheduled) {
+            return;
+        }
+
+        enqueueTagOrderUpdate(scheduledGeneration);
+    }
+
+    private void enqueueTagOrderUpdate(long scheduledGeneration) {
+        tagOrderUpdateScheduled = true;
+        Platform.runLater(() -> runTagOrderUpdate(scheduledGeneration));
+    }
+
+    private void runTagOrderUpdate(long scheduledGeneration) {
+        tagOrderUpdateScheduled = false;
+        if (scheduledGeneration != tagOrderUpdateGeneration) {
+            enqueueTagOrderUpdate(tagOrderUpdateGeneration);
+            return;
+        }
+
+        try {
+            updatingTagOrder = true;
+            updateTagOrder();
+        } finally {
+            updatingTagOrder = false;
+        }
+    }
+
+    private void updateTagOrder() {
+        if (tagsField.getTags().size() < 2) {
+            isSortedTagsField = false;
+        } else if (Comparators.isInOrder(tagsField.getTags(), Comparator.comparing(Keyword::get))) {
+            isSortedTagsField = true;
+        } else if (isSortedTagsField) {
+            tagsField.getTags().sort(Comparator.comparing(Keyword::get));
+        }
     }
 
     private Node createTag(Keyword tag) {

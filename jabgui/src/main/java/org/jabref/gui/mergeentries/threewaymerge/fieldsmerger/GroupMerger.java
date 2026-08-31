@@ -6,7 +6,7 @@ import org.jabref.model.entry.KeywordList;
 
 import org.jspecify.annotations.NonNull;
 
-/// A merger for the {@link org.jabref.model.entry.field.StandardField#GROUPS} field
+/// A merger for the [org.jabref.model.entry.field.StandardField#GROUPS] field
 public class GroupMerger implements FieldMerger {
 
     private final @NonNull BibEntryPreferences bibEntryPreferences;

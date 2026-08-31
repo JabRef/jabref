@@ -28,7 +28,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.edit.ReplaceStringAction;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
+import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorAction;
 import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
@@ -77,7 +77,7 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
@@ -109,7 +109,7 @@ public class MainMenu extends MenuBar {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
@@ -128,7 +128,7 @@ public class MainMenu extends MenuBar {
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
-                    CountingUndoManager undoManager,
+                    GuiUndoManager undoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
@@ -195,7 +195,7 @@ public class MainMenu extends MenuBar {
 
                 // region: Sharing of the library
                 factory.createSubMenu(StandardActions.GIT,
-                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager, preferences.getGitPreferences())),
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, journalAbbreviationRepository, taskExecutor, gitHandlerRegistry)),
                         factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         new SeparatorMenuItem(),
@@ -240,7 +240,7 @@ public class MainMenu extends MenuBar {
         edit.getItems().addAll(
                 specialFieldsSeparator,
                 // ToDo: SpecialField needs the active BasePanel to mark it as changed.
-                //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
+                //  Refactor BasePanel, should mark the BibDatabaseContext or the GuiUndoManager as dirty instead!
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
@@ -287,7 +287,7 @@ public class MainMenu extends MenuBar {
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences())) {
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, undoManager, dialogService, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
@@ -306,14 +306,14 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.UPDATE_WITH_WEB_INFO,
-                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor)),
+                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor, undoManager)),
                 // endregion
 
                 new SeparatorMenuItem(),
 
                 // region file-related
                 factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(stateManager))
                 // endregion
         );
 

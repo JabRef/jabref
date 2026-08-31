@@ -38,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * More tests are located at {@link org.jabref.logic.shared.SynchronizationSimulatorTest} and {@link org.jabref.logic.shared.DBMSProcessorTest}.
- */
+/// More tests are located at [org.jabref.logic.shared.SynchronizationSimulatorTest] and [org.jabref.logic.shared.DBMSProcessorTest].
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class DBMSSynchronizerTest {

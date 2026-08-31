@@ -239,7 +239,7 @@ public class DBMSProcessor {
 
     /// For use in test only. Inserts the BibEntry into the shared database.
     ///
-    /// @param bibEntry {@link BibEntry} to be inserted.
+    /// @param bibEntry [BibEntry] to be inserted.
     @VisibleForTesting
     public void insertEntry(BibEntry bibEntry) {
         insertEntries(Collections.singletonList(bibEntry));
@@ -311,7 +311,7 @@ public class DBMSProcessor {
     /// Inserts the given list of BibEntry into FIELD table.
     /// These entries do not yet exist in the remote database.
     ///
-    /// @param bibEntries {@link BibEntry} to be inserted
+    /// @param bibEntries [BibEntry] to be inserted
     protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         if (bibEntries.isEmpty()) {
             return;
@@ -357,9 +357,9 @@ public class DBMSProcessor {
         }
     }
 
-    /// Updates the whole {@link BibEntry} on shared database.
+    /// Updates the whole [BibEntry] on shared database.
     ///
-    /// @param localBibEntry {@link BibEntry} affected by changes
+    /// @param localBibEntry [BibEntry] affected by changes
     /// @throws SQLException in case of error
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         // FIXME: either two connections (one with auto commit and one without) or better auto commit state - this line here can lead to issues if autocommit is required in a parallel thread
@@ -483,7 +483,7 @@ public class DBMSProcessor {
 
     /// Removes the shared bibEntry.
     ///
-    /// @param bibEntries {@link BibEntry} to be deleted
+    /// @param bibEntries [BibEntry] to be deleted
     public void removeEntries(List<BibEntry> bibEntries) {
         Objects.requireNonNull(bibEntries);
         if (bibEntries.isEmpty()) {
@@ -504,7 +504,7 @@ public class DBMSProcessor {
     }
 
     /// @param sharedID Entry ID
-    /// @return instance of {@link BibEntry}
+    /// @return instance of [BibEntry]
     public Optional<BibEntry> getSharedEntry(int sharedID) {
         List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {
@@ -651,7 +651,7 @@ public class DBMSProcessor {
 
     /// Listens for notifications from DBMS. Needs to be implemented if LiveUpdate is supported by the DBMS
     ///
-    /// @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
+    /// @param dbmsSynchronizer [DBMSSynchronizer] which handles the notification.
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         try {
             listenerConnection = dbmsConnection.openNewConnection();

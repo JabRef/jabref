@@ -1,7 +1,6 @@
 package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,13 +39,13 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
-/// An intelligent {@link java.util.concurrent.ExecutorService} with a {@link java.util.concurrent.BlockingQueue} prevents a high load while making backups and
-/// rejects all redundant backup tasks. This class does not manage the .bak file which is created when opening a
-/// database.
+/// Backups the given bib database file from [BibDatabaseContext] on every [BibDatabaseContextChangedEvent].
+/// An intelligent [java.util.concurrent.ExecutorService] with a [java.util.concurrent.BlockingQueue] prevents a high load while making backups and
+/// rejects all redundant backup tasks. This class does not manage [org.jabref.logic.util.BackupFileType#SAVE] file.
 public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
@@ -54,6 +53,21 @@ public class BackupManager {
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
+
+    @NullMarked
+    public sealed interface RestoreResult {
+        record Restored() implements RestoreResult {
+        }
+
+        record Empty(Path backupPath) implements RestoreResult {
+        }
+
+        record Failed(Path backupPath, IOException exception) implements RestoreResult {
+        }
+
+        record NotFound(Path originalPath) implements RestoreResult {
+        }
+    }
 
     private static final Set<BackupManager> RUNNING_INSTANCES = new HashSet<>();
 
@@ -85,15 +99,15 @@ public class BackupManager {
 
     /// Determines the most recent existing backup file name
     static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
-        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
+        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
     }
 
-    /// Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
-    /// file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
+    /// Starts the BackupManager which is associated with the given [BibDatabaseContext]. As long as no database
+    /// file is present in [BibDatabaseContext], the [BackupManager] will do nothing.
     ///
     /// This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
@@ -102,16 +116,16 @@ public class BackupManager {
         return backupManager;
     }
 
-    /// Marks the backup as discarded at the library which is associated with the given {@link BibDatabaseContext}.
+    /// Marks the backup as discarded at the library which is associated with the given [BibDatabaseContext].
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
-    /// Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
+    /// Shuts down the BackupManager which is associated with the given [BibDatabaseContext].
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     /// @param backupDir          The path to the backup directory
     /// @param createBackup       True, if a backup should be created
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
@@ -122,7 +136,7 @@ public class BackupManager {
     /// Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
     /// newer and different from the original.
     ///
-    /// In case a discarded file is present, the method also returns `false`, See also {@link #discardBackup(Path)}.
+    /// In case a discarded file is present, the method also returns `false`, See also [#discardBackup(Path)].
     ///
     /// @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
@@ -176,18 +190,25 @@ public class BackupManager {
     }
 
     /// Restores the backup file by copying and overwriting the original one.
+    /// [impl->req~jabgui.autosaveandbackup.complete-backup~1]
     ///
     /// @param originalPath Path to the file which should be equalized to the backup file.
-    public static void restoreBackup(Path originalPath, Path backupDir) {
+    public static RestoreResult restoreBackup(Path originalPath, Path backupDir) {
         Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
         if (backupPath.isEmpty()) {
             LOGGER.error("There is no backup file");
-            return;
+            return new RestoreResult.NotFound(originalPath);
         }
         try {
+            if (Files.size(backupPath.get()) == 0) {
+                LOGGER.warn("Backup file {} is empty and will not be restored", backupPath.get());
+                return new RestoreResult.Empty(backupPath.get());
+            }
             Files.copy(backupPath.get(), originalPath, StandardCopyOption.REPLACE_EXISTING);
+            return new RestoreResult.Restored();
         } catch (IOException e) {
             LOGGER.error("Error while restoring the backup file.", e);
+            return new RestoreResult.Failed(backupPath.get(), e);
         }
     }
 
@@ -255,21 +276,27 @@ public class BackupManager {
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
         // Example: What happens if one hard powers off the machine (or kills the jabref process) during writing of the backup?
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
-        try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
+        try (AtomicFileWriter writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibDatabaseWriter(
-                    bibWriter,
-                    saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager)
-                    // we save the clone to prevent the original database (and thus the UI) from being changed
-                    .writeDatabase(bibDatabaseContextClone);
-            backupFilesQueue.add(backupPath);
+            try {
+                new BibDatabaseWriter(
+                        bibWriter,
+                        saveConfiguration,
+                        preferences.getFieldPreferences(),
+                        preferences.getCitationKeyPatternPreferences(),
+                        entryTypesManager)
+                        // we save the clone to prevent the original database (and thus the UI) from being changed
+                        .writeDatabase(bibDatabaseContextClone);
+                backupFilesQueue.add(backupPath);
 
-            // We wrote the file successfully
-            // Thus, we currently do not need any new backup
-            this.needsBackup = false;
+                // We wrote the file successfully
+                // Thus, we currently do not need any new backup
+                this.needsBackup = false;
+                // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
+            } catch (IOException e) {
+                writer.abort();
+                throw e;
+            }
         } catch (IOException e) {
             LOGGER.error("Error while saving to file {}", backupPath, e);
         }
@@ -311,25 +338,11 @@ public class BackupManager {
     }
 
     private void fillQueue(Path backupDir) {
-        if (!Files.exists(backupDir)) {
-            return;
-        }
-        bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
-            // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
-            try {
-                List<Path> allSavFiles = Files.list(backupDir)
-                                              // just list the .sav belonging to the given targetFile
-                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                              .sorted().toList();
-                backupFilesQueue.addAll(allSavFiles);
-            } catch (IOException e) {
-                LOGGER.error("Could not determine most recent file", e);
-            }
-        });
+        bibDatabaseContext.getDatabasePath().ifPresent(databasePath ->
+                backupFilesQueue.addAll(BackupFileUtil.getExistingBackupFiles(databasePath, backupDir)));
     }
 
-    /// Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
+    /// Unregisters the BackupManager from the eventBus of [BibDatabaseContext].
     /// This method should only be used when closing a database/JabRef in a normal way.
     ///
     /// @param backupDir    The backup directory

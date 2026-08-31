@@ -6,11 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +20,23 @@ import org.slf4j.LoggerFactory;
 /// Converts LaTeX fragments to HTML by shelling out to pandoc.
 ///
 /// The path to pandoc is read from [OpenOfficePreferences] and can be changed by the user
-/// via the OpenOffice panel settings menu. Use [autoDetect] to find pandoc automatically.
+/// in Preferences > OpenOffice/LibreOffice. Use [autoDetect] to find pandoc automatically.
 @NullMarked
 public class PandocLatexConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PandocLatexConverter.class);
 
-    /// Candidate paths tried by [autoDetect], in priority order, per OS.
+    private static final String PANDOC_EXECUTABLE = "pandoc";
+
+    /// Candidate commands tried by [autoDetect] on Windows, in priority order.
     private static final List<String> WINDOWS_CANDIDATES = List.of(
-            "pandoc"
-            // MSI installer adds to PATH; AppData path varies per user so we leave PATH as the only candidate
+            // MSI installer adds to PATH; AppData path varies per user so we do not hardcode those locations here.
+            PANDOC_EXECUTABLE
+    );
+    /// Additional Windows install-directory hints resolved at runtime to absolute paths such as
+    /// `C:\\Program Files\\Pandoc\\pandoc.exe`.
+    private static final List<String> WINDOWS_INSTALL_DIRECTORY_HINTS = List.of(
+            "Pandoc"
     );
     private static final List<String> MACOS_CANDIDATES = List.of(
             "pandoc",
@@ -49,12 +58,24 @@ public class PandocLatexConverter {
     /// Returns the first pandoc executable found in the OS-specific candidate list,
     /// or [Optional.empty] if none responds to `--version` within 5 seconds.
     public static Optional<String> autoDetect() {
-        List<String> candidates = OS.WINDOWS ? WINDOWS_CANDIDATES
-                                             : OS.OS_X ? MACOS_CANDIDATES
-                                                       : LINUX_CANDIDATES;
-        return candidates.stream()
-                         .filter(PandocLatexConverter::probeCandidate)
-                         .findFirst();
+        return getAutoDetectCandidates(OS.WINDOWS, OS.OS_X).stream()
+                                                           .filter(PandocLatexConverter::probeCandidate)
+                                                           .findFirst();
+    }
+
+    @VisibleForTesting
+    static List<String> getAutoDetectCandidates(boolean windows, boolean osX) {
+        if (windows) {
+            return Stream.concat(
+                                 WINDOWS_CANDIDATES.stream(),
+                                 WINDOWS_INSTALL_DIRECTORY_HINTS.stream()
+                                                                .map(directoryName -> OS.detectProgramPath(PANDOC_EXECUTABLE, directoryName))
+                                                                .filter(path -> !path.isBlank()))
+                         .distinct()
+                         .toList();
+        }
+
+        return osX ? MACOS_CANDIDATES : LINUX_CANDIDATES;
     }
 
     private static boolean probeCandidate(String candidate) {

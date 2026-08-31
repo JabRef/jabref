@@ -40,6 +40,20 @@ The user needs a visible error dialog, in addition to the log entry, since [digg
 
 Needs: impl
 
+## Merge entries dialog allows selecting empty field values
+`req~ux.merge-entries.select-empty-field~1`
+
+When the merge entries dialog shows a field that is missing in one of the source entries, the user must be able to explicitly select that empty value so the merged entry is cleared for that field.
+
+Needs: impl
+
+## Updating an entry via entry data applies the confirmed merge result
+`req~ux.update-entry-web-info.apply-merge-result~1`
+
+When a user chooses `Update with bibliographic information via entry data` and confirms the merge dialog, the selected merged values must be written back to the original entry as one undoable update.
+
+Needs: impl
+
 ## GitHub personal access token verification
 `req~ux.git-share.personal-access-token-verification~1`
 
@@ -68,10 +82,55 @@ Git push must report a rejected remote update to the user.
 
 Needs: impl
 
+## Git commit previews changes in the current library
+`req~ux.git-commit.preview-current-library~1`
+
+Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
+
+Needs: impl
+
+## Committing does not depend on the remote
+`req~ux.git-commit.remote-independent~1`
+
+Git commit must offer the uncommitted changes of the local library even when no remote is configured or the configured remote cannot be reached.
+
+Needs: impl
+
 ### Activating large libraries keeps entry previews responsive
 `req~ux.active-library.preview-responsiveness~1`
 
 When a user activates a large library, automatic group construction and group-count evaluation must not delay rendering the selected entry preview.
+
+Needs: impl
+
+### Creating a new explicit group can reuse the current selection
+`req~ux.groups.create-explicit-from-selection~1`
+
+When a user creates a new explicit group, JabRef should allow reusing the currently selected entries for that group and should keep the newly created group selected afterwards.
+
+Needs: impl
+
+### Saving keeps external change detection active
+`req~ux.external-library-changes.after-save~1`
+
+When JabRef saves a library, it must keep observing filesystem changes, defer change detection until the save has finished, and then inspect the resulting file for external changes that require conflict resolution.
+Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
+
+Needs: impl
+
+### Committing a library that is not under version control
+`req~ux.git-commit.initialize-repository~1`
+
+When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.
+Only the library file and the generated `.gitignore` are committed, so unrelated files in that directory stay untracked.
+Declining the offer must leave the directory unchanged, because the user may want to clone an existing repository into it instead.
+
+Needs: impl, utest
+
+### Deleting many entries keeps the main table responsive
+`req~ux.large-library.bulk-entry-removal~1`
+
+When a user deletes many entries from a large library, JabRef must keep the main table responsive.
 
 Needs: impl
 

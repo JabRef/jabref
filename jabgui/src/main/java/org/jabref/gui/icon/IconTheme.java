@@ -91,6 +91,12 @@ public class IconTheme {
         }
     }
 
+    public static Optional<JabRefIcon> findGroupIcon(String iconCode) {
+        return findJabRefIcon(iconCode)
+                .or(() -> IkonliIcon.findIconByDescription(iconCode))
+                .or(() -> IkonliIcon.findIcon(iconCode));
+    }
+
     private static URL getIconUrl(String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
@@ -99,7 +105,7 @@ public class IconTheme {
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
     }
 
-    /// Reads file mapping icon keys to image file names, prefixing each value with {@link #ICON_PATH_PREFIX}.
+    /// Reads file mapping icon keys to image file names, prefixing each value with [#ICON_PATH_PREFIX].
     ///
     /// @param url The URL to read information from.
     /// @return A Map containing all key-value pairs found.

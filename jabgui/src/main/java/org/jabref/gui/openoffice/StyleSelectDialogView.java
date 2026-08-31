@@ -31,6 +31,7 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
@@ -42,6 +43,7 @@ import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -53,6 +55,8 @@ import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOStyle> {
+
+    private static final String PANDOC_WARNING_LABEL_STYLE = "-fx-text-fill: #c9a227;";
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
@@ -84,12 +88,14 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TableColumn<BstStyleSelectViewModel, String> bstNameColumn;
     @FXML private TableColumn<BstStyleSelectViewModel, String> bstFileColumn;
     @FXML private TableColumn<BstStyleSelectViewModel, Boolean> bstDeleteColumn;
+    @FXML private Label bstPandocWarning;
 
     @FXML private Button addCslButton;
     @FXML private Button addJStyleButton;
     @FXML private Button addBstStyleButton;
     @FXML private RadioButton numericFormatButton;
     @FXML private RadioButton authorYearFormatButton;
+    @FXML private RadioButton styleDefinedFormatButton;
     @FXML private VBox bstPreviewBox;
 
     @FXML private VBox cslPreviewBox;
@@ -320,6 +326,23 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private void setupBstStylesTab() {
+        OpenOfficePreferences openOfficePreferences =
+                preferences.getOpenOfficePreferences(journalAbbreviationRepository);
+
+        String pandocPath = openOfficePreferences.getPandocPath();
+
+        if (StringUtil.isBlank(pandocPath)) {
+            bstPandocWarning.setText(
+                    Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
+            // FIXME: Inline style should be removed eventually.
+            bstPandocWarning.setStyle(PANDOC_WARNING_LABEL_STYLE);
+        } else {
+            bstPandocWarning.setText(
+                    Localization.lang("Pandoc path: %0", pandocPath));
+            // FIXME: Inline style should be removed eventually.
+            bstPandocWarning.setStyle("");
+        }
+
         bstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         bstFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         bstDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
@@ -379,10 +402,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         ToggleGroup formatGroup = new ToggleGroup();
         numericFormatButton.setToggleGroup(formatGroup);
         authorYearFormatButton.setToggleGroup(formatGroup);
+        styleDefinedFormatButton.setToggleGroup(formatGroup);
 
         BstCitationFormat currentFormat = viewModel.bstCitationFormatProperty().get();
         numericFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC);
         authorYearFormatButton.setSelected(currentFormat == BstCitationFormat.AUTHOR_YEAR);
+        styleDefinedFormatButton.setSelected(currentFormat == BstCitationFormat.STYLE_DEFINED);
 
         numericFormatButton.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
@@ -392,6 +417,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         authorYearFormatButton.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
                 viewModel.bstCitationFormatProperty().set(BstCitationFormat.AUTHOR_YEAR);
+            }
+        });
+        styleDefinedFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.STYLE_DEFINED);
             }
         });
     }

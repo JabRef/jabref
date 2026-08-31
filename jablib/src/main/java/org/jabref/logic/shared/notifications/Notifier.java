@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 /// Notifies the other clients connected to the same database about changes.
 ///
-/// TODO: Send the change itself (see {@link FieldChange}) so receivers can apply it without pulling.
+/// TODO: Send the change itself (see [FieldChange]) so receivers can apply it without pulling.
 ///       For sizes > 8000 bytes, use a table for exchange.
 public class Notifier {
 

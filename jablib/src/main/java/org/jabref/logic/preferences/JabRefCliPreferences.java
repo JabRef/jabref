@@ -37,6 +37,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -79,6 +80,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.EngineSelection;
+import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -137,8 +139,8 @@ import org.slf4j.LoggerFactory;
 /// Internally it defines symbols used to pick a value from the `java.util.prefs`
 /// interface and keeps a hashmap with all the default values.
 ///
-/// There are still some similar preferences classes ({@link OpenOfficePreferences} and
-/// {@link SharedDatabasePreferences}) which also use the `java.util.prefs` API.
+/// There are still some similar preferences classes ([OpenOfficePreferences] and
+/// [SharedDatabasePreferences]) which also use the `java.util.prefs` API.
 ///
 /// contents of the defaults HashMap that are defined in this class.
 /// There are more default parameters in this map which belong to separate preference classes.
@@ -281,6 +283,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_ADD_SPACE_BEFORE = "ooAddSpaceBefore";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     public static final String OO_ZOTERO_COMPATIBILITY_MODE = "ooZoteroCompatibilityMode";
+    public static final String OO_INFER_CSL_STYLE_FROM_DOCUMENT = "ooInferCslStyleFromDocument";
     public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
     public static final String OO_PANDOC_PATH = "ooPandocPath";
     public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
@@ -416,6 +419,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
+    private static final String OCR_LANGUAGES = "ocrLanguages";
     // endregion
 
     // region Push to application preferences
@@ -1753,7 +1757,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
                 getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
-                // Backups should sit in the data directory, because a ".bak" file should survive cache cleanups
+                // Backups should sit in the data directory, because a backup file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, defaultValues.getBackupDirectory()),
                 getBoolean(FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile()),
                 // Use fallback method in case AWT is not initialized in headless (JabKit) mode
@@ -2171,14 +2175,28 @@ public class JabRefCliPreferences implements CliPreferences {
 
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
+        List<OcrLanguage> savedLanguages = getStringList(OCR_LANGUAGES).stream()
+                                                                       .map(OcrLanguage::safeValueOf)
+                                                                       .toList();
+
+        List<OcrLanguage> ocrLanguagesToLoad = savedLanguages.isEmpty()
+                                               ? defaultValues.getOcrLanguages()
+                                               : savedLanguages;
+
         ocrPreferences = new OcrPreferences(
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
-                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())));
+                EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
+                ocrLanguagesToLoad);
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+
+        ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) _ ->
+                putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()
+                                                           .map(OcrLanguage::getCode)
+                                                           .toList()));
 
         return ocrPreferences;
     }
@@ -2529,6 +2547,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore()),
                 getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
                 getBoolean(OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode()),
+                getBoolean(OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument()),
                 getStringList(OO_EXTERNAL_BST_STYLES),
                 get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
                 getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()),
@@ -2541,6 +2560,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindBoolean(openOfficePreferences.addSpaceBeforeProperty(), OO_ADD_SPACE_BEFORE, defaultValues.getAddSpaceBefore());
         bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
         bindBoolean(openOfficePreferences.zoteroCompatibilityModeProperty(), OO_ZOTERO_COMPATIBILITY_MODE, defaultValues.getZoteroCompatibilityMode());
+        bindBoolean(openOfficePreferences.inferCslStyleFromDocumentProperty(), OO_INFER_CSL_STYLE_FROM_DOCUMENT, defaultValues.shouldInferCslStyleFromDocument());
 
         bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
@@ -2583,16 +2603,20 @@ public class JabRefCliPreferences implements CliPreferences {
             return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                 .orElse(CSLStyleLoader.getDefaultStyle());
         } else if (currentStylePath.endsWith(".bst")) {
-            // Internal BST style (classpath resource path starting with /resource/openoffice/)
-            if (currentStylePath.startsWith("/")) {
-                return BstStyle.createInternal(currentStylePath);
+            try {
+                // Internal BST style (classpath resource path starting with /resource/openoffice/)
+                if (currentStylePath.startsWith("/")) {
+                    return BstStyle.createInternal(currentStylePath);
+                }
+                // External BST style (absolute filesystem path)
+                Path bstPath = Path.of(currentStylePath);
+                if (Files.exists(bstPath)) {
+                    return BstStyle.loadExternal(bstPath);
+                }
+                LOGGER.warn("BST style file not found: {}", currentStylePath);
+            } catch (IOException e) {
+                LOGGER.warn("Could not load BST style: {}", currentStylePath, e);
             }
-            // External BST style (absolute filesystem path)
-            java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
-            if (java.nio.file.Files.exists(bstPath)) {
-                return new BstStyle(bstPath);
-            }
-            LOGGER.warn("BST style file not found: {}", currentStylePath);
         } else if (journalAbbreviationRepository != null) {
             try {
                 return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);

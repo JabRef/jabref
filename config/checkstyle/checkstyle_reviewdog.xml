@@ -70,6 +70,15 @@
         <property name="fileExtensions" value="groovy,java" />
     </module>
 
+    <!-- Markdown Javadoc (///) must use Markdown syntax, not JavaDoc inline tags.
+         {@value} and {@inheritDoc} stay allowed as they have no Markdown equivalent. -->
+    <module name="RegexpSingleline">
+        <property name="id" value="MarkdownJavadocNoInlineTags"/>
+        <property name="message" value="Markdown Javadoc (///) must use Markdown syntax, not JavaDoc inline tags: `code` instead of {@code code}, [ClassName] instead of {@link ClassName}." />
+        <property name="format" value="^\s*///.*\{@(link|linkplain|code|literal)\b" />
+        <property name="fileExtensions" value="java" />
+    </module>
+
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
