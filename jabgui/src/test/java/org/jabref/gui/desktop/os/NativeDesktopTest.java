@@ -13,6 +13,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 /// The "browser" in these tests is a shell script recording its argument, so the assertions catch
 /// any URL mangling on the way to the external application (the regression fixed here: routing
 /// online links through `Path.of`, which collapses `https://` and truncates query strings).
+@NullMarked
 @DisabledOnOs(OS.WINDOWS)
 class NativeDesktopTest {
 
