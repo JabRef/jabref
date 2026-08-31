@@ -223,7 +223,6 @@ This section is informational and carries no `req~` identifier.
 - **JabRef-side consumer** — `BrowserExtensionFulltextFetcher.java` (registered in `WebFetchers#getFullTextFetchers`) consumes this protocol on JabRef's behalf.
 - **Provider implementations** — each provider repository keeps a verbatim copy of this file for cross-repo tracing and tracks its own derived obligations there.
 
-
 <!-- OFT / OpenFastTrace does not recognise ```mermaid as a code-fence opener, so a mermaid block placed before any `req~...` marker makes its bare closing fence read as an *opening* fence and silently swallows the next requirements. Keep this diagram at the end, after the last requirement. See traceRequirements. -->
 ## Happy-path flow
 
