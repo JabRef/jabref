@@ -74,7 +74,7 @@ public class DBMSProcessor {
 
     /// Scans the database for required tables.
     ///
-    /// @return <code>true</code> if the structure matches the requirements, <code>false</code> if not.
+    /// @return `true` if the structure matches the requirements, `false` if not.
     /// @throws SQLException in case of error
     public boolean checkBaseIntegrity() throws SQLException {
         boolean databasePassesIntegrityCheck = false;
@@ -91,7 +91,7 @@ public class DBMSProcessor {
 
     /// Determines whether the database is using an pre-3.6 structure.
     ///
-    /// @return <code>true</code> if the structure is old, else <code>false</code>.
+    /// @return `true` if the structure is old, else `false`.
     public boolean databaseIsAtMostJabRef35() throws SQLException {
         return checkTableAvailability(
                 "ENTRIES",
@@ -103,10 +103,10 @@ public class DBMSProcessor {
                 "STRINGS"); // old tables
     }
 
-    /// Checks whether all given table names (<b>case insensitive</b>) exist in database.
+    /// Checks whether all given table names (**case insensitive**) exist in database.
     ///
     /// @param tableNames Table names to be checked
-    /// @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
+    /// @return `true` if **all** given tables are present, else `false`.
     protected boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {

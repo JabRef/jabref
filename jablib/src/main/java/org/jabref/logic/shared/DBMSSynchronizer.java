@@ -361,26 +361,24 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Synchronizes local BibEntries only if last entry changes still remain
     public synchronized void pullLastEntryChanges() {
-        if (entryWithPendingChanges.isPresent()) {
-            if (!checkCurrentConnection()) {
-                return;
-            }
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            // Pull changes for the case that there were some
-            synchronizeLocalDatabase();
+        if (entryWithPendingChanges.isEmpty() || !checkCurrentConnection()) {
+            return;
         }
+        synchronizeLocalMetaData();
+        pullWithLastEntry();
+        // Pull changes for the case that there were some
+        synchronizeLocalDatabase();
     }
 
     /// Synchronizes local BibEntries and pulls remaining last entry changes
     // [impl->req~shared-database.micro-edit-batching~1]
     private void pullWithLastEntry() {
-        if (entryWithPendingChanges.isPresent() && isPresentLocalBibEntry(entryWithPendingChanges.get())) {
-            synchronizeSharedEntry(entryWithPendingChanges.get());
+        entryWithPendingChanges.filter(this::isPresentLocalBibEntry).ifPresent(entry -> {
+            synchronizeSharedEntry(entry);
             // The flush writes the whole entry without a describing field-change event,
             // so other clients have to pull
             notifier.notifyClientsToPull();
-        }
+        });
         entryWithPendingChanges = Optional.empty();
     }
 
