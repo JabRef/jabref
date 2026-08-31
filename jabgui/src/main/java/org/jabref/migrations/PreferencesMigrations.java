@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.SequencedMap;
@@ -120,10 +121,11 @@ public class PreferencesMigrations {
     /// if both its name is a translation of "General"/"Abstract" (names were stored localized, and not
     /// necessarily in the current language) and its fields are exactly one of the shipped default sets.
     private static boolean isLegacyDefaultTab(String name, List<String> fields) {
-        if (!legacyDefaultTabNames().contains(name.trim().toLowerCase())) {
+        if (!legacyDefaultTabNames().contains(name.trim().toLowerCase(Locale.ROOT))) {
             return false;
         }
-        Set<String> stored = fields.stream().map(String::toLowerCase).collect(Collectors.toSet());
+        // Locale.ROOT: a Turkish UI locale would fold "I" to a dotless "ı" and break the comparison.
+        Set<String> stored = fields.stream().map(field -> field.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
         return stored.equals(Set.of(StandardField.ABSTRACT.getName()))
                 || legacyGeneralFieldSets().contains(stored);
     }
@@ -136,7 +138,7 @@ public class PreferencesMigrations {
                 ResourceBundle bundle = ResourceBundle.getBundle("l10n/JabRef", locale);
                 for (String key : List.of("General", "Abstract")) {
                     if (bundle.containsKey(key)) {
-                        names.add(bundle.getString(key).toLowerCase());
+                        names.add(bundle.getString(key).toLowerCase(Locale.ROOT));
                     }
                 }
             });

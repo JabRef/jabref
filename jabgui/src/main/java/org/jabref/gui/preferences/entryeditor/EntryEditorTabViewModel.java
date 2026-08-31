@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.entryeditor;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -146,7 +147,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     private static Set<String> lowerCaseSet(List<String> patterns) {
-        return patterns.stream().map(String::toLowerCase).collect(Collectors.toSet());
+        // Locale.ROOT: with a Turkish UI locale, "FILE".toLowerCase() is "fıle" and would not match "file".
+        return patterns.stream().map(pattern -> pattern.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
     }
 
     public void removeTab(EditorTabViewModel tab) {

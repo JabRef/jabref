@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.entryeditor;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -73,12 +74,19 @@ class EntryEditorTabViewModelTest {
         viewModel.setValues();
         EditorTabViewModel german = viewModel.addCustomTab("Allgemein").orElseThrow();
         EntryEditorTabModel.CustomizedFieldsTab general = EntryEditorTabModel.CustomizedFieldsTab.classicTabs().getFirst();
-        general.fieldPatterns().forEach(field -> viewModel.addFieldPattern(german, field.toUpperCase()));
+        // Turkish default locale: naive case folding turns "FILE" into "fıle" and would miss the duplicate
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.of("tr", "TR"));
+            general.fieldPatterns().forEach(field -> viewModel.addFieldPattern(german, field.toUpperCase(Locale.ROOT)));
 
-        viewModel.addClassicTabs();
+            viewModel.addClassicTabs();
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
 
         List<String> names = viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList();
-        assertFalse(names.contains(general.name()));
+        assertFalse(names.contains(general.displayName()));
         assertTrue(names.contains(Localization.lang("Abstract")));
     }
 
