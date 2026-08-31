@@ -388,7 +388,8 @@ public class StringUtil {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
-    /// Checks if the given String has exactly one pair of surrounding curly braces <br>
+    /// Checks if the given String has exactly one pair of surrounding curly braces
+    ///
     /// Strings with escaped characters in curly braces at the beginning and end are respected, too
     ///
     /// @param toCheck The string to check
