@@ -242,8 +242,8 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     /// Result of a duplicate search.
-    /// Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
-    /// {@link BibEntry BibEntries} are equal to each other.
+    /// Uses [System#identityHashCode(Object)] for identifying objects for removal, as completely identical
+    /// [BibEntries][BibEntry] are equal to each other.
     static class DuplicateSearchResult {
 
         private final Map<String, BibEntry> toRemove = new HashMap<>();

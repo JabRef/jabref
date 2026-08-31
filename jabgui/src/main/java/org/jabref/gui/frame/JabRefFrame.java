@@ -569,8 +569,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     /// Opens a new tab with existing data.
-    /// Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-    /// Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
+    /// Asynchronous loading is done at [LibraryTab#createLibraryTab].
+    /// Similar method: [OpenDatabaseAction#openTheFile(Path)]
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
