@@ -6,6 +6,6 @@ import java.sql.SQLException;
 /// be used for tests.
 public class TestManager {
     public static void clearTables(DBMSConnection dbmsConnection) throws SQLException {
-        dbmsConnection.getConnection().createStatement().executeUpdate("DROP SCHEMA IF EXISTS \"jabref-alpha\" CASCADE");
+        dbmsConnection.getConnection().createStatement().executeUpdate("DROP SCHEMA IF EXISTS jabref CASCADE");
     }
 }

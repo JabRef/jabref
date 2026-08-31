@@ -146,8 +146,9 @@ public class DBMSProcessor {
         //         - https://contribute.liquibase.com/extensions-integrations/directory/integration-docs/gradle
         //         - https://forum.liquibase.org/t/adding-liquibase-to-an-existing-project/6076
         // If the schema name is changed, also adjust [TestManager#clearTables]
-        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
-        connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
+        // The old (structure version <= 1) quoted upper-case tables coexist in the same schema
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+        connection.createStatement().executeUpdate("SET search_path TO jabref");
 
         // TODO: entrytype should be moved to table "field" (org.jabref.model.entry.field.InternalField.TYPE_HEADER)
         connection.createStatement().executeUpdate("""

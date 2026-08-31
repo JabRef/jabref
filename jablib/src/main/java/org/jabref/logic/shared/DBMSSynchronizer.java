@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
@@ -43,6 +44,9 @@ import org.slf4j.LoggerFactory;
 
 /// Synchronizes the shared or local databases with their opposite side. Local changes are pushed by [EntriesEvent]
 /// using Google's Guava EventBus.
+// Synchronization methods are `synchronized`: they are invoked both from EventBus dispatch
+// threads and from the notification listener thread, and concurrent pulls would insert
+// entries twice. ponytail: coarse instance lock; finer locking only if profiling demands it.
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
@@ -59,13 +63,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
 
-    @SuppressWarnings("unused")
-    // will be required later for save actions
     private final FieldPreferences fieldPreferences;
 
     private final FileUpdateMonitor fileMonitor;
 
-    private Optional<BibEntry> lastEntryChanged_REMOVEME;
+    private Optional<BibEntry> entryWithPendingChanges;
     private final String userAndHost;
 
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
@@ -82,13 +84,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
-        this.lastEntryChanged_REMOVEME = Optional.empty();
+        this.entryWithPendingChanges = Optional.empty();
         this.userAndHost = userAndHost;
     }
 
     /// Listening method. Inserts a new [BibEntry] into shared database.
     @Subscribe
-    public void listen(EntriesAddedEvent event) {
+    public synchronized void listen(EntriesAddedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
@@ -100,7 +102,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             // TODO: Rewrite
             dbmsProcessor.insertEntries(event.getBibEntries());
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
-            lastEntryChanged_REMOVEME = Optional.empty();
+            entryWithPendingChanges = Optional.empty();
         }
     }
 
@@ -108,14 +110,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     ///
     /// In JabRef (UI), the field is modified
     @Subscribe
-    public void listen(FieldChangedEvent event) {
+    public synchronized void listen(FieldChangedEvent event) {
         if (!isEventSourceAccepted(event)) {
             return;
         }
         BibEntry bibEntry = event.getBibEntry();
         if (event.isFiltered() || !isPresentLocalBibEntry(bibEntry) || !checkCurrentConnection()) {
             // Filtered micro-edits are accumulated here and written on the next major change or on close
-            lastEntryChanged_REMOVEME = Optional.of(bibEntry);
+            entryWithPendingChanges = Optional.of(bibEntry);
             return;
         }
         synchronizeLocalMetaData();
@@ -128,7 +130,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Listening method. Deletes the given list of [BibEntry] from shared database.
     @Subscribe
-    public void listen(EntriesRemovedEvent event) {
+    public synchronized void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
@@ -141,18 +143,18 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Listening method. Synchronizes the shared [MetaData] and applies them locally.
     @Subscribe
-    public void listen(MetaDataChangedEvent event) {
+    public synchronized void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
             synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
             // Other clients are notified through the upsert_metadata function (see DBMSProcessor.setUp)
-            // TODO: applyMetaData();
+            applyMetaData();
         }
     }
 
     /// Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
     ///
     /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ([DBMSProcessor]).
-    public void initializeDatabases() throws DatabaseNotSupportedException {
+    public synchronized void initializeDatabases() throws DatabaseNotSupportedException {
         try {
             if (!dbmsProcessor.checkBaseIntegrity()) {
                 LOGGER.info("Integrity check failed. Fixing...");
@@ -178,7 +180,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
     /// [BibEntry].
     @Override
-    public void synchronizeLocalDatabase() {
+    public synchronized void synchronizeLocalDatabase() {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -246,14 +248,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Synchronizes the shared [BibEntry] with the local one.
     @Override
-    public void synchronizeSharedEntry(BibEntry bibEntry) {
+    public synchronized void synchronizeSharedEntry(BibEntry bibEntry) {
         if (!checkCurrentConnection()) {
             return;
         }
         try {
-            // TODO: Either reenable (compare with fix https://github.com/JabRef/jabref/pull/11282) or write user documentation that "cleanup actions" should be used or introduce SQL databse cleanup (stored procedure, ...)
-            // BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
-
+            // Perform possibly existing save actions
+            BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences);
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
@@ -263,7 +264,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Synchronizes all meta data locally.
-    public void synchronizeLocalMetaData() {
+    public synchronized void synchronizeLocalMetaData() {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -292,16 +293,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Applies the [MetaData] on all local and shared BibEntries.
-    public void applyMetaData() {
+    public synchronized void applyMetaData() {
         if (!checkCurrentConnection()) {
             return;
         }
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
             try {
                 // synchronize only if changes were present
-                // TODO: apply save actions
-                // if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
-                if (false) {
+                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
                     dbmsProcessor.updateEntry(bibEntry);
                 }
             } catch (OfflineLockException exception) {
@@ -314,7 +313,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Synchronizes the local BibEntries and applies the fetched MetaData on them.
     @Override
-    public void pullChanges() {
+    public synchronized void pullChanges() {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -327,7 +326,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Applies a field change received from another client. Any state that does not exactly
     /// match the received change (content-less payload, unknown entry, diverged field value)
     /// falls back to pulling everything from the database.
-    public void applyRemoteFieldChange(FieldChange fieldChange) {
+    public synchronized void applyRemoteFieldChange(FieldChange fieldChange) {
         if (fieldChange.field() == null) {
             // The sender could not include the change content
             pullChanges();
@@ -357,8 +356,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Synchronizes local BibEntries only if last entry changes still remain
-    public void pullLastEntryChanges() {
-        if (lastEntryChanged_REMOVEME.isPresent()) {
+    public synchronized void pullLastEntryChanges() {
+        if (entryWithPendingChanges.isPresent()) {
             if (!checkCurrentConnection()) {
                 return;
             }
@@ -371,10 +370,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Synchronizes local BibEntries and pulls remaining last entry changes
     private void pullWithLastEntry() {
-        if (lastEntryChanged_REMOVEME.isPresent() && isPresentLocalBibEntry(lastEntryChanged_REMOVEME.get())) {
-            synchronizeSharedEntry(lastEntryChanged_REMOVEME.get());
+        if (entryWithPendingChanges.isPresent() && isPresentLocalBibEntry(entryWithPendingChanges.get())) {
+            synchronizeSharedEntry(entryWithPendingChanges.get());
         }
-        lastEntryChanged_REMOVEME = Optional.empty();
+        entryWithPendingChanges = Optional.empty();
     }
 
     /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new [ConnectionLostEvent] is going to be sent.

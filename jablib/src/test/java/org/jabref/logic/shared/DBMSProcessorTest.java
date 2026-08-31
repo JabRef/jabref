@@ -119,7 +119,7 @@ class DBMSProcessorTest {
     void migrationFromV1Structure() throws SQLException {
         // Recreate the structure of JabRef 5.x/6.0-alpha (structure version 1) with one entry
         Connection connection = dbmsConnection.getConnection();
-        connection.createStatement().executeUpdate("CREATE SCHEMA jabref");
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
         connection.createStatement().executeUpdate("""
                     CREATE TABLE jabref."ENTRY" (
                         "SHARED_ID" SERIAL PRIMARY KEY,
