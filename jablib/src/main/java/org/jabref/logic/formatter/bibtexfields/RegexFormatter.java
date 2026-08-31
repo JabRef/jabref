@@ -28,8 +28,7 @@ public class RegexFormatter extends Formatter {
     private static final String REGEX_CAPTURING_GROUP = "regex";
     private static final String REPLACEMENT_CAPTURING_GROUP = "replacement";
 
-    /// Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
-    /// RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
+    /// Matches a valid argument to the constructor. Two capturing groups are used to parse the [RegexFormatter#regex] and [RegexFormatter#replacement] used in [RegexFormatter#format(String)]
     private static final Pattern CONSTRUCTOR_ARGUMENT = Pattern.compile(
             "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*)\"\\)$");
 

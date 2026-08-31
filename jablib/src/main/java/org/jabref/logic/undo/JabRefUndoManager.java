@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 ///     never wait for another thread. A change that hopped to the JavaFX thread and waited
 ///     would deadlock against a menu refresh already inside [#canUndo] — the journal's monitor
 ///     held here, the JavaFX thread held there. Every change today is a plain model write.
+///
 ///   - Everything else this class does not own runs outside the lock.
 ///     [#addEdit(String,Consumer)] never holds it while calling `mutations`, and
 ///     [#notifyListeners] runs after the monitor is released, because a listener may well wait

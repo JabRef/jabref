@@ -493,12 +493,13 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 ## Documentation
 
 - Add a CHANGELOG.md entry only if the change is visible to the user.
+- Do not add an entry when fixing something that was itself introduced after the last release (e.g. a bug in a feature that only exists in `## [Unreleased]`) — users of the last release never saw the bug. Instead, update the existing unreleased entry if the fix changes what it should say.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
 - **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
 - Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
 - Do not add extra blank lines in CHANGELOG.md
-- Do not reorder or reword existing entries, and do not create a new version heading.
+- Do not reorder or reword existing entries (except the unreleased entry your fix relates to, per the rule above), and do not create a new version heading.
 - CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
 - When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.

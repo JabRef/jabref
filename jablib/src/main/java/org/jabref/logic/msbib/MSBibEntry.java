@@ -76,7 +76,7 @@ class MSBibEntry {
         // empty
     }
 
-    /// Create a new {@link MSBibEntry} to import from an XML element
+    /// Create a new [MSBibEntry] to import from an XML element
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }

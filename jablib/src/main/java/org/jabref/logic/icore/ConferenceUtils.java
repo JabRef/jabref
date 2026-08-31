@@ -79,7 +79,7 @@ public final class ConferenceUtils {
     /// Generates possible acronym candidates from the given input string by splitting on common delimiters and extracting
     /// substrings within the specified cutoff length.
     ///
-    /// Candidates are ordered in a {@link TreeSet} such that longer strings are positioned before shorter ones, with
+    /// Candidates are ordered in a [TreeSet] such that longer strings are positioned before shorter ones, with
     /// lexicographical ordering used to break ties. This prevents overfitting on composite acronyms during lookup (like
     /// between `IEEE-IV` and `IV`) by pushing the shorter substrings to the end.
     /// A maximum of 50 candidates are generated to avoid excessive expansion.
@@ -164,6 +164,7 @@ public final class ConferenceUtils {
     /// The normalization process performs the following steps:
     ///
     /// <ol>
+    ///
     /// - Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
     /// - Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
     /// regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,

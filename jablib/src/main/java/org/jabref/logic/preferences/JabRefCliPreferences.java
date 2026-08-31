@@ -139,8 +139,8 @@ import org.slf4j.LoggerFactory;
 /// Internally it defines symbols used to pick a value from the `java.util.prefs`
 /// interface and keeps a hashmap with all the default values.
 ///
-/// There are still some similar preferences classes ({@link OpenOfficePreferences} and
-/// {@link SharedDatabasePreferences}) which also use the `java.util.prefs` API.
+/// There are still some similar preferences classes ([OpenOfficePreferences] and
+/// [SharedDatabasePreferences]) which also use the `java.util.prefs` API.
 ///
 /// contents of the defaults HashMap that are defined in this class.
 /// There are more default parameters in this map which belong to separate preference classes.

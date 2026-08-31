@@ -95,7 +95,7 @@ public class MetaDataDiff {
         return groupRoot.getGroup().equals(GroupsFactory.createAllEntriesGroup());
     }
 
-    /// Should be kept in sync with {@link MetaData#equals(Object)}
+    /// Should be kept in sync with [MetaData#equals(Object)]
     public List<Difference> getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         List<Difference> changes = new ArrayList<>();
         addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
@@ -123,7 +123,7 @@ public class MetaDataDiff {
         return originalMetaData;
     }
 
-    /// Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
+    /// Currently, the groups diff is contained here - and as entry in [#getDifferences(GlobalCitationKeyPatterns)]
     public Optional<GroupDiff> getGroupDifferences() {
         return groupDiff;
     }
