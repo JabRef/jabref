@@ -153,10 +153,10 @@ public class SharedDatabaseUIManager {
         }
     }
 
-    /// Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
+    /// Opens a new shared database tab with the given [DBMSConnectionProperties].
     ///
     /// @param dbmsConnectionProperties Connection data
-    /// @return BasePanel which also used by {@link org.jabref.gui.exporter.SaveDatabaseAction}
+    /// @return BasePanel which also used by [org.jabref.gui.exporter.SaveDatabaseAction]
     public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 

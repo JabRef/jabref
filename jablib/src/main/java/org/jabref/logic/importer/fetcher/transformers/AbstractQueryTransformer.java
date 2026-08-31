@@ -13,7 +13,7 @@ import org.jabref.model.search.query.SearchQueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+/// In case the transformer contains state for a query transformation (such as the [IEEEQueryTransformer]), it has to be noted at the JavaDoc.
 /// Otherwise, a single instance QueryTransformer can be used.
 public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";

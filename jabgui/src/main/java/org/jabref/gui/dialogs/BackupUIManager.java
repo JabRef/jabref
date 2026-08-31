@@ -32,7 +32,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Stores all user dialogs related to {@link BackupManager}.
+/// Stores all user dialogs related to [BackupManager].
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 

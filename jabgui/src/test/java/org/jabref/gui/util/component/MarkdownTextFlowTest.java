@@ -62,7 +62,7 @@ class MarkdownTextFlowTest {
         return textFlowReference.get();
     }
 
-    /// Concatenation of the text of every {@link Text} child, i.e. what the user actually sees.
+    /// Concatenation of the text of every [Text] child, i.e. what the user actually sees.
     private static String renderedText(FxRobot robot, MarkdownTextFlow textFlow) {
         AtomicReference<String> renderedTextReference = new AtomicReference<>();
         robot.interact(() -> {
