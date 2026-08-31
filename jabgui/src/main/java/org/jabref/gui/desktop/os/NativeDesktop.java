@@ -304,7 +304,12 @@ public abstract class NativeDesktop {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e);
+                    LoggerFactory.getLogger(NativeDesktop.class).warn("Desktop.browse failed for {}, falling back to platform opener", url, e);
+                    try {
+                        get().openFile(url, "html", externalApplicationsPreferences);
+                    } catch (IOException e2) {
+                        LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e2);
+                    }
                 }
             });
         } else {
