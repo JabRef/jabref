@@ -14,12 +14,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Attaches a local `file:` PDF (e.g. one written by a browser-extension companion fetcher) to an
 /// entry: it copies or moves the file into the library's file directory and renames it per the
 /// file-naming pattern, mirroring the fate of a completed HTTP download.
+@NullMarked
 public final class LocalFulltextAttacher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFulltextAttacher.class);

@@ -1,7 +1,7 @@
 ---
 parent: Requirements
 ---
-<!-- markdownlint-disable-file MD022 -->
+
 # Browser-Extension Fulltext Provider Protocol
 
 A loopback HTTP protocol by which JabRef requests fulltext PDFs from a locally-running browser-extension companion. The companion uses the user's already-authenticated browser session to obtain a PDF that JabRef cannot reach directly (paywall, anti-bot, 418, institutional SSO).
@@ -280,3 +280,5 @@ Notes:
 - The race step fans out one HTTP request per discovered provider. The first `200` wins; losing requests are cancelled by closing their TCP connections (see [`req~bxf.cancellation~1`](#cancellation-via-connection-close)).
 - Adapter selection (publisher-specific vs generic fallback) and the per-publisher concurrency cap both live on the provider side; JabRef does not know which publisher adapters a provider supports.
 - The provider returns a local file path; JabRef wraps it as a `file://` URL so its existing attach pipeline copies the PDF into the library's file directory and renames it per the configured pattern.
+
+<!-- markdownlint-disable-file MD022 -->

@@ -140,6 +140,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
                     // Losers get cancelled once winner completes — expected.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    LOGGER.debug("Interrupted while draining browser-extension provider tasks", e);
                     return;
                 }
             }
@@ -150,6 +151,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             return winner.get(socketTimeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            LOGGER.debug("Interrupted while waiting for the browser-extension fulltext race", e);
             return Optional.empty();
         } catch (TimeoutException e) {
             LOGGER.debug("Browser-extension fulltext race timed out after {}", socketTimeout);
@@ -205,6 +207,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             return Optional.empty();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            LOGGER.debug("Interrupted while requesting fulltext from provider {}", provider.name(), e);
             return Optional.empty();
         }
     }

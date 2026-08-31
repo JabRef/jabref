@@ -23,9 +23,10 @@ FETCH_TIMEOUT = 300.0            # seconds; req~bxf.sync-hold / cancellation fal
 MATHSCINET_TIMEOUT = 10.0
 MAX_NM_MESSAGE = 1 << 20
 
-# error-code -> HTTP status (mirrors JabExtBridge.httpStatusForError)
-_STATUS = {"no-pdf-found": 404, "no-adapter": 404, "auth-required": 404,
-           "not-reachable": 404, "timeout": 504, "busy": 503, "bad-request": 400}
+# error-code -> HTTP status (per docs/requirements/browser-extension-fulltext.md)
+_STATUS = {"no-pdf-found": 404, "no-adapter": 404, "auth-required": 403,
+           "not-reachable": 502, "timeout": 504, "busy": 503, "bad-request": 400,
+           "internal-error": 500}
 
 
 # ---- platform paths (mirror BrowserExtensionProviderDiscovery) ----

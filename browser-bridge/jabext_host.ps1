@@ -23,8 +23,9 @@ $MathTimeoutMs   = 10000
 $ConfigBase = if ($env:JABEXT_CONFIG_BASE) { $env:JABEXT_CONFIG_BASE } else { Join-Path $env:APPDATA 'JabRef' }
 $DiscoveryDir = Join-Path $ConfigBase 'fulltext-providers'
 $TokenDir     = Join-Path $ConfigBase 'fulltext-providers-state'
-$StatusFor = @{ 'no-pdf-found'=404; 'no-adapter'=404; 'auth-required'=404;
-                'not-reachable'=404; 'timeout'=504; 'busy'=503; 'bad-request'=400 }
+$StatusFor = @{ 'no-pdf-found'=404; 'no-adapter'=404; 'auth-required'=403;
+                'not-reachable'=502; 'timeout'=504; 'busy'=503; 'bad-request'=400;
+                'internal-error'=500 }
 
 function Ensure-Token {
     New-Item -ItemType Directory -Force -Path $TokenDir | Out-Null
