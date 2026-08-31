@@ -221,6 +221,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// shows not-yet-linked files as auto-found suggestions (issue #16737). Probe for such
     /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
     /// the search and renders the suggestion rows.
+    // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
     private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
         if (editors.containsKey(StandardField.FILE)
                 || !guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {

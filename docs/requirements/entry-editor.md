@@ -75,6 +75,13 @@ A field's row shows a small gray "remove field" icon button pinned to its top-ri
 
 Needs: impl
 
+## Files found in the file directory are suggested even when no file is linked
+`req~entry-editor.main-tab.autolink-suggestions~1`
+
+When "Search and store files relative to library file location" finds files in the file directory that match the entry but are not linked in it, the file editor is shown in the files and links section even if the entry has no file field, listing those files as suggestions with an orange background and an accept button. This matches the file editor's behavior for entries that already have linked files.
+
+Needs: impl
+
 ## Custom tabs show a user-defined list of field patterns
 `req~entry-editor.custom-tabs~1`
 
