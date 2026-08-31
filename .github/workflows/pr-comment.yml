@@ -27,16 +27,18 @@ on:
   pull_request_review:
     types: [ submitted ]
   # Addressing a Qodo thread (resolving it, or the PR author replying in it) changes the label
-  # outcome but completes no workflow - listen to these events directly.
+  # outcome but completes no workflow - listen to these events directly. Deleting the author's
+  # last reply flips a thread back to unaddressed, so deletions count as well.
   pull_request_review_thread:
     types: [ resolved, unresolved ]
   pull_request_review_comment:
-    types: [ created ]
+    types: [ created, deleted ]
 
 jobs:
   comment:
-    # pull_request_review_comment: only a PR-author reply can un-count a Qodo thread, so other
-    # commenters' replies (including Qodo posting its own review comments) need no run.
+    # pull_request_review_comment: only a PR-author reply can un-count (or, when deleted,
+    # re-count) a Qodo thread, so other commenters' replies (including Qodo posting its own
+    # review comments) need no run. The deleted comment's author is in the same payload field.
     if: >-
       ${{ github.repository == 'JabRef/jabref'
           && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]')
