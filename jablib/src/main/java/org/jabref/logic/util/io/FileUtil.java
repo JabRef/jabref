@@ -381,6 +381,8 @@ public class FileUtil {
                     Thread.sleep(REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
                 } catch (InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();
+                    e.addSuppressed(interruptedException);
+                    LOGGER.debug("Interrupted while waiting to retry moving {} onto {}", source, target, e);
                     throw e;
                 }
             }
