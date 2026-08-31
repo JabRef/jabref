@@ -187,8 +187,19 @@ public class AllFieldsTab extends FieldsEditorTab {
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
+        // Fields shown on a custom tab are moved there, not displayed twice. Subtracted before
+        // re-adding userAddedFields so a field the user just added here stays visible (and keeps
+        // its focused editor) until another entry is opened, even when a regex pattern captures
+        // it as soon as the first character is typed.
+        fields.removeAll(customTabFields(entry));
         fields.addAll(userAddedFields);
         return fields;
+    }
+
+    /// Fields resolved by the configured custom tabs; the Main tab shows no editor and no
+    /// add-chip for these.
+    private Set<Field> customTabFields(BibEntry entry) {
+        return EntryEditorTabModel.fieldsOnCustomTabs(guiPreferences.getEntryEditorPreferences().getTabModels(), entry);
     }
 
     @Override
@@ -460,7 +471,9 @@ public class AllFieldsTab extends FieldsEditorTab {
             content.getChildren().add(sectionGrid);
         }
 
-        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
+        Set<Field> hidden = new LinkedHashSet<>(editors.keySet());
+        hidden.addAll(customTabFields(entry));
+        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), hidden);
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
             chips.getStyleClass().add("all-fields-add-chips");
@@ -498,7 +511,10 @@ public class AllFieldsTab extends FieldsEditorTab {
         chips.getStyleClass().add("all-fields-add-chips");
 
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
-            List<Field> shown = List.copyOf(editors.keySet());
+            // Custom-tab fields get no chip here: clicking one would show the field on its
+            // custom tab, not below this chip bar.
+            Set<Field> shown = new LinkedHashSet<>(editors.keySet());
+            shown.addAll(customTabFields(entry));
             FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));

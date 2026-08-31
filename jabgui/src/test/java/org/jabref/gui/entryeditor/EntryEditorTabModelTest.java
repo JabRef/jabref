@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -52,5 +53,17 @@ class EntryEditorTabModelTest {
     @Test
     void invalidRegexResolvesToNothing() {
         assertEquals(List.of(StandardField.AUTHOR), resolve(entry, "author", "comment-["));
+    }
+
+    @Test
+    void fieldsOnCustomTabsUnitesCustomTabsAndIgnoresBuiltInTabs() {
+        List<EntryEditorTabModel> tabModels = List.of(
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS, true),
+                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "url")),
+                new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("comment-.*")));
+        assertEquals(
+                Set.of(StandardField.AUTHOR, StandardField.URL,
+                        new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob")),
+                EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
     }
 }
