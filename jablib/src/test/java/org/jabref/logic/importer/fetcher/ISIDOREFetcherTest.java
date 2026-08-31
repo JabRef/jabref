@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
+@Disabled("isidore.science is unreachable: every request fails with \"Error getting response code\" before any assertion runs. Re-enable the whole class when the service is reachable again. See #16665")
 class ISIDOREFetcherTest {
 
     @TempDir
@@ -80,7 +81,6 @@ class ISIDOREFetcherTest {
     }
 
     @Test
-    @Disabled("isidore.science is unreachable; the fetcher fails with \"Error getting response code\" before any assertion runs. See #16665")
     void checkThesis() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Thesis)
                 .withField(StandardField.TITLE, "Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system")
@@ -114,14 +114,12 @@ class ISIDOREFetcherTest {
     }
 
     @Test
-    @Disabled("isidore.science is unreachable; the fetcher fails with \"Error getting response code\" before any assertion runs. See #16665")
     void noResults() throws FetcherException {
         List<BibEntry> actual = fetcher.performSearch("nothing notthingham jojoyolo");
         assertEquals(List.of(), actual);
     }
 
     @Test
-    @Disabled("isidore.science is unreachable; the fetcher fails with \"Error getting response code\" before any assertion runs. See #16665")
     void author() throws FetcherException {
         List<BibEntry> actual = fetcher.performSearch("author=\"Adam Strange\"");
         assertEquals(List.of(new BibEntry(StandardEntryType.Article)
@@ -139,7 +137,6 @@ class ISIDOREFetcherTest {
     }
 
     @Test
-    @Disabled("isidore.science is unreachable; the fetcher fails with \"Error getting response code\" before any assertion runs. See #16665")
     void performRawSearchQueryPagedFindsEntry() throws FetcherException {
         Page<BibEntry> page = fetcher.performRawSearchQueryPaged("Corporate Social Responsibility", 0);
         assertFalse(page.getContent().isEmpty());
