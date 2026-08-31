@@ -69,6 +69,7 @@ jobs:
           done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
           echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
+          echo "head_sha=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" >> $GITHUB_OUTPUT
 
           if [ "$MERGEABLE" != "CONFLICTING" ]; then
             echo "✅ No merge conflicts"
@@ -198,8 +199,9 @@ jobs:
           if [ "$EVENT" = "workflow_dispatch" ]; then
             # Fail closed: a failing "gh api" must abort the step (via set -e), not be
             # swallowed into "no comment found" - which would post a duplicate comment.
-            # Redirected to a file rather than captured in a variable, because xtrace
-            # would echo the expanded assignment - all 20 comment bodies - into the log.
+            # jq matches the complete workflow-owned marker (a shell grep would either split a
+            # multi-line -F pattern into per-line alternatives or loosely match free text quoting
+            # the phrase), and only matches reach the file - so xtrace never echoes comment bodies.
             gh api graphql -f query="
                 query {
                   repository(owner: \"JabRef\", name: \"JabRef\") {
@@ -210,9 +212,9 @@ jobs:
                     }
                   }
                 }
-              " --jq '.data.repository.pullRequest.comments.nodes[].body' > comments.txt
+              " --jq '.data.repository.pullRequest.comments.nodes[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
 
-            if grep -q "Conflicts with target branch" comments.txt; then
+            if [ -s marker_comments.txt ]; then
               echo "Already commented about conflicts."
               # When triggered by another workflow, success is also if there is a merge conflict
               exit 0;
@@ -250,11 +252,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          HEAD_SHA: ${{ steps.check_mergeable.outputs.head_sha }}
         run: |
           set -exo pipefail
-          MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
-          # File, not pipe: "grep -q" exits on the first match and would SIGPIPE "gh", which pipefail turns into a skip.
-          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' > comments.txt
-          if grep -qzF -- "$MARKER" comments.txt; then
-            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
+          # jq matches the complete workflow-owned marker, per page of the paginated response
+          # (a shell grep would either split a multi-line -F pattern into per-line alternatives
+          # or loosely match free text quoting the phrase).
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
+          if [ -s marker_comments.txt ]; then
+            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID" --field head_sha="$HEAD_SHA"
           fi

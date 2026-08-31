@@ -21,7 +21,7 @@ public final class EntryDelete extends DatabaseChange {
 
     @Override
     public void applyChange(CompoundEdit undoEdit) {
-        undoEdit.apply(new UndoableRemoveEntries(databaseContext.getDatabase(), deletedEntry));
+        undoEdit.applyEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), deletedEntry));
     }
 
     public BibEntry getDeletedEntry() {

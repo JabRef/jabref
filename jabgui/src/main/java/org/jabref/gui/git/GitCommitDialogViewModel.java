@@ -74,7 +74,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                 })
                 .onFailure(ex ->
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("Git Commit Failed"),
+                                Localization.lang("Git commit failed"),
                                 ex.getMessage(),
                                 ex
                         )
@@ -143,7 +143,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
 
-        Path bibFilePath = bibFilePathOpt.get();
+        Path bibFilePath = GitHandler.resolveToRealPath(bibFilePathOpt.get());
         Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRootOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));

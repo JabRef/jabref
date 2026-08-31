@@ -52,11 +52,17 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractV
         allFields.setAll(fieldsSet);
     }
 
-    protected void addEdit(AutomaticFieldEditorUndoableEdit edits) {
+    /// Folds `edits` into the dialog's step and reports how many entries it touched.
+    ///
+    /// `affectedEntries` is passed rather than carried by `edits`, because it is what this
+    /// notification says to the user and not part of the change being recorded. An
+    /// `AutomaticFieldEditorUndoableEdit` subclass used to carry it, which cost [CompoundEdit]
+    /// its `final` and gave a value type a field the undo model never reads.
+    protected void addEdit(CompoundEdit edits, int affectedEntries) {
         compoundEdit.addEdit(edits);
         dialogService.notify(new Notifications.UiNotification(
                 Localization.lang("Automatic field editor"),
-                Localization.lang("%0 / %1 affected entries", edits.getAffectedEntries(), stateManager.getSelectedEntries().size()))
+                Localization.lang("%0 / %1 affected entries", affectedEntries, stateManager.getSelectedEntries().size()))
                 .withAutoClose(Duration.seconds(5)));
     }
 }

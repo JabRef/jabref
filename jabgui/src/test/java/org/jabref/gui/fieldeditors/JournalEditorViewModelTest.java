@@ -7,7 +7,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class JournalEditorViewModelTest {
 
     private final JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
-    private final UndoManager undoManager = new UndoManager();
+    private final JabRefUndoManager undoManager = new JabRefUndoManager();
     private BibEntry entry;
     private JournalEditorViewModel viewModel;
 

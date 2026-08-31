@@ -49,7 +49,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        setTitle(Localization.lang("Git Commit"));
+        setTitle(Localization.lang("Git commit"));
         this.viewModel = new GitCommitDialogViewModel(
                 stateManager,
                 dialogService,
