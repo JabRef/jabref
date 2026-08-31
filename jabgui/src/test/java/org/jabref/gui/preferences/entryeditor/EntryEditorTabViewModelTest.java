@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.entryeditor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,6 +15,8 @@ import org.jabref.logic.util.TaskExecutor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -70,6 +74,7 @@ class EntryEditorTabViewModelTest {
     }
 
     @Test
+    @ResourceLock(Resources.LOCALE)
     void classicTabStoredUnderAnotherLanguageIsNotAddedAgain() {
         viewModel.setValues();
         EditorTabViewModel german = viewModel.addCustomTab("Allgemein").orElseThrow();
@@ -85,9 +90,16 @@ class EntryEditorTabViewModelTest {
             Locale.setDefault(defaultLocale);
         }
 
-        List<String> names = viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList();
-        assertFalse(names.contains(general.displayName()));
-        assertTrue(names.contains(Localization.lang("Abstract")));
+        List<String> expected = new ArrayList<>();
+        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
+              .filter(builtIn -> builtIn != EntryEditorTabModel.BuiltIn.PREVIEW)
+              .map(EntryEditorTabModel.BuiltIn::displayName)
+              .forEach(expected::add);
+        // "General" already exists as "Allgemein" (same fields), so only "Abstract" and "Comments" are inserted
+        expected.addAll(1, List.of(Localization.lang("Abstract"), Localization.lang("Comments")));
+        expected.add("Allgemein");
+
+        assertEquals(expected, viewModel.getTabs().stream().map(EditorTabViewModel::getDisplayName).toList());
     }
 
     @Test

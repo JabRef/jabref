@@ -8,10 +8,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class EntryEditorPreferencesTest {
 
     @Test

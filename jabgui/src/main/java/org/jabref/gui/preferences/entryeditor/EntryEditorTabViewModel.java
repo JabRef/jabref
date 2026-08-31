@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -130,10 +131,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     /// tab with its display name exists, or when a custom tab already has exactly its fields.
     // [impl->req~entry-editor.classic-tabs~1]
     public void addClassicTabs() {
-        int insertAt = 1 + tabs.stream()
-                               .map(EditorTabViewModel::getDisplayName)
-                               .toList()
-                               .indexOf(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
+        // Located by type, not display name: a custom tab could be named like the "Main" tab.
+        int insertAt = 1 + IntStream.range(0, tabs.size())
+                                    .filter(index -> tabs.get(index).isBuiltIn(EntryEditorTabModel.BuiltIn.ALL_FIELDS))
+                                    .findFirst()
+                                    .orElse(-1);
         for (EntryEditorTabModel.CustomizedFieldsTab classicTab : EntryEditorTabModel.CustomizedFieldsTab.classicTabs()) {
             Set<String> classicFields = lowerCaseSet(classicTab.fieldPatterns());
             boolean exists = tabs.stream().anyMatch(tab ->

@@ -69,6 +69,10 @@ public class EditorTabViewModel {
         return builtIn == null;
     }
 
+    public boolean isBuiltIn(EntryEditorTabModel.BuiltIn type) {
+        return builtIn == type;
+    }
+
     public String getDisplayName() {
         return builtIn != null ? builtIn.displayName() : EntryEditorTabModel.CustomizedFieldsTab.localizedName(customName);
     }
