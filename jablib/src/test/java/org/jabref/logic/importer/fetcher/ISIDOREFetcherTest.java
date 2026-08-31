@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
+@Disabled("isidore.science is unreachable: every request fails with \"Error getting response code\" before any assertion runs. Re-enable the whole class when the service is reachable again. See #16665")
 class ISIDOREFetcherTest {
 
     @TempDir

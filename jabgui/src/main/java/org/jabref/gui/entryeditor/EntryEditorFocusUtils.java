@@ -19,10 +19,10 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.Nullable;
 
-/// Handles all focus and keyboard-navigation concerns for {@link EntryEditor}.
+/// Handles all focus and keyboard-navigation concerns for [EntryEditor].
 ///
 /// Owns: field-level focus capture/restore across entry changes; tab-to-tab keyboard navigation
-/// (Tab/Shift-Tab wrapping) and jump-to-field lookups. DOM traversal is delegated to {@link EntryEditorFocusTraversal}.
+/// (Tab/Shift-Tab wrapping) and jump-to-field lookups. DOM traversal is delegated to [EntryEditorFocusTraversal].
 class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
@@ -98,7 +98,7 @@ class EntryEditorFocusUtils {
 
     // region — tab keyboard navigation (Tab / Shift-Tab wrapping)
 
-    /// Installs Tab/Shift-Tab wrapping key filters on every focusable node inside {@code tab}'s content.
+    /// Installs Tab/Shift-Tab wrapping key filters on every focusable node inside `tab`'s content.
     void setupNavigationForTab(FieldsEditorTab tab) {
         Node content = tab.getContent();
         if (content instanceof Parent parent) {

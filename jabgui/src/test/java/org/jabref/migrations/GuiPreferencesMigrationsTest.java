@@ -1,9 +1,11 @@
 package org.jabref.migrations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.preferences.CliPreferences;
@@ -70,6 +72,26 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
         verify(preferences, never()).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, arbitraryPattern);
+    }
+
+    @Test
+    void upgradeMacKeyBindingDefaultsMigratesOldFullSnapshotWithoutOverwritingCustomizedBinding() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = new ArrayList<>(Arrays.stream(KeyBinding.values()).map(KeyBinding::getDefaultKeyBinding).toList());
+        bindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "alt+s");
+        bindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "alt+F");
+        bindings.set(bindNames.indexOf(KeyBinding.CLEANUP.getConstant()), "shortcut+shift+9");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacKeyBindingDefaults(preferences, true);
+
+        List<String> expectedBindings = new ArrayList<>(bindings);
+        expectedBindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "shortcut+alt+G");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "shortcut+alt+F");
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
+        verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
     }
 
     @Test
