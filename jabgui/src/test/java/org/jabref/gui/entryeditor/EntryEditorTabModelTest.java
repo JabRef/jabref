@@ -66,4 +66,16 @@ class EntryEditorTabModelTest {
                         new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob")),
                 EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
     }
+
+    @Test
+    void regexCapturesFieldOnlyOnceItHasAValue() {
+        List<EntryEditorTabModel> tabModels = List.of(
+                new EntryEditorTabModel.CustomizedFieldsTab("Notes", List.of("note.*")));
+        BibEntry withoutNote = new BibEntry(StandardEntryType.Article);
+        assertEquals(Set.of(), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, withoutNote));
+        // First typed character sets the field; from then on it belongs to the custom tab
+        // (and the Main tab must drop it, even when it was chip-added there).
+        BibEntry withNote = new BibEntry(StandardEntryType.Article).withField(StandardField.NOTE, "x");
+        assertEquals(Set.of(StandardField.NOTE), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, withNote));
+    }
 }

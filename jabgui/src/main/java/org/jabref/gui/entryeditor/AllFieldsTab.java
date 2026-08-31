@@ -187,11 +187,12 @@ public class AllFieldsTab extends FieldsEditorTab {
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
-        // Fields shown on a custom tab are moved there, not displayed twice. Subtracted before
-        // re-adding userAddedFields so a field the user just added here stays visible (and keeps
-        // its focused editor) until another entry is opened, even when a regex pattern captures
-        // it as soon as the first character is typed.
-        fields.removeAll(customTabFields(entry));
+        // Fields shown on a custom tab are moved there, not displayed twice. Also dropped from
+        // userAddedFields: a chip-added field whose value starts matching a custom-tab regex must
+        // not linger on the Main tab (its editor moves to the custom tab on that rebuild).
+        Set<Field> customFields = customTabFields(entry);
+        fields.removeAll(customFields);
+        userAddedFields.removeAll(customFields);
         fields.addAll(userAddedFields);
         return fields;
     }
