@@ -244,6 +244,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                           // so this also invalidates callbacks that outlive the tab. The citation
                           // key comparison drops results of probes started for a stale key.
                           if (!foundFiles.isEmpty()
+                                  && guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()
                                   && subscribedEntry.filter(current -> current == entry).isPresent()
                                   && entry.getCitationKey().equals(keyAtProbeStart)
                                   && !editors.containsKey(StandardField.FILE)) {

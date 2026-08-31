@@ -349,6 +349,16 @@
     -fx-background-radius: 4px;
 }
 
+/* The suggestion background must not mask the list's interaction affordances
+   (same colors the themes use for cell hover and selection). */
+.linked-files-list .list-cell:auto-found:filled:hover {
+    -fx-background-color: -color-border-default;
+}
+
+.linked-files-list .list-cell:auto-found:filled:selected {
+    -fx-background-color: -color-selection;
+}
+
 /* Sidepane */
 
 .sidePaneComponent {
