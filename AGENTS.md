@@ -487,6 +487,16 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
 8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change. If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
+### After opening or updating a PR
+
+Opening a PR is not the end of the task — green checks are. After `gh pr create` and after every later push:
+
+1. Watch the checks: `gh pr checks <number> --watch` (or poll `gh pr checks <number>`).
+2. For each failing check, read the failure before touching anything: `gh run view <run-id> --log-failed`, or fetch the annotations (`gh api repos/JabRef/jabref/check-runs/<job-id>/annotations`) — they usually name the file and line.
+3. Fix straightforward failures yourself and push the fix. Typical ones: formatting/OpenRewrite diffs, CHANGELOG placement, Markdown/MADR lint (e.g. an ADR number colliding with one that landed on `main` after branching — renumber to the next free ID), a test broken by the PR's own change.
+4. If the failure is unrelated to the PR (infrastructure flake, `main` already red), say so in a PR comment instead of blindly re-pushing; re-run the job if it looks transient.
+5. Repeat until all checks are green or every remaining failure is explained on the PR.
+
 ---
 
 ## Documentation
