@@ -312,7 +312,7 @@ public class BibEntry {
     /// If a database is given, this function will try to resolve any string
     /// references in the field-value.
     /// Also, if a database is given, this function will try to find values for
-    /// unset fields in the entry linked by the "crossref" ([StandardField#CROSSREF] field, if any.
+    /// unset fields in the entry linked by the "crossref" ([StandardField#CROSSREF]) field, if any.
     ///
     /// @param field    The field to return the value of.
     /// @param database The database of the bibtex entry.
@@ -908,7 +908,7 @@ public class BibEntry {
     ///
     /// - comments before entry
     /// - entry type
-    /// - fields (including the citation key [InternalField#KEY_FIELD]
+    /// - fields (including the citation key [InternalField#KEY_FIELD])
     ///
     @Override
     public int hashCode() {
