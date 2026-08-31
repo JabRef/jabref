@@ -340,9 +340,10 @@
     -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
-/* File found in the file directory but not (yet) linked in the entry */
+/* File found in the file directory but not (yet) linked in the entry.
+   Deliberately not -color-warning-subtle: orange signals "linked but not found". */
 .file-row:auto-found {
-    -fx-background-color: -color-warning-subtle;
+    -fx-background-color: -color-shadow-subtle;
     -fx-background-radius: 4px;
 }
 
