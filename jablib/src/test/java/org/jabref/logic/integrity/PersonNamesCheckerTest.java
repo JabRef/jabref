@@ -52,7 +52,10 @@ class PersonNamesCheckerTest {
 
                 "hugo Para{\\~n}os",                // tilde in name
 
-                "Kolb, Stefan\n               and Harrer, Simon" // value wrapped over several lines
+                "Kolb, Stefan\n               and Harrer, Simon", // value wrapped over several lines
+
+                "John\u2003Smith",             // em space (Unicode whitespace) between names
+                "\u00A0Kolb, Stefan\u2009"    // leading/trailing Unicode whitespace
         );
     }
 
