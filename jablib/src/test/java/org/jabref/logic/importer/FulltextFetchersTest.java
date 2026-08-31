@@ -11,7 +11,7 @@ import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 class FulltextFetchersTest {
 
     /// Required for testing the FulltextFetchers class.

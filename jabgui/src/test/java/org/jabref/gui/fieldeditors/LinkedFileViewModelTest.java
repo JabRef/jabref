@@ -268,8 +268,8 @@ class LinkedFileViewModelTest {
         assertEquals("URL", actual);
     }
 
-    // We cannot use "@FetcherTest" annotation, because a @FetcherTest does not fire up a GUI environment (which is needed for this test)
-    // @FetcherTest
+    // We cannot use "@ExternalServicesTest" annotation, because a @ExternalServicesTest does not fire up a GUI environment (which is needed for this test)
+    // @ExternalServicesTest
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {

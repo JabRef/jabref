@@ -386,7 +386,7 @@ npx markdownlint-cli2 "*.md"
 Tests requiring external resources have dedicated tasks:
 
 - `./gradlew databaseTest` — requires PostgreSQL
-- `./gradlew fetcherTest` — hits live external APIs
+- `./gradlew externalServicesTest` — hits live external APIs
 
 Fetcher tests must always hit the live endpoints — do not mock or stub the remote API in fetcher tests.
 
