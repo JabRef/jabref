@@ -118,28 +118,28 @@ public class PreferencesMigrations {
     /// preferences dialog and the former per-startup General-fields migration did), so the store cannot
     /// tell defaults from customizations. Since [#12711](https://github.com/JabRef/jabref/issues/12711) the
     /// "Main" tab shows all these fields, so such a tab is pure duplication. A tab counts as a default only
-    /// if both its name is a translation of "General"/"Abstract" (names were stored localized, and not
-    /// necessarily in the current language) and its fields are exactly one of the shipped default sets.
+    /// if its name and its fields match as a shipped pair: a translation of "Abstract" (names were stored
+    /// localized, and not necessarily in the current language) with exactly the abstract field, or a
+    /// translation of "General" with exactly one of the shipped default field sets. A cross-match (e.g. an
+    /// "Abstract" tab holding the General fields) is a customization and is kept.
     private static boolean isLegacyDefaultTab(String name, List<String> fields) {
-        if (!legacyDefaultTabNames().contains(name.trim().toLowerCase(Locale.ROOT))) {
-            return false;
-        }
+        String normalizedName = name.trim().toLowerCase(Locale.ROOT);
         // Locale.ROOT: a Turkish UI locale would fold "I" to a dotless "ı" and break the comparison.
         Set<String> stored = fields.stream().map(field -> field.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
-        return stored.equals(Set.of(StandardField.ABSTRACT.getName()))
-                || legacyGeneralFieldSets().contains(stored);
+        if (stored.equals(Set.of(StandardField.ABSTRACT.getName()))) {
+            return legacyTabNames("Abstract").contains(normalizedName);
+        }
+        return legacyGeneralFieldSets().contains(stored) && legacyTabNames("General").contains(normalizedName);
     }
 
-    /// "General" and "Abstract" in every language JabRef ships, lower-cased.
-    private static Set<String> legacyDefaultTabNames() {
+    /// The translations of the given tab name in every language JabRef ships, lower-cased.
+    private static Set<String> legacyTabNames(String key) {
         Set<String> names = new HashSet<>();
         for (Language language : Language.values()) {
             Language.convertToSupportedLocale(language).ifPresent(locale -> {
                 ResourceBundle bundle = ResourceBundle.getBundle("l10n/JabRef", locale);
-                for (String key : List.of("General", "Abstract")) {
-                    if (bundle.containsKey(key)) {
-                        names.add(bundle.getString(key).toLowerCase(Locale.ROOT));
-                    }
+                if (bundle.containsKey(key)) {
+                    names.add(bundle.getString(key).toLowerCase(Locale.ROOT));
                 }
             });
         }

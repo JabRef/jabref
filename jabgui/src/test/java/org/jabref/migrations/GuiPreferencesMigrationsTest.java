@@ -375,12 +375,18 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList("customTabFields_1")).thenReturn(List.of(
                 "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
                 "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
-        when(preferences.get(eq("customTabName_2"), any())).thenReturn(null);
+        // cross-match: a stock "Abstract" name (German) paired with a shipped General field set
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn("Zusammenfassung");
+        when(preferences.getStringList("customTabFields_2")).thenReturn(List.of(
+                "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
+                "doi", "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
+        when(preferences.get(eq("customTabName_3"), any())).thenReturn(null);
 
         PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
 
         verify(preferences).put(eq("entryEditorCustomTabs"), eq(
-                "{\"My summary\":[\"abstract\"],\"General\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"]}"));
+                "{\"My summary\":[\"abstract\"],\"General\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"],"
+                        + "\"Zusammenfassung\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"doi\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"]}"));
     }
 
     @Test
