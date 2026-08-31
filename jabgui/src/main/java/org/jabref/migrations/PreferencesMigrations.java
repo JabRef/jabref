@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
@@ -54,6 +57,7 @@ public class PreferencesMigrations {
         upgradeImportFileAndDirePatterns(preferences);
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
+        upgradeMacKeyBindingDefaults(preferences, OS.OS_X);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
@@ -299,6 +303,36 @@ public class PreferencesMigrations {
         List<String> keys = new ArrayList<>(prefs.getStringList(JabRefGuiPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefGuiPreferences.BINDINGS, keys);
+    }
+
+    /// Updates unchanged key bindings in snapshots persisted before macOS-specific defaults were introduced.
+    static void upgradeMacKeyBindingDefaults(JabRefCliPreferences prefs, boolean isMacOs) {
+        if (!isMacOs || prefs.getBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, false)) {
+            return;
+        }
+
+        List<String> bindNames = prefs.getStringList(JabRefGuiPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefGuiPreferences.BINDINGS);
+        if (bindNames.isEmpty() || bindNames.size() != bindings.size()) {
+            return;
+        }
+
+        List<String> migratedBindings = new ArrayList<>(bindings);
+        for (int i = 0; i < bindNames.size(); i++) {
+            String bindingName = bindNames.get(i);
+            String persistedBinding = bindings.get(i);
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                if (keyBinding.getConstant().equals(bindingName)) {
+                    int index = i;
+                    keyBinding.getMacDefaultReplacement(persistedBinding)
+                              .ifPresent(replacement -> migratedBindings.set(index, replacement));
+                    break;
+                }
+            }
+        }
+
+        prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
+        prefs.putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
@@ -585,13 +619,47 @@ public class PreferencesMigrations {
 
     /// upgrade the old theme css names of the theme to the new theme properties
     /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
+    ///
+    /// The old keys are deleted after reading them, so the migration runs at most once --
+    /// migrations run on every startup, and re-applying the old value each time would
+    /// overwrite whatever the user selected in the new UI in the meantime.
     static void upgradeTheme(JabRefGuiPreferences preferences) {
-        if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
-            preferences.getWorkspacePreferences().setTheme(Theme.dark());
+        String theme = preferences.get("fxTheme", null);
+        // The old preference defaulted to syncing with the OS color scheme
+        boolean themeSyncOs = preferences.getBoolean("themeSyncOs", true);
+
+        if (theme != null) {
+            preferences.deleteKey("fxTheme");
         }
+        if (preferences.get("themeSyncOs", null) != null) {
+            preferences.deleteKey("themeSyncOs");
+        }
+
+        if (theme == null) {
+            // Fresh install, or already migrated: keep the new defaults (follow the system color scheme)
+            return;
+        }
+
+        if ("".equals(theme) && themeSyncOs) {
+            // Old default behavior: follow the OS color scheme -- matches the new defaults
+            return;
+        }
+
         // no value means light theme when sync with os theme switch is not on
-        if ("".equals(preferences.get("fxTheme", "")) && !preferences.getBoolean("themeSyncOs", false)) {
-            preferences.getWorkspacePreferences().setTheme(Theme.light());
+        if ("".equals(theme) || "Base.css".equals(theme) || "light".equals(theme)) {
+            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
+            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.LIGHT);
+
+            return;
         }
+
+        if ("Dark.css".equals(theme) || "dark".equals(theme)) {
+            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
+            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.DARK);
+
+            return;
+        }
+
+        preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
     }
 }

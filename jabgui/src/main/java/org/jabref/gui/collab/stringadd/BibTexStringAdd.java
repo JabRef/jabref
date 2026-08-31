@@ -26,7 +26,7 @@ public final class BibTexStringAdd extends DatabaseChange {
     @Override
     public void applyChange(CompoundEdit undoEdit) {
         try {
-            undoEdit.apply(new UndoableInsertString(databaseContext.getDatabase(), addedString));
+            undoEdit.applyEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));
         } catch (KeyCollisionException ex) {
             LOGGER.warn("Error: could not add string '{}': {}", addedString.getName(), ex.getMessage(), ex);
         }

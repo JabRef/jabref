@@ -103,7 +103,7 @@ public class ConferenceRepository {
     /// @param bookTitle the string to search, must not be `null`
     /// @return an `Optional` conference entry, if found
     /// or `Optional.empty()` if no conference entry is found
-    /// @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
+    /// @implNote see [ConferenceRepository#fuzzySearchConferenceTitles] for more details on matching
     public Optional<ConferenceEntry> getConferenceFromBookTitle(@NonNull String bookTitle) {
         String query = bookTitle.strip().toLowerCase();
         ConferenceEntry conference;
@@ -144,15 +144,16 @@ public class ConferenceRepository {
     }
 
     /// Searches the conference data for the given query string using a combination of Levenshtein similarity
-    /// {@link StringSimilarity#similarity} and Longest Common Substring (LCS) similarity {@link StringSimilarity#LCSSimilarity}.
+    /// [StringSimilarity#similarity] and Longest Common Substring (LCS) similarity [StringSimilarity#LCSSimilarity].
     ///
-    /// The input query is first fed through the normalizer at {@link ConferenceUtils#normalize} which strips away much of the
+    /// The input query is first fed through the normalizer at [ConferenceUtils#normalize] which strips away much of the
     /// noise.
     ///
     ///
     /// While searching, the function computes Levenshtein similarity and LCS similarity between the query and the current conference
     /// title (also normalized) and prioritizes them in the following order:
     /// <ol>
+    ///
     /// - Whenever LCS similarity returns `1.0`, i.e., a conference title is found entirely as a substring in the query.
     /// - Whenever Levenshtein similarity exceeds the threshold defined by the `LEVENSHTEIN_THRESHOLD` constant.
     /// - The combined weighted score of both LCS and Levenshtein similarities exceeds the `COMBINED_LCS_LEV_THRESHOLD`.

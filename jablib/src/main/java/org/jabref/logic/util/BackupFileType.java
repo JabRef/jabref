@@ -7,8 +7,9 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public enum BackupFileType implements FileType {
 
-    // Used at BackupManager
-    BACKUP("Backup", "bak"),
+    // Used at BackupManager.
+    // The backup gets the .bib extension, so that it can be opened in JabRef directly.
+    BACKUP("Backup", "bib"),
 
     // Used when writing the .bib file. See {@link org.jabref.logic.exporter.AtomicFileWriter}
     // Used for copying the .bib away before overwriting on save.

@@ -119,7 +119,7 @@ public class MetaDataSerializerTest {
         assertEquals(Set.of(), type.get().getOptionalFields());
     }
 
-    /// Code clone of {@link org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()}
+    /// Code clone of [org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()]
     public static Stream<Arguments> serializeCustomizedEntryType() {
         return Stream.of(
                 Arguments.of(
