@@ -378,7 +378,7 @@ public class StringUtil {
     /// We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
     ///
     /// <h4>Example</h4>
-    /// ```
+    /// ```text
     /// Legacy Macintosh \r -> OS.NEWLINE
     /// Windows \r\n -> OS.NEWLINE
     /// ```

@@ -53,7 +53,7 @@ public class XMLUtil {
 
     /// Gets the content of a subnode.
     /// For example,
-    /// ```
+    /// ```xml
     /// <item>
     /// <nodeName>content</nodeName>
     /// </item>
@@ -81,7 +81,7 @@ public class XMLUtil {
 
     /// Gets a list of subnodes with the specified tag name.
     /// For example,
-    /// ```
+    /// ```xml
     /// <item>
     /// <node>first hit</node>
     /// <node>second hit</node>
@@ -97,7 +97,7 @@ public class XMLUtil {
 
     /// Gets a the first subnode with the specified tag name.
     /// For example,
-    /// ```
+    /// ```xml
     /// <item>
     /// <node>hit</node>
     /// <node>second hit, but not returned</node>

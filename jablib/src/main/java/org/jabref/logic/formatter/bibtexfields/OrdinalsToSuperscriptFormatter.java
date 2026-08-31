@@ -31,7 +31,7 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
     /// Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
     ///
     /// <h4>Example</h4>
-    /// ```
+    /// ```text
     /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
     /// ```
     @Override

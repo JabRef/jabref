@@ -237,7 +237,7 @@ class CitationKeyGeneratorTest {
     ///
     /// not tested/ not in hashmap UNICODE_CHARS:
     ///
-    /// ```
+    /// ```text
     /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
     /// Ǣ ǣ ǖ ǘ ǚ ǜ
     /// Đ đ   Ů ů
