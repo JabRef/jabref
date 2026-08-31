@@ -18,11 +18,6 @@ public final class BSTFormatUtils {
     private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
     private static final Pattern BRACED_ETALCHAR_PATTERN = Pattern.compile("\\{\\\\etalchar\\{([^}]*)}}");
     private static final Pattern ETALCHAR_PATTERN = Pattern.compile("\\\\etalchar\\{([^}]*)}");
-    private static final Pattern TEXTSC_PATTERN = Pattern.compile("\\\\textsc\\{([^}]*?)}");
-    private static final Pattern GROUP_SC_PATTERN = Pattern.compile("\\{\\\\sc\\s+([^}]*?)}");
-    private static final Pattern TEXTSUPERSCRIPT_PATTERN = Pattern.compile("\\\\textsuperscript\\{([^}]*?)}");
-    private static final Pattern TEXTSUBSCRIPT_PATTERN = Pattern.compile("\\\\textsubscript\\{([^}]*?)}");
-
     private BSTFormatUtils() {
     }
 
@@ -81,20 +76,33 @@ public final class BSTFormatUtils {
     }
 
     public static String convertInlineLatexFormattingToHtml(String latex) {
-        String html = replaceInlineLatexFormatting(TEXTSC_PATTERN, latex, "<span style=\"font-variant: small-caps\">", "</span>");
-        html = replaceInlineLatexFormatting(GROUP_SC_PATTERN, html, "<span style=\"font-variant: small-caps\">", "</span>");
-        html = replaceInlineLatexFormatting(TEXTSUPERSCRIPT_PATTERN, html, "<sup>", "</sup>");
-        return replaceInlineLatexFormatting(TEXTSUBSCRIPT_PATTERN, html, "<sub>", "</sub>");
+        String html = replaceCommandWithBalancedArgument(latex, "textsc", "<span style=\"font-variant: small-caps\">", "</span>");
+        html = replaceLegacySwitchWithBalancedArgument(html, "sc", "<span style=\"font-variant: small-caps\">", "</span>");
+        html = replaceCommandWithBalancedArgument(html, "textsuperscript", "<sup>", "</sup>");
+        return replaceCommandWithBalancedArgument(html, "textsubscript", "<sub>", "</sub>");
     }
 
-    private static String replaceInlineLatexFormatting(Pattern pattern, String input, String openingTag, String closingTag) {
-        Matcher matcher = pattern.matcher(input);
-        StringBuilder converted = new StringBuilder();
-        while (matcher.find()) {
-            matcher.appendReplacement(converted, Matcher.quoteReplacement(openingTag + matcher.group(1) + closingTag));
+    private static String replaceCommandWithBalancedArgument(String input, String command, String openingTag, String closingTag) {
+        String needle = "\\" + command + "{";
+        StringBuilder out = new StringBuilder(input.length());
+        int i = 0;
+        while (i < input.length()) {
+            int j = input.indexOf(needle, i);
+            if (j < 0) {
+                out.append(input, i, input.length());
+                break;
+            }
+            out.append(input, i, j);
+            int contentStart = j + needle.length();
+            int groupEnd = findBalancedGroupEnd(input, contentStart);
+            if (groupEnd < 0) {
+                out.append(input, j, input.length());
+                break;
+            }
+            out.append(openingTag).append(input, contentStart, groupEnd).append(closingTag);
+            i = groupEnd + 1;
         }
-        matcher.appendTail(converted);
-        return converted.toString();
+        return out.toString();
     }
 
     private static String replaceLegacySwitch(String input, String legacy, String modern) {
@@ -115,32 +123,60 @@ public final class BSTFormatUtils {
                 whitespacePos++;
             }
             int contentStart = whitespacePos;
-            int depth = 0;
-            int pos = whitespacePos;
-            boolean closed = false;
-            while (pos < input.length()) {
-                char c = input.charAt(pos);
-                if (c == '{') {
-                    depth++;
-                } else if (c == '}') {
-                    if (depth == 0) {
-                        String content = input.substring(contentStart, pos);
-                        out.append('\\').append(modern).append('{').append(content).append('}');
-                        i = pos + 1;
-                        closed = true;
-                        break;
-                    } else {
-                        depth--;
-                    }
-                }
-                pos++;
-            }
-            if (!closed) {
+            int groupEnd = findBalancedGroupEnd(input, contentStart);
+            if (groupEnd < 0) {
                 out.append(input, j, input.length());
                 break;
             }
+            out.append('\\').append(modern).append('{').append(input, contentStart, groupEnd).append('}');
+            i = groupEnd + 1;
         }
         return out.toString();
+    }
+
+    private static String replaceLegacySwitchWithBalancedArgument(String input, String legacy, String openingTag, String closingTag) {
+        String needle = "{\\" + legacy;
+        StringBuilder out = new StringBuilder(input.length());
+        int i = 0;
+        while (i < input.length()) {
+            int j = input.indexOf(needle, i);
+            if (j < 0) {
+                out.append(input, i, input.length());
+                break;
+            }
+            out.append(input, i, j);
+            int k = j + needle.length();
+            int whitespacePos = k;
+            while (whitespacePos < input.length() && Character.isWhitespace(input.charAt(whitespacePos))) {
+                whitespacePos++;
+            }
+            int groupEnd = findBalancedGroupEnd(input, whitespacePos);
+            if (groupEnd < 0) {
+                out.append(input, j, input.length());
+                break;
+            }
+            out.append(openingTag).append(input, whitespacePos, groupEnd).append(closingTag);
+            i = groupEnd + 1;
+        }
+        return out.toString();
+    }
+
+    private static int findBalancedGroupEnd(String input, int contentStart) {
+        int depth = 0;
+        int pos = contentStart;
+        while (pos < input.length()) {
+            char c = input.charAt(pos);
+            if (c == '{') {
+                depth++;
+            } else if (c == '}') {
+                if (depth == 0) {
+                    return pos;
+                }
+                depth--;
+            }
+            pos++;
+        }
+        return -1;
     }
 
     // ---- Pandoc HTML -> OOText inline mapping (LibreOffice path) ----

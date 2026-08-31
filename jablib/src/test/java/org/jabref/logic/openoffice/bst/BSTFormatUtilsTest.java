@@ -59,6 +59,27 @@ class BSTFormatUtilsTest {
     }
 
     @Test
+    void convertInlineLatexFormattingToHtmlConvertsTextscWithNestedBraces() {
+        String latex = "\\textsc{L{\\'o}pez}";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("<span style=\"font-variant: small-caps\">L{\\'o}pez</span>", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlConvertsTextscWithNestedFormatting() {
+        String latex = "\\textsc{Small \\textbf{bold} caps}";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("<span style=\"font-variant: small-caps\">Small \\textbf{bold} caps</span>", html);
+    }
+
+    @Test
+    void convertInlineLatexFormattingToHtmlConvertsScSwitchWithNestedBraces() {
+        String latex = "{\\sc L{\\'o}pez}";
+        String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);
+        assertEquals("<span style=\"font-variant: small-caps\">L{\\'o}pez</span>", html);
+    }
+
+    @Test
     void convertInlineLatexFormattingToHtmlConvertsSuperscript() {
         String latex = "Proceedings of the 9\\textsuperscript{th} symposium";
         String html = BSTFormatUtils.convertInlineLatexFormattingToHtml(latex);

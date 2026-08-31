@@ -63,6 +63,15 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void nestedBracesInSmallCapsArePreserved() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc{L{\\'o}pez}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">L\u00f3pez.</span>", preview);
+    }
+
+    @Test
     void unresolvableBracedMathIsKept() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
