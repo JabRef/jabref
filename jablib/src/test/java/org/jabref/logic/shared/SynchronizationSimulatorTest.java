@@ -145,6 +145,23 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
+    void simulateLiveEntryInsertionAndRemovalPropagation() throws Exception {
+        // client A inserts an entry; client B's listener pulls it
+        clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
+        for (int i = 0; (i < 100) && clientContextB.getDatabase().getEntries().isEmpty(); i++) {
+            Thread.sleep(100);
+        }
+        assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+
+        // client A removes the entry again; client B follows
+        clientContextA.getDatabase().removeEntry(clientContextA.getDatabase().getEntries().getFirst());
+        for (int i = 0; (i < 100) && !clientContextB.getDatabase().getEntries().isEmpty(); i++) {
+            Thread.sleep(100);
+        }
+        assertEquals(List.of(), clientContextB.getDatabase().getEntries());
+    }
+
+    @Test
     void simulateEntryInsertionAndManualPull() {
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));

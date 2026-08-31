@@ -102,6 +102,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             dbmsProcessor.insertEntries(event.getBibEntries());
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
             entryWithPendingChanges = Optional.empty();
+            // Insertions are not described by a single field change, so other clients have to pull
+            notifier.notifyClientsToPull();
         }
     }
 
@@ -137,6 +139,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             pullWithLastEntry();
             dbmsProcessor.removeEntries(event.getBibEntries());
             synchronizeLocalDatabase();
+            // Removals are not described by a single field change, so other clients have to pull
+            notifier.notifyClientsToPull();
         }
     }
 

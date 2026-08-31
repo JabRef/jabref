@@ -32,8 +32,8 @@ import org.jabref.model.metadata.MetaData;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.github.thibaultmeyer.cuid.CUID;
-import org.postgresql.PGConnection;
 import org.jspecify.annotations.NonNull;
+import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
