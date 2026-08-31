@@ -144,6 +144,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
             synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
+            // Other clients are notified through the upsert_metadata function (see DBMSProcessor.setUp)
             // TODO: applyMetaData();
         }
     }

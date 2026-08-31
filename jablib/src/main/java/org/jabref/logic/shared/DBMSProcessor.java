@@ -197,27 +197,31 @@ public class DBMSProcessor {
             LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] does not exist.");
         }
 
+        // Parameters must not be named key/value: inside the function body they would be
+        // ambiguous with the equally named columns.
+        // CREATE OR REPLACE cannot rename parameters, hence the preceding DROP.
         String upsertMetadata = """
-                CREATE OR REPLACE FUNCTION upsert_metadata(key TEXT, value TEXT) RETURNS VOID AS $$
+                DROP FUNCTION IF EXISTS upsert_metadata(TEXT, TEXT);
+                CREATE FUNCTION upsert_metadata(metadata_key TEXT, metadata_value TEXT) RETURNS VOID AS $$
                 DECLARE
                     existing_value TEXT;
                 BEGIN
                     -- Check if the key already exists and get its current value
-                    SELECT VALUE INTO existing_value FROM METADATA WHERE KEY = key;
+                    SELECT VALUE INTO existing_value FROM METADATA WHERE KEY = metadata_key;
 
                     -- Perform the upsert
                     INSERT INTO METADATA (KEY, VALUE)
-                    VALUES (key, value)
+                    VALUES (metadata_key, metadata_value)
                     ON CONFLICT (KEY)
                     DO UPDATE SET VALUE = EXCLUDED.VALUE;
 
                     -- Notify only if the value has changed
-                    IF existing_value IS DISTINCT FROM value THEN
-                        PERFORM pg_notify('metadata_update', json_build_object('key', key, 'value', value)::TEXT);
+                    IF existing_value IS DISTINCT FROM metadata_value THEN
+                        PERFORM pg_notify('%s', json_build_object('key', metadata_key, 'value', metadata_value)::TEXT);
                     END IF;
                 END;
                 $$ LANGUAGE plpgsql;
-                """;
+                """.formatted(Notifier.METADATA_CHANNEL);
         connection.createStatement().executeUpdate(upsertMetadata);
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
@@ -636,18 +640,12 @@ public class DBMSProcessor {
     ///
     /// @param data JabRef meta data as map
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
-        String insertOrUpdateQuery = """
-                    INSERT INTO METADATA (KEY, VALUE)
-                    VALUES (?, ?)
-                    ON CONFLICT (KEY) DO UPDATE
-                    SET VALUE = EXCLUDED.VALUE
-                """;
-
-        try (PreparedStatement statement = connection.prepareStatement(insertOrUpdateQuery)) {
+        // The function upserts and notifies other clients about actually changed values (see setUp)
+        try (PreparedStatement statement = connection.prepareStatement("SELECT upsert_metadata(?, ?)")) {
             for (Map.Entry<String, String> metaEntry : data.entrySet()) {
                 statement.setString(1, metaEntry.getKey());
                 statement.setString(2, metaEntry.getValue());
-                statement.executeUpdate();
+                statement.execute();
             }
         }
     }
@@ -663,6 +661,7 @@ public class DBMSProcessor {
         try {
             listenerConnection = dbmsConnection.openNewConnection();
             listenerConnection.createStatement().execute("LISTEN \"" + Notifier.CHANNEL + "\"");
+            listenerConnection.createStatement().execute("LISTEN \"" + Notifier.METADATA_CHANNEL + "\"");
             listener = new NotificationListener(dbmsSynchronizer, listenerConnection.unwrap(PGConnection.class), processorId);
             HeadlessExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {

@@ -40,7 +40,13 @@ public class NotificationListener implements Runnable {
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
                         try {
-                            handleNotification(notification.getParameter());
+                            if (Notifier.METADATA_CHANNEL.equals(notification.getName())) {
+                                // The payload carries the changed key/value, but metadata is small:
+                                // re-reading all of it is simpler and always consistent
+                                dbmsSynchronizer.synchronizeLocalMetaData();
+                            } else {
+                                handleNotification(notification.getParameter());
+                            }
                         } catch (RuntimeException e) {
                             // The listener thread has to survive a single failing notification
                             LOGGER.error("Error while handling notification", e);

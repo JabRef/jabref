@@ -8,8 +8,10 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -96,6 +98,21 @@ class SynchronizationSimulatorTest {
         }
         assertEquals(expected, bibEntryOfClientB.getField(StandardField.YEAR));
         assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), bibEntryOfClientB.getSharedBibEntryData().getVersion());
+    }
+
+    @Test
+    void simulateLiveMetaDataPropagation() throws Exception {
+        MetaData metaDataOfClientA = clientContextA.getMetaData();
+        metaDataOfClientA.registerListener(clientContextA.getDBMSSynchronizer());
+
+        // client A changes the library mode; client B's listener re-reads the shared metadata
+        metaDataOfClientA.setMode(BibDatabaseMode.BIBLATEX);
+
+        Optional<BibDatabaseMode> expected = Optional.of(BibDatabaseMode.BIBLATEX);
+        for (int i = 0; (i < 100) && !expected.equals(clientContextB.getMetaData().getMode()); i++) {
+            Thread.sleep(100);
+        }
+        assertEquals(expected, clientContextB.getMetaData().getMode());
     }
 
     @Test

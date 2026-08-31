@@ -22,6 +22,9 @@ public class Notifier {
     /// (the listener quotes it in `LISTEN`).
     public static final String CHANNEL = "jabrefLiveUpdate";
 
+    /// Channel on which the database-side `upsert_metadata` function announces changed metadata values
+    public static final String METADATA_CHANNEL = "metadata_update";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Notifier.class);
 
     // Keep safely below PostgreSQL's 8000 byte NOTIFY payload limit
