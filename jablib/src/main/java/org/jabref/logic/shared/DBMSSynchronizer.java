@@ -542,19 +542,23 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     @Override
     public void closeSharedDatabase() {
-        // Let queued writes finish before flushing and closing the connection
+        // Flush the buffered micro-edits as the last queued write, then let the queue drain.
+        // Strictly bounded: a dead remote connection must not block application shutdown -
+        // the writer is a daemon thread and the connection is closed underneath it below.
         if (ownedSyncExecutor != null) {
+            ownedSyncExecutor.execute(this::flushPendingEntry);
             ownedSyncExecutor.shutdown();
             try {
-                if (!ownedSyncExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    LOGGER.warn("Queued shared database writes did not finish in time");
+                if (!ownedSyncExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                    LOGGER.warn("Queued shared database writes did not finish in time - closing anyway");
+                    ownedSyncExecutor.shutdownNow();
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        } else {
+            flushPendingEntry();
         }
-        // Submit remaining entry changes
-        pullLastEntryChanges();
         try {
             dbmsProcessor.stopNotificationListener();
             currentConnection.close();
