@@ -38,6 +38,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
@@ -80,6 +81,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty serverTimezone = new SimpleStringProperty("");
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
+    private final StringProperty connectionUrl = new SimpleStringProperty("");
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
@@ -100,6 +102,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator userValidator;
     private final Validator folderValidator;
     private final Validator keystoreValidator;
+    private final Validator connectionUrlValidator;
     private final CompositeValidator formValidator;
 
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
@@ -139,8 +142,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
-        Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
-        Predicate<String> keyStoreRule = input -> !useSSL.get() || notEmptyAndfilesExist.test(input);
+        // The PostgreSQL driver validates certificates via ~/.postgresql/root.crt, so a keystore is optional
+        Predicate<String> keyStoreRule = input -> !useSSL.get() || !notEmpty.test(input) || fileExists.test(input);
         Predicate<String> folderRule = input -> {
             if (!autosave.get()) {
                 return true;
@@ -162,11 +165,27 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, folderRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
         keystoreValidator = new FunctionBasedValidator<>(keystore, keyStoreRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        connectionUrlValidator = new FunctionBasedValidator<>(connectionUrl, input -> !notEmpty.test(input) || DBMSConnectionUrl.parse(input).isPresent(), ValidationMessage.error(Localization.lang("Not a PostgreSQL connection URL.")));
 
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator, folderValidator);
 
         applyPreferences();
+
+        EasyBind.subscribe(connectionUrl, text -> DBMSConnectionUrl.parse(text).ifPresent(this::applyConnectionUrl));
+    }
+
+    private void applyConnectionUrl(DBMSConnectionUrl url) {
+        selectedDBMSType.set(url.type());
+        host.set(url.host());
+        port.set(Integer.toString(url.port()));
+        database.set(url.database());
+        url.user().ifPresent(user::set);
+        url.password().ifPresent(password::set);
+        useSSL.set(url.useSSL());
+        // Parameters without a dedicated field (e.g. sslmode=require) survive only in the custom JDBC URL
+        expertMode.set(!url.query().isEmpty());
+        jdbcUrl.set(url.toJdbcUrl());
     }
 
     public boolean openDatabase() {
@@ -280,6 +299,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePreferences.setUseSSL(useSSL.getValue());
         sharedDatabasePreferences.setKeystoreFile(keystore.getValue());
         sharedDatabasePreferences.setServerTimezone(serverTimezone.getValue());
+        sharedDatabasePreferences.setExpertMode(expertMode.get());
+        sharedDatabasePreferences.setJdbcUrl(jdbcUrl.getValue());
 
         if (rememberPassword.get()) {
             try {
@@ -321,6 +342,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabaseUser.ifPresent(user::set);
         sharedDatabaseKeystoreFile.ifPresent(keystore::set);
         useSSL.setValue(sharedDatabasePreferences.isUseSSL());
+        sharedDatabasePreferences.getServerTimezone().ifPresent(serverTimezone::set);
+        expertMode.set(sharedDatabasePreferences.isUseExpertMode());
+        sharedDatabasePreferences.getJdbcUrl().ifPresent(jdbcUrl::set);
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {
@@ -457,5 +481,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public StringProperty jdbcUrlProperty() {
         return jdbcUrl;
+    }
+
+    public StringProperty connectionUrlProperty() {
+        return connectionUrl;
+    }
+
+    public ValidationStatus connectionUrlValidation() {
+        return connectionUrlValidator.getValidationStatus();
     }
 }

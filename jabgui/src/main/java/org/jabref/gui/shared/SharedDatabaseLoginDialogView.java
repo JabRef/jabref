@@ -9,6 +9,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -53,6 +54,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField serverTimezone;
     @FXML private TextField jdbcUrl;
     @FXML private CheckBox expertMode;
+    @FXML private TextField connectionUrl;
+    @FXML private TitledPane advancedPane;
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
@@ -112,6 +115,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
+        connectionUrl.textProperty().bindBidirectional(viewModel.connectionUrlProperty());
         database.textProperty().bindBidirectional(viewModel.databaseproperty());
         host.textProperty().bindBidirectional(viewModel.hostProperty());
         user.textProperty().bindBidirectional(viewModel.userProperty());
@@ -139,8 +143,18 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
         rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
 
+        // Settings a pasted URL or the last login switched on must not stay hidden
+        EasyBind.subscribe(viewModel.useSSLProperty(), this::expandAdvancedIf);
+        EasyBind.subscribe(viewModel.expertModeProperty(), this::expandAdvancedIf);
+        EasyBind.subscribe(advancedPane.expandedProperty(), expanded -> Platform.runLater(() -> {
+            if (getDialogPane().getScene() != null) {
+                getDialogPane().getScene().getWindow().sizeToScene();
+            }
+        }));
+
         // Must be executed after the initialization of the view, otherwise it doesn't work
         Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.connectionUrlValidation(), connectionUrl, false);
             visualizer.initVisualization(viewModel.dbValidation(), database, true);
             visualizer.initVisualization(viewModel.hostValidation(), host, true);
             visualizer.initVisualization(viewModel.portValidation(), port, true);
@@ -152,6 +166,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             EasyBind.subscribe(useSSL.selectedProperty(), selected ->
                     visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true));
         });
+    }
+
+    private void expandAdvancedIf(boolean active) {
+        if (active) {
+            advancedPane.setExpanded(true);
+        }
     }
 
     @FXML

@@ -31,4 +31,11 @@ Connecting to a database created by an earlier JabRef version copies its content
 
 Needs: impl
 
+## Connection details can be pasted as a URL
+`req~shared-database.connection-url~1`
+
+The login dialog accepts a connection URL as handed out by hosting providers (`postgres://user:password@host:port/database?...`) or a JDBC URL and fills in the connection details from it. Parameters JabRef has no dedicated setting for are passed on to the driver unchanged.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
