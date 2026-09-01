@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -35,7 +33,8 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -55,6 +54,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -92,7 +92,7 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static CountingUndoManager countingUndoManager;
+    private static GuiUndoManager undoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
@@ -124,6 +124,8 @@ public class JabRefGUI extends Application {
 
         try {
             this.mainStage = stage;
+            // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
+            setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
 
             initialize();
@@ -135,7 +137,7 @@ public class JabRefGUI extends Application {
                     preferences,
                     aiService,
                     stateManager,
-                    countingUndoManager,
+                    undoManager,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
@@ -240,9 +242,11 @@ public class JabRefGUI extends Application {
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
-        JabRefGUI.countingUndoManager = new CountingUndoManager();
-        Injector.setModelOrService(UndoManager.class, countingUndoManager);
-        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
+        JabRefGUI.undoManager = new JabRefGuiUndoManager();
+        // Two keys, one instance: almost everything asks for the recording interface, while the
+        // classes that build the undo UI ask for the one that can drive the stacks and be bound to.
+        Injector.setModelOrService(UndoManager.class, undoManager);
+        Injector.setModelOrService(GuiUndoManager.class, undoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -383,7 +387,7 @@ public class JabRefGUI extends Application {
         installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

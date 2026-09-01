@@ -4,13 +4,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.EmptySuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

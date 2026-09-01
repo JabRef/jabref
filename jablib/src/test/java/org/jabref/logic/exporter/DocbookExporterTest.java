@@ -43,7 +43,7 @@ public class DocbookExporterTest {
                 "DocBook 4",
                 "docbook4",
                 "docbook4",
-                null,
+                "",
                 StandardFileType.XML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder());

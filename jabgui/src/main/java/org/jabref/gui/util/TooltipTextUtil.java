@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import javafx.scene.text.Text;
 
-/// Utility class with static methods for javafx {@link Text} objects
+/// Utility class with static methods for javafx [Text] objects
 public class TooltipTextUtil {
 
     // (?s) tells Java that "." also matches the newline character

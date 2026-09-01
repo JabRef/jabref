@@ -100,7 +100,7 @@ public abstract class Exporter {
     }
 
     /// Exports bib-entries a file is linked to
-    /// Behaviour in case the file is linked to different bib-entries depends on the implementation of {@link #export}.
+    /// Behaviour in case the file is linked to different bib-entries depends on the implementation of [#export].
     /// If it overwrites any existing information, only the last found bib-entry will be exported (as the previous exports are overwritten).
     /// If it extends existing information, all found bib-entries will be exported.
     ///

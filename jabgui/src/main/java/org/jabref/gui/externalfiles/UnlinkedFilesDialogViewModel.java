@@ -7,15 +7,11 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -41,12 +37,12 @@ import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -80,8 +76,9 @@ public class UnlinkedFilesDialogViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
+    private BackgroundTask<UnlinkedFilesSearchResult> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
+    private Map<Path, List<BibEntry>> relatedEntriesByFile = Map.of();
 
     private final BibDatabaseContext bibDatabase;
     private final TaskExecutor taskExecutor;
@@ -132,21 +129,40 @@ public class UnlinkedFilesDialogViewModel {
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
-                .onRunning(() -> {
-                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressTextProperty.setValue(Localization.lang("Searching file system..."));
-                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
-                    taskActiveProperty.setValue(true);
-                    treeRootProperty.setValue(Optional.empty());
-                })
-                .onFinished(() -> {
-                    progressValueProperty.set(0);
-                    taskActiveProperty.setValue(false);
-                })
-                .onSuccess(treeRoot -> treeRootProperty.setValue(Optional.of(treeRoot)));
-
-        findUnlinkedFilesTask.executeWith(taskExecutor);
+        if (findUnlinkedFilesTask != null) {
+            findUnlinkedFilesTask.cancel();
+        }
+        UnlinkedFilesCrawler task = new UnlinkedFilesCrawler(
+                directory,
+                selectedFileFilter,
+                selectedDateFilter,
+                selectedSortFilter,
+                bibDatabase,
+                preferences.getFilePreferences(),
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getAutoLinkPreferences());
+        findUnlinkedFilesTask = task;
+        task.onRunning(() -> {
+                progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                progressTextProperty.setValue(Localization.lang("Searching file system..."));
+                progressTextProperty.bind(task.messageProperty());
+                taskActiveProperty.setValue(true);
+                treeRootProperty.setValue(Optional.empty());
+                relatedEntriesByFile = Map.of();
+            })
+            .onFinished(() -> {
+                progressValueProperty.set(0);
+                taskActiveProperty.setValue(false);
+            })
+            .onSuccess(searchResult -> {
+                // A search that completed before being superseded must not overwrite the newer search's state
+                if (findUnlinkedFilesTask != task) {
+                    return;
+                }
+                relatedEntriesByFile = searchResult.relatedEntriesByFile();
+                treeRootProperty.setValue(Optional.of(searchResult.treeRoot()));
+            })
+            .executeWith(taskExecutor);
     }
 
     public void startImport() {
@@ -328,32 +344,8 @@ public class UnlinkedFilesDialogViewModel {
         return checkedFileListProperty;
     }
 
-    /// This method retrieves a list of BibEntry objects that are related to the given file path.
-    /// It checks for associated files that are not yet linked to any entry in the database
-    /// and returns the entries that have such associated files.
+    /// Returns the entries associated with a file in the most recent search.
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
-        List<BibEntry> relatedEntriesList = new ArrayList<>();
-        List<BibEntry> allEntries = bibDatabase.getDatabase().getEntries();
-
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                bibDatabase,
-                preferences.getExternalApplicationsPreferences(),
-                preferences.getFilePreferences(),
-                preferences.getAutoLinkPreferences());
-
-        for (BibEntry entry : allEntries) {
-            try {
-                Collection<LinkedFile> associatedFiles = util.findAssociatedNotLinkedFiles(entry);
-
-                if (associatedFiles.stream().anyMatch(linkedFile -> linkedFile.findIn(List.of(filePath)).isPresent())) {
-                    relatedEntriesList.add(entry);
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Error finding associated files for entry {}", entry.getCitationKey(), e);
-            }
-        }
-
-        LOGGER.debug("Found {} related entries for file {}", relatedEntriesList.size(), filePath);
-        return FXCollections.observableArrayList(relatedEntriesList);
+        return FXCollections.observableArrayList(relatedEntriesByFile.getOrDefault(UnlinkedFilesSearchResult.normalizePath(filePath), List.of()));
     }
 }

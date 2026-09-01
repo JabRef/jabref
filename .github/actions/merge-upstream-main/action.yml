@@ -1,0 +1,49 @@
+name: "Merge upstream main"
+description: "Merges upstream/main into the current branch, resolving CHANGELOG.md conflicts semantically, and pushes the merge commit. The changelog merge driver is run from source via jbang, so driver fixes apply without waiting for a maven-flow/merge release."
+
+inputs:
+  target-branch:
+    description: "Branch to push the merge commit to"
+    required: true
+  driver-revision:
+    description: "Commit of maven-flow/changelog-merge-driver to run (immutable pin; bump explicitly to pick up driver fixes)"
+    required: false
+    default: "4f9446a29a9e6b935b0fd710aa047f9ff03641ad"
+
+runs:
+  using: "composite"
+  steps:
+    # Some runners (e.g. ubuntu-slim) do not provide Java, which jbang needs
+    - name: Setup Java
+      uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+      with:
+        distribution: 'temurin'
+        java-version: '25'
+
+    - name: Setup JBang
+      uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
+
+    # Bumping the pin is a cache miss (fresh build); everything else hits.
+    - name: Cache JBang
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.jbang
+        key: jbang-changelog-merge-driver-${{ inputs.driver-revision }}
+
+    - name: Merge upstream/main
+      shell: bash
+      env:
+        TARGET_BRANCH: ${{ inputs.target-branch }}
+        DRIVER_REVISION: ${{ inputs.driver-revision }}
+      run: |
+        set -ex
+        jbang trust add https://github.com/maven-flow/changelog-merge-driver/
+        # Pinned to an immutable commit - never the repo's mutable HEAD/alias - since the
+        # driver runs with a push-capable token in this job.
+        git config merge.changelog.driver "jbang https://github.com/maven-flow/changelog-merge-driver/blob/$DRIVER_REVISION/ChangelogMergeDriver.java %A %O %B --rebase"
+        # Overrides the checked-in "CHANGELOG.md merge=union" without dirtying the working tree
+        echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+        git merge --no-ff --no-edit upstream/main
+        git push origin "HEAD:refs/heads/$TARGET_BRANCH"

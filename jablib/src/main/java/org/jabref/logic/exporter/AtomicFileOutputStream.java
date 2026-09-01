@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.jspecify.annotations.NullMarked;
@@ -47,6 +48,9 @@ import org.slf4j.LoggerFactory;
 /// original file untouched).
 /// 2. If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
 /// kept.
+/// 3. If the target file was modified by another process between opening this stream and committing it (e.g. a second
+/// JabRef instance saving the same library), the commit is aborted with a [FileChangedException], leaving the other
+/// process's version of the file untouched.
 ///
 /// Implementation inspired by code from [Marty Lamb](https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java) and [Apache](https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java).
 @NullMarked
@@ -83,6 +87,15 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private final FileCopyOperation backupFileCopyOperation;
 
+    /// The state the target file must still be in when this stream commits: an inherited baseline (see the
+    /// [#AtomicFileOutputStream(Path,boolean,FileSnapshot)] constructor), or the state at stream creation. `null` if
+    /// the attributes could not be read, in which case concurrent-change detection is disabled for this write.
+    @Nullable private final FileSnapshot expectedTargetFileState;
+
+    /// State of the target file right after a successful commit; `null` before the commit, after an aborted or failed
+    /// one, and when the attributes could not be read.
+    @Nullable private FileSnapshot committedTargetFileState;
+
     private boolean errorDuringWrite = false;
 
     @FunctionalInterface
@@ -100,26 +113,38 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// @param path       the path of the file to write to or replace
     /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        this(path, createTemporaryFile(path), keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
+        this(path, keepBackup, null);
+    }
+
+    /// Creates a new output stream to write to or replace the file at the specified path, verifying against an
+    /// inherited baseline instead of the file's state at stream creation.
+    ///
+    /// @param path          the path of the file to write to or replace
+    /// @param keepBackup    whether to keep the backup file (.sav) after a successful write process
+    /// @param expectedState the state the target file is expected to (still) be in when this stream commits — a snapshot from an earlier point of the same logical operation, so that a concurrent write landing before this stream was even opened is still detected; `null` to verify against the state at stream creation
+    public AtomicFileOutputStream(Path path, boolean keepBackup, @Nullable FileSnapshot expectedState) throws IOException {
+        this(path, createTemporaryFile(path), keepBackup, expectedState, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// The temporary file is opened as a [FileChannel], because the channel is needed for [FileChannel#force(boolean)].
     /// `Files.newOutputStream(...)` returns a `sun.nio.ch.ChannelOutputStream`, which does not offer it.
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
         this(path,
                 pathOfTemporaryFile,
                 FileChannel.open(pathOfTemporaryFile, StandardOpenOption.WRITE),
                 keepBackup,
+                expectedState,
                 fileMoveOperation,
                 backupFileCopyOperation);
     }
 
-    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
+    private AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, FileChannel temporaryFileChannel, boolean keepBackup, @Nullable FileSnapshot expectedState, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) {
         this(path,
                 pathOfTemporaryFile,
                 Channels.newOutputStream(temporaryFileChannel),
                 temporaryFileChannel,
                 keepBackup,
+                expectedState,
                 fileMoveOperation,
                 backupFileCopyOperation);
     }
@@ -133,18 +158,18 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) {
         this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, AtomicFileOutputStream::moveAtomically, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation) throws IOException {
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation) {
         this(path, pathOfTemporaryFile, temporaryFileOutputStream, keepBackup, fileMoveOperation, AtomicFileOutputStream::copyReplacingExisting);
     }
 
     /// Required for proper testing
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) throws IOException {
-        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, fileMoveOperation, backupFileCopyOperation);
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup, FileMoveOperation fileMoveOperation, FileCopyOperation backupFileCopyOperation) {
+        this(path, pathOfTemporaryFile, temporaryFileOutputStream, null, keepBackup, null, fileMoveOperation, backupFileCopyOperation);
     }
 
     private AtomicFileOutputStream(Path path,
@@ -152,8 +177,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                                    OutputStream temporaryFileOutputStream,
                                    @Nullable FileChannel temporaryFileChannel,
                                    boolean keepBackup,
+                                   @Nullable FileSnapshot expectedState,
                                    FileMoveOperation fileMoveOperation,
-                                   FileCopyOperation backupFileCopyOperation) throws IOException {
+                                   FileCopyOperation backupFileCopyOperation) {
         super(temporaryFileOutputStream);
         this.targetFile = path;
         this.temporaryFile = pathOfTemporaryFile;
@@ -162,6 +188,33 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this.temporaryFileChannel = temporaryFileChannel;
         this.fileMoveOperation = fileMoveOperation;
         this.backupFileCopyOperation = backupFileCopyOperation;
+        this.expectedTargetFileState = expectedState != null ? expectedState : FileSnapshot.read(path);
+    }
+
+    /// Best-effort lost-update guard: detects whether another process modified the target file after the expected
+    /// baseline state was captured. See [FileSnapshot] for the limits of the comparison; additionally, there is an
+    /// unavoidable race between this check and the subsequent commit, so the check is repeated as late as possible.
+    /// An unreadable current state does not abort the write (the commit itself will surface real I/O problems).
+    // [impl->req~logic.exporter.concurrent-save-detection~1]
+    private void ensureTargetFileUnchanged() throws FileChangedException {
+        if (expectedTargetFileState == null) {
+            return;
+        }
+        FileSnapshot currentState = FileSnapshot.read(targetFile);
+        if (currentState != null && !expectedTargetFileState.equals(currentState)) {
+            throw new FileChangedException(targetFile);
+        }
+    }
+
+    /// Returns the state of the target file as written by this stream, captured immediately after the successful
+    /// commit. Callers spanning a longer logical operation (e.g. a save that may be retried with a different encoding
+    /// after a user dialog) can pass it as the expected state of a follow-up stream, so that the whole operation is
+    /// guarded against concurrent writes — including the time between the two streams.
+    ///
+    /// @return the committed state, or `null` when the stream did not commit (yet) or the attributes could not be read
+    @Nullable
+    public FileSnapshot getCommittedTargetFileState() {
+        return committedTargetFileState;
     }
 
     private static Path createTemporaryFile(Path targetFile) throws IOException {
@@ -242,6 +295,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 return;
             }
 
+            // Check before creating the backup, so that no backup of a concurrently written file is left behind
+            ensureTargetFileUnchanged();
+
             boolean mustOverwriteTargetInPlace = targetHasHardLinks() || Files.isSymbolicLink(targetFile);
 
             // We successfully wrote everything to the temporary file, lets copy it to the correct place
@@ -262,6 +318,24 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
+            // Re-check right before the commit: creating the backup of a large file can take a while, so the first
+            // check may be long in the past by now
+            try {
+                ensureTargetFileUnchanged();
+            } catch (FileChangedException exception) {
+                // The target is untouched, so the backup written by this aborted attempt has no recovery value (unlike
+                // on commit failures, where the backup is deliberately kept). With keepBackup, a backup file is
+                // expected to persist across saves, so the (overwritten) one is left in place.
+                if (backupCreated && !keepBackup) {
+                    try {
+                        Files.deleteIfExists(backupFile);
+                    } catch (IOException deleteException) {
+                        exception.addSuppressed(deleteException);
+                    }
+                }
+                throw exception;
+            }
+
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {
                     LOGGER.warn("Could not create a backup for linked file {} (backup created: {}). Replacing the file without preserving its links.", targetFile, backupCreated);
@@ -273,6 +347,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 // Move temporary file (replace original if it exists)
                 moveTemporaryFileToTargetFile(backupCreated);
             }
+
+            // Captured directly after the commit, so the window in which a concurrent write could be mistaken for our
+            // own is as small as possible
+            committedTargetFileState = FileSnapshot.read(targetFile);
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
@@ -294,16 +372,44 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     private boolean createBackup() {
+        // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
         if (!Files.exists(targetFile)) {
             return false;
         }
 
+        Path temporaryBackupFile = null;
         try {
-            backupFileCopyOperation.copy(targetFile, backupFile);
+            temporaryBackupFile = createTemporaryFile(backupFile);
+            backupFileCopyOperation.copy(targetFile, temporaryBackupFile);
+            forceFileToDisk(temporaryBackupFile);
+            moveBackupFileIntoPlace(temporaryBackupFile);
             return true;
         } catch (IOException exception) {
             LOGGER.warn("Could not create backup file {} (backup created: false)", backupFile, exception);
             return false;
+        } finally {
+            if (temporaryBackupFile != null) {
+                try {
+                    Files.deleteIfExists(temporaryBackupFile);
+                } catch (IOException exception) {
+                    LOGGER.debug("Unable to delete temporary backup file {}", temporaryBackupFile, exception);
+                }
+            }
+        }
+    }
+
+    private static void forceFileToDisk(Path file) throws IOException {
+        try (FileChannel fileChannel = FileChannel.open(file, StandardOpenOption.WRITE)) {
+            fileChannel.force(true);
+        }
+    }
+
+    private void moveBackupFileIntoPlace(Path temporaryBackupFile) throws IOException {
+        try {
+            Files.move(temporaryBackupFile, backupFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException exception) {
+            LOGGER.debug("Atomic move is not supported for backup file {}. Falling back to a non-atomic move.", backupFile, exception);
+            Files.move(temporaryBackupFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

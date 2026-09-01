@@ -1,6 +1,6 @@
 package org.jabref.logic.shared.exception;
 
-/// This exception is thrown in case that {@link org.jabref.logic.shared.DBMSConnectionProperties} does not provide all data needed for a connection.
+/// This exception is thrown in case that [org.jabref.logic.shared.DBMSConnectionProperties] does not provide all data needed for a connection.
 public class InvalidDBMSConnectionPropertiesException extends Exception {
 
     public InvalidDBMSConnectionPropertiesException() {
