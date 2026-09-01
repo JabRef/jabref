@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -28,20 +27,17 @@
                            GridPane.columnIndex="1" GridPane.columnSpan="2"/>
                 <Label text="%Paste the connection URL of your database to fill in the fields below." wrapText="true"
                        GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
-                <Label text="%Database type:" GridPane.rowIndex="2"/>
-                <ComboBox fx:id="databaseType" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.columnSpan="2"
-                          GridPane.rowIndex="2"/>
-                <Label text="%Host/Port:" GridPane.rowIndex="3"/>
-                <TextField fx:id="host" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                <TextField fx:id="port" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
-                <Label text="%Database:" GridPane.rowIndex="4"/>
-                <TextField fx:id="database" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4"/>
-                <Label text="%User:" GridPane.rowIndex="5"/>
-                <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
-                <Label text="%Password:" GridPane.rowIndex="6"/>
-                <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6"/>
+                <Label text="%Host/Port:" GridPane.rowIndex="2"/>
+                <TextField fx:id="host" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="port" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <Label text="%Database:" GridPane.rowIndex="3"/>
+                <TextField fx:id="database" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
+                <Label text="%User:" GridPane.rowIndex="4"/>
+                <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4"/>
+                <Label text="%Password:" GridPane.rowIndex="5"/>
+                <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
                 <SplitPane fx:id="rememberPasswordWrapper" GridPane.columnIndex="1" GridPane.columnSpan="2"
-                           GridPane.rowIndex="7">
+                           GridPane.rowIndex="6">
                     <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember password"/>
                 </SplitPane>
             </GridPane>

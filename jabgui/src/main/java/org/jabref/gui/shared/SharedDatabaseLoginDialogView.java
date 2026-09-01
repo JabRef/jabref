@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -25,7 +24,6 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -38,7 +36,6 @@ import jakarta.inject.Inject;
 /// This offers the user to connect to a remove SQL database.
 /// Moreover, it directly opens the shared database after successful connection.
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
-    @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;
     @FXML private TextField database;
     @FXML private TextField port;
@@ -112,9 +109,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 clipBoardManager,
                 taskExecutor,
                 journalAbbreviationRepository);
-        databaseType.getItems().addAll(DBMSType.values());
-        databaseType.getSelectionModel().select(0);
-
         connectionUrl.textProperty().bindBidirectional(viewModel.connectionUrlProperty());
         database.textProperty().bindBidirectional(viewModel.databaseproperty());
         host.textProperty().bindBidirectional(viewModel.hostProperty());
@@ -122,7 +116,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         password.textProperty().bindBidirectional(viewModel.passwordProperty());
         port.textProperty().bindBidirectional(viewModel.portProperty());
         serverTimezone.textProperty().bindBidirectional(viewModel.serverTimezoneProperty());
-        databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
         browseButton.disableProperty().bind(viewModel.autosaveProperty().not());

@@ -9,9 +9,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert.AlertType;
@@ -62,11 +60,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabaseLoginDialogViewModel.class);
 
-    private final ObjectProperty<DBMSType> selectedDBMSType = new SimpleObjectProperty<>(DBMSType.values()[0]);
-
     private final StringProperty database = new SimpleStringProperty("");
     private final StringProperty host = new SimpleStringProperty("");
-    private final StringProperty port = new SimpleStringProperty("");
+    private final StringProperty port = new SimpleStringProperty(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort()));
     private final StringProperty user = new SimpleStringProperty("");
     private final StringProperty password = new SimpleStringProperty("");
     private final StringProperty folder = new SimpleStringProperty("");
@@ -124,7 +120,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
-        EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
         EasyBind.subscribe(autosave, selected -> {
             String current = folder.getValue();
             folder.setValue(null);
@@ -163,7 +158,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void applyConnectionUrl(DBMSConnectionUrl url) {
-        selectedDBMSType.set(url.type());
         host.set(url.host());
         port.set(Integer.toString(url.port()));
         database.set(url.database());
@@ -177,7 +171,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public boolean openDatabase() {
         DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
-                .setType(selectedDBMSType.getValue())
+                .setType(DBMSType.POSTGRESQL)
                 .setHost(host.getValue())
                 .setPort(Integer.parseInt(port.getValue()))
                 .setDatabase(database.getValue())
@@ -275,7 +269,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void setPreferences() {
-        sharedDatabasePreferences.setType(selectedDBMSType.getValue().toString());
+        sharedDatabasePreferences.setType(DBMSType.POSTGRESQL.toString());
         sharedDatabasePreferences.setHost(host.getValue());
         sharedDatabasePreferences.setPort(port.getValue());
         sharedDatabasePreferences.setName(database.getValue());
@@ -299,7 +293,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     /// Fetches possibly saved data and configures the control elements respectively.
     private void applyPreferences() {
-        Optional<String> sharedDatabaseType = sharedDatabasePreferences.getType();
         Optional<String> sharedDatabaseHost = sharedDatabasePreferences.getHost();
         Optional<String> sharedDatabasePort = sharedDatabasePreferences.getPort();
         Optional<String> sharedDatabaseName = sharedDatabasePreferences.getName();
@@ -307,11 +300,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
         Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
         boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
-
-        if (sharedDatabaseType.isPresent()) {
-            Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
-            dbmsType.ifPresent(selectedDBMSType::set);
-        }
 
         sharedDatabaseHost.ifPresent(host::set);
         sharedDatabasePort.ifPresent(port::set);
@@ -389,10 +377,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public BooleanProperty useSSLProperty() {
         return useSSL;
-    }
-
-    public ObjectProperty<DBMSType> selectedDbmstypeProperty() {
-        return selectedDBMSType;
     }
 
     public BooleanProperty loadingProperty() {
