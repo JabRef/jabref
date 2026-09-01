@@ -47,12 +47,12 @@ public final class DocumentReader {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, fileLink);
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                addContentIfNotEmpty(pdfDocument, newDocument, fileLink, resolvedPdfPath, pageNumber);
+                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, pageNumber);
 
                 pages.add(newDocument);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read linked file '{}' ({})", fileLink, resolvedPdfPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
             return pages;
         } finally {
             ThreadContext.remove("file");
@@ -92,11 +92,7 @@ public final class DocumentReader {
         addStringField(newDocument, PAGE_NUMBER.toString(), String.valueOf(pageNumber));
     }
 
-    /// Extracts text content from a single PDF page and adds it to the Lucene document.
-    ///
-    /// @param fileLink     the plain file link as stored in the bib entry (may be relative or a URL)
-    /// @param resolvedPath the absolute path on the file system where the file was found
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, String fileLink, Path resolvedPath, int pageNumber) {
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, int pageNumber) {
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
         pdfTextStripper.setStartPage(pageNumber);
@@ -120,7 +116,7 @@ public final class DocumentReader {
                 newDocument.add(new TextField(ANNOTATIONS.toString(), String.join("\n", annotations), Field.Store.YES));
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read page {} of linked file '{}' ({})", pageNumber, fileLink, resolvedPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);
         }
     }
 
