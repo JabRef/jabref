@@ -285,14 +285,16 @@ public abstract class NativeDesktop {
     ///
     /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        openBrowser(url, externalApplicationsPreferences, e -> LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e));
+        openBrowser(url, externalApplicationsPreferences, e -> {
+            // Terminal failure is already logged where it is caught
+        });
     }
 
     /// Opens the given URL using the system browser
     ///
     /// @param url            the URL to open
     /// @param onAsyncFailure invoked (from a background thread) when opening fails after this
-    ///                                                                   method has already returned; synchronous failures throw instead
+    ///                                                                                         method has already returned; synchronous failures throw instead
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure) throws IOException {
         openBrowser(url, externalApplicationsPreferences, onAsyncFailure, get());
     }
@@ -327,6 +329,7 @@ public abstract class NativeDesktop {
                     try {
                         desktop.openUrlWithSystemHandler(url);
                     } catch (IOException e2) {
+                        LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e2);
                         onAsyncFailure.accept(e2);
                     }
                 }
