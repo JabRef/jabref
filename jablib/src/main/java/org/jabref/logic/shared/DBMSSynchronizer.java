@@ -109,13 +109,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     private DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
-                            Character keywordSeparator,
-                            FieldPreferences fieldPreferences,
-                            @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
-                            FileUpdateMonitor fileMonitor,
-                            String userAndHost,
-                            Executor remoteUpdateExecutor,
-                            Executor syncExecutor) {
+                             Character keywordSeparator,
+                             FieldPreferences fieldPreferences,
+                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
+                             FileUpdateMonitor fileMonitor,
+                             String userAndHost,
+                             Executor remoteUpdateExecutor,
+                             Executor syncExecutor) {
         this.syncExecutor = syncExecutor;
         this.ownedSyncExecutor = (syncExecutor instanceof ExecutorService executorService) ? executorService : null;
         this.bibDatabaseContext = bibDatabaseContext;
