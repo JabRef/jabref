@@ -48,6 +48,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.base.Throwables;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -248,7 +249,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"), exception);
+            // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
+            String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Connection error"),
+                    Localization.lang("Could not connect to %0", host.getValue() + ":" + port.getValue()) + "\n\n" + reason,
+                    exception);
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
