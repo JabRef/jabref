@@ -88,6 +88,7 @@ class BackupManagerTest {
         assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
     }
 
+    // [utest->req~jabgui.autosaveandbackup.ignore-modification-date~1]
     @Test
     void backupDifferingOnlyInModificationDateIsNoDifference(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
