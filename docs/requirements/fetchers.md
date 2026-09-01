@@ -43,4 +43,9 @@ The user can enter an arbitrary URL to create an entry from it. JabRef tries URL
 
 Needs: impl
 
+## Download full text from ScholarAPI
+`req~fetchers.scholarapi-fulltext~1`
+
+For entries that contain a ScholarAPI identifier and have a PDF available, JabRef discovers the ScholarAPI PDF endpoint and uses the configured ScholarAPI API key to download the full text.
+
 <!-- markdownlint-disable-file MD022 -->

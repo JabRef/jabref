@@ -220,15 +220,17 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
+        // Named for the effect, not for the command: "Find duplicates" started this, but what a
+        // reader undoes is the removal and the merges their review of each pair produced.
         libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
-                edit.apply(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
+                edit.applyEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
                 libraryTab.markBaseChanged();
             }
             // and adding merged entries:
             if (!result.getToAdd().isEmpty()) {
-                edit.apply(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
+                edit.applyEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
                 libraryTab.markBaseChanged();
             }
         });
@@ -240,8 +242,8 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     /// Result of a duplicate search.
-    /// Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
-    /// {@link BibEntry BibEntries} are equal to each other.
+    /// Uses [System#identityHashCode(Object)] for identifying objects for removal, as completely identical
+    /// [BibEntries][BibEntry] are equal to each other.
     static class DuplicateSearchResult {
 
         private final Map<String, BibEntry> toRemove = new HashMap<>();

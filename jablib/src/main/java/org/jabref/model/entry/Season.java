@@ -49,6 +49,7 @@ public enum Season {
     }
 
     /// This method accepts three types of seasons:
+    ///
     /// - Double Digit seasons from 21 to 24
     /// - Full English Season identifiers.
     ///

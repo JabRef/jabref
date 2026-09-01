@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 public class GroupNodeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupNodeViewModel.class);
+    private static final int BULK_CHANGE_THRESHOLD = 10;
 
     private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
@@ -294,13 +295,18 @@ public class GroupNodeViewModel {
 
     /// Gets invoked if an entry in the current database changes.
     ///
-    /// @implNote Search groups are updated in {@link SearchIndexListener}.
+    /// @implNote Search groups are updated in [SearchIndexListener].
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
         }
         while (change.next()) {
-            if (change.wasPermutated()) {
+            /// A replacement represents a bulk mutation, so recompute on the background executor
+            /// instead of matching every added entry on the JavaFX thread.
+            // [impl->req~ux.large-library.bulk-entry-removal~1]
+            if (change.wasReplaced() || change.getRemovedSize() > BULK_CHANGE_THRESHOLD) {
+                updateMatchedEntries();
+            } else if (change.wasPermutated()) {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
@@ -355,7 +361,7 @@ public class GroupNodeViewModel {
 
         matchedEntriesUpdateInProgress = true;
         BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
-                .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                .wrap(() -> databaseContext.getDatabase().getEntriesSnapshot().stream()
                                            .filter(e -> isMatchEffective(this, e))
                                            .toList())
                 .onSuccess(entries -> {
@@ -439,10 +445,10 @@ public class GroupNodeViewModel {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
-    /// Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+    /// Decides if the content stored in the given [Dragboard] can be dropped on the given target row. Currently, the following sources are allowed:
     ///
     /// - another group (will be added as subgroup on drop)
-    /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    /// - entries if the group implements [GroupEntryChanger] (will be assigned to group on drop)
     ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant

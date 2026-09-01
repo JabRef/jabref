@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
@@ -43,7 +44,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         this.notificationService = notificationService;
         this.keywordSeparator = keywordSeparator;
 
-        this.compoundEdit = new CompoundEdit(Localization.lang("Merge entries"));
+        this.compoundEdit = new CompoundEdit(StandardActions.MERGE_ENTRIES.getText());
         this.processedEntries = 0;
         this.successfulUpdates = 0;
 

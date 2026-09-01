@@ -13,7 +13,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/// {@link Password} contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
+/// [Password] contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
 public class Password {
 
     private final byte[] phrase;
@@ -42,7 +42,7 @@ public class Password {
         return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), StandardCharsets.UTF_8);
     }
 
-    /// Decrypts the set phrase/password which was encrypted via {@link Password#encrypt()}.
+    /// Decrypts the set phrase/password which was encrypted via [Password#encrypt()].
     ///
     /// @return Decrypted phrase/password
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {

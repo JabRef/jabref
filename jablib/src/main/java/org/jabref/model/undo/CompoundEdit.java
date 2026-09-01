@@ -21,11 +21,14 @@ import org.jspecify.annotations.NullMarked;
 /// from `setField`, `putKeywords`, `setCitationKey` and friends, so recording a change is a
 /// matter of handing the return value over rather than restating it.
 @NullMarked
-public class CompoundEdit {
+public final class CompoundEdit {
 
     private final String name;
     private final List<BibChange> changes = new ArrayList<>();
 
+    /// @param name what the user did, as they would recognise it — see [ChangeSet]. It travels
+    ///             unchanged into the set that [#toChangeSet] builds, so whatever is passed here
+    ///             is what a reader eventually sees.
     public CompoundEdit(String name) {
         this.name = name;
     }
@@ -34,8 +37,13 @@ public class CompoundEdit {
         changes.add(change);
     }
 
-    /// Performs `change` and records it, see [org.jabref.logic.undo.UndoManager#apply].
-    public void apply(BibChange change) {
+    /// Performs `change` and records it in this step, the recorder's counterpart to
+    /// [org.jabref.logic.undo.UndoManager#applyEdit]. As there, the difference from
+    /// [#addEdit(BibChange)] is only who performs the change.
+    ///
+    /// No lock, unlike the manager's method: a recorder belongs to the thread running its block,
+    /// and nothing it collects is reachable from another thread until the block ends.
+    public void applyEdit(BibChange change) {
         change.apply();
         addEdit(change);
     }
