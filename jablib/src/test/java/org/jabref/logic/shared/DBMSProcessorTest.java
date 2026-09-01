@@ -430,6 +430,34 @@ class DBMSProcessorTest {
     }
 
     @Test
+    void insertManyEntries() throws SQLException {
+        // Must survive pgjdbc's limit of 65535 bind parameters per statement:
+        // 3000 entries x 8 fields x 3 parameters would be 72000 in a single unchunked INSERT
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 3000; i++) {
+            entries.add(new BibEntry(StandardEntryType.Article)
+                    .withField(StandardField.AUTHOR, "Author " + i)
+                    .withField(StandardField.TITLE, "Title " + i)
+                    .withField(StandardField.JOURNAL, "Journal " + i)
+                    .withField(StandardField.VOLUME, Integer.toString(i))
+                    .withField(StandardField.NUMBER, Integer.toString(i))
+                    .withField(StandardField.PAGES, i + "--" + (i + 10))
+                    .withField(StandardField.YEAR, "2026")
+                    .withCitationKey("key" + i));
+        }
+        dbmsProcessor.insertEntries(entries);
+
+        try (ResultSet resultSet = dbmsConnection.getConnection().createStatement().executeQuery("SELECT count(*) AS cnt FROM entry")) {
+            resultSet.next();
+            assertEquals(3000, resultSet.getInt("cnt"));
+        }
+        try (ResultSet resultSet = dbmsConnection.getConnection().createStatement().executeQuery("SELECT count(*) AS cnt FROM field")) {
+            resultSet.next();
+            assertEquals(3000 * 8, resultSet.getInt("cnt"));
+        }
+    }
+
+    @Test
     void insertMultipleEntries() throws SQLException {
         List<BibEntry> entries = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

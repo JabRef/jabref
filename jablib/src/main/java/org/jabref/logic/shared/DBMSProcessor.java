@@ -307,8 +307,12 @@ public class DBMSProcessor {
 
     public void insertEntries(List<BibEntry> bibEntries) {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
-        insertIntoEntryTable(notYetExistingEntries);
-        insertIntoFieldTable(notYetExistingEntries);
+        // pgjdbc caps bind parameters at 65535 per statement; with three parameters per field,
+        // 500 entries stay below that up to an average of 43 fields per entry
+        for (List<BibEntry> chunk : Lists.partition(notYetExistingEntries, 500)) {
+            insertIntoEntryTable(chunk);
+            insertIntoFieldTable(chunk);
+        }
     }
 
     /// Filters a list of BibEntry to those which do not yet exist in the database
@@ -321,7 +325,7 @@ public class DBMSProcessor {
             return bibEntries;
         }
 
-        List<Integer> remoteIds = new ArrayList<>();
+        Set<Integer> remoteIds = new HashSet<>();
         try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT shared_id FROM entry")) {
             while (resultSet.next()) {
                 remoteIds.add(resultSet.getInt("shared_id"));
