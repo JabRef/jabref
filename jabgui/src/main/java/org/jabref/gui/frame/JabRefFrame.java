@@ -2,6 +2,7 @@ package org.jabref.gui.frame;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -37,7 +38,6 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 
-import java.sql.SQLException;
 
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
