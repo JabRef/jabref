@@ -46,9 +46,9 @@ public class ChangeScanner {
         }
     }
 
-    /// @return the external changes sorted by the side they happened on, see [LibraryBaseline#triage]
-    public LibraryBaseline.Triage scanForChanges(LibraryBaseline baseline) {
-        return baseline.triage(scanForChanges(), database, databaseChangeResolverFactory);
+    /// @return the given external changes sorted by the side they happened on, see [LibraryBaseline#triage]
+    public LibraryBaseline.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
+        return baseline.triage(changes, database, databaseChangeResolverFactory);
     }
 
     public List<DatabaseChange> getDatabaseChanges(Path fileToCompare) throws IOException {

@@ -128,9 +128,6 @@ Fields changed only in the file are taken over even when other fields of the sam
 Needs: impl
 
 ## Committing a library that is not under version control
-## Committing a library that is not under version control
-||||||| parent of 9b7de4f9fc (Synchronize local libraries with their files)
-### Committing a library that is not under version control
 `req~ux.git-commit.initialize-repository~1`
 
 When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.

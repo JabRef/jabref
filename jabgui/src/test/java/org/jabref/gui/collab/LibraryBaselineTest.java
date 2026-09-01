@@ -1,10 +1,12 @@
 package org.jabref.gui.collab;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
+import org.jabref.gui.collab.metedatachange.MetadataChange;
 import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.model.database.BibDatabase;
@@ -111,6 +113,31 @@ class LibraryBaselineTest {
         EntryChange merged = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
         assertEquals("NewKey", merged.getNewEntry().getCitationKey().orElseThrow());
         assertEquals("Disk title", merged.getNewEntry().getField(StandardField.TITLE).orElseThrow());
+    }
+
+    @Test
+    void citationKeyChangedOnDiskIsMergedIntoTheSameEntry() {
+        disk.setCitationKey("Renamed");
+        disk.setField(StandardField.YEAR, "2021");
+
+        LibraryBaseline.Triage triage = triage();
+
+        EntryChange merged = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
+        assertEquals(local, merged.getOldEntry());
+        assertEquals("Renamed", merged.getNewEntry().getCitationKey().orElseThrow());
+        assertEquals(1, triage.diskOnly().size());
+    }
+
+    @Test
+    void encodingChangedOnDiskIsAccepted() {
+        localContext.getMetaData().setEncoding(StandardCharsets.UTF_8);
+        baseline = LibraryBaseline.of(localContext, PATTERNS);
+        diskContext.getMetaData().setEncoding(StandardCharsets.ISO_8859_1);
+
+        LibraryBaseline.Triage triage = triage();
+
+        assertInstanceOf(MetadataChange.class, triage.diskOnly().getFirst());
+        assertTrue(triage.memoryOnly().isEmpty());
     }
 
     @Test
