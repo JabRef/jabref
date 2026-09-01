@@ -2485,29 +2485,22 @@ public class JabRefCliPreferences implements CliPreferences {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         List<String> persists = new ArrayList<>();
-        Map<KeyringSlot, String> keysToPersist = new HashMap<>();
-        Map<KeyringSlot, String> keysToClear = new HashMap<>();
+        Map<KeyringSlot, String> keyringUpdates = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
             names.add(apiKey.getName());
             uses.add(String.valueOf(apiKey.shouldUse()));
             persists.add(String.valueOf(apiKey.shouldPersist()));
-            if (apiKey.shouldPersist()) {
-                keysToPersist.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
-            } else {
-                keysToClear.put(KeyringSlot.customApiKey(apiKey.getName()), "");
-            }
+            String valueToStore = apiKey.shouldPersist() ? apiKey.getKey() : "";
+            keyringUpdates.put(KeyringSlot.customApiKey(apiKey.getName()), valueToStore);
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
         putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
 
-        if (!keysToClear.isEmpty()) {
-            writeKeyring(keysToClear);
-        }
-        if (!keysToPersist.isEmpty()) {
-            writeKeyring(keysToPersist);
+        if (!keyringUpdates.isEmpty()) {
+            writeKeyring(keyringUpdates);
         }
     }
 
