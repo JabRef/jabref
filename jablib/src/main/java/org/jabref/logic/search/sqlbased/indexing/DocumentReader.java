@@ -16,14 +16,13 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.contentstream.operator.Operator;
-import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tinylog.ThreadContext;
 
 import static org.jabref.model.search.LinkedFilesConstants.ANNOTATIONS;
 import static org.jabref.model.search.LinkedFilesConstants.CONTENT;
@@ -40,6 +39,7 @@ public final class DocumentReader {
 
     public List<Document> readPdfContents(String fileLink, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
+        ThreadContext.put("file", fileLink);
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
             LOGGER.debug("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
@@ -54,6 +54,8 @@ public final class DocumentReader {
         } catch (IOException e) {
             LOGGER.warn("Could not read linked file '{}' ({})", fileLink, resolvedPdfPath.toAbsolutePath(), e);
             return pages;
+        } finally {
+            ThreadContext.remove("file");
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
@@ -95,13 +97,7 @@ public final class DocumentReader {
     /// @param fileLink     the plain file link as stored in the bib entry (may be relative or a URL)
     /// @param resolvedPath the absolute path on the file system where the file was found
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, String fileLink, Path resolvedPath, int pageNumber) {
-        PDFTextStripper pdfTextStripper = new PDFTextStripper() {
-            @Override
-            protected void operatorException(Operator operator, List<COSBase> operands, IOException e) throws IOException {
-                LOGGER.warn("Could not process page {} of linked file '{}'", pageNumber, fileLink, e);
-                super.operatorException(operator, operands, e);
-            }
-        };
+        PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
         pdfTextStripper.setStartPage(pageNumber);
         pdfTextStripper.setEndPage(pageNumber);

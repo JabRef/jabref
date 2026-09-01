@@ -184,6 +184,7 @@ open module org.jabref.jablib {
     // route all requests to log4j to SLF4J
     requires /*runtime*/ org.apache.logging.log4j.to.slf4j;
     // required by org.jabref.generators (only)
+    requires org.tinylog.api;
     requires /*runtime*/ org.tinylog.api.slf4j;
     requires /*runtime*/ org.tinylog.impl;
     // endregion
