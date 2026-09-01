@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -283,6 +284,48 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
+    /// Applies entries fetched by the database executor on the local model executor.
+    private void doSynchronizeLocalDatabase(List<BibEntry> sharedEntries) {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
+        Map<Integer, BibEntry> sharedEntriesById = new LinkedHashMap<>();
+        for (BibEntry sharedEntry : sharedEntries) {
+            sharedEntriesById.put(sharedEntry.getSharedBibEntryData().getSharedIdAsInt(), sharedEntry);
+        }
+
+        List<BibEntry> localEntries = bibDatabase.getEntries();
+
+        // remove old entries locally
+        removeNotSharedEntries(localEntries, sharedEntriesById.keySet());
+        List<BibEntry> entriesToInsertIntoLocalDatabase = new ArrayList<>();
+        // compare versions and update local entry if needed
+        for (BibEntry localEntry : localEntries) {
+            BibEntry sharedEntry = sharedEntriesById.remove(localEntry.getSharedBibEntryData().getSharedIdAsInt());
+            if ((sharedEntry != null) && (sharedEntry.getSharedBibEntryData().getVersion() > localEntry.getSharedBibEntryData().getVersion())) {
+                // update fields
+                localEntry.setType(sharedEntry.getType(), EntriesEventSource.SHARED);
+                localEntry.getSharedBibEntryData().setVersion(sharedEntry.getSharedBibEntryData().getVersion());
+                sharedEntry.getFieldMap().forEach(
+                        // copy remote values to local entry
+                        (field, value) -> localEntry.setField(field, value, EntriesEventSource.SHARED)
+                );
+
+                // locally remove not existing fields
+                localEntry.getFields().stream()
+                          .filter(field -> !sharedEntry.hasField(field))
+                          .forEach(field -> localEntry.clearField(field, EntriesEventSource.SHARED));
+            }
+        }
+
+        entriesToInsertIntoLocalDatabase.addAll(sharedEntriesById.values());
+        if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
+            // in case entries should be added into the local database, insert them
+            bibDatabase.insertEntries(entriesToInsertIntoLocalDatabase, EntriesEventSource.SHARED);
+        }
+    }
+
     /// Removes all local entries which are not present on shared database.
     ///
     /// @param localEntries List of [BibEntry] the entries should be removed from
@@ -337,7 +380,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a metadata update received from another shared-database client.
     public void handleRemoteMetaDataChange() {
-        remoteUpdateExecutor.execute(this::synchronizeLocalMetaData);
+        syncExecutor.execute(() -> {
+            Map<String, String> sharedMetaData = dbmsProcessor.getSharedMetaData();
+            remoteUpdateExecutor.execute(() -> withPullLock(() -> doSynchronizeLocalMetaData(sharedMetaData)));
+        });
     }
 
     private void doSynchronizeLocalMetaData() {
@@ -349,6 +395,22 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             metaData.setEventPropagation(false);
             MetaDataParser parser = new MetaDataParser(fileMonitor);
             parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator, userAndHost);
+            metaData.setEventPropagation(true);
+        } catch (ParseException e) {
+            LOGGER.error("Parse error", e);
+        }
+    }
+
+    /// Applies metadata fetched by the database executor on the local model executor.
+    private void doSynchronizeLocalMetaData(Map<String, String> sharedMetaData) {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
+        try {
+            metaData.setEventPropagation(false);
+            MetaDataParser parser = new MetaDataParser(fileMonitor);
+            parser.parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
             metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
@@ -409,7 +471,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a full synchronization requested by another shared-database client.
     public void handleRemoteDatabaseChange() {
-        remoteUpdateExecutor.execute(this::pullChanges);
+        syncExecutor.execute(() -> {
+            List<BibEntry> sharedEntries = dbmsProcessor.getSharedEntries();
+            remoteUpdateExecutor.execute(() -> withPullLock(() -> doSynchronizeLocalDatabase(sharedEntries)));
+        });
     }
 
     /// Applies a field change received from another client. Any state that does not exactly
@@ -428,7 +493,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private void doApplyRemoteFieldChange(FieldChange fieldChange) {
         if (fieldChange.field() == null) {
             // The sender could not include the change content
-            pullChanges();
+            handleRemoteDatabaseChange();
             return;
         }
         Optional<BibEntry> localEntry = bibDatabase.getEntries().stream()
@@ -436,14 +501,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                                                    .findFirst();
         if (localEntry.isEmpty()) {
             // Entry unknown locally - e.g. inserted remotely after our last pull
-            pullChanges();
+            handleRemoteDatabaseChange();
             return;
         }
         BibEntry bibEntry = localEntry.get();
         Field field = FieldFactory.parseField(fieldChange.field());
         if (!bibEntry.getField(field).equals(Optional.ofNullable(fieldChange.oldValue()))) {
             // Local state diverged from the sender's sanity-check value
-            pullChanges();
+            handleRemoteDatabaseChange();
             return;
         }
         if (fieldChange.newValue() == null) {

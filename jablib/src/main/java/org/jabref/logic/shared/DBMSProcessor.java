@@ -41,6 +41,8 @@ public class DBMSProcessor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
+    private static final Set<String> GROUP_TREE_METADATA_KEYS = Set.of(MetaData.GROUPSTREE, MetaData.GROUPSTREE_LEGACY);
+
     // Arbitrary application-wide id serializing the one-time data migration across clients
     private static final long MIGRATION_ADVISORY_LOCK_ID = 11_879L;
 
@@ -699,6 +701,24 @@ public class DBMSProcessor {
                 statement.execute();
             }
         }
+        removeObsoleteGroupTreeMetaData(data.keySet());
+    }
+
+    /// Removes group tree formats which are no longer present after a group update.
+    private void removeObsoleteGroupTreeMetaData(Set<String> currentMetaDataKeys) throws SQLException {
+        try (PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM metadata WHERE key = ?");
+             PreparedStatement notifyStatement = connection.prepareStatement("SELECT pg_notify(?, ?)")) {
+            for (String groupTreeKey : GROUP_TREE_METADATA_KEYS) {
+                if (!currentMetaDataKeys.contains(groupTreeKey)) {
+                    deleteStatement.setString(1, groupTreeKey);
+                    if (deleteStatement.executeUpdate() > 0) {
+                        notifyStatement.setString(1, Notifier.METADATA_CHANNEL);
+                        notifyStatement.setString(2, groupTreeKey);
+                        notifyStatement.execute();
+                    }
+                }
+            }
+        }
     }
 
     public DatabaseConnectionProperties getDBMSConnectionProperties() {
@@ -731,4 +751,3 @@ public class DBMSProcessor {
         }
     }
 }
-

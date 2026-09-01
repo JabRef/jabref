@@ -18,6 +18,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -382,6 +383,15 @@ class DBMSProcessorTest {
         assertEquals(expectedMetaData, actualMetaData);
     }
 
+    @Test
+    void setSharedMetaDataRemovesObsoleteGroupTree() throws SQLException {
+        dbmsProcessor.setSharedMetaData(Map.of(MetaData.GROUPSTREE, "group tree"));
+
+        dbmsProcessor.setSharedMetaData(Map.of());
+
+        assertFalse(dbmsProcessor.getSharedMetaData().containsKey(MetaData.GROUPSTREE));
+    }
+
     private static Map<String, String> getMetaDataExample() {
         Map<String, String> expectedMetaData = new HashMap<>();
 
@@ -395,11 +405,10 @@ class DBMSProcessorTest {
     }
 
     private static BibEntry getBibEntryExampleWithEmptyFields() {
-        BibEntry bibEntry = new BibEntry()
+        return new BibEntry()
                 .withField(StandardField.AUTHOR, "Author")
                 .withField(StandardField.TITLE, "")
                 .withField(StandardField.YEAR, "");
-        return bibEntry;
     }
 
     private static BibEntry getBibEntryExample2() {
