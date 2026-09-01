@@ -58,7 +58,7 @@ $Gone = @{ error = 'not-reachable'; message = 'browser extension disconnected (n
 
 function Round-Trip([hashtable]$msg, [int]$timeoutMs) {
     $Sync.Seq++                                     # only the single-threaded HTTP loop calls this
-    $rid = "r$($Sync.Seq)"
+    $rid = "r$PID-$($Sync.Seq)"                   # unique across host restarts: the extension names downloads after it
     $msg['requestId'] = $rid
     $ev = New-Object System.Threading.ManualResetEventSlim $false
     $Sync.Pending[$rid] = @{ Event = $ev; Reply = $null }

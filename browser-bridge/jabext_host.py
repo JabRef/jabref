@@ -93,7 +93,7 @@ class Pending:
     def new(self) -> tuple[str, threading.Event, list]:
         with self._lock:
             self._seq += 1
-            rid = f"r{self._seq}"
+            rid = f"r{os.getpid()}-{self._seq}"   # unique across host restarts: the extension names downloads after it
             ev, box = threading.Event(), []
             self._slots[rid] = (ev, box)
         return rid, ev, box
