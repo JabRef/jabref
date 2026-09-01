@@ -1,5 +1,6 @@
 package org.jabref.gui.collab;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,8 @@ import org.jabref.logic.git.merge.planning.util.FieldPatchComputer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
@@ -48,6 +51,8 @@ public final class LibraryBaseline {
     }
 
     private enum Side { DISK, MEMORY, BOTH }
+
+    private static final String ENCODING_KEY = "\0encoding";
 
     private final Map<String, BibEntry> entriesById;
     private final Map<String, String> metaData;
@@ -247,13 +252,24 @@ public final class LibraryBaseline {
         return one.getType().equals(other.getType()) && one.getFieldMap().equals(other.getFieldMap());
     }
 
-    /// Looks up the baseline of a disk entry without in-memory counterpart: by citation key, or by content for entries without one.
+    /// Looks up the baseline of a disk entry without in-memory counterpart: by citation key, or else by the remaining
+    /// content, which covers entries without a key as well as a key changed on disk.
     private Optional<BibEntry> find(BibEntry remote) {
-        return entriesById.values().stream()
-                          .filter(base -> remote.getCitationKey()
-                                                .map(key -> base.getCitationKey().filter(key::equals).isPresent())
-                                                .orElseGet(() -> sameContent(base, remote)))
-                          .findFirst();
+        Optional<BibEntry> byKey = remote.getCitationKey()
+                                         .flatMap(key -> entriesById.values().stream()
+                                                                    .filter(base -> base.getCitationKey().filter(key::equals).isPresent())
+                                                                    .findFirst());
+        return byKey.or(() -> entriesById.values().stream()
+                                         .filter(base -> sameContentExceptKey(base, remote))
+                                         .findFirst());
+    }
+
+    private static boolean sameContentExceptKey(BibEntry one, BibEntry other) {
+        Map<Field, String> oneFields = new HashMap<>(one.getFieldMap());
+        Map<Field, String> otherFields = new HashMap<>(other.getFieldMap());
+        oneFields.remove(InternalField.KEY_FIELD);
+        otherFields.remove(InternalField.KEY_FIELD);
+        return one.getType().equals(other.getType()) && oneFields.equals(otherFields);
     }
 
     private void keepEntry(LibraryBaseline previous, String entryId) {
@@ -274,7 +290,11 @@ public final class LibraryBaseline {
         }
     }
 
+    /// The encoding is not part of the serialized metadata (it is written as a file header instead), but it is part
+    /// of what the two-way comparison reports.
     private static Map<String, String> serialize(MetaData metaData, GlobalCitationKeyPatterns citationKeyPatterns) {
-        return new HashMap<>(MetaDataSerializer.getSerializedStringMap(metaData, citationKeyPatterns));
+        Map<String, String> serialized = new HashMap<>(MetaDataSerializer.getSerializedStringMap(metaData, citationKeyPatterns));
+        serialized.put(ENCODING_KEY, metaData.getEncoding().map(Charset::name).orElse(""));
+        return serialized;
     }
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.value.ChangeListener;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.Notifications;
@@ -53,6 +55,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// every external change is offered for review.
     @Nullable private LibraryBaseline baseline;
 
+    /// Counts started scans, so that a scan overtaken by a later one (whose result reflects the newer file state)
+    /// discards its result instead of applying stale content.
+    private volatile int scanGeneration;
+
+    private final ChangeListener<Boolean> synchronizingListener = (_, _, enabled) -> onSynchronizingChanged(enabled);
+
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
@@ -80,6 +88,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
                 LOGGER.error("Error while trying to monitor {}", path, e);
+            }
+            if (database.getLocation() == DatabaseLocation.LOCAL) {
+                preferences.getLibraryPreferences().autoSaveProperty().addListener(synchronizingListener);
             }
         });
 
@@ -184,6 +195,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         return database.getLocation() == DatabaseLocation.LOCAL && preferences.getLibraryPreferences().shouldAutoSave();
     }
 
+    /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
+    /// unmodified, it still matches its file. Otherwise the next save establishes the baseline.
+    private void onSynchronizingChanged(boolean enabled) {
+        synchronized (database) {
+            if (!enabled) {
+                baseline = null;
+            } else if (baseline == null && !libraryTab.isModified()) {
+                baseline = captureBaseline();
+            }
+        }
+    }
+
     private @Nullable LibraryBaseline captureBaseline() {
         if (!isSynchronizing()) {
             return null;
@@ -207,10 +230,19 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private void scanForChanges() {
         ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
         LibraryBaseline scannedBaseline = baseline;
+        int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
-            BackgroundTask.wrap(() -> scanner.scanForChanges(scannedBaseline))
-                          .onSuccess(triage -> synchronize(scannedBaseline, triage))
+            BackgroundTask.wrap(() -> scanner.scanForChanges())
+                          .onSuccess(changes -> {
+                              if (generation != scanGeneration) {
+                                  LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
+                                  return;
+                              }
+                              // Sorting the changes on the FX thread right before applying them leaves no window
+                              // for a user edit to slip in between classification and application
+                              synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
+                          })
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
@@ -267,6 +299,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        monitoredPath.ifPresent(path -> fileMonitor.removeListener(path, this));
+        monitoredPath.ifPresent(path -> {
+            fileMonitor.removeListener(path, this);
+            if (database.getLocation() == DatabaseLocation.LOCAL) {
+                preferences.getLibraryPreferences().autoSaveProperty().removeListener(synchronizingListener);
+            }
+        });
     }
 }
