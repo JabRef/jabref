@@ -712,6 +712,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             getOpenDatabaseAction().openFiles(lastFiles);
         }
 
+        // [impl->req~shared-database.reopen-on-startup~1]
         // ponytail: connects on the FX thread like the login dialog does; move to a BackgroundTask if startup stalls on unreachable servers
         for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
             DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId));
