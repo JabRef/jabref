@@ -12,6 +12,7 @@ import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -47,6 +48,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// `synchronized (database)`; `null` when unknown, in which case the next event triggers a full scan.
     @Nullable private FileSnapshot knownDiskState;
 
+    /// The library as of the last point where it was known to match the disk, for telling external changes apart
+    /// from unsaved in-memory edits. Guarded like [#knownDiskState]; `null` while synchronizing is off, in which case
+    /// every external change is offered for review.
+    @Nullable private LibraryBaseline baseline;
+
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
@@ -69,6 +75,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         monitoredPath.ifPresent(path -> {
             knownDiskState = FileSnapshot.read(path);
+            baseline = captureBaseline();
             try {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
@@ -167,7 +174,21 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             } else {
                 monitoredPath.ifPresent(path -> knownDiskState = FileSnapshot.read(path));
             }
+            baseline = captureBaseline();
         }
+    }
+
+    /// Synchronizing (silently merging external changes) is tied to the autosave preference: both together keep a
+    /// local library and its file the same in both directions.
+    private boolean isSynchronizing() {
+        return database.getLocation() == DatabaseLocation.LOCAL && preferences.getLibraryPreferences().shouldAutoSave();
+    }
+
+    private @Nullable LibraryBaseline captureBaseline() {
+        if (!isSynchronizing()) {
+            return null;
+        }
+        return LibraryBaseline.of(database, preferences.getCitationKeyPatternPreferences().getKeyPatterns());
     }
 
     /// A full scan parses the whole library file, so it is skipped when size and modification time show that the file
@@ -185,7 +206,16 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// there are such changes.
     private void scanForChanges() {
         ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
-        BackgroundTask.wrap(scanner::scanForChanges)
+        LibraryBaseline scannedBaseline = baseline;
+        if (scannedBaseline != null && isSynchronizing()) {
+            // [impl->req~ux.external-library-changes.synchronize~1]
+            BackgroundTask.wrap(() -> scanner.scanForChanges(scannedBaseline))
+                          .onSuccess(triage -> synchronize(scannedBaseline, triage))
+                          .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
+                          .executeWith(taskExecutor);
+            return;
+        }
+        BackgroundTask.wrap(() -> scanner.scanForChanges())
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
                               listeners.forEach(listener -> listener.databaseChanged(changes));
@@ -193,6 +223,26 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       })
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// Applies what changed on disk only, and offers the review for what changed on both sides.
+    private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage) {
+        List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
+        unresolved.addAll(triage.memoryOnly());
+        if (!triage.diskOnly().isEmpty()) {
+            applyResolvedChanges(triage.diskOnly(), unresolved.isEmpty() && !libraryTab.isModified());
+            dialogService.notify(Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())));
+        }
+        synchronized (database) {
+            LibraryBaseline updated = captureBaseline();
+            if (updated != null) {
+                updated.keepUnresolved(scannedBaseline, unresolved);
+            }
+            baseline = updated;
+        }
+        if (!triage.bothSides().isEmpty()) {
+            listeners.forEach(listener -> listener.databaseChanged(triage.bothSides()));
+        }
     }
 
     /// Applies the accepted external changes and updates the library's dirty state.
