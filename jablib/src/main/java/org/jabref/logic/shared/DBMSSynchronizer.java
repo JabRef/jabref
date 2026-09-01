@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -21,6 +25,7 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.model.database.BibDatabase;
@@ -40,6 +45,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +81,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
     private final String userAndHost;
+    private final Executor remoteUpdateExecutor;
+    // Serializes all outgoing database writes off the event threads (which include the UI thread)
+    private final Executor syncExecutor;
+    private final @Nullable ExecutorService ownedSyncExecutor;
 
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
                             Character keywordSeparator,
@@ -82,6 +92,32 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
                             String userAndHost) {
+        // Direct executors keep everything synchronous - for tests and headless use
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, Runnable::run, Runnable::run);
+    }
+
+    public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
+                            Character keywordSeparator,
+                            FieldPreferences fieldPreferences,
+                            @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
+                            FileUpdateMonitor fileMonitor,
+                            String userAndHost,
+                            Executor remoteUpdateExecutor) {
+        // One background worker so that typing never waits for the database (which may be remote)
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, remoteUpdateExecutor,
+                Executors.newSingleThreadExecutor(runnable -> Thread.ofVirtual().name("JabRef - shared database writer").unstarted(runnable)));
+    }
+
+    private DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
+                             Character keywordSeparator,
+                             FieldPreferences fieldPreferences,
+                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
+                             FileUpdateMonitor fileMonitor,
+                             String userAndHost,
+                             Executor remoteUpdateExecutor,
+                             Executor syncExecutor) {
+        this.syncExecutor = syncExecutor;
+        this.ownedSyncExecutor = (syncExecutor instanceof ExecutorService executorService) ? executorService : null;
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -91,6 +127,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
         this.userAndHost = userAndHost;
+        this.remoteUpdateExecutor = remoteUpdateExecutor;
     }
 
     /// Listening method. Inserts a new [BibEntry] into shared database.
@@ -99,17 +136,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            flushPendingEntry();
-            // Pull BEFORE inserting remotely: this event is dispatched before BibDatabase has added
-            // the entries to its list, so a pull running after the remote insert would re-import
-            // the just-inserted rows as duplicates
-            ifNotPullingAlready(() -> {
-                doSynchronizeLocalMetaData();
-                doSynchronizeLocalDatabase();
+            // All database work happens off the event thread: the caller may be the UI thread,
+            // and the database may be remote
+            syncExecutor.execute(() -> {
+                flushPendingEntry();
+                dbmsProcessor.insertEntries(event.getBibEntries());
+                // Insertions are not described by a single field change, so other clients have to pull
+                notifier.notifyClientsToPull();
             });
-            dbmsProcessor.insertEntries(event.getBibEntries());
-            // Insertions are not described by a single field change, so other clients have to pull
-            notifier.notifyClientsToPull();
         }
     }
 
@@ -127,22 +161,16 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             entryWithPendingChanges.set(bibEntry);
             return;
         }
-        flushPendingEntry();
-        boolean written = writeSharedEntry(bibEntry);
-        // Pull changes to detect concurrent modifications - e.g. the entry meanwhile being deleted
-        // remotely - and to refresh the entry's version, which travels in the notification below
-        boolean pulled = ifNotPullingAlready(() -> {
-            doSynchronizeLocalMetaData();
-            doSynchronizeLocalDatabase();
-        });
-        if (written) {
-            if (pulled) {
+        // All database work happens off the event thread: the caller may be the UI thread
+        // (typing!), and the database may be remote
+        syncExecutor.execute(() -> {
+            flushPendingEntry();
+            if (writeSharedEntry(bibEntry)) {
+                // updateEntry refreshed the entry's version, which travels in the notification -
+                // no pull is needed for receivers to stay consistent
                 notifier.notifyAboutChangedField(event);
-            } else {
-                // Version not refreshed - let the receivers pull the authoritative state instead
-                notifier.notifyClientsToPull();
             }
-        }
+        });
     }
 
     /// Listening method. Deletes the given list of [BibEntry] from shared database.
@@ -151,14 +179,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            flushPendingEntry();
-            dbmsProcessor.removeEntries(event.getBibEntries());
-            ifNotPullingAlready(() -> {
-                doSynchronizeLocalMetaData();
-                doSynchronizeLocalDatabase();
+            syncExecutor.execute(() -> {
+                flushPendingEntry();
+                dbmsProcessor.removeEntries(event.getBibEntries());
+                // Removals are not described by a single field change, so other clients have to pull
+                notifier.notifyClientsToPull();
             });
-            // Removals are not described by a single field change, so other clients have to pull
-            notifier.notifyClientsToPull();
         }
     }
 
@@ -166,7 +192,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
-            synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
+            syncExecutor.execute(() -> synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern));
             // Other clients are notified through the upsert_metadata function (see DBMSProcessor.setUp)
             ifNotPullingAlready(this::doApplyMetaData);
         }
@@ -295,6 +321,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return true;
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+        } catch (SharedEntryNotPresentException exception) {
+            // The entry disappeared on the shared side - the user decides whether to keep it
+            eventBus.post(new SharedEntriesNotPresentEvent(List.of(bibEntry)));
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
@@ -304,6 +333,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Synchronizes all meta data locally.
     public void synchronizeLocalMetaData() {
         withPullLock(this::doSynchronizeLocalMetaData);
+    }
+
+    /// Schedules a metadata update received from another shared-database client.
+    public void handleRemoteMetaDataChange() {
+        remoteUpdateExecutor.execute(this::synchronizeLocalMetaData);
     }
 
     private void doSynchronizeLocalMetaData() {
@@ -351,6 +385,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
             } catch (OfflineLockException exception) {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            } catch (SharedEntryNotPresentException exception) {
+                eventBus.post(new SharedEntriesNotPresentEvent(List.of(bibEntry)));
             } catch (SQLException e) {
                 LOGGER.error("SQL Error", e);
             }
@@ -371,12 +407,22 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         });
     }
 
+    /// Schedules a full synchronization requested by another shared-database client.
+    public void handleRemoteDatabaseChange() {
+        remoteUpdateExecutor.execute(this::pullChanges);
+    }
+
     /// Applies a field change received from another client. Any state that does not exactly
     /// match the received change (content-less payload, unknown entry, diverged field value)
     /// falls back to pulling everything from the database.
     // [impl->req~shared-database.change-content-in-notification~1]
     public void applyRemoteFieldChange(FieldChange fieldChange) {
         withPullLock(() -> doApplyRemoteFieldChange(fieldChange));
+    }
+
+    /// Schedules a field update received from another shared-database client.
+    public void handleRemoteFieldChange(FieldChange fieldChange) {
+        remoteUpdateExecutor.execute(() -> applyRemoteFieldChange(fieldChange));
     }
 
     private void doApplyRemoteFieldChange(FieldChange fieldChange) {
@@ -496,6 +542,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     @Override
     public void closeSharedDatabase() {
+        // Let queued writes finish before flushing and closing the connection
+        if (ownedSyncExecutor != null) {
+            ownedSyncExecutor.shutdown();
+            try {
+                if (!ownedSyncExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                    LOGGER.warn("Queued shared database writes did not finish in time");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         // Submit remaining entry changes
         pullLastEntryChanges();
         try {

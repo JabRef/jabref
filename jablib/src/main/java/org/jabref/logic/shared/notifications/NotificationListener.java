@@ -113,7 +113,7 @@ public class NotificationListener implements Runnable {
         if (Notifier.METADATA_CHANNEL.equals(notification.getName())) {
             // The payload names the changed key, but metadata is small:
             // re-reading all of it is simpler and always consistent
-            dbmsSynchronizer.synchronizeLocalMetaData();
+            dbmsSynchronizer.handleRemoteMetaDataChange();
             return;
         }
         String payload = notification.getParameter();
@@ -125,14 +125,14 @@ public class NotificationListener implements Runnable {
             fieldChange = null;
         }
         if (fieldChange == null) {
-            dbmsSynchronizer.pullChanges();
+            dbmsSynchronizer.handleRemoteDatabaseChange();
             return;
         }
         if (processorId.equals(fieldChange.sourceProcessorId())) {
             // Own notification
             return;
         }
-        dbmsSynchronizer.applyRemoteFieldChange(fieldChange);
+        dbmsSynchronizer.handleRemoteFieldChange(fieldChange);
     }
 
     public void stop() {

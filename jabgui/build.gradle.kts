@@ -1,4 +1,5 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
+import org.gradle.api.tasks.testing.Test
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import org.jabref.gradle.VerifyJpackageJavaOptions
 import org.jabref.gradle.useLibericaJdkFull
@@ -20,6 +21,7 @@ version = providers.gradleProperty("projVersion")
 
 testModuleInfo {
     requires("org.jabref.testsupport")
+    requires("embedded.postgres")
 
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
@@ -34,6 +36,13 @@ testModuleInfo {
     requires("com.tngtech.archunit.junit5.api")
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+}
+
+tasks.named<Test>("test") {
+    if (project.hasProperty("sharedDatabaseProfile")) {
+        maxHeapSize = "4g"
+        jvmArgs("-XX:StartFlightRecording=filename=/tmp/group-tree-shared-database-profile.jfr,settings=profile,dumponexit=true")
+    }
 }
 
 // Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
