@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,6 +24,8 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -258,22 +261,100 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
-
-        // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
+        if (command == null || command.isBlank()) {
+            return;
+        }
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        String[] subcommands = command.split(" ");
+        List<String> subcommands = splitCommandLine(command).stream()
+                .map(token -> token.replace("%DIR", absolutePath))
+                .toList();
+
+        if (subcommands.isEmpty()) {
+            return;
+        }
+
         try {
-            new ProcessBuilder(subcommands).start();
+            ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
+            processBuilder.directory(Path.of(absolutePath).toFile());
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerStdOut = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+            StreamGobbler streamGobblerStdErr = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::warn);
+
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerStdOut);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerStdErr);
+
+            process.onExit().thenAcceptAsync(p -> {
+                if (p.exitValue() != 0) {
+                    LoggerFactory.getLogger(NativeDesktop.class).warn("Command \"{}\" finished with non-zero exit code: {}", command, p.exitValue());
+                    dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
+                }
+            }, HeadlessExecutorService.INSTANCE);
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
         }
+    }
+
+    /// Splits a command line string into separate arguments, respecting single and double quotes.
+    ///
+    /// @param commandLine the command line to format.
+    /// @return list of found tokens.
+    public static List<String> splitCommandLine(String commandLine) {
+        List<String> tokens = new ArrayList<>();
+        if (commandLine == null || commandLine.isBlank()) {
+            return tokens;
+        }
+
+        StringBuilder currentToken = new StringBuilder();
+        boolean inSingleQuote = false;
+        boolean inDoubleQuote = false;
+        boolean escaped = false;
+
+        for (int i = 0; i < commandLine.length(); i++) {
+            char c = commandLine.charAt(i);
+
+            if (escaped) {
+                currentToken.append(c);
+                escaped = false;
+                continue;
+            }
+
+            if (c == '\\' && !inSingleQuote) {
+                escaped = true;
+                continue;
+            }
+
+            if (c == '\'' && !inDoubleQuote) {
+                inSingleQuote = !inSingleQuote;
+                continue;
+            }
+
+            if (c == '"' && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+                continue;
+            }
+
+            if (Character.isWhitespace(c) && !inSingleQuote && !inDoubleQuote) {
+                if (!currentToken.isEmpty()) {
+                    tokens.add(currentToken.toString());
+                    currentToken.setLength(0);
+                }
+
+                continue;
+            }
+
+            currentToken.append(c);
+        }
+
+        if (!currentToken.isEmpty()) {
+            tokens.add(currentToken.toString());
+        }
+
+        return tokens;
     }
 
     /// Opens the given URL using the system browser
