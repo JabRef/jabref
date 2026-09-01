@@ -15,6 +15,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -239,7 +240,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void synchronizeLocalDatabaseWithEntryUpdate() throws SQLException, OfflineLockException {
+    void synchronizeLocalDatabaseWithEntryUpdate() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -258,7 +259,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void updateEntryDoesNotModifyLocalDatabase() throws SQLException, OfflineLockException {
+    void updateEntryDoesNotModifyLocalDatabase() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
