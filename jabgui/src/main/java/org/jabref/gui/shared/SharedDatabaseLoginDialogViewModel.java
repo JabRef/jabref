@@ -31,7 +31,6 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -75,9 +74,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
     private final BooleanProperty loading = new SimpleBooleanProperty();
-    private final StringProperty keystore = new SimpleStringProperty("");
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
-    private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
@@ -101,7 +98,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator portValidator;
     private final Validator userValidator;
     private final Validator folderValidator;
-    private final Validator keystoreValidator;
     private final Validator connectionUrlValidator;
     private final CompositeValidator formValidator;
 
@@ -129,11 +125,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
-        EasyBind.subscribe(useSSL, selected -> {
-            String current = keystore.getValue();
-            keystore.setValue(null);
-            keystore.setValue(current);
-        });
         EasyBind.subscribe(autosave, selected -> {
             String current = folder.getValue();
             folder.setValue(null);
@@ -141,9 +132,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
 
         Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
-        Predicate<String> fileExists = input -> Files.exists(Path.of(input));
-        // The PostgreSQL driver validates certificates via ~/.postgresql/root.crt, so a keystore is optional
-        Predicate<String> keyStoreRule = input -> !useSSL.get() || !notEmpty.test(input) || fileExists.test(input);
         Predicate<String> folderRule = input -> {
             if (!autosave.get()) {
                 return true;
@@ -164,11 +152,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, folderRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-        keystoreValidator = new FunctionBasedValidator<>(keystore, keyStoreRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
         connectionUrlValidator = new FunctionBasedValidator<>(connectionUrl, input -> !notEmpty.test(input) || DBMSConnectionUrl.parse(input).isPresent(), ValidationMessage.error(Localization.lang("Not a PostgreSQL connection URL.")));
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator, folderValidator);
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, folderValidator);
 
         applyPreferences();
 
@@ -199,20 +186,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setUseSSL(useSSL.getValue())
                 // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
                 .setAllowPublicKeyRetrieval(true)
-                .setKeyStore(keystore.getValue())
                 .setServerTimezone(serverTimezone.getValue())
                 .setExpertMode(expertMode.getValue())
                 .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
-        setupKeyStore();
         return openSharedDatabase(connectionProperties);
-    }
-
-    private void setupKeyStore() {
-        System.setProperty("javax.net.ssl.trustStore", keystore.getValue());
-        System.setProperty("javax.net.ssl.trustStorePassword", keyStorePasswordProperty.getValue());
-        System.setProperty("javax.net.debug", "ssl");
     }
 
     private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
@@ -297,7 +276,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePreferences.setName(database.getValue());
         sharedDatabasePreferences.setUser(user.getValue());
         sharedDatabasePreferences.setUseSSL(useSSL.getValue());
-        sharedDatabasePreferences.setKeystoreFile(keystore.getValue());
         sharedDatabasePreferences.setServerTimezone(serverTimezone.getValue());
         sharedDatabasePreferences.setExpertMode(expertMode.get());
         sharedDatabasePreferences.setJdbcUrl(jdbcUrl.getValue());
@@ -329,7 +307,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
         Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
         boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
-        Optional<String> sharedDatabaseKeystoreFile = sharedDatabasePreferences.getKeyStoreFile();
 
         if (sharedDatabaseType.isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
@@ -340,7 +317,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePort.ifPresent(port::set);
         sharedDatabaseName.ifPresent(database::set);
         sharedDatabaseUser.ifPresent(user::set);
-        sharedDatabaseKeystoreFile.ifPresent(keystore::set);
         useSSL.setValue(sharedDatabasePreferences.isUseSSL());
         sharedDatabasePreferences.getServerTimezone().ifPresent(serverTimezone::set);
         expertMode.set(sharedDatabasePreferences.isUseExpertMode());
@@ -380,17 +356,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         exportPath.ifPresent(path -> folder.setValue(path.toString()));
     }
 
-    public void showOpenKeystoreFileDialog() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileFilterConverter.ANY_FILE)
-                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
-                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
-                .build();
-        Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
-        keystorePath.ifPresent(path -> keystore.setValue(path.toString()));
-    }
-
     public StringProperty databaseproperty() {
         return database;
     }
@@ -423,14 +388,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         return folder;
     }
 
-    public StringProperty keyStoreProperty() {
-        return keystore;
-    }
-
-    public StringProperty keyStorePasswordProperty() {
-        return keyStorePasswordProperty;
-    }
-
     public BooleanProperty useSSLProperty() {
         return useSSL;
     }
@@ -461,10 +418,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus folderValidation() {
         return folderValidator.getValidationStatus();
-    }
-
-    public ValidationStatus keystoreValidation() {
-        return keystoreValidator.getValidationStatus();
     }
 
     public ValidationStatus formValidation() {

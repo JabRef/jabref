@@ -10,7 +10,6 @@ public class DBMSConnectionPropertiesBuilder {
     private boolean useSSL;
     private boolean allowPublicKeyRetrieval;
     private String serverTimezone = "";
-    private String keyStore;
     private boolean expertMode = false;
     private String jdbcUrl = "";
 
@@ -59,11 +58,6 @@ public class DBMSConnectionPropertiesBuilder {
         return this;
     }
 
-    public DBMSConnectionPropertiesBuilder setKeyStore(String keyStore) {
-        this.keyStore = keyStore;
-        return this;
-    }
-
     public DBMSConnectionPropertiesBuilder setJdbcUrl(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
         return this;
@@ -78,6 +72,6 @@ public class DBMSConnectionPropertiesBuilder {
         if (port == -1) {
             port = type.getDefaultPort();
         }
-        return new DBMSConnectionProperties(type, host, port, database, user, password, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore, jdbcUrl, expertMode);
+        return new DBMSConnectionProperties(type, host, port, database, user, password, useSSL, allowPublicKeyRetrieval, serverTimezone, jdbcUrl, expertMode);
     }
 }
