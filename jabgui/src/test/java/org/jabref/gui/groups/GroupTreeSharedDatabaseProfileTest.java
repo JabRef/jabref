@@ -24,6 +24,7 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -33,6 +34,7 @@ import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.shared.DatabaseConnection;
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -45,6 +47,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -54,8 +57,11 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Temporary profiler for the generated large library through the shared-database path.
+/// Profiles group-tree creation after synchronizing the generated large library through a shared database.
+///
+/// Run explicitly with `-PsharedDatabaseProfile`.
 @ExtendWith(ApplicationExtension.class)
+@EnabledIfSystemProperty(named = "sharedDatabaseProfile", matches = "true")
 class GroupTreeSharedDatabaseProfileTest {
 
     private static final Path LIBRARY = Path.of("..", "generated-large-library.bib");
@@ -76,12 +82,12 @@ class GroupTreeSharedDatabaseProfileTest {
         try (PostgresServer postgres = new PostgresServer()) {
             DatabaseConnection sourceConnection = openConnection(postgres);
             DatabaseConnection targetConnection = openConnection(postgres);
-            BibDatabaseContext sourceContext = new BibDatabaseContext();
-            DBMSSynchronizer sourceSynchronizer = newSynchronizer(sourceContext);
-            sourceContext.convertToSharedDatabase(sourceSynchronizer);
-            sourceSynchronizer.openSharedDatabase(sourceConnection);
-            insertEntriesInBatches(sourceContext, parsedLibrary.getDatabase().getEntries());
-            parsedLibrary.getMetaData().getGroups().ifPresent(sourceContext.getMetaData()::setGroups);
+            ProfileDBMSProcessor sourceProcessor = new ProfileDBMSProcessor(sourceConnection);
+            sourceProcessor.setUp();
+            insertEntriesInBatches(sourceProcessor, parsedLibrary.getDatabase().getEntries());
+            sourceProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(
+                    parsedLibrary.getMetaData(),
+                    GlobalCitationKeyPatterns.fromPattern("[auth][year]")));
 
             BibDatabaseContext targetContext = new BibDatabaseContext();
             DBMSSynchronizer targetSynchronizer = newSynchronizer(targetContext);
@@ -103,7 +109,6 @@ class GroupTreeSharedDatabaseProfileTest {
                         Duration.ofNanos(treeCreationDuration).toMillis());
                 assertTrue(groupTree.rootGroupProperty().get() != null);
             } finally {
-                sourceSynchronizer.closeSharedDatabase();
                 targetSynchronizer.closeSharedDatabase();
             }
         }
@@ -141,10 +146,16 @@ class GroupTreeSharedDatabaseProfileTest {
         };
     }
 
-    private void insertEntriesInBatches(BibDatabaseContext context, List<BibEntry> entries) {
+    private void insertEntriesInBatches(ProfileDBMSProcessor processor, List<BibEntry> entries) {
         int batchSize = 1_000;
         for (int start = 0; start < entries.size(); start += batchSize) {
-            context.getDatabase().insertEntries(entries.subList(start, Math.min(start + batchSize, entries.size())));
+            processor.insertEntries(entries.subList(start, Math.min(start + batchSize, entries.size())));
+        }
+    }
+
+    private static class ProfileDBMSProcessor extends DBMSProcessor {
+        private ProfileDBMSProcessor(DatabaseConnection connection) {
+            super(connection);
         }
     }
 
@@ -199,4 +210,3 @@ class GroupTreeSharedDatabaseProfileTest {
         return groupTree[0];
     }
 }
-

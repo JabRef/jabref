@@ -39,6 +39,7 @@ testModuleInfo {
 tasks.named<Test>("test") {
     if (project.hasProperty("sharedDatabaseProfile")) {
         maxHeapSize = "4g"
+        systemProperty("sharedDatabaseProfile", "true")
         jvmArgs("-XX:StartFlightRecording=filename=/tmp/group-tree-shared-database-profile.jfr,settings=profile,dumponexit=true")
     }
 }
