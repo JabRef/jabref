@@ -134,7 +134,7 @@ function Handle-Context($ctx) {
             if (-not $doi -and -not $url) { Send-Err $ctx 400 'bad-request' 'At least one of doi or url is required'; return }
             $r = Round-Trip @{ type = 'fetchFulltext'; doi = $doi; url = $url } $FetchTimeoutMs
             if ($r.error) { Send-Err $ctx (Status-For $r.error) $r.error (Msg-Of $r); return }
-            if (-not $r.path -or -not (Test-Path -LiteralPath $r.path -PathType Leaf)) {
+            if (-not $r.path -or -not (Test-Path -LiteralPath $r.path -PathType Leaf) -or (Get-Item -LiteralPath $r.path).Length -eq 0) {
                 Send-Err $ctx 404 'no-pdf-found' 'Provider returned no readable PDF path'; return
             }
             $out = @{ id = $r.id; path = $r.path }
