@@ -134,8 +134,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 return;
             }
             GroupNodeViewModel currentRoot = rootGroup.get();
+            // Rebuilding is expensive on large libraries (automatic groups scan every entry), so it
+            // only happens when the replacing root differs structurally from the displayed one -
+            // e.g. a remote metadata change that did not touch the groups replaces the root
+            // with an equal tree and is skipped here
             boolean rootReplaced = (currentRoot == null)
-                    || event.getMetaData().getGroups().filter(root -> root == currentRoot.getGroupNode()).isEmpty();
+                    || event.getMetaData().getGroups()
+                            .filter(root -> (root == currentRoot.getGroupNode()) || root.equals(currentRoot.getGroupNode()))
+                            .isEmpty();
             if (rootReplaced) {
                 // Event bursts coalesce naturally: after the first rebuild, the displayed root is
                 // the current one, and the remaining queued callbacks fall through here
