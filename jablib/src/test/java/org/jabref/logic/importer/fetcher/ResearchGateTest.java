@@ -14,7 +14,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@FetcherTest
+@ExternalServicesTest
 @DisabledOnCIServer("Blocked by Cloudflare")
 class ResearchGateTest {
 
