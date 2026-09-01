@@ -162,7 +162,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return props;
     }
 
-
     /// Compares all properties except the password.
     @Override
     public boolean equals(Object obj) {
