@@ -93,6 +93,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
     private final StringProperty styleNameProperty = new SimpleStringProperty("");
+    private final StringProperty newCustomizedStyleNameProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -595,6 +596,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return styleNameProperty;
     }
 
+    public StringProperty newCustomizedStyleNameProperty() {
+        return newCustomizedStyleNameProperty;
+    }
+
     public void addBstStyle(Path bstFile) {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
         bstStylesPaths.add(bstFile);
@@ -612,32 +617,59 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addCustomizedStyle() {
+        String requestedName = newCustomizedStyleNameProperty.getValue();
+        String trimmedName = requestedName == null ? "" : requestedName.trim();
         TextBasedPreviewLayout layout =
                 TextBasedPreviewLayout.of(
-                        nextCustomStyleDefaultName(),
+                        trimmedName,
                         TextBasedPreviewLayout.DEFAULT,
                         layoutFormatterPreferences,
                         abbreviationRepository);
 
+        if (!trimmedName.isEmpty() && isStyleNameAvailable(trimmedName, layout)) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Error"),
+                    Localization.lang("A style with this name already exists."));
+            return;
+        }
+
+        String name = trimmedName.isEmpty() ? nextCustomStyleDefaultName() : trimmedName;
+        layout.setName(name);
+
         customizedListProperty.add(layout);
+        newCustomizedStyleNameProperty.setValue("");
 
         availableSelectionModelProperty.getValue().clearSelection();
         availableSelectionModelProperty.getValue().select(layout);
         setPreviewLayout(layout);
     }
 
-    public void removeCustomizedStyle() {
-        PreviewLayout layout =
-                availableSelectionModelProperty.getValue().getSelectedItem();
+    private boolean isStyleNameAvailable(String trimmedName, @Nullable PreviewLayout layout) {
+        boolean inCustomized = customizedListProperty.stream()
+                                                     .filter(existing -> existing != layout)
+                                                     .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmedName));
+        boolean inChosen = chosenListProperty.stream()
+                                             .filter(TextBasedPreviewLayout.class::isInstance)
+                                             .filter(existing -> existing != layout)
+                                             .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmedName));
+        boolean inCsl = cslListProperty.stream()
+                                       .filter(existing -> existing != layout)
+                                       .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmedName));
+        return inCustomized || inChosen || inCsl;
+    }
 
-        // customized citation item are TextBasedPreviewLayout
-        // This check prevents original csl citations from being deleted
+    public void removeCustomizedStyle(PreviewLayout layout) {
         if (!(layout instanceof TextBasedPreviewLayout)) {
             return;
         }
-
         customizedListProperty.remove(layout);
-        availableSelectionModelProperty.getValue().clearSelection();
+        if (availableSelectionModelProperty.getValue().getSelectedItem() == layout) {
+            availableSelectionModelProperty.getValue().clearSelection();
+        }
+    }
+
+    public void removeCustomizedStyle() {
+        removeCustomizedStyle(availableSelectionModelProperty.getValue().getSelectedItem());
     }
 
     /// Commits an edit made in the style-name field to the currently selected TextBasedPreviewLayout.
@@ -652,16 +684,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     return;
                 }
                 // check for duplicates in both lists.
-                boolean isDupInCustomizedListProperty = customizedListProperty.stream()
-                                                                              .filter(existing -> existing != layout)
-                                                                              .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
-                boolean isDupInCslListProperty = cslListProperty.stream()
-                                                                .filter(existing -> existing != layout)
-                                                                .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
-                boolean isDupInChosenListProperty = chosenListProperty().stream()
-                                                                        .filter(existing -> existing != layout)
-                                                                        .anyMatch(existing -> existing.getDisplayName().equalsIgnoreCase(trimmed));
-                if (isDupInCslListProperty || isDupInCustomizedListProperty || isDupInChosenListProperty) {
+                if (isStyleNameAvailable(trimmed, layout)) {
                     dialogService.showWarningDialogAndWait(
                             Localization.lang("Error"),
                             Localization.lang("A style with this name already exists."));

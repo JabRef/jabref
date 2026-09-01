@@ -486,6 +486,22 @@ class PreviewTabViewModelTest {
         assertTrue(viewModel.cslListProperty().contains(cslLayout));
         assertEquals(viewModel.availableSelectionModelProperty().getValue().getSelectedItem(), cslLayout);
     }
+    
+    @Test
+    void removeCustomizedStyleInputRemovesSelectedTextBasedStyle() {
+        PreviewTabViewModel viewModel = setUpViewModel();
+
+        // add new custom layout
+        TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
+                layoutFormatterPreferences, abbreviationRepository);
+        viewModel.customizedListProperty().add(textBasedPreviewLayout);
+        assertEquals(1, viewModel.customizedListProperty().size());
+
+        viewModel.removeCustomizedStyle(textBasedPreviewLayout);
+
+        assertEquals(0, viewModel.customizedListProperty().size());
+        assertFalse(viewModel.customizedListProperty().contains(textBasedPreviewLayout));
+    }
 
     @Test
     void renameSelectedStyleSuccess() {
@@ -569,6 +585,25 @@ class PreviewTabViewModelTest {
 
     @Test
     void renameSelectedStyleFailsOnBlankLayoutNameAndTextFiledUnchanged() {
+        PreviewTabViewModel viewModel = setUpViewModel();
+
+        TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
+                layoutFormatterPreferences, abbreviationRepository);
+        viewModel.customizedListProperty().add(textBasedPreviewLayout);
+        viewModel.setPreviewLayout(textBasedPreviewLayout);
+        viewModel.styleNameProperty().set(NAME1);
+
+        viewModel.renameSelectedStyle("   ");
+        assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
+        viewModel.renameSelectedStyle("");
+        assertEquals(NAME1, viewModel.styleNameProperty().getValue());
+        assertEquals(ID1, textBasedPreviewLayout.getId());
+        assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
+        assertEquals(TEXT1, textBasedPreviewLayout.getText());
+    }
+
+    @Test
+    void renameSelectedStyleFailsOnBlankLayoutNameAndTextFiledUnchanged222() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
