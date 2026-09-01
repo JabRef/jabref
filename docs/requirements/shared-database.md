@@ -30,3 +30,5 @@ Needs: impl
 Connecting to a database created by an earlier JabRef version copies its content into the current table structure. The old tables are kept, so older JabRef versions continue to work.
 
 Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->

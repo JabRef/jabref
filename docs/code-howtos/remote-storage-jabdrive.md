@@ -153,7 +153,8 @@ If this is not the case, then the entry has been modified on the server since th
 
 During the push operation, the user is not allowed to locally edit these entries that are currently pushed.
 After the push operation, all entries accepted by the server are marked clean.
-Moreover, the server will generate a new `Version` dirty and their `Version` remains unchanged.
+Moreover, the server generates a new `Version` for each accepted entry, which the client stores.
+Entries rejected by the server remain dirty, and their `Version` remains unchanged.
 
 ### Start the "pull-merge-push cycle" again
 

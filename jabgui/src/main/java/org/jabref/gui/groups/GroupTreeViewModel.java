@@ -129,10 +129,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
     @Subscribe
     public void listen(GroupUpdatedEvent event) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+            if (event.getMetaData() != observedMetaData) {
+                // Stale callback: the observed library changed after the event was queued
+                return;
+            }
             GroupNodeViewModel currentRoot = rootGroup.get();
             boolean rootReplaced = (currentRoot == null)
                     || event.getMetaData().getGroups().filter(root -> root == currentRoot.getGroupNode()).isEmpty();
             if (rootReplaced) {
+                // Event bursts coalesce naturally: after the first rebuild, the displayed root is
+                // the current one, and the remaining queued callbacks fall through here
                 refresh();
             }
         });

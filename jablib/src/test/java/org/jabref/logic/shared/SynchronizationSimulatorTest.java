@@ -1,7 +1,10 @@
 package org.jabref.logic.shared;
 
+import java.sql.Statement;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import javafx.collections.FXCollections;
 
@@ -52,6 +55,15 @@ class SynchronizationSimulatorTest {
                 .withCitationKey("nanoproc199" + index);
     }
 
+    /// Awaits an asynchronously arriving state change (listener-thread work) with a bounded deadline.
+    /// The assertion afterwards reports the actual state if the deadline was missed.
+    private static void waitUntil(BooleanSupplier condition) throws InterruptedException {
+        long deadline = System.currentTimeMillis() + Duration.ofSeconds(10).toMillis();
+        while (!condition.getAsBoolean() && (System.currentTimeMillis() < deadline)) {
+            Thread.sleep(50);
+        }
+    }
+
     @BeforeEach
     void setup() throws Exception {
         this.connectorTest = new ConnectorTest();
@@ -95,9 +107,7 @@ class SynchronizationSimulatorTest {
         bibEntryOfClientA.setField(StandardField.YEAR, "2026");
 
         Optional<String> expected = Optional.of("2026");
-        for (int i = 0; (i < 100) && !expected.equals(bibEntryOfClientB.getField(StandardField.YEAR)); i++) {
-            Thread.sleep(100);
-        }
+        waitUntil(() -> expected.equals(bibEntryOfClientB.getField(StandardField.YEAR)));
         assertEquals(expected, bibEntryOfClientB.getField(StandardField.YEAR));
         assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), bibEntryOfClientB.getSharedBibEntryData().getVersion());
     }
@@ -111,9 +121,7 @@ class SynchronizationSimulatorTest {
         metaDataOfClientA.setMode(BibDatabaseMode.BIBLATEX);
 
         Optional<BibDatabaseMode> expected = Optional.of(BibDatabaseMode.BIBLATEX);
-        for (int i = 0; (i < 100) && !expected.equals(clientContextB.getMetaData().getMode()); i++) {
-            Thread.sleep(100);
-        }
+        waitUntil(() -> expected.equals(clientContextB.getMetaData().getMode()));
         assertEquals(expected, clientContextB.getMetaData().getMode());
     }
 
@@ -136,10 +144,8 @@ class SynchronizationSimulatorTest {
 
         Optional<String> expectedYear = Optional.of("2030");
         Optional<String> expectedTitle = Optional.of("Flush trigger");
-        for (int i = 0; (i < 100) && !(expectedYear.equals(bibEntryOfClientB.getField(StandardField.YEAR))
-                && expectedTitle.equals(bibEntryOfClientB.getField(StandardField.TITLE))); i++) {
-            Thread.sleep(100);
-        }
+        waitUntil(() -> expectedYear.equals(bibEntryOfClientB.getField(StandardField.YEAR))
+                && expectedTitle.equals(bibEntryOfClientB.getField(StandardField.TITLE)));
         assertEquals(expectedYear, bibEntryOfClientB.getField(StandardField.YEAR));
         assertEquals(expectedTitle, bibEntryOfClientB.getField(StandardField.TITLE));
     }
@@ -148,16 +154,12 @@ class SynchronizationSimulatorTest {
     void simulateLiveEntryInsertionAndRemovalPropagation() throws Exception {
         // client A inserts an entry; client B's listener pulls it
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
-        for (int i = 0; (i < 100) && clientContextB.getDatabase().getEntries().isEmpty(); i++) {
-            Thread.sleep(100);
-        }
+        waitUntil(() -> !clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
         // client A removes the entry again; client B follows
         clientContextA.getDatabase().removeEntry(clientContextA.getDatabase().getEntries().getFirst());
-        for (int i = 0; (i < 100) && !clientContextB.getDatabase().getEntries().isEmpty(); i++) {
-            Thread.sleep(100);
-        }
+        waitUntil(() -> clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(List.of(), clientContextB.getDatabase().getEntries());
     }
 
@@ -210,7 +212,7 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateUpdateOnNoLongerExistingEntry() {
+    void simulateUpdateOnNoLongerExistingEntry() throws Exception {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -221,8 +223,11 @@ class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
-        // client A removes the entry
-        clientContextA.getDatabase().removeEntry(bibEntryOfClientA);
+        // The entry disappears on the shared side without any notification
+        // (a removal through JabRef would notify client B thanks to live synchronization)
+        try (Statement statement = connectorTest.getTestDBMSConnection().getConnection().createStatement()) {
+            statement.executeUpdate("DELETE FROM jabref.entry");
+        }
 
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
@@ -231,6 +236,7 @@ class SynchronizationSimulatorTest {
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
+        waitUntil(() -> eventListenerB.getSharedEntriesNotPresentEvent() != null);
         assertNotNull(eventListenerB.getSharedEntriesNotPresentEvent());
         assertEquals(List.of(bibEntryOfClientB), eventListenerB.getSharedEntriesNotPresentEvent().bibEntries());
     }

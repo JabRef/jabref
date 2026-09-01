@@ -33,7 +33,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NonNull;
-import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +40,9 @@ import org.slf4j.LoggerFactory;
 public class DBMSProcessor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
+
+    // Arbitrary application-wide id serializing the one-time data migration across clients
+    private static final long MIGRATION_ADVISORY_LOCK_ID = 11_879L;
 
     protected final Connection connection;
 
@@ -54,9 +56,6 @@ public class DBMSProcessor {
     private final DatabaseConnection dbmsConnection;
 
     private NotificationListener listener;
-
-    // The listener needs its own connection: polling for notifications blocks the connection it runs on
-    private Connection listenerConnection;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
@@ -212,7 +211,9 @@ public class DBMSProcessor {
 
                     -- Notify only if the value has changed
                     IF existing_value IS DISTINCT FROM metadata_value THEN
-                        PERFORM pg_notify('%s', json_build_object('key', metadata_key, 'value', metadata_value)::TEXT);
+                        -- Only the key: values (e.g. serialized groups) can exceed the 8000 byte payload limit,
+                        -- and receivers re-read the metadata anyway
+                        PERFORM pg_notify('%s', metadata_key);
                     END IF;
                 END;
                 $$ LANGUAGE plpgsql;
@@ -233,12 +234,9 @@ public class DBMSProcessor {
     /// The old tables are kept untouched, so older JabRef versions can still work with them.
     // [impl->req~shared-database.migration~1]
     private void migrateFromOldStructure() throws SQLException {
-        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT EXISTS (SELECT 1 FROM entry)")) {
-            resultSet.next();
-            if (resultSet.getBoolean(1)) {
-                // Only a freshly created database is migrated into - never one that is already used
-                return;
-            }
+        if (!isEntryTableEmpty()) {
+            // Only a freshly created database is migrated into - never one that is already used
+            return;
         }
 
         Optional<String> oldSchema = findOldSchema();
@@ -247,15 +245,38 @@ public class DBMSProcessor {
         }
 
         LOGGER.info("Migrating shared database from old structure in schema \"{}\"", oldSchema.get());
-        connection.createStatement().executeUpdate(
-                "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", \"TYPE\", \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
-        connection.createStatement().executeUpdate(
-                "INSERT INTO field (entry_shared_id, name, value) SELECT \"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\" FROM %s.\"FIELD\"".formatted(oldSchema.get()));
-        connection.createStatement().executeUpdate(
-                "INSERT INTO metadata (key, value) SELECT \"KEY\", \"VALUE\" FROM %s.\"METADATA\"".formatted(oldSchema.get()));
-        // The serial has to continue after the copied ids
-        connection.createStatement().execute(
-                "SELECT setval(pg_get_serial_sequence('entry', 'shared_id'), COALESCE((SELECT MAX(shared_id) FROM entry), 0) + 1, false)");
+        // One transaction: a mid-migration failure must not leave a partially copied library behind,
+        // which would never be retried (the entry table would no longer be empty)
+        connection.setAutoCommit(false);
+        try {
+            // Serializes concurrent first connections; the lock is released at commit/rollback
+            connection.createStatement().execute("SELECT pg_advisory_xact_lock(" + MIGRATION_ADVISORY_LOCK_ID + ")");
+            if (isEntryTableEmpty()) {
+                // Still empty after acquiring the lock - no other client migrated in the meantime
+                connection.createStatement().executeUpdate(
+                        "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", \"TYPE\", \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
+                connection.createStatement().executeUpdate(
+                        "INSERT INTO field (entry_shared_id, name, value) SELECT \"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\" FROM %s.\"FIELD\"".formatted(oldSchema.get()));
+                connection.createStatement().executeUpdate(
+                        "INSERT INTO metadata (key, value) SELECT \"KEY\", \"VALUE\" FROM %s.\"METADATA\"".formatted(oldSchema.get()));
+                // The serial has to continue after the copied ids
+                connection.createStatement().execute(
+                        "SELECT setval(pg_get_serial_sequence('entry', 'shared_id'), COALESCE((SELECT MAX(shared_id) FROM entry), 0) + 1, false)");
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+
+    private boolean isEntryTableEmpty() throws SQLException {
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT EXISTS (SELECT 1 FROM entry)")) {
+            resultSet.next();
+            return !resultSet.getBoolean(1);
+        }
     }
 
     private Optional<String> findOldSchema() throws SQLException {
@@ -437,8 +458,8 @@ public class DBMSProcessor {
                 throw new OfflineLockException(localBibEntry, sharedBibEntry);
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
             connection.rollback(); // undo changes made in current transaction
+            throw e;
         } finally {
             connection.setAutoCommit(true); // enable auto commit mode again
         }
@@ -681,28 +702,24 @@ public class DBMSProcessor {
     ///
     /// @param dbmsSynchronizer [DBMSSynchronizer] which handles the notification.
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+        NotificationListener newListener = new NotificationListener(dbmsSynchronizer, dbmsConnection, processorId);
         try {
-            listenerConnection = dbmsConnection.openNewConnection();
-            listenerConnection.createStatement().execute("LISTEN \"" + Notifier.CHANNEL + "\"");
-            listenerConnection.createStatement().execute("LISTEN \"" + Notifier.METADATA_CHANNEL + "\"");
-            listener = new NotificationListener(dbmsSynchronizer, listenerConnection.unwrap(PGConnection.class), processorId);
-            HeadlessExecutorService.INSTANCE.execute(listener);
+            // Register the subscription synchronously: notifications sent after this method
+            // returns must not be missed
+            newListener.start();
         } catch (SQLException e) {
             LOGGER.error("SQL Error during starting the notification listener", e);
+            newListener.stop();
+            return;
         }
+        listener = newListener;
+        HeadlessExecutorService.INSTANCE.execute(newListener);
     }
 
     /// Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
     public void stopNotificationListener() {
-        if (listener == null) {
-            return;
-        }
-        listener.stop();
-        try {
-            // Also interrupts a pending getNotifications poll on the listener thread
-            listenerConnection.close();
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error during stopping the notification listener", e);
+        if (listener != null) {
+            listener.stop();
         }
     }
 }
