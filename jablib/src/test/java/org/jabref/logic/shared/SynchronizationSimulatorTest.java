@@ -2,6 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.Statement;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -161,6 +162,22 @@ class SynchronizationSimulatorTest {
         clientContextA.getDatabase().removeEntry(clientContextA.getDatabase().getEntries().getFirst());
         waitUntil(() -> clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(List.of(), clientContextB.getDatabase().getEntries());
+    }
+
+    @Test
+    void simulateBulkInsertionPropagation() throws Exception {
+        // Pasting many entries at once arrives as a single EntriesAddedEvent - all of them
+        // have to reach the other client through one pull notification
+        List<BibEntry> pasted = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            pasted.add(new BibEntry(StandardEntryType.Article)
+                    .withField(StandardField.TITLE, "Title " + i)
+                    .withCitationKey("bulk" + i));
+        }
+        clientContextA.getDatabase().insertEntries(pasted);
+
+        waitUntil(() -> clientContextB.getDatabase().getEntries().size() == 1000);
+        assertEquals(1000, clientContextB.getDatabase().getEntries().size());
     }
 
     @Test

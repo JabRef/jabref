@@ -4,6 +4,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
@@ -31,12 +32,12 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.sqlbased.PostgresServer;
-import org.jabref.logic.shared.DatabaseConnection;
-import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.DBMSType;
+import org.jabref.logic.shared.DatabaseConnection;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -48,8 +49,8 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
-import org.testfx.framework.junit5.ApplicationExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -146,7 +147,7 @@ class GroupTreeSharedDatabaseProfileTest {
         };
     }
 
-    private void insertEntriesInBatches(ProfileDBMSProcessor processor, List<BibEntry> entries) {
+    private void insertEntriesInBatches(ProfileDBMSProcessor processor, List<BibEntry> entries) throws SQLException {
         int batchSize = 1_000;
         for (int start = 0; start < entries.size(); start += batchSize) {
             processor.insertEntries(entries.subList(start, Math.min(start + batchSize, entries.size())));

@@ -104,6 +104,17 @@ The listening is implemented at `org.jabref.logic.shared.notifications.Notificat
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.
 
+## Reliability of change propagation
+
+A change reaches other clients in one of two ways:
+
+1. The `NOTIFY` payload carries the change itself (single field edits): applied directly, no extra round trip.
+2. The payload only says "pull" (insertions, removals, bulk pastes, payloads over the 8000-byte `NOTIFY` limit): receivers run `pullChanges`, which diffs the full `shared_id`/`version` mapping against the local state. This diff is complete - it covers any number of changes at once, so a paste of thousands of entries arrives via one notification.
+
+The same full diff runs when the notification listener reconnects after downtime, so notifications missed while disconnected are not lost.
+
+A possible future refinement is a change-log table: writers append each change as a row (in the same transaction as the data change), the `NOTIFY` payload carries only the change-log id, and clients fetch all rows since the last id they applied. This gives per-change history (no size limit, exact catch-up instead of a full diff) and would become the PostgreSQL equivalent of the JabDrive changes feed. It only pays off once per-change semantics are needed (offline-first synchronization, tombstones, undo across clients) - the version-diff pull already guarantees losslessness.
+
 ## Tests
 
 Tests are executed using [Zonky Embedded Postgres](https://github.com/zonkyio/embedded-postgres).

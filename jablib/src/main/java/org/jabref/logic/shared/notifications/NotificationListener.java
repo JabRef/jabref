@@ -57,6 +57,10 @@ public class NotificationListener implements Runnable {
                 if (currentPgConnection == null) {
                     currentPgConnection = connect();
                     pgConnection = currentPgConnection;
+                    // Notifications sent while the listener was down are gone - pull the
+                    // full state once so no remote change is lost over the downtime
+                    dbmsSynchronizer.handleRemoteDatabaseChange();
+                    dbmsSynchronizer.handleRemoteMetaDataChange();
                 }
                 while (!stop && !Thread.currentThread().isInterrupted()) {
                     // Wait for 12 seconds for notifications. Result will be null if no notifications arrive
@@ -82,6 +86,7 @@ public class NotificationListener implements Runnable {
                 consecutiveFailures++;
                 if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
                     LOGGER.error("Listening for shared database updates failed repeatedly - live updates are disabled until the library is reopened", exception);
+                    dbmsSynchronizer.handleListenerFailure();
                     return;
                 }
                 LOGGER.warn("Error while listening for shared database updates - reconnecting", exception);

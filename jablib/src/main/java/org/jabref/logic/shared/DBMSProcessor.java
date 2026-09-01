@@ -301,11 +301,11 @@ public class DBMSProcessor {
     ///
     /// @param bibEntry [BibEntry] to be inserted.
     @VisibleForTesting
-    public void insertEntry(BibEntry bibEntry) {
+    public void insertEntry(BibEntry bibEntry) throws SQLException {
         insertEntries(List.of(bibEntry));
     }
 
-    public void insertEntries(List<BibEntry> bibEntries) {
+    public void insertEntries(List<BibEntry> bibEntries) throws SQLException {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
         // pgjdbc caps bind parameters at 65535 per statement; with three parameters per field,
         // 500 entries stay below that up to an average of 43 fields per entry
@@ -316,7 +316,7 @@ public class DBMSProcessor {
     }
 
     /// Filters a list of BibEntry to those which do not yet exist in the database
-    private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
+    private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) throws SQLException {
         List<Integer> localIds = bibEntries.stream()
                                            .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
                                            .filter(id -> id != -1)
@@ -330,15 +330,13 @@ public class DBMSProcessor {
             while (resultSet.next()) {
                 remoteIds.add(resultSet.getInt("shared_id"));
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
         }
         return bibEntries.stream()
                          .filter(entry -> !remoteIds.contains(entry.getSharedBibEntryData().getSharedIdAsInt()))
                          .toList();
     }
 
-    protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
+    protected void insertIntoEntryTable(List<BibEntry> bibEntries) throws SQLException {
         if (bibEntries.isEmpty()) {
             return;
         }
@@ -367,8 +365,6 @@ public class DBMSProcessor {
                     LOGGER.error("Some shared IDs left unassigned");
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error during entry insertion", e);
         }
     }
 
@@ -376,48 +372,42 @@ public class DBMSProcessor {
     /// These entries do not yet exist in the remote database.
     ///
     /// @param bibEntries [BibEntry] to be inserted
-    protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
+    protected void insertIntoFieldTable(List<BibEntry> bibEntries) throws SQLException {
         if (bibEntries.isEmpty()) {
             return;
         }
 
-        try {
-            // Inserting into FIELD table
-            // Coerce to ArrayList in order to use List.get()
-            List<List<Field>> fields = bibEntries.stream()
-                                                 .map(bibEntry -> new ArrayList<>(bibEntry.getFields()))
-                                                 .collect(Collectors.toList());
+        // Coerce to ArrayList in order to use List.get()
+        List<List<Field>> fields = bibEntries.stream()
+                                             .map(bibEntry -> new ArrayList<>(bibEntry.getFields()))
+                                             .collect(Collectors.toList());
 
-            StringBuilder insertFieldQuery = new StringBuilder()
-                    .append("INSERT INTO FIELD (ENTRY_SHARED_ID, NAME, VALUE) VALUES(?, ?, ?)");
-            int numFields = 0;
-            for (List<Field> entryFields : fields) {
-                numFields += entryFields.size();
-            }
+        StringBuilder insertFieldQuery = new StringBuilder()
+                .append("INSERT INTO FIELD (ENTRY_SHARED_ID, NAME, VALUE) VALUES(?, ?, ?)");
+        int numFields = 0;
+        for (List<Field> entryFields : fields) {
+            numFields += entryFields.size();
+        }
 
-            if (numFields == 0) {
-                // Nothing to insert
-                return;
-            }
+        if (numFields == 0) {
+            // Nothing to insert
+            return;
+        }
 
-            // Number of commas is fields.size() - 1
-            insertFieldQuery.append(", (?, ?, ?)".repeat(numFields - 1));
-            try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
-                int fieldsCompleted = 0;
-                for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
-                    for (int entryFieldsIndex = 0; entryFieldsIndex < fields.get(entryIndex).size(); entryFieldsIndex++) {
-                        // columnIndex starts with 1
-                        preparedFieldStatement.setInt((3 * fieldsCompleted) + 1, bibEntries.get(entryIndex).getSharedBibEntryData().getSharedIdAsInt());
-                        preparedFieldStatement.setString((3 * fieldsCompleted) + 2, fields.get(entryIndex).get(entryFieldsIndex).getName());
-                        preparedFieldStatement.setString((3 * fieldsCompleted) + 3, bibEntries.get(entryIndex).getField(fields.get(entryIndex).get(entryFieldsIndex)).get());
-                        fieldsCompleted += 1;
-                    }
+        // Number of commas is fields.size() - 1
+        insertFieldQuery.append(", (?, ?, ?)".repeat(numFields - 1));
+        try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
+            int fieldsCompleted = 0;
+            for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
+                for (int entryFieldsIndex = 0; entryFieldsIndex < fields.get(entryIndex).size(); entryFieldsIndex++) {
+                    // columnIndex starts with 1
+                    preparedFieldStatement.setInt((3 * fieldsCompleted) + 1, bibEntries.get(entryIndex).getSharedBibEntryData().getSharedIdAsInt());
+                    preparedFieldStatement.setString((3 * fieldsCompleted) + 2, fields.get(entryIndex).get(entryFieldsIndex).getName());
+                    preparedFieldStatement.setString((3 * fieldsCompleted) + 3, bibEntries.get(entryIndex).getField(fields.get(entryIndex).get(entryFieldsIndex)).get());
+                    fieldsCompleted += 1;
                 }
-                // TODO: This could grow too large for a single query
-                preparedFieldStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            preparedFieldStatement.executeUpdate();
         }
     }
 
@@ -555,21 +545,18 @@ public class DBMSProcessor {
     /// Removes the shared bibEntry.
     ///
     /// @param bibEntries [BibEntry] to be deleted
-    public void removeEntries(@NonNull List<BibEntry> bibEntries) {
-        if (bibEntries.isEmpty()) {
-            return;
-        }
-        String query = "DELETE FROM ENTRY WHERE SHARED_ID IN (" +
-                "?, ".repeat(bibEntries.size() - 1) +
-                "?)";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            for (int j = 0; j < bibEntries.size(); j++) {
-                preparedStatement.setInt(j + 1, bibEntries.get(j).getSharedBibEntryData().getSharedIdAsInt());
+    public void removeEntries(@NonNull List<BibEntry> bibEntries) throws SQLException {
+        // Chunked for the same reason as insertEntries: at most 65535 bind parameters per statement
+        for (List<BibEntry> chunk : Lists.partition(bibEntries, 500)) {
+            String query = "DELETE FROM ENTRY WHERE SHARED_ID IN (" +
+                    "?, ".repeat(chunk.size() - 1) +
+                    "?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                for (int j = 0; j < chunk.size(); j++) {
+                    preparedStatement.setInt(j + 1, chunk.get(j).getSharedBibEntryData().getSharedIdAsInt());
+                }
+                preparedStatement.executeUpdate();
             }
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
         }
     }
 

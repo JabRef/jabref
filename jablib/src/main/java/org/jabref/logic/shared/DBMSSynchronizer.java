@@ -24,6 +24,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
+import org.jabref.logic.shared.event.SharedWriteFailedEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
@@ -141,9 +142,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             // and the database may be remote
             syncExecutor.execute(() -> {
                 flushPendingEntry();
-                dbmsProcessor.insertEntries(event.getBibEntries());
-                // Insertions are not described by a single field change, so other clients have to pull
-                notifier.notifyClientsToPull();
+                try {
+                    dbmsProcessor.insertEntries(event.getBibEntries());
+                    // Insertions are not described by a single field change, so other clients have to pull
+                    notifier.notifyClientsToPull();
+                } catch (SQLException e) {
+                    LOGGER.error("Could not insert entries into the shared database", e);
+                    reportWriteFailure();
+                }
             });
         }
     }
@@ -182,9 +188,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             syncExecutor.execute(() -> {
                 flushPendingEntry();
-                dbmsProcessor.removeEntries(event.getBibEntries());
-                // Removals are not described by a single field change, so other clients have to pull
-                notifier.notifyClientsToPull();
+                try {
+                    dbmsProcessor.removeEntries(event.getBibEntries());
+                    // Removals are not described by a single field change, so other clients have to pull
+                    notifier.notifyClientsToPull();
+                } catch (SQLException e) {
+                    LOGGER.error("Could not remove entries from the shared database", e);
+                    reportWriteFailure();
+                }
             });
         }
     }
@@ -368,9 +379,25 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             // The entry disappeared on the shared side - the user decides whether to keep it
             eventBus.post(new SharedEntriesNotPresentEvent(List.of(bibEntry)));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            LOGGER.error("Could not write entry to the shared database", e);
+            reportWriteFailure();
         }
         return false;
+    }
+
+    /// Tells the user that local changes did not reach the shared database. If the connection is
+    /// down, checking it posts a [ConnectionLostEvent] (reconnect dialog); otherwise the failure
+    /// is transient and reported as a [SharedWriteFailedEvent].
+    private void reportWriteFailure() {
+        if (checkCurrentConnection()) {
+            eventBus.post(new SharedWriteFailedEvent(bibDatabaseContext));
+        }
+    }
+
+    /// Called when live updates stopped permanently (the notification listener gave up
+    /// reconnecting). The user has to decide how to go on - same situation as a lost connection.
+    public void handleListenerFailure() {
+        eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
     }
 
     /// Synchronizes all meta data locally.

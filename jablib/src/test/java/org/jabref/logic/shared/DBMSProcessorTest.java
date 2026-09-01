@@ -205,7 +205,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getEntriesByIdList() {
+    void getEntriesByIdList() throws SQLException {
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
@@ -220,7 +220,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateNewerEntry() {
+    void updateNewerEntry() throws SQLException {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -308,7 +308,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedEntries() {
+    void getSharedEntries() throws SQLException {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -322,7 +322,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedEntry() {
+    void getSharedEntry() throws SQLException {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);

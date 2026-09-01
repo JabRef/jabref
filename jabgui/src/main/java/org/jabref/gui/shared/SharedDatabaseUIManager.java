@@ -29,6 +29,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
+import org.jabref.logic.shared.event.SharedWriteFailedEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -80,6 +81,11 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(ConnectionLostEvent connectionLostEvent) {
+        // Shared-database events are posted from background threads
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> handleConnectionLost(connectionLostEvent));
+    }
+
+    private void handleConnectionLost(ConnectionLostEvent connectionLostEvent) {
         ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
         ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
@@ -106,7 +112,16 @@ public class SharedDatabaseUIManager {
     }
 
     @Subscribe
+    public void listen(SharedWriteFailedEvent event) {
+        dialogService.notify(Localization.lang("Could not save changes to the shared database. The latest changes are not synchronized."));
+    }
+
+    @Subscribe
     public void listen(UpdateRefusedEvent updateRefusedEvent) {
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> handleUpdateRefused(updateRefusedEvent));
+    }
+
+    private void handleUpdateRefused(UpdateRefusedEvent updateRefusedEvent) {
         dialogService.notify(Localization.lang("Update refused."));
 
         BibEntry localBibEntry = updateRefusedEvent.localBibEntry();
@@ -140,6 +155,10 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> handleSharedEntriesNotPresent(event));
+    }
+
+    private void handleSharedEntriesNotPresent(SharedEntriesNotPresentEvent event) {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
 
         if (libraryTab != null) {
