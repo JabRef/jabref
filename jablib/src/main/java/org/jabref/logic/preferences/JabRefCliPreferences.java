@@ -2423,6 +2423,10 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Set<FetcherApiKey> getFetcherKeys(Set<FetcherApiKey> defaults) {
+        if (!hasKey(FETCHER_CUSTOM_KEY_NAMES) || !hasKey(FETCHER_CUSTOM_KEY_USES)) {
+            return defaults;
+        }
+
         Set<FetcherApiKey> fetcherApiKeys = new HashSet<>();
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
