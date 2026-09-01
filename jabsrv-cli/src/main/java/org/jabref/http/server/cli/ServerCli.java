@@ -33,7 +33,8 @@ public class ServerCli implements Callable<Void> {
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
     private Integer port = 23119;
 
-    /// Starts an http server serving the last files opened in JabRef<br>
+    /// Starts an http server serving the last files opened in JabRef
+    ///
     /// More files can be provided as args.
     ///
     /// @implNote method needs to be public, because JabServLauncher calls it.

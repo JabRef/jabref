@@ -97,8 +97,7 @@ import static java.util.function.Predicate.not;
 /// - citation key --&gt; contained in [#fields] using they hashmap key `KEY_FIELD`
 /// - fields --&gt; contained in [#fields]
 ///
-/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
-///
+/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to `false`. In case `changed`, use [#withChanged(boolean)].
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry {
 
@@ -423,7 +422,8 @@ public class BibEntry {
         return setType(type, EntriesEventSource.LOCAL);
     }
 
-    /// Sets this entry's type and sets the changed flag to true <br>
+    /// Sets this entry's type and sets the changed flag to true
+    ///
     /// If the new entry type equals the old entry type no changed flag is set.
     public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
         EntryType oldType = type.get();
@@ -559,7 +559,6 @@ public class BibEntry {
     /// The fields 'year' and 'month' are used if the 'date'
     /// field is empty. Conversely, getFieldOrAlias("year") also tries to
     /// extract the year from the 'date' field (analogously for 'month').
-    ///
     public Optional<String> getFieldOrAlias(Field field) {
         return genericGetFieldOrAlias(field, BibEntry::getField);
     }
@@ -666,7 +665,6 @@ public class BibEntry {
     /// We do it this way to
     ///   a) enable debugging the internal representation and
     ///   b) save time at this method.
-    ///
     ///
     /// This returns canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
     /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
@@ -905,11 +903,9 @@ public class BibEntry {
     ///
     /// The content is
     ///
-    ///
     /// - comments before entry
     /// - entry type
     /// - fields (including the citation key [InternalField#KEY_FIELD])
-    ///
     @Override
     public int hashCode() {
         return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
