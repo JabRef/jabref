@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 /// ``
 ///
 /// Almost every call to a public method creates a new HTTP connection
-/// (except for {@link #asString(Charset, URLConnection) asString},
+/// (except for [asString][#asString(Charset, URLConnection)],
 /// which uses an already opened connection).
 ///
 /// Nothing is cached.

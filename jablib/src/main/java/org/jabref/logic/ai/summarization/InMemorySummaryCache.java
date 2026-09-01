@@ -12,11 +12,11 @@ import org.jabref.model.entry.BibEntry;
 
 /// Session-scoped RAM cache for AI summaries.
 ///
-/// Keyed by {@link BibEntry} *reference identity* (using {@link IdentityHashMap}), so it
+/// Keyed by [BibEntry] *reference identity* (using [IdentityHashMap]), so it
 /// works even for entries that have no citation key or a non-unique one.
 ///
-/// On {@link #close()}, entries whose {@link BibEntry} has a *present and unique*
-/// citation key and a valid AI library ID are flushed to the persistent {@link SummariesRepository}.
+/// On [#close()], entries whose [BibEntry] has a *present and unique*
+/// citation key and a valid AI library ID are flushed to the persistent [SummariesRepository].
 ///
 /// Thread-safe: all map operations are protected by a synchronized wrapper.
 public class InMemorySummaryCache {
@@ -41,7 +41,7 @@ public class InMemorySummaryCache {
         cache.put(fullEntry.entry(), new CachedEntry(summary, fullEntry));
     }
 
-    /// Returns the cached summary for `entry`, or {@link Optional#empty()} if none exists.
+    /// Returns the cached summary for `entry`, or [Optional#empty()] if none exists.
     public Optional<AiSummary> get(BibEntry entry) {
         return Optional.ofNullable(cache.get(entry)).map(CachedEntry::summary);
     }

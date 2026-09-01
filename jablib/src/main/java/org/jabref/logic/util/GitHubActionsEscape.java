@@ -4,8 +4,8 @@ package org.jabref.logic.util;
 /// [GitHub Actions workflow command](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-creating-an-annotation-for-an-error)
 /// format. Two escaping flavours are needed:
 ///
-/// - {@link #data(String)} for the message body after `::`.
-/// - {@link #property(String)} for `key=value` properties (additionally escapes `:` and `,`,
+/// - [#data(String)] for the message body after `::`.
+/// - [#property(String)] for `key=value` properties (additionally escapes `:` and `,`,
 ///   which is critical for Windows-style file paths such as `C:\foo\bar.bib`).
 public final class GitHubActionsEscape {
 
