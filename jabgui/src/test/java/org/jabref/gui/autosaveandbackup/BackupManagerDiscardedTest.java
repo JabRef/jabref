@@ -11,6 +11,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabase;
@@ -38,6 +39,7 @@ class BackupManagerDiscardedTest {
     private Path testBib;
     private SelfContainedSaveConfiguration saveConfiguration;
     private CliPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
 
@@ -95,7 +97,7 @@ class BackupManagerDiscardedTest {
     void noDiscardingAChangeLeadsToNewerBackupBeReported() {
         databaseModification();
         makeBackup();
-        assertTrue(BackupManager.backupFileDiffers(testBib, backupDir));
+        assertTrue(BackupManager.backupFileDiffers(testBib, backupDir, importFormatPreferences));
     }
 
     @Test
@@ -103,7 +105,7 @@ class BackupManagerDiscardedTest {
         databaseModification();
         makeBackup();
         saveDatabase();
-        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir, importFormatPreferences));
     }
 
     @Test
@@ -111,6 +113,6 @@ class BackupManagerDiscardedTest {
         databaseModification();
         makeBackup();
         backupManager.discardBackup(backupDir);
-        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir, importFormatPreferences));
     }
 }
