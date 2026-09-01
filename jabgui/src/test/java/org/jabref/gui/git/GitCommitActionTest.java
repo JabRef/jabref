@@ -136,7 +136,7 @@ class GitCommitActionTest {
         }
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void committingLibraryOutsideRepositoryInitializesRepositoryAndAddsOnlyTheLibrary() throws Exception {
         Path libraryFile = libraryDirectory.resolve("library.bib");
@@ -152,7 +152,7 @@ class GitCommitActionTest {
         }
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void cancellingLeavesTheDirectoryUntouched() throws Exception {
         Path libraryFile = libraryDirectory.resolve("library.bib");
