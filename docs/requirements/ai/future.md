@@ -11,40 +11,52 @@ Captures upcoming enhancements and architectural refactoring for the AI system.
 
 Needs: impl
 
-## Allow modification of the LLM in AI chat
-`req~ai.chatting.llm-selection~1`
+Status: draft
 
-Users may prefer specific models for conversation based on cost, speed, or reasoning capability.
+## User can change LLM in AI chat
+`feat~ai.chatting.llm-selection~1`
 
-Needs: impl
-
-## Allow modification of the LLM in AI summary
-`req~ai.summarization.llm-selection~1`
-
-Summarization tasks may require different model strengths or token limits compared to interactive chat.
+User may prefer specific models for conversation based on cost, speed, or reasoning capability.
 
 Needs: impl
 
-## Support editing of user messages in AI chat
-`req~ai.chatting.user-message-editing~1`
+Status: draft
 
-Users need to correct typos or refine their queries without restarting the entire conversation context.
+## User can change LLM for AI summarization
+`feat~ai.summarization.llm-selection~1`
+
+Summarization tasks may require different model strengths or token limits compared to interactive AI chat.
 
 Needs: impl
 
-## Introduce AI profiles
-`req~ai.chatting.ai-profiles~1`
+Status: draft
 
-Currently it is hard to test other chat model in an AI chat, because the model setting is global and only one.
+## User can edit messages in AI chat
+`feat~ai.chatting.user-message-editing~1`
+
+User needs to correct typos or refine their queries without restarting the entire conversation context.
+
+Needs: impl
+
+Status: draft
+
+## User can create AI profiles
+`feat~ai.chatting.ai-profiles~1`
+
+Currently it is hard to test other AI chat model in an AI chat, because the model setting is global and only one.
 
 Needs: impl, dsn, utest
 
-## Allow modification of local RAG parameters in AI expert settings
-`req~ai.expert-settings.rag-local~1`
+Status: draft
 
-Users need to adjust the RAG parameters to refine AI outputs.
+## User can modify local RAG parameters
+`feat~ai.expert-settings.rag-local~1`
+
+User needs to adjust the RAG parameters to refine AI outputs.
 
 Needs: impl
+
+Status: draft
 
 <!-- oft:on -->
 

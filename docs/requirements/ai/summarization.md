@@ -13,21 +13,21 @@ Needs: model
 
 Basic functional requirements that apply to all summarization activities regardless of the specific algorithm.
 
-### Handle documents of any size for AI summarization
+### Documents of any size can be summarized
 `req~ai.summarization.general.unlimited-size~1`
 
 Users upload documents of varying lengths, from single pages to books, and the system must process them without hitting context window limits.
 
 Needs: impl
 
-### Allow export of AI summaries
-`req~ai.summarization.general.export~1`
+### User can export AI summaries
+`feat~ai.summarization.general.export~1`
 
-Users would want to access a summary offline, or use it in some other program.
+User would want to access a summary offline, or use it in some other program.
 
 Needs: impl
 
-### AI summaries should be preserved
+### AI summaries are preserved
 `req~ai.summarization.general.storage~1`
 
 Needs: impl, utest, dsn
@@ -39,10 +39,10 @@ Specific functionality related to the summarization of database entries or docum
 
 Needs: impl, pp
 
-### Add ability for automatic AI summarization of new entries
-`req~ai.summarization.entries.auto~1`
+### User can enable automatic AI summarization of new entries
+`feat~ai.summarization.entries.auto~1`
 
-Users may wish to automatically generate the summaries for new entries in a library.
+User may wish to automatically generate the summaries for new entries in a library.
 
 Needs: impl, pp
 
@@ -53,8 +53,8 @@ Distinct strategies for processing text, necessary because different document le
 
 Needs: impl
 
-### Allow users to select a default summarization algorithm
-`req~ai.summarization.algorithm.default~1`
+### User can select default AI summarization algorithm
+`feat~ai.summarization.algorithm.default~1`
 
 Needs: impl
 
@@ -67,17 +67,17 @@ Needs: impl
 
 Reference: simplified version of the algorithm described in <https://arxiv.org/abs/2109.10862>
 
-#### Allow customization of the system prompt for chunk task in "chunked" AI summarization
-`req~ai.summarization.algorithms.chunked.system-prompt-chunk~1`
+#### User can customize system prompt for chunking in AI summarization
+`feat~ai.summarization.algorithms.chunked.system-prompt-chunk~1`
 
-Users need to adjust the underlying prompt structures to refine AI outputs.
+User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
 
-#### Allow customization of the system prompt for combination task in "chunked" AI summarization
-`req~ai.summarization.algorithms.chunked.system-prompt-combine~1`
+#### User can customize system prompt for combining in AI summarization
+`feat~ai.summarization.algorithms.chunked.system-prompt-combine~1`
 
-Users need to adjust the underlying prompt structures to refine AI outputs.
+User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
 
@@ -90,10 +90,10 @@ Needs: impl
 
 Reference: <https://arxiv.org/abs/2307.03172>
 
-#### Allow customization of the system prompt for "full document" AI summarization
-`req~ai.summarization.algorithms.full.system-prompt~1`
+#### User can customize system prompt for full document AI summarization
+`feat~ai.summarization.algorithms.full.system-prompt~1`
 
-Users need to adjust the underlying prompt structures to refine AI outputs.
+User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
 

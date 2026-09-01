@@ -9,8 +9,8 @@ Enables the automatic extraction and identification of references within text us
 
 Needs: impl, pp
 
-## Allow customization of the system prompt for LLM citation parsing
-`req~ai.citation-parsing.system-prompt-config~1`
+## User can customize system prompt for LLM citation parsing
+`feat~ai.citation-parsing.system-prompt-config~1`
 
 Different citation styles or strictness levels require adjusting the baseline instructions (system prompt) given to the AI.
 

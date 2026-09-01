@@ -11,8 +11,8 @@ Different response engines are suitable for different tasks.
 
 Needs: impl
 
-## Allow users to select a default response engine
-`req~ai.response-engines.default~1`
+## User can select default AI response engine
+`feat~ai.response-engines.default~1`
 
 Needs: impl
 
@@ -25,8 +25,8 @@ Reference: <https://arxiv.org/abs/2005.11401>
 
 Needs: impl, dsn
 
-### Allow users to customize injection prompt for "embedding search" AI response engine
-`req~ai.response-engines.embeddings-search.prompt~1`
+### User can customize injection prompt for embedding search AI response engine
+`feat~ai.response-engines.embeddings-search.prompt~1`
 
 Different prompts are suited for different tasks and affect the LLM output.
 
@@ -41,8 +41,8 @@ Needs: impl
 
 Reference: <https://arxiv.org/abs/2407.16833>
 
-### Allow users to customize injection prompt for "full document" AI response engine
-`req~ai.response-engines.full-document.prompt~1`
+### User can customize injection prompt for full document AI response engine
+`feat~ai.response-engines.full-document.prompt~1`
 
 Different prompts are suited for different tasks and affect the LLM output.
 

@@ -13,84 +13,84 @@ Needs: impl
 
 Common functionalities required across all chat modes (single entry or group) to ensure a standard user experience.
 
-### Support deletion of messages in AI chat
-`req~ai.chat.delete-messages~1`
+### User can delete messages in AI chat
+`feat~ai.chat.delete-messages~1`
 
-Users should be able to remove specific messages to clean up the conversation or correct context
-
-Needs: impl, utest
-
-### Support regeneration of AI responses in AI chat
-`req~ai.chat.regenerate-response~1`
-
-Users may want a different answer if the previous one was unsatisfactory or hallucinated.
+User can remove specific messages to clean up the conversation or correct context.
 
 Needs: impl, utest
 
-### Provide a smart prompt input field in AI chat
-`req~ai.chat.smart-prompt-field~1`
+### User can regenerate AI responses in AI chat
+`feat~ai.chat.regenerate-response~1`
 
-The input field should support multi-line input, auto-resizing, keyboard shortcuts, and history.
+User may want a different answer if the previous one was unsatisfactory or hallucinated.
+
+Needs: impl, utest
+
+### User can use smart prompt input field in AI chat
+`feat~ai.chat.smart-prompt-field~1`
+
+Input field supports multi-line input, auto-resizing, keyboard shortcuts, and history.
 
 Needs: impl
 
-### Support clearing of chat history in AI chat
-`req~ai.chat.clear-history~1`
+### User can clear AI chat history
+`feat~ai.chat.clear-history~1`
 
-Allows the user to reset the context completely and start a fresh conversation without previous biases.
+User can reset the context completely and start a fresh conversation without previous biases.
 
 Needs: impl, guard, utest
 
-### Display the status of ingested files in AI chat
-`req~ai.chat.ingestion-status~1`
+### User can see ingestion status in AI chat
+`feat~ai.chat.ingestion-status~1`
 
-The user needs to know if the context files are fully indexed/embedded.
+Rationale: User needs to know if the context files are fully indexed/embedded.
 
 Needs: impl
 
-### Display the currently used AI model in AI chat
+### User can see current AI model in AI chat
 `req~ai.chat.model-visibility~1`
 
 Provides transparency regarding which LLM is generating the text.
 
 Needs: impl
 
-### Allow user to cancel AI response generation in AI chat
-`req~ai.chat.cancel-generation~1`
+### User can cancel AI response generation in AI chat
+`feat~ai.chat.cancel-generation~1`
 
 Saves resources/tokens and time if the user realizes the prompt was incorrect while the answer is streaming.
 
 Needs: impl
 
-### Display errors in AI chat
-`req~ai.chat.show-errors~1`
+### User can see errors in AI chat
+`feat~ai.chat.show-errors~1`
 
-Feedback must be provided within the chat interface if the API fails, the network drops, or rate limits are hit.
+Feedback must be provided within the AI chat interface if the API fails, the network drops, or rate limits are hit.
 
 Needs: impl
 
-### Support retry of AI response generation after error in AI chat
-`req~ai.chat.retry-error~1`
+### User can retry AI response generation after error
+`feat~ai.chat.retry-error~1`
 
 Provides a quick way to re-attempt the request without re-typing the prompt if the failure was transient.
 
 Needs: impl
 
-### Allow user to cancel AI response generation after an error in AI chat
-`req~ai.chat.cancel-error-state~1`
+### User can cancel AI response generation after error
+`feat~ai.chat.cancel-error-state~1`
 
-Allows the user to dismiss the error state or stop a retry loop to regain control of the interface.
-
-Needs: impl
-
-### Support customization of the system prompt in AI chat
-`req~ai.chat.customize-system-prompt~1`
-
-Users should be able to modify the AI behavior by changing the system prompt to better suit their needs.
+User can dismiss the error state or stop a retry loop to regain control of the interface.
 
 Needs: impl
 
-### Ensure that a response engine is used in AI chat
+### User can customize system prompt in AI chat
+`feat~ai.chat.customize-system-prompt~1`
+
+User can modify the AI behavior by changing the system prompt to better suit their needs.
+
+Needs: impl
+
+### Response engine must be used in AI chat
 `req~ai.chat.uses-response-engine~1`
 
 This requirement ensures that the AI has context to answer a question.
@@ -104,14 +104,14 @@ Specific requirements for chatting with a single bibliography entry.
 
 Needs: impl, pp
 
-### Support hiding of the AI chat tab
-`req~ai.chat.entries.hide-tab~1`
+### User can hide AI chat tab
+`feat~ai.chat.entries.hide-tab~1`
 
-Users who do not use AI features should be able to declutter their interface.
+User can declutter their interface if they do not use AI features.
 
 Needs: impl
 
-### Persist AI chat history for AI chat with entries
+### AI entry chat is persisted
 `req~ai.chat.entries.history-storage~1`
 
 History must be persisted per entry, so the user can resume the conversation later.
@@ -125,24 +125,24 @@ Specific requirements for chatting with a collection/group of entries simultaneo
 
 Needs: impl, pp
 
-### Support hiding of the context menu entry for AI chat with group
-`req~ai.chat.groups.hide-context-menu~1`
+### User can hide group AI chat context menu entry
+`feat~ai.chat.groups.hide-context-menu~1`
 
-Allows customization of the context menu to remove "Chat with group" if the user does not use it.
+User can customize the context menu to remove "Chat with group" if they do not use it.
 
 Needs: impl
 
-### Persist AI chat history for AI chat with groups
+### AI group chat is persisted
 `req~ai.chat.groups.history-storage~1`
 
 History must be persisted per group, so the conversation context is preserved across sessions.
 
 Needs: dsn, model, impl, utest
 
-### Display library name and group name in AI group chat
+### Library and group names are displayed in AI group chat dialog title
 `req~ai.chat.groups.display-names~1`
 
-Essential for user orientation, ensuring that users can distinguish between different chats of a group that has the same name in different libraries.
+Essential for user orientation, ensuring that users can distinguish between different AI chats of a group that has the same name in different libraries.
 
 Needs: impl
 
