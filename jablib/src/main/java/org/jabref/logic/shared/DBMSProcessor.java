@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.shared.notifications.Notifier;
-import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
@@ -713,7 +712,8 @@ public class DBMSProcessor {
             return;
         }
         listener = newListener;
-        HeadlessExecutorService.INSTANCE.execute(newListener);
+        // A virtual thread: the listener spends its life blocked in getNotifications
+        Thread.ofVirtual().name("JabRef - shared database notification listener").start(newListener);
     }
 
     /// Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
