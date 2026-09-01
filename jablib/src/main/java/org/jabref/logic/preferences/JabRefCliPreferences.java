@@ -2510,11 +2510,6 @@ public class JabRefCliPreferences implements CliPreferences {
             cleared.put(slot, "");
         }
         writeKeyring(cleared);
-
-        // Remove the preference keys
-        remove(FETCHER_CUSTOM_KEY_NAMES);
-        remove(FETCHER_CUSTOM_KEY_USES);
-        remove(FETCHER_CUSTOM_KEY_PERSIST);
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
