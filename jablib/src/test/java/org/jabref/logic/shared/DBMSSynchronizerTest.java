@@ -1,6 +1,7 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
+import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -129,6 +132,48 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void remoteFieldChangeIsAppliedOnConfiguredExecutor() throws Exception {
+        List<Runnable> remoteUpdates = new ArrayList<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                remoteUpdates::add);
+        remoteDatabase.registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            BibEntry localEntry = createExampleBibEntry(1);
+            remoteDatabase.insertEntry(localEntry);
+
+            String oldTitle = localEntry.getField(StandardField.TITLE).orElseThrow();
+            remoteSynchronizer.handleRemoteFieldChange(new FieldChange(
+                    "remote",
+                    localEntry.getSharedBibEntryData().getSharedIdAsString(),
+                    StandardField.TITLE.getName(),
+                    oldTitle,
+                    "Updated title",
+                    localEntry.getSharedBibEntryData().getVersion() + 1));
+
+            assertEquals(1, remoteUpdates.size());
+            assertEquals(oldTitle, localEntry.getField(StandardField.TITLE).orElseThrow());
+
+            remoteUpdates.getFirst().run();
+
+            assertEquals("Updated title", localEntry.getField(StandardField.TITLE).orElseThrow());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
     void entriesRemovedEventListener() {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
@@ -195,7 +240,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void synchronizeLocalDatabaseWithEntryUpdate() throws SQLException, OfflineLockException {
+    void synchronizeLocalDatabaseWithEntryUpdate() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -214,7 +259,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void updateEntryDoesNotModifyLocalDatabase() throws SQLException, OfflineLockException {
+    void updateEntryDoesNotModifyLocalDatabase() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());

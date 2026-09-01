@@ -129,10 +129,12 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         // (issue #11211: connection lost after ~2h)
         props.setProperty("tcpKeepAlive", Boolean.toString(true));
         if (useSSL) {
-            props.setProperty("ssl", Boolean.toString(true));
-            props.setProperty("useSSL", Boolean.toString(true));
-            // The driver's own factory only trusts ~/.postgresql/root.crt; the JVM default context carries the certificates managed in JabRef's network preferences
-            props.setProperty("sslfactory", "org.postgresql.ssl.DefaultJavaSSLFactory");
+            // Encrypt without authenticating the server - the same default as psql/libpq.
+            // Managed PostgreSQL providers use private CAs, which strict validation would
+            // reject out of the box. For strict validation, use the expert-mode JDBC URL with
+            // sslmode=verify-full, or sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory to
+            // validate against the certificates configured in JabRef's preferences.
+            props.setProperty("sslmode", "require");
         }
         if (allowPublicKeyRetrieval) {
             props.setProperty("allowPublicKeyRetrieval", Boolean.toString(true));

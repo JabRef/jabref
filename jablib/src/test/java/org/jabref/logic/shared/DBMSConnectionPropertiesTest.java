@@ -23,7 +23,7 @@ class DBMSConnectionPropertiesTest {
     }
 
     @Test
-    void sslUsesJabRefsCertificateStore() {
+    void sslMeansEncryptionWithoutServerAuthentication() {
         DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
                 .setHost("localhost")
@@ -34,6 +34,7 @@ class DBMSConnectionPropertiesTest {
                 .setUseSSL(true)
                 .createDBMSConnectionProperties();
 
-        assertEquals("org.postgresql.ssl.DefaultJavaSSLFactory", properties.asProperties().getProperty("sslfactory"));
+        // psql/libpq parity: managed providers use private CAs that strict validation rejects
+        assertEquals("require", properties.asProperties().getProperty("sslmode"));
     }
 }

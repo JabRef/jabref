@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -174,7 +175,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateEntry() throws SQLException, OfflineLockException {
+    void updateEntry() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry expectedEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -189,7 +190,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateEmptyEntry() throws SQLException, OfflineLockException {
+    void updateEmptyEntry() throws SQLException, OfflineLockException, SharedEntryNotPresentException {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -231,7 +232,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateEqualEntry() throws OfflineLockException, SQLException {
+    void updateEqualEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -340,7 +341,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedIdVersionMapping() throws OfflineLockException, SQLException {
+    void getSharedIdVersionMapping() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(firstEntry);
 

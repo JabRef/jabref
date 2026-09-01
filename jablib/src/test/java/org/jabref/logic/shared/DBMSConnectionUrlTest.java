@@ -16,8 +16,8 @@ class DBMSConnectionUrlTest {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://avnadmin:s%3Acret@pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require").orElseThrow();
 
         assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "pg-123.h.aivencloud.com", 27372, "defaultdb",
-                Optional.of("avnadmin"), Optional.of("s:cret"), true, "sslmode=require"), url);
-        assertEquals("jdbc:postgresql://pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require", url.toJdbcUrl());
+                Optional.of("avnadmin"), Optional.of("s:cret"), true, ""), url);
+        assertEquals("jdbc:postgresql://pg-123.h.aivencloud.com:27372/defaultdb", url.toJdbcUrl());
     }
 
     @Test
@@ -27,6 +27,14 @@ class DBMSConnectionUrlTest {
         assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "localhost", 5432, "jabref",
                 Optional.of("me"), Optional.of("a+b"), true, ""), url);
         assertEquals("jdbc:postgresql://localhost:5432/jabref", url.toJdbcUrl());
+    }
+
+    @Test
+    void strictSslModeIsKeptForTheDriver() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://db.example.org/lib?sslmode=verify-full&sslrootcert=ca.pem").orElseThrow();
+
+        assertTrue(url.useSSL());
+        assertEquals("jdbc:postgresql://db.example.org:5432/lib?sslmode=verify-full&sslrootcert=ca.pem", url.toJdbcUrl());
     }
 
     @Test

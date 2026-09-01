@@ -40,6 +40,13 @@ testModuleInfo {
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 }
 
+tasks.named<Test>("test") {
+    if (project.hasProperty("sharedDatabaseProfile")) {
+        maxHeapSize = "4g"
+        jvmArgs("-XX:StartFlightRecording=filename=/tmp/group-tree-shared-database-profile.jfr,settings=profile,dumponexit=true")
+    }
+}
+
 // Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
 // The per-module opens/exports declared in org.jabref.gradle.base.dependency-rules.gradle.kts (javafx.base,
 // javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.

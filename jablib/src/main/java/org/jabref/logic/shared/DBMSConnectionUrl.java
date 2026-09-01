@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 /// A PostgreSQL connection URL as handed out by hosting providers or used with JDBC, e.g.
 /// `postgres://user:secret@host:5432/db?sslmode=require` or `jdbc:postgresql://host/db?user=me`.
 ///
-/// @param query the query part without `user`, `password`, and `ssl`, which map to dedicated settings; empty if none
+/// @param query the query part without `user`, `password`, `ssl`, and `sslmode=require`, which map to dedicated settings; empty if none
 @NullMarked
 public record DBMSConnectionUrl(DBMSType type,
                                 String host,
@@ -30,6 +30,7 @@ public record DBMSConnectionUrl(DBMSType type,
                                 String query) {
 
     private static final Set<String> SSL_MODES_REQUIRING_SSL = Set.of("require", "verify-ca", "verify-full");
+    private static final Set<String> SSL_MODES_VERIFYING_SERVER = Set.of("verify-ca", "verify-full");
 
     // [impl->req~shared-database.connection-url~1]
     public static Optional<DBMSConnectionUrl> parse(@Nullable String text) {
@@ -83,9 +84,12 @@ public record DBMSConnectionUrl(DBMSType type,
                 } else if ("ssl".equals(key)) {
                     useSSL = value.isEmpty() || Boolean.parseBoolean(value);
                 } else if ("sslmode".equals(key)) {
-                    useSSL = SSL_MODES_REQUIRING_SSL.contains(value.toLowerCase(Locale.ROOT));
-                    // Kept: JabRef's "Use SSL" means verify-full, which is stricter than e.g. sslmode=require
-                    remaining.add(parameter);
+                    String mode = value.toLowerCase(Locale.ROOT);
+                    useSSL = SSL_MODES_REQUIRING_SSL.contains(mode);
+                    // JabRef's "Use SSL" is sslmode=require; stricter modes are only expressible in the JDBC URL
+                    if (SSL_MODES_VERIFYING_SERVER.contains(mode)) {
+                        remaining.add(parameter);
+                    }
                 } else {
                     remaining.add(parameter);
                 }

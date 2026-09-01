@@ -164,7 +164,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         url.user().ifPresent(user::set);
         url.password().ifPresent(password::set);
         useSSL.set(url.useSSL());
-        // Parameters without a dedicated field (e.g. sslmode=require) survive only in the custom JDBC URL
+        // Parameters without a dedicated field (e.g. sslmode=verify-full) survive only in the custom JDBC URL
         expertMode.set(!url.query().isEmpty());
         jdbcUrl.set(url.toJdbcUrl());
     }
