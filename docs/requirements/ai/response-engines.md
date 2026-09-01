@@ -11,14 +11,10 @@ Rationale: different response engines are suitable for different tasks
 
 Needs: impl
 
-Covers: `feat~ai.chatting~1`
-
 ## Allow users to select a default response engine
 `req~ai.response-engines.default~1`
 
 Needs: impl
-
-Covers: `feat~ai.response-engines~1`
 
 ## "Embedding search" AI response engine
 `feat~ai.response-engines.embeddings-search~1`
@@ -29,16 +25,12 @@ Reference: <https://arxiv.org/abs/2005.11401>
 
 Needs: impl, dsn
 
-Covers: `feat~ai.response-engines~1`
-
 ### Allow users to customize injection prompt for "embedding search" AI response engine
 `req~ai.response-engines.embeddings-search.prompt~1`
 
 Rationale: different prompts are suited for different tasks and affect the LLM output
 
 Needs: impl
-
-Covers: `feat~ai.response-engines.embeddings-search~1`, `feat~ai.expert-settings~1`
 
 ## "Full document" AI response engine
 `feat~ai.response-engines.full-document~1`
@@ -49,15 +41,11 @@ Needs: impl
 
 Reference: <https://arxiv.org/abs/2407.16833>
 
-Covers: `feat~ai.response-engines~1`
-
 ### Allow users to customize injection prompt for "full document" AI response engine
 `req~ai.response-engines.full-document.prompt~1`
 
 Rationale: different prompts are suited for different tasks and affect the LLM output
 
 Needs: impl
-
-Covers: `feat~ai.response-engines.full-document~1`, `feat~ai.expert-settings~1`
 
 <!-- markdownlint-disable-file MD022 -->
