@@ -1,5 +1,7 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.EmbeddedPostgresBinaries
+import org.jabref.gradle.VerifyJpackageJavaOptions
+import org.jabref.gradle.jdkVendor
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -19,6 +21,9 @@ version = providers.gradleProperty("projVersion")
 
 testModuleInfo {
     requires("org.jabref.testsupport")
+
+    // Local HTTP stub server for tests exercising download code hermetically
+    requires("jdk.httpserver")
 
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
@@ -83,10 +88,20 @@ dependencies {
     embeddedPostgresHostBinary?.let { runtimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
+// OpenJ9 (IBM Semeru, -Pjdk=IBM/openj9) only: also cache application classes in the per-user shared
+// classes cache (default location, e.g. ~/.cache/javasharedresources). Without this OpenJ9 starts
+// noticeably slower than HotSpot; with it warm startup beats HotSpot (jabref-koppor#729).
+// "nonfatal" keeps JabRef starting when the cache cannot be created or opened. The vendor guard is
+// required: HotSpot refuses to start on unrecognized -X options.
+val openJ9JvmArgs = if (jdkVendor == JvmVendorSpec.IBM) listOf(
+    "-Xshareclasses:name=jabref,nonfatal",
+    "-Xscmx256m"
+) else emptyList()
+
 application {
     mainClass= "org.jabref.Launcher"
 
-    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + openJ9JvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,org.apache.lucene.core,jkeychain",
 
@@ -257,9 +272,28 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(binary.moduleName)
         // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
-        javaOptions.add("--add-modules=${binary.moduleName}")
+        // add will siply replace the existing args!
+        javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
+}
+
+val verifyJpackageJavaOptions = tasks.register<VerifyJpackageJavaOptions>("verifyJpackageJavaOptions") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Verifies that packaged launchers retain application JVM options"
+    mismatches.set(embeddedPostgresBinaryByJpackageTask.mapNotNull { (taskName, binary) ->
+        val actualOptions = tasks.named<Jpackage>(taskName).get().javaOptions.get()
+        val expectedOptions = application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}"
+        if (actualOptions == expectedOptions) {
+            null
+        } else {
+            "$taskName expected $expectedOptions, but got $actualOptions"
+        }
+    })
+}
+
+tasks.named("check") {
+    dependsOn(verifyJpackageJavaOptions)
 }
 
 tasks.test {

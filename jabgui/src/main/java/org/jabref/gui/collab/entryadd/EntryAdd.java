@@ -21,7 +21,7 @@ public final class EntryAdd extends DatabaseChange {
 
     @Override
     public void applyChange(CompoundEdit undoEdit) {
-        undoEdit.apply(new UndoableInsertEntries(databaseContext.getDatabase(), addedEntry));
+        undoEdit.applyEdit(new UndoableInsertEntries(databaseContext.getDatabase(), addedEntry));
     }
 
     public BibEntry getAddedEntry() {

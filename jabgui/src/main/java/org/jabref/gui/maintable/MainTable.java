@@ -54,6 +54,7 @@ import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
@@ -64,7 +65,6 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -94,7 +94,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
@@ -297,10 +297,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSortOrder().setAll(restoredSortOrder);
     }
 
-    /// This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+    /// This is called, if a user starts typing some characters into the keyboard with focus on main table. The [MainTable] will scroll to the cell with the same starting column value and typed string
     /// If the user presses any other special key as well, e.g. alt or shift we don't jump
     ///
-    /// @param sortedColumn The sorted column in {@link MainTable}
+    /// @param sortedColumn The sorted column in [MainTable]
     /// @param keyEvent     The pressed character
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {

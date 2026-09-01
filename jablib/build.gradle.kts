@@ -106,18 +106,35 @@ val jbangVersion = project(":versions").extra["jbangVersion"] as String
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
+// JBang compiles the files listed in `//SOURCES` into the script, so they must be task inputs
+// as well - otherwise a change there leaves the generated output stale.
+fun jbangSources(script: RegularFile): FileCollection {
+    val scriptDir = script.asFile.parentFile
+    val paths = script.asFile.readLines()
+        .filter { it.startsWith("//SOURCES ") }
+        .map { it.removePrefix("//SOURCES ").trim() }
+    return files(paths.map { path ->
+        if (path.contains('*')) {
+            fileTree(scriptDir.resolve(path.substringBeforeLast('/'))) { include(path.substringAfterLast('/')) }
+        } else {
+            scriptDir.resolve(path)
+        }
+    })
+}
+
 var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
     version = jbangVersion
 
-    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
+    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java")
+    script = '"' + generatorScript.asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
+    inputs.file(generatorScript)
+    inputs.files(jbangSources(generatorScript))
     outputs.file(generatedJournalFile)
-    val generatedJournalFileProv = generatedJournalFile
-    onlyIf { !generatedJournalFileProv.get().asFile.exists() }
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
@@ -127,13 +144,13 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     mustRunAfter(taskGenerateJournalListMV)
     version = jbangVersion
 
-    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
+    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java")
+    script = '"' + generatorScript.asFile.absolutePath + '"'
 
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
-    val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
-    outputs.file(cslCatalogJson)
-    val cslCatalogJsonProv = cslCatalogJson
-    onlyIf { !cslCatalogJsonProv.get().asFile.exists() }
+    inputs.file(generatorScript)
+    inputs.files(jbangSources(generatorScript))
+    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
@@ -293,7 +310,7 @@ tasks.javadoc {
 
 tasks.test {
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "FetcherTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -315,12 +332,12 @@ jmh {
 
 val testSourceSet = sourceSets.test.get()
 
-tasks.register<Test>("fetcherTest") {
+tasks.register<Test>("externalServicesTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
-        includeTags("FetcherTest")
+        includeTags("ExternalServicesTest")
     }
     maxParallelForks = 1
 }
@@ -353,14 +370,14 @@ tasks.register('jacocoPrepare') {
 }
 test.mustRunAfter jacocoPrepare
 databaseTest.mustRunAfter jacocoPrepare
-fetcherTest.mustRunAfter jacocoPrepare
+externalServicesTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
-    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+    dependsOn jacocoPrepare, test, externalServicesTest, databaseTest
 
     executionData files(
             layout.buildDirectory.file('jacoco/test.exec').get().asFile,
-            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/externalServicesTest.exec').get().asFile,
             layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
 
     reports {

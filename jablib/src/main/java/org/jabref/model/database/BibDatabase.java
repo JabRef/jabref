@@ -52,6 +52,7 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final int BATCH_REPLACEMENT_THRESHOLD = 10;
 
     /// State attributes
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
@@ -113,6 +114,11 @@ public class BibDatabase {
 
     public ObservableList<BibEntry> getEntries() {
         return FXCollections.unmodifiableObservableList(entries);
+    }
+
+    /// Returns an immutable, stable snapshot of the current entries.
+    public synchronized List<BibEntry> getEntriesSnapshot() {
+        return List.copyOf(entries);
     }
 
     /// Returns a set of Strings, that contains all field names that are visible. This means that the fields
@@ -196,7 +202,7 @@ public class BibDatabase {
     }
 
     /// Removes the given entries.
-    /// The entries removed based on the id {@link BibEntry#getId()}
+    /// The entries removed based on the id [BibEntry#getId()]
     ///
     /// @param toBeDeleted Entries to delete
     public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
@@ -204,13 +210,15 @@ public class BibDatabase {
     }
 
     /// Removes the given entries.
-    /// The entries are removed based on the id {@link BibEntry#getId()}
+    /// The entries are removed based on the id [BibEntry#getId()]
     ///
     /// @param toBeDeleted Entry to delete
     /// @param eventSource Source the event is sent from
+    // [impl->req~ux.large-library.bulk-entry-removal~1]
     public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
+        boolean useBatchReplacement = toBeDeleted.size() > BATCH_REPLACEMENT_THRESHOLD;
         Collection<String> idsToBeDeleted;
-        if (toBeDeleted.size() > 10) {
+        if (useBatchReplacement) {
             idsToBeDeleted = new HashSet<>();
         } else {
             idsToBeDeleted = new ArrayList<>(toBeDeleted.size());
@@ -220,15 +228,23 @@ public class BibDatabase {
             idsToBeDeleted.add(entry.getId());
         }
 
-        List<BibEntry> newEntries = new ArrayList<>(entries);
-        newEntries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
-
         toBeDeleted.forEach(entry -> {
             entriesId.remove(entry.getId());
             removeEntryFromIndex(entry);
         });
 
-        entries.setAll(newEntries);
+        if (useBatchReplacement) {
+            List<BibEntry> entriesAfterDeletion = entries.stream()
+                                                         .filter(entry -> !idsToBeDeleted.contains(entry.getId()))
+                                                         .toList();
+            if ((entries.size() - entriesAfterDeletion.size()) > BATCH_REPLACEMENT_THRESHOLD) {
+                entries.setAll(entriesAfterDeletion);
+            } else {
+                entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+            }
+        } else {
+            entries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+        }
         eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
     }
 
@@ -519,9 +535,9 @@ public class BibDatabase {
     /// Registers a listener object (subscriber) to the internal event bus.
     /// The following events are posted:
     ///
-    /// - {@link EntriesAddedEvent}
-    /// - {@link org.jabref.model.entry.event.EntryChangedEvent}
-    /// - {@link EntriesRemovedEvent}
+    /// - [EntriesAddedEvent]
+    /// - [org.jabref.model.entry.event.EntryChangedEvent]
+    /// - [EntriesRemovedEvent]
     ///
     /// @param listener listener (subscriber) to add
     public void registerListener(Object listener) {
@@ -644,9 +660,9 @@ public class BibDatabase {
 
     /// @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
     /// @implNote New entries are always added to the end of the list and always get a higher ID.
-    /// See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-    /// {@link org.jabref.model.entry.IdGenerator IdGenerator},
-    /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+    /// See [BibEntry][org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)],
+    /// [IdGenerator][org.jabref.model.entry.IdGenerator],
+    /// [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)].
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(@NonNull BibEntry bibEntry) {

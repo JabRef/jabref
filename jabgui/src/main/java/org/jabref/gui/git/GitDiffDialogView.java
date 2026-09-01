@@ -1,0 +1,150 @@
+package org.jabref.gui.git;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.entrychange.EntryChange;
+import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
+import org.jabref.gui.collab.groupchange.GroupChange;
+import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
+import org.jabref.gui.collab.metedatachange.MetadataChange;
+import org.jabref.gui.collab.metedatachange.MetadataChangeDetailsView;
+import org.jabref.gui.collab.preamblechange.PreambleChange;
+import org.jabref.gui.collab.preamblechange.PreambleChangeDetailsView;
+import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+import org.jabref.gui.collab.stringadd.BibTexStringAddDetailsView;
+import org.jabref.gui.collab.stringchange.BibTexStringChange;
+import org.jabref.gui.collab.stringchange.BibTexStringChangeDetailsView;
+import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
+import org.jabref.gui.collab.stringrename.BibTexStringRename;
+import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
+
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
+public class GitDiffDialogView extends BaseDialog<Void> {
+
+    @FXML private TableView<DatabaseChange> changesTableView;
+    @FXML private TableColumn<DatabaseChange, String> changeName;
+    @FXML private BorderPane changeInfoPane;
+
+    @Inject private org.jabref.gui.DialogService dialogService;
+    @Inject private GuiPreferences preferences;
+    @Inject private BibEntryTypesManager entryTypesManager;
+    @Inject private TaskExecutor taskExecutor;
+
+    private final List<DatabaseChange> changes;
+    private final BibDatabaseContext headDatabase;
+    private final BibDatabaseContext workingTreeDatabase;
+    private final Map<DatabaseChange, Node> detailsViewCache = new HashMap<>();
+
+    public GitDiffDialogView(List<DatabaseChange> changes,
+                             BibDatabaseContext headDatabase,
+                             BibDatabaseContext workingTreeDatabase) {
+        this.changes = changes;
+        this.headDatabase = headDatabase;
+        this.workingTreeDatabase = workingTreeDatabase;
+
+        setTitle(Localization.lang("Diff view"));
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+    }
+
+    @FXML
+    private void initialize() {
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
+
+        changeName.setText(Localization.lang("Change"));
+        changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+
+        changesTableView.setItems(javafx.collections.FXCollections.observableArrayList(changes));
+        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        changesTableView.getSelectionModel().selectedItemProperty().addListener((_, _, selectedChange) -> {
+            if (selectedChange != null) {
+                changeInfoPane.setCenter(detailsViewCache.computeIfAbsent(selectedChange, change -> createDetailsNode(change, previewViewer)));
+            } else {
+                changeInfoPane.setCenter(null);
+            }
+        });
+
+        if (!changes.isEmpty()) {
+            changesTableView.getSelectionModel().selectFirst();
+        }
+    }
+
+    private Node createDetailsNode(DatabaseChange change, PreviewViewer previewViewer) {
+        return switch (change) {
+            case EntryChange entryChange ->
+                    new GitEntryChangeDetailsView(
+                            entryChange.getOldEntry(),
+                            entryChange.getNewEntry(),
+                            headDatabase,
+                            workingTreeDatabase,
+                            preferences,
+                            entryTypesManager
+                    );
+            case org.jabref.gui.collab.entryadd.EntryAdd entryAdd ->
+                    new EntryWithPreviewAndSourceDetailsView(
+                            entryAdd.getAddedEntry(),
+                            workingTreeDatabase,
+                            preferences,
+                            entryTypesManager,
+                            previewViewer
+                    );
+            case org.jabref.gui.collab.entrydelete.EntryDelete entryDelete ->
+                    new EntryWithPreviewAndSourceDetailsView(
+                            entryDelete.getDeletedEntry(),
+                            headDatabase,
+                            preferences,
+                            entryTypesManager,
+                            previewViewer
+                    );
+            case MetadataChange metadataChange ->
+                    new MetadataChangeDetailsView(
+                            metadataChange,
+                            preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
+                            Localization.lang("Committed version"),
+                            Localization.lang("Saved file")
+                    );
+            case GroupChange groupChange ->
+                    new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');
+            case PreambleChange preambleChange ->
+                    new PreambleChangeDetailsView(preambleChange);
+            case BibTexStringAdd stringAdd ->
+                    new BibTexStringAddDetailsView(stringAdd);
+            case BibTexStringDelete stringDelete ->
+                    new BibTexStringDeleteDetailsView(stringDelete);
+            case BibTexStringChange stringChange ->
+                    new BibTexStringChangeDetailsView(stringChange);
+            case BibTexStringRename stringRename ->
+                    new BibTexStringRenameDetailsView(stringRename);
+            default -> {
+                Label label = new Label(change.getName());
+                label.setWrapText(true);
+                yield label;
+            }
+        };
+    }
+}
