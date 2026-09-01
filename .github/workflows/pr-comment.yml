@@ -26,10 +26,22 @@ on:
   # It submits a review when done - that is the signal to re-evaluate the status labels.
   pull_request_review:
     types: [ submitted ]
+  # The PR author replying in a Qodo thread changes the label outcome but completes no
+  # workflow - listen to this event directly. Deleting the author's last reply flips a
+  # thread back to unaddressed, so deletions count as well. (Thread resolve/unresolve has
+  # no workflow trigger event; those are only picked up on the next triggering event.)
+  pull_request_review_comment:
+    types: [ created, deleted ]
 
 jobs:
   comment:
-    if: ${{ github.repository == 'JabRef/jabref' && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]') }}
+    # pull_request_review_comment: only a PR-author reply can un-count (or, when deleted,
+    # re-count) a Qodo thread, so other commenters' replies (including Qodo posting its own
+    # review comments) need no run. The deleted comment's author is in the same payload field.
+    if: >-
+      ${{ github.repository == 'JabRef/jabref'
+          && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]')
+          && (github.event_name != 'pull_request_review_comment' || github.event.comment.user.login == github.event.pull_request.user.login) }}
     runs-on: ubuntu-slim
     permissions:
       actions: read
@@ -124,13 +136,13 @@ jobs:
 
       # Set a common variable for PR number and workflow_run_id from either event.
       - name: Set variables
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request_review' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         id: set-vars
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
             echo "workflow_run_id=${{ github.event.inputs.workflow_run_id }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+          elif [[ "${{ github.event_name }}" == pull_request_review* ]]; then
             echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
             echo "pr_number=${{ steps.read-pr_number.outputs.pr_number }}" >> $GITHUB_OUTPUT
@@ -138,7 +150,7 @@ jobs:
           fi
 
       - name: "Check if PR has 'dev: no-bot-comments' label"
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request_review' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         id: check-label
         run: |
           has_label=$(gh pr view "${{ steps.set-vars.outputs.pr_number }}" --json labels -q \
@@ -207,7 +219,7 @@ jobs:
         # Every workflow in this workflow's workflow_run trigger list is a label-relevant producer:
         # the pending guard below defers evaluation to whichever of them finishes last, so each of
         # their completion events must be allowed to run this step - not only Source Code Tests.
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request_review' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
           # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
           # this step's own mutations (ghprcomment may have run for a while in between).

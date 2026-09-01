@@ -169,7 +169,7 @@ public class CSLCitationOOAdapter {
     /// Inserts in-text citations for a group of entries.
     /// Comparable to LaTeX's \citet command.
     ///
-    /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext) insertCitation} method.
+    /// @implNote Very similar to the [insertCitation][#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext)] method.
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
 
@@ -340,10 +340,10 @@ public class CSLCitationOOAdapter {
         return sb.toString();
     }
 
-    /// Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
-    /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
-    /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
-    /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
+    /// Ideally, the methods of this class are supposed to work with [CSLReferenceMarkManager], and not [CSLReferenceMark] directly.
+    /// However, all "generation" of CSL style citations (via [CitationStyleGenerator]) occur in this class, and not in [CSLReferenceMarkManager].
+    /// Furthermore, [CSLReferenceMarkManager] is not composed of [CitationStyle].
+    /// Hence, we keep [CSLReferenceMarkManager] independent of [CitationStyleGenerator] and [CitationStyle], and keep the following two methods here.
     private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         // We first get a list of all cited entries from the configured lookup scope to create a unified database context

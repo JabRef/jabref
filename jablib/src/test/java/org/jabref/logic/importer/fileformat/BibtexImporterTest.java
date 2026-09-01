@@ -38,8 +38,8 @@ import static org.mockito.Mockito.when;
 
 /// This class tests the BibtexImporter.
 ///
-/// Tests for writing can be found at {@link org.jabref.logic.exporter.BibDatabaseWriterTest}.
-/// Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
+/// Tests for writing can be found at [org.jabref.logic.exporter.BibDatabaseWriterTest].
+/// Tests for parsing single entry BibTeX can be found at [BibtexParserTest]
 class BibtexImporterTest {
 
     private BibtexImporter importer;

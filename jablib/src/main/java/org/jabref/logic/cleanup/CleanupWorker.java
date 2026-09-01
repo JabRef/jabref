@@ -43,10 +43,10 @@ public class CleanupWorker {
         return cleanup(preset, entry, Runnable::run);
     }
 
-    /// Cleans up the entry, routing all {@link org.jabref.model.entry.BibEntry} field mutations through
-    /// the provided {@code mutationScheduler}.
+    /// Cleans up the entry, routing all [org.jabref.model.entry.BibEntry] field mutations through
+    /// the provided `mutationScheduler`.
     ///
-    /// Pass {@code UiTaskExecutor::runAndWaitInJavaFXThread} when calling from a background thread
+    /// Pass `UiTaskExecutor::runAndWaitInJavaFXThread` when calling from a background thread
     /// so that field mutations (which fire JavaFX listeners) are dispatched to the FX thread.
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry, Consumer<Runnable> mutationScheduler) {
         List<CleanupJob> jobs = determineCleanupActions(preset);

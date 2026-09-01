@@ -29,7 +29,7 @@ extra["jbangVersion"] = jbang
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.19.0"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.1")
+    api("com.dlsc.gemsfx:gemsfx:4.4.4")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -75,7 +75,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.5.0")
     api("com.tngtech.archunit:archunit-junit5-api:1.5.0")
     api("com.tngtech.archunit:archunit-junit5-engine:1.5.0")
-    api("com.uber.nullaway:nullaway:0.14.0")
+    api("com.uber.nullaway:nullaway:0.14.1")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.22.0")
@@ -165,7 +165,7 @@ dependencies.constraints {
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.xmlunit:xmlunit-core:2.13.0")
     api("org.xmlunit:xmlunit-matchers:2.13.0")
-    api("org.yaml:snakeyaml:2.6")
+    api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svgnode:2.0.0")
 }
