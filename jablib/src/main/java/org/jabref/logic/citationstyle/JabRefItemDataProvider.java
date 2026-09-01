@@ -50,7 +50,6 @@ public class JabRefItemDataProvider implements ItemDataProvider {
 
     /// Converts the [BibEntry] into [CSLItemData].
     ///
-    /// <br>
     /// <table>
     /// <thead>
     /// <tr>

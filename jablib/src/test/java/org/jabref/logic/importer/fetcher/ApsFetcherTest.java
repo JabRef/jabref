@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@FetcherTest
+@ExternalServicesTest
 @Disabled("See https://github.com/JabRef/jabref/issues/12864")
 class ApsFetcherTest {
 
