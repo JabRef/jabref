@@ -27,6 +27,7 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -261,7 +262,7 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        if (command == null || command.isBlank()) {
+        if (StringUtil.isBlank(command)) {
             return;
         }
 
@@ -269,7 +270,7 @@ public abstract class NativeDesktop {
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
         List<String> subcommands = splitCommandLine(command).stream()
-                .map(token -> token.replace("%DIR", absolutePath))
+                .map(token -> token.replace("%DIR%", absolutePath).replace("%DIR", absolutePath))
                 .toList();
 
         if (subcommands.isEmpty()) {
@@ -303,9 +304,9 @@ public abstract class NativeDesktop {
     ///
     /// @param commandLine the command line to format.
     /// @return list of found tokens.
-    public static List<String> splitCommandLine(String commandLine) {
+    static List<String> splitCommandLine(String commandLine) {
         List<String> tokens = new ArrayList<>();
-        if (commandLine == null || commandLine.isBlank()) {
+        if (StringUtil.isBlank(commandLine)) {
             return tokens;
         }
 
@@ -323,7 +324,7 @@ public abstract class NativeDesktop {
                 continue;
             }
 
-            if (c == '\\' && !inSingleQuote) {
+            if (c == '\\' && !inSingleQuote && isEscapable(commandLine, i + 1)) {
                 escaped = true;
                 continue;
             }
@@ -355,6 +356,14 @@ public abstract class NativeDesktop {
         }
 
         return tokens;
+    }
+
+    private static boolean isEscapable(String commandLine, int index) {
+        if (index >= commandLine.length()) {
+            return false;
+        }
+        char c = commandLine.charAt(index);
+        return c == '\'' || c == '"' || c == '\\' || Character.isWhitespace(c);
     }
 
     /// Opens the given URL using the system browser
