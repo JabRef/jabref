@@ -21,6 +21,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
@@ -124,6 +125,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
+    @FXML private HBox idSearchingBox;
 
     @FXML private TextField urlText;
     @FXML private Label urlErrorInvalidText;
@@ -375,6 +377,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idSearchingBox.visibleProperty().bind(viewModel.executingProperty());
+        idSearchingBox.managedProperty().bind(viewModel.executingProperty());
 
         idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
 
