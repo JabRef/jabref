@@ -1,21 +1,13 @@
 package org.jabref.logic.shared;
 
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.shared.security.Password;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);
 
     private DBMSType type;
     private String host;
@@ -45,21 +37,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.expertMode = prefs.isUseExpertMode();
         this.useSSL = prefs.isUseSSL();
 
-        if (prefs.getUser().isPresent()) {
-            this.user = prefs.getUser().get();
-            if (prefs.getPassword().isPresent()) {
-                try {
-                    this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
-                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                    LOGGER.error("Could not decrypt password", e);
-                }
-            }
-        }
-
-        if (prefs.getPassword().isEmpty()) {
-            // Some DBMS require a non-null value as a password (in case of using an empty string).
-            this.password = "";
-        }
+        prefs.getUser().ifPresent(theUser -> this.user = theUser);
+        // The driver requires a non-null password even when none is stored
+        this.password = prefs.getPassword().orElse("");
     }
 
     DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,

@@ -8,8 +8,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -43,6 +45,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField user;
     @FXML private PasswordField password;
     @FXML private CheckBox rememberPassword;
+    @FXML private SplitPane rememberPasswordWrapper;
     @FXML private TextField folder;
     @FXML private Button browseButton;
     @FXML private CheckBox autosave;
@@ -133,6 +136,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
 
         rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
+        if (!viewModel.isKeyringAvailable()) {
+            rememberPassword.setDisable(true);
+            // A disabled control gets no mouse events, so the tooltip has to sit on the wrapper
+            rememberPasswordWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
+        }
 
         // Settings a pasted URL or the last login switched on must not stay hidden
         EasyBind.subscribe(viewModel.useSSLProperty(), this::expandAdvancedIf);

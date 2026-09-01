@@ -7,6 +7,7 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -39,8 +40,10 @@
                 <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
                 <Label text="%Password:" GridPane.rowIndex="6"/>
                 <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6"/>
-                <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember password"
-                          GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="7"/>
+                <SplitPane fx:id="rememberPasswordWrapper" GridPane.columnIndex="1" GridPane.columnSpan="2"
+                           GridPane.rowIndex="7">
+                    <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember password"/>
+                </SplitPane>
             </GridPane>
             <TitledPane fx:id="advancedPane" text="%Advanced" animated="false" expanded="false">
                 <GridPane hgap="10.0" vgap="8.0">

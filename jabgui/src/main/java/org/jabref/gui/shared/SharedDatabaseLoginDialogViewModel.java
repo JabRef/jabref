@@ -1,10 +1,8 @@
 package org.jabref.gui.shared;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +33,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSConnectionUrl;
@@ -43,7 +42,6 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -73,6 +71,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty folder = new SimpleStringProperty("");
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
+    private final boolean keyringAvailable = OS.isKeyringAvailable();
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty serverTimezone = new SimpleStringProperty("");
@@ -281,13 +280,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePreferences.setJdbcUrl(jdbcUrl.getValue());
 
         if (rememberPassword.get()) {
-            try {
-                sharedDatabasePreferences.setPassword(new Password(password.getValue(), user.getValue()).encrypt());
-            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                LOGGER.error("Could not store the password due to encryption problems.", e);
-            }
+            sharedDatabasePreferences.setPassword(password.getValue());
         } else {
-            sharedDatabasePreferences.clearPassword(); // for the case that the password is already set
+            sharedDatabasePreferences.clearPassword();
         }
 
         sharedDatabasePreferences.setRememberPassword(rememberPassword.get());
@@ -303,7 +298,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Optional<String> sharedDatabasePort = sharedDatabasePreferences.getPort();
         Optional<String> sharedDatabaseName = sharedDatabasePreferences.getName();
         Optional<String> sharedDatabaseUser = sharedDatabasePreferences.getUser();
-        Optional<String> sharedDatabasePassword = sharedDatabasePreferences.getPassword();
         boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
         Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
         boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
@@ -322,15 +316,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         expertMode.set(sharedDatabasePreferences.isUseExpertMode());
         sharedDatabasePreferences.getJdbcUrl().ifPresent(jdbcUrl::set);
 
-        if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
-            try {
-                password.setValue(new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
-            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                LOGGER.error("Could not read the password due to decryption problems.", e);
-            }
+        rememberPassword.set(sharedDatabaseRememberPassword && keyringAvailable);
+        if (rememberPassword.get()) {
+            sharedDatabasePreferences.getPassword().ifPresent(password::set);
         }
-
-        rememberPassword.set(sharedDatabaseRememberPassword);
 
         sharedDatabaseFolder.ifPresent(folder::set);
         autosave.set(sharedDatabaseAutosave);
@@ -382,6 +371,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public BooleanProperty rememberPasswordProperty() {
         return rememberPassword;
+    }
+
+    public boolean isKeyringAvailable() {
+        return keyringAvailable;
     }
 
     public StringProperty folderProperty() {
