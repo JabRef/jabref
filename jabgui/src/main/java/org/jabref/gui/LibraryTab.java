@@ -45,6 +45,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -63,7 +64,6 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -109,7 +109,7 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -168,7 +168,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Runnable autoCompleterChangedListener;
 
-    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path [BibDatabaseContext#getFulltextIndexPath()].
     /// If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
     /// Closing the index takes time and will slow down opening the library.
     ///
@@ -181,7 +181,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       UndoManager undoManager,
+                       GuiUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
@@ -673,7 +673,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (buttonType.equals(saveChanges)) {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
-                if (saveAction.save()) {
+                if (saveAction.save() != SaveDatabaseAction.SaveResult.FAILURE) {
                     return true;
                 }
                 // The action was either canceled or unsuccessful.
@@ -772,7 +772,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public UndoManager getUndoManager() {
+    public GuiUndoManager getUndoManager() {
         return undoManager;
     }
 
@@ -805,7 +805,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService,
                 preferences,
                 undoManager,
-                stateManager));
+                stateManager,
+                this));
     }
 
     public void suspendChangeMonitor() {
@@ -894,7 +895,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
         addEntriesWithFeedback(
-                clipBoardManager.getJabRefClipboardTransferData(),
+                clipBoardManager.getJabRefClipboardTransferData().orElse(null),
                 entriesToAdd,
                 bibDatabaseContext,
                 params -> Localization.lang("Pasted %0 entry(s) to %1", params),
@@ -973,7 +974,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().apply(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().applyEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
 
         if (mode != StandardActions.CUT) {
             List<LinkedFile> linkedFileList = entries.stream()
@@ -1077,7 +1078,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
@@ -1113,7 +1114,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         return new LibraryTab(

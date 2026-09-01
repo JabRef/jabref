@@ -13,9 +13,9 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
 import org.jabref.gui.edit.automaticfieldeditor.MoveFieldValueAction;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -102,7 +102,7 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
     }
 
     public void renameField() {
-        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("RENAME_EDIT");
+        CompoundEdit edits = new CompoundEdit(Localization.lang("Rename field"));
         int affectedEntriesCount = 0;
         if (fieldNameValidationStatus().isValid()) {
             affectedEntriesCount = new MoveFieldValueAction(selectedField.get(),
@@ -110,10 +110,8 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
                     selectedEntries,
                     edits,
                     false).executeAndGetAffectedEntriesCount();
-
-            edits.setAffectedEntries(affectedEntriesCount);
         }
 
-        addEdit(edits);
+        addEdit(edits, affectedEntriesCount);
     }
 }

@@ -328,7 +328,7 @@ public class MetaData {
         postChange();
     }
 
-    /// Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
+    /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
@@ -361,7 +361,7 @@ public class MetaData {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
-    /// If disabled {@link MetaDataChangedEvent} will not be posted.
+    /// If disabled [MetaDataChangedEvent] will not be posted.
     public void setEventPropagation(boolean enabled) {
         this.isEventPropagationEnabled = enabled;
     }

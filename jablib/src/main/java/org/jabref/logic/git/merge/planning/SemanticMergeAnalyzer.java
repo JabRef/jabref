@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 /// Single-pass, three-way semantic merge planner:
+///
 ///   - For each citation key that changed on either side (base→local or base→remote), we first detect semantic conflicts (entry- and field-level).
 ///   - Only if no conflict is found for that key, we generate the auto-merge plan; (remote - base) applied on local, but ONLY on fields where local kept base.
 public final class SemanticMergeAnalyzer {

@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -21,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is used to determine the status of a Git repository from any given path inside it.
-/// If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+/// If no repository is found, it returns a [GitStatusSnapshot] with tracking = false.
 /// Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
@@ -40,14 +41,8 @@ public class GitStatusChecker {
             SyncStatus syncStatus;
 
             if (remoteHead == null) {
-                boolean remoteEmpty = isRemoteEmpty(gitHandler);
-                if (remoteEmpty) {
-                    LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
-                    syncStatus = SyncStatus.REMOTE_EMPTY;
-                } else {
-                    LOGGER.debug("Remote is NOT empty but remoteHead unresolved -> UNKNOWN");
-                    syncStatus = SyncStatus.UNKNOWN;
-                }
+                // [impl->req~ux.git-commit.remote-independent~1]
+                syncStatus = determineSyncStatusWithoutRemoteHead(gitHandler);
             } else {
                 syncStatus = determineSyncStatus(repo, localHead, remoteHead);
             }
@@ -86,6 +81,27 @@ public class GitStatusChecker {
     public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
         gitHandler.fetchOnCurrentBranch();
         return checkStatus(gitHandler);
+    }
+
+    /// The remote is only consulted to tell "remote exists but is empty" apart from "cannot tell".
+    /// Any failure to reach it (no `origin`, unsupported or unreachable URI, ...) must not affect the
+    /// local working-tree result the caller relies on, so it degrades to [SyncStatus#UNKNOWN].
+    private static SyncStatus determineSyncStatusWithoutRemoteHead(GitHandler gitHandler) {
+        if (!gitHandler.hasRemote("origin")) {
+            LOGGER.debug("No origin remote configured -> UNKNOWN");
+            return SyncStatus.UNKNOWN;
+        }
+        try {
+            if (isRemoteEmpty(gitHandler)) {
+                LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
+                return SyncStatus.REMOTE_EMPTY;
+            }
+            LOGGER.debug("Remote is NOT empty but remoteHead unresolved -> UNKNOWN");
+            return SyncStatus.UNKNOWN;
+        } catch (IOException | GitAPIException | JGitInternalException e) {
+            LOGGER.warn("Could not query remote origin", e);
+            return SyncStatus.UNKNOWN;
+        }
     }
 
     private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {

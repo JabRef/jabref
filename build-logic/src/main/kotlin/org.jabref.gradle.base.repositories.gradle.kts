@@ -8,6 +8,10 @@ repositories {
         mavenLocal()
     }
 
+    // Google's Maven Central mirror first: repo.maven.apache.org rate-limits CI (HTTP 429) since 2026.
+    // mavenCentral() stays as fallback for artifacts the mirror has not synced yet.
+    // See https://central.sonatype.org/faq/429-error/ and build-logic/build.gradle.kts.
+    maven { url = uri("https://maven-central.storage-download.googleapis.com/maven2/") }
     mavenCentral()
 
     maven { url = uri("https://central.sonatype.com/repository/maven-snapshots/") }

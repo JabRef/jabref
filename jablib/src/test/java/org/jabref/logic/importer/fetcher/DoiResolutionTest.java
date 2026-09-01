@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.logic.preferences.DOIPreferences;
@@ -9,6 +11,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,6 +33,19 @@ class DoiResolutionTest {
         when(doiPreferences.shouldUseCustom()).thenReturn(false);
         finder = new DoiResolution(doiPreferences);
         entry = new BibEntry();
+    }
+
+    @Test
+    void anchorFallbackPreservesUrlCase() throws MalformedURLException {
+        // A page without citation_pdf_url, whose single PDF anchor has a case-sensitive path;
+        // the fallback scan must keep the original case (it once lowercased the whole URL).
+        String pdfUrl = "https://example.org/Article/AbC123/fulltext.PDF";
+        Document html = Jsoup.parse(
+                "<html><body><a href=\"" + pdfUrl + "\">Download</a></body></html>",
+                "https://example.org/");
+        assertEquals(
+                Optional.of(URLUtil.create(pdfUrl).toString()),
+                finder.findPdfLinkInAnchors(html).map(URL::toString));
     }
 
     @Test

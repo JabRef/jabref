@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.generators.CitationStyleCatalogGenerator;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.type.TypeReference;
@@ -18,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitationStyleCatalogGeneratorTest {
 
-    private static final String CATALOG_PATH = "build/generated/resources/citation-style-catalog.json";
+    private static final String CATALOG_PATH = "jablib/build/generated/resources/citation-style-catalog.json";
 
     @BeforeEach
     void generateCatalog() {
@@ -47,6 +45,7 @@ class CitationStyleCatalogGeneratorTest {
         assertTrue(firstStyle.containsKey("shortTitle"), "Style entry should have a short title");
         assertTrue(firstStyle.containsKey("isNumeric"), "Style entry should have isNumeric flag");
         assertTrue(firstStyle.containsKey("hasBibliography"), "Style entry should have hasBibliography flag");
+        assertTrue(firstStyle.containsKey("hasBibliographySortOrder"), "Style entry should have hasBibliographySortOrder flag");
         assertTrue(firstStyle.containsKey("usesHangingIndent"), "Style entry should have usesHangingIndent flag");
     }
 }
