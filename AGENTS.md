@@ -133,7 +133,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax instead of JavaDoc inline tags or HTML formatting tags: `` `code` `` instead of `{@code code}` or `<code>code</code>`, `[ClassName]` instead of `{@link ClassName}`, and fenced code blocks (```` ``` ````) instead of `<pre><code>`.
 
 ### Comments
 
@@ -386,7 +386,7 @@ npx markdownlint-cli2 "*.md"
 Tests requiring external resources have dedicated tasks:
 
 - `./gradlew databaseTest` — requires PostgreSQL
-- `./gradlew fetcherTest` — hits live external APIs
+- `./gradlew externalServicesTest` — hits live external APIs
 
 Fetcher tests must always hit the live endpoints — do not mock or stub the remote API in fetcher tests.
 
