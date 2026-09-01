@@ -113,7 +113,8 @@ public final class LibraryBaseline {
                     metaDataSide = sideOf(metaData, serialize(local.getMetaData(), citationKeyPatterns), serialize(metadataChange.getMetaDataDiff().getNewMetaData(), citationKeyPatterns), Objects::equals);
                     yield metaDataSide;
                 }
-                case GroupChange _ -> metaDataSide;
+                case GroupChange _ ->
+                        metaDataSide;
                 case PreambleChange preambleChange ->
                         sideOf(preamble, local.getDatabase().getPreamble().orElse(null), preambleChange.getPreambleDiff().getNewPreamble(), Objects::equals);
                 case BibTexStringAdd stringAdd ->
@@ -132,8 +133,10 @@ public final class LibraryBaseline {
                     change.accept();
                     triage.diskOnly().add(change);
                 }
-                case BOTH -> triage.bothSides().add(change);
-                case MEMORY -> triage.memoryOnly().add(change);
+                case BOTH ->
+                        triage.bothSides().add(change);
+                case MEMORY ->
+                        triage.memoryOnly().add(change);
             }
         }
         return triage;
@@ -144,17 +147,25 @@ public final class LibraryBaseline {
     public void keepUnresolved(LibraryBaseline previous, List<DatabaseChange> unresolved) {
         for (DatabaseChange change : unresolved) {
             switch (change) {
-                case EntryChange entryChange -> keepEntry(previous, entryChange.getOldEntry().getId());
-                case EntryDelete entryDelete -> keepEntry(previous, entryDelete.getDeletedEntry().getId());
-                case EntryAdd entryAdd -> previous.find(entryAdd.getAddedEntry()).ifPresent(base -> entriesById.put(base.getId(), base));
-                case MetadataChange _, GroupChange _ -> {
+                case EntryChange entryChange ->
+                        keepEntry(previous, entryChange.getOldEntry().getId());
+                case EntryDelete entryDelete ->
+                        keepEntry(previous, entryDelete.getDeletedEntry().getId());
+                case EntryAdd entryAdd ->
+                        previous.find(entryAdd.getAddedEntry()).ifPresent(base -> entriesById.put(base.getId(), base));
+                case MetadataChange _,
+                     GroupChange _ -> {
                     metaData.clear();
                     metaData.putAll(previous.metaData);
                 }
-                case PreambleChange _ -> preamble = previous.preamble;
-                case BibTexStringAdd stringAdd -> keepString(previous, stringAdd.getAddedString().getName());
-                case BibTexStringDelete stringDelete -> keepString(previous, stringDelete.getDeletedString().getName());
-                case BibTexStringChange stringChange -> keepString(previous, stringChange.getOldString().getName());
+                case PreambleChange _ ->
+                        preamble = previous.preamble;
+                case BibTexStringAdd stringAdd ->
+                        keepString(previous, stringAdd.getAddedString().getName());
+                case BibTexStringDelete stringDelete ->
+                        keepString(previous, stringDelete.getDeletedString().getName());
+                case BibTexStringChange stringChange ->
+                        keepString(previous, stringChange.getOldString().getName());
                 case BibTexStringRename stringRename -> {
                     keepString(previous, stringRename.getOldString().getName());
                     keepString(previous, stringRename.getNewString().getName());
