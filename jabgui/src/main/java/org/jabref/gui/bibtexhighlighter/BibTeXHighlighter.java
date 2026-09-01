@@ -76,6 +76,11 @@ public class BibTeXHighlighter implements SyntaxDecorator {
     public RichParagraph createRichParagraph(CodeTextModel model, int index) {
         refreshCacheIfNeeded(model);
 
+        // VFlow can request a cell from the previous model state while the source is being replaced.
+        if (index >= lineStarts.length) {
+            return RichParagraph.builder().build();
+        }
+
         String text = model.getPlainText(index);
         RichParagraph.Builder builder = RichParagraph.builder();
 

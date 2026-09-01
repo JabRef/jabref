@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -21,6 +19,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 

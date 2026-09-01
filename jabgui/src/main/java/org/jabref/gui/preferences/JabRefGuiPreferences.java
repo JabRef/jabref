@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
@@ -44,7 +45,9 @@ import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.welcome.DonationPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -104,6 +107,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region keybindings - public because needed for pref migration
     public static final String BIND_NAMES = "bindNames";
     public static final String BINDINGS = "bindings";
+    public static final String MACOS_KEY_BINDING_DEFAULTS_MIGRATED = "macOSKeyBindingDefaultsMigrated";
     // endregion
 
     // region column names
@@ -131,8 +135,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     private static final String MAIN_FONT_SIZE = "mainFontSize";
-    private static final String THEME = "fxTheme";
-    private static final String THEME_SYNC_OS = "themeSyncOs";
+    private static final String THEME = "theme";
+    private static final String THEME_COLOR_SCHEME = "themeColorScheme";
+    private static final String THEME_CUSTOM = "themeCustom";
     private static final String OPEN_LAST_EDITED = "openLastEdited";
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
@@ -676,8 +681,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize()),
                 getInt(MAIN_FONT_SIZE, defaultValues.getMainFontSize()),
-                new Theme(get(THEME, Theme.SYSTEM)),
-                getBoolean(THEME_SYNC_OS, defaultValues.shouldThemeSyncOs()),
+                ThemePreset.of(get(THEME, defaultValues.getTheme().getPreferenceName())),
+                ThemeColorScheme.of(get(THEME_COLOR_SCHEME, defaultValues.getColorScheme().getPreferenceName())),
+                asStyleSheet(get(THEME_CUSTOM, "")),
                 getBoolean(OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited()),
                 getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
                 getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
@@ -696,8 +702,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize());
         bindInt(workspacePreferences.mainFontSizeProperty(), MAIN_FONT_SIZE, defaultValues.getMainFontSize());
         bindObject(workspacePreferences.themeProperty(), THEME, defaultValues.getTheme(),
-                Theme::getName, Theme::new);
-        bindBoolean(workspacePreferences.themeSyncOsProperty(), THEME_SYNC_OS, defaultValues.shouldThemeSyncOs());
+                ThemePreset::getPreferenceName, ThemePreset::of);
+        bindObject(workspacePreferences.colorSchemeProperty(), THEME_COLOR_SCHEME, defaultValues.getColorScheme(),
+                ThemeColorScheme::getPreferenceName, ThemeColorScheme::of);
+        bindCustom(workspacePreferences.customThemeProperty(), THEME_CUSTOM, defaultValues.getCustomTheme(),
+                (_, _, newValue) -> put(THEME_CUSTOM, newValue.map(StyleSheet::getName).orElse("")),
+                () -> workspacePreferences.setCustomTheme(Optional.ofNullable(asStyleSheet(get(THEME_CUSTOM, "")))),
+                () -> workspacePreferences.setCustomTheme(defaultValues.getCustomTheme()));
         bindBoolean(workspacePreferences.openLastEditedProperty(), OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited());
         bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
         bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
@@ -707,6 +718,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> getStringList(SELECTED_SLR_CATALOGS));
 
         return workspacePreferences;
+    }
+
+    private StyleSheet asStyleSheet(String path) {
+        if (StringUtil.isBlank(path)) {
+            return null;
+        }
+        return StyleSheet.create(path).orElse(null);
     }
     // endregion
 

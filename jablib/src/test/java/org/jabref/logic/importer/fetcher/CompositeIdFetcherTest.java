@@ -16,7 +16,7 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 /// Tests the CompositeIdFetcher, for which Fetchers implementing the
 /// IdBasedFetcher interface are a prerequisite. Excluding TitleFetcher.
-@FetcherTest
+@ExternalServicesTest
 class CompositeIdFetcherTest {
 
     private CompositeIdFetcher compositeIdFetcher;

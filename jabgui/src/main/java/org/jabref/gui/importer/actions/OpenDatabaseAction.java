@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -22,7 +20,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -70,7 +68,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
 
@@ -81,7 +79,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager,
+                              GuiUndoManager undoManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
@@ -225,9 +223,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
-    /// This is the real file opening. Should be called via {@link #openFile(Path)}
+    /// This is the real file opening. Should be called via [#openFile(Path)]
     ///
-    /// Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
+    /// Similar method: [org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)].
     ///
     /// @param file the file, may be NOT null, but may not be existing
     private void openTheFile(@NonNull Path file) {
@@ -315,7 +313,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          UndoManager undoManager,
+                                          GuiUndoManager undoManager,
                                           ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {

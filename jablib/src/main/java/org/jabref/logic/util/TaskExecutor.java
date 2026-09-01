@@ -3,7 +3,7 @@ package org.jabref.logic.util;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-/// An object that executes submitted {@link javafx.concurrent.Task}s. This
+/// An object that executes submitted [javafx.concurrent.Task]s. This
 /// interface provides a way of decoupling task submission from the
 /// mechanics of how each task will be run, including details of thread
 /// use, scheduling, thread pooling, etc.

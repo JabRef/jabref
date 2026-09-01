@@ -29,7 +29,7 @@ public class SearchGroup extends AbstractGroup {
         this.searchQuery = new SearchQuery(searchExpression, searchFlags);
     }
 
-    /// Used by {@link org.jabref.gui.importer.actions.SearchGroupsMigrationAction} to update the search expression.
+    /// Used by [org.jabref.gui.importer.actions.SearchGroupsMigrationAction] to update the search expression.
     /// *Do not use otherwise*.
     public void setSearchExpression(String searchExpression) {
         LOGGER.debug("Setting search expression {}", searchExpression);

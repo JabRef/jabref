@@ -160,7 +160,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return result;
     }
 
-    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
+    /// Returns the parser used to convert the response to a list of [BibEntry].
     @Override
     public Parser getParser() {
         return inputStream -> {
@@ -229,10 +229,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return "SemanticScholar";
     }
 
-    /// Looks for hits which are matched by the given {@link BibEntry}.
+    /// Looks for hits which are matched by the given [BibEntry].
     ///
     /// @param entry entry to search bibliographic information for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of [BibEntry], which are matched by the query (may be empty)
     /// @throws FetcherException if an error linked to the Fetcher applies
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {

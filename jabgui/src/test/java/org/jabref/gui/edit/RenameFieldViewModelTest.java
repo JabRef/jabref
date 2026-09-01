@@ -8,14 +8,14 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.edit.automaticfieldeditor.renamefield.RenameFieldViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.undo.CompoundEdit;
 
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
@@ -67,7 +67,7 @@ class RenameFieldViewModelTest {
         renameFieldViewModel = new RenameFieldViewModel(
                 List.of(entryA, entryB),
                 bibDatabase,
-                mock(NamedCompoundEdit.class),
+                mock(CompoundEdit.class),
                 dialogService,
                 stateManager);
     }
