@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -75,6 +76,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
     private final String userAndHost;
+    private final Executor remoteUpdateExecutor;
 
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
                             Character keywordSeparator,
@@ -82,6 +84,16 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
                             String userAndHost) {
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, Runnable::run);
+    }
+
+    public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
+                            Character keywordSeparator,
+                            FieldPreferences fieldPreferences,
+                            @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
+                            FileUpdateMonitor fileMonitor,
+                            String userAndHost,
+                            Executor remoteUpdateExecutor) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -91,6 +103,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
         this.userAndHost = userAndHost;
+        this.remoteUpdateExecutor = remoteUpdateExecutor;
     }
 
     /// Listening method. Inserts a new [BibEntry] into shared database.
@@ -306,6 +319,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         withPullLock(this::doSynchronizeLocalMetaData);
     }
 
+    /// Schedules a metadata update received from another shared-database client.
+    public void handleRemoteMetaDataChange() {
+        remoteUpdateExecutor.execute(this::synchronizeLocalMetaData);
+    }
+
     private void doSynchronizeLocalMetaData() {
         if (!checkCurrentConnection()) {
             return;
@@ -371,12 +389,22 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         });
     }
 
+    /// Schedules a full synchronization requested by another shared-database client.
+    public void handleRemoteDatabaseChange() {
+        remoteUpdateExecutor.execute(this::pullChanges);
+    }
+
     /// Applies a field change received from another client. Any state that does not exactly
     /// match the received change (content-less payload, unknown entry, diverged field value)
     /// falls back to pulling everything from the database.
     // [impl->req~shared-database.change-content-in-notification~1]
     public void applyRemoteFieldChange(FieldChange fieldChange) {
         withPullLock(() -> doApplyRemoteFieldChange(fieldChange));
+    }
+
+    /// Schedules a field update received from another shared-database client.
+    public void handleRemoteFieldChange(FieldChange fieldChange) {
+        remoteUpdateExecutor.execute(() -> applyRemoteFieldChange(fieldChange));
     }
 
     private void doApplyRemoteFieldChange(FieldChange fieldChange) {
