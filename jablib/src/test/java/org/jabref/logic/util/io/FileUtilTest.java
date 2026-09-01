@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -803,5 +804,26 @@ class FileUtilTest {
         FileUtil.replaceFileAtomically(source, target);
 
         assertEquals("new", Files.readString(sibling));
+    }
+
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "POSIX directory permissions")
+    @Test
+    void replaceFileAtomicallyOverwritesInPlaceInReadOnlyDirectory(@TempDir Path tempDir) throws IOException {
+        Path readOnlyDir = tempDir.resolve("readonly");
+        Files.createDirectory(readOnlyDir);
+        Path target = readOnlyDir.resolve("target.txt");
+        Files.writeString(target, "old");
+        Path source = tempDir.resolve("source.txt");
+        Files.writeString(source, "new");
+        Files.setPosixFilePermissions(readOnlyDir, PosixFilePermissions.fromString("r-xr-xr-x"));
+
+        try {
+            FileUtil.replaceFileAtomically(source, target);
+        } finally {
+            Files.setPosixFilePermissions(readOnlyDir, PosixFilePermissions.fromString("rwxr-xr-x"));
+        }
+
+        assertEquals("new", Files.readString(target));
+        assertFalse(Files.exists(source));
     }
 }

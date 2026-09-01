@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.FileSystems;
@@ -337,8 +338,9 @@ public class FileUtil {
     /// Replaces `target` with `source`, atomically where the filesystem supports it, so concurrent readers
     /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
     ///
-    /// Exception: a target with multiple hard links is overwritten in place (non-atomically), since an atomic
-    /// move would detach it from its sibling links — the same trade-off [org.jabref.logic.exporter.AtomicFileOutputStream] makes.
+    /// Exceptions overwriting in place (non-atomically) instead: a target with multiple hard links, since an atomic
+    /// move would detach it from its sibling links — the same trade-off [org.jabref.logic.exporter.AtomicFileOutputStream]
+    /// makes — and a writable target inside a directory that forbids replacing entries (read-only directory).
     // [impl->req~logic.xmp.atomic-pdf-write~1]
     public static void replaceFileAtomically(Path source, Path target) throws IOException {
         if (Files.isSymbolicLink(target)) {
@@ -353,29 +355,37 @@ public class FileUtil {
             }
         }
         if (hasMultipleHardLinks(target)) {
-            // A move (or Files.copy with REPLACE_EXISTING, which deletes and recreates the target) would detach
-            // the target from its sibling hard links; write into the existing inode to keep them
-            try (OutputStream out = Files.newOutputStream(target)) {
-                Files.copy(source, out);
-            }
-            Files.delete(source);
+            // A move would detach the target from its sibling hard links; write into the existing inode to keep them
+            overwriteInPlace(source, target);
             return;
         }
         // On Windows, another process briefly holding the file open (editor, anti-virus, indexer) causes a
         // sharing violation; retrying with backoff clears virtually all of these collisions.
         // Same policy as AtomicFileOutputStream#moveTemporaryFileToTargetFile.
+        boolean atomicMoveSupported = true;
         for (int attempt = 1; ; attempt++) {
             try {
-                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-                return;
-            } catch (AtomicMoveNotSupportedException e) {
-                // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
-                LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
+                if (atomicMoveSupported) {
+                    try {
+                        Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                        return;
+                    } catch (AtomicMoveNotSupportedException e) {
+                        // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
+                        LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
+                        atomicMoveSupported = false;
+                    }
+                }
                 Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
                 return;
             } catch (FileSystemException e) {
                 LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, REPLACE_MOVE_ATTEMPTS, source, target, e);
                 if (attempt == REPLACE_MOVE_ATTEMPTS) {
+                    if (e instanceof AccessDeniedException) {
+                        // The directory may forbid replacing entries while the file itself is writable
+                        // (read-only directory); overwrite in place as the pre-atomic code did
+                        overwriteInPlace(source, target);
+                        return;
+                    }
                     throw e;
                 }
                 try {
@@ -388,6 +398,15 @@ public class FileUtil {
                 }
             }
         }
+    }
+
+    /// Note: `Files.copy` with `REPLACE_EXISTING` would delete and recreate the target — writing through
+    /// an output stream keeps the existing directory entry and inode.
+    private static void overwriteInPlace(Path source, Path target) throws IOException {
+        try (OutputStream out = Files.newOutputStream(target)) {
+            Files.copy(source, out);
+        }
+        Files.delete(source);
     }
 
     private static boolean hasMultipleHardLinks(Path file) {

@@ -18,7 +18,7 @@ Needs: impl, utest
 Writing metadata into a PDF (XMP metadata, embedded bib file, or metadata removal) must never rewrite the original file in place.
 The new content is written to a temporary file (preferably in the same directory as the target) and then moved over the original, atomically where the filesystem supports it, so concurrent readers such as file synchronization tools never observe a partially written PDF.
 A failed write must leave the original file untouched and must not leave temporary files behind.
-Exception: a target with multiple hard links is overwritten in place (non-atomically, matching the pre-existing behavior), because an atomic move would detach it from its sibling links.
+Exceptions, overwritten in place (non-atomically, matching the pre-existing behavior): a target with multiple hard links, because an atomic move would detach it from its sibling links, and a writable target inside a directory that forbids replacing entries (read-only directory).
 
 Needs: impl, utest
 
