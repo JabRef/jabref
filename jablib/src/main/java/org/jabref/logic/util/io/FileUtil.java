@@ -322,7 +322,8 @@ public class FileUtil {
             // Stage on the referent's filesystem so the later move can be atomic
             target = target.toRealPath();
         }
-        Path parent = target.getParent();
+        // toAbsolutePath so a bare file name resolves to the working directory, not the system temp fallback
+        Path parent = target.toAbsolutePath().getParent();
         if (parent != null) {
             try {
                 return Files.createTempFile(parent, ".jabref-", ".pdf.tmp");
@@ -373,10 +374,10 @@ public class FileUtil {
                 Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
                 return;
             } catch (FileSystemException e) {
+                LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, REPLACE_MOVE_ATTEMPTS, source, target, e);
                 if (attempt == REPLACE_MOVE_ATTEMPTS) {
                     throw e;
                 }
-                LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, REPLACE_MOVE_ATTEMPTS, source, target, e);
                 try {
                     Thread.sleep(REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
                 } catch (InterruptedException interruptedException) {
