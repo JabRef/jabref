@@ -1,6 +1,7 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import org.jabref.gradle.VerifyJpackageJavaOptions
+import org.jabref.gradle.jdkVendor
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -20,6 +21,9 @@ version = providers.gradleProperty("projVersion")
 
 testModuleInfo {
     requires("org.jabref.testsupport")
+
+    // Local HTTP stub server for tests exercising download code hermetically
+    requires("jdk.httpserver")
 
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
@@ -91,10 +95,20 @@ dependencies {
     embeddedPostgresHostBinary?.let { runtimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
+// OpenJ9 (IBM Semeru, -Pjdk=IBM/openj9) only: also cache application classes in the per-user shared
+// classes cache (default location, e.g. ~/.cache/javasharedresources). Without this OpenJ9 starts
+// noticeably slower than HotSpot; with it warm startup beats HotSpot (jabref-koppor#729).
+// "nonfatal" keeps JabRef starting when the cache cannot be created or opened. The vendor guard is
+// required: HotSpot refuses to start on unrecognized -X options.
+val openJ9JvmArgs = if (jdkVendor == JvmVendorSpec.IBM) listOf(
+    "-Xshareclasses:name=jabref,nonfatal",
+    "-Xscmx256m"
+) else emptyList()
+
 application {
     mainClass= "org.jabref.Launcher"
 
-    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + openJ9JvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,org.apache.lucene.core,jkeychain",
 
