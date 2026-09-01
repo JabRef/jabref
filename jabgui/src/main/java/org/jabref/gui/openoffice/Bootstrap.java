@@ -66,11 +66,11 @@ import com.sun.star.uno.XComponentContext;
 ///
 /// Other services can be inserted into the service manager by
 /// using its XSet interface:
-/// <pre>
+/// ```java
 /// XSet xSet = UnoRuntime.queryInterface( XSet.class, aMultiComponentFactory );
 /// // insert the service manager
 /// xSet.insert( aSingleComponentFactory );
-/// </pre>
+/// ```
 public class Bootstrap {
 
     private static final Random RANDOM_PIPE_NAME = new Random();
@@ -96,14 +96,14 @@ public class Bootstrap {
     /// Returns an array of default commandline options to start bootstrapped
     /// instance of soffice with. You may use it in connection with bootstrap
     /// method for example like this:
-    /// <pre>
+    /// ```java
     /// List list = Arrays.asList( Bootstrap.getDefaultOptions() );
     /// list.remove("--nologo");
     /// list.remove("--nodefault");
     /// list.add("--invisible");
     ///
     /// Bootstrap.bootstrap( list.toArray( new String[list.size()] );
-    /// </pre>
+    /// ```
     ///
     /// @return an array of default commandline options
     /// @see #bootstrap(String[])
