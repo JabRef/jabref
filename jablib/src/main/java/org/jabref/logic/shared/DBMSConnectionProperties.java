@@ -29,9 +29,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String jdbcUrl = "";
     private boolean expertMode;
 
-    // Not needed for connection, but stored for future login
-    private String keyStore;
-
     /// Gets all required data from [SharedDatabasePreferences] and sets them if present.
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
         if (prefs.getType().isPresent()) {
@@ -42,7 +39,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
-        prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
         prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
         prefs.getJdbcUrl().ifPresent(theJdbcUrl -> this.jdbcUrl = theJdbcUrl);
 
@@ -68,7 +64,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
                              String password, boolean useSSL, boolean allowPublicKeyRetrieval,
-                             String serverTimezone, String keyStore, String jdbcUrl, boolean expertMode) {
+                             String serverTimezone, String jdbcUrl, boolean expertMode) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -78,7 +74,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.useSSL = useSSL;
         this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;
         this.serverTimezone = serverTimezone;
-        this.keyStore = keyStore;
         this.jdbcUrl = jdbcUrl;
         this.expertMode = expertMode;
     }
@@ -155,7 +150,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         props.setProperty("tcpKeepAlive", Boolean.toString(true));
         if (useSSL) {
             props.setProperty("ssl", Boolean.toString(true));
-            props.setProperty("useSSL", Boolean.toString(true));
+            // Validate the server certificate against Java's default SSL context, into which
+            // JabRef merges the certificates configured in the preferences (TrustStoreManager)
+            props.setProperty("sslfactory", "org.postgresql.ssl.DefaultJavaSSLFactory");
         }
         if (allowPublicKeyRetrieval) {
             props.setProperty("allowPublicKeyRetrieval", Boolean.toString(true));
@@ -163,10 +160,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return props;
     }
 
-    @Override
-    public String getKeyStore() {
-        return keyStore;
-    }
 
     /// Compares all properties except the password.
     @Override
@@ -186,14 +179,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
                 && Objects.equals(useSSL, properties.isUseSSL())
                 && Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())
                 && Objects.equals(serverTimezone, properties.getServerTimezone())
-                && Objects.equals(keyStore, properties.getKeyStore())
                 && Objects.equals(jdbcUrl, properties.getJdbcUrl())
                 && Objects.equals(expertMode, properties.isUseExpertMode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore, jdbcUrl, expertMode);
+        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, jdbcUrl, expertMode);
     }
 
     @Override
