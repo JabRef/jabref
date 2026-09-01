@@ -286,6 +286,7 @@ public class WebFetchers {
         fetchers.add(new OpenAccessDoi());
         // OpenAlex provides OA locations and direct PDF links via its API
         fetchers.add(new OpenAlex(importerPreferences));
+        fetchers.add(new ScholarFetcher(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new UnpaywallFetcher(importerPreferences));

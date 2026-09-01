@@ -55,7 +55,7 @@ public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
                 if (undoManager == null) {
                     change.apply();
                 } else {
-                    undoManager.apply(change);
+                    undoManager.applyEdit(change);
                 }
             });
             menu.getItems().add(menuItem);

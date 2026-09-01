@@ -46,10 +46,10 @@ import org.slf4j.LoggerFactory;
 /// **Problem:** The old inner class no longer exists, so MVStore's ObjectDataType fails with
 /// ClassNotFoundException before our code can intercept.
 ///
-/// **Solution:** Open the map with a custom {@link RawBytesDataType} that returns the raw
+/// **Solution:** Open the map with a custom [RawBytesDataType] that returns the raw
 /// Java-serialized bytes for each value without invoking standard Java deserialization.
-/// Then a {@link ClassRemappingObjectInputStream} deserializes those bytes while remapping
-/// the deleted inner class name to the current {@link ChatHistoryRecord}.
+/// Then a [ClassRemappingObjectInputStream] deserializes those bytes while remapping
+/// the deleted inner class name to the current [ChatHistoryRecord].
 public final class ChatHistoryMigrationV1 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryMigrationV1.class);
 
@@ -241,12 +241,12 @@ public final class ChatHistoryMigrationV1 {
         return true;
     }
 
-    /// Returns {@code true} if {@code pathPrefix} (extracted from an old map name) refers to the
+    /// Returns `true` if `pathPrefix` (extracted from an old map name) refers to the
     /// same file as the current library.
     ///
     /// - If the prefix is an **absolute** path, it is compared after normalization.
     /// - If the prefix is a **relative** path, the current library's absolute path is checked with
-    ///   {@link Path#endsWith(Path)}, so {@code a/lib1.bib} matches {@code D:/my/a/lib1.bib}.
+    ///   [Path#endsWith(Path)], so `a/lib1.bib` matches `D:/my/a/lib1.bib`.
     private static boolean pathMatchesCurrentLibrary(String pathPrefix, BibDatabaseContext bibDatabaseContext) {
         if (pathPrefix.isEmpty() || bibDatabaseContext.getDatabasePath().isEmpty()) {
             return false;
@@ -262,7 +262,7 @@ public final class ChatHistoryMigrationV1 {
     }
 
     /// Deserializes old ChatHistoryRecord bytes using a remapping ObjectInputStream.
-    /// Remaps the deleted inner class name to the current {@link ChatHistoryRecord}.
+    /// Remaps the deleted inner class name to the current [ChatHistoryRecord].
     private static ChatHistoryRecord deserializeOldRecord(byte[] data) {
         try (ClassRemappingObjectInputStream ois = new ClassRemappingObjectInputStream(
                 new java.io.ByteArrayInputStream(data))) {
@@ -305,7 +305,7 @@ public final class ChatHistoryMigrationV1 {
     }
 
     /// Custom ObjectInputStream that remaps the deleted old inner class name
-    /// to the current {@link ChatHistoryRecord} class.
+    /// to the current [ChatHistoryRecord] class.
     ///
     /// The old and new records have identical components (className: String, content: String),
     /// so Java record deserialization will call the canonical constructor successfully.
@@ -330,11 +330,9 @@ public final class ChatHistoryMigrationV1 {
 
     /// Reads raw Java-serialized bytes from MVStore's binary page format without invoking
     /// Java deserialization. MVStore's ObjectDataType stores each serializable value as:
-    /// <ol>
-    /// - 1 byte: type identifier — `19` (TYPE_SERIALIZED_OBJECT in H2 2.3.232)
-    /// - VarInt: byte length of the serialized payload
-    /// - N bytes: the raw Java-serialized payload
-    /// </ol>
+    /// 1. 1 byte: type identifier — `19` (TYPE_SERIALIZED_OBJECT in H2 2.3.232)
+    /// 2. VarInt: byte length of the serialized payload
+    /// 3. N bytes: the raw Java-serialized payload
     private static class RawBytesDataType extends BasicDataType<byte[]> {
 
         // TYPE_SERIALIZED_OBJECT = 19, verified from H2 2.3.232 bytecode.

@@ -139,8 +139,8 @@ import org.slf4j.LoggerFactory;
 /// Internally it defines symbols used to pick a value from the `java.util.prefs`
 /// interface and keeps a hashmap with all the default values.
 ///
-/// There are still some similar preferences classes ({@link OpenOfficePreferences} and
-/// {@link SharedDatabasePreferences}) which also use the `java.util.prefs` API.
+/// There are still some similar preferences classes ([OpenOfficePreferences] and
+/// [SharedDatabasePreferences]) which also use the `java.util.prefs` API.
 ///
 /// contents of the defaults HashMap that are defined in this class.
 /// There are more default parameters in this map which belong to separate preference classes.
@@ -1757,7 +1757,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
                 getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
-                // Backups should sit in the data directory, because a ".bak" file should survive cache cleanups
+                // Backups should sit in the data directory, because a backup file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, defaultValues.getBackupDirectory()),
                 getBoolean(FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile()),
                 // Use fallback method in case AWT is not initialized in headless (JabKit) mode

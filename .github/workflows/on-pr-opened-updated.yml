@@ -69,15 +69,35 @@ jobs:
           done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
           echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
+          echo "head_sha=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" >> $GITHUB_OUTPUT
 
           if [ "$MERGEABLE" != "CONFLICTING" ]; then
             echo "✅ No merge conflicts"
             echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
           fi
 
+      # Once the conflict is resolved, drop the old comment (posted as jabref-machine by
+      # pr-comment.yml, or as github-actions by the dispatch path below). Otherwise, the next
+      # conflict is silently skipped by the "Already commented" check below.
+      # Requires an explicit MERGEABLE: after five retries the check may still report UNKNOWN.
+      - name: Remove stale conflict comments
+        if: steps.check_mergeable.outputs.mergeable == 'MERGEABLE'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          set -exo pipefail
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select((.user.login == "github-actions[bot]" or .user.login == "jabref-machine") and (.body | contains("Conflicts with target branch"))) | .id' |
+          while read -r id; do
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
+            echo "Removed stale conflict comment $id" >> $GITHUB_STEP_SUMMARY
+          done
+
       # In case of a conflict, try to resolve it automatically by merging main:
-      # maven-flow/merge resolves conflicts in CHANGELOG.md semantically and lets "git merge"
-      # fail on any other conflict - then, nothing is pushed.
+      # the changelog merge driver resolves conflicts in CHANGELOG.md semantically and lets
+      # "git merge" fail on any other conflict - then, nothing is pushed.
       # Thus, a merge commit is pushed if and only if CHANGELOG.md is the only conflicting file.
       # Pushing is possible for branches in JabRef/jabref and for forks allowing maintainer edits.
       # All steps use continue-on-error; if anything fails, the conflict is reported as before.
@@ -101,30 +121,19 @@ jobs:
           set -ex
           git remote add upstream "https://github.com/JabRef/jabref.git" || true
           git fetch upstream main
-      # ubuntu-slim does not provide Java, which is required by the changelog merge driver
-      - name: Setup Java
-        id: setup_java
-        if: steps.fetch_upstream.outcome == 'success'
-        continue-on-error: true
-        uses: actions/setup-java@v6
-        with:
-          distribution: 'temurin'
-          java-version: '25'
+      # Pushes the resolved merge back to the PR branch. This is the whole point:
+      # the push triggers a fresh run that then reports no conflicts (no comment).
+      # "$/" resolves the action from this workflow's own (trusted) commit, not from the
+      # workspace - the workspace holds the untrusted PR head, whose copy of the action
+      # must never run with write credentials.
       - name: Merge main into PR branch
         id: automerge
-        if: steps.setup_java.outcome == 'success'
+        if: steps.fetch_upstream.outcome == 'success'
         continue-on-error: true
-        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
+        uses: $/.github/actions/merge-upstream-main
         with:
-          changelog-file: CHANGELOG.md
-          changelog-rebase: true
-          pom-file: 'match-nothing.txt'
-          source-branch: 'upstream/main'
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
-          # Push the resolved merge back to the PR branch. This is the whole point:
-          # the push triggers a fresh run that then reports no conflicts (no comment).
-          push-changes: true
-      # maven-flow/merge leaves the target branch checked out, so HEAD is the merge commit it pushed.
+      # After the merge, HEAD is the merge commit that was pushed.
       - name: Record pushed merge commit
         id: merge_commit
         if: steps.automerge.outcome == 'success'
@@ -179,8 +188,9 @@ jobs:
           if [ "$EVENT" = "workflow_dispatch" ]; then
             # Fail closed: a failing "gh api" must abort the step (via set -e), not be
             # swallowed into "no comment found" - which would post a duplicate comment.
-            # Redirected to a file rather than captured in a variable, because xtrace
-            # would echo the expanded assignment - all 20 comment bodies - into the log.
+            # jq matches the complete workflow-owned marker (a shell grep would either split a
+            # multi-line -F pattern into per-line alternatives or loosely match free text quoting
+            # the phrase), and only matches reach the file - so xtrace never echoes comment bodies.
             gh api graphql -f query="
                 query {
                   repository(owner: \"JabRef\", name: \"JabRef\") {
@@ -191,9 +201,9 @@ jobs:
                     }
                   }
                 }
-              " --jq '.data.repository.pullRequest.comments.nodes[].body' > comments.txt
+              " --jq '.data.repository.pullRequest.comments.nodes[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
 
-            if grep -q "Conflicts with target branch" comments.txt; then
+            if [ -s marker_comments.txt ]; then
               echo "Already commented about conflicts."
               # When triggered by another workflow, success is also if there is a merge conflict
               exit 0;
@@ -231,11 +241,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          HEAD_SHA: ${{ steps.check_mergeable.outputs.head_sha }}
         run: |
           set -exo pipefail
-          MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
-          # File, not pipe: "grep -q" exits on the first match and would SIGPIPE "gh", which pipefail turns into a skip.
-          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' > comments.txt
-          if grep -qzF -- "$MARKER" comments.txt; then
-            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
+          # jq matches the complete workflow-owned marker, per page of the paginated response
+          # (a shell grep would either split a multi-line -F pattern into per-line alternatives
+          # or loosely match free text quoting the phrase).
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
+          if [ -s marker_comments.txt ]; then
+            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID" --field head_sha="$HEAD_SHA"
           fi
