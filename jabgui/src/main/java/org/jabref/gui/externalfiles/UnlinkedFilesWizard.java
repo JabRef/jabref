@@ -124,6 +124,6 @@ public class UnlinkedFilesWizard {
         stage.setWidth(650);
         stage.setHeight(550);
         stage.getIcons().addAll(IconTheme.getLogoSet());
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
     }
 }
