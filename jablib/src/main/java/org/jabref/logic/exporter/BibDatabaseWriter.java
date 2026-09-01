@@ -54,9 +54,9 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
+/// Writes a .bib file following the BibTeX / BibLaTeX format using the provided [BibWriter]
 ///
-/// The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexImporter}
+/// The opposite class is [org.jabref.logic.importer.fileformat.BibtexImporter]
 public class BibDatabaseWriter {
     public enum SaveType { WITH_JABREF_META_DATA, PLAIN_BIBTEX }
 
