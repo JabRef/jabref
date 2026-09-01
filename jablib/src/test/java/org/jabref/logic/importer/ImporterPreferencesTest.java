@@ -100,15 +100,15 @@ class ImporterPreferencesTest {
 
         assertAll(
                 () -> assertTrue(prefs.getApiKeys().stream()
-                        .filter(k -> k.getName().equals("FetcherA"))
-                        .findFirst()
-                        .orElseThrow()
-                        .shouldPersist()),
+                                      .filter(k -> k.getName().equals("FetcherA"))
+                                      .findFirst()
+                                      .orElseThrow()
+                                      .shouldPersist()),
                 () -> assertFalse(prefs.getApiKeys().stream()
-                        .filter(k -> k.getName().equals("FetcherB"))
-                        .findFirst()
-                        .orElseThrow()
-                        .shouldPersist())
+                                       .filter(k -> k.getName().equals("FetcherB"))
+                                       .findFirst()
+                                       .orElseThrow()
+                                       .shouldPersist())
         );
     }
 
