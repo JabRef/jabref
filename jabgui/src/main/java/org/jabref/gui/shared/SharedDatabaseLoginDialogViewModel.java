@@ -42,6 +42,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -120,6 +121,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
+        // In expert mode the JDBC URL replaces host, port, and database; re-run their validators on toggling
+        EasyBind.subscribe(expertMode, _ -> {
+            for (StringProperty property : List.of(host, port, database)) {
+                String current = property.getValue();
+                property.setValue(null);
+                property.setValue(current);
+            }
+        });
         EasyBind.subscribe(autosave, selected -> {
             String current = folder.getValue();
             folder.setValue(null);
@@ -142,9 +151,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             return false;
         };
 
-        databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
-        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
-        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
+        Predicate<String> notEmptyUnlessExpert = input -> expertMode.get() || notEmpty.test(input);
+        Predicate<String> portNumber = input -> expertMode.get() || (notEmpty.test(input) && input.chars().allMatch(Character::isDigit));
+        databaseValidator = new FunctionBasedValidator<>(database, notEmptyUnlessExpert, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
+        hostValidator = new FunctionBasedValidator<>(host, notEmptyUnlessExpert, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        portValidator = new FunctionBasedValidator<>(port, portNumber, ValidationMessage.error(Localization.lang("Port must be a number.")));
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, folderRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
         connectionUrlValidator = new FunctionBasedValidator<>(connectionUrl, input -> !notEmpty.test(input) || DBMSConnectionUrl.parse(input).isPresent(), ValidationMessage.error(Localization.lang("Not a PostgreSQL connection URL.")));
@@ -173,7 +184,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
                 .setHost(host.getValue())
-                .setPort(Integer.parseInt(port.getValue()))
+                .setPort(expertMode.get() && StringUtil.isBlank(port.getValue()) ? DBMSType.POSTGRESQL.getDefaultPort() : Integer.parseInt(port.getValue()))
                 .setDatabase(database.getValue())
                 .setUser(user.getValue())
                 .setPassword(password.getValue())

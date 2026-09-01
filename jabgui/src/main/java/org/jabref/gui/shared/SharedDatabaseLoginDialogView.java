@@ -127,6 +127,9 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         expertMode.selectedProperty().bindBidirectional(viewModel.expertModeProperty());
         jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());
         jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
+        host.disableProperty().bind(viewModel.expertModeProperty());
+        port.disableProperty().bind(viewModel.expertModeProperty());
+        database.disableProperty().bind(viewModel.expertModeProperty());
 
         rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
         if (!viewModel.isKeyringAvailable()) {
