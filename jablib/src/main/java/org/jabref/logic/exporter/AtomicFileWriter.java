@@ -13,11 +13,11 @@ import org.jabref.logic.util.io.FileSnapshot;
 
 import org.jspecify.annotations.Nullable;
 
-/// Writer that similar to the built-in {@link java.io.FileWriter} but uses the {@link AtomicFileOutputStream} as the
+/// Writer that similar to the built-in [java.io.FileWriter] but uses the [AtomicFileOutputStream] as the
 /// underlying output stream. In this way, we make sure that the errors during the write process do not destroy the
 /// contents of the target file.
 /// Moreover, this writer checks if the chosen encoding supports all text that is written. Characters whose encoding
-/// was problematic can be retrieved by {@link #getEncodingProblems()}.
+/// was problematic can be retrieved by [#getEncodingProblems()].
 public class AtomicFileWriter extends OutputStreamWriter {
 
     private final AtomicFileOutputStream outputStream;
@@ -68,5 +68,10 @@ public class AtomicFileWriter extends OutputStreamWriter {
 
     public Set<Character> getEncodingProblems() {
         return Collections.unmodifiableSet(problemCharacters);
+    }
+
+    /// Aborts the write without replacing the target file.
+    public void abort() {
+        outputStream.abort();
     }
 }

@@ -349,9 +349,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     /// Generic over the row type so that all three columns (authors, research questions, queries)
-    /// can share the same delete button setup. {@code displayExtractor} pulls the display string
-    /// from each row - {@link Function#identity()} for the {@code String} columns (authors and
-    /// questions), {@link org.jabref.model.study.StudyQuery#getQuery()} for the queries column.
+    /// can share the same delete button setup. `displayExtractor` pulls the display string
+    /// from each row - [Function#identity()] for the `String` columns (authors and
+    /// questions), [org.jabref.model.study.StudyQuery#getQuery()] for the queries column.
     private <T> void setupCellFactories(TableColumn<T, String> contentColumn,
                                         TableColumn<T, String> actionColumn,
                                         Function<T, String> displayExtractor,

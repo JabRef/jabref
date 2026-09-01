@@ -13,8 +13,14 @@ import org.slf4j.LoggerFactory;
 /// does not have to flatten anything. Only the outermost set is pushed onto the undo stack, so
 /// one user action stays one undo step regardless of nesting.
 ///
-/// `name` is the only user-facing text in the change model. It exists at this granularity
-/// because it is the granularity the user acts in.
+/// `name` is the only text in the change model, and it exists at this granularity because that
+/// is the granularity the user acts in: "Merge entries", not "change field author of entry X".
+///
+/// Today it is read in one place, the warning [#apply] logs when part of a set fails, so it is a
+/// diagnostic that is written to be shown. Naming it as the user would recognise the action —
+/// from [org.jabref.gui.actions.Action#getText] where the step comes from a command, from a
+/// localized string otherwise — is what keeps it usable the day something renders it, which is
+/// what the postponed P5 does. A developer token here is a defect, not a shortcut.
 @NullMarked
 public record ChangeSet(String name, List<BibChange> changes) implements BibChange {
 

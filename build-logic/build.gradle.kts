@@ -8,8 +8,10 @@ repositories {
     // to repo.maven.apache.org, which enforces consumption limits since 2026.
     // See https://central.sonatype.org/faq/429-error/ and gradle/gradle#37880.
     maven { url = uri("https://maven-central.storage-download.googleapis.com/maven2/") }
-
     gradlePluginPortal()
+
+    mavenCentral()
+
     maven { url = uri("https://jitpack.io") }
 }
 

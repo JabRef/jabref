@@ -12,4 +12,11 @@ The detection is best-effort: it is based on the file's size and modification ti
 
 Needs: impl, utest
 
+## Failed backup writes do not replace recoverable files
+`req~jabgui.autosaveandbackup.complete-backup~1`
+
+When creating a backup, a serialization failure must not replace a previous backup with incomplete content. JabRef must not restore an empty backup over an existing library.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

@@ -56,6 +56,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
@@ -660,7 +661,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
-    /// @implNote This code is similar to {@link org.jabref.gui.collab.entrychange.PreviewWithSourceTab}.
+    /// @implNote This code is similar to [org.jabref.gui.collab.entrychange.PreviewWithSourceTab].
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
@@ -1043,10 +1044,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-                edit.apply(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+            undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
+                edit.applyEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
                 libraryTab.get().getMainTable().setCitationMergeMode(true);
-                edit.apply(new UndoableInsertEntries(database, mergedEntry));
+                edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));
             });
 
             dialogService.notify(Localization.lang("Merged entries"));

@@ -18,7 +18,7 @@ import javafx.util.Callback;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/// Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.
+/// Constructs a [TableCell] based on the value of the cell and a bunch of specified converter methods.
 ///
 /// @param <S> view model of table row
 /// @param <T> cell value

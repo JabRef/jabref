@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 /// Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
 /// when closing a database or quitting the applications.
 ///
-/// The save operation is loaded off of the GUI thread using {@link org.jabref.logic.util.BackgroundTask}. Callers can query whether the
+/// The save operation is loaded off of the GUI thread using [org.jabref.logic.util.BackgroundTask]. Callers can query whether the
 /// operation was canceled, or whether it was successful.
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
@@ -72,6 +72,12 @@ public class SaveDatabaseAction {
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
+    }
+
+    /// `ALREADY_SAVING` reports that another thread is writing the very same library: nothing was written by this call,
+    /// and the file on disk is not yet the state the user sees.
+    public enum SaveResult {
+        SUCCESS, FAILURE, ALREADY_SAVING
     }
 
     public SaveDatabaseAction(LibraryTab libraryTab,
@@ -88,11 +94,11 @@ public class SaveDatabaseAction {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
-    public boolean save() {
-        return save(libraryTab.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
+    public SaveResult save() {
+        return save(SaveDatabaseMode.NORMAL);
     }
 
-    public boolean save(SaveDatabaseMode mode) {
+    public SaveResult save(SaveDatabaseMode mode) {
         return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
@@ -144,8 +150,8 @@ public class SaveDatabaseAction {
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-        Optional<Path> databasePath = context.getDatabasePath();
-        if (databasePath.isPresent()) {
+        boolean managersShutDown = context.getDatabasePath().isPresent();
+        if (managersShutDown) {
             // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
@@ -160,9 +166,13 @@ public class SaveDatabaseAction {
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
-        boolean saveResult = save(file, mode);
+        SaveResult saveResult = save(file, mode);
+        if (saveResult == SaveResult.ALREADY_SAVING) {
+            // Nothing was written to the new file, so the library has to keep pointing at the old one.
+            dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));
+        }
 
-        if (saveResult) {
+        if (saveResult == SaveResult.SUCCESS) {
             // we managed to successfully save the file
             // thus, we can store the path into the context
             context.setDatabasePath(file);
@@ -175,8 +185,12 @@ public class SaveDatabaseAction {
             libraryTab.createSearchContext();
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
+        } else if (managersShutDown) {
+            // The library stays at its old path, so the managers shut down above have to come back for that file.
+            libraryTab.installAutosaveManagerAndBackupManager();
+            libraryTab.createSearchContext();
         }
-        return saveResult;
+        return saveResult == SaveResult.SUCCESS;
     }
 
     /// Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
@@ -208,25 +222,25 @@ public class SaveDatabaseAction {
         return selectedPath;
     }
 
-    private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
+    private SaveResult save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            return savePath.filter(path -> saveAs(path, mode)).isPresent();
+            return savePath.filter(path -> saveAs(path, mode)).isPresent() ? SaveResult.SUCCESS : SaveResult.FAILURE;
         }
 
         return save(databasePath.get(), mode);
     }
 
-    private boolean save(Path targetPath, SaveDatabaseMode mode) {
+    private SaveResult save(Path targetPath, SaveDatabaseMode mode) {
         if (mode == SaveDatabaseMode.NORMAL && libraryTab.getBibDatabaseContext().getEntries().size() > 2_000) {
             dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
         synchronized (libraryTab) {
             if (libraryTab.isSaving()) {
-                // if another thread is saving, we do not need to save
-                return true;
+                // Another thread is already writing this library; that save is still in flight.
+                return SaveResult.ALREADY_SAVING;
             }
             libraryTab.setSaving(true);
         }
@@ -249,7 +263,7 @@ public class SaveDatabaseAction {
             libraryTab.resetChangedProperties(committedState);
             autoCommit(targetPath);
             dialogService.notify(Localization.lang("Library saved"));
-            return true;
+            return SaveResult.SUCCESS;
         } catch (SaveException ex) {
             if (ex.getCause() instanceof FileChangedException) {
                 LOGGER.info("Library {} was modified by another program while saving; save aborted", targetPath, ex);
@@ -258,7 +272,7 @@ public class SaveDatabaseAction {
                 LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
-            return false;
+            return SaveResult.FAILURE;
         } finally {
             libraryTab.resumeChangeMonitor();
             // release panel from save status

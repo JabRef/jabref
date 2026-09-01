@@ -35,17 +35,20 @@ import jakarta.inject.Inject;
 /// Displays status and metadata for an AI chat session.
 ///
 /// This component provides information about:
+///
 /// - The currently selected chat model
 /// - The response engine in use
 /// - Entries included in the chat context
 /// - The ingestion status of linked files, including any errors encountered
 ///
 /// It also offers actions to:
+///
 /// - Export the chat history
 /// - Clear the chat history
 ///
 /// Typical usage:
 /// This component is primarily used within the AiChatView, where:
+///
 /// - The chat model and response engine are bound to this component
 /// - The chat history is provided by the AI chat and displayed here
 ///

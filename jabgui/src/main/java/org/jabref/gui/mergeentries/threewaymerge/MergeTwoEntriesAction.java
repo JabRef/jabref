@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -32,9 +32,9 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
         List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
 
-        undoManager.addEdit(Localization.lang("Merge entries"), edit -> {
-            edit.apply(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
-            edit.apply(new UndoableRemoveEntries(database, entriesToRemove));
+        undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
+            edit.applyEdit(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
+            edit.applyEdit(new UndoableRemoveEntries(database, entriesToRemove));
         });
     }
 }
