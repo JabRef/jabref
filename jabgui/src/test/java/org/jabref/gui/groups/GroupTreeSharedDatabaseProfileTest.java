@@ -199,3 +199,4 @@ class GroupTreeSharedDatabaseProfileTest {
         return groupTree[0];
     }
 }
+

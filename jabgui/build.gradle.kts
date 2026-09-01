@@ -1,5 +1,4 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
-import org.gradle.api.tasks.testing.Test
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import org.jabref.gradle.VerifyJpackageJavaOptions
 import org.jabref.gradle.useLibericaJdkFull
@@ -21,7 +20,6 @@ version = providers.gradleProperty("projVersion")
 
 testModuleInfo {
     requires("org.jabref.testsupport")
-    requires("embedded.postgres")
 
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
