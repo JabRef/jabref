@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Tag;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@Tag("FetcherTest")
-public @interface FetcherTest {
+@Tag("ExternalServicesTest")
+public @interface ExternalServicesTest {
     String value() default "";
 }

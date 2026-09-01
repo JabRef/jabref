@@ -10,7 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FetcherTest
+@ExternalServicesTest
 class URLDownloadTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
