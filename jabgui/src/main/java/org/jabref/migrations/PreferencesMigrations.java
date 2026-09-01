@@ -532,25 +532,22 @@ public class PreferencesMigrations {
 
     /// In version 6.0 the formatting of the CleanUps preferences changed. Instead of using several keys that have have a variable name a single preference key is introduced containing just the active cleanup jobs. Also instead of a combined field for the field formatters and the enabled status of all of them, they are split for easier parsing.
     ///
-    /// <h3>Changes:</h3>
-    /// <table>
-    /// <tr> <td>                key                     </td> <td>  value </td> </tr>
-    /// <tr> <td colspan="2">    CLEANUP - old format:   </td> </tr>
-    /// <tr> <td> CleanUpCLEAN_UP_DOI    </td> <td>  enabled </td> </tr>
-    /// <tr> <td> CleanUpRENAME_PDF      </td> <td>  disabled </td> </tr>
-    /// <tr> <td> CleanUpMOVE_PDF        </td> <td>  enabled<br>
-    /// <tr> <td colspan="2"> ... </td> </tr>
-    /// <tr> <td> &nbsp; </td> </tr>
-    /// <tr> <td colspan="2"> CLEANUP_JOBS - new format: </td> </tr>
-    /// <tr> <td> CleanUpJobs            </td> <td> `CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF `</td> </tr>
-    /// <tr> <td> &nbsp; </td> </tr>
-    /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - old format: </td> </tr>
-    /// <tr> <td> CleanUpFormatters     </td> <td> `ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
-    /// <tr> <td> &nbsp; </td> </tr>
-    /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - new format: </td> </tr>
-    /// <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
-    /// <tr> <td> CleanUpFormatters        </td> <td> `field[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
-    /// </table>
+    /// ### Changes
+    ///
+    /// | key                                  | value                                                                    |
+    /// |--------------------------------------|--------------------------------------------------------------------------|
+    /// | **CLEANUP - old format:**            |                                                                          |
+    /// | CleanUpCLEAN_UP_DOI                  | enabled                                                                  |
+    /// | CleanUpRENAME_PDF                    | disabled                                                                 |
+    /// | CleanUpMOVE_PDF                      | enabled                                                                  |
+    /// | ...                                  |                                                                          |
+    /// | **CLEANUP_JOBS - new format:**       |                                                                          |
+    /// | CleanUpJobs                          | `CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF`                                       |
+    /// | **CLEANUP_FORMATTERS - old format:** |                                                                          |
+    /// | CleanUpFormatters                    | `ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]...`      |
+    /// | **CLEANUP_FORMATTERS - new format:** |                                                                          |
+    /// | CleanUpFormattersEnabled             | TRUE                                                                     |
+    /// | CleanUpFormatters                    | `field[formatter,formatter...]\nfield[...]\nfield[...]...`               |
     static void upgradeCleanups(JabRefCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";
         final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
