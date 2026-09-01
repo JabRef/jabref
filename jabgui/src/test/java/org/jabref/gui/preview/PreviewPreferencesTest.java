@@ -24,6 +24,8 @@ class PreviewPreferencesTest {
     private final String NAME1 = "name1";
     private final String TEXT1 = "<b>text1</b>";
     private final String TEST_FILEPATH = "test-filepath";
+    private final String TEST_STYLE_ID = "test-style-id";
+    private final String TEST_STYLE_CLASS = "test-style-class";
     private final String TEST_TITLE = "test-title";
     private final String TEST_SHORT_TITLE = "test-short-title";
     private final String TEST_SOURCE = "test-source";
@@ -66,12 +68,16 @@ class PreviewPreferencesTest {
         PreviewPreferences preferences = new PreviewPreferences(
                 List.of(new CitationStylePreviewLayout(
                         new CitationStyle(TEST_FILEPATH,
+                                TEST_STYLE_ID,
+                                TEST_STYLE_CLASS,
                                 TEST_TITLE,
                                 TEST_SHORT_TITLE,
                                 false,
                                 false,
                                 false,
-                                TEST_SOURCE),
+                                false,
+                                TEST_SOURCE,
+                                false),
                         bibEntryTypesManager)
                 ),
                 0,

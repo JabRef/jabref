@@ -55,6 +55,8 @@ class PreviewTabViewModelTest {
     private final String TEXT2 = "<b>text2</b>";
     private final String TEXT3 = "<b>text3</b>";
     private final String TEST_FILEPATH = "test-filepath";
+    private final String TEST_STYLE_ID = "test-style-id";
+    private final String TEST_STYLE_CLASS = "test-style-class";
     private final String TEST_TITLE = "test-title";
     private final String TEST_SHORT_TITLE = "test-short-title";
     private final String TEST_SOURCE = "test-source";
@@ -133,13 +135,17 @@ class PreviewTabViewModelTest {
         PreviewPreferences previewPreferences = new PreviewPreferences(
                 // populate chosenListProperty
                 List.of(new CitationStylePreviewLayout(
-                        new CitationStyle("testfilepath",
-                                "test-title",
-                                "test-short-title",
+                        new CitationStyle(TEST_FILEPATH,
+                                TEST_STYLE_ID,
+                                TEST_STYLE_CLASS,
+                                TEST_TITLE,
+                                TEST_SHORT_TITLE,
                                 false,
                                 false,
                                 false,
-                                "test-source"),
+                                false,
+                                TEST_SOURCE,
+                                false),
                         bibEntryTypesManager)
                 ),
                 0,
@@ -157,7 +163,7 @@ class PreviewTabViewModelTest {
         assertInstanceOf(CitationStylePreviewLayout.class, chosenListProperty.getValue().getFirst());
         CitationStylePreviewLayout citationStylePreviewLayout1 = (CitationStylePreviewLayout) chosenListProperty.getValue().getFirst();
         CitationStyle citationStyle1 = citationStylePreviewLayout1.citationStyle();
-        assertEquals("testfilepath", citationStyle1.getPath());
+        assertEquals("test-filepath", citationStyle1.getPath());
         assertEquals("test-title", citationStyle1.getTitle());
         assertEquals("test-short-title", citationStyle1.getShortTitle());
         assertEquals("test-source", citationStyle1.getSource());
@@ -266,8 +272,8 @@ class PreviewTabViewModelTest {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.cslListProperty().add(cslLayout);
@@ -306,8 +312,8 @@ class PreviewTabViewModelTest {
         viewModel.chosenListProperty().add(textBasedPreviewLayout);
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.chosenListProperty().add(cslLayout);
@@ -340,8 +346,8 @@ class PreviewTabViewModelTest {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.cslListProperty().add(cslLayout);
@@ -394,8 +400,8 @@ class PreviewTabViewModelTest {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.cslListProperty().add(cslLayout);
@@ -469,8 +475,8 @@ class PreviewTabViewModelTest {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.cslListProperty().add(cslLayout);
@@ -486,7 +492,7 @@ class PreviewTabViewModelTest {
         assertTrue(viewModel.cslListProperty().contains(cslLayout));
         assertEquals(viewModel.availableSelectionModelProperty().getValue().getSelectedItem(), cslLayout);
     }
-    
+
     @Test
     void removeCustomizedStyleInputRemovesSelectedTextBasedStyle() {
         PreviewTabViewModel viewModel = setUpViewModel();
@@ -564,8 +570,8 @@ class PreviewTabViewModelTest {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
-        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_TITLE, TEST_SHORT_TITLE,
-                false, false, false, TEST_SOURCE);
+        CitationStyle citationStyle = new CitationStyle(TEST_FILEPATH, TEST_STYLE_ID, TEST_STYLE_CLASS, TEST_TITLE, TEST_SHORT_TITLE,
+                false, false, false, false, TEST_SOURCE, false);
         CitationStylePreviewLayout cslLayout =
                 new CitationStylePreviewLayout(citationStyle, bibEntryTypesManager);
         viewModel.cslListProperty().add(cslLayout);

@@ -140,7 +140,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
         MenuItem newStyleItem = new MenuItem(Localization.lang("New preview style"));
         newStyleItem.setOnAction(_ -> addCustomizedStyleFromField());
-        MenuItem addBstStyleItem = new MenuItem(Localization.lang("Add BST file..."));
+        MenuItem addBstStyleItem = new MenuItem(Localization.lang("Add BST file"));
         addBstStyleItem.setOnAction(_ -> selectBstFile());
 
         MenuButton addCustomizedStyleMenuButton = new MenuButton();
