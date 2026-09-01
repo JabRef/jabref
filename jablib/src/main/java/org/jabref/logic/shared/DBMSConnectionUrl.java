@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -17,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 /// A PostgreSQL connection URL as handed out by hosting providers or used with JDBC, e.g.
 /// `postgres://user:secret@host:5432/db?sslmode=require` or `jdbc:postgresql://host/db?user=me`.
+/// Surrounding text is ignored, so a whole `psql 'postgres://…'` command line can be pasted as well.
 ///
 /// @param query the query part without `user`, `password`, `ssl`, and `sslmode=require`, which map to dedicated settings; empty if none
 @NullMarked
@@ -31,25 +34,28 @@ public record DBMSConnectionUrl(DBMSType type,
 
     private static final Set<String> SSL_MODES_REQUIRING_SSL = Set.of("require", "verify-ca", "verify-full");
     private static final Set<String> SSL_MODES_VERIFYING_SERVER = Set.of("verify-ca", "verify-full");
+    private static final Pattern URL_IN_TEXT = Pattern.compile("(?i)(?:jdbc:)?postgres(?:ql)?://[^\\s'\"]+");
 
     // [impl->req~shared-database.connection-url~1]
     public static Optional<DBMSConnectionUrl> parse(@Nullable String text) {
         if (StringUtil.isBlank(text)) {
             return Optional.empty();
         }
-        String trimmed = text.strip();
-        if (trimmed.regionMatches(true, 0, "jdbc:", 0, 5)) {
-            trimmed = trimmed.substring(5);
+        Matcher matcher = URL_IN_TEXT.matcher(text);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+        String url = matcher.group();
+        if (url.regionMatches(true, 0, "jdbc:", 0, 5)) {
+            url = url.substring(5);
         }
         URI uri;
         try {
-            uri = new URI(trimmed);
+            uri = new URI(url);
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
-        String scheme = uri.getScheme();
-        boolean isPostgres = "postgres".equalsIgnoreCase(scheme) || "postgresql".equalsIgnoreCase(scheme);
-        if (!isPostgres || StringUtil.isBlank(uri.getHost())) {
+        if (StringUtil.isBlank(uri.getHost())) {
             return Optional.empty();
         }
 

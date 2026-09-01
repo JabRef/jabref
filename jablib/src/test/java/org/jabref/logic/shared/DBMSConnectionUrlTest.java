@@ -21,6 +21,14 @@ class DBMSConnectionUrlTest {
     }
 
     @Test
+    void parsesPsqlCommandLine() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("psql 'postgres://avnadmin:secret@pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require'").orElseThrow();
+
+        assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "pg-123.h.aivencloud.com", 27372, "defaultdb",
+                Optional.of("avnadmin"), Optional.of("secret"), true, ""), url);
+    }
+
+    @Test
     void parsesJdbcUrlWithCredentialsInQuery() {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse(" jdbc:postgresql://localhost/jabref?user=me&password=a%2Bb&ssl=true ").orElseThrow();
 
@@ -47,7 +55,7 @@ class DBMSConnectionUrlTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "   ", "localhost", "mysql://localhost/db", "postgres://", "jdbc:postgresql:db", "postgres://a b/db"})
+    @ValueSource(strings = {"", "   ", "localhost", "mysql://localhost/db", "postgres://", "jdbc:postgresql:db", "user=me host=localhost"})
     void rejectsNonPostgresUrls(String text) {
         assertTrue(DBMSConnectionUrl.parse(text).isEmpty());
     }
