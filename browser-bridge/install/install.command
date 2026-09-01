@@ -10,6 +10,14 @@
 
 set -euo pipefail
 
+# The host runs on python3 (no interpreter is bundled); fail early and clearly.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "error: python3 was not found on PATH." >&2
+  echo "       The fulltext host (jabext_host.py) runs on python3 via its shebang;" >&2
+  echo "       install Python 3 (e.g. from python.org or 'brew install python') and re-run." >&2
+  exit 1
+fi
+
 here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/.." && pwd)"
 

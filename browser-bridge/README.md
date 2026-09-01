@@ -8,6 +8,11 @@ Shipped **as source**, exactly like `jabgui/buildres/*/jabrefHost.py`: no build
 step, no GraalVM/JBang/native-image, no per-OS binary. Python on Linux/macOS,
 PowerShell on Windows.
 
+**Prerequisite (Linux/macOS):** a `python3` interpreter on `PATH`, exactly as
+`jabrefHost.py` already requires — no interpreter is bundled. The installer
+preflight-checks for `python3` and aborts with a clear message if it is absent,
+rather than failing silently when the browser later launches the host.
+
 ## Why
 
 MV3 service workers cannot bind TCP ports. The protocol requires the provider
@@ -27,12 +32,15 @@ JabRef --HTTP--> jabext_host --native-messaging--> extension --> tab/PDF
 | Host script (Linux/macOS)                        | `jabext_host.py`                      |
 | Host script + launcher (Windows)                 | `jabext_host.ps1` + `jabext_host.bat` |
 | Firefox extension gecko id                       | `@jabfox`                             |
-| Chromium extension id (pinned)                   | `bifehkofibaamoeaopjglfkddgkijdlh`    |
+| Chrome/Chromium extension id (pinned)            | `bifehkofibaamoeaopjglfkddgkijdlh`    |
+| Edge extension id (pinned)                       | `pgkajmkfgbehiomipedjhoddkejohfna`    |
 
 The Chromium extension id is fixed by the `manifest.key` field in the
 extension's [`wxt.config.ts`][ext] and matches the store-published JabRef
 Browser Extension, so the native-messaging manifests work for dev builds and
-the store install alike.
+the store install alike. Edge assigns a different id, so the Chromium manifest
+lists **both** origins in `allowed_origins`; otherwise Edge's native-messaging
+calls are rejected.
 
 ## Layout
 
@@ -67,6 +75,14 @@ needed.
 
 ## Installing
 
+**Released JabRef registers the host automatically.** Its platform installer
+drops the `jabext_bridge` native-messaging manifest into the browser
+directories — macOS `postinstall`, Linux `postinst`/`postrm`, Windows registry —
+exactly as it registers the import host `org.jabref.jabref`.
+
+The scripts below are **development/manual only**, for running from a source
+checkout; they are excluded from the app package:
+
 ```sh
 ./browser-bridge/install/install.sh          # Linux
 pwsh browser-bridge/install/install.ps1       # Windows
@@ -95,8 +111,10 @@ this trade-off.
 
 ## Relationship to jabrefHost.py
 
-This host serves the fulltext direction only. The import direction (browser →
-JabRef: send a BibTeX entry) is served by a separate native-messaging host,
+This host serves the fulltext direction, plus a small `POST /v1/mathscinet/open`
+endpoint that asks the extension to open/focus a MathSciNet tab. The import
+direction (browser → JabRef: send a BibTeX entry) is served by a separate
+native-messaging host,
 `org.jabref.jabref` (`jabgui/buildres/*/jabrefHost.py` and
 `buildres/windows/JabRefHost.ps1`), which the extension reaches one-shot.
 
@@ -109,9 +127,15 @@ for the trade-offs.
 
 The extension starts the host by calling `runtime.connectNative` on
 service-worker startup. The host inherits stdin/stdout from the browser, binds
-an ephemeral 127.0.0.1 port, writes
-`<JabRef-config>/fulltext-providers/jabext-bridge.json`, and serves HTTP until
-stdin EOF. On EOF it deletes the discovery file and exits.
+an ephemeral 127.0.0.1 port, and writes a **per-instance** discovery file
+`<JabRef-config>/fulltext-providers/jabext-bridge.<port>.json` (published
+atomically), then serves HTTP until stdin EOF. On EOF it deletes its own
+discovery file and exits.
+
+Because the filename is keyed by the port and JabRef enumerates every `*.json`
+in the directory, several browsers/profiles each run their own host and surface
+as separate providers that JabRef races — one host can no longer clobber or
+strand another's discovery record.
 
 [jabref]: https://github.com/JabRef/jabref
 [spec]: ../docs/requirements/browser-extension-fulltext.md
