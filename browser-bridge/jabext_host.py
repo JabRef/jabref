@@ -110,8 +110,17 @@ class Pending:
         with self._lock:
             self._slots.pop(rid, None)
 
+    def wake_all(self) -> None:
+        """stdin EOF: release every waiting HTTP thread (its box stays empty)."""
+        with self._lock:
+            slots = list(self._slots.values())
+        for ev, _ in slots:
+            ev.set()
+
 PENDING = Pending()
 BEARER = ""
+DONE = False                     # set on stdin EOF; browser/extension gone
+_GONE = {"error": "not-reachable", "message": "browser extension disconnected (native-messaging stdin closed)"}
 # send_nm is pluggable so the self-check can stand in for the extension.
 send_nm = write_frame
 
@@ -120,10 +129,17 @@ def _round_trip(nm_msg: dict, timeout: float) -> dict:
     rid, ev, box = PENDING.new()
     nm_msg["requestId"] = rid
     try:
-        send_nm(nm_msg)
+        if DONE:
+            return _GONE
+        try:
+            send_nm(nm_msg)
+        except (OSError, ValueError):             # stdout closed: browser gone
+            return _GONE
         if not ev.wait(timeout):
             return {"error": "timeout", "message": "provider fetch exceeded internal timeout"}
-        return box[0]
+        # Woken by nm_loop on stdin EOF without a reply: answer now instead of
+        # after our own (up to 5 min) timeout.
+        return box[0] if box else _GONE
     finally:
         PENDING.drop(rid)
 
@@ -185,7 +201,8 @@ class Handler(BaseHTTPRequestHandler):
                             FETCH_TIMEOUT)
             if r.get("error"):
                 return self._error(_STATUS.get(r["error"], 500), r["error"], r.get("message", r["error"]))
-            if not r.get("path") or not Path(r["path"]).is_file():
+            path = Path(r["path"]) if r.get("path") else None
+            if path is None or not path.is_file() or path.stat().st_size == 0:
                 return self._error(404, "no-pdf-found", "Provider returned no readable PDF path")
             out = {"id": r.get("id"), "path": r["path"]}
             if r.get("sourceUrl"):
@@ -233,12 +250,15 @@ def nm_loop() -> None:
     request, correlated by requestId. Import is served by a separate host
     (jabrefHost.py / org.jabref.jabref, see ADR 0071), so anything without a
     requestId is ignored here."""
+    global DONE
     while True:
         msg = read_frame(sys.stdin.buffer)
         if msg is None:
             break                                # stdin EOF: browser/extension gone
         if "requestId" in msg:
             PENDING.deliver(msg)
+    DONE = True
+    PENDING.wake_all()                           # in-flight requests reply not-reachable
 
 
 def main() -> int:
