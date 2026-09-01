@@ -331,6 +331,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // region last files opened
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
+    private static final String LAST_SHARED_DATABASES = "lastSharedDatabases";
     private static final String RECENT_DATABASES = "recentDatabases";
     // endregion
 
@@ -2057,11 +2058,14 @@ public class JabRefCliPreferences implements CliPreferences {
         lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 getStringList(LAST_EDITED).stream().map(Path::of).toList(),
                 getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
+                getStringList(LAST_SHARED_DATABASES),
                 FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
 
         bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
         bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
         bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
+        bindCustomList(lastFilesOpenedPreferences.getLastSharedDatabasesOpened(), LAST_SHARED_DATABASES, defaultValues.getLastSharedDatabasesOpened(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         return lastFilesOpenedPreferences;
     }

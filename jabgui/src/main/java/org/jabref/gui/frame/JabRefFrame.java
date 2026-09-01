@@ -30,6 +30,15 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+
+import java.sql.SQLException;
+
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -699,11 +708,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void openLastEditedDatabases() {
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
-        if (lastFiles.isEmpty()) {
-            return;
+        if (!lastFiles.isEmpty()) {
+            getOpenDatabaseAction().openFiles(lastFiles);
         }
 
-        getOpenDatabaseAction().openFiles(lastFiles);
+        // ponytail: connects on the FX thread like the login dialog does; move to a BackgroundTask if startup stalls on unreachable servers
+        for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
+            DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId));
+            try {
+                LibraryTab libraryTab = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, undoManager, clipBoardManager, taskExecutor)
+                        .openNewSharedDatabaseTab(connectionProperties);
+                libraryTab.getDatabase().setSharedDatabaseID(sharedDatabaseId);
+            } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
+                LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                        Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), e);
+            }
+        }
     }
 
     @Deprecated
