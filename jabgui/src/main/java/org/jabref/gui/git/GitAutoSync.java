@@ -189,11 +189,11 @@ public class GitAutoSync {
 
     private void showPushError(Exception exception) {
         LOGGER.warn("Automatic Git push failed", exception);
-        dialogService.notify(Localization.lang("Git Push Failed") + ": " + exception.getLocalizedMessage());
+        dialogService.notify(Localization.lang("Git push failed") + ": " + exception.getLocalizedMessage());
     }
 
     private void showCommitError(Exception exception) {
         LOGGER.warn("Automatic Git commit failed", exception);
-        dialogService.notify(Localization.lang("Git Commit Failed") + ": " + exception.getLocalizedMessage());
+        dialogService.notify(Localization.lang("Git commit failed") + ": " + exception.getLocalizedMessage());
     }
 }
