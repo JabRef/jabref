@@ -77,6 +77,23 @@ The installers point the native-messaging manifest at `jabext_host.py`
 (Linux/macOS, run via its `#!/usr/bin/env python3` shebang) or
 `jabext_host.bat` → `jabext_host.ps1` (Windows).
 
+### Windows: HTTP.sys and URL reservations
+
+`jabext_host.ps1` serves HTTP through `System.Net.HttpListener`, i.e. HTTP.sys.
+A non-elevated user can bind `http://127.0.0.1:<port>/` without any URL
+reservation (verified on Windows 10 22H2), so normally nothing needs to be done.
+Should HTTP.sys still answer `Access is denied`, the host exits with an
+actionable message on stderr (visible in the extension's console): pin a port
+and reserve it once from an elevated prompt:
+
+```powershell
+setx JABEXT_PORT 47123
+netsh http add urlacl url=http://127.0.0.1:47123/ user=%USERDOMAIN%\%USERNAME%
+```
+
+Then restart the browser. `JABEXT_PORT` is only read by the Windows host; the
+Python host always picks an ephemeral port.
+
 ## Protocol mirror
 
 The spec is the canonical copy at
