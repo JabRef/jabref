@@ -120,6 +120,7 @@ function Handle-Context($ctx) {
 
     if ($method -eq 'GET' -and $path -eq '/v1/health') {
         if (Reject-Origin $ctx) { return }
+        if (Reject-Bearer $ctx) { return }   # spec: every request carries the bearer token, health included
         Send-Json $ctx 200 @{ ok = $true; name = $ProviderName; protocolVersion = $ProtocolVersion }; return
     }
     if ($method -ne 'POST') { Send-Err $ctx 404 'bad-request' 'unknown endpoint'; return }
@@ -222,7 +223,9 @@ function Main {
     $async = $ps.BeginInvoke()
 
     New-Item -ItemType Directory -Force -Path $DiscoveryDir | Out-Null
-    $discovery = Join-Path $DiscoveryDir "$ProviderName.json"
+    # Per-instance filename (keyed by port): concurrent hosts coexist as separate
+    # providers instead of clobbering one shared file (JabRef enumerates every *.json).
+    $discovery = Join-Path $DiscoveryDir "$ProviderName.$port.json"
     # Publish atomically (write temp, then replace) so JabRef never reads a partial file.
     $discoveryTmp = "$discovery.$PID.tmp"
     @{ name = $ProviderName; displayName = $DisplayName; port = $port
@@ -238,12 +241,9 @@ function Main {
             catch { try { Send-Err $ctx 500 'internal-error' "$($_.Exception.Message)" } catch {} }
         }
     } finally {
-        # Only remove the discovery record if it still points at this instance's port;
-        # a newer concurrent host may have taken ownership.
-        try {
-            $cur = Get-Content -Raw $discovery -ErrorAction Stop | ConvertFrom-Json
-            if ($cur.port -eq $port) { Remove-Item $discovery -ErrorAction SilentlyContinue }
-        } catch { }
+        # The discovery file is unique to this instance (keyed by port), so removing it
+        # on exit cannot strand another concurrently-running host.
+        Remove-Item $discovery -ErrorAction SilentlyContinue
         if ($listener.IsListening) { $listener.Stop() }
         $ps.EndInvoke($async); $ps.Dispose()
     }

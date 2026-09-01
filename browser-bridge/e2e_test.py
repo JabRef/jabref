@@ -91,9 +91,12 @@ class HostRun:
                 break
 
     def discovery(self):
-        f = self.config / "fulltext-providers" / "jabext-bridge.json"
+        d_dir = self.config / "fulltext-providers"
         for _ in range(100):                          # up to ~10s (pwsh cold start)
-            if f.exists() and f.stat().st_size > 0:
+            # Per-instance filename: jabext-bridge.<port>.json (one host per browser).
+            matches = sorted(d_dir.glob("jabext-bridge.*.json")) if d_dir.is_dir() else []
+            if matches and matches[0].stat().st_size > 0:
+                f = matches[0]
                 d = json.loads(f.read_text("utf-8"))
                 d["_token"] = Path(d["tokenFile"]).read_text("utf-8").strip()
                 d["_file"] = f
@@ -134,8 +137,10 @@ def check(host_name, argv):
         assert disc["name"] == "jabext-bridge" and disc["protocolVersion"] == 1, disc
         auth = {"Authorization": f"Bearer {token}"}
 
-        # health (no auth, origin only)
-        s, b = httpreq(port, "GET", "/v1/health")
+        # health (spec: bearer required, same as every endpoint)
+        s, _ = httpreq(port, "GET", "/v1/health")
+        assert s == 401, ("health without token -> 401", s)
+        s, b = httpreq(port, "GET", "/v1/health", None, auth)
         assert s == 200 and b["ok"] is True and b["name"] == "jabext-bridge", (s, b)
 
         # auth + origin gating
