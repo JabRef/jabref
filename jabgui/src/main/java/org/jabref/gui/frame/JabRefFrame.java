@@ -31,14 +31,6 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DBMSConnectionProperties;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-
-
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -56,6 +48,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.GuiUndoManager;
@@ -68,6 +61,11 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
