@@ -26,7 +26,26 @@ Note that we are currently switching to JavaFX's observables, as we aim for a st
 
 Permitted dependencies in our architecture are:
 
-[![components dependency](images/components-dependencies.svg)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/components-dependancy.svg)
+```mermaid
+flowchart LR
+    subgraph shared["Accessible from every layer above"]
+        direction LR
+        preferences["Preferences"]
+        global["global classes"]
+    end
+    gui["gui"] --> logic["logic"]
+    cli["cli"] --> logic
+    logic --> model["model"]
+    model ~~~ shared
+
+    preferences:::component
+    global:::component
+    gui:::layer
+    logic:::component
+    cli:::layer
+    model:::component
+
+```
 
 All packages and classes which are currently not part of these packages (we are still in the process of structuring) are considered as gui classes from a dependency standpoint.
 
@@ -263,6 +282,8 @@ This component refers to the central entry table in JabRef, including its layout
 - Open issues: [component: microsoft-word-integration](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+microsoft-word-integration%22)
 - Docs: <https://docs.jabref.org/cite/export-to-microsoft-word>
 
+This component manages exporting JabRef entries as MS Office 2007 XML so they can be used as citation sources in Microsoft Word's built-in bibliography tools.
+
 ### PDF Viewer
 
 - Open issues: [component: pdf viewer](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+pdf+viewer%22)
@@ -275,7 +296,7 @@ This component relates to the built-in PDF viewer functionality in JabRef, inclu
 - Open issues: [component: preferences](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+preferences%22)
 - Docs: TBD
 
-Covers all aspects of configuration settings for features, appearance, and behavior.
+This component covers all aspects of configuration settings for features, appearance, and behavior.
 
 ### Search
 
