@@ -40,9 +40,9 @@ import static org.mockito.Mockito.when;
 
 class BackupManagerTest {
 
-    private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-
     Path backupDir;
+
+    private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     @BeforeEach
     void setup(@TempDir Path tempDir) {
