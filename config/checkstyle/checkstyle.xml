@@ -90,6 +90,18 @@
         <property name="fileExtensions" value="java" />
     </module>
 
+    <!-- Markdown Javadoc (///) must use Markdown syntax, not HTML formatting tags.
+         Tags quoted in backticks (documenting literal HTML/XML content) stay allowed: a tag directly
+         preceded or followed by a backtick is skipped (line-based heuristic, not a full code-span parser).
+         Single-letter tags (b, i, p) are matched lowercase only, since uppercase <B>/<I>/<P> are generic
+         type parameters in @param tags. -->
+    <module name="RegexpSingleline">
+        <property name="id" value="MarkdownJavadocNoHtmlFormattingTags"/>
+        <property name="message" value="Markdown Javadoc (///) must use Markdown syntax, not HTML formatting tags: `code` instead of &lt;code&gt;code&lt;/code&gt;, fenced code blocks (```) instead of &lt;pre&gt;&lt;code&gt;." />
+        <property name="format" value="^\s*///.*(?&lt;!`)&lt;/?((?i:code|tt|em|strong|br|pre)|b|i|p)\s*/?&gt;(?!`)" />
+        <property name="fileExtensions" value="java" />
+    </module>
+
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
