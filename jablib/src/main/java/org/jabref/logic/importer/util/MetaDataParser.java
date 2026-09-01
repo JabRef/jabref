@@ -45,7 +45,7 @@ public class MetaDataParser {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
-    private static FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
 
     static {
@@ -58,7 +58,7 @@ public class MetaDataParser {
     }
 
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
-        MetaDataParser.fileMonitor = fileMonitor;
+        this.fileMonitor = fileMonitor;
     }
 
     public static Optional<BibEntryType> parseCustomEntryType(String comment) {

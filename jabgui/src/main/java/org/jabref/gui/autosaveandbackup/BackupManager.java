@@ -41,7 +41,6 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
@@ -212,21 +211,8 @@ public class BackupManager {
         if (original.isInvalid() || backup.isInvalid()) {
             return false;
         }
-        BibDatabaseDiff diff = BibDatabaseDiff.compare(original.getDatabaseContext(), backup.getDatabaseContext());
-        if (diff.getMetaDataDifferences().isPresent() || diff.getPreambleDifferences().isPresent() || !diff.getBibStringDifferences().isEmpty()) {
-            return false;
-        }
-        // Without any semantic difference the byte difference is unexplained (e.g. content the parser dropped), so the user still gets asked
-        return !diff.getEntryDifferences().isEmpty() && diff.getEntryDifferences().stream().allMatch(entryDiff ->
-                (entryDiff.originalEntry() != null) && (entryDiff.newEntry() != null)
-                        && entryDiff.originalEntry().getType().equals(entryDiff.newEntry().getType())
-                        && withoutModificationDate(entryDiff.originalEntry()).equals(withoutModificationDate(entryDiff.newEntry())));
-    }
-
-    private static Map<Field, String> withoutModificationDate(BibEntry entry) {
-        Map<Field, String> fields = new HashMap<>(entry.getFieldMap());
-        fields.remove(StandardField.MODIFICATIONDATE);
-        return fields;
+        return BibDatabaseDiff.compare(original.getDatabaseContext(), backup.getDatabaseContext())
+                              .differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE));
     }
 
     /// Restores the backup file by copying and overwriting the original one.

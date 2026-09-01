@@ -3,6 +3,7 @@ package org.jabref.logic.bibtex.comparator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -12,7 +13,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BibDatabaseDiffTest {
 
@@ -139,5 +142,42 @@ class BibDatabaseDiffTest {
         BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(List.of(entryTwo)));
 
         return BibDatabaseDiff.compare(databaseOne, databaseTwo);
+    }
+
+    private static BibDatabaseContext contextOf(BibEntry entry) {
+        return new BibDatabaseContext(new BibDatabase(List.of(entry)));
+    }
+
+    @Test
+    void differsOnlyInFieldsForChangedIgnoredField() {
+        BibEntry original = new BibEntry().withCitationKey("key").withField(StandardField.TITLE, "Title").withField(StandardField.MODIFICATIONDATE, "2026-09-01T10:00:00");
+        BibEntry changed = new BibEntry().withCitationKey("key").withField(StandardField.TITLE, "Title").withField(StandardField.MODIFICATIONDATE, "2026-09-01T11:00:00");
+
+        assertTrue(BibDatabaseDiff.compare(contextOf(original), contextOf(changed)).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
+    }
+
+    @Test
+    void differsOnlyInFieldsIsFalseForChangedOtherField() {
+        BibEntry original = new BibEntry().withCitationKey("key").withField(StandardField.TITLE, "Title").withField(StandardField.MODIFICATIONDATE, "2026-09-01T10:00:00");
+        BibEntry changed = new BibEntry().withCitationKey("key").withField(StandardField.TITLE, "Other title").withField(StandardField.MODIFICATIONDATE, "2026-09-01T11:00:00");
+
+        assertFalse(BibDatabaseDiff.compare(contextOf(original), contextOf(changed)).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
+    }
+
+    @Test
+    void differsOnlyInFieldsIsFalseForChangedComment() {
+        BibEntry original = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T10:00:00");
+        original.setCommentsBeforeEntry("% old comment");
+        BibEntry changed = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T11:00:00");
+        changed.setCommentsBeforeEntry("% new comment");
+
+        assertFalse(BibDatabaseDiff.compare(contextOf(original), contextOf(changed)).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
+    }
+
+    @Test
+    void differsOnlyInFieldsIsFalseWithoutEntryDifference() {
+        BibEntry entry = new BibEntry().withCitationKey("key").withField(StandardField.TITLE, "Title");
+
+        assertFalse(BibDatabaseDiff.compare(contextOf(entry), contextOf(new BibEntry(entry))).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
     }
 }
