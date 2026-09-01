@@ -9,7 +9,6 @@ import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -18,7 +17,6 @@ import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -73,13 +71,8 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         new ValidationVisualizer().initVisualization(viewModel.commitMessageProperty(), commitMessage);
 
         Platform.runLater(() -> {
+            // [impl->req~ux.textdialogs.focus~1]
             commitMessage.requestFocus();
-            // [impl->req~textinput.clipboard.autofocus~1]
-            final String clipboardText = ClipBoardManager.getContents().trim();
-            if (!StringUtil.isBlank(clipboardText)) {
-                commitMessage.setText(clipboardText);
-                commitMessage.selectAll();
-            }
         });
     }
 

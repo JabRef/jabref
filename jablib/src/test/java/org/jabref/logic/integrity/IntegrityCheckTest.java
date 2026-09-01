@@ -79,12 +79,11 @@ class IntegrityCheckTest {
     }
 
     private static Stream<String> provideCorrectFormat() {
-        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
+        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein", "   Knuth, Donald E. ");
     }
 
     private static Stream<String> provideIncorrectFormat() {
-        return Stream.of("   Knuth, Donald E. ",
-                "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+        return Stream.of("Knuth, Donald E. and Kurt Cobain and A. Einstein",
                 ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
                 "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }

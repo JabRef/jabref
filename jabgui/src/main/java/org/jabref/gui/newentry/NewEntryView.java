@@ -175,8 +175,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     if (idText != null) {
+                        // [impl->req~ux.textdialogs.autopaste~1]
                         idText.setText(clipboardText);
                         idText.selectAll();
+                        // [impl->req~ux.textdialogs.focus~1]
                         Platform.runLater(() -> idText.requestFocus());
                     }
                 } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
@@ -340,6 +342,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         Optional<Identifier> identifier = Identifier.from(clipboard);
 
         if (identifier.isPresent()) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             idText.setText(clipboard);
             idText.selectAll();
 
@@ -379,9 +382,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
         // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
-        // [impl->req~textinput.clipboard.autofocus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (URLUtil.isURL(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             urlText.setText(clipboardText);
             urlText.selectAll();
         }
@@ -391,10 +394,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
-        // [impl->req~textinput.clipboard.autofocus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             interpretText.setText(clipboardText);
             interpretText.selectAll();
         }
@@ -416,6 +419,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (!StringUtil.isBlank(clipboardText)) {
             // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
             // supported Bib(La)TeX source format.
+            // [impl->req~ux.textdialogs.autopaste~1]
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
@@ -447,6 +451,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
 
         if (idText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> idText.requestFocus());
         }
 
@@ -468,6 +473,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (urlText != null) {
             Platform.runLater(() -> {
                 if (tabEnterUrl.isSelected()) {
+                    // [impl->req~ux.textdialogs.focus~1]
                     urlText.requestFocus();
                 }
             });
@@ -488,8 +494,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
-        // [impl->req~textinput.clipboard.autofocus~1]
         if (interpretText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> interpretText.requestFocus());
         }
 
@@ -509,6 +515,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> bibtexText.requestFocus());
         }
 
