@@ -242,15 +242,17 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateEntryChangeConflicts() {
+    void simulateEntryChangeConflicts() throws InterruptedException {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
         // client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        // A now increases the version number
+        // A now increases the version number; the write happens asynchronously,
+        // so wait until the version reported back by the database is visible locally
         bibEntryOfClientA.setField(StandardField.YEAR, "2001");
+        waitUntil(() -> bibEntryOfClientA.getSharedBibEntryData().getVersion() >= 2);
 
         // B does nothing here, so there is no event occurrence
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
@@ -262,6 +264,7 @@ class SynchronizationSimulatorTest {
 
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
+        waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
     }
 }
