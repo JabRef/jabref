@@ -80,4 +80,13 @@ are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
 
+## Startup uses an ahead-of-time cache
+`req~jabkit.cli.aot-cache~1`
+
+The `jabkit` app image ships a JVM ahead-of-time cache ([JEP 514](https://openjdk.org/jeps/514))
+that the launcher loads at startup, reducing startup time. The cache is trained during packaging
+by running the packaged launcher once. A missing or unusable cache must not prevent `jabkit`
+from starting. The implementation lives in the build script (`jabkit/build.gradle.kts`), which is
+outside the sources scanned by requirement tracing, hence no `Needs: impl`.
+
 <!-- markdownlint-disable-file MD022 -->

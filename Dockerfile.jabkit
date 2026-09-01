@@ -48,7 +48,8 @@ RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
 
-RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
+# skipAotTraining: the AOT training run executes the packaged launcher, which needs glibc (see below)
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" -PskipAotTraining=true :jabkit:jpackage
 
 RUN mkdir /dist
 

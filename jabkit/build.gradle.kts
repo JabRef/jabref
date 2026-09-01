@@ -81,7 +81,11 @@ javaModulePackaging {
 // appended to the launcher .cfg only after training. An unusable cache is non-fatal at runtime
 // (default -XX:AOTMode=auto) and its diagnostics are silenced by -Xlog:disable above.
 // OpenJ9 does not implement the HotSpot AOT cache (it has -Xshareclasses instead), so skip it there.
-if (jdkVendor != JvmVendorSpec.IBM) {
+// -PskipAotTraining=true skips it for builds whose packaged launcher cannot run on the build host
+// (e.g. Dockerfile.jabkit packages in a plain-Alpine stage without glibc).
+// Requirement: req~jabkit.cli.aot-cache~1 (docs/requirements/cli.md)
+val skipAotTraining = providers.gradleProperty("skipAotTraining").map(String::toBoolean).getOrElse(false)
+if (jdkVendor != JvmVendorSpec.IBM && !skipAotTraining) {
     tasks.withType<Jpackage>().configureEach {
         val os = operatingSystem
         val dest = destination
@@ -93,9 +97,12 @@ if (jdkVendor != JvmVendorSpec.IBM) {
                 else -> image.resolve("bin/jabkit") to image.resolve("lib/app")
             }
             val cache = appDir.resolve("jabkit.aot")
+            // JAVA_TOOL_OPTIONS is whitespace-tokenized; the working-directory-relative cache name
+            // keeps the option a single token even when the checkout path contains spaces.
             val process = ProcessBuilder(launcher.absolutePath, "--version")
+                .directory(appDir)
                 .redirectErrorStream(true)
-                .apply { environment()["JAVA_TOOL_OPTIONS"] = "-XX:AOTCacheOutput=${cache.absolutePath}" }
+                .apply { environment()["JAVA_TOOL_OPTIONS"] = "-XX:AOTCacheOutput=${cache.name}" }
                 .start()
             val output = process.inputStream.bufferedReader().readText()
             check(process.waitFor() == 0 && cache.isFile) { "AOT cache training run failed:\n$output" }
