@@ -108,6 +108,7 @@ public class NotificationListener implements Runnable {
         return newConnection.unwrap(PGConnection.class);
     }
 
+    // [impl->req~shared-database.live-propagation~1]
     private void handleNotification(PGNotification notification) {
         if (Notifier.METADATA_CHANNEL.equals(notification.getName())) {
             // The payload names the changed key, but metadata is small:
