@@ -150,6 +150,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         props.setProperty("user", user);
         props.setProperty("password", password);
         props.setProperty("serverTimezone", serverTimezone);
+        // Without keepalives, NAT/firewall timeouts silently kill idle connections
+        // (issue #11211: connection lost after ~2h)
+        props.setProperty("tcpKeepAlive", Boolean.toString(true));
         if (useSSL) {
             props.setProperty("ssl", Boolean.toString(true));
             props.setProperty("useSSL", Boolean.toString(true));
