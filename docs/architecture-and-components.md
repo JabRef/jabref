@@ -10,9 +10,9 @@ Note that components are seen as "logical" components and summarize features and
 
 JabRef's code is structured into these packages:
 
-- The `model` package encompasses the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
+- The `model` package encompasses the most important data structures (`BibDatabases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
 - The `logic` package is responsible for business logic such as reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
-- Only the `gui` knows the user and their preferences and can interact with them to help them solving tasks.
+- The `gui` package the only one knows the user and their preferences and can interact with them to help them solving tasks.
 - For each layer, we form packages according to their responsibility, i.e., vertical structuring.
 - The `model` classes should have no dependencies to other classes of JabRef and the `logic` classes should only depend on `model` classes.
 - The `cli` package bundles classes that are responsible for JabRef's command line interface.
@@ -26,22 +26,7 @@ Note that we are currently switching to JavaFX's observables, as we aim for a st
 
 Permitted dependencies in our architecture are:
 
-```monospaced
-gui --> logic --> model
-gui ------------> model
-gui ------------> preferences
-gui ------------> cli
-gui ------------> global classes
-
-logic ------------> model
-
-global classes ------------> everywhere
-
-cli ------------> model
-cli ------------> logic
-cli ------------> global classes
-cli ------------> preferences
-```
+[![components dependency](images/components-dependencies.svg)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/components-dependancy.svg)
 
 All packages and classes which are currently not part of these packages (we are still in the process of structuring) are considered as gui classes from a dependency standpoint.
 
@@ -60,8 +45,8 @@ General information about architectural decision records is available at <https:
 
 ## Components
 
-We regard each "larger" feature as component.
-Each such component gets a label "component: {component-name}" to enable ease issue searching of it.
+We regard each "larger" feature as a component.
+Each such component gets a label "component: {component-name}" to make it easier to search for issues related to it.
 
 ### AI
 
