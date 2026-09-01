@@ -701,6 +701,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Perform necessary cleanup when this Library is closed.
+    ///
+    /// Cleanup steps catch [Throwable] rather than [RuntimeException]: an escaping [Error] (e.g., a
+    /// [NoClassDefFoundError] when the classpath has vanished under a running JVM) aborts the tab close,
+    /// leaving JabRef unclosable behind a recurring uncaught-exception dialog.
     private void onClosed(Event event) {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
@@ -712,27 +716,27 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when closing change monitor", e);
         }
         try {
             if (searchContext != null) {
                 searchContext.close();
             }
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when closing search context", e);
         }
 
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when shutting down autosave manager", e);
         }
         try {
             BackupManager.shutdown(bibDatabaseContext,
                     preferences.getFilePreferences().getBackupDirectory(),
                     preferences.getFilePreferences().shouldCreateBackup());
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
