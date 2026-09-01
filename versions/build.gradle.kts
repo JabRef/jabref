@@ -165,7 +165,7 @@ dependencies.constraints {
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.xmlunit:xmlunit-core:2.13.0")
     api("org.xmlunit:xmlunit-matchers:2.13.0")
-    api("org.yaml:snakeyaml:2.6")
+    api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svgnode:2.0.0")
 }

@@ -168,7 +168,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the entry's arXiv ID
-    /// <br/><br/>
+    ///
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed
     /// [#DOI_PREFIX] + the entry's ArXiv ID
     ///
@@ -179,7 +179,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the arXiv entry itself.
-    /// <br/><br/>
+    ///
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
@@ -197,7 +197,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from ArXiv Identifier object
-    /// <br/><br/>
+    ///
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivId An ArXiv ID as internal object
@@ -212,7 +212,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get user-issued DOI from ArXiv Bibtex entry, if any
-    /// <br/><br/>
+    ///
     /// User-issued DOIs are identifiers associated with some ArXiv entries that can associate an entry with an external service, like
     /// <a href="https://link.springer.com/">Springer Link</a>.
     ///
