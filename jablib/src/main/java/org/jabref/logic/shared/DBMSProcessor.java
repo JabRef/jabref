@@ -18,6 +18,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.model.entry.BibEntry;
@@ -418,7 +419,7 @@ public class DBMSProcessor {
     ///
     /// @param localBibEntry [BibEntry] affected by changes
     /// @throws SQLException in case of error
-    public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
+    public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SharedEntryNotPresentException, SQLException {
         // FIXME: either two connections (one with auto commit and one without) or better auto commit state - this line here can lead to issues if autocommit is required in a parallel thread
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
@@ -426,7 +427,7 @@ public class DBMSProcessor {
             Optional<BibEntry> sharedEntryOptional = getSharedEntry(localBibEntry.getSharedBibEntryData().getSharedIdAsInt());
 
             if (sharedEntryOptional.isEmpty()) {
-                return;
+                throw new SharedEntryNotPresentException(localBibEntry);
             }
 
             BibEntry sharedBibEntry = sharedEntryOptional.get();
@@ -444,12 +445,19 @@ public class DBMSProcessor {
                             SET entrytype = ?,
                                 version = version + 1
                             WHERE shared_id = ?
+                            RETURNING version
                         """;
 
                 try (PreparedStatement preparedUpdateEntryTypeStatement = connection.prepareStatement(updateEntryTypeQuery)) {
                     preparedUpdateEntryTypeStatement.setString(1, localBibEntry.getType().getName());
                     preparedUpdateEntryTypeStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedIdAsInt());
-                    preparedUpdateEntryTypeStatement.executeUpdate();
+                    try (ResultSet resultSet = preparedUpdateEntryTypeStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            // The fresh version travels in the change notification, so receivers
+                            // do not need a pull to stay consistent
+                            localBibEntry.getSharedBibEntryData().setVersion(resultSet.getInt("version"));
+                        }
+                    }
                 }
 
                 connection.commit(); // apply all changes in current transaction
