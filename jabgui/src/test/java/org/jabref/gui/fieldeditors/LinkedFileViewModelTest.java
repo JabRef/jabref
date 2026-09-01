@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.MalformedURLException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,6 +72,7 @@ class LinkedFileViewModelTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private CookieManager cookieManager;
+    private HttpServer httpServer;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {
@@ -100,6 +104,26 @@ class LinkedFileViewModelTest {
     @AfterEach
     void tearDown() {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_NONE);
+        if (httpServer != null) {
+            httpServer.stop(0);
+        }
+    }
+
+    /// Serves the given bytes for every request on a random free port, so download tests do not depend on external sites
+    private String serve(String contentType, byte[] body) throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        httpServer.createContext("/", exchange -> {
+            exchange.getResponseHeaders().add("Content-Type", contentType);
+            if ("HEAD".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(200, -1);
+            } else {
+                exchange.sendResponseHeaders(200, body.length);
+                exchange.getResponseBody().write(body);
+            }
+            exchange.close();
+        });
+        httpServer.start();
+        return "http://localhost:" + httpServer.getAddress().getPort() + "/";
     }
 
     @Test
@@ -187,16 +211,18 @@ class LinkedFileViewModelTest {
 
     @ParameterizedTest
     @CsvSource({
-            "true, Download 'https://www.google.com/' was a HTML file. Keeping URL.",
-            "false, Download 'https://www.google.com/' was a HTML file. Removed."
+            "true, Keeping URL.",
+            "false, Removed."
     })
-    void downloadHtmlFileCausesWarningDisplay(Boolean keepHtmlLink, String warningText) throws MalformedURLException {
+    void downloadHtmlFileCausesWarningDisplay(Boolean keepHtmlLink, String warningSuffix) throws IOException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
-        URL url = URLUtil.create("https://www.google.com/");
+        String serverUrl = serve("text/html; charset=UTF-8", "<html></html>".getBytes(StandardCharsets.UTF_8));
+        String warningText = "Download '%s' was a HTML file. %s".formatted(serverUrl, warningSuffix);
+        URL url = URLUtil.create(serverUrl);
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
@@ -268,12 +294,11 @@ class LinkedFileViewModelTest {
         assertEquals("URL", actual);
     }
 
-    // We cannot use "@FetcherTest" annotation, because a @FetcherTest does not fire up a GUI environment (which is needed for this test)
-    // @FetcherTest
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
-        linkedFile = new LinkedFile(URLUtil.create("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+    void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws IOException {
+        String serverUrl = serve("application/pdf", "%PDF-1.4\n%%EOF\n".getBytes(StandardCharsets.UTF_8));
+        linkedFile = new LinkedFile(URLUtil.create(serverUrl), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
@@ -283,7 +308,6 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
-        // TODO: Rewrite using WireMock
         viewModel.download(keepHtml);
 
         // Loop through downloaded files to check for filetype='pdf'
