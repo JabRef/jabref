@@ -22,7 +22,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tinylog.ThreadContext;
+import org.slf4j.MDC;
 
 import static org.jabref.model.search.LinkedFilesConstants.ANNOTATIONS;
 import static org.jabref.model.search.LinkedFilesConstants.CONTENT;
@@ -39,7 +39,7 @@ public final class DocumentReader {
 
     public List<Document> readPdfContents(String fileLink, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
-        ThreadContext.put("file", fileLink);
+        MDC.put("file", fileLink);
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
             LOGGER.debug("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
@@ -55,7 +55,7 @@ public final class DocumentReader {
             LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
             return pages;
         } finally {
-            ThreadContext.remove("file");
+            MDC.remove("file");
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
