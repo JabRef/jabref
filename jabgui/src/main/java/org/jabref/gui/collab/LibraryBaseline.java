@@ -27,6 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// The library as it last matched its file on disk. Comparing both the in-memory library and the file against it tells
@@ -35,6 +36,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Entries are keyed by the id of the in-memory entry they were copied from, so that a citation key change in memory
 /// does not break the association. The metadata is kept in its serialized form, which is the only way to snapshot it.
+@NullMarked
 public final class LibraryBaseline {
 
     /// Outcome of comparing external changes against the baseline.
