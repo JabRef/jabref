@@ -20,6 +20,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ExtractionModeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Check.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
@@ -27,6 +28,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/ExtractionMode.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateBibFromAux.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
@@ -35,6 +37,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfExtractReferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java

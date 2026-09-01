@@ -32,7 +32,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,29 +85,20 @@ public class ClipBoardManager {
     /// Get the String residing on the system clipboard.
     ///
     /// @return any text found on the Clipboard; if none found, return an empty String.
-    public static @NonNull String getContents() {
-        String result = clipboard.getString();
-        if (result == null) {
-            return "";
-        }
-        return result;
+    public static String getContents() {
+        return Optional.ofNullable(clipboard.getString()).orElse("");
     }
 
-    public @Nullable TransferInformation getJabRefClipboardTransferData() {
+    public Optional<TransferInformation> getJabRefClipboardTransferData() {
         return Optional.ofNullable(clipboard.getContent(DATAFORMAT_JABREF_DATA))
                        .filter(String.class::isInstance)
                        .map(String.class::cast)
                        .map(JabRefClipboardData::fromJson)
-                       .flatMap(data -> data.toTransferInformation(stateManager))
-                       .orElse(null);
+                       .flatMap(data -> data.toTransferInformation(stateManager));
     }
 
-    public static @NonNull String getHtmlContents() {
-        String result = clipboard.getHtml();
-        if (result == null) {
-            return "";
-        }
-        return result;
+    public static String getHtmlContents() {
+        return Optional.ofNullable(clipboard.getHtml()).orElse("");
     }
 
     public static boolean hasHtml() {
@@ -118,7 +108,7 @@ public class ClipBoardManager {
     /// Get the String residing on the primary clipboard (if it exists).
     ///
     /// @return any text found on the primary Clipboard; if none found, try with the system clipboard.
-    public static @NonNull String getContentsPrimary() {
+    public static String getContentsPrimary() {
         if (primary != null) {
             Transferable contents = primary.getContents(null);
             if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -175,7 +165,7 @@ public class ClipBoardManager {
         StringBuilder builder = new StringBuilder();
         if (!stringConstants.isEmpty()) {
             stringConstants.forEach(strConst -> {
-                builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization());
+                builder.append(strConst.getParsedSerialization());
                 builder.append(OS.NEWLINE);
             });
             builder.append(OS.NEWLINE);

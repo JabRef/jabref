@@ -95,7 +95,7 @@ public class Pseudonymization {
         return newEntries;
     }
 
-    /// Pseudonymizes the {@link StandardField#GROUPS} field content.
+    /// Pseudonymizes the [StandardField#GROUPS] field content.
     /// Groups not present in the group tree are also pseudonymized.
     private String pseudonymizeGroupsField(String fieldContent,
                                            Map<String, String> groupNameMapping,

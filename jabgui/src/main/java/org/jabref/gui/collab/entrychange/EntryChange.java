@@ -35,7 +35,7 @@ public final class EntryChange extends DatabaseChange {
 
     @Override
     public void applyChange(CompoundEdit undoEdit) {
-        undoEdit.apply(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
-        undoEdit.apply(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
+        undoEdit.applyEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        undoEdit.applyEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
     }
 }

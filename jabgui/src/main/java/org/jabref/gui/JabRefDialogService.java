@@ -69,10 +69,10 @@ import org.slf4j.LoggerFactory;
 /// This class provides methods to create default
 /// JavaFX dialogs which will also work on top of Swing
 /// windows. The created dialogs are instances of the
-/// {@link FXDialog} class. The available dialogs in this class
+/// [FXDialog] class. The available dialogs in this class
 /// are useful for displaying small information graphic dialogs
 /// rather than complex windows. For more complex dialogs it is
-/// advised to rather create a new sub class of {@link FXDialog}.
+/// advised to rather create a new sub class of [FXDialog].
 @NullMarked
 public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
@@ -483,8 +483,13 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
+        return showFileOpenDialog(fileDialogConfiguration, mainWindow);
+    }
+
+    @Override
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        File file = chooser.showOpenDialog(mainWindow);
+        File file = chooser.showOpenDialog(owner);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }

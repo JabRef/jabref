@@ -77,9 +77,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+/// Tests for reading whole bib files can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
 ///
-/// Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
+/// Tests cannot be executed concurrently, because Localization is used at [BibtexParser#parseAndAddEntry(String)]
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @ResourceLock("Localization.lang")
 class BibtexParserTest {
