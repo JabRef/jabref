@@ -3,7 +3,6 @@ package org.jabref.gui.shared;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -38,8 +37,8 @@ import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -180,7 +179,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         jdbcUrl.set(url.toJdbcUrl());
     }
 
-    public boolean openDatabase() {
+    /// Connects in the background; `onConnected` runs on the JavaFX thread once the dialog can be closed
+    public void openDatabase(Runnable onConnected) {
         DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
                 .setHost(host.getValue())
@@ -196,14 +196,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
-        return openSharedDatabase(connectionProperties);
+        openSharedDatabase(connectionProperties, onConnected);
     }
 
-    private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+    private void openSharedDatabase(DBMSConnectionProperties connectionProperties, Runnable onConnected) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
-            return true;
+            onConnected.run();
+            return;
         }
 
         if (autosave.get()) {
@@ -215,52 +216,55 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                         Localization.lang("Overwrite file"),
                         Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
-                    return true;
+                    onConnected.run();
+                    return;
                 }
             }
         }
 
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
+                tabContainer,
+                dialogService,
+                preferences,
+                aiService,
+                stateManager,
+                entryTypesManager,
+                fileUpdateMonitor,
+                undoManager,
+                clipBoardManager,
+                taskExecutor);
+
         loading.set(true);
+        BackgroundTask.wrap(() -> manager.connect(connectionProperties))
+                      .onSuccess(bibDatabaseContext -> {
+                          loading.set(false);
+                          LibraryTab libraryTab = manager.openTab(bibDatabaseContext);
+                          setPreferences();
+                          if (!folder.getValue().isEmpty() && autosave.get()) {
+                              try {
+                                  new SaveDatabaseAction(
+                                          libraryTab,
+                                          dialogService,
+                                          preferences,
+                                          entryTypesManager,
+                                          stateManager,
+                                          journalAbbreviationRepository
+                                  ).saveAs(Path.of(folder.getValue()));
+                              } catch (Throwable e) {
+                                  LOGGER.error("Error while saving the database", e);
+                              }
+                          }
+                          onConnected.run();
+                      })
+                      .onFailure(exception -> {
+                          loading.set(false);
+                          showConnectionFailure(exception, connectionProperties, onConnected);
+                      })
+                      .executeWith(taskExecutor);
+    }
 
-        try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
-                    tabContainer,
-                    dialogService,
-                    preferences,
-                    aiService,
-                    stateManager,
-                    entryTypesManager,
-                    fileUpdateMonitor,
-                    undoManager,
-                    clipBoardManager,
-                    taskExecutor);
-            LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
-            setPreferences();
-
-            if (!folder.getValue().isEmpty() && autosave.get()) {
-                try {
-                    new SaveDatabaseAction(
-                            libraryTab,
-                            dialogService,
-                            preferences,
-                            entryTypesManager,
-                            stateManager,
-                            journalAbbreviationRepository
-                    ).saveAs(Path.of(folder.getValue()));
-                } catch (Throwable e) {
-                    LOGGER.error("Error while saving the database", e);
-                }
-            }
-
-            return true;
-        } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
-            String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Connection error"),
-                    Localization.lang("Could not connect to %0", host.getValue() + ":" + port.getValue()) + "\n\n" + reason,
-                    exception);
-        } catch (DatabaseNotSupportedException exception) {
+    private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, Runnable onConnected) {
+        if (exception instanceof DatabaseNotSupportedException) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
             Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
@@ -273,10 +277,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties));
+            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties, onConnected));
+            return;
         }
-        loading.set(false);
-        return false;
+        // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
+        String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
+        dialogService.showErrorDialogAndWait(
+                Localization.lang("Connection error"),
+                Localization.lang("Could not connect to %0", host.getValue() + ":" + port.getValue()) + "\n\n" + reason,
+                exception);
     }
 
     private void setPreferences() {

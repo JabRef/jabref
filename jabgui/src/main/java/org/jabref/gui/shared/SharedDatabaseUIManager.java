@@ -158,15 +158,20 @@ public class SharedDatabaseUIManager {
     ///
     /// @param dbmsConnectionProperties Connection data
     /// @return BasePanel which also used by [org.jabref.gui.exporter.SaveDatabaseAction]
-    public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
+    /// Connects and loads the shared database. Blocks on the network, so call it off the JavaFX thread and hand the
+    /// result to [#openTab(BibDatabaseContext)].
+    public BibDatabaseContext connect(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
-
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
-
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
+        return bibDatabaseContext;
+    }
+
+    /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
+    public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
         dbmsSynchronizer.registerListener(this);
-        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 bibDatabaseContext,
