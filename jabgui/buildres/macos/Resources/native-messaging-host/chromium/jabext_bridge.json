@@ -1,0 +1,9 @@
+{
+  "name": "jabext_bridge",
+  "description": "JabRef Browser Extension - fulltext bridge",
+  "path": "/Applications/JabRef.app/Contents/Resources/jabext_host.py",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/"
+  ]
+}
