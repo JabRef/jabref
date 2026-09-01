@@ -2440,8 +2440,6 @@ public class JabRefCliPreferences implements CliPreferences {
             if (rawPersists.size() == 1 && names.size() > 1) {
                 boolean legacyPersist = Boolean.parseBoolean(rawPersists.getFirst());
                 persists = Collections.nCopies(names.size(), String.valueOf(legacyPersist));
-                // Normalize storage to list format
-                putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
             } else if (rawPersists.size() == names.size()) {
                 persists = rawPersists;
             } else {
