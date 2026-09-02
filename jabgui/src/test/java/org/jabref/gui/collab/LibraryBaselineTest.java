@@ -59,8 +59,8 @@ class LibraryBaselineTest {
 
         assertEquals(1, triage.diskOnly().size());
         assertTrue(triage.diskOnly().getFirst().isAccepted());
-        assertTrue(triage.bothSides().isEmpty());
-        assertTrue(triage.memoryOnly().isEmpty());
+        assertEquals(List.of(), triage.bothSides());
+        assertEquals(List.of(), triage.memoryOnly());
     }
 
     @Test
@@ -70,8 +70,8 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertEquals(1, triage.memoryOnly().size());
-        assertTrue(triage.diskOnly().isEmpty());
-        assertTrue(triage.bothSides().isEmpty());
+        assertEquals(List.of(), triage.diskOnly());
+        assertEquals(List.of(), triage.bothSides());
     }
 
     @Test
@@ -82,7 +82,7 @@ class LibraryBaselineTest {
 
         LibraryBaseline.Triage triage = triage();
 
-        assertTrue(triage.bothSides().isEmpty());
+        assertEquals(List.of(), triage.bothSides());
         EntryChange merged = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
         assertTrue(merged.isAccepted());
         assertEquals(new BibEntry(StandardEntryType.Article).withCitationKey("Key")
@@ -100,7 +100,7 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertEquals(1, triage.bothSides().size());
-        assertTrue(triage.diskOnly().isEmpty());
+        assertEquals(List.of(), triage.diskOnly());
     }
 
     @Test
@@ -137,7 +137,22 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertInstanceOf(MetadataChange.class, triage.diskOnly().getFirst());
-        assertTrue(triage.memoryOnly().isEmpty());
+        assertEquals(List.of(), triage.memoryOnly());
+    }
+
+    @Test
+    void duplicateCitationKeysAreMatchedByContent() {
+        BibEntry duplicate = new BibEntry(StandardEntryType.Article).withCitationKey("Key").withField(StandardField.TITLE, "Duplicate");
+        localContext.getDatabase().insertEntry(duplicate);
+        diskContext.getDatabase().insertEntry(new BibEntry(duplicate));
+        baseline = LibraryBaseline.of(localContext, PATTERNS);
+        localContext.getDatabase().removeEntry(local);
+
+        LibraryBaseline.Triage triage = triage();
+
+        // The entry deleted in memory is still unchanged on disk, so nothing is reported; the duplicate must not be mistaken for it
+        assertInstanceOf(EntryAdd.class, triage.memoryOnly().getFirst());
+        assertEquals(List.of(), triage.bothSides());
     }
 
     @Test
@@ -147,7 +162,7 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertInstanceOf(EntryAdd.class, triage.diskOnly().getFirst());
-        assertTrue(triage.bothSides().isEmpty());
+        assertEquals(List.of(), triage.bothSides());
     }
 
     @Test
@@ -157,7 +172,7 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertInstanceOf(EntryAdd.class, triage.memoryOnly().getFirst());
-        assertTrue(triage.diskOnly().isEmpty());
+        assertEquals(List.of(), triage.diskOnly());
     }
 
     @Test
@@ -196,7 +211,7 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage triage = triage();
 
         assertInstanceOf(EntryDelete.class, triage.memoryOnly().getFirst());
-        assertTrue(triage.diskOnly().isEmpty());
+        assertEquals(List.of(), triage.diskOnly());
     }
 
     @Test
@@ -221,6 +236,6 @@ class LibraryBaselineTest {
         LibraryBaseline.Triage second = triage();
 
         assertEquals(1, second.bothSides().size());
-        assertTrue(second.diskOnly().isEmpty());
+        assertEquals(List.of(), second.diskOnly());
     }
 }

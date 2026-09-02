@@ -55,8 +55,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// every external change is offered for review.
     @Nullable private LibraryBaseline baseline;
 
-    /// Counts started scans, so that a scan overtaken by a later one (whose result reflects the newer file state)
-    /// discards its result instead of applying stale content.
+    /// Counts started scans and invalidations, so that a scan overtaken by a later one (whose result reflects the
+    /// newer file state), by a save, by switching synchronization off, or by closing the tab discards its result
+    /// instead of applying stale content.
     private volatile int scanGeneration;
 
     private final ChangeListener<Boolean> synchronizingListener = (_, _, enabled) -> onSynchronizingChanged(enabled);
@@ -186,6 +187,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 monitoredPath.ifPresent(path -> knownDiskState = FileSnapshot.read(path));
             }
             baseline = captureBaseline();
+            scanGeneration++;
         }
     }
 
@@ -201,6 +203,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         synchronized (database) {
             if (!enabled) {
                 baseline = null;
+                scanGeneration++;
             } else if (baseline == null && !libraryTab.isModified()) {
                 baseline = captureBaseline();
             }
@@ -299,6 +302,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
+        scanGeneration++;
         monitoredPath.ifPresent(path -> {
             fileMonitor.removeListener(path, this);
             if (database.getLocation() == DatabaseLocation.LOCAL) {

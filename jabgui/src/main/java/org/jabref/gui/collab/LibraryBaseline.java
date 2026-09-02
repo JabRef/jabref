@@ -107,7 +107,7 @@ public final class LibraryBaseline {
                 }
                 // No in-memory counterpart: either new on disk, or deleted in memory (and possibly modified on disk)
                 case EntryAdd entryAdd ->
-                        find(entryAdd.getAddedEntry()).map(base -> sameContent(base, entryAdd.getAddedEntry()) ? Side.MEMORY : Side.BOTH)
+                        find(entryAdd.getAddedEntry()).map(base -> sameContent(base.getValue(), entryAdd.getAddedEntry()) ? Side.MEMORY : Side.BOTH)
                                                       .orElse(Side.DISK);
                 // No counterpart on disk: either deleted on disk, or added in memory (and possibly modified on disk)
                 case EntryDelete entryDelete -> {
@@ -157,7 +157,7 @@ public final class LibraryBaseline {
                 case EntryDelete entryDelete ->
                         keepEntry(previous, entryDelete.getDeletedEntry().getId());
                 case EntryAdd entryAdd ->
-                        previous.find(entryAdd.getAddedEntry()).ifPresent(base -> entriesById.put(base.getId(), base));
+                        previous.find(entryAdd.getAddedEntry()).ifPresent(base -> entriesById.put(base.getKey(), base.getValue()));
                 case MetadataChange _,
                      GroupChange _ -> {
                     metaData.clear();
@@ -186,9 +186,9 @@ public final class LibraryBaseline {
         Map<String, EntryDelete> deletesByBaseId = new HashMap<>();
         for (DatabaseChange change : changes) {
             if (change instanceof EntryDelete entryDelete) {
-                BibEntry base = entriesById.get(entryDelete.getDeletedEntry().getId());
-                if (base != null) {
-                    deletesByBaseId.put(base.getId(), entryDelete);
+                String baseId = entryDelete.getDeletedEntry().getId();
+                if (entriesById.containsKey(baseId)) {
+                    deletesByBaseId.put(baseId, entryDelete);
                 }
             }
         }
@@ -198,7 +198,7 @@ public final class LibraryBaseline {
         List<DatabaseChange> paired = new ArrayList<>(changes);
         for (DatabaseChange change : changes) {
             if (change instanceof EntryAdd entryAdd) {
-                find(entryAdd.getAddedEntry()).map(base -> deletesByBaseId.remove(base.getId())).ifPresent(entryDelete -> {
+                find(entryAdd.getAddedEntry()).map(base -> deletesByBaseId.remove(base.getKey())).ifPresent(entryDelete -> {
                     paired.remove(entryDelete);
                     paired.set(paired.indexOf(entryAdd), new EntryChange(entryDelete.getDeletedEntry(), entryAdd.getAddedEntry(), local, resolverFactory));
                 });
@@ -252,15 +252,19 @@ public final class LibraryBaseline {
         return one.getType().equals(other.getType()) && one.getFieldMap().equals(other.getFieldMap());
     }
 
-    /// Looks up the baseline of a disk entry without in-memory counterpart: by citation key, or else by the remaining
-    /// content, which covers entries without a key as well as a key changed on disk.
-    private Optional<BibEntry> find(BibEntry remote) {
-        Optional<BibEntry> byKey = remote.getCitationKey()
-                                         .flatMap(key -> entriesById.values().stream()
-                                                                    .filter(base -> base.getCitationKey().filter(key::equals).isPresent())
-                                                                    .findFirst());
-        return byKey.or(() -> entriesById.values().stream()
-                                         .filter(base -> sameContentExceptKey(base, remote))
+    /// Looks up the baseline of a disk entry without in-memory counterpart, keyed by the id of the in-memory entry it
+    /// was taken from: by citation key (preferring identical content, as keys need not be unique), or else by the
+    /// remaining content, which covers entries without a key as well as a key changed on disk.
+    private Optional<Map.Entry<String, BibEntry>> find(BibEntry remote) {
+        Optional<Map.Entry<String, BibEntry>> byKey = remote.getCitationKey().flatMap(key -> {
+            List<Map.Entry<String, BibEntry>> candidates = entriesById.entrySet().stream()
+                                                                      .filter(entry -> entry.getValue().getCitationKey().filter(key::equals).isPresent())
+                                                                      .toList();
+            return candidates.stream().filter(entry -> sameContent(entry.getValue(), remote)).findFirst()
+                             .or(() -> candidates.stream().findFirst());
+        });
+        return byKey.or(() -> entriesById.entrySet().stream()
+                                         .filter(entry -> sameContentExceptKey(entry.getValue(), remote))
                                          .findFirst());
     }
 
