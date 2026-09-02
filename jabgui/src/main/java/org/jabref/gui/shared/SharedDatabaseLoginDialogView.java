@@ -48,7 +48,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private CheckBox autosave;
     @FXML private ButtonType connectButton;
     @FXML private CheckBox useSSL;
-    @FXML private TextField serverTimezone;
     @FXML private TextField jdbcUrl;
     @FXML private CheckBox expertMode;
     @FXML private TextField connectionUrl;
@@ -111,7 +110,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         user.textProperty().bindBidirectional(viewModel.userProperty());
         password.textProperty().bindBidirectional(viewModel.passwordProperty());
         port.textProperty().bindBidirectional(viewModel.portProperty());
-        serverTimezone.textProperty().bindBidirectional(viewModel.serverTimezoneProperty());
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
         browseButton.disableProperty().bind(viewModel.autosaveProperty().not());
