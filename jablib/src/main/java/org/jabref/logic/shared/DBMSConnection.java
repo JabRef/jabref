@@ -50,9 +50,9 @@ public class DBMSConnection implements DatabaseConnection {
     }
 
     @Override
-    public Connection openNewConnection() throws SQLException {
+    public DatabaseConnection openNewConnection() throws SQLException {
         try {
-            return new DBMSConnection(properties).getConnection();
+            return new DBMSConnection(properties);
         } catch (InvalidDBMSConnectionPropertiesException e) {
             // Cannot happen: this connection was already opened from the very same properties
             throw new IllegalStateException(e);

@@ -118,6 +118,18 @@ A buffered micro-edit is written before a pull. If it conflicts with what is pul
 
 A possible future refinement is a change-log table: writers append each change as a row (in the same transaction as the data change), the `NOTIFY` payload carries only the change-log id, and clients fetch all rows since the last id they applied. This gives per-change history (no size limit, exact catch-up instead of a full diff) and would become the PostgreSQL equivalent of the JabDrive changes feed. It only pays off once per-change semantics are needed (offline-first synchronization, tombstones, undo across clients) - the version-diff pull already guarantees losslessness.
 
+## Connection loss
+
+The first write that finds the connection dead takes the `DBMSSynchronizer` offline: from then on every local change is recorded in `OfflineChanges` instead of being written, pulls are skipped, and a background loop opens a new connection with exponential backoff (up to 30 s between attempts) for as long as the library is open.
+The recorded changes are mirrored to one JSON file per database under the `shared-database` application directory (`Directories#getSharedDatabaseDirectory`), so they survive closing JabRef.
+
+Once a connection is back - or on the next connect to the same database after a restart - the recorded changes are replayed: applied to the local library where a restart lost them, then written through the same optimistic lock as any live change.
+An entry whose shared version moved on meanwhile is refused and merged by the user; an entry deleted on the shared side meanwhile is kept as a new entry.
+The replay ends with a pull.
+Until written, replayed entries are protected from that pull like refused ones.
+
+The user only sees two notifications (connection lost / restored); the notification listener reconnects independently on its own connection.
+
 ## Tests
 
 Tests are executed using [Zonky Embedded Postgres](https://github.com/zonkyio/embedded-postgres).

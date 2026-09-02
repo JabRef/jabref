@@ -38,6 +38,20 @@ When a local change is refused because the shared entry has a newer version, the
 
 Needs: impl
 
+## Changes made without connection are not lost
+`req~shared-database.offline-changes~1`
+
+When the connection to the shared database is lost, the user keeps working: every change is kept locally, survives closing and reopening JabRef, and is synchronized on the next connect to the same database. A kept change whose shared entry was changed meanwhile is offered for merging.
+
+Needs: impl
+
+## The connection is re-established automatically
+`req~shared-database.automatic-reconnect~1`
+
+After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 
