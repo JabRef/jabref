@@ -101,6 +101,17 @@ class BackupManagerTest {
     }
 
     @Test
+    void backupDifferingInModificationDateAndCustomEntryTypeIsDifference(@TempDir Path tempDir) throws IOException {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{key, title = {Title}, modificationdate = {2026-09-01T10:00:00}}\n@Comment{jabref-entrytype: Custom: req[title] opt[]}\n");
+        Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backup, "@Article{key, title = {Title}, modificationdate = {2026-09-01T11:00:00}}\n@Comment{jabref-entrytype: Custom: req[title;author] opt[]}\n");
+        Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
+
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+    }
+
+    @Test
     void backupDifferingInModificationDateAndContentIsDifference(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@Article{key, title = {Title}, modificationdate = {2026-09-01T10:00:00}}");

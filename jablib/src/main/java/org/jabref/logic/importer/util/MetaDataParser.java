@@ -61,6 +61,10 @@ public class MetaDataParser {
         this.fileMonitor = fileMonitor;
     }
 
+    public FileUpdateMonitor getFileMonitor() {
+        return fileMonitor;
+    }
+
     public static Optional<BibEntryType> parseCustomEntryType(String comment) {
         String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());
         if (comment.contains(MetaData.ENTRYTYPE_FLAG_V2)) {

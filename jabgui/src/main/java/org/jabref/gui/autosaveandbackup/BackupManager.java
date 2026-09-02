@@ -209,7 +209,8 @@ public class BackupManager {
     private static boolean differsOnlyInModificationDate(Path originalPath, Path backupPath, ImportFormatPreferences importFormatPreferences) throws IOException {
         ParserResult original = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult backup = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor());
-        if (original.isInvalid() || backup.isInvalid()) {
+        // Custom entry type definitions live in the parser result, not in the database context
+        if (original.isInvalid() || backup.isInvalid() || !original.getEntryTypes().equals(backup.getEntryTypes())) {
             return false;
         }
         return BibDatabaseDiff.compare(original.getDatabaseContext(), backup.getDatabaseContext())
