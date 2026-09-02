@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -759,71 +758,5 @@ class FileUtilTest {
     @ValueSource(strings = {"/home/username/Downloads/test.bib"})
     void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
         assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
-    }
-
-    @Test
-        // [utest->req~logic.xmp.atomic-pdf-write~1]
-    void replaceFileAtomicallyReplacesContentAndRemovesSource(@TempDir Path tempDir) throws IOException {
-        Path target = tempDir.resolve("target.txt");
-        Path source = tempDir.resolve("source.txt");
-        Files.writeString(target, "old");
-        Files.writeString(source, "new");
-
-        FileUtil.replaceFileAtomically(source, target);
-
-        assertEquals("new", Files.readString(target));
-        assertFalse(Files.exists(source));
-    }
-
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symbolic links require elevated rights on Windows")
-    @Test
-    void replaceFileAtomicallyKeepsSymbolicLinkIntact(@TempDir Path tempDir) throws IOException {
-        Path realFile = tempDir.resolve("real.txt");
-        Path link = tempDir.resolve("link.txt");
-        Path source = tempDir.resolve("source.txt");
-        Files.writeString(realFile, "old");
-        Files.createSymbolicLink(link, realFile);
-        Files.writeString(source, "new");
-
-        FileUtil.replaceFileAtomically(source, link);
-
-        assertTrue(Files.isSymbolicLink(link));
-        assertEquals("new", Files.readString(realFile));
-    }
-
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Hard-link count check is POSIX-only")
-    @Test
-    void replaceFileAtomicallyKeepsSiblingHardLinksUpdated(@TempDir Path tempDir) throws IOException {
-        Path target = tempDir.resolve("target.txt");
-        Path sibling = tempDir.resolve("sibling.txt");
-        Path source = tempDir.resolve("source.txt");
-        Files.writeString(target, "old");
-        Files.createLink(sibling, target);
-        Files.writeString(source, "new");
-
-        FileUtil.replaceFileAtomically(source, target);
-
-        assertEquals("new", Files.readString(sibling));
-    }
-
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "POSIX directory permissions")
-    @Test
-    void replaceFileAtomicallyOverwritesInPlaceInReadOnlyDirectory(@TempDir Path tempDir) throws IOException {
-        Path readOnlyDir = tempDir.resolve("readonly");
-        Files.createDirectory(readOnlyDir);
-        Path target = readOnlyDir.resolve("target.txt");
-        Files.writeString(target, "old");
-        Path source = tempDir.resolve("source.txt");
-        Files.writeString(source, "new");
-        Files.setPosixFilePermissions(readOnlyDir, PosixFilePermissions.fromString("r-xr-xr-x"));
-
-        try {
-            FileUtil.replaceFileAtomically(source, target);
-        } finally {
-            Files.setPosixFilePermissions(readOnlyDir, PosixFilePermissions.fromString("rwxr-xr-x"));
-        }
-
-        assertEquals("new", Files.readString(target));
-        assertFalse(Files.exists(source));
     }
 }

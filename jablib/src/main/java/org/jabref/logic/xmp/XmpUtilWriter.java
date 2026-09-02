@@ -3,6 +3,7 @@ package org.jabref.logic.xmp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.exporter.AtomicFileOutputStream;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -271,36 +272,26 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        // Read from another file
-        // Reason: Apache PDFBox does not support writing while the file is opened
-        // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = FileUtil.createTempFileForReplacement(path);
-        try {
-            try (PDDocument document = Loader.loadPDF(path.toFile())) {
-                if (document.isEncrypted()) {
-                    throw new EncryptedPdfsNotSupportedException();
-                }
-
-                // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-                if (!resolvedEntries.isEmpty()) {
-                    writeDocumentInformation(document, resolvedEntries.getFirst(), null);
-                    writeDublinCore(document, resolvedEntries, null);
-                }
-
-                try {
-                    document.save(newFile.toFile());
-                } catch (IOException e) {
-                    LOGGER.debug("Could not write XMP metadata", e);
-                    throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
-                }
+        // Load fully into memory: PDFBox does not support writing while the source file is open
+        // (https://issues.apache.org/jira/browse/PDFBOX-4028), and holding no file handle lets
+        // AtomicFileOutputStream replace the file on every platform.
+        // [impl->req~logic.xmp.atomic-pdf-write~1]
+        try (PDDocument document = Loader.loadPDF(Files.readAllBytes(path))) {
+            if (document.isEncrypted()) {
+                throw new EncryptedPdfsNotSupportedException();
             }
-            // Replace only after the document (and thus its read handle on the original) is closed
-            FileUtil.replaceFileAtomically(newFile, path);
-        } finally {
-            try {
-                Files.deleteIfExists(newFile);
+
+            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+            if (!resolvedEntries.isEmpty()) {
+                writeDocumentInformation(document, resolvedEntries.getFirst(), null);
+                writeDublinCore(document, resolvedEntries, null);
+            }
+
+            try (OutputStream out = new AtomicFileOutputStream(path, false)) {
+                document.save(out);
             } catch (IOException e) {
-                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
+                LOGGER.debug("Could not write XMP metadata", e);
+                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
     }
@@ -311,32 +302,22 @@ public class XmpUtilWriter {
     /// @throws IOException          If the file could not be read from or written to.
     /// @throws TransformerException If the XMP metadata could not be removed.
     public static void removeXmpMetadata(Path path) throws IOException, TransformerException {
-        // Read from another file
-        // Reason: Apache PDFBox does not support writing while the file is opened
-        // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = FileUtil.createTempFileForReplacement(path);
-        try {
-            try (PDDocument document = Loader.loadPDF(path.toFile())) {
-                if (document.isEncrypted()) {
-                    throw new EncryptedPdfsNotSupportedException();
-                }
-                PDDocumentCatalog catalog = document.getDocumentCatalog();
-                if (catalog.getMetadata() != null) {
-                    catalog.setMetadata(null);
-                }
-                document.save(newFile.toFile());
+        // See writeXmp for why the document is loaded fully into memory
+        // [impl->req~logic.xmp.atomic-pdf-write~1]
+        try (PDDocument document = Loader.loadPDF(Files.readAllBytes(path))) {
+            if (document.isEncrypted()) {
+                throw new EncryptedPdfsNotSupportedException();
+            }
+            PDDocumentCatalog catalog = document.getDocumentCatalog();
+            if (catalog.getMetadata() != null) {
+                catalog.setMetadata(null);
+            }
+            try (OutputStream out = new AtomicFileOutputStream(path, false)) {
+                document.save(out);
             } catch (IOException e) {
                 LOGGER.debug("Could not remove XMP metadata", e);
                 throw new TransformerException(
                         "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
-            }
-            // Replace only after the document (and thus its read handle on the original) is closed
-            FileUtil.replaceFileAtomically(newFile, path);
-        } finally {
-            try {
-                Files.deleteIfExists(newFile);
-            } catch (IOException e) {
-                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
             }
         }
     }

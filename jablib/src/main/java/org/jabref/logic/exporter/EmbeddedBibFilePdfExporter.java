@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -89,70 +90,62 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
             return;
         }
 
-        // Read from another file
-        // Reason: Apache PDFBox does not support writing while the file is opened
-        // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = FileUtil.createTempFileForReplacement(path);
-        try {
-            try (PDDocument document = Loader.loadPDF(path.toFile())) {
-                PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
-                PDEmbeddedFilesNameTreeNode efTree;
-                Map<String, PDComplexFileSpecification> names;
+        // Load fully into memory: PDFBox does not support writing while the source file is open
+        // (https://issues.apache.org/jira/browse/PDFBOX-4028), and holding no file handle lets
+        // AtomicFileOutputStream replace the file on every platform.
+        // [impl->req~logic.xmp.atomic-pdf-write~1]
+        try (PDDocument document = Loader.loadPDF(Files.readAllBytes(path))) {
+            PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
+            PDEmbeddedFilesNameTreeNode efTree;
+            Map<String, PDComplexFileSpecification> names;
 
-                if (nameDictionary == null) {
+            if (nameDictionary == null) {
+                efTree = new PDEmbeddedFilesNameTreeNode();
+                names = new HashMap<>();
+                nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
+                nameDictionary.setEmbeddedFiles(efTree);
+                document.getDocumentCatalog().setNames(nameDictionary);
+            } else {
+                efTree = nameDictionary.getEmbeddedFiles();
+                if (efTree == null) {
                     efTree = new PDEmbeddedFilesNameTreeNode();
+                    nameDictionary.setEmbeddedFiles(efTree);
+                }
+                names = efTree.getNames();
+                if (names == null) {
                     names = new HashMap<>();
-                    nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
-                    nameDictionary.setEmbeddedFiles(efTree);
-                    document.getDocumentCatalog().setNames(nameDictionary);
-                } else {
-                    efTree = nameDictionary.getEmbeddedFiles();
-                    if (efTree == null) {
-                        efTree = new PDEmbeddedFilesNameTreeNode();
-                        nameDictionary.setEmbeddedFiles(efTree);
-                    }
-                    names = efTree.getNames();
-                    if (names == null) {
-                        names = new HashMap<>();
-                        efTree.setNames(names);
-                    }
-                }
-
-                PDComplexFileSpecification fileSpecification;
-                if (names.containsKey(EMBEDDED_FILE_NAME)) {
-                    fileSpecification = names.get(EMBEDDED_FILE_NAME);
-                } else {
-                    fileSpecification = new PDComplexFileSpecification();
-                }
-                if (efTree != null) {
-                    InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
-                    fileSpecification.setFile(EMBEDDED_FILE_NAME);
-                    PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
-                    embeddedFile.setSubtype("text/x-bibtex");
-                    embeddedFile.setSize(bibTeX.length());
-                    fileSpecification.setEmbeddedFile(embeddedFile);
-
-                    if (!names.containsKey(EMBEDDED_FILE_NAME)) {
-                        try {
-                            names.put(EMBEDDED_FILE_NAME, fileSpecification);
-                        } catch (UnsupportedOperationException e) {
-                            throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
-                        }
-                    }
-
                     efTree.setNames(names);
-                    nameDictionary.setEmbeddedFiles(efTree);
-                    document.getDocumentCatalog().setNames(nameDictionary);
                 }
-                document.save(newFile.toFile());
             }
-            // Replace only after the document (and thus its read handle on the original) is closed
-            FileUtil.replaceFileAtomically(newFile, path);
-        } finally {
-            try {
-                Files.deleteIfExists(newFile);
-            } catch (IOException e) {
-                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
+
+            PDComplexFileSpecification fileSpecification;
+            if (names.containsKey(EMBEDDED_FILE_NAME)) {
+                fileSpecification = names.get(EMBEDDED_FILE_NAME);
+            } else {
+                fileSpecification = new PDComplexFileSpecification();
+            }
+            if (efTree != null) {
+                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
+                fileSpecification.setFile(EMBEDDED_FILE_NAME);
+                PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
+                embeddedFile.setSubtype("text/x-bibtex");
+                embeddedFile.setSize(bibTeX.length());
+                fileSpecification.setEmbeddedFile(embeddedFile);
+
+                if (!names.containsKey(EMBEDDED_FILE_NAME)) {
+                    try {
+                        names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                    } catch (UnsupportedOperationException e) {
+                        throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
+                    }
+                }
+
+                efTree.setNames(names);
+                nameDictionary.setEmbeddedFiles(efTree);
+                document.getDocumentCatalog().setNames(nameDictionary);
+            }
+            try (OutputStream out = new AtomicFileOutputStream(path, false)) {
+                document.save(out);
             }
         }
     }

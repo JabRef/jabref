@@ -2,13 +2,9 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.FileSystemException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -57,8 +53,6 @@ public class FileUtil {
     private static final String ELLIPSIS = "...";
     private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
     private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();
-    private static final int REPLACE_MOVE_ATTEMPTS = 5;
-    private static final long REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS = 20;
     private static final String CYGDRIVE_PREFIX = "/cygdrive/";
     private static final String MNT_PREFIX = "/mnt/";
     private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile("^/[a-zA-Z]/.*");
@@ -311,112 +305,6 @@ public class FileUtil {
             return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
-            return false;
-        }
-    }
-
-    /// Creates a temporary file intended to atomically replace `target` via [#replaceFileAtomically(Path, Path)].
-    /// Preferably created in the same directory as `target` so the subsequent move stays on one filesystem
-    /// (and thus can be atomic); falls back to the system temporary directory if that directory is not writable.
-    public static Path createTempFileForReplacement(Path target) throws IOException {
-        if (Files.isSymbolicLink(target)) {
-            // Stage on the referent's filesystem so the later move can be atomic
-            target = target.toRealPath();
-        }
-        // toAbsolutePath so a bare file name resolves to the working directory, not the system temp fallback
-        Path parent = target.toAbsolutePath().getParent();
-        if (parent != null) {
-            try {
-                return Files.createTempFile(parent, ".jabref-", ".pdf.tmp");
-            } catch (IOException e) {
-                LOGGER.debug("Could not create temporary file next to {}, falling back to the system temporary directory", target, e);
-            }
-        }
-        return Files.createTempFile("JabRef", "pdf");
-    }
-
-    /// Replaces `target` with `source`, atomically where the filesystem supports it, so concurrent readers
-    /// (e.g. file synchronization tools such as Syncthing or Dropbox) never observe a partially written target.
-    ///
-    /// Exceptions overwriting in place (non-atomically) instead: a target with multiple hard links, since an atomic
-    /// move would detach it from its sibling links — the same trade-off [org.jabref.logic.exporter.AtomicFileOutputStream]
-    /// makes — and a writable target inside a directory that forbids replacing entries (read-only directory).
-    // [impl->req~logic.xmp.atomic-pdf-write~1]
-    public static void replaceFileAtomically(Path source, Path target) throws IOException {
-        if (Files.isSymbolicLink(target)) {
-            // Replace the referent, not the link, so the link stays intact
-            target = target.toRealPath();
-        }
-        if (IS_POSIX_COMPLIANT && Files.exists(target)) {
-            try {
-                Files.setPosixFilePermissions(source, Files.getPosixFilePermissions(target));
-            } catch (IOException | UnsupportedOperationException e) {
-                LOGGER.warn("Could not carry over file permissions of {}", target, e);
-            }
-        }
-        if (hasMultipleHardLinks(target)) {
-            // A move would detach the target from its sibling hard links; write into the existing inode to keep them
-            overwriteInPlace(source, target);
-            return;
-        }
-        // On Windows, another process briefly holding the file open (editor, anti-virus, indexer) causes a
-        // sharing violation; retrying with backoff clears virtually all of these collisions.
-        // Same policy as AtomicFileOutputStream#moveTemporaryFileToTargetFile.
-        boolean atomicMoveSupported = true;
-        for (int attempt = 1; ; attempt++) {
-            try {
-                if (atomicMoveSupported) {
-                    try {
-                        Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-                        return;
-                    } catch (AtomicMoveNotSupportedException e) {
-                        // Some network/FAT filesystems (and cross-filesystem moves from the temp-dir fallback) cannot do this atomically
-                        LOGGER.debug("Atomic move to {} not supported, falling back to a non-atomic replace", target, e);
-                        atomicMoveSupported = false;
-                    }
-                }
-                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
-                return;
-            } catch (FileSystemException e) {
-                LOGGER.debug("Attempt {} of {} to move {} onto {} failed", attempt, REPLACE_MOVE_ATTEMPTS, source, target, e);
-                if (attempt == REPLACE_MOVE_ATTEMPTS) {
-                    if (e instanceof AccessDeniedException) {
-                        // The directory may forbid replacing entries while the file itself is writable
-                        // (read-only directory); overwrite in place as the pre-atomic code did
-                        overwriteInPlace(source, target);
-                        return;
-                    }
-                    throw e;
-                }
-                try {
-                    Thread.sleep(REPLACE_MOVE_RETRY_INITIAL_DELAY_MILLIS << (attempt - 1));
-                } catch (InterruptedException interruptedException) {
-                    Thread.currentThread().interrupt();
-                    e.addSuppressed(interruptedException);
-                    LOGGER.debug("Interrupted while waiting to retry moving {} onto {}", source, target, e);
-                    throw e;
-                }
-            }
-        }
-    }
-
-    /// Note: `Files.copy` with `REPLACE_EXISTING` would delete and recreate the target — writing through
-    /// an output stream keeps the existing directory entry and inode.
-    private static void overwriteInPlace(Path source, Path target) throws IOException {
-        try (OutputStream out = Files.newOutputStream(target)) {
-            Files.copy(source, out);
-        }
-        Files.delete(source);
-    }
-
-    private static boolean hasMultipleHardLinks(Path file) {
-        if (!IS_POSIX_COMPLIANT || !Files.exists(file)) {
-            return false;
-        }
-        try {
-            return ((Number) Files.getAttribute(file, "unix:nlink")).longValue() > 1;
-        } catch (IllegalArgumentException | UnsupportedOperationException | IOException e) {
-            LOGGER.debug("Could not determine hard-link count for {}", file, e);
             return false;
         }
     }
