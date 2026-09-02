@@ -2503,11 +2503,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearCustomFetcherKeys() {
-        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
-        List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
         Map<KeyringSlot, String> cleared = new HashMap<>();
-        for (KeyringSlot slot : slots) {
-            cleared.put(slot, "");
+        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
+            cleared.put(KeyringSlot.customApiKey(name), "");
         }
         writeKeyring(cleared);
     }
