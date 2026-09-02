@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 
 import org.jabref.gui.DialogService;
@@ -15,6 +16,7 @@ import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.SaveDatabaseAction.AutoCommit;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -23,6 +25,7 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -107,16 +110,64 @@ class GitCommitActionTest {
         }
     }
 
+    // [utest->req~git.commit.unsaved-changes~1]
     @Test
-    void modifiedLibraryWithoutAutosaveIsNotSavedAndAbortsCommit() {
+    void cancellingLeavesTheLibraryUnsavedAndAbortsCommit() {
         when(libraryTab.isModified()).thenReturn(true);
         when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class)) {
             gitCommitAction.execute();
 
             assertEquals(List.of(), saveDatabaseAction.constructed());
-            verify(dialogService).showWarningDialogAndWait(any(), any());
+            verify(stateManager, never()).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void committingWithoutSavingLeavesTheLibraryUnsaved() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Commit without saving"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class)) {
+            gitCommitAction.execute();
+
+            assertEquals(List.of(), saveDatabaseAction.constructed());
+            verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void savingAndCommittingWritesTheLibraryFirst() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Save and commit"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
+                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL, AutoCommit.DISABLED)).thenReturn(SaveResult.SUCCESS))) {
+            gitCommitAction.execute();
+
+            verify(saveDatabaseAction.constructed().getFirst()).save(SaveDatabaseMode.NORMAL, AutoCommit.DISABLED);
+            verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void unsuccessfulSaveAfterChoosingToSaveAbortsCommit() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Save and commit"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
+                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL, AutoCommit.DISABLED)).thenReturn(SaveResult.FAILURE))) {
+            gitCommitAction.execute();
+
             verify(stateManager, never()).getActiveDatabase();
         }
     }
@@ -186,5 +237,18 @@ class GitCommitActionTest {
                 mock(JournalAbbreviationRepository.class),
                 new CurrentThreadTaskExecutor(),
                 new GitHandlerRegistry(mock(GitPreferences.class))).execute();
+    }
+
+    private void clickButton(String label) {
+        when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
+                .thenAnswer(invocation -> {
+                    System.out.println("STUB HIT, args: " + java.util.Arrays.toString(invocation.getArguments()));
+                    return Stream.of(invocation.getArguments())
+                                 .filter(ButtonType.class::isInstance)
+                                 .map(ButtonType.class::cast)
+                                 .peek(button -> System.out.println("  button: [" + button.getText() + "] vs [" + label + "]"))
+                                 .filter(button -> label.equals(button.getText()))
+                                 .findFirst();
+                });
     }
 }
