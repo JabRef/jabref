@@ -76,7 +76,7 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
         @Subscribe
         public void listen(EntriesAddedEvent event) {
             event.getBibEntries().forEach(entry -> {
-                // [pp->req~ai.summarization.entries.auto~1]
+                // [pp->feat~ai.summarization.entries.auto~1]
                 if (!aiPreferences.getAiFeaturesEnabled() || !aiPreferences.getAutoGenerateSummaries()) {
                     return;
                 }
@@ -93,7 +93,7 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
 
         @Subscribe
         public void listen(FieldChangedEvent event) {
-            // [pp->req~ai.summarization.entries.auto~1]
+            // [pp->feat~ai.summarization.entries.auto~1]
             if (!aiPreferences.getAiFeaturesEnabled() || !aiPreferences.getAutoGenerateSummaries() || event.getField() != StandardField.FILE) {
                 return;
             }
