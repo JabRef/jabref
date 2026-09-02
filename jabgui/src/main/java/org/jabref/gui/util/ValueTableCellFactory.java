@@ -192,7 +192,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
             /// i.e. whether the text is truncated and a tooltip should be shown.
             private boolean isCellTextTruncated() {
                 String cellText = getText();
-                if (cellText == null || cellText.isEmpty()) {
+                if (StringUtil.isNullOrEmpty(cellText)) {
                     return false;
                 }
                 Text measuringText = new Text(cellText);
