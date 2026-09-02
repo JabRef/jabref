@@ -2,6 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.Statement;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -164,6 +165,22 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
+    void simulateBulkInsertionPropagation() throws Exception {
+        // Pasting many entries at once arrives as a single EntriesAddedEvent - all of them
+        // have to reach the other client through one pull notification
+        List<BibEntry> pasted = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            pasted.add(new BibEntry(StandardEntryType.Article)
+                    .withField(StandardField.TITLE, "Title " + i)
+                    .withCitationKey("bulk" + i));
+        }
+        clientContextA.getDatabase().insertEntries(pasted);
+
+        waitUntil(() -> clientContextB.getDatabase().getEntries().size() == 1000);
+        assertEquals(1000, clientContextB.getDatabase().getEntries().size());
+    }
+
+    @Test
     void simulateEntryInsertionAndManualPull() {
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
@@ -242,15 +259,17 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateEntryChangeConflicts() {
+    void simulateEntryChangeConflicts() throws InterruptedException {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
         // client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        // A now increases the version number
+        // A now increases the version number; the write happens asynchronously,
+        // so wait until the version reported back by the database is visible locally
         bibEntryOfClientA.setField(StandardField.YEAR, "2001");
+        waitUntil(() -> bibEntryOfClientA.getSharedBibEntryData().getVersion() >= 2);
 
         // B does nothing here, so there is no event occurrence
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
@@ -262,6 +281,30 @@ class SynchronizationSimulatorTest {
 
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
+        waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
+    }
+
+    @Test
+    void simulateRemoteChangeDuringMicroEditIsReportedAsConflict() throws Exception {
+        BibEntry bibEntryOfClientA = getBibEntryExample(1);
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        // Client B is typing: the edit is buffered, not yet written
+        bibEntryOfClientB.setField(StandardField.YEAR, "2030", EntriesEventSource.SHARED);
+        FieldChangedEvent filteredEvent = new FieldChangedEvent(bibEntryOfClientB, StandardField.YEAR, "1991", "2030");
+        filteredEvent.setFiltered(true);
+        ((DBMSSynchronizer) clientContextB.getDBMSSynchronizer()).listen(filteredEvent);
+
+        // Client A changes the same field meanwhile
+        bibEntryOfClientA.setField(StandardField.YEAR, "2001");
+
+        // Client B's buffered edit conflicts: reported for merging instead of silently overwritten
+        waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
+        assertNotNull(eventListenerB.getUpdateRefusedEvent());
+        assertEquals(Optional.of("2030"), bibEntryOfClientB.getField(StandardField.YEAR));
+        assertEquals(Optional.of("2001"), eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.YEAR));
     }
 }

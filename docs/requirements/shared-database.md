@@ -24,6 +24,20 @@ Keystroke-level edits are not written per keystroke: they are buffered and flush
 
 Needs: impl
 
+## Concurrent edits of one entry are detected
+`req~shared-database.concurrent-edit-detection~1`
+
+Two clients editing the same entry cannot overwrite each other unnoticed: the second write is refused and offered for merging, even if both writes happen at the same moment. A refused edit keeps its local state until it is merged.
+
+Needs: impl
+
+## Conflicts are resolved by the user in the merge dialog
+`req~shared-database.conflict-merge-dialog~1`
+
+When a local change is refused because the shared entry has a newer version, the user is told which versions collide and is offered the merge entries dialog showing the local and the shared entry side by side. The merged entry replaces the shared one and becomes the local one. Until the user has decided, the local entry keeps its unsynchronized state; cancelling leaves it unsynchronized.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 

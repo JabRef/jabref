@@ -18,14 +18,16 @@ import org.slf4j.LoggerFactory;
 
 /// A listener for PostgreSQL database notifications.
 ///
-/// Opens - and on transient failures reopens - its own database connection, because polling for
-/// notifications blocks the connection it runs on.
+/// Opens - and on failures reopens - its own database connection, because polling for
+/// notifications blocks the connection it runs on. Reconnecting is retried for as long as the
+/// library is open: every successful reconnect is followed by a full pull, so an outage costs
+/// nothing but delay.
 @NullMarked
 public class NotificationListener implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationListener.class);
 
-    private static final int MAX_CONSECUTIVE_FAILURES = 5;
+    private static final long MAX_RECONNECT_DELAY_MILLIS = 30_000L;
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final DatabaseConnection dbmsConnection;
@@ -57,6 +59,10 @@ public class NotificationListener implements Runnable {
                 if (currentPgConnection == null) {
                     currentPgConnection = connect();
                     pgConnection = currentPgConnection;
+                    // Notifications sent while the listener was down are gone - pull the
+                    // full state once so no remote change is lost over the downtime
+                    dbmsSynchronizer.handleRemoteDatabaseChange();
+                    dbmsSynchronizer.handleRemoteMetaDataChange();
                 }
                 while (!stop && !Thread.currentThread().isInterrupted()) {
                     // Wait for 12 seconds for notifications. Result will be null if no notifications arrive
@@ -80,13 +86,15 @@ public class NotificationListener implements Runnable {
                 }
                 closeConnection();
                 consecutiveFailures++;
-                if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-                    LOGGER.error("Listening for shared database updates failed repeatedly - live updates are disabled until the library is reopened", exception);
-                    return;
+                // Exponential backoff: 1, 2, 4, ... seconds up to the cap
+                long delayMillis = Math.min(MAX_RECONNECT_DELAY_MILLIS, 1000L << Math.min(consecutiveFailures - 1, 10));
+                if (consecutiveFailures == 1) {
+                    LOGGER.warn("Error while listening for shared database updates - reconnecting", exception);
+                } else {
+                    LOGGER.debug("Reconnecting the shared database listener in {} ms (attempt {})", delayMillis, consecutiveFailures, exception);
                 }
-                LOGGER.warn("Error while listening for shared database updates - reconnecting", exception);
                 try {
-                    Thread.sleep(1000L * consecutiveFailures);
+                    Thread.sleep(delayMillis);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;

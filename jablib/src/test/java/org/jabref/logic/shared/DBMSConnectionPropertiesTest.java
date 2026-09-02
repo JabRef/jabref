@@ -23,6 +23,23 @@ class DBMSConnectionPropertiesTest {
     }
 
     @Test
+    void halfDeadConnectionsFailFast() {
+        DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
+                .setType(DBMSType.POSTGRESQL)
+                .setHost("localhost")
+                .setPort(5432)
+                .setDatabase("jabref")
+                .setUser("user")
+                .setPassword("password")
+                .setUseSSL(false)
+                .createDBMSConnectionProperties();
+
+        assertEquals("10", properties.asProperties().getProperty("connectTimeout"));
+        // Must stay above the notification listener's 12 s poll interval
+        assertEquals("30", properties.asProperties().getProperty("socketTimeout"));
+    }
+
+    @Test
     void sslMeansEncryptionWithoutServerAuthentication() {
         DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)

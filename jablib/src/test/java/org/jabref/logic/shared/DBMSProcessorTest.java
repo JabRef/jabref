@@ -18,6 +18,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -204,7 +205,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getEntriesByIdList() {
+    void getEntriesByIdList() throws SQLException {
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
@@ -219,7 +220,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateNewerEntry() {
+    void updateNewerEntry() throws SQLException {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -307,7 +308,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedEntries() {
+    void getSharedEntries() throws SQLException {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -321,7 +322,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedEntry() {
+    void getSharedEntry() throws SQLException {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -335,7 +336,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getNotExistingSharedEntry() {
+    void getNotExistingSharedEntry() throws SQLException {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
     }
@@ -360,7 +361,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedMetaData() {
+    void getSharedMetaData() throws SQLException {
         insertMetaData("databaseType", "bibtex;", dbmsConnection);
         insertMetaData("protectedFlag", "true;", dbmsConnection);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection);
@@ -382,6 +383,15 @@ class DBMSProcessorTest {
         assertEquals(expectedMetaData, actualMetaData);
     }
 
+    @Test
+    void setSharedMetaDataRemovesObsoleteGroupTree() throws SQLException {
+        dbmsProcessor.setSharedMetaData(Map.of(MetaData.GROUPSTREE, "group tree"));
+
+        dbmsProcessor.setSharedMetaData(Map.of());
+
+        assertFalse(dbmsProcessor.getSharedMetaData().containsKey(MetaData.GROUPSTREE));
+    }
+
     private static Map<String, String> getMetaDataExample() {
         Map<String, String> expectedMetaData = new HashMap<>();
 
@@ -395,11 +405,10 @@ class DBMSProcessorTest {
     }
 
     private static BibEntry getBibEntryExampleWithEmptyFields() {
-        BibEntry bibEntry = new BibEntry()
+        return new BibEntry()
                 .withField(StandardField.AUTHOR, "Author")
                 .withField(StandardField.TITLE, "")
                 .withField(StandardField.YEAR, "");
-        return bibEntry;
     }
 
     private static BibEntry getBibEntryExample2() {
@@ -418,6 +427,34 @@ class DBMSProcessorTest {
                 .withField(StandardField.JOURNAL, "Annals of Mathematical Logic")
                 .withField(StandardField.YEAR, "1981")
                 .withCitationKey("infigame1981");
+    }
+
+    @Test
+    void insertManyEntries() throws SQLException {
+        // Must survive pgjdbc's limit of 65535 bind parameters per statement:
+        // 3000 entries x 8 fields x 3 parameters would be 72000 in a single unchunked INSERT
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 3000; i++) {
+            entries.add(new BibEntry(StandardEntryType.Article)
+                    .withField(StandardField.AUTHOR, "Author " + i)
+                    .withField(StandardField.TITLE, "Title " + i)
+                    .withField(StandardField.JOURNAL, "Journal " + i)
+                    .withField(StandardField.VOLUME, Integer.toString(i))
+                    .withField(StandardField.NUMBER, Integer.toString(i))
+                    .withField(StandardField.PAGES, i + "--" + (i + 10))
+                    .withField(StandardField.YEAR, "2026")
+                    .withCitationKey("key" + i));
+        }
+        dbmsProcessor.insertEntries(entries);
+
+        try (ResultSet resultSet = dbmsConnection.getConnection().createStatement().executeQuery("SELECT count(*) AS cnt FROM entry")) {
+            resultSet.next();
+            assertEquals(3000, resultSet.getInt("cnt"));
+        }
+        try (ResultSet resultSet = dbmsConnection.getConnection().createStatement().executeQuery("SELECT count(*) AS cnt FROM field")) {
+            resultSet.next();
+            assertEquals(3000 * 8, resultSet.getInt("cnt"));
+        }
     }
 
     @Test
@@ -489,5 +526,54 @@ class DBMSProcessorTest {
             // TODO: maybe use a prepared statement here
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO metadata (\"key\", value) VALUES ('" + key + "', '" + value + "');");
         });
+    }
+
+    @Test
+    void updateEntryWithStaleVersionIsRefusedAndLeavesSharedEntryUntouched() throws Exception {
+        BibEntry sharedEntry = getBibEntryExample();
+        dbmsProcessor.insertEntry(sharedEntry);
+
+        // Another client adds a field, which increments the version
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry entryOfOtherClient = otherClient.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        entryOfOtherClient.setField(StandardField.DOI, "10.1000/182");
+        otherClient.updateEntry(entryOfOtherClient);
+        assertEquals(2, entryOfOtherClient.getSharedBibEntryData().getVersion());
+
+        // The stale local copy neither knows the field nor the version
+        sharedEntry.setField(StandardField.TITLE, "Changed while stale");
+        OfflineLockException refusal = assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(sharedEntry));
+
+        assertEquals(entryOfOtherClient, refusal.getSharedBibEntry());
+        assertEquals(1, sharedEntry.getSharedBibEntryData().getVersion());
+        // Nothing of the refused update reached the database - in particular, the field the
+        // stale copy lacks was not deleted
+        assertEquals(Optional.of(entryOfOtherClient), dbmsProcessor.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()));
+    }
+
+    @Test
+    void updateEntryWithStaleVersionButEqualContentAdoptsVersion() throws Exception {
+        BibEntry sharedEntry = getBibEntryExample();
+        dbmsProcessor.insertEntry(sharedEntry);
+
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry entryOfOtherClient = otherClient.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        otherClient.updateEntry(entryOfOtherClient);
+
+        dbmsProcessor.updateEntry(sharedEntry);
+
+        assertEquals(2, sharedEntry.getSharedBibEntryData().getVersion());
+    }
+
+    @Test
+    void insertEntriesIsAtomic() throws SQLException {
+        // PostgreSQL rejects NUL characters in text, which fails the field insert after the entry insert
+        BibEntry invalidEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "contains\u0000nul");
+
+        assertThrows(SQLException.class, () -> dbmsProcessor.insertEntry(invalidEntry));
+
+        assertEquals(List.of(), dbmsProcessor.getSharedEntries());
+        assertTrue(dbmsConnection.getConnection().getAutoCommit());
     }
 }

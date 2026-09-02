@@ -128,6 +128,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         // Without keepalives, NAT/firewall timeouts silently kill idle connections
         // (issue #11211: connection lost after ~2h)
         props.setProperty("tcpKeepAlive", Boolean.toString(true));
+        // Fail fast on half-dead connections instead of blocking a thread indefinitely.
+        // The socket timeout has to stay above the notification listener's 12 s poll.
+        props.setProperty("connectTimeout", "10");
+        props.setProperty("socketTimeout", "30");
+        // Every connection - the notification listener's as well as one to a database another
+        // client set up - has to resolve the unqualified table names (see DBMSProcessor.setUp)
+        props.setProperty("currentSchema", "jabref");
         if (useSSL) {
             // Encrypt without authenticating the server - the same default as psql/libpq.
             // Managed PostgreSQL providers use private CAs, which strict validation would
