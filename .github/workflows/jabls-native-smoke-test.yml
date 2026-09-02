@@ -56,7 +56,7 @@ jobs:
 
       - name: Checkout
         if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -67,7 +67,7 @@ jobs:
 
       - name: Set up GraalVM
         if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1
         with:
           distribution: 'graalvm'
           java-version: '25'
@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload JabLS native binary
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: jabls-native-${{ matrix.os }}
           path: jabls-cli/build/native/nativeCompile/
