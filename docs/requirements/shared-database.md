@@ -59,4 +59,18 @@ Connecting to a database created by an earlier JabRef version copies its content
 
 Needs: impl
 
+## Connection details can be pasted as a URL
+`req~shared-database.connection-url~1`
+
+The login dialog accepts a connection URL as handed out by hosting providers (`postgres://user:password@host:port/database?...`) or a JDBC URL and fills in the connection details from it. Parameters JabRef has no dedicated setting for are passed on to the driver unchanged.
+
+Needs: impl
+
+## Connected databases are reopened on startup
+`req~shared-database.reopen-on-startup~1`
+
+A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

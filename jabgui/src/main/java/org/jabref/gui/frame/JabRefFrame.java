@@ -2,6 +2,7 @@ package org.jabref.gui.frame;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -47,6 +48,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.GuiUndoManager;
@@ -59,6 +61,11 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -699,11 +706,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void openLastEditedDatabases() {
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
-        if (lastFiles.isEmpty()) {
-            return;
+        if (!lastFiles.isEmpty()) {
+            getOpenDatabaseAction().openFiles(lastFiles);
         }
 
-        getOpenDatabaseAction().openFiles(lastFiles);
+        // [impl->req~shared-database.reopen-on-startup~1]
+        // ponytail: connects on the FX thread like the login dialog does; move to a BackgroundTask if startup stalls on unreachable servers
+        for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
+            DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId));
+            try {
+                LibraryTab libraryTab = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, undoManager, clipBoardManager, taskExecutor)
+                        .openNewSharedDatabaseTab(connectionProperties);
+                libraryTab.getDatabase().setSharedDatabaseID(sharedDatabaseId);
+            } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
+                LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                        Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), e);
+            }
+        }
     }
 
     @Deprecated
