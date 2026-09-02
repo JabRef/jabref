@@ -78,6 +78,18 @@ jobs:
           java-version: '25'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # The jabsrv image bundles the CAYW JavaFX picker, so native-image links against JavaFX's
+      # GTK/X11/GL toolkit. GitHub's Linux runners lack those -dev libraries (macOS links system
+      # frameworks instead). Only needed to link the binary; the headless data plane never loads them.
+      - name: Install JavaFX native link libraries (Linux)
+        if: runner.os == 'Linux' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            libgtk-3-dev libglib2.0-dev libpango1.0-dev libcairo2-dev \
+            libatk1.0-dev libgdk-pixbuf-2.0-dev libharfbuzz-dev \
+            libxtst-dev libgl1-mesa-dev
+
       - name: Build JabSrv native binary
         if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
         run: gradle :jabsrv-cli:nativeCompile -PuseLibericaJdkFull=true
