@@ -315,6 +315,11 @@ jobs:
             fi
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # On the pull_request_review* events of a fork PR the default GITHUB_TOKEN is read-only,
+          # so writing the label fails with "Resource not accessible by integration". The PAT is
+          # unaffected. Labels set by it do emit "labeled" events, which is harmless here: the only
+          # listener acting on a status label ("Adapt PR status") marks drafts ready for review,
+          # and this step never puts "status: ready-for-review" on a draft.
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
           HEAD_SHA: ${{ github.event.inputs.head_sha }}
