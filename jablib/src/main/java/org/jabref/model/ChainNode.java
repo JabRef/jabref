@@ -56,7 +56,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /// Sets the parent node of this node.
     ///
     /// This method does not set this node as the child of the new parent, nor does it remove this node
-    /// from the old parent. You should probably call {@link #moveTo(ChainNode)} to change the chain.
+    /// from the old parent. You should probably call [#moveTo(ChainNode)] to change the chain.
     ///
     /// @param parent the new parent
     protected void setParent(@Nullable T parent) {

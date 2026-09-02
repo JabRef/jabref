@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.util;
 
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@FetcherTest
+@ExternalServicesTest
 class ShortDOIServiceTest {
 
     private final DOI doi = new DOI("10.1109/ACCESS.2013.2260813");
