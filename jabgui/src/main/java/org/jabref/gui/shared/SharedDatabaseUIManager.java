@@ -133,6 +133,7 @@ public class SharedDatabaseUIManager {
         UiTaskExecutor.runNowOrInJavaFXThread(() -> handleUpdateRefused(updateRefusedEvent));
     }
 
+    // [impl->req~shared-database.conflict-merge-dialog~1]
     private void handleUpdateRefused(UpdateRefusedEvent updateRefusedEvent) {
         dialogService.notify(Localization.lang("Update refused."));
 

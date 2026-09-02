@@ -31,6 +31,13 @@ Two clients editing the same entry cannot overwrite each other unnoticed: the se
 
 Needs: impl
 
+## Conflicts are resolved by the user in the merge dialog
+`req~shared-database.conflict-merge-dialog~1`
+
+When a local change is refused because the shared entry has a newer version, the user is told which versions collide and is offered the merge entries dialog showing the local and the shared entry side by side. The merged entry replaces the shared one and becomes the local one. Until the user has decided, the local entry keeps its unsynchronized state; cancelling leaves it unsynchronized.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 
