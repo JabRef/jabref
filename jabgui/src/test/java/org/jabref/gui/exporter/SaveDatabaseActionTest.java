@@ -66,6 +66,7 @@ class SaveDatabaseActionTest {
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
+    private MetaData metaData;
 
     @BeforeEach
     void setUp() {
@@ -105,11 +106,11 @@ class SaveDatabaseActionTest {
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(libraryPreferences.autoSaveProperty()).thenReturn(new SimpleBooleanProperty(false));
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
-        doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
+        doReturn(true).when(saveDatabaseAction).saveAs(any(), any(), any());
 
         saveDatabaseAction.save();
 
-        verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
+        verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL, SaveDatabaseAction.AutoCommit.ENABLED);
     }
 
     @Test
@@ -151,7 +152,7 @@ class SaveDatabaseActionTest {
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
-        MetaData metaData = mock(MetaData.class);
+        metaData = mock(MetaData.class);
         when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         GlobalCitationKeyPatterns emptyGlobalCitationKeyPatterns = GlobalCitationKeyPatterns.fromPattern("");

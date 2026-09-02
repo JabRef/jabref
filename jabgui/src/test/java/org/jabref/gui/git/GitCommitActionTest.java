@@ -85,12 +85,12 @@ class GitCommitActionTest {
         when(libraryTab.isModified()).thenReturn(true);
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
-                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.SUCCESS))) {
+                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL, SaveDatabaseAction.AutoCommit.DISABLED)).thenReturn(SaveResult.SUCCESS))) {
             gitCommitAction.execute();
 
             SaveDatabaseAction save = saveDatabaseAction.constructed().getFirst();
             InOrder inOrder = inOrder(save, stateManager);
-            inOrder.verify(save).save(SaveDatabaseMode.NORMAL);
+            inOrder.verify(save).save(SaveDatabaseMode.NORMAL, SaveDatabaseAction.AutoCommit.DISABLED);
             inOrder.verify(stateManager).getActiveDatabase();
         }
     }
@@ -127,10 +127,10 @@ class GitCommitActionTest {
         when(libraryTab.isModified()).thenReturn(true);
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
-                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL)).thenReturn(saveResult))) {
+                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL, SaveDatabaseAction.AutoCommit.DISABLED)).thenReturn(saveResult))) {
             gitCommitAction.execute();
 
-            verify(saveDatabaseAction.constructed().getFirst()).save(SaveDatabaseMode.NORMAL);
+            verify(saveDatabaseAction.constructed().getFirst()).save(SaveDatabaseMode.NORMAL, SaveDatabaseAction.AutoCommit.DISABLED);
             verify(stateManager, never()).getActiveDatabase();
             verify(dialogService, never()).showCustomDialogAndWait(any(Dialog.class));
         }
