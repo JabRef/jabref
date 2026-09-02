@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
@@ -63,6 +65,14 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 stateManager,
                 dialogService,
                 taskExecutor
+        );
+
+        this.executable.bind(
+                Bindings.createBooleanBinding(
+                        () -> !linkedFile.isOnlineLink()
+                                && linkedFile.findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
+                        linkedFile.linkProperty()
+                )
         );
     }
 
