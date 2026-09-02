@@ -27,6 +27,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -102,6 +103,7 @@ public class FileSelectionPage extends WizardPane {
     private Button collapseAllButton;
     private Button showPreviewButton;
     private boolean nextButtonBound = false;
+    private boolean headerGraphicHidden = false;
 
     public FileSelectionPage(StateManager stateManager,
                              UnlinkedFilesDialogViewModel viewModel,
@@ -113,7 +115,6 @@ public class FileSelectionPage extends WizardPane {
         this.importFormatPreferences = importFormatPreferences;
         this.previewThrottler = taskExecutor.createThrottler(PREVIEW_REFRESH_DELAY);
 
-        setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
         setupUI();
         setupBindings();
@@ -147,6 +148,15 @@ public class FileSelectionPage extends WizardPane {
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
+        unlinkedFilesList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                TreeItem<FileNodeViewModel> selectedItem = unlinkedFilesList.getSelectionModel().getSelectedItem();
+                if (selectedItem instanceof CheckBoxTreeItem<FileNodeViewModel> checkBoxItem) {
+                    checkBoxItem.setSelected(!checkBoxItem.isSelected());
+                    event.consume();
+                }
+            }
+        });
         VBox.setVgrow(unlinkedFilesList, Priority.ALWAYS);
 
         VBox treePane = new VBox(unlinkedFilesList);
@@ -212,6 +222,8 @@ public class FileSelectionPage extends WizardPane {
     private void setupBindings() {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
+
+        headerTextProperty().bind(Bindings.when(viewModel.taskActiveProperty()).then("").otherwise(Localization.lang("Select files to import")));
 
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(), fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren)).orElse(null)));
 
@@ -410,6 +422,8 @@ public class FileSelectionPage extends WizardPane {
     @Override
     public void onEnteringPage(Wizard wizard) {
         // Start search if not already done
+        headerGraphicHidden = false;
+        Platform.runLater(this::hideHeaderGraphic);
         if (viewModel.treeRootProperty().get().isEmpty()) {
             ((BorderPane) getContent()).setCenter(progressPane);
             viewModel.startSearch();
@@ -424,6 +438,19 @@ public class FileSelectionPage extends WizardPane {
                     nextButtonBound = true;
                 }
             });
+        }
+    }
+
+    private void hideHeaderGraphic() {
+        if (headerGraphicHidden || getScene() == null) {
+            return;
+        }
+        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
+            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
+            headerGraphicHidden = true;
         }
     }
 

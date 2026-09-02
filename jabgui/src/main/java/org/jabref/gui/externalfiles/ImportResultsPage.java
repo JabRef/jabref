@@ -148,10 +148,23 @@ public class ImportResultsPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
+        Platform.runLater(() -> hideHeaderGraphic());
         Platform.runLater(() -> {
             if (viewModel.resultTableItems().isEmpty()) {
                 viewModel.startImport();
             }
         });
+    }
+
+    private void hideHeaderGraphic() {
+        if (getScene() == null) {
+            return;
+        }
+        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
+            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
+        }
     }
 }

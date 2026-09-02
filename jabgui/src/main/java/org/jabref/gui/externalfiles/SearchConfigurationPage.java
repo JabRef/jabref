@@ -48,6 +48,7 @@ public class SearchConfigurationPage extends WizardPane {
     private ComboBox<FileExtensionViewModel> fileTypeCombo;
     private ComboBox<DateRange> fileDateCombo;
     private ComboBox<ExternalFileSorter> fileSortCombo;
+    private boolean headerGraphicHidden = false;
 
     public SearchConfigurationPage(UnlinkedFilesDialogViewModel viewModel,
                                    BibDatabaseContext bibDatabaseContext,
@@ -235,6 +236,8 @@ public class SearchConfigurationPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
+        headerGraphicHidden = false;
+        Platform.runLater(() -> hideHeaderGraphic());
         viewModel.treeRootProperty().setValue(Optional.empty());
         Platform.runLater(() -> {
             Node nextButton = this.lookupButton(ButtonType.NEXT);
@@ -246,5 +249,18 @@ public class SearchConfigurationPage extends WizardPane {
                 getScene().getWindow().sizeToScene();
             }
         });
+    }
+
+    private void hideHeaderGraphic() {
+        if (headerGraphicHidden || getScene() == null) {
+            return;
+        }
+        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
+            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
+            headerGraphicHidden = true;
+        }
     }
 }
