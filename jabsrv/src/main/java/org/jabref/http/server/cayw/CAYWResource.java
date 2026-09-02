@@ -267,8 +267,9 @@ public class CAYWResource {
         boolean headless;
         try {
             headless = GraphicsEnvironment.isHeadless();
-        } catch (Throwable awtUnavailable) {
-            // Native image has no bundled AWT libs, so isHeadless() throws; treat that as headless.
+        } catch (LinkageError awtUnavailable) {
+            // Native image doesn't bundle AWT libs, so isHeadless() fails to link; treat that as headless.
+            LOGGER.debug("AWT unavailable (native image without bundled AWT libs); treating as headless.", awtUnavailable);
             headless = true;
         }
         if (headless) {

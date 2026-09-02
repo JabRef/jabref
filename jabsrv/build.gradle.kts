@@ -55,7 +55,8 @@ tasks.register<Test>("nativeSmokeTest") {
         exceptionFormat = TestExceptionFormat.FULL
     }
 
-    val smokePort = (project.findProperty("jabsrv.native.smoke") as String?)?.toIntOrNull() ?: 9998
+    val smokePort = (project.findProperty("jabsrv.native.smoke") as String?)?.toIntOrNull()
+        ?: throw GradleException("nativeSmokeTest requires -Pjabsrv.native.smoke=<port> (the port the running native jabsrv binary serves on).")
     systemProperty(
         "jersey.config.test.container.factory",
         "org.glassfish.jersey.test.external.ExternalTestContainerFactory"
