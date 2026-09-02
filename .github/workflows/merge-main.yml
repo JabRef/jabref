@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       pr:
-        description: 'PR number to merge main into'
+        description: 'PR number whose base branch (main, or the next lower PR of a stack) is merged into it'
         required: true
         type: number
 
@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Resolve the PR head repo and branch for BOTH triggers. On pull_request the PR may
-      # come from a fork, so we must check out the head repo, not github.repository (the base) -
-      # otherwise the head branch does not exist in the checked-out repo and checkout fails.
+      # Resolve the PR head repo, head branch, and base branch for BOTH triggers. On pull_request
+      # the PR may come from a fork, so we must check out the head repo, not github.repository
+      # (the base) - otherwise the head branch does not exist in the checked-out repo and checkout fails.
       - name: Resolve PR head repo and branch
         id: resolve
         env:
@@ -38,14 +38,16 @@ jobs:
           PR_NUMBER: ${{ inputs.pr }}
           PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           set -euo pipefail
           if [ "$EVENT" = "workflow_dispatch" ]; then
-            gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName,headRepositoryOwner,headRepository \
-              --jq '"branch=\(.headRefName)\nrepo=\(.headRepositoryOwner.login)/\(.headRepository.name)"' >> "$GITHUB_OUTPUT"
+            gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName,headRepositoryOwner,headRepository,baseRefName \
+              --jq '"branch=\(.headRefName)\nrepo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nbase=\(.baseRefName)"' >> "$GITHUB_OUTPUT"
           else
             echo "branch=$PR_HEAD_REF" >> "$GITHUB_OUTPUT"
             echo "repo=$PR_HEAD_REPO" >> "$GITHUB_OUTPUT"
+            echo "base=$PR_BASE_REF" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout
@@ -57,18 +59,14 @@ jobs:
           ref: ${{ steps.resolve.outputs.branch }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
-      # The PR may live in a fork ("repository" above); always merge main of JabRef/jabref
-      - name: Fetch upstream main
-        run: |
-          set -ex
-          git remote add upstream "https://github.com/JabRef/jabref.git" || true
-          git fetch upstream main
-
       # Pushes the merge commit back to the PR branch (the reason this workflow exists).
       # "$/" resolves the action from this workflow's own commit, not from the workspace -
       # the workspace holds the PR head (possibly a fork), whose copy of the action must
       # never run with write credentials.
-      - name: Merge main
-        uses: $/.github/actions/merge-upstream-main
+      # The PR may live in a fork ("repository" above); the base branch is always taken from
+      # JabRef/jabref. For a stacked PR, the base is the next lower PR's head branch, not main.
+      - name: Merge ${{ steps.resolve.outputs.base }}
+        uses: $/.github/actions/merge-upstream-branch
         with:
           target-branch: ${{ steps.resolve.outputs.branch }}
+          base-branch: ${{ steps.resolve.outputs.base }}
