@@ -253,7 +253,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    /// Check if it is necessary to show a group modified, reassign entry dialog <br>
+    /// Check if it is necessary to show a group modified, reassign entry dialog
+    ///
     /// Group name change is handled separately
     ///
     /// @param oldGroup Original Group

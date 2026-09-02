@@ -153,7 +153,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     }
 
     public void checkGitHubAccess() {
-        // [impl->req~ux.git-share.personal-access-token-verification~1]
+        // [impl->req~git.share.personal-access-token-verification~1]
         BackgroundTask
                 .wrap(() -> gitHubRepositoryAccessChecker.check(repositoryUrlProperty.get().trim(), gitPreferences.getUsername(), gitPreferences.getPat()))
                 .onSuccess(this::showGitHubAccessResult)

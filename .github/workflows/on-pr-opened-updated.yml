@@ -43,8 +43,8 @@ jobs:
         run: |
           set -ex
           # approved_automerge is read before the merge commit below is pushed: that push may dismiss the approval.
-          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,maintainerCanModify,reviewDecision,autoMergeRequest \
-            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nmaintainer_can_modify=\(.maintainerCanModify)\napproved_automerge=\(.reviewDecision == "APPROVED" and .autoMergeRequest != null)"' \
+          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,baseRefName,maintainerCanModify,reviewDecision,autoMergeRequest \
+            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nbase_ref=\(.baseRefName)\nmaintainer_can_modify=\(.maintainerCanModify)\napproved_automerge=\(.reviewDecision == "APPROVED" and .autoMergeRequest != null)"' \
             >> $GITHUB_OUTPUT
       - name: Check PR mergeability
         id: check_mergeable
@@ -95,7 +95,8 @@ jobs:
             echo "Removed stale conflict comment $id" >> $GITHUB_STEP_SUMMARY
           done
 
-      # In case of a conflict, try to resolve it automatically by merging main:
+      # In case of a conflict, try to resolve it automatically by merging the PR's base branch
+      # (main, or the next lower PR's head branch for a stacked PR):
       # the changelog merge driver resolves conflicts in CHANGELOG.md semantically and lets
       # "git merge" fail on any other conflict - then, nothing is pushed.
       # Thus, a merge commit is pushed if and only if CHANGELOG.md is the only conflicting file.
@@ -113,26 +114,19 @@ jobs:
           fetch-depth: 0
           show-progress: 'false'
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
-      - name: Fetch upstream main
-        id: fetch_upstream
-        if: steps.checkout_pr.outcome == 'success'
-        continue-on-error: true
-        run: |
-          set -ex
-          git remote add upstream "https://github.com/JabRef/jabref.git" || true
-          git fetch upstream main
       # Pushes the resolved merge back to the PR branch. This is the whole point:
       # the push triggers a fresh run that then reports no conflicts (no comment).
       # "$/" resolves the action from this workflow's own (trusted) commit, not from the
       # workspace - the workspace holds the untrusted PR head, whose copy of the action
       # must never run with write credentials.
-      - name: Merge main into PR branch
+      - name: Merge ${{ steps.pr_info.outputs.base_ref }} into PR branch
         id: automerge
-        if: steps.fetch_upstream.outcome == 'success'
+        if: steps.checkout_pr.outcome == 'success'
         continue-on-error: true
-        uses: $/.github/actions/merge-upstream-main
+        uses: $/.github/actions/merge-upstream-branch
         with:
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
+          base-branch: ${{ steps.pr_info.outputs.base_ref }}
       # After the merge, HEAD is the merge commit that was pushed.
       - name: Record pushed merge commit
         id: merge_commit
@@ -145,6 +139,7 @@ jobs:
           AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
           APPROVED_AUTOMERGE: ${{ steps.pr_info.outputs.approved_automerge }}
           HEAD_REPO: ${{ steps.pr_info.outputs.head_repo }}
+          BASE_REF: ${{ steps.pr_info.outputs.base_ref }}
           MERGE_COMMIT: ${{ steps.merge_commit.outputs.sha }}
           PAT: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           EVENT: ${{ github.event_name }}
@@ -155,9 +150,9 @@ jobs:
           set -ex
 
           if [ "$AUTOMERGE_OUTCOME" = "success" ]; then
-            # CHANGELOG.md was the only conflicting file - main was merged and pushed.
+            # CHANGELOG.md was the only conflicting file - the base branch was merged and pushed.
             # No comment: the push triggers a new run, which then reports no conflicts.
-            echo "✅ Conflict in CHANGELOG.md only - resolved by merging main" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Conflict in CHANGELOG.md only - resolved by merging $BASE_REF" >> $GITHUB_STEP_SUMMARY
             if [ "$APPROVED_AUTOMERGE" = "true" ]; then
               # The pushed merge commit dismisses the approval and thereby stalls auto-merge.
               # The label triggers "On PR labeled", which approves again and re-enables auto-merge.
@@ -210,12 +205,12 @@ jobs:
             fi
 
             echo "Commenting on PR..."
-            # Quoted delimiter: the body contains backticks, which an unquoted
-            # heredoc would run as command substitution - swallowing the link text.
-            cat > body.txt <<'EOF'
+            # Backticks are escaped: the heredoc is unquoted to expand $BASE_REF, and an
+            # unquoted heredoc would otherwise run them as command substitution.
+            cat > body.txt <<EOF
           Your pull request conflicts with the target branch.
 
-          Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
+          Please [merge \`upstream/$BASE_REF\`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 
           <!-- ghprcomment
           On PR opened/updated

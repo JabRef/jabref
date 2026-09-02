@@ -14,9 +14,9 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
 
-/// Search class for files. <br>
-/// <br>
-/// This class provides some functionality to search in a [org.jabref.model.database.BibDatabase] for files. <br>
+/// Search class for files.
+///
+/// This class provides some functionality to search in a [org.jabref.model.database.BibDatabase] for files.
 public class DatabaseFileLookup {
 
     private final Set<Path> fileCache = new HashSet<>();
@@ -37,11 +37,11 @@ public class DatabaseFileLookup {
     }
 
     /// Returns whether the File `file` is present in the database
-    /// as an attached File to an [BibEntry]. <br>
-    /// <br>
+    /// as an attached File to an [BibEntry].
+    ///
     /// To do this, the field specified by the key **file** will be searched
-    /// for the provided file for every [BibEntry] in the database. <br>
-    /// <br>
+    /// for the provided file for every [BibEntry] in the database.
+    ///
     /// For the matching, the absolute file paths will be used.
     ///
     /// @return `true`, if the file Object is stored in at least one
