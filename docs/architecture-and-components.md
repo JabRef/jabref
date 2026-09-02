@@ -12,7 +12,7 @@ JabRef's code is structured into these packages:
 
 - The `model` package encompasses the most important data structures (`BibDatabases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
 - The `logic` package is responsible for business logic such as reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
-- The `gui` package the only one knows the user and their preferences and can interact with them to help them solving tasks.
+- The `gui` package is the only one that has access to the user and their preferences and can interact with them to help them solving tasks.
 - For each layer, we form packages according to their responsibility, i.e., vertical structuring.
 - The `model` classes should have no dependencies to other classes of JabRef and the `logic` classes should only depend on `model` classes.
 - The `cli` package bundles classes that are responsible for JabRef's command line interface.
@@ -28,7 +28,7 @@ Permitted dependencies in our architecture are:
 
 ```mermaid
 flowchart LR
-    subgraph shared["Accessible from every layer above"]
+    subgraph shared["Accessible from every layer"]
         direction LR
         preferences["Preferences"]
         global["global classes"]
