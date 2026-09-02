@@ -136,7 +136,7 @@ jobs:
 
       # Set a common variable for PR number and workflow_run_id from either event.
       - name: Set variables
-        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || steps.read-pr_number.outputs.pr_number != '' }}
         id: set-vars
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -219,7 +219,10 @@ jobs:
         # Every workflow in this workflow's workflow_run trigger list is a label-relevant producer:
         # the pending guard below defers evaluation to whichever of them finishes last, so each of
         # their completion events must be allowed to run this step - not only Source Code Tests.
-        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        # Deliberately not restricted to fork PRs (unlike ghprcomment, which only forks need):
+        # labels are computed nowhere else, and with the restriction a same-repo PR whose Qodo
+        # review arrived while a check was still running never got a second chance to be labelled.
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || steps.read-pr_number.outputs.pr_number != '' }}
         run: |
           # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
           # this step's own mutations (ghprcomment may have run for a while in between).
