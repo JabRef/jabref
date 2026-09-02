@@ -314,7 +314,7 @@ tasks.javadoc {
 
 tasks.test {
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "FetcherTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -336,12 +336,12 @@ jmh {
 
 val testSourceSet = sourceSets.test.get()
 
-tasks.register<Test>("fetcherTest") {
+tasks.register<Test>("externalServicesTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
-        includeTags("FetcherTest")
+        includeTags("ExternalServicesTest")
     }
     maxParallelForks = 1
 }
@@ -374,14 +374,14 @@ tasks.register('jacocoPrepare') {
 }
 test.mustRunAfter jacocoPrepare
 databaseTest.mustRunAfter jacocoPrepare
-fetcherTest.mustRunAfter jacocoPrepare
+externalServicesTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
-    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+    dependsOn jacocoPrepare, test, externalServicesTest, databaseTest
 
     executionData files(
             layout.buildDirectory.file('jacoco/test.exec').get().asFile,
-            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/externalServicesTest.exec').get().asFile,
             layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
 
     reports {

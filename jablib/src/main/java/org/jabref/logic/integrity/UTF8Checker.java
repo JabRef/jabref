@@ -17,11 +17,8 @@ public class UTF8Checker implements EntryChecker {
     private final Charset charset;
 
     /// Creates a UTF8Checker that,
-    /// <ol>
-    ///
-    /// - decode a String into a bytes array
-    /// - attempts to decode the bytes array to a character array using the UTF-8 Charset
-    /// </ol>
+    /// 1. decode a String into a bytes array
+    /// 2. attempts to decode the bytes array to a character array using the UTF-8 Charset
     ///
     /// @param charset the charset used to decode BibEntry fields
     public UTF8Checker(Charset charset) {

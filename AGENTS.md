@@ -133,7 +133,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax instead of JavaDoc inline tags or HTML formatting tags: `` `code` `` instead of `{@code code}` or `<code>code</code>`, `[ClassName]` instead of `{@link ClassName}`, and fenced code blocks (```` ``` ````) instead of `<pre><code>`.
 
 ### Comments
 
@@ -387,7 +387,7 @@ npx markdownlint-cli2 "*.md"
 Tests requiring external resources have dedicated tasks:
 
 - `./gradlew databaseTest` — requires PostgreSQL
-- `./gradlew fetcherTest` — hits live external APIs
+- `./gradlew externalServicesTest` — hits live external APIs
 
 Fetcher tests must always hit the live endpoints — do not mock or stub the remote API in fetcher tests.
 
@@ -498,6 +498,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
 - **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
 - Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
+- Within the section, sort the entry in next to existing entries about the same component or feature (e.g. a jabkit fix goes next to the other jabkit fixes) instead of appending it at the end.
 - Do not add extra blank lines in CHANGELOG.md
 - Do not reorder or reword existing entries (except the unreleased entry your fix relates to, per the rule above), and do not create a new version heading.
 - CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.

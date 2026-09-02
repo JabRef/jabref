@@ -1,4 +1,4 @@
-name: Fetcher Tests
+name: External Services Tests
 
 on:
   push:
@@ -50,7 +50,7 @@ permissions:
 jobs:
   fetchertests:
     if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
-    name: Fetcher tests
+    name: External services tests
     # On ubuntu-slim, it takes more than 15 minutes
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +60,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - name: Run fetcher tests
-        run: gradle fetcherTest
+      - name: Run external services tests
+        run: gradle externalServicesTest
         env:
           CI: "true"
