@@ -264,7 +264,14 @@ public class CAYWResource {
             return false;
         }
 
-        if (GraphicsEnvironment.isHeadless()) {
+        boolean headless;
+        try {
+            headless = GraphicsEnvironment.isHeadless();
+        } catch (Throwable awtUnavailable) {
+            // Native image has no bundled AWT libs, so isHeadless() throws; treat that as headless.
+            headless = true;
+        }
+        if (headless) {
             LOGGER.warn("Rejecting CAYW library path access in headless mode: {}", requestedLibraryPath);
             return false;
         }
