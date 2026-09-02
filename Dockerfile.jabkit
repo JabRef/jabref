@@ -67,6 +67,12 @@ WORKDIR /work
 
 COPY --from=build /dist /jabref
 
+# Train the JEP 514 AOT cache here: the launcher needs glibc, so the build stage skips it
+# (-PskipAotTraining=true above). Mirrors the jpackage doLast in jabkit/build.gradle.kts.
+RUN cd /jabref/jabkit/lib/app \
+ && JAVA_TOOL_OPTIONS="-XX:AOTCacheOutput=jabkit.aot" /jabref/jabkit/bin/jabkit --version \
+ && echo 'java-options=-XX:AOTCache=$APPDIR/jabkit.aot' >> jabkit.cfg
+
 EXPOSE 6050
 
 ENTRYPOINT ["/jabref/jabkit/bin/jabkit"]
