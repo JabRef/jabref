@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
 import javafx.beans.binding.BooleanExpression;
@@ -33,6 +34,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
     private BiFunction<S, T, Tooltip> tooltip;
+    private BooleanSupplier showTooltipRegardlessOfTruncation;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
     private Pos alignment;
@@ -59,6 +61,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
     public ValueTableCellFactory<S, T> graphicTooltip(BiFunction<S, T, Tooltip> tooltip) {
         this.tooltip = tooltip;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> showTooltipRegardlessOfTruncation(BooleanSupplier condition) {
+        this.showTooltipRegardlessOfTruncation = condition;
         return this;
     }
 
@@ -153,9 +160,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     setOnMouseEntered(event -> {
                         int rowIndex = getTableRow().getIndex();
                         int totalItems = getTableView().getItems().size();
+                        boolean forceShow = showTooltipRegardlessOfTruncation != null && showTooltipRegardlessOfTruncation.getAsBoolean();
                         // tooltip is != null even for empty lines. Not easy to fix, therefore, there is a check if the current line is a real entry.
-                        // Additionally, the tooltip is only shown if the cell's text is actually truncated; otherwise a stale tooltip is cleared.
-                        if (tooltip != null && rowIndex < totalItems && isCellTextTruncated()) {
+                        // The tooltip is shown when the cell's text is truncated, or when the caller says it should always be shown
+                        // (e.g. the "show entry preview in tooltip" preference is enabled, in which case the tooltip is the only
+                        // place the preview is ever visible — it must show even when the title itself isn't cut off).
+                        if (tooltip != null && rowIndex < totalItems && (isCellTextTruncated() || forceShow)) {
                             setTooltip(tooltip.apply(rowItem, item));
                         } else if (tooltip != null) {
                             setTooltip(null);
