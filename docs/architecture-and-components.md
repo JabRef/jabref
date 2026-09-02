@@ -156,7 +156,7 @@ This component controls the preview pane that renders formatted citations or abs
 
 ### Event Bus
 
-- Open issues: [component: event bus](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+event+bus%22)
+- Open issues: [component: event-bus](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+event-bus%22)
 - Docs: <../code-howtos/eventbus.md>
 
 This component manages JabRef’s internal event bus system, which enables communication between decoupled components through event publishing and subscription.
@@ -191,7 +191,7 @@ This component handles the retrieval of bibliographic data from online sources s
 
 ## GitHub Action
 
-- Open issues: [component: github-action](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+github-action%22)
+- Open issues: [dev: ci-cd](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22dev%3A+ci-cd%22)
 - Docs: TBD
 
 This component refers to the GitHub Action offered by JabRef.
