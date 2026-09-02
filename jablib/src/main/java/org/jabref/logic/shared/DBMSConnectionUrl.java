@@ -38,7 +38,6 @@ public record DBMSConnectionUrl(DBMSType type,
     private static final Set<String> SSL_MODES_REQUIRING_SSL = Set.of("require", "verify-ca", "verify-full");
     private static final Set<String> SSL_MODES_VERIFYING_SERVER = Set.of("verify-ca", "verify-full");
     private static final Pattern URL_IN_TEXT = Pattern.compile("(?i)(?:jdbc:)?postgres(?:ql)?://[^\\s'\"]+");
-    private static final Pattern KEYWORD_VALUE = Pattern.compile("(\\w+)\\s*=\\s*('(?:\\\\.|[^'])*'|\\S+)");
 
     // [impl->req~shared-database.connection-url~1]
     public static Optional<DBMSConnectionUrl> parse(@Nullable String text) {
@@ -88,30 +87,69 @@ public record DBMSConnectionUrl(DBMSType type,
         return Optional.of(fromParts(uri.getHost(), Optional.of(uri.getPort()).filter(port -> port != -1), path.startsWith("/") ? path.substring(1) : path, parameters));
     }
 
-    /// libpq keyword form as shown by some providers: `host=db.example.org port=5432 dbname=lib user=me password='p w'`
+    /// libpq keyword form as shown by some providers: `host=db.example.org port=5432 dbname=lib user=me password='p w'`.
+    /// Hand-written instead of a regex: a repeated alternation recurses per character in Java's regex engine and overflows
+    /// the stack on long pastes.
     private static Optional<DBMSConnectionUrl> parseKeywords(String text) {
-        Matcher matcher = KEYWORD_VALUE.matcher(text);
         String host = "";
         Optional<Integer> port = Optional.empty();
         String database = "";
         List<Map.Entry<String, String>> parameters = new ArrayList<>();
-        while (matcher.find()) {
-            String key = matcher.group(1).toLowerCase(Locale.ROOT);
-            String value = unquote(matcher.group(2));
-            if ("host".equals(key) || "hostaddr".equals(key)) {
-                host = value;
-            } else if ("port".equals(key)) {
-                port = parsePort(value);
-            } else if ("dbname".equals(key)) {
-                database = value;
+        int position = 0;
+        while (position < text.length()) {
+            position = skipWhitespace(text, position);
+            int keyStart = position;
+            while (position < text.length() && (Character.isLetterOrDigit(text.charAt(position)) || text.charAt(position) == '_')) {
+                position++;
+            }
+            String key = text.substring(keyStart, position).toLowerCase(Locale.ROOT);
+            position = skipWhitespace(text, position);
+            if (key.isEmpty() || position >= text.length() || text.charAt(position) != '=') {
+                // Not a key=value pair: skip the word
+                while (position < text.length() && !Character.isWhitespace(text.charAt(position))) {
+                    position++;
+                }
+                continue;
+            }
+            position = skipWhitespace(text, position + 1);
+            StringBuilder value = new StringBuilder();
+            if (position < text.length() && text.charAt(position) == '\'') {
+                position++;
+                while (position < text.length() && text.charAt(position) != '\'') {
+                    if (text.charAt(position) == '\\' && position + 1 < text.length()) {
+                        position++;
+                    }
+                    value.append(text.charAt(position));
+                    position++;
+                }
+                position++;
             } else {
-                parameters.add(Map.entry(key, value));
+                while (position < text.length() && !Character.isWhitespace(text.charAt(position))) {
+                    value.append(text.charAt(position));
+                    position++;
+                }
+            }
+            if ("host".equals(key) || "hostaddr".equals(key)) {
+                host = value.toString();
+            } else if ("port".equals(key)) {
+                port = parsePort(value.toString());
+            } else if ("dbname".equals(key)) {
+                database = value.toString();
+            } else {
+                parameters.add(Map.entry(key, value.toString()));
             }
         }
         if (StringUtil.isBlank(host)) {
             return Optional.empty();
         }
         return Optional.of(fromParts(host, port, database, parameters));
+    }
+
+    private static int skipWhitespace(String text, int position) {
+        while (position < text.length() && Character.isWhitespace(text.charAt(position))) {
+            position++;
+        }
+        return position;
     }
 
     private static DBMSConnectionUrl fromParts(String host, Optional<Integer> port, String database, List<Map.Entry<String, String>> parameters) {
@@ -149,14 +187,6 @@ public record DBMSConnectionUrl(DBMSType type,
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
-    }
-
-    /// Strips libpq's single quotes and their backslash escapes
-    private static String unquote(String value) {
-        if (value.length() >= 2 && value.startsWith("'") && value.endsWith("'")) {
-            return value.substring(1, value.length() - 1).replace("\\'", "'").replace("\\\\", "\\");
-        }
-        return value;
     }
 
     /// The URL for the JDBC driver, keeping every parameter JabRef has no dedicated setting for.

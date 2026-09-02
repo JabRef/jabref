@@ -61,6 +61,15 @@ class DBMSConnectionUrlTest {
     }
 
     @Test
+    void unterminatedQuoteWithManyBackslashesIsHandledQuickly() {
+        String hostile = "host=localhost password='" + "\\\\&".repeat(5000);
+        long start = System.nanoTime();
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse(hostile).orElseThrow();
+        assertTrue(System.nanoTime() - start < 1_000_000_000L);
+        assertEquals("localhost", url.host());
+    }
+
+    @Test
     void urlWithoutCredentialsLeavesThemEmpty() {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgresql://db.example.org:5433/lib").orElseThrow();
 
