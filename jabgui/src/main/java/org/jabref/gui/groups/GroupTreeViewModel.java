@@ -57,11 +57,12 @@ import org.jabref.model.metadata.MetaData;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
-    private MetaData observedMetaData;
+    private @Nullable MetaData observedMetaData;
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;

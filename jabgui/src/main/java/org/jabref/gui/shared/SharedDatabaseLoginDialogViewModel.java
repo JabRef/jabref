@@ -71,7 +71,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final boolean keyringAvailable = OS.isKeyringAvailable();
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
-    private final StringProperty serverTimezone = new SimpleStringProperty("");
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
     private final StringProperty connectionUrl = new SimpleStringProperty("");
@@ -191,7 +190,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setUseSSL(useSSL.getValue())
                 // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
                 .setAllowPublicKeyRetrieval(true)
-                .setServerTimezone(serverTimezone.getValue())
                 .setExpertMode(expertMode.getValue())
                 .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
@@ -295,7 +293,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePreferences.setName(database.getValue());
         sharedDatabasePreferences.setUser(user.getValue());
         sharedDatabasePreferences.setUseSSL(useSSL.getValue());
-        sharedDatabasePreferences.setServerTimezone(serverTimezone.getValue());
         sharedDatabasePreferences.setExpertMode(expertMode.get());
         sharedDatabasePreferences.setJdbcUrl(jdbcUrl.getValue());
 
@@ -326,7 +323,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabaseName.ifPresent(database::set);
         sharedDatabaseUser.ifPresent(user::set);
         useSSL.setValue(sharedDatabasePreferences.isUseSSL());
-        sharedDatabasePreferences.getServerTimezone().ifPresent(serverTimezone::set);
         expertMode.set(sharedDatabasePreferences.isUseExpertMode());
         sharedDatabasePreferences.getJdbcUrl().ifPresent(jdbcUrl::set);
 
@@ -425,10 +421,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus formValidation() {
         return formValidator.getValidationStatus();
-    }
-
-    public StringProperty serverTimezoneProperty() {
-        return serverTimezone;
     }
 
     public BooleanProperty expertModeProperty() {

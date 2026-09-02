@@ -49,13 +49,10 @@
                         <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0"/>
                     </columnConstraints>
                     <CheckBox fx:id="useSSL" mnemonicParsing="false" text="%Use SSL" GridPane.columnSpan="3"/>
-                    <Label text="%Server timezone:" GridPane.rowIndex="1"/>
-                    <TextField fx:id="serverTimezone" GridPane.columnIndex="1" GridPane.columnSpan="2"
-                               GridPane.rowIndex="1"/>
                     <CheckBox fx:id="expertMode" mnemonicParsing="false" text="%Use expert mode" GridPane.columnSpan="3"
-                              GridPane.rowIndex="2"/>
-                    <Label text="%Custom JDBC URL:" GridPane.rowIndex="3"/>
-                    <TextField fx:id="jdbcUrl" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
+                              GridPane.rowIndex="1"/>
+                    <Label text="%Custom JDBC URL:" GridPane.rowIndex="2"/>
+                    <TextField fx:id="jdbcUrl" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
                 </GridPane>
             </TitledPane>
             <GridPane hgap="10.0" vgap="8.0">

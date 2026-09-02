@@ -34,7 +34,6 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_AUTOSAVE = "sharedDatabaseAutosave";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
-    private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
     private static final String SHARED_DATABASE_EXPERT_MODE = "sharedDatabaseExpertMode";
     private static final String SHARED_DATABASE_JDBC_URL = "sharedDatabaseJdbcUrl";
 
@@ -97,10 +96,6 @@ public class SharedDatabasePreferences {
             LOGGER.error("Could not read the stored shared database password", e);
             return Optional.empty();
         }
-    }
-
-    public Optional<String> getServerTimezone() {
-        return getOptionalValue(SHARED_DATABASE_SERVER_TIMEZONE);
     }
 
     public boolean getRememberPassword() {
@@ -173,10 +168,6 @@ public class SharedDatabasePreferences {
         internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
     }
 
-    public void setServerTimezone(String serverTimezone) {
-        internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);
-    }
-
     public void clearPassword() {
         setPassword("");
     }
@@ -219,7 +210,6 @@ public class SharedDatabasePreferences {
         setName(properties.getDatabase());
         setUser(properties.getUser());
         setUseSSL(properties.isUseSSL());
-        setServerTimezone(properties.getServerTimezone());
         setExpertMode(properties.isUseExpertMode());
         setJdbcUrl(properties.getJdbcUrl());
 

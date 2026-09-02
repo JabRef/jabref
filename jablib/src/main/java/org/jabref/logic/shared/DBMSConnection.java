@@ -55,7 +55,7 @@ public class DBMSConnection implements DatabaseConnection {
             return new DBMSConnection(properties);
         } catch (InvalidDBMSConnectionPropertiesException e) {
             // Cannot happen: this connection was already opened from the very same properties
-            throw new IllegalStateException(e);
+            throw new SQLException(e);
         }
     }
 
