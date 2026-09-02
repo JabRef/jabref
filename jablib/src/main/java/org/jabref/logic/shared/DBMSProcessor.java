@@ -33,6 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class DBMSProcessor {
 
     private final DatabaseConnection dbmsConnection;
 
-    private NotificationListener listener;
+    private @Nullable NotificationListener listener;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
