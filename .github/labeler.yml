@@ -183,6 +183,7 @@
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/auxparser/**'
           - 'jablib/src/**/org/jabref/logic/biblog/**'
+          - 'jablib/src/**/org/jabref/logic/blg/**'
           - 'jablib/src/**/org/jabref/logic/bst/**'
           - 'jablib/src/**/org/jabref/logic/texparser/**'
           - 'jablib/src/**/org/jabref/model/biblog/**'
