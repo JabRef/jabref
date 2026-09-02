@@ -14,6 +14,8 @@ JabRef supports up to four directory types for storing linked files (see [Direct
 
 Issue: [#12287](https://github.com/JabRef/jabref/issues/12287)
 
+<!-- oft:off -->
+
 ## Context menu shows all configured directories as move targets
 `req~jabgui.linked-files.move.context-menu-all-directories~1`
 
@@ -83,6 +85,8 @@ Example:
 | Expected file path after move | `U:\papers\a\b\c\paper.pdf` |
 
 TODO Needs: impl, utest
+
+<!-- oft:on -->
 
 ## Alternatives considered for the context menu
 
