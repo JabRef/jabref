@@ -10,6 +10,7 @@ import org.jabref.gradle.useLibericaJdkFull
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
@@ -414,3 +415,22 @@ val generateThemePreviews = tasks.register("generateThemePreviews") {
 }
 sourceSets["main"].resources.srcDir(generateThemePreviews)
 // endregion
+
+// GraalVM Native Image (GSoC bootstrap). JavaFX must come from the JDK (Liberica NIK Full):
+// build with -PuseLibericaJdkFull=true and JAVA_HOME pointing at a *.fx-nik toolchain.
+// Common buildArgs (--no-fallback, -march=compatibility, etc.) come from
+// org.jabref.gradle.feature.nativecompile; transitive jablib/jabls/jabsrv modules already
+// ship their own META-INF/native-image metadata, which the builder picks up automatically.
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("jabref")
+            mainClass.set("org.jabref.Launcher")
+            resources {
+                includedPatterns.add(".*\\.fxml$")
+                includedPatterns.add(".*\\.css$")
+                includedPatterns.add("build\\.properties")
+            }
+        }
+    }
+}
