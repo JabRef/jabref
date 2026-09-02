@@ -259,37 +259,38 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateEntryChangeConflicts() throws InterruptedException {
-        BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        // client A inserts an entry
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
-        // client B pulls the entry
+    void simulateEntryChangeConflicts() throws Exception {
+        // Inserted without a notification, so that no pull triggered by it can interfere below
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry sharedEntry = getBibEntryExample(1);
+        otherClient.insertEntry(sharedEntry);
         clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
 
-        // A now increases the version number; the write happens asynchronously,
-        // so wait until the version reported back by the database is visible locally
-        bibEntryOfClientA.setField(StandardField.YEAR, "2001");
-        waitUntil(() -> bibEntryOfClientA.getSharedBibEntryData().getVersion() >= 2);
-
-        // B does nothing here, so there is no event occurrence
-        assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
+        // The entry changes on the shared side without client B learning about it
+        // (e.g. the notification was lost while B was briefly disconnected)
+        sharedEntry.setField(StandardField.YEAR, "2001");
+        otherClient.updateEntry(sharedEntry);
         assertNull(eventListenerB.getUpdateRefusedEvent());
 
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
-        // B also tries to change something
-        bibEntryOfClientB.setField(StandardField.YEAR, "2016");
+        // B changes its stale copy; a major change is written at once
+        bibEntryOfClientB.setField(StandardField.YEAR, "2016 (in press)");
 
-        // B now cannot update the shared entry, due to optimistic offline lock.
-        // In this case an BibEntry merge dialog pops up.
+        // B cannot update the shared entry, due to optimistic offline lock: a merge dialog pops up
         waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
+        assertEquals(Optional.of("2001"), eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2016 (in press)"), bibEntryOfClientB.getField(StandardField.YEAR));
     }
 
     @Test
     void simulateRemoteChangeDuringMicroEditIsReportedAsConflict() throws Exception {
-        BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        // Inserted without a notification, so that no pull triggered by it flushes B's buffered edit early
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        otherClient.insertEntry(getBibEntryExample(1));
+        clientContextA.getDBMSSynchronizer().pullChanges();
         clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientA = clientContextA.getDatabase().getEntries().getFirst();
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
 
         // Client B is typing: the edit is buffered, not yet written
@@ -298,7 +299,7 @@ class SynchronizationSimulatorTest {
         filteredEvent.setFiltered(true);
         ((DBMSSynchronizer) clientContextB.getDBMSSynchronizer()).listen(filteredEvent);
 
-        // Client A changes the same field meanwhile
+        // Client A changes the same field meanwhile; the notification makes B write its buffered edit first
         bibEntryOfClientA.setField(StandardField.YEAR, "2001");
 
         // Client B's buffered edit conflicts: reported for merging instead of silently overwritten
