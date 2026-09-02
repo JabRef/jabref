@@ -30,8 +30,8 @@ jobs:
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+.+'; then
-            echo "❌ Title contains 'issue <number>' — not allowed."
+          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+|fix(es|ed)? ?(for ?)?#[0-9]+'; then
+            echo "❌ Title references an issue number instead of describing the change — not allowed."
             exit 1
           fi
 

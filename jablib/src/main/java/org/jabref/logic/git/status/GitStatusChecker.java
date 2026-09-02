@@ -41,7 +41,7 @@ public class GitStatusChecker {
             SyncStatus syncStatus;
 
             if (remoteHead == null) {
-                // [impl->req~ux.git-commit.remote-independent~1]
+                // [impl->req~git.commit.remote-independent~1]
                 syncStatus = determineSyncStatusWithoutRemoteHead(gitHandler);
             } else {
                 syncStatus = determineSyncStatus(repo, localHead, remoteHead);

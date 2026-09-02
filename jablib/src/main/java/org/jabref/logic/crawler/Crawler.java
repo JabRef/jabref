@@ -54,13 +54,10 @@ public class Crawler {
     /// This method also persists the results in the same folder the study definition file is stored in.
     ///
     /// The whole process works as follows:
-    /// <ol>
-    ///
-    /// - Then the search is executed
-    /// - The repository changes to the search branch
-    /// - Afterwards, the results are persisted on the search branch.
-    /// - Finally, the changes are merged into the work branch
-    /// </ol>
+    /// 1. Then the search is executed
+    /// 2. The repository changes to the search branch
+    /// 3. Afterwards, the results are persisted on the search branch.
+    /// 4. Finally, the changes are merged into the work branch
     ///
     /// @throws IOException Thrown if a problem occurred during the persistence of the result.
     public void performCrawl() throws IOException, GitAPIException, SaveException, JabRefException {

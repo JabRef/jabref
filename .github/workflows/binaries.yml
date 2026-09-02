@@ -397,6 +397,7 @@ jobs:
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
+      jabkit-native-matrix: ${{ steps.set.outputs.jabkit-native-matrix }}
     steps:
       - id: set
         name: Compute Matrix
@@ -465,6 +466,42 @@ jobs:
 
           echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
+          # BellSoft does not publish the Full NIK (jdk+fx) for linux-aarch64;
+          # the standard JDK bundle still contains java.desktop/AWT
+          NATIVE_MATRIX_JSON='{
+            "include": [
+              {
+                "os": "ubuntu-22.04",
+                "displayName": "linux-amd64",
+                "javaPackage": "jdk+fx",
+                "archiveNative": "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
+              },
+              {
+                "os": "ubuntu-22.04-arm",
+                "displayName": "linux-arm",
+                "javaPackage": "jdk",
+                "archiveNative": "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
+              },
+              {
+                "os": "macos-15",
+                "displayName": "macOS-silicon",
+                "javaPackage": "jdk+fx",
+                "archiveNative": "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
+              }
+            ]
+          }'
+
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "merge_group" ]]; then
+            # native-image on the macOS arm runner is the slowest build and mac runners are scarce;
+            # drop the entry entirely (a skipped-steps job would still occupy a macos-15 runner slot)
+            # so it only builds where the binary is shipped (push to main/main-release, tags, workflow_dispatch)
+            NATIVE_MATRIX_JSON="$(jq -c '.include |= map(select(.os != "macos-15"))' <<<"$NATIVE_MATRIX_JSON")"
+          else
+            NATIVE_MATRIX_JSON="$(jq -c . <<<"$NATIVE_MATRIX_JSON")"
+          fi
+
+          echo "jabkit-native-matrix=$NATIVE_MATRIX_JSON" >> "$GITHUB_OUTPUT"
+
   pre-build:
     needs: [ conditions, disk-space-check ]
     runs-on: ubuntu-22.04
@@ -488,13 +525,13 @@ jobs:
       - name: Install GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: pre-gitversion
-        uses: gittools/actions/gitversion/setup@v3.2.1
+        uses: gittools/actions/gitversion/setup@v4.7.0
         with:
-          versionSpec: "5.x"
+          versionSpec: "6.x"
       - name: Run GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3.2.1
+        uses: gittools/actions/gitversion/execute@v4.7.0
       - name: Normalize branch name
         if: needs.conditions.outputs.should-build == 'true'
         id: normalize
@@ -853,35 +890,19 @@ jobs:
           compression-level: 0 # no compression
 
   jabkit-native:
-    needs: [ conditions, disk-space-check, pre-build ]
+    needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-22.04
-            displayName: linux-amd64
-            runOnPullRequest: true
-            javaPackage: jdk+fx
-            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
-          - os: ubuntu-22.04-arm
-            displayName: linux-arm
-            runOnPullRequest: true
-            # BellSoft does not publish the Full NIK (jdk+fx) for linux-aarch64; the standard JDK bundle still contains java.desktop/AWT
-            javaPackage: jdk
-            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
-          - os: macos-15
-            displayName: macOS-silicon
-            runOnPullRequest: false
-            javaPackage: jdk+fx
-            archiveNative: "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
+        ${{ fromJSON(needs.compute-matrix.outputs.jabkit-native-matrix) }}
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} jabkit native binary
     steps:
       - name: Skip native binary build because it is not needed for this event
-        if: needs.conditions.outputs.should-build != 'true' || (github.event_name == 'pull_request' && matrix.runOnPullRequest != true)
+        if: needs.conditions.outputs.should-build != 'true'
         run: echo "Skipping native binary build because it is not needed for this event."
       - name: Checkout
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
@@ -889,10 +910,10 @@ jobs:
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
 
       - name: Setup macOS key chain for app id cert
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -902,7 +923,7 @@ jobs:
       # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'liberica'
@@ -911,14 +932,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabKit native binary
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         run: gradle :jabkit:nativeCompile
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       - name: Install clitest
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         uses: ethanjli/cached-download-action@v0.1.4
         with:
           # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
@@ -926,23 +947,23 @@ jobs:
           destination: /tmp/clitest
 
       - name: Make clitest executable
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         run: chmod +x /tmp/clitest
 
       - name: Run JabKit offline smoke tests
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
       - name: Run JabKit PDF native smoke test (Linux only)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && runner.os == 'Linux' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Linux' }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
 
       - name: Run JabKit online smoke tests
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && inputs.run-jabkit-online-tests }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && inputs.run-jabkit-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
       - name: Package JabKit native binary
-        if: needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true)
+        if: needs.conditions.outputs.should-build == 'true'
         shell: bash
         run: |
           set -eo pipefail
@@ -958,7 +979,7 @@ jobs:
           ${{ matrix.archiveNative }}
 
       - name: Upload jabkit native to GitHub artifacts store
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         uses: actions/upload-artifact@v7
         with:
           name: jabkit-native (${{ matrix.displayName }})
@@ -966,7 +987,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
@@ -975,15 +996,15 @@ jobs:
           compression-level: 0 # no compression
 
       - name: Setup SSH key
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && needs.disk-space-check.outputs.available == 'true' }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Upload jabkit native to builds.jabref.org
-        if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event_name != 'pull_request' || matrix.runOnPullRequest == true) && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
