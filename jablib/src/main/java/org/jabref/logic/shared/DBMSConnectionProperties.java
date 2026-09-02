@@ -17,7 +17,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String password;
     private boolean allowPublicKeyRetrieval;
     private boolean useSSL;
-    private String serverTimezone = "";
     private String jdbcUrl = "";
     private boolean expertMode;
 
@@ -31,7 +30,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
-        prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
         prefs.getJdbcUrl().ifPresent(theJdbcUrl -> this.jdbcUrl = theJdbcUrl);
 
         this.expertMode = prefs.isUseExpertMode();
@@ -44,7 +42,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
                              String password, boolean useSSL, boolean allowPublicKeyRetrieval,
-                             String serverTimezone, String jdbcUrl, boolean expertMode) {
+                             String jdbcUrl, boolean expertMode) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -53,7 +51,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.password = password;
         this.useSSL = useSSL;
         this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;
-        this.serverTimezone = serverTimezone;
         this.jdbcUrl = jdbcUrl;
         this.expertMode = expertMode;
     }
@@ -99,11 +96,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     @Override
-    public String getServerTimezone() {
-        return serverTimezone;
-    }
-
-    @Override
     public String getJdbcUrl() {
         return jdbcUrl;
     }
@@ -124,7 +116,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
-        props.setProperty("serverTimezone", serverTimezone);
         // Without keepalives, NAT/firewall timeouts silently kill idle connections
         // (issue #11211: connection lost after ~2h)
         props.setProperty("tcpKeepAlive", Boolean.toString(true));
@@ -166,14 +157,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
                 && Objects.equals(user, properties.getUser())
                 && Objects.equals(useSSL, properties.isUseSSL())
                 && Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())
-                && Objects.equals(serverTimezone, properties.getServerTimezone())
                 && Objects.equals(jdbcUrl, properties.getJdbcUrl())
                 && Objects.equals(expertMode, properties.isUseExpertMode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, jdbcUrl, expertMode);
+        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
     }
 
     @Override

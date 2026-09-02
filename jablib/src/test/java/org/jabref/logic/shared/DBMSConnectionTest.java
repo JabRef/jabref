@@ -25,7 +25,6 @@ class DBMSConnectionTest {
                                 .setUser("XXXX")
                                 .setPassword("XXXX")
                                 .setUseSSL(false)
-                                .setServerTimezone("XXXX")
                                 .createDBMSConnectionProperties())
                         .getConnection());
     }
