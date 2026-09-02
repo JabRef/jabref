@@ -241,14 +241,10 @@ class GitCommitActionTest {
 
     private void clickButton(String label) {
         when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
-                .thenAnswer(invocation -> {
-                    System.out.println("STUB HIT, args: " + java.util.Arrays.toString(invocation.getArguments()));
-                    return Stream.of(invocation.getArguments())
-                                 .filter(ButtonType.class::isInstance)
-                                 .map(ButtonType.class::cast)
-                                 .peek(button -> System.out.println("  button: [" + button.getText() + "] vs [" + label + "]"))
-                                 .filter(button -> label.equals(button.getText()))
-                                 .findFirst();
-                });
+                .thenAnswer(invocation -> Stream.of(invocation.getArguments())
+                                                .filter(ButtonType.class::isInstance)
+                                                .map(ButtonType.class::cast)
+                                                .filter(button -> label.equals(button.getText()))
+                                                .findFirst());
     }
 }

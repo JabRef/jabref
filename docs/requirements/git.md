@@ -58,8 +58,8 @@ Needs: impl, utest
 `req~git.commit.unsaved-changes~1`
 
 Git commits operate on the file on disk, so unsaved changes are not part of a commit.
-With autosave disabled the user decides when the library is written, 
-so JabRef must let them choose between writing those changes first and committing what is already on disk, 
+With autosave disabled the user decides when the library is written,
+so JabRef must let them choose between writing those changes first and committing what is already on disk,
 because the user may deliberately want to commit only the saved work.
 
 Needs: impl, utest
