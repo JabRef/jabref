@@ -112,6 +112,17 @@ class BackupManagerTest {
     }
 
     @Test
+    void backupWithInvalidEncodingIsDifference(@TempDir Path tempDir) throws IOException {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{key, title = {Title}}");
+        Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backup, "% Encoding: no-such-charset\n@Article{key, title = {Title}}");
+        Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
+
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+    }
+
+    @Test
     void correctBackupFileDeterminedForMultipleBackupFiles() throws URISyntaxException, IOException {
         Path noChangesBib = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
         Path noChangesBibBackup = Path.of(BackupManagerTest.class.getResource("no-changes-backup.bib").toURI());

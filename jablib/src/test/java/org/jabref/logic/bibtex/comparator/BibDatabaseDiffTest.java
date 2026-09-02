@@ -180,4 +180,24 @@ class BibDatabaseDiffTest {
 
         assertFalse(BibDatabaseDiff.compare(contextOf(entry), contextOf(new BibEntry(entry))).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
     }
+
+    @Test
+    void differsOnlyInFieldsIsFalseForChangedEpilog() {
+        BibEntry original = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T10:00:00");
+        BibEntry changed = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T11:00:00");
+        BibDatabaseContext changedContext = contextOf(changed);
+        changedContext.getDatabase().setEpilog("trailing text");
+
+        assertFalse(BibDatabaseDiff.compare(contextOf(original), changedContext).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
+    }
+
+    @Test
+    void differsOnlyInFieldsIsFalseForMetaDataChangeNotReportedByMetaDataDiff() {
+        BibEntry original = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T10:00:00");
+        BibEntry changed = new BibEntry().withCitationKey("key").withField(StandardField.MODIFICATIONDATE, "2026-09-01T11:00:00");
+        BibDatabaseContext changedContext = contextOf(changed);
+        changedContext.getMetaData().setAiLibraryId("library-id");
+
+        assertFalse(BibDatabaseDiff.compare(contextOf(original), changedContext).differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE)));
+    }
 }

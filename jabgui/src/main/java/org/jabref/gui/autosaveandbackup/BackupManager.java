@@ -2,7 +2,9 @@ package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -191,7 +193,7 @@ public class BackupManager {
                 }
                 LOGGER.info("Backup file {} differs from current file {}", latestBackupPath, originalPath);
                 return true;
-            } catch (IOException e) {
+            } catch (IOException | IllegalCharsetNameException | UnsupportedCharsetException e) {
                 LOGGER.debug("Could not compare original file and backup file.", e);
                 // User has to investigate in this case
                 return true;
@@ -201,7 +203,8 @@ public class BackupManager {
 
     /// An edit that was reverted still leaves a new `modificationdate` behind, so the backup written afterwards differs
     /// from the file without containing anything worth restoring. Parsing both files is only done once the bytes are
-    /// known to differ, so that the common case of opening a library stays cheap.
+    /// known to differ, so that the common case of opening a library stays cheap. An invalid `% Encoding:` line makes
+    /// the parser throw an unchecked charset exception; the caller treats that like an I/O failure.
     /// [impl->req~jabgui.autosaveandbackup.ignore-modification-date~1]
     private static boolean differsOnlyInModificationDate(Path originalPath, Path backupPath, ImportFormatPreferences importFormatPreferences) throws IOException {
         ParserResult original = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
