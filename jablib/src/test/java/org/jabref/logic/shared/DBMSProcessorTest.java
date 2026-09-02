@@ -336,7 +336,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getNotExistingSharedEntry() {
+    void getNotExistingSharedEntry() throws SQLException {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
     }
@@ -361,7 +361,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedMetaData() {
+    void getSharedMetaData() throws SQLException {
         insertMetaData("databaseType", "bibtex;", dbmsConnection);
         insertMetaData("protectedFlag", "true;", dbmsConnection);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection);
@@ -526,5 +526,54 @@ class DBMSProcessorTest {
             // TODO: maybe use a prepared statement here
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO metadata (\"key\", value) VALUES ('" + key + "', '" + value + "');");
         });
+    }
+
+    @Test
+    void updateEntryWithStaleVersionIsRefusedAndLeavesSharedEntryUntouched() throws Exception {
+        BibEntry sharedEntry = getBibEntryExample();
+        dbmsProcessor.insertEntry(sharedEntry);
+
+        // Another client adds a field, which increments the version
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry entryOfOtherClient = otherClient.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        entryOfOtherClient.setField(StandardField.DOI, "10.1000/182");
+        otherClient.updateEntry(entryOfOtherClient);
+        assertEquals(2, entryOfOtherClient.getSharedBibEntryData().getVersion());
+
+        // The stale local copy neither knows the field nor the version
+        sharedEntry.setField(StandardField.TITLE, "Changed while stale");
+        OfflineLockException refusal = assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(sharedEntry));
+
+        assertEquals(entryOfOtherClient, refusal.getSharedBibEntry());
+        assertEquals(1, sharedEntry.getSharedBibEntryData().getVersion());
+        // Nothing of the refused update reached the database - in particular, the field the
+        // stale copy lacks was not deleted
+        assertEquals(Optional.of(entryOfOtherClient), dbmsProcessor.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()));
+    }
+
+    @Test
+    void updateEntryWithStaleVersionButEqualContentAdoptsVersion() throws Exception {
+        BibEntry sharedEntry = getBibEntryExample();
+        dbmsProcessor.insertEntry(sharedEntry);
+
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry entryOfOtherClient = otherClient.getSharedEntry(sharedEntry.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        otherClient.updateEntry(entryOfOtherClient);
+
+        dbmsProcessor.updateEntry(sharedEntry);
+
+        assertEquals(2, sharedEntry.getSharedBibEntryData().getVersion());
+    }
+
+    @Test
+    void insertEntriesIsAtomic() throws SQLException {
+        // PostgreSQL rejects NUL characters in text, which fails the field insert after the entry insert
+        BibEntry invalidEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "contains\u0000nul");
+
+        assertThrows(SQLException.class, () -> dbmsProcessor.insertEntry(invalidEntry));
+
+        assertEquals(List.of(), dbmsProcessor.getSharedEntries());
+        assertTrue(dbmsConnection.getConnection().getAutoCommit());
     }
 }

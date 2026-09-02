@@ -1,7 +1,6 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
@@ -25,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
@@ -86,6 +86,11 @@ public class SharedDatabaseUIManager {
     }
 
     private void handleConnectionLost(ConnectionLostEvent connectionLostEvent) {
+        BibDatabaseContext bibDatabaseContext = connectionLostEvent.bibDatabaseContext();
+        if (bibDatabaseContext.getLocation() != DatabaseLocation.SHARED) {
+            // Already handled - the connection loss is reported by every failing operation
+            return;
+        }
         ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
         ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
@@ -97,22 +102,29 @@ public class SharedDatabaseUIManager {
                 workOffline,
                 closeLibrary);
 
-        if (answer.isPresent()) {
-            if (answer.get().equals(reconnect)) {
-                tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
-                dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
-            } else if (answer.get().equals(workOffline)) {
-                connectionLostEvent.bibDatabaseContext().convertToLocalDatabase();
-                tabContainer.getLibraryTabs().forEach(tab -> tab.updateTabTitle(tab.isModified()));
-                dialogService.notify(Localization.lang("Working offline."));
-            }
-        } else {
-            tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
+        // The affected tab is not necessarily the active one (several shared libraries may be open)
+        Optional<LibraryTab> affectedTab = tabContainer.getLibraryTabs().stream()
+                                                       .filter(tab -> tab.getBibDatabaseContext() == bibDatabaseContext)
+                                                       .findFirst();
+        if (answer.isPresent() && answer.get().equals(workOffline)) {
+            // Same teardown as closing the tab - otherwise the notification listener keeps
+            // reconnecting and would pull the shared state into the now local library
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+            affectedTab.ifPresent(tab -> tab.updateTabTitle(tab.isModified()));
+            dialogService.notify(Localization.lang("Working offline."));
+            return;
+        }
+        affectedTab.ifPresent(tabContainer::closeTab);
+        if (answer.isPresent() && answer.get().equals(reconnect)) {
+            dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
         }
     }
 
     @Subscribe
     public void listen(SharedWriteFailedEvent event) {
+        // notify() marshals to the JavaFX thread itself
         dialogService.notify(Localization.lang("Could not save changes to the shared database. The latest changes are not synchronized."));
     }
 
@@ -147,8 +159,9 @@ public class SharedDatabaseUIManager {
                 mergedBibEntry.getSharedBibEntryData().setSharedId(sharedBibEntry.getSharedBibEntryData().getSharedIdAsString());
                 mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
 
-                dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
-                dbmsSynchronizer.synchronizeLocalDatabase();
+                DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                synchronizer.synchronizeSharedEntry(mergedBibEntry);
+                synchronizer.synchronizeLocalDatabase();
             });
         }
     }
@@ -158,19 +171,13 @@ public class SharedDatabaseUIManager {
         UiTaskExecutor.runNowOrInJavaFXThread(() -> handleSharedEntriesNotPresent(event));
     }
 
+    /// Another client removed entries. Live synchronization makes this an everyday event, so it
+    /// is reported without interrupting the user; the undo edit keeps the entries' last local
+    /// state (including unsynchronized edits) recoverable.
     private void handleSharedEntriesNotPresent(SharedEntriesNotPresentEvent event) {
-        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
-
-        if (libraryTab != null) {
-            undoManager.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
-
-            dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                    Localization.lang("The entry you currently work on has been deleted on the shared side.")
-                            + "\n"
-                            + Localization.lang("You can restore the entry using the \"Undo\" operation."));
-
-            stateManager.setSelectedEntries(List.of());
-        }
+        undoManager.addEdit(new UndoableRemoveEntries(event.bibDatabaseContext().getDatabase(), event.bibEntries()));
+        dialogService.notify(Localization.lang("%0 entries were deleted on the shared side. Use \"Undo\" to restore them.",
+                String.valueOf(event.bibEntries().size())));
     }
 
     /// Opens a new shared database tab with the given [DBMSConnectionProperties].

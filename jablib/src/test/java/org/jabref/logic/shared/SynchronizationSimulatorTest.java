@@ -284,4 +284,27 @@ class SynchronizationSimulatorTest {
         waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
     }
+
+    @Test
+    void simulateRemoteChangeDuringMicroEditIsReportedAsConflict() throws Exception {
+        BibEntry bibEntryOfClientA = getBibEntryExample(1);
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        // Client B is typing: the edit is buffered, not yet written
+        bibEntryOfClientB.setField(StandardField.YEAR, "2030", EntriesEventSource.SHARED);
+        FieldChangedEvent filteredEvent = new FieldChangedEvent(bibEntryOfClientB, StandardField.YEAR, "1991", "2030");
+        filteredEvent.setFiltered(true);
+        ((DBMSSynchronizer) clientContextB.getDBMSSynchronizer()).listen(filteredEvent);
+
+        // Client A changes the same field meanwhile
+        bibEntryOfClientA.setField(StandardField.YEAR, "2001");
+
+        // Client B's buffered edit conflicts: reported for merging instead of silently overwritten
+        waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
+        assertNotNull(eventListenerB.getUpdateRefusedEvent());
+        assertEquals(Optional.of("2030"), bibEntryOfClientB.getField(StandardField.YEAR));
+        assertEquals(Optional.of("2001"), eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.YEAR));
+    }
 }

@@ -152,6 +152,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         // The socket timeout has to stay above the notification listener's 12 s poll.
         props.setProperty("connectTimeout", "10");
         props.setProperty("socketTimeout", "30");
+        // Every connection - the notification listener's as well as one to a database another
+        // client set up - has to resolve the unqualified table names (see DBMSProcessor.setUp)
+        props.setProperty("currentSchema", "jabref");
         if (useSSL) {
             // Encrypt without authenticating the server - the same default as psql/libpq.
             // Managed PostgreSQL providers use private CAs, which strict validation would
