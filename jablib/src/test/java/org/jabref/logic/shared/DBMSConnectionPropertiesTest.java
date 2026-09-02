@@ -23,7 +23,24 @@ class DBMSConnectionPropertiesTest {
     }
 
     @Test
-    void sslUsesJabRefsCertificateStore() {
+    void halfDeadConnectionsFailFast() {
+        DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
+                .setType(DBMSType.POSTGRESQL)
+                .setHost("localhost")
+                .setPort(5432)
+                .setDatabase("jabref")
+                .setUser("user")
+                .setPassword("password")
+                .setUseSSL(false)
+                .createDBMSConnectionProperties();
+
+        assertEquals("10", properties.asProperties().getProperty("connectTimeout"));
+        // Must stay above the notification listener's 12 s poll interval
+        assertEquals("30", properties.asProperties().getProperty("socketTimeout"));
+    }
+
+    @Test
+    void sslMeansEncryptionWithoutServerAuthentication() {
         DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
                 .setHost("localhost")
@@ -34,6 +51,7 @@ class DBMSConnectionPropertiesTest {
                 .setUseSSL(true)
                 .createDBMSConnectionProperties();
 
-        assertEquals("org.postgresql.ssl.DefaultJavaSSLFactory", properties.asProperties().getProperty("sslfactory"));
+        // psql/libpq parity: managed providers use private CAs that strict validation rejects
+        assertEquals("require", properties.asProperties().getProperty("sslmode"));
     }
 }

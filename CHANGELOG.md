@@ -71,7 +71,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- SSL connections to a shared database now trust the certificates from Preferences → Network; the keystore fields of the login dialog were removed. [#16800](https://github.com/JabRef/jabref/pull/16800)
+- We removed the keystore fields and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - A remembered shared database password is now kept in the operating system's credential store instead of JabRef's preferences. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
@@ -109,6 +109,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first (if autosave is enabled) or asks to save it, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)

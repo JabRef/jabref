@@ -39,13 +39,8 @@ Therefore, synchronization only happens if several conditions are fulfilled:
 
 Class `org.jabref.logic.util.CoarseChangeFilter.java` checks both conditions.
 
-Remaining changes that have not been synchronized yet are saved at closing the database rendering additional closing time.
+Remaining changes that have not been synchronized yet are written on the next major change, before a pull, and at closing the database.
 Saving is realized in `org.jabref.logic.shared.DBMSSynchronizer.java`.
-
-Following methods account for synchronization modes:
-
-* `pullChanges` synchronizes the database unconditionally.
-* `pullLastEntryChanges` synchronizes only if there are remaining entry changes. It is invoked when closing the shared database (`closeSharedDatabase`).
 
 ## Database structure
 
@@ -94,6 +89,10 @@ This version is used as version in the sense of an [Optimistic Offline Lock](htt
 It assumes that the chance of conflict is low.
 Implementation details are found at <https://www.baeldung.com/cs/offline-concurrency-control>.
 
+An update is one transaction: `UPDATE entry ... WHERE shared_id = ? AND version = ?` first (the version check and the increment in one statement, whose row lock serializes concurrent writers of the same entry), then the fields are replaced.
+A writer whose version does not match gets nothing written and an `OfflineLockException`; the user merges (`UpdateRefusedEvent`).
+Until the merge, pulls leave that entry's local state alone (`DBMSSynchronizer#sharedIdsInConflict`), so a refused edit is not silently overwritten either.
+
 The `shared_id` and `version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
 
 ## Synchronization
@@ -103,6 +102,21 @@ PostgreSQL supports to register listeners on the database on changes.
 The listening is implemented at `org.jabref.logic.shared.notifications.NotificationListener`.
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.
+
+## Reliability of change propagation
+
+A change reaches other clients in one of two ways:
+
+1. The `NOTIFY` payload carries the change itself (single field edits): applied directly, no extra round trip.
+2. The payload only says "pull" (insertions, removals, bulk pastes, payloads over the 8000-byte `NOTIFY` limit): receivers diff the full `shared_id`/`version` mapping against the local state and fetch only the entries that are new or newer on the shared side. This diff is complete - it covers any number of changes at once, so a paste of thousands of entries arrives via one notification - and its transfer volume is proportional to the changes, not to the library.
+
+The same diff runs when the notification listener reconnects after downtime, so notifications missed while disconnected are not lost. The listener reconnects with exponential backoff for as long as the library is open.
+
+A pull fetches on the database worker and applies on the model (UI) thread. A fetch that fails leaves the local library untouched (the failure is logged and, if the connection is gone, reported as `ConnectionLostEvent`) - it never applies an empty result. Removals are decided against the local ids as of the fetch, so an entry inserted locally while the apply is queued is not mistaken for a remotely deleted one.
+
+A buffered micro-edit is written before a pull. If it conflicts with what is pulled, the write is refused and the user merges - the pull does not overwrite unsynchronized local edits.
+
+A possible future refinement is a change-log table: writers append each change as a row (in the same transaction as the data change), the `NOTIFY` payload carries only the change-log id, and clients fetch all rows since the last id they applied. This gives per-change history (no size limit, exact catch-up instead of a full diff) and would become the PostgreSQL equivalent of the JabDrive changes feed. It only pays off once per-change semantics are needed (offline-first synchronization, tombstones, undo across clients) - the version-diff pull already guarantees losslessness.
 
 ## Tests
 

@@ -16,8 +16,16 @@ class DBMSConnectionUrlTest {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://avnadmin:s%3Acret@pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require").orElseThrow();
 
         assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "pg-123.h.aivencloud.com", 27372, "defaultdb",
-                Optional.of("avnadmin"), Optional.of("s:cret"), true, "sslmode=require"), url);
-        assertEquals("jdbc:postgresql://pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require", url.toJdbcUrl());
+                Optional.of("avnadmin"), Optional.of("s:cret"), true, ""), url);
+        assertEquals("jdbc:postgresql://pg-123.h.aivencloud.com:27372/defaultdb", url.toJdbcUrl());
+    }
+
+    @Test
+    void parsesPsqlCommandLine() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("psql 'postgres://avnadmin:secret@pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require'").orElseThrow();
+
+        assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "pg-123.h.aivencloud.com", 27372, "defaultdb",
+                Optional.of("avnadmin"), Optional.of("secret"), true, ""), url);
     }
 
     @Test
@@ -30,6 +38,38 @@ class DBMSConnectionUrlTest {
     }
 
     @Test
+    void strictSslModeIsKeptForTheDriver() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://db.example.org/lib?sslmode=verify-full&sslrootcert=ca.pem").orElseThrow();
+
+        assertTrue(url.useSSL());
+        assertEquals("jdbc:postgresql://db.example.org:5432/lib?sslmode=verify-full&sslrootcert=ca.pem", url.toJdbcUrl());
+    }
+
+    @Test
+    void parsesLibpqKeywordForm() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("host=db.example.org port=6543 dbname=lib user=me password='it\\'s a b' sslmode=require").orElseThrow();
+
+        assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "db.example.org", 6543, "lib",
+                Optional.of("me"), Optional.of("it's a b"), true, ""), url);
+    }
+
+    @Test
+    void keywordFormKeepsUnknownParametersForTheDriver() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("host=localhost dbname=lib sslmode=verify-full sslrootcert='/tmp/ca cert.pem'").orElseThrow();
+
+        assertEquals("jdbc:postgresql://localhost:5432/lib?sslmode=verify-full&sslrootcert=%2Ftmp%2Fca%20cert.pem", url.toJdbcUrl());
+    }
+
+    @Test
+    void unterminatedQuoteWithManyBackslashesIsHandledQuickly() {
+        String hostile = "host=localhost password='" + "\\\\&".repeat(5000);
+        long start = System.nanoTime();
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse(hostile).orElseThrow();
+        assertTrue(System.nanoTime() - start < 1_000_000_000L);
+        assertEquals("localhost", url.host());
+    }
+
+    @Test
     void urlWithoutCredentialsLeavesThemEmpty() {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgresql://db.example.org:5433/lib").orElseThrow();
 
@@ -39,7 +79,7 @@ class DBMSConnectionUrlTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "   ", "localhost", "mysql://localhost/db", "postgres://", "jdbc:postgresql:db", "postgres://a b/db"})
+    @ValueSource(strings = {"", "   ", "localhost", "mysql://localhost/db", "postgres://", "jdbc:postgresql:db", "user=me dbname=lib"})
     void rejectsNonPostgresUrls(String text) {
         assertTrue(DBMSConnectionUrl.parse(text).isEmpty());
     }
