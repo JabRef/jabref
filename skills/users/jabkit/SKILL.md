@@ -13,6 +13,8 @@ license: MIT
 
 Preferred: the native binary — a single self-contained executable, no JDK or JBang needed, instant startup. Download and unpack for your platform:
 
+<!-- Features that do not use AWT have been verified to work without the bundled .so files. -->
+
 ```bash
 # Linux (amd64)
 curl -fL https://builds.jabref.org/main/linux-amd64/tools/jabkit-native_linux.tar.gz | tar xz
@@ -87,6 +89,7 @@ Place before the subcommand:
 | `generate-bib-from-aux` | Extract the subset of a library cited in a LaTeX `.aux` file |
 | `get-cited-works DOI` | List the works cited by a publication |
 | `get-citing-works DOI` | List the works citing a publication |
+| `pdf extract-references FILE...` | Parse the "References" section of PDFs into BibTeX entries |
 | `pdf update` | Write XMP metadata and/or embedded BibTeX into linked PDFs |
 | `preferences reset\|import\|export` | Manage jabkit preferences |
 | `pseudonymize` | Replace identifying data in a library (writes a key file for reversal) |
@@ -111,6 +114,9 @@ jabkit -p check library.bib --output-format github-actions
 
 # Citation keys with a custom pattern
 jabkit citationkeys generate library.bib --pattern "[auth][year]" --output library.bib
+
+# Cited works from a paper's "References" section (see the pdf-extract-references skill)
+jabkit -p pdf extract-references paper.pdf
 
 # Write BibTeX + XMP metadata into the PDFs linked from an entry
 jabkit pdf update --citation-key Smith2020 --input library.bib --input-format bibtex

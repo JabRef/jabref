@@ -151,6 +151,7 @@ public class CitationsResource {
     /// the reader lands on a new page we extract every citation link's
     /// extracted bibliography text in one shot, fire one POST, and paint the
     /// returned per-citation `matchScope` as in-PDF dots. Single round-trip
+    ///
     /// + JabRef-side [CitationCacheService#getByText] hits mean repeat
     /// scans of the same page are O(1) per citation with no LLM cost.
     @POST
@@ -328,7 +329,7 @@ public class CitationsResource {
 
     /// Resolves the path-segment library id to the library this request operates on.
     /// "current" -> active library; any other id -> that open library (404 if unknown or
-    /// closed). Same id semantics as {@link EntriesResource}.
+    /// closed). Same id semantics as [EntriesResource].
     private BibDatabaseContext resolveTargetContext(String id) {
         try {
             return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
@@ -339,7 +340,7 @@ public class CitationsResource {
 
     /// The append target for the resolved library: empty for "current" (append to the active
     /// tab without switching), otherwise the open library's on-disk path so the GUI switches to it
-    /// first. Mirrors {@link EntriesResource#resolveTargetLibrary}.
+    /// first. Mirrors [EntriesResource#resolveTargetLibrary].
     ///
     /// Non-"current" ids are resolved against the *open* libraries via [ServerUtils#getLibraryPath]
     /// rather than the resolved context's path. This rejects path-less contexts such as the bundled

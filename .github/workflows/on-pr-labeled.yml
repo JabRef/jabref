@@ -13,9 +13,25 @@ jobs:
       github.repository == 'JabRef/jabref' &&
       github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
     runs-on: ubuntu-slim
+    # Same concurrency group as automerge.yml's automerge job: serializes the
+    # two workflows per PR so the approve guard below cannot race.
+    concurrency:
+      group: automerge-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     steps:
       - name: Approve PR
-        run: gh pr review --approve "$PR_URL"
+        # Guard: automerge.yml (running for a push made just before the label was added)
+        # queries labels live and may approve concurrently — skip if an un-dismissed
+        # approval by jabref-machine already exists.
+        run: |
+          # Separate query from test so a failed API call fails the step
+          # instead of being mistaken for "no approval yet".
+          approvers=$(gh pr view "$PR_URL" --json reviews --jq '.reviews[] | select(.state == "APPROVED") | .author.login')
+          if grep -qx 'jabref-machine' <<< "$approvers"; then
+            echo "Already approved"
+          else
+            gh pr review --approve "$PR_URL"
+          fi
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
@@ -25,6 +41,9 @@ jobs:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
   upload-pr-nnumber:
+    # "status: to-be-merged" is set when the PR is added to the merge queue.
+    # The PR is then merged (and thus closed) before the follow-up workflow runs, which would make "gh pr ready" fail.
+    if: "github.event.label.name != 'status: to-be-merged'"
     runs-on: ubuntu-slim
     permissions:
       contents: read

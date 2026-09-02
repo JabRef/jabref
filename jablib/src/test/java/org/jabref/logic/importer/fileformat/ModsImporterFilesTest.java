@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -8,10 +10,12 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,5 +45,16 @@ class ModsImporterFilesTest {
     @MethodSource("fileNames")
     void importEntries(String fileName) throws ImportException, IOException {
         ImporterTestEngine.testImportEntries(new ModsImporter(importFormatPreferences), fileName, FILE_ENDING);
+    }
+
+    @Test
+    void rejectsExternalEntities() throws IOException {
+        String xmlWithExternalEntity = """
+                <!DOCTYPE modsCollection [<!ENTITY entity SYSTEM "file:///not-accessed">]>
+                <modsCollection><mods><titleInfo><title>&entity;</title></titleInfo></mods></modsCollection>
+                """;
+        ModsImporter importer = new ModsImporter(importFormatPreferences);
+
+        assertTrue(importer.importDatabase(new BufferedReader(Reader.of(xmlWithExternalEntity))).isInvalid());
     }
 }

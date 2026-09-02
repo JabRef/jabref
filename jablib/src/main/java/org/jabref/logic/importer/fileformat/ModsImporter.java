@@ -45,8 +45,10 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Importer for the MODS format.<br>
-/// More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
+/// Importer for the MODS format.
+///
+/// More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>.
+///
 /// The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
 public class ModsImporter extends Importer implements Parser {
 
@@ -59,10 +61,8 @@ public class ModsImporter extends Importer implements Parser {
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
         keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
         xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // Not supported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
     }
 
     @Override

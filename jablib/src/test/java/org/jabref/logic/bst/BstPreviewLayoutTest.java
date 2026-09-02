@@ -1,6 +1,8 @@
 package org.jabref.logic.bst;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.preview.BstPreviewLayout;
@@ -10,6 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,6 +51,35 @@ class BstPreviewLayoutTest {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T.\u00a0Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
+    }
+
+    @Test
+    void mathSymbolsInBracedMathAreConvertedToUnicode() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{{$\\Sigma$}}{{$\\Delta$}} Modulator");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. \u03a3\u0394 modulator.", preview);
+    }
+
+    @Test
+    void unresolvableBracedMathIsKept() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{{$\\notacommand$}} Modulator");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. modulator.", preview);
+    }
+
+    @Test
+    void unparsableBstShowsPreviewError(@TempDir Path tempDir) throws IOException {
+        Path invalidBst = tempDir.resolve("invalid.bst");
+        Files.writeString(invalidBst, "}");
+
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(invalidBst);
+        String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
+
+        assertEquals("Error parsing file '" + invalidBst.toString() + "'", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {

@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -81,7 +82,7 @@ public class BibtexImporter extends Importer {
     }
 
     /// Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
-    /// If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
+    /// If there is none present, [com.ibm.icu.text.CharsetDetector#CharsetDetector()] is used.
     private static EncodingResult getEncodingResult(Path filePath) throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
@@ -120,7 +121,14 @@ public class BibtexImporter extends Importer {
     /// reader manually to the metadata
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        normalizeKeywordDelimiters(result);
+        return result;
+    }
+
+    /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
+    private void normalizeKeywordDelimiters(ParserResult result) {
+        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences());
     }
 
     @Override

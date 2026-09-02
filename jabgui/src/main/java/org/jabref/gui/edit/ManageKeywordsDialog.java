@@ -15,6 +15,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -29,6 +30,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
     @Inject private CliPreferences preferences;
+    @Inject private UndoManager undoManager;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -49,7 +51,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries);
+        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries, undoManager);
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {

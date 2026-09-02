@@ -8,7 +8,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This task generates embeddings for a {@link LinkedFile}.
+/// This task generates embeddings for a [LinkedFile].
 /// It will check if embeddings were already generated.
 /// And it also will store the embeddings.
 public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
@@ -19,7 +19,8 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
     private final LinkedFileIngestor linkedFileIngestor;
 
     public GenerateEmbeddingsTask(
-            GenerateEmbeddingsTaskRequest request
+            GenerateEmbeddingsTaskRequest request,
+            boolean showToUser
     ) {
         this.request = request;
         this.linkedFileIngestor = new LinkedFileIngestor(
@@ -30,11 +31,11 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
                 request.documentSplitter()
         );
 
-        configure();
+        configure(showToUser);
     }
 
-    private void configure() {
-        showToUser(true);
+    private void configure(boolean showToUser) {
+        showToUser(showToUser);
         titleProperty().set(Localization.lang("Generating embeddings for file '%0'", request.linkedFile().getLink()));
     }
 

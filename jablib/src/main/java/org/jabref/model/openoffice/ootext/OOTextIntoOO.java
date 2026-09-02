@@ -63,6 +63,7 @@ public class OOTextIntoOO {
      */
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
+    private static final String CHAR_AUTO_ESCAPEMENT = "CharAutoEscapement";
     private static final String CHAR_STYLE_NAME = "CharStyleName";
     private static final String CHAR_UNDERLINE = "CharUnderline";
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
@@ -203,8 +204,8 @@ public class OOTextIntoOO {
                     insertParagraphBreak(text, cursor);
                     cursor.collapseToEnd();
                     for (OOPair<String, String> pair : attributes) {
-                        String key = pair.a;
-                        String value = pair.b;
+                        String key = pair.a();
+                        String value = pair.b();
                         switch (key) {
                             case "oo:ParaStyleName":
                                 // <p oo:ParaStyleName="Standard">
@@ -225,8 +226,8 @@ public class OOTextIntoOO {
                     break;
                 case "oo:referenceToPageNumberOfReferenceMark":
                     for (OOPair<String, String> pair : attributes) {
-                        String key = pair.a;
-                        String value = pair.b;
+                        String key = pair.a();
+                        String value = pair.b();
                         switch (key) {
                             case "target" ->
                                     UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
@@ -243,8 +244,8 @@ public class OOTextIntoOO {
                 case "span":
                     List<OOPair<String, Object>> settings = new ArrayList<>();
                     for (OOPair<String, String> pair : attributes) {
-                        String key = pair.a;
-                        String value = pair.b;
+                        String key = pair.a();
+                        String value = pair.b();
                         switch (key) {
                             case "oo:CharStyleName" ->
                                 // <span oo:CharStyleName="Standard">
@@ -372,6 +373,27 @@ public class OOTextIntoOO {
         }
     }
 
+    /// Reset only direct superscript/subscript formatting before rewriting marked-up citation text.
+    public static void removeEscapementFormatting(@NonNull XTextCursor cursor) {
+        Optional<XMultiPropertyStates> optionalPropertyStates = UnoCast.cast(XMultiPropertyStates.class, cursor);
+        if (optionalPropertyStates.isEmpty()) {
+            LOGGER.debug("Could not reset escapement format.");
+            return;
+        }
+
+        XMultiPropertyStates propertyStates = optionalPropertyStates.get();
+
+        try {
+            propertyStates.setPropertiesToDefault(new String[] {
+                    CHAR_AUTO_ESCAPEMENT,
+                    CHAR_ESCAPEMENT,
+                    CHAR_ESCAPEMENT_HEIGHT
+            });
+        } catch (UnknownPropertyException ex) {
+            LOGGER.warn("Could not reset escapement format", ex);
+        }
+    }
+
     static class MyPropertyStack {
 
         /*
@@ -493,13 +515,13 @@ public class OOTextIntoOO {
             ArrayList<Optional<Object>> oldLayer = layers.peek();
             ArrayList<Optional<Object>> newLayer = new ArrayList<>(oldLayer);
             for (OOPair<String, Object> pair : settings) {
-                String name = pair.a;
+                String name = pair.a();
                 Integer index = goodNameToIndex.get(name);
                 if (index == null) {
                     LOGGER.warn("pushLayer: '{}' is not in goodNameToIndex", name);
                     continue;
                 }
-                Object newValue = pair.b;
+                Object newValue = pair.b();
                 newLayer.set(index, Optional.ofNullable(newValue));
             }
             layers.push(newLayer);

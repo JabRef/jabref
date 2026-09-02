@@ -1,4 +1,7 @@
 import org.gradlex.javamodule.packaging.tasks.Jpackage
+import org.jabref.gradle.EmbeddedPostgresBinaries
+import org.jabref.gradle.VerifyJpackageJavaOptions
+import org.jabref.gradle.jdkVendor
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -18,6 +21,9 @@ version = providers.gradleProperty("projVersion")
 
 testModuleInfo {
     requires("org.jabref.testsupport")
+
+    // Local HTTP stub server for tests exercising download code hermetically
+    requires("jdk.httpserver")
 
     requires("com.github.javaparser.core")
     requires("org.junit.jupiter.api")
@@ -73,12 +79,31 @@ tasks.named<JavaCompile>("compileJava") {
     options.compilerArgs.addAll(useLibericaJdkFullCompilerArgs)
 }
 
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
+
+dependencies {
+    embeddedPostgresHostBinary?.let { runtimeOnly(javaModuleDependencies.ga(it.moduleName)) }
+}
+
+// OpenJ9 (IBM Semeru, -Pjdk=IBM/openj9) only: also cache application classes in the per-user shared
+// classes cache (default location, e.g. ~/.cache/javasharedresources). Without this OpenJ9 starts
+// noticeably slower than HotSpot; with it warm startup beats HotSpot (jabref-koppor#729).
+// "nonfatal" keeps JabRef starting when the cache cannot be created or opened. The vendor guard is
+// required: HotSpot refuses to start on unrecognized -X options.
+val openJ9JvmArgs = if (jdkVendor == JvmVendorSpec.IBM) listOf(
+    "-Xshareclasses:name=jabref,nonfatal",
+    "-Xscmx256m"
+) else emptyList()
+
 application {
     mainClass= "org.jabref.Launcher"
 
-    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + openJ9JvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,org.apache.lucene.core,jkeychain",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,org.apache.lucene.core,jkeychain",
 
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
@@ -99,6 +124,8 @@ application {
 tasks.named<JavaExec>("run") {
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
+    jvmArgs(application.applicationDefaultJvmArgs)
+    embeddedPostgresHostBinary?.let { jvmArgs("--add-modules", it.moduleName) }
 }
 
 // These modules need to be present in every jpackage runtime image. Keeping them named separately
@@ -106,19 +133,19 @@ tasks.named<JavaExec>("run") {
 val sharedJpackageImageModules = listOf("jdk.incubator.vector")
 
 val embeddedPostgresBinaryByJpackageTask = mapOf(
-    "jpackageUbuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
-    "jpackageUbuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
-    "jpackageMacos-15-intel" to "embedded.postgres.binaries.darwin.amd64",
-    "jpackageMacos-15" to "embedded.postgres.binaries.darwin.arm64v8",
-    "jpackageWindows-latest" to "embedded.postgres.binaries.windows.amd64"
+    "jpackageUbuntu-22.04" to EmbeddedPostgresBinaries.linuxAmd64,
+    "jpackageUbuntu-22.04-arm" to EmbeddedPostgresBinaries.linuxArm64,
+    "jpackageMacos-15-intel" to EmbeddedPostgresBinaries.macosAmd64,
+    "jpackageMacos-15" to EmbeddedPostgresBinaries.macosArm64,
+    "jpackageWindows-latest" to EmbeddedPostgresBinaries.windowsAmd64
 )
 
 val embeddedPostgresDependencyByTarget = mapOf(
-    "ubuntu-22.04" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64",
-    "ubuntu-22.04-arm" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8",
-    "macos-15-intel" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64",
-    "macos-15" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8",
-    "windows-latest" to "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64"
+    "ubuntu-22.04" to EmbeddedPostgresBinaries.linuxAmd64,
+    "ubuntu-22.04-arm" to EmbeddedPostgresBinaries.linuxArm64,
+    "macos-15-intel" to EmbeddedPostgresBinaries.macosAmd64,
+    "macos-15" to EmbeddedPostgresBinaries.macosArm64,
+    "windows-latest" to EmbeddedPostgresBinaries.windowsAmd64
 )
 
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
@@ -222,16 +249,51 @@ javaModulePackaging {
 }
 
 dependencies {
-    embeddedPostgresDependencyByTarget.forEach { (target, dependency) ->
-        add("${target}RuntimeClasspath", dependency)
+    embeddedPostgresDependencyByTarget.forEach { (target, binary) ->
+        add("${target}RuntimeClasspath", javaModuleDependencies.ga(binary.moduleName))
     }
 }
 
-embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
+embeddedPostgresHostBinary?.let { hostBinary ->
+    embeddedPostgresDependencyByTarget
+        .filterValues { it != hostBinary }
+        .forEach { (target, _) ->
+            configurations.named("${target}RuntimeClasspath") {
+                exclude(mapOf(
+                    "group" to "io.zonky.test.postgres",
+                    "module" to hostBinary.artifactName
+                ))
+            }
+        }
+}
+
+embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
     tasks.named<Jpackage>(taskName) {
-        addModules.add(moduleName)
+        // Include the platform-specific Postgres binary module in the jlink runtime image.
+        addModules.add(binary.moduleName)
+        // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
+        // add will siply replace the existing args!
+        javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
+}
+
+val verifyJpackageJavaOptions = tasks.register<VerifyJpackageJavaOptions>("verifyJpackageJavaOptions") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Verifies that packaged launchers retain application JVM options"
+    mismatches.set(embeddedPostgresBinaryByJpackageTask.mapNotNull { (taskName, binary) ->
+        val actualOptions = tasks.named<Jpackage>(taskName).get().javaOptions.get()
+        val expectedOptions = application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}"
+        if (actualOptions == expectedOptions) {
+            null
+        } else {
+            "$taskName expected $expectedOptions, but got $actualOptions"
+        }
+    })
+}
+
+tasks.named("check") {
+    dependsOn(verifyJpackageJavaOptions)
 }
 
 tasks.test {

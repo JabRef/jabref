@@ -3,18 +3,24 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.StringJoiner;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.openoffice.CitationEntryTypeMetadataManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
+import org.jabref.logic.openoffice.ZoteroCitationLinker;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,44 +30,58 @@ import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.NoDocumentException;
 
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
+import com.sun.star.uno.UnoRuntime;
+import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
-/// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
-/// It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
+/// It is tightly coupled with [CSLReferenceMarkManager] for management of reference marks tied to the CSL citations.
+/// It uses [OpenOfficePreferences] to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
 /// Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
 ///
-/// @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
+/// Implementation note: UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
 /// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
 /// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
-/// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
+/// For example, see the comment inside [CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext)].
 public class CSLCitationOOAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSLCitationOOAdapter.class);
 
     private static final String CITATION_DELIMITER = ", ";
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
 
+    private final XComponentContext componentContext;
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
-    private final Supplier<List<BibDatabaseContext>> databasesSupplier;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final OpenOfficePreferences openOfficePreferences;
 
     private CitationStyle currentStyle;
     private CSLCitationType citationType;
+    private boolean needsCSLReferenceMarkConversion = true;
+    private final ChangeListener<Boolean> zoteroCompatibilityModeListener;
+    private List<BibDatabase> currentSelectedDatabases = List.of();
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, XComponentContext componentContext, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
+            throws WrappedTargetException, NoSuchElementException {
+        this.componentContext = componentContext;
         this.document = doc;
-        this.markManager = new CSLReferenceMarkManager(doc);
-        this.databasesSupplier = databasesSupplier;
+        this.markManager = new CSLReferenceMarkManager(doc, componentContext);
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
+        this.zoteroCompatibilityModeListener = (_, _, _) -> needsCSLReferenceMarkConversion = true;
+        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener(zoteroCompatibilityModeListener);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
@@ -72,9 +92,47 @@ public class CSLCitationOOAdapter {
         this.citationType = markManager.getCitationType();
     }
 
-    /// This method is used to determine whether citation style and citation type should be updated
-    /// Citation type and citation style are extracted into one method for more readability and uniformity
-    public void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType) throws CreationException, Exception {
+    public void dispose() {
+        openOfficePreferences.zoteroCompatibilityModeProperty().removeListener(zoteroCompatibilityModeListener);
+    }
+
+    public boolean needsReferenceMarkConversion() throws WrappedTargetException, NoSuchElementException {
+        if (!needsCSLReferenceMarkConversion) {
+            return false;
+        }
+
+        markManager.readAndUpdateExistingMarks();
+        boolean conversionNeeded = markManager.isConversionNeededForFirstReferenceMark(openOfficePreferences.getReferenceMarkFormat());
+        if (!conversionNeeded) {
+            needsCSLReferenceMarkConversion = false;
+        }
+        return conversionNeeded;
+    }
+
+    public void convertReferenceMarksToPreference(List<BibDatabase> selectedDatabases) throws CreationException, com.sun.star.uno.Exception {
+        try {
+            int convertedMarks = markManager.convertReferenceMarks(
+                    openOfficePreferences.getReferenceMarkFormat(),
+                    selectedDatabases,
+                    bibEntryTypesManager);
+            LOGGER.debug("Converted {} reference marks to {}", convertedMarks, openOfficePreferences.getReferenceMarkFormat());
+        } finally {
+            needsCSLReferenceMarkConversion = false;
+        }
+    }
+
+    public void prepareCitationInsertion(CitationStyle newStyle, CSLCitationType newCitationType, BibDatabaseContext currentEntryContext, List<BibDatabase> selectedDatabases)
+            throws CreationException, Exception {
+        linkZoteroCitations(currentEntryContext);
+        refreshCitationState();
+        currentSelectedDatabases = List.copyOf(selectedDatabases);
+        setCitationStyleParameters(newStyle, newCitationType, selectedDatabases);
+    }
+
+    /// This method is used to determine whether citation style and citation type should be updated.
+    /// Citation type and citation style are extracted into one method for more readability and uniformity.
+    private void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType, List<BibDatabase> selectedDatabases)
+            throws CreationException, Exception {
         boolean styleChanged;
         boolean citationTypeIsChanged;
 
@@ -93,138 +151,175 @@ public class CSLCitationOOAdapter {
         }
 
         if (styleChanged || citationTypeIsChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, newCitationType);
+            updateAllCitationsWithNewStyle(currentStyle, newCitationType, selectedDatabases);
         }
     }
 
     /// Inserts a citation for a group of entries.
     /// Comparable to LaTeX's \cite command.
-    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
-        // If current citation style is not the same as passed-in citation type, then change it to the new citation style
-        // If current citation type is not "NORMAL", then change it to "NORMAL".
-        // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
-        setCitationStyleParameters(selectedStyle, CSLCitationType.NORMAL);
 
-        String style = selectedStyle.getSource();
-        boolean isNumericStyle = selectedStyle.isNumericStyle();
-        boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
-
-        String citation;
-
-        if (isAlphanumericStyle) {
-            citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
-        } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
-        }
-
-        String formattedCitation = CSLFormatUtils.transformHTML(citation);
-
-        if (isNumericStyle) {
-            formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
-        }
+        String formattedCitation = createCitationText(selectedStyle, entries, currentEntryContext);
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.NORMAL);
+        insertReferences(cursor, entries, ooText, selectedStyle, CSLCitationType.NORMAL, currentEntryContext);
     }
 
     /// Inserts in-text citations for a group of entries.
     /// Comparable to LaTeX's \citet command.
     ///
-    /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
-    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    /// @implNote Very similar to the [insertCitation][#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext)] method.
+    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
-        setCitationStyleParameters(selectedStyle, CSLCitationType.IN_TEXT);
 
-        boolean isNumericStyle = selectedStyle.isNumericStyle();
-        boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
-        String citation = createInTextCitationGroupText(selectedStyle, isAlphanumericStyle, isNumericStyle, entries, bibDatabaseContext);
+        String citation = createInTextCitationGroupText(selectedStyle, entries, currentEntryContext);
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citation));
-        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.IN_TEXT);
+        insertReferences(cursor, entries, ooText, selectedStyle, CSLCitationType.IN_TEXT, currentEntryContext);
     }
 
     /// Inserts "empty" citations for a list of entries at the cursor to the document.
     /// Adds the entries to the list for which bibliography is to be generated.
-    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
+    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
-        setCitationStyleParameters(selectedStyle, CSLCitationType.EMPTY);
 
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), CSLCitationType.EMPTY);
+        insertReferences(cursor, entries, emptyOOText, selectedStyle, CSLCitationType.EMPTY, currentEntryContext);
     }
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertJabRefBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
         }
 
-        boolean isNumericStyle = selectedStyle.isNumericStyle();
-
-        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
-        markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, citationType);
-        markManager.readAndUpdateExistingMarks();
+        List<BibEntry> bibliographyEntries = prepareBibliographyEntries(selectedStyle, entries, selectedDatabases);
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, ooBreak);
 
-        String style = selectedStyle.getSource();
+        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
+    }
 
-        if (isNumericStyle) {
-            // Sort entries based on their order of appearance in the document
-            entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+    public void insertZoteroBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
+            throws com.sun.star.uno.Exception, CreationException {
+        if (!selectedStyle.hasBibliography()) {
+            return;
+        }
 
-            for (BibEntry entry : entries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
-                String citationKey = entry.getCitationKey().orElse("");
-                int currentNumber = markManager.getCitationNumber(citationKey);
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
-                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
+        List<BibEntry> bibliographyEntries = prepareBibliographyEntries(selectedStyle, entries, selectedDatabases);
 
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
-        } else {
-            // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        cursorProperties.setPropertyValue("ParaStyleName", openOfficePreferences.getCslBibliographyBodyFormat());
+        writeBibliographyEntries(cursor, selectedStyle, bibliographyEntries);
+    }
 
-            for (String bibliographyEntry : bibliographyEntries) {
-                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+    private List<BibEntry> prepareBibliographyEntries(CitationStyle selectedStyle, List<BibEntry> entries, List<BibDatabase> selectedDatabases)
+            throws com.sun.star.uno.Exception, CreationException {
+        boolean isNumericStyle = selectedStyle.isNumericStyle();
+        boolean hasBibliographySortOrder = selectedStyle.hasBibliographySortOrder();
 
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-                OOTextIntoOO.write(document, cursor, ooText);
-            }
+        markManager.setRealTimeNumberUpdateRequired(isNumericStyle && !hasBibliographySortOrder);
+        markManager.readAndUpdateExistingMarks();
+        updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
+        markManager.readAndUpdateExistingMarks();
+
+        List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
+        if (isNumericStyle && hasBibliographySortOrder) {
+            Map<String, Integer> citationKeyToNumber = computeBibliographyOrderedCitationNumbers(selectedStyle, selectedDatabases);
+            markManager.updateAllCitationNumbers(citationKeyToNumber);
+            sortBibliographyEntriesByPreferredCitationNumbers(bibliographyEntries, citationKeyToNumber);
+        } else if (isNumericStyle) {
+            sortBibliographyEntriesByCurrentCitationNumbers(bibliographyEntries);
+        }
+        return bibliographyEntries;
+    }
+
+    private void sortBibliographyEntriesByCurrentCitationNumbers(List<BibEntry> bibliographyEntries) {
+        bibliographyEntries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+    }
+
+    private void sortBibliographyEntriesByPreferredCitationNumbers(List<BibEntry> bibliographyEntries, Map<String, Integer> citationKeyToNumber) {
+        bibliographyEntries.sort(Comparator.comparingInt(entry -> {
+            String citationKey = entry.getCitationKey().orElse("");
+            return citationKeyToNumber.getOrDefault(citationKey, markManager.getCitationNumber(citationKey));
+        }));
+    }
+
+    /// Writes bibliography entries using JabRef's standard CSL bibliography rendering.
+    ///
+    /// Numeric styles without a bibliography sort keep first-appearance ordering. Numeric styles with
+    /// a bibliography sort are preordered to the citeproc-emitted bibliography order so in-text numbers
+    /// and bibliography numbers stay aligned. For non-numeric styles, ordering is left to the citeproc
+    /// item data provider.
+    private void writeBibliographyEntries(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> bibliographyEntries)
+            throws com.sun.star.uno.Exception, CreationException {
+        BibDatabaseContext currentEntryContext = new BibDatabaseContext(new BibDatabase(bibliographyEntries));
+        List<String> bibliographyEntriesText = CitationStyleGenerator.generateBibliography(
+                bibliographyEntries,
+                selectedStyle.getSource(),
+                HTML_OUTPUT_FORMAT,
+                currentEntryContext,
+                bibEntryTypesManager);
+
+        for (String bibliographyEntry : bibliographyEntriesText) {
+            String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
+            OOTextIntoOO.write(document, cursor, ooText);
         }
     }
 
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
-    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle, CSLCitationType citationType)
+    private void insertReferences(XTextCursor cursor,
+                                  List<BibEntry> entries,
+                                  OOText ooText,
+                                  CitationStyle selectedStyle,
+                                  CSLCitationType citationType,
+                                  BibDatabaseContext currentEntryContext)
             throws CreationException, com.sun.star.uno.Exception {
-        boolean preceedingSpaceExists;
-        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
+        boolean precedingSpaceExists = CitationOOAdapterUtils.hasPrecedingSpace(cursor);
+        boolean succeedingSpaceExists = CitationOOAdapterUtils.hasSucceedingSpace(cursor);
+        markManager.insertReferenceIntoOO(
+                entries,
+                document,
+                cursor,
+                ooText,
+                !precedingSpaceExists && openOfficePreferences.getAddSpaceBefore(),
+                !succeedingSpaceExists && openOfficePreferences.getAddSpaceAfter(),
+                citationType,
+                currentEntryContext,
+                bibEntryTypesManager,
+                openOfficePreferences.getReferenceMarkFormat());
+        boolean isNumericStyle = selectedStyle.isNumericStyle();
+        boolean hasBibliographySortOrder = selectedStyle.hasBibliographySortOrder();
 
-        // Check if we're at the start of the document - if yes we set the flag and don't insert a space
-        if (!checkCursor.goLeft((short) 1, true)) {
-            // We're at the start of the document
-            preceedingSpaceExists = true;
-        } else {
-            // If not at the start of document, check if there is a space before
-            preceedingSpaceExists = " ".equals(checkCursor.getString());
-            // If not a space, check if it's a paragraph break
-            if (!preceedingSpaceExists) {
-                preceedingSpaceExists = checkCursor.getString().matches("\\R");
-            }
-        }
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), citationType);
-        CitationEntryTypeMetadataManager.storeEntryTypes(document, entries);
-        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
+        markManager.setRealTimeNumberUpdateRequired(isNumericStyle && !hasBibliographySortOrder);
         markManager.readAndUpdateExistingMarks();
+        if (isNumericStyle && hasBibliographySortOrder) {
+            updateNumericCitationsFromBibliographyOrder(selectedStyle, currentSelectedDatabases);
+        }
         this.citationType = markManager.getCitationType();
+    }
+
+    public void linkZoteroCitations(BibDatabaseContext currentEntryContext) {
+        if (openOfficePreferences.getReferenceMarkFormat() != OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE) {
+            return;
+        }
+
+        try {
+            int linkedCitations = ZoteroCitationLinker.linkZoteroCitations(
+                    document,
+                    currentEntryContext,
+                    bibEntryTypesManager);
+            LOGGER.debug("Linked {} Zotero citations to JabRef entries", linkedCitations);
+        } catch (NoDocumentException | CreationException | Exception e) {
+            LOGGER.warn("Could not link Zotero citations to JabRef entries", e);
+        }
     }
 
     /// Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
@@ -245,33 +340,17 @@ public class CSLCitationOOAdapter {
         return sb.toString();
     }
 
-    /// Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
-    /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
-    /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
-    /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
-    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType)
+    /// Ideally, the methods of this class are supposed to work with [CSLReferenceMarkManager], and not [CSLReferenceMark] directly.
+    /// However, all "generation" of CSL style citations (via [CitationStyleGenerator]) occur in this class, and not in [CSLReferenceMarkManager].
+    /// Furthermore, [CSLReferenceMarkManager] is not composed of [CitationStyle].
+    /// Hence, we keep [CSLReferenceMarkManager] independent of [CitationStyleGenerator] and [CitationStyle], and keep the following two methods here.
+    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType, List<BibDatabase> selectedDatabases)
             throws com.sun.star.uno.Exception, CreationException {
-        boolean isNumericStyle = style.isNumericStyle();
-        boolean isAlphaNumericStyle = style.isAlphanumericStyle();
-
-        /*
-        Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
-        So, to get all databases in real time without having to refresh the connection, we obtain all open databases via the state manager
-        */
-
-        // Collect all open databases
-        List<BibDatabaseContext> databaseContexts = databasesSupplier.get();
-        List<BibDatabase> databases = new ArrayList<>();
-        for (BibDatabaseContext databaseContext : databaseContexts) {
-            databases.add(databaseContext.getDatabase());
-        }
-
-        // We first get a list of all cited entries to create a unified database context
-        List<BibEntry> citedEntries = databases.stream()
-                                               .flatMap(db -> db.getEntries().stream())
-                                               .filter(this::isCitedEntry)
-                                               .toList();
-        CitationEntryTypeMetadataManager.storeEntryTypes(document, citedEntries);
+        // We first get a list of all cited entries from the configured lookup scope to create a unified database context
+        List<BibEntry> citedEntries = selectedDatabases.stream()
+                                                       .flatMap(db -> db.getEntries().stream())
+                                                       .filter(this::isCitedEntry)
+                                                       .toList();
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
@@ -286,75 +365,156 @@ public class CSLCitationOOAdapter {
         } else if (citationType == CSLCitationType.IN_TEXT) {
             // Now, for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<String> citationKeys = mark.getCitationKeys();
-                List<BibEntry> entries = citationKeys.stream()
-                                                     .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
-                String citation = createInTextCitationGroupText(style, isAlphaNumericStyle, isNumericStyle, entries, unifiedBibDatabaseContext);
+                List<BibEntry> entries = getResolvedEntriesForMark(mark, unifiedDatabase);
+                if (entries.isEmpty()) {
+                    continue;
+                }
+                String citation = createInTextCitationGroupText(style, entries, unifiedBibDatabaseContext);
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.IN_TEXT);
             }
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<String> citationKeys = mark.getCitationKeys();
-                List<BibEntry> entries = citationKeys.stream()
-                                                     .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
+                List<BibEntry> entries = getResolvedEntriesForMark(mark, unifiedDatabase);
+                if (entries.isEmpty()) {
+                    continue;
+                }
 
                 // We re-generate the citation in the new style and update it in the document
-                String citation = createCitationText(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
+                String citation = createCitationText(style, entries, unifiedBibDatabaseContext);
 
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.NORMAL);
             }
         }
     }
 
+    private List<BibEntry> getResolvedEntriesForMark(CSLReferenceMark mark, BibDatabase unifiedDatabase) {
+        List<String> citationKeys = mark.getCitationKeys();
+        List<BibEntry> entries = citationKeys.stream()
+                                             .map(unifiedDatabase::getEntryByCitationKey)
+                                             .flatMap(Optional::stream)
+                                             .toList();
+        if (entries.isEmpty()) {
+            LOGGER.debug("Skipping CSL citation update for unresolved citation keys {}", citationKeys);
+        }
+        return entries;
+    }
+
     /// Helper method for creating citations for `updateAllCitationsWithNewStyle` and `insertCitation`.
-    private @NonNull String createCitationText(CitationStyle style, boolean isAlphaNumericStyle, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
+    private @NonNull String createCitationText(CitationStyle style, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
+        boolean isNumeric = style.isNumericStyle();
+        boolean isAlphaNumeric = style.isAlphanumericStyle();
+
         String citation;
 
-        if (isAlphaNumericStyle) {
+        if (isAlphaNumeric) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
         } else {
             citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
         }
 
-        return CSLFormatUtils.transformHTML(citation);
+        String formattedCitation = CSLFormatUtils.transformHTML(citation);
+        if (isNumeric) {
+            formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
+        }
+        return formattedCitation;
+    }
+
+    private void updateNumericCitationsFromBibliographyOrder(CitationStyle selectedStyle, List<BibDatabase> selectedDatabases)
+            throws CreationException, Exception {
+        if (!selectedStyle.hasBibliographySortOrder()) {
+            return;
+        }
+        markManager.updateAllCitationNumbers(computeBibliographyOrderedCitationNumbers(selectedStyle, selectedDatabases));
+    }
+
+    private Map<String, Integer> computeBibliographyOrderedCitationNumbers(CitationStyle selectedStyle, List<BibDatabase> selectedDatabases) {
+        List<BibEntry> citedEntries = selectedDatabases.stream()
+                                                       .flatMap(db -> db.getEntries().stream())
+                                                       .filter(this::isCitedEntry)
+                                                       .toList();
+        if (citedEntries.isEmpty()) {
+            return Map.of();
+        }
+
+        BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
+        BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
+        Optional<List<String>> bibliographyEntryIds = CitationStyleGenerator.generateBibliographyEntryIds(
+                citedEntries,
+                selectedStyle.getSource(),
+                HTML_OUTPUT_FORMAT,
+                unifiedBibDatabaseContext,
+                bibEntryTypesManager);
+
+        if (bibliographyEntryIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, Integer> citationKeyToNumber = new LinkedHashMap<>();
+        int number = 1;
+        for (String citationKey : bibliographyEntryIds.get()) {
+            if (!citationKeyToNumber.containsKey(citationKey)) {
+                citationKeyToNumber.put(citationKey, number++);
+            }
+        }
+        return citationKeyToNumber;
     }
 
     /// Helper method for creating citation group for `insertInTextCitation` and `updateAllCitationsWithNewStyle`
-    private @NonNull String createInTextCitationGroupText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationGroupText(CitationStyle style,
+                                                          List<BibEntry> entries,
+                                                          BibDatabaseContext bibDatabaseContext) {
         StringJoiner citations = new StringJoiner(CITATION_DELIMITER);
         for (BibEntry entry : entries) {
-            citations.add(createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, entry, bibDatabaseContext));
+            citations.add(createInTextCitationText(style, entry, bibDatabaseContext));
         }
 
         return citations.toString();
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
-    private @NonNull String createInTextCitationText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
-        String citation;
+    private @NonNull String createInTextCitationText(CitationStyle style,
+                                                     BibEntry currentEntry,
+                                                     BibDatabaseContext bibDatabaseContext) {
+        boolean isNumeric = style.isNumericStyle();
+        boolean isAlphaNumeric = style.isAlphanumericStyle();
 
-        if (isAlphaNumericStyle) {
-            citation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
-        } else {
-            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+        if (isAlphaNumeric) {
+            return CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
         }
+
+        String citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
         citation = CSLFormatUtils.transformHTML(citation);
 
-        if (isNumericStyle) {
+        if (isNumeric) {
             citation = updateSingleOrMultipleCitationNumbers(citation, List.of(currentEntry));
             String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, bibDatabaseContext);
             citation = prefix + citation;
-        } else if (!isAlphaNumericStyle) {
+        } else {
             citation = CSLFormatUtils.changeToInText(citation);
         }
 
         return citation;
+    }
+
+    public void refreshCitationState() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
+        this.citationType = markManager.getCitationType();
+    }
+
+    public List<String> getCitedCitationKeys() throws WrappedTargetException, NoSuchElementException {
+        // Use a transient manager here so export stays read-only. Reusing the adapter's live manager would reset
+        // its numbering/cache state when re-reading marks, which can affect later CSL operations before the next
+        // full readAndUpdateExistingMarks() refresh.
+        CSLReferenceMarkManager exportMarkManager = new CSLReferenceMarkManager(document, componentContext);
+        exportMarkManager.readExistingMarks();
+
+        SequencedSet<String> citationKeys = new LinkedHashSet<>();
+        for (CSLReferenceMark mark : exportMarkManager.getMarksInOrder().reversed()) {
+            citationKeys.addAll(mark.getCitationKeys());
+        }
+        return List.copyOf(citationKeys);
     }
 
     /// Checks if an entry has already been cited before in the document.
