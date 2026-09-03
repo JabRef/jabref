@@ -14,7 +14,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.util.Callback;
 
@@ -147,7 +146,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
 
                     if (contextMenuFactory != null) {
-                        // We only create the context menu when really necessary
                         setOnContextMenuRequested(event -> {
                             if (!isEmpty()) {
                                 setContextMenu(contextMenuFactory.apply(item));
@@ -165,7 +163,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         // The tooltip is shown when the cell's text is truncated, or when the caller says it should always be shown
                         // (e.g. the "show entry preview in tooltip" preference is enabled, in which case the tooltip is the only
                         // place the preview is ever visible — it must show even when the title itself isn't cut off).
-                        if (tooltip != null && rowIndex < totalItems && (isCellTextTruncated() || forceShow)) {
+                        if (tooltip != null && rowIndex < totalItems && (isTextTruncated() || forceShow)) {
                             setTooltip(tooltip.apply(rowItem, item));
                         } else if (tooltip != null) {
                             setTooltip(null);
@@ -196,24 +194,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         visibleProperty().bind(toVisibleExpression.apply(item));
                     }
                 }
-            }
-
-            /// Checks whether the currently displayed text is wider than the space available in the cell,
-            /// i.e. whether the text is truncated and a tooltip should be shown.
-            private boolean isCellTextTruncated() {
-                String cellText = getText();
-                if (StringUtil.isNullOrEmpty(cellText)) {
-                    return false;
-                }
-                Text measuringText = new Text(cellText);
-                measuringText.setFont(getFont());
-                double textWidth = measuringText.getLayoutBounds().getWidth();
-                double availableWidth = getWidth() - getPadding().getLeft() - getPadding().getRight();
-                Node graphic = getGraphic();
-                if (graphic != null) {
-                    availableWidth -= graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
-                }
-                return textWidth > availableWidth + 1.0; // added +1.0 to avoid false positives in case the text barely fits
             }
         };
     }

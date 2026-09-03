@@ -573,11 +573,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
-                    // Show the entry preview only when the user clicks this icon, instead of automatically on hover.
                     Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
                     showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
                     showPreview.setOnMouseClicked(event -> {
-                        // Clicking again while the preview is open closes it (toggle behaviour).
                         if (previewTooltip.isShowing()) {
                             previewTooltip.hide();
                             return;
