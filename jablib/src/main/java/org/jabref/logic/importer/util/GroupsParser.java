@@ -200,7 +200,7 @@ public class GroupsParser {
 
         String name = StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(token.nextToken()));
-        DirectoryStructureGroup group = new DirectoryStructureGroup(name, context, entry -> Optional.empty());
+        DirectoryStructureGroup group = new DirectoryStructureGroup(name, context, _ -> Optional.empty());
         addGroupDetails(token, group);
         return group;
     }

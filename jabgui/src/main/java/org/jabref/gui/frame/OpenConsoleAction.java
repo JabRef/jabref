@@ -45,7 +45,7 @@ public class OpenConsoleAction extends SimpleCommand {
     public void execute() {
         Optional.ofNullable(databaseContext.get())
                 .or(stateManager::getActiveDatabase)
-                .flatMap(context -> context.getDatabasePath().or(context::getDirectoryLibraryRoot))
+                .flatMap(BibDatabaseContext::getPathOnDisk)
                 .ifPresent(path -> {
                     try {
                         NativeDesktop.openConsole(path, preferences, dialogService);
