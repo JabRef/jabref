@@ -64,8 +64,6 @@ public class DownloadFullTextAction extends SimpleCommand {
             return;
         }
 
-        dialogService.notify(Localization.lang("Looking for full text document..."));
-
         if (entries.size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Download full text documents"),
