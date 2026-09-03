@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -170,5 +171,34 @@ class FulltextFetchersTest {
 
         assertEquals(Optional.of(fileUrl), fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
         assertTrue(fallbackCalled.get(), "Fallback fetcher must run when the regular fetchers find nothing");
+    }
+
+    @Test
+    void fallbackRunsInParallelWhenDirectFetchersAreSlow(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("fallback.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        // A direct fetcher that is slow and ultimately finds nothing (like DoiResolution on IEEE).
+        FulltextFetcherWithTrustLevel slowPrimary = e -> {
+            try {
+                Thread.sleep(5_000);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return Optional.empty();
+        };
+        FallbackFileFetcher fallback = e -> Optional.of(fileUrl);
+
+        // Head start of 200 ms: the fallback must launch and win while the primary is still sleeping,
+        // instead of waiting out the primary's full run (ADR-0072).
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(slowPrimary, fallback), Duration.ofMillis(200));
+
+        long startNanos = System.nanoTime();
+        Optional<URL> result = fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source);
+        long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000;
+
+        assertEquals(Optional.of(fileUrl), result);
+        assertTrue(elapsedMs < 3_000, "fallback should return during the head start, not after the slow primary; took " + elapsedMs + " ms");
     }
 }
