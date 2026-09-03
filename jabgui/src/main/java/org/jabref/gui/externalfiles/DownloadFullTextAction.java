@@ -115,6 +115,10 @@ public class DownloadFullTextAction extends SimpleCommand {
         }
         for (Map.Entry<BibEntry, Optional<FetcherResult>> download : downloads.entrySet()) {
             BibEntry entry = download.getKey();
+            if (!databaseContext.getDatabase().getEntries().contains(entry)) {
+                // Entry was deleted while the search ran; attaching the file would mutate a detached entry.
+                continue;
+            }
             Optional<FetcherResult> result = download.getValue();
             if (result.isPresent()) {
                 addLinkedFileFromURL(databaseContext, result.get(), entry);
