@@ -2,25 +2,20 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -32,6 +27,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -55,6 +52,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -68,7 +66,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import jakarta.inject.Inject;
 
-public class LinkedFilesEditor extends HBox implements FieldEditorFX {
+public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
     // Upper bound on how many rows the ListView grows to before it starts scrolling internally,
     // so entries with many linked files cannot expand the entry editor layout indefinitely.
@@ -76,6 +74,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private ListView<LinkedFileViewModel> listView;
+    @FXML
+    private HBox buttonRow;
     @FXML
     private JabRefIconView fulltextFetcher;
     @FXML
@@ -167,51 +167,38 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Size the control to (number of files + 1) rows, so it ends right after the content instead of leaving blank
+        // Size the list to exactly the number of files, so it ends right after the content instead of leaving blank
         // space, but cap it at MAX_VISIBLE_ROWS so large file lists scroll internally rather than growing the layout.
         // The row height comes from the CSS-driven fixed cell size, so theming and font scaling adjust it naturally.
+        // The list's own insets (CSS padding/border) must be added on top: they are not part of the viewport, and
+        // leaving them out makes the viewport a few pixels shorter than the rows, which shows a vertical scrollbar
+        // and, since that bar narrows the viewport, a horizontal one as well.
         listView.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> Math.min(listView.getItems().size() + 1, MAX_VISIBLE_ROWS) * listView.getFixedCellSize(),
+                () -> listView.getItems().isEmpty()
+                      ? 0
+                      : Math.min(listView.getItems().size(), MAX_VISIBLE_ROWS) * listView.getFixedCellSize() + verticalInsets(listView),
                 listView.getItems(),
-                listView.fixedCellSizeProperty()));
-        listView.maxHeightProperty().bind(listView.fixedCellSizeProperty().multiply(MAX_VISIBLE_ROWS));
+                listView.fixedCellSizeProperty(),
+                listView.insetsProperty()));
+        listView.maxHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> MAX_VISIBLE_ROWS * listView.getFixedCellSize() + verticalInsets(listView),
+                listView.fixedCellSizeProperty(),
+                listView.insetsProperty()));
+        // Allow the list to collapse completely when there are no files; the button row below stays visible.
+        listView.setMinHeight(0);
+
+        // The button row acts as the list's trailing row: same height as a list row, buttons only.
+        buttonRow.prefHeightProperty().bind(listView.fixedCellSizeProperty());
+        buttonRow.minHeightProperty().bind(listView.fixedCellSizeProperty());
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
-
-        // Double-clicking the empty row below the files (the "+1" row) adds a new file, same as the add button.
-        listView.setOnMouseClicked(event -> {
-            if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2) && isEmptyRow(event.getTarget())) {
-                addNewFile();
-            }
-        });
     }
 
-    private static boolean isEmptyRow(EventTarget target) {
-        if (!(target instanceof Node node)) {
-            return false;
-        }
-        // Walk up from the clicked node to the ListView. The handler sits on the ListView, so
-        // events from scrollbars and other skin sub-controls bubble up here too; only clicks on
-        // the list's content background (no enclosing cell, no scrollbar crossed) count as the
-        // empty area and behave like double-clicking the trailing empty "+1" row.
-        for (Node current = node; current != null; current = current.getParent()) {
-            if (current instanceof ListCell<?> cell) {
-                return cell.isEmpty();
-            }
-            if (current instanceof ScrollBar) {
-                return false;
-            }
-            if (current instanceof ListView) {
-                // Reached the list itself without crossing a cell or a scrollbar: the click
-                // landed on the content background (the blank space below the files, or the
-                // whole control when no files exist yet).
-                return true;
-            }
-        }
-        return false;
+    private static double verticalInsets(Region region) {
+        return region.getInsets().getTop() + region.getInsets().getBottom();
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
@@ -322,7 +309,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox container = new HBox(2);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        container.maxWidthProperty().bind(listView.widthProperty().subtract(20d));
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;

@@ -1,8 +1,8 @@
 package org.jabref.logic.net;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
@@ -10,7 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FetcherTest
+@ExternalServicesTest
 class URLDownloadTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
@@ -35,15 +35,17 @@ class URLDownloadTest {
 
     @Test
     void fileDownload() throws IOException, FetcherException {
-        File destination = File.createTempFile("jabref-test", ".html");
+        Path destination = Files.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
-            dl.toFile(destination.toPath());
-            assertTrue(destination.exists(), "file must exist");
+            dl.toFile(destination);
+            assertTrue(Files.exists(destination), "file must exist");
         } finally {
             // cleanup
-            if (!destination.delete()) {
-                LOGGER.error("Cannot delete downloaded file");
+            try {
+                Files.delete(destination);
+            } catch (IOException e) {
+                LOGGER.error("Cannot delete downloaded file", e);
             }
         }
     }

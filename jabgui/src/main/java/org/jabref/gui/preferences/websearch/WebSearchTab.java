@@ -6,13 +6,10 @@ import java.util.Optional;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -24,17 +21,16 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
-import com.airhacks.afterburner.views.ViewLoader;
+public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> {
 
-public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
     // Multiplier for row height based on font size
     private static final double FONT_HEIGHT_MULTIPLIER = 2.5;
 
@@ -44,35 +40,29 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     // Estimate for header height (used in table prefHeight calculation)
     private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
 
-    @FXML private CheckBox enableWebSearch;
-    @FXML private CheckBox warnAboutDuplicatesOnImport;
-    @FXML private CheckBox downloadLinkedOnlineFiles;
-    @FXML private CheckBox keepDownloadUrl;
-    @FXML private CheckBox addImportedEntries;
-    @FXML private TextField addImportedEntriesGroupName;
-    @FXML private ComboBox<PlainCitationParserChoice> defaultPlainCitationParser;
-    @FXML private TextField citationsRelationStoreTTL;
+    private final VBox fetchersContainer = new VBox();
 
-    @FXML private CheckBox useCustomDOI;
-    @FXML private TextField useCustomDOIName;
+    /// Also the source of the table's row height: it is a themed control in the tree, so its font
+    /// tracks the configured font size.
+    private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
-    @FXML private CheckBox grobidEnabled;
-    @FXML private TextField grobidURL;
+    /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab observes its master switch to offer or hide the LLM citation parser
+    public WebSearchTab(AiPreferences workingAiPreferences) {
+        this.viewModel = new WebSearchTabViewModel(
+                preferences.getImporterPreferences(),
+                preferences.getGrobidPreferences(),
+                preferences.getDOIPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getLibraryPreferences(),
+                workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
+                taskExecutor);
+        buildView();
+    }
 
-    @FXML private TableView<SearchEngineItem> searchEngineTable;
-    @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
-    @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
-
-    @FXML private VBox fetchersContainer;
-
-    private final ReadOnlyBooleanProperty refAiEnabled;
-
-    public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {
-        this.refAiEnabled = refAiEnabled;
-
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+    @Override
+    public String getTabName() {
+        return Localization.lang("Web search");
     }
 
     @Override
@@ -87,82 +77,105 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         );
     }
 
-    @Override
-    public String getTabName() {
-        return Localization.lang("Web search");
-    }
+    private void buildView() {
+        setContent(form()
 
-    public void initialize() {
-        this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
+                .section(Localization.lang("General"), general -> general
+                        .flow(toggles -> toggles
+                                        .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
+                                        .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
+                                        .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
+                                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
+                                toggleRow -> toggleRow.styleClass("checkbox-flowpane"))
+                        .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName(),
+                                PreferencesFormBuilder.InputElement::grow)
+                        .combo(Localization.lang("Default plain citation parser"), viewModel.plainCitationParsers(), viewModel.defaultPlainCitationParserProperty(), PlainCitationParserChoice::getLocalizedName)
+                        .field(Localization.lang("Citations relations local storage time-to-live (in days)"), buildStoreTtlField()))
 
-        searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
-        searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
-        searchEngineName.setEditable(false);
+                .section(Localization.lang("Custom DOI URI"), doi -> doi
+                        .checkWithField(Localization.lang("Use custom DOI base URI for article access"), viewModel.useCustomDOIProperty(), viewModel.useCustomDOINameProperty(),
+                                PreferencesFormBuilder.InputElement::grow))
 
-        searchEngineUrlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
-        searchEngineUrlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
-        searchEngineUrlTemplate.setEditable(true);
+                .section(Localization.lang("Remote services"), remote -> remote
+                        .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
+                        .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty(),
+                                url -> url.disableWhen(viewModel.grobidEnabledProperty().not())))
 
-        searchEngineTable.setItems(viewModel.getSearchEngines());
+                .section(Localization.lang("Search Engine URL Templates"), searchEngines -> searchEngines
+                        .custom(tableNote)
+                        .custom(buildSearchEngineTable()))
 
-        // Dynamic height based on font size and number of items
-        DoubleBinding rowHeight = Bindings.createDoubleBinding(
-                () -> enableWebSearch.getFont() != null ? enableWebSearch.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
-                enableWebSearch.fontProperty());
-        searchEngineTable.fixedCellSizeProperty().bind(rowHeight);
-        searchEngineTable.prefHeightProperty().bind(
-                Bindings.size(searchEngineTable.getItems())
-                        .add(HEADER_HEIGHT_ESTIMATE)
-                        .multiply(rowHeight));
+                .section(Localization.lang("Pre-selected fetchers"), fetchers -> fetchers
+                        .custom(fetchersContainer))
 
-        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
-        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
-        downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
-        keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
+                .build());
 
-        addImportedEntries.selectedProperty().bindBidirectional(viewModel.getAddImportedEntries());
-        addImportedEntriesGroupName.textProperty().bindBidirectional(viewModel.getAddImportedEntriesGroupName());
-        addImportedEntriesGroupName.disableProperty().bind(addImportedEntries.selectedProperty().not());
-
-        new ViewModelListCellFactory<PlainCitationParserChoice>()
-                .withText(PlainCitationParserChoice::getLocalizedName)
-                .install(defaultPlainCitationParser);
-        defaultPlainCitationParser.itemsProperty().bind(viewModel.plainCitationParsers());
-        defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());
-
-        viewModel.citationsRelationsStoreTTLProperty()
-                 .addListener((_, _, newValue) -> {
-                     if (newValue != null && !newValue.toString().equals(citationsRelationStoreTTL.getText())) {
-                         citationsRelationStoreTTL.setText(newValue.toString());
-                     }
-                 });
-        citationsRelationStoreTTL
-                .textProperty()
-                .addListener((_, _, newValue) -> {
-                    if (StringUtil.isBlank(newValue)) {
-                        return;
-                    }
-                    if (!newValue.matches("\\d*")) {
-                        citationsRelationStoreTTL.setText(newValue.replaceAll("\\D", ""));
-                        return;
-                    }
-                    viewModel.citationsRelationsStoreTTLProperty().set(Integer.parseInt(newValue));
-                });
-
-        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
-        grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
-        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
-
-        useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
-        useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
-        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
-
+        // The fetcher list is filled in setValues(), i.e. after this view exists.
         InvalidationListener listener = _ -> fetchersContainer
                 .getChildren()
                 .setAll(viewModel.getFetchers()
                                  .stream()
-                                 .map(this::createFetcherNode).toList());
+                                 .map(this::createFetcherNode)
+                                 .toList());
         viewModel.getFetchers().addListener(listener);
+    }
+
+    /// Whole-day counts only: non-digits are stripped as they are typed, so the field never holds a
+    /// value the view model cannot parse.
+    private TextField buildStoreTtlField() {
+        TextField field = new TextField();
+        field.setPrefWidth(60.0);
+        field.setMaxWidth(60.0);
+
+        viewModel.citationsRelationsStoreTTLProperty().addListener((_, _, newValue) -> {
+            if (newValue != null && !newValue.toString().equals(field.getText())) {
+                field.setText(newValue.toString());
+            }
+        });
+        field.textProperty().addListener((_, _, newValue) -> {
+            if (StringUtil.isBlank(newValue)) {
+                return;
+            }
+            if (!newValue.matches("\\d*")) {
+                field.setText(newValue.replaceAll("\\D", ""));
+                return;
+            }
+            viewModel.citationsRelationsStoreTTLProperty().set(Integer.parseInt(newValue));
+        });
+        return field;
+    }
+
+    private Node buildSearchEngineTable() {
+        TableView<SearchEngineItem> table = new TableView<>();
+        table.setEditable(true);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        table.setItems(viewModel.getSearchEngines());
+
+        TableColumn<SearchEngineItem, String> name = new TableColumn<>(Localization.lang("Search Engine"));
+        name.setMinWidth(120.0);
+        name.setEditable(false);
+        name.setCellValueFactory(param -> param.getValue().nameProperty());
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<SearchEngineItem, String> urlTemplate = new TableColumn<>(Localization.lang("URL Template"));
+        urlTemplate.setMinWidth(300.0);
+        urlTemplate.setEditable(true);
+        urlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
+        urlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        table.getColumns().add(name);
+        table.getColumns().add(urlTemplate);
+
+        // Size the table to its content so it never scrolls inside the already scrolling dialog.
+        DoubleBinding rowHeight = Bindings.createDoubleBinding(
+                () -> tableNote.getFont() != null ? tableNote.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
+                tableNote.fontProperty());
+        table.fixedCellSizeProperty().bind(rowHeight);
+        table.prefHeightProperty().bind(
+                Bindings.size(table.getItems())
+                        .add(HEADER_HEIGHT_ESTIMATE)
+                        .multiply(rowHeight));
+        return table;
     }
 
     private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {

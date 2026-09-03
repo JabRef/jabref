@@ -138,7 +138,7 @@ class InMemoryChatHistoryCacheTest {
         assertEquals("group message", persisted.getFirst().content());
     }
 
-    /// Minimal in-memory implementation of {@link ChatHistoryRepository} used for testing.
+    /// Minimal in-memory implementation of [ChatHistoryRepository] used for testing.
     private static class FakeChatHistoryRepository implements ChatHistoryRepository {
 
         private final Map<String, List<ChatMessage>> store = new HashMap<>();

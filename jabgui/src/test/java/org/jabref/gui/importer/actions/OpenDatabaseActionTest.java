@@ -10,7 +10,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
@@ -49,7 +49,7 @@ public class OpenDatabaseActionTest {
                 mock(StateManager.class),
                 mock(FileUpdateMonitor.class),
                 mock(BibEntryTypesManager.class),
-                mock(CountingUndoManager.class),
+                mock(GuiUndoManager.class),
                 mock(ClipBoardManager.class),
                 mock(TaskExecutor.class)
         ));

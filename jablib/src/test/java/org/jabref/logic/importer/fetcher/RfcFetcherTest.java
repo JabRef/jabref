@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@FetcherTest
+@ExternalServicesTest
 class RfcFetcherTest {
 
     private RfcFetcher fetcher = new RfcFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
@@ -31,8 +31,8 @@ class RfcFetcherTest {
             .withField(StandardField.HOWPUBLISHED, "RFC 1945")
             .withField(StandardField.PUBLISHER, "RFC Editor")
             .withField(StandardField.DOI, "10.17487/RFC1945")
-            .withField(StandardField.URL, "https://www.rfc-editor.org/info/rfc1945")
-            .withField(StandardField.AUTHOR, "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee")
+            .withField(StandardField.URL, "https://www.rfc-editor.org/info/rfc1945/")
+            .withField(StandardField.AUTHOR, "T. Berners-Lee and R. Fielding and H. Frystyk")
             .withField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}")
             .withField(StandardField.PAGETOTAL, "60")
             .withField(StandardField.YEAR, "1996")
@@ -81,9 +81,10 @@ class RfcFetcherTest {
     @ValueSource(strings = {
             // syntactically valid identifier
             "draft-test-draft-spec",
-            "RFC9999",
+            "RFC99999",
             // invalid identifier
-            "banana"})
+            "banana"
+    })
     void performSearchByIdFindsNothingWithValidDraftIdentifier(String identifier) {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById(identifier));
     }

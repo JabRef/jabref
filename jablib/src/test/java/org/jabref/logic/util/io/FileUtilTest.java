@@ -72,6 +72,19 @@ class FileUtilTest {
     }
 
     @Test
+    void getFileSizeReturnsHumanReadableSize(@TempDir Path tempDir) throws IOException {
+        Path file = tempDir.resolve("library.bib");
+        Files.write(file, new byte[1024]);
+
+        assertEquals(Optional.of("1 KB"), FileUtil.getFileSize(file));
+    }
+
+    @Test
+    void getFileSizeReturnsEmptyForMissingFile(@TempDir Path tempDir) {
+        assertEquals(Optional.empty(), FileUtil.getFileSize(tempDir.resolve("missing.bib")));
+    }
+
+    @Test
     void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
         assertEquals(Path.of("tmp", "demo.bib.bak"),
                 FileUtil.addExtension(Path.of("tmp", "demo.bib"), ".bak"));
@@ -444,13 +457,33 @@ class FileUtilTest {
     @Test
     void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        Path bibUpperFile = Files.createFile(rootDir.resolve("test_upper.BIB"));
+        Path bibMixedFile = Files.createFile(rootDir.resolve("test_mixed.Bib"));
         assertTrue(FileUtil.isBibFile(bibFile));
+        assertTrue(FileUtil.isBibFile(bibUpperFile));
+        assertTrue(FileUtil.isBibFile(bibMixedFile));
     }
 
     @Test
     void isNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    void isPDFFile() throws IOException {
+        Path pdfFile = Files.createFile(rootDir.resolve("test.pdf"));
+        Path pdfUpperFile = Files.createFile(rootDir.resolve("test_upper.PDF"));
+        Path pdfMixedFile = Files.createFile(rootDir.resolve("test_mixed.Pdf"));
+        assertTrue(FileUtil.isPDFFile(pdfFile));
+        assertTrue(FileUtil.isPDFFile(pdfUpperFile));
+        assertTrue(FileUtil.isPDFFile(pdfMixedFile));
+    }
+
+    @Test
+    void isNotPDFFile() throws IOException {
+        Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+        assertFalse(FileUtil.isPDFFile(bibFile));
     }
 
     @Test
@@ -642,7 +675,7 @@ class FileUtilTest {
         assertEquals(secretFile, result);
     }
 
-    /// @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
+    /// @implNote Tests inspired by [org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata]
     public static Stream<Arguments> relativize() {
         Path bibPath = bibTempDir.resolve("bibliography.bib");
         Path filesPath = bibTempDir.resolve("files").resolve("pdfs");

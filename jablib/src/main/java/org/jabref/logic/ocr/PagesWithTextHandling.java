@@ -2,6 +2,9 @@ package org.jabref.logic.ocr;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum PagesWithTextHandling {
     SKIP(Localization.lang("Skip pages with text")),
     FORCE(Localization.lang("Overwrite text in pages containing text")),

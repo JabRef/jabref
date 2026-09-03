@@ -149,8 +149,8 @@ public class DOI implements Identifier {
 
     /// Creates an `Optional<DOI>` from various schemes including URL, URN, and plain DOIs.
     ///
-    /// Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
-    /// of the constructor and checking for {@link java.util.Optional#isPresent} instead.
+    /// Useful for suppressing the [IllegalArgumentException][java.lang.IllegalArgumentException]
+    /// of the constructor and checking for [java.util.Optional#isPresent] instead.
     ///
     /// @param doi the DOI/Short DOI string
     /// @return an Optional containing the DOI or an empty Optional
@@ -197,7 +197,7 @@ public class DOI implements Identifier {
     /// replacement. The replaced region includes any URL or `doi:` prefix that
     /// was part of the match. Returns the text unchanged if no DOI is present.
     ///
-    /// This reuses the same matching as {@link #findInText(String)} so callers
+    /// This reuses the same matching as [#findInText(String)] so callers
     /// that need to strip a DOI from text do not have to re-derive the regex.
     ///
     /// @param text        the text which might contain a DOI/Short DOI
@@ -219,7 +219,7 @@ public class DOI implements Identifier {
         return text.replaceAll("[�]", "");
     }
 
-    /// @param text text that has already been passed through {@link #removeReplacementCharacters}
+    /// @param text text that has already been passed through [#removeReplacementCharacters]
     private static Optional<DoiTextMatch> findInTextInternal(String text) {
         // Each pattern is tried independently; the earliest match in the text wins so
         // callers like {@link #replaceInText} strip the first DOI rather than whichever

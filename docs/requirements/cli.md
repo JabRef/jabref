@@ -3,6 +3,16 @@ parent: Requirements
 ---
 # CLI
 
+## Remote server health check
+`req~jabref.remote.health-check~1`
+
+The remote listener accepts the versioned plain-text request `JABREF/1 PING` and responds with
+`JABREF/1 PONG jabref`. This check identifies a running JabRef instance without requiring clients
+to implement the Java serialization protocol. Existing serialized remote-operation requests remain
+supported.
+
+Needs: impl
+
 ## Input file as positional argument across all commands
 `req~jabkit.cli.input-flag~2`
 
@@ -13,15 +23,16 @@ See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more
 
 Needs: impl
 
-<!-- markdownlint-disable-file MD022 -->
-
 ## Input file argument accepts an http(s)/ftp URL
-`req~jabkit.cli.input-url~1`
+`req~jabkit.cli.input-url~2`
 
 The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
-`https://`, or `ftp://` URL wherever a `jabkit` command reads a single file.
+`https://`, or `ftp://` URL. This holds for every input a `jabkit` command reads, including
+each argument of a command taking several of them.
 The URL is downloaded to a local temporary file before use; a download failure is reported
 as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+For a command reading several inputs, an unusable input is skipped and the remaining ones are
+still processed, with the command exiting non-zero afterwards.
 See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
 
 Needs: impl
@@ -47,6 +58,15 @@ Field-level findings additionally carry the affected field name.
 
 Needs: impl
 
+## Standard output conversion format
+`req~jabkit.cli.convert-stdout-format~1`
+
+When `jabkit convert` writes to standard output, it uses the exporter selected by
+`--output-format`. Progress messages are written to standard error so standard output
+contains only the exported data.
+
+Needs: impl
+
 ## GitHub Actions output of the `check` commands
 `req~jabkit.cli.check-github-actions-output~1`
 
@@ -59,3 +79,5 @@ Windows-style paths (containing `:`) and titles (containing `:` between citation
 are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->

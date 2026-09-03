@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -61,11 +63,9 @@ import org.xml.sax.SAXException;
 /// Fetcher for ArXiv that merges fields from arXiv-issued DOIs (and user-issued ones when applicable) to get more information overall.
 ///
 /// These are the post-processing steps applied to the original fetch from ArXiv's API:
-/// <ol>
-/// - Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
-/// - Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
-/// - Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
-/// </ol>
+/// 1. Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
+/// 2. Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
+/// 3. Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
 ///
 /// @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
 /// @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
@@ -168,9 +168,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the entry's arXiv ID
-    /// <br/><br/>
+    ///
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed
-    /// {@link #DOI_PREFIX} + the entry's ArXiv ID
+    /// [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivId An ArXiv ID
     /// @return ArXiv-issued DOI
@@ -179,8 +179,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the arXiv entry itself.
-    /// <br/><br/>
-    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
+    ///
+    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
     /// @return ArXiv-issued DOI, or Empty, if method could not retrieve it
@@ -197,8 +197,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from ArXiv Identifier object
-    /// <br/><br/>
-    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
+    ///
+    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivId An ArXiv ID as internal object
     /// @return ArXiv-issued DOI
@@ -212,12 +212,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get user-issued DOI from ArXiv Bibtex entry, if any
-    /// <br/><br/>
+    ///
     /// User-issued DOIs are identifiers associated with some ArXiv entries that can associate an entry with an external service, like
     /// <a href="https://link.springer.com/">Springer Link</a>.
     ///
     /// @param arXivBibEntry An ArXiv Bibtex entry from where the DOI is extracted
-    /// @return User-issued DOI, if any field exists and if it's not an automatic one (see {@link #getAutomaticDoi(ArXivIdentifier)})
+    /// @return User-issued DOI, if any field exists and if it's not an automatic one (see [#getAutomaticDoi(ArXivIdentifier)])
     private static Optional<String> getManualDoi(BibEntry arXivBibEntry) {
         return arXivBibEntry.getField(StandardField.DOI).filter(ArXivFetcher::isManualDoi);
     }
@@ -374,7 +374,56 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (this.doiFetcher != null) {
             inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
         }
-        return arXivBibEntryPromise.join();
+        Optional<BibEntry> result = arXivBibEntryPromise.join();
+        result.ifPresent(this::infuseWithInspireCitationKeyIfMissing);
+        return result;
+    }
+
+    /// If the entry has no "real" citation key yet, try to look up the paper on INSPIRE (the
+    /// standard literature database for high-energy physics) and adopt its curated texkey instead.
+    ///
+    /// A "real" key means anything other than absent or URL-shaped: when no manually-assigned
+    /// (journal) DOI is found to provide a "nicer" key (see [#CHOSEN_MANUAL_DOI_FIELDS]),
+    /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
+    /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
+    /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
+    /// Without this distinction, a plain "is a key present?" check would already be satisfied by
+    /// that URL and skip the INSPIRE lookup below entirely — leaving exactly the entries this
+    /// method exists to fix stuck with a DOI URL as their citation key.
+    ///
+    /// Most arXiv categories aren't indexed by INSPIRE, so a miss here is expected, not an error —
+    /// the entry is simply left with whatever citation key (if any) it already had.
+    ///
+    /// The entry's EPRINT field is expected to already be normalized by [ArXiv#performSearchById].
+    ///
+    /// @param entry The fetched arXiv entry to infuse, modified in place.
+    private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
+        if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
+            return;
+        }
+        entry.getField(StandardField.EPRINT).ifPresent(eprint -> lookUpInspireCitationKey(entry, eprint));
+    }
+
+    private void lookUpInspireCitationKey(BibEntry entry, String eprint) {
+        try {
+            // INSPIREFetcher only recognizes the lowercase "arxiv" value for this field
+            BibEntry inspireQuery = new BibEntry()
+                    .withField(StandardField.ARCHIVEPREFIX, "arxiv")
+                    .withField(StandardField.EPRINT, eprint);
+            new INSPIREFetcher(importFormatPreferences).performSearch(inspireQuery).stream()
+                                                       .findFirst()
+                                                       .flatMap(BibEntry::getCitationKey)
+                                                       .ifPresent(entry::setCitationKey);
+        } catch (FetcherClientException e) {
+            // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
+            LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}'", eprint, e);
+        }
+    }
+
+    private static boolean isUrlShaped(String key) {
+        return key.startsWith("http://") || key.startsWith("https://");
     }
 
     @Override
@@ -412,11 +461,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
-        private static final com.google.common.util.concurrent.RateLimiter ARXIV_API_RATE_LIMITER = com.google.common.util.concurrent.RateLimiter.create(3.0);
+        private static final FetcherRateLimiter ARXIV_API_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("arXiv", 1, Duration.ofSeconds(3));
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
-
-        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
 
         private final ImportFormatPreferences importFormatPreferences;
 
@@ -566,10 +614,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
-                double waitingTime = ARXIV_API_RATE_LIMITER.acquire();
-                LOGGER.trace("Thread {}, searching arXiv API '{}', waited {} because of API rate limiter",
-                        Thread.currentThread().threadId(), url, waitingTime);
-                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                ARXIV_API_RATE_LIMITER.acquire(url.toString());
+                DocumentBuilder builder = createDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {
@@ -581,6 +627,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             } catch (SAXException | ParserConfigurationException | IOException exception) {
                 throw new FetcherException(url, "arXiv API request failed", exception);
             }
+        }
+
+        private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setFeature(DISALLOW_DOCTYPE_DECLARATION, true);
+            return documentBuilderFactory.newDocumentBuilder();
         }
 
         private FetcherException getException(Document error) {

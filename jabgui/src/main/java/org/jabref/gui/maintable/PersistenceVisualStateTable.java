@@ -41,17 +41,17 @@ public class PersistenceVisualStateTable {
              });
     }
 
-    /// Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
+    /// Stores shown columns, their width and their [TableColumn.SortType] in preferences.
     /// The conversion to the "real" string in the preferences is made at
-    /// {@link org.jabref.logic.preferences.JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
+    /// [org.jabref.logic.preferences.JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)]
     private void updateColumns() {
         List<MainTableColumnModel> list = toList(table.getColumns());
         LOGGER.debug("Updating columns to {}", list);
         preferences.setColumns(list);
     }
 
-    /// Stores the SortOrder of the Table in the preferences. This includes {@link TableColumn.SortType}.
-    /// <br>
+    /// Stores the SortOrder of the Table in the preferences. This includes [TableColumn.SortType].
+    ///
     /// Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
     /// on other changes.
     private void updateSortOrder() {
