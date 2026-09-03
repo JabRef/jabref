@@ -109,18 +109,18 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> List.copyOf(entry.getValue())));
     }
 
-    /// Searches recursively all files in the specified directory. <br>
-    /// <br>
-    /// All files matched by the given [UnlinkedPDFFileFilter] are taken into the resulting tree. <br>
-    /// <br>
-    /// The result will be a tree structure of nodes of the type [javafx.scene.control.CheckBoxTreeItem]. <br>
-    /// <br>
-    /// The user objects that are attached to the nodes is the [FileNodeViewModel], which wraps the [java.io.File]-Object. <br>
-    /// <br>
+    /// Searches recursively all files in the specified directory.
+    ///
+    /// All files matched by the given [UnlinkedPDFFileFilter] are taken into the resulting tree.
+    ///
+    /// The result will be a tree structure of nodes of the type [javafx.scene.control.CheckBoxTreeItem].
+    ///
+    /// The user objects that are attached to the nodes is the [FileNodeViewModel], which wraps the [java.io.File]-Object.
+    ///
     /// For ensuring the capability to cancel the work of this recursive method, the first position in the integer array
     /// 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve
     /// its recursion and return what it has saved so far.
-    /// <br>
+    ///
     /// The files are filtered according to the [DateRange] filter value
     /// and then sorted according to the [ExternalFileSorter] value.
     ///

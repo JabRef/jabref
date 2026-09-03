@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
 public class BibEntryRelationsRepositoryTestHelpers {
 
     /// Provide mocks factories for [BibEntryCitationsAndReferencesRepository] mocks.
-    /// <br>
+    ///
     /// Those implementations should help to test the values passed to an injected repository instance
     /// when it is called from [org.jabref.logic.citation.SearchCitationsRelationsService].
     public static class Mocks {

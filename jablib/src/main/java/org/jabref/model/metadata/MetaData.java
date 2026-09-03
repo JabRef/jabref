@@ -153,7 +153,7 @@ public class MetaData {
 
     /// Updates the stored key patterns to the given key patterns.
     ///
-    /// @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+    /// @param bibtexKeyPatterns the key patterns to update to. A reference to this object is stored internally and is returned at getCiteKeyPattern();
     public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();

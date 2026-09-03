@@ -51,7 +51,7 @@ public class PersistenceVisualStateTable {
     }
 
     /// Stores the SortOrder of the Table in the preferences. This includes [TableColumn.SortType].
-    /// <br>
+    ///
     /// Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
     /// on other changes.
     private void updateSortOrder() {
