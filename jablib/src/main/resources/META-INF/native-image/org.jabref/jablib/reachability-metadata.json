@@ -267,7 +267,15 @@
       "serializable": true
     },
     {
-      "type": "org.jabref.model.database.BibDatabase"
+      "type": "org.jabref.model.database.BibDatabase",
+      "methods": [
+        {
+          "name": "relayEntryChangeEvent",
+          "parameterTypes": [
+            "org.jabref.model.entry.event.FieldChangedEvent"
+          ]
+        }
+      ]
     },
     {
       "type": "org.jabref.model.database.KeyChangeListener"
