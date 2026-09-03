@@ -18,6 +18,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -55,6 +56,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
 
     @Inject private CliPreferences preferences;
+    @Inject private UndoManager undoManager;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -70,7 +72,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences, undoManager);
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)
