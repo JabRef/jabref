@@ -76,7 +76,7 @@ Therefore, JabRef performs an automatic merge without requiring manual conflict 
 ## Using the semantic merge as Git merge driver
 
 `jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver), so that Git merges `.bib` files entry by entry.
-The setup is documented at <https://docs.jabref.org/collaborative-work/git-merge-driver>.
+The setup is described in the user documentation, [Share](https://docs.jabref.org/collaborative-work/) → "Merging a Bib(la)TeX Library with Git".
 
 Git calls the driver with the base (`%O`), current (`%A`), and other (`%B`) version.
 The driver writes `current + (other - base)` into `%A`.
