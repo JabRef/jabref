@@ -120,8 +120,8 @@ class HayagrivaExporterTest {
                 "  parent:",
                 "    type: periodical",
                 "    title: Physical Review B",
-                "    volume: 102",
-                "    issue: 16",
+                "    volume: \"102\"",
+                "    issue: \"16\"",
                 "    publisher: American Physical Society");
 
         assertEquals(expected, export(List.of(entry), tempDir));

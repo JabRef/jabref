@@ -3,6 +3,7 @@ package org.jabref.logic.directorylibrary;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +25,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// A directory-library sidecar in Markdown form: `X.md` next to `X.pdf`. The YAML frontmatter
 /// (between two `---` lines) is a regular Hayagriva document carrying the bibliographic data;
@@ -69,12 +69,18 @@ public class MarkdownSidecar {
     /// opens with a frontmatter block that is recognized as Hayagriva. Arbitrary Markdown
     /// (READMEs, plain notes) is no sidecar.
     public boolean looksLikeSidecar(Path file) throws IOException {
-        Optional<Document> document = split(Files.readString(file, StandardCharsets.UTF_8));
-        if (document.isEmpty()) {
-            return false;
-        }
-        try (BufferedReader reader = new BufferedReader(Reader.of(document.get().frontmatter()))) {
+        return split(Files.readString(file, StandardCharsets.UTF_8))
+                .map(Document::frontmatter)
+                .map(this::isHayagrivaFrontmatter)
+                .orElse(false);
+    }
+
+    private boolean isHayagrivaFrontmatter(String frontmatter) {
+        try (BufferedReader reader = new BufferedReader(Reader.of(frontmatter))) {
             return importer.isRecognizedFormat(reader);
+        } catch (IOException e) {
+            // Reading from an in-memory string cannot fail
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -82,17 +88,22 @@ public class MarkdownSidecar {
     /// into the first entry's comment fields. A file without a frontmatter block yields an empty
     /// result (callers recognize sidecars via [#looksLikeSidecar] first).
     public ParserResult read(Path file) throws IOException {
-        Optional<Document> document = split(Files.readString(file, StandardCharsets.UTF_8));
-        if (document.isEmpty()) {
-            return new ParserResult();
-        }
+        return split(Files.readString(file, StandardCharsets.UTF_8))
+                .map(this::read)
+                .orElseGet(ParserResult::new);
+    }
+
+    private ParserResult read(Document document) {
         ParserResult result;
-        try (BufferedReader reader = new BufferedReader(Reader.of(document.get().frontmatter()))) {
+        try (BufferedReader reader = new BufferedReader(Reader.of(document.frontmatter()))) {
             result = importer.importDatabase(reader);
+        } catch (IOException e) {
+            // Reading from an in-memory string cannot fail
+            throw new UncheckedIOException(e);
         }
         List<BibEntry> entries = result.getDatabase().getEntries();
         if (!entries.isEmpty()) {
-            applyBody(entries.getFirst(), document.get().body());
+            applyBody(entries.getFirst(), document.body());
         }
         return result;
     }
@@ -102,25 +113,22 @@ public class MarkdownSidecar {
     /// stripped, they live in the body — and the body by regenerating the intro and the
     /// `## comment-<name>` sections from the first entry while keeping foreign sections
     /// verbatim. The document heading is normalized to `# Notes`.
-    public String merge(@Nullable String existingDocument, List<HayagrivaEntryWriter.KeyedEntry> entries) {
-        Optional<Document> existing = Optional.ofNullable(existingDocument).flatMap(MarkdownSidecar::split);
-        List<HayagrivaEntryWriter.KeyedEntry> frontmatterEntries = entries.stream()
-                .map(keyed -> new HayagrivaEntryWriter.KeyedEntry(keyed.previousKey(), keyed.targetKey(), withoutCommentFields(keyed.entry())))
-                .toList();
-        String frontmatter = entryWriter.mergeIntoDocument(existing.map(Document::frontmatter).orElse(null), frontmatterEntries);
+    ///
+    /// @param existingDocument the sidecar's current text, empty for a new file
+    public String merge(String existingDocument, List<HayagrivaEntryWriter.KeyedEntry> entries) throws IOException {
+        Optional<Document> existing = split(existingDocument);
+        // Only the first entry's comments live in the body; further entries keep theirs as keys
+        List<HayagrivaEntryWriter.KeyedEntry> frontmatterEntries = new ArrayList<>(entries);
+        if (!entries.isEmpty()) {
+            HayagrivaEntryWriter.KeyedEntry first = entries.getFirst();
+            frontmatterEntries.set(0, new HayagrivaEntryWriter.KeyedEntry(first.previousKey(), first.targetKey(), withoutCommentFields(first.entry())));
+        }
+        String frontmatter = entryWriter.mergeIntoDocument(existing.map(Document::frontmatter).orElse(""), frontmatterEntries);
         String body = entries.isEmpty() ? "" : renderBody(existing.map(Document::body).orElse(""), entries.getFirst().entry());
 
-        StringBuilder document = new StringBuilder();
-        document.append(FRONTMATTER_DELIMITER).append('\n');
-        document.append(frontmatter);
-        if (!frontmatter.isEmpty() && !frontmatter.endsWith("\n")) {
-            document.append('\n');
-        }
-        document.append(FRONTMATTER_DELIMITER).append('\n');
-        if (!body.isEmpty()) {
-            document.append('\n').append(body);
-        }
-        return document.toString();
+        String frontmatterBlock = frontmatter.isBlank() ? "" : frontmatter.stripTrailing() + "\n";
+        return FRONTMATTER_DELIMITER + "\n" + frontmatterBlock + FRONTMATTER_DELIMITER + "\n"
+                + (body.isEmpty() ? "" : "\n" + body);
     }
 
     /// Splits the raw text at the frontmatter delimiters: the first line must be `---`, the
