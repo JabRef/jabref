@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.jspecify.annotations.NonNull;
 
 /// Stores all information needed to manage entries on a shared (SQL) database.
 public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
@@ -11,23 +12,42 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     // It has to be unique on remote DBS for all connected JabRef instances.
     // The old id above does not satisfy this requirement.
     // This is "ID" in JabDrive sync
-    private int sharedID;
+    private String sharedIdAsString;
+
+    private int sharedIdAsInt;
 
     // Needed for version controlling if used on shared database
     // This is "Revision" in JabDrive sync
     private int version;
 
     public SharedBibEntryData() {
-        this.sharedID = -1;
+        this.sharedIdAsString = "";
+        this.sharedIdAsInt = -1;
         this.version = 1;
     }
 
-    public int getSharedID() {
-        return sharedID;
+    /// @return Empty string if no sharedId is set yet
+    public String getSharedIdAsString() {
+        return sharedIdAsString;
     }
 
-    public void setSharedID(int sharedID) {
-        this.sharedID = sharedID;
+    /// @return -1 if no sharedId is set yet
+    public int getSharedIdAsInt() {
+        return sharedIdAsInt;
+    }
+
+    public void setSharedId(@NonNull String sharedIdAsString) {
+        this.sharedIdAsString = sharedIdAsString;
+        try {
+            this.sharedIdAsInt = Integer.parseInt(sharedIdAsString);
+        } catch (NumberFormatException e) {
+            this.sharedIdAsInt = Objects.hash(sharedIdAsString);
+        }
+    }
+
+    public void setSharedId(int sharedId) {
+        this.sharedIdAsString = String.valueOf(sharedId);
+        this.sharedIdAsInt = sharedId;
     }
 
     public int getVersion() {
@@ -41,7 +61,7 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                          .add("sharedID", sharedID)
+                          .add("sharedId", sharedIdAsString)
                           .add("version", version)
                           .toString();
     }
@@ -54,20 +74,20 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
         if (!(o instanceof SharedBibEntryData other)) {
             return false;
         }
-        return sharedID == other.sharedID && version == other.version;
+        return sharedIdAsString.equals(other.sharedIdAsString) && version == other.version;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sharedID, version);
+        return Objects.hash(sharedIdAsString, version);
     }
 
     @Override
     public int compareTo(SharedBibEntryData o) {
-        if (this.sharedID == o.sharedID) {
+        if (this.sharedIdAsString.equals(o.sharedIdAsString)) {
             return Integer.compare(this.version, o.version);
         } else {
-            return Integer.compare(this.sharedID, o.sharedID);
+            return this.sharedIdAsString.compareTo(o.sharedIdAsString);
         }
     }
 }

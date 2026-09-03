@@ -18,7 +18,6 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
         final Map<KeyBinding, String> keyBindings = new HashMap<>();
 
         // Clear conflicting default presets
-        keyBindings.put(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE, "");
         keyBindings.put(KeyBinding.COPY_PREVIEW, "");
 
         // Add new entry presets
