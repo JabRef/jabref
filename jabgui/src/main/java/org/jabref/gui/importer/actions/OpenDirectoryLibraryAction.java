@@ -2,6 +2,9 @@ package org.jabref.gui.importer.actions;
 
 import java.nio.file.Path;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -22,9 +25,14 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /// Opens a directory as a library: the main table fills from the Hayagriva `.yml` sidecars and
 /// `.pdf` files found in the directory tree (see [DirectoryLibraryScanner]).
 public class OpenDirectoryLibraryAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDirectoryLibraryAction.class);
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
@@ -65,18 +73,31 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(this::openDirectory);
+                     .ifPresent(root -> {
+                         preferences.getFilePreferences().setWorkingDirectory(root);
+                         openDirectory(root);
+                     });
     }
 
     /// Opens the directory as a library without showing the chooser (used by the session
-    /// restore and internal routing).
-    public void openDirectory(Path root) {
-        preferences.getFilePreferences().setWorkingDirectory(root);
+    /// restore and internal routing). An already open directory library is raised instead.
+    public void openDirectory(Path directory) {
+        Path root = directory.toAbsolutePath().normalize();
+        tabContainer.getLibraryTabs().stream()
+                    .filter(tab -> tab.getBibDatabaseContext().getDirectoryLibraryRoot()
+                                      .map(openRoot -> openRoot.toAbsolutePath().normalize())
+                                      .filter(root::equals)
+                                      .isPresent())
+                    .findFirst()
+                    .ifPresentOrElse(tabContainer::showLibraryTab, () -> scanAndShow(root));
+    }
+
+    private void scanAndShow(Path root) {
         PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
                 preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
                 preferences.getCitationKeyPatternPreferences());
         BackgroundTask.wrap(() -> new DirectoryLibraryScanner(pdfEntryFactory).scan(root))
-                      .onSuccess(this::showLibraryTab)
+                      .onSuccess(scanResult -> showLibraryTab(scanResult, pdfEntryFactory))
                       .onFailure(exception -> dialogService.showErrorDialogAndWait(
                               Localization.lang("Open folder as library"),
                               Localization.lang("Could not open folder '%0' as library.", root.toString()),
@@ -84,7 +105,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                       .executeWith(taskExecutor);
     }
 
-    private void showLibraryTab(DirectoryLibraryScanner.ScanResult scanResult) {
+    private void showLibraryTab(DirectoryLibraryScanner.ScanResult scanResult, PdfEntryFactory pdfEntryFactory) {
         // The synchronous factory keeps the DIRECTORY location: the ParserResult-based one
         // reconstructs a fresh (LOCAL) context from database + metadata on loading success
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -101,12 +122,11 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 taskExecutor);
         tabContainer.addTab(libraryTab, true);
         if (!scanResult.pendingPdfImports().isEmpty()) {
-            PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
-                    preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
-                    preferences.getCitationKeyPatternPreferences());
-            new PdfEnrichmentTask(scanResult.pendingPdfImports(), pdfEntryFactory, scanResult.databaseContext(),
-                    UiTaskExecutor::runInJavaFXThread)
-                    .executeWith(taskExecutor);
+            PdfEnrichmentTask enrichment = new PdfEnrichmentTask(scanResult.pendingPdfImports(), pdfEntryFactory,
+                    scanResult.databaseContext(), UiTaskExecutor::runInJavaFXThread);
+            enrichment.onFailure(exception -> LOGGER.error("Extracting PDF metadata failed", exception));
+            cancelOnClose(libraryTab, enrichment);
+            enrichment.executeWith(taskExecutor);
         }
 
         if (!scanResult.warnings().isEmpty()) {
@@ -114,5 +134,14 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                     Localization.lang("Open folder as library"),
                     String.join("\n", scanResult.warnings()));
         }
+    }
+
+    /// The enrichment mutates entries of the tab's library, so it must not outlive the tab.
+    private static void cancelOnClose(LibraryTab libraryTab, PdfEnrichmentTask enrichment) {
+        EventHandler<Event> onClosed = libraryTab.getOnClosed();
+        libraryTab.setOnClosed(event -> {
+            enrichment.cancel();
+            onClosed.handle(event);
+        });
     }
 }

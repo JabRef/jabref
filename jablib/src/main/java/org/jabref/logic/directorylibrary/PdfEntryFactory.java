@@ -88,10 +88,9 @@ public class PdfEntryFactory {
     /// The immediately available placeholder for a PDF: title from the file name, PDF linked.
     /// Metadata extraction happens asynchronously afterwards (see [PdfEnrichmentTask]).
     public BibEntry createStub(Path pdf, Path root) {
-        BibEntry stub = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.TITLE, FileUtil.getBaseName(pdf));
-        stub.addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName()));
-        return stub;
+        return new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.TITLE, FileUtil.getBaseName(pdf))
+                .withFiles(List.of(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName())));
     }
 
     /// Applies extracted metadata onto the live stub entry (same instance, so table selection
@@ -133,14 +132,21 @@ public class PdfEntryFactory {
             return;
         }
         try {
-            Optional<DOI> doi = crossRef.findIdentifier(entry);
-            if (doi.isEmpty()) {
-                return;
-            }
-            entry.setField(StandardField.DOI, doi.get().asString());
-            doiFetcher.performSearchById(doi.get().asString()).ifPresent(entry::mergeWith);
+            crossRef.findIdentifier(entry).map(DOI::asString).ifPresent(doi -> {
+                entry.setField(StandardField.DOI, doi);
+                fetchByDoi(doi).ifPresent(entry::mergeWith);
+            });
         } catch (FetcherException e) {
             LOGGER.debug("DOI lookup failed for {}", entry.getAuthorTitleYear(80), e);
+        }
+    }
+
+    private Optional<BibEntry> fetchByDoi(String doi) {
+        try {
+            return doiFetcher.performSearchById(doi);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not fetch metadata for DOI {}", doi, e);
+            return Optional.empty();
         }
     }
 }
