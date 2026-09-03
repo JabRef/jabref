@@ -31,6 +31,7 @@ import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -77,9 +78,9 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// **Usage**
 ///
 /// ```java
-/// BibtexParser parser = new BibtexParser(importFormatPreferences);
-/// ParserResult result = parser.parse();
-/// ```
+ /// BibtexParser parser = new BibtexParser(importFormatPreferences);
+ /// ParserResult result = parser.parse();
+ ///```
 ///
 /// Can be used standalone.
 ///
@@ -271,10 +272,15 @@ public class BibtexParser implements Parser {
         int startLine = line;
         int startColumn = column;
         try {
+            // A library without a declared separator keeps the one its keyword fields already use, so opening it does not rewrite them
+            Optional<Character> guessedSeparator = KeywordImportNormalizer.guessSeparator(database.getEntries(), importFormatPreferences.bibEntryPreferences());
             MetaData metaData = metaDataParser.parse(
                     meta,
-                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator(),
+                    guessedSeparator.orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()),
                     importFormatPreferences.filePreferences().getUserAndHost());
+            if (metaData.getKeywordSeparator().isEmpty()) {
+                guessedSeparator.ifPresent(metaData::setKeywordSeparator);
+            }
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
                             String existingGroups = meta.get(MetaData.GROUPSTREE);

@@ -1,6 +1,8 @@
 package org.jabref.logic.importer;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.SequencedSet;
@@ -28,8 +30,32 @@ public final class KeywordImportNormalizer {
         entries.forEach(entry -> normalizeKeywords(entry, preferences));
     }
 
+    public static void normalizeKeywords(Iterable<BibEntry> entries, BibEntryPreferences preferences, @Nullable Character separator) {
+        entries.forEach(entry -> normalizeKeywords(entry, preferences, separator));
+    }
+
     public static void normalizeKeywords(BibEntry entry, BibEntryPreferences preferences) {
-        Character separator = Optional.ofNullable(preferences.getKeywordSeparator())
+        normalizeKeywords(entry, preferences, preferences.getKeywordSeparator());
+    }
+
+    /// Guesses the separator the given entries already use: the configured import delimiter occurring most often in keyword fields.
+    /// Empty if no keyword field contains any delimiter, or if two delimiters are tied (then the caller's fallback applies).
+    public static Optional<Character> guessSeparator(Iterable<BibEntry> entries, BibEntryPreferences preferences) {
+        List<Character> candidates = parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
+        Map<Character, Long> counts = new HashMap<>();
+        for (BibEntry entry : entries) {
+            entry.getField(StandardField.KEYWORDS).ifPresent(keywords ->
+                    keywords.chars().mapToObj(symbol -> (char) symbol)
+                            .filter(candidates::contains)
+                            .forEach(symbol -> counts.merge(symbol, 1L, Long::sum)));
+        }
+        long max = counts.values().stream().mapToLong(Long::longValue).max().orElse(0);
+        List<Character> winners = counts.entrySet().stream().filter(count -> count.getValue() == max).map(Map.Entry::getKey).toList();
+        return (max > 0) && (winners.size() == 1) ? Optional.of(winners.getFirst()) : Optional.empty();
+    }
+
+    public static void normalizeKeywords(BibEntry entry, BibEntryPreferences preferences, @Nullable Character requestedSeparator) {
+        Character separator = Optional.ofNullable(requestedSeparator)
                                       .orElse(BibEntryPreferences.getDefault().getKeywordSeparator());
         List<Character> importKeywordDelimiters = parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
         BibEntryPreferences.ImportDelimiterParsingStrategy parsingStrategy = Optional.ofNullable(preferences.getImportDelimiterParsingStrategy())
@@ -42,7 +68,10 @@ public final class KeywordImportNormalizer {
                 case INFER_DELIMITER_BY_PRIORITY ->
                         KeywordList.parseWithPrioritizedDelimiters(rawKeywords, importKeywordDelimiters);
             };
-            entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
+            // Only rewrite fields that actually use a different delimiter; a field already using the separator keeps its original formatting
+            if (!importedKeywords.equals(KeywordList.parse(rawKeywords, separator))) {
+                entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
+            }
         });
     }
 

@@ -43,6 +43,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -86,6 +87,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
+        keywordSeparatorProperty.setValue(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()).toString());
     }
 
     @Override
@@ -114,6 +116,13 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
             newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
+        }
+
+        String keywordSeparator = keywordSeparatorProperty.getValue().trim();
+        if (keywordSeparator.isEmpty()) {
+            newMetaData.clearKeywordSeparator();
+        } else {
+            newMetaData.setKeywordSeparator(keywordSeparator.charAt(0));
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -193,6 +202,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
+    }
+
+    public StringProperty keywordSeparatorProperty() {
+        return this.keywordSeparatorProperty;
     }
 
     private Path getBrowseDirectory(String configuredDir) {

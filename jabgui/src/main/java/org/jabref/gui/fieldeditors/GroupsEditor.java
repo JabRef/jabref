@@ -10,6 +10,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -25,7 +26,8 @@ public class GroupsEditor extends TagsEditor {
 
     public GroupsEditor(Field field,
                         SuggestionProvider<?> suggestionProvider,
-                        FieldCheckers fieldCheckers) {
+                        FieldCheckers fieldCheckers,
+                        BibDatabaseContext databaseContext) {
 
         super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
 
@@ -33,7 +35,7 @@ public class GroupsEditor extends TagsEditor {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                Injector.instantiateModelOrService(CliPreferences.class),
+                databaseContext.getKeywordSeparator(Injector.instantiateModelOrService(CliPreferences.class).getBibEntryPreferences()),
                 undoManager);
 
         setupTagsField(
