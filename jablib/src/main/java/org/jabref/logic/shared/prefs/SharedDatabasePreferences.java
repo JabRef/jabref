@@ -8,7 +8,10 @@ import java.util.prefs.Preferences;
 
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.strings.StringUtil;
 
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,17 +27,19 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_PORT = "sharedDatabasePort";
     private static final String SHARED_DATABASE_NAME = "sharedDatabaseName";
     private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
+    /// Legacy key: the password used to be stored AES-encrypted in these preferences; it now lives in the system keyring
     private static final String SHARED_DATABASE_PASSWORD = "sharedDatabasePassword";
+    private static final String KEYRING_SERVICE = "org.jabref.shareddatabase";
     private static final String SHARED_DATABASE_FOLDER = "sharedDatabaseFolder";
     private static final String SHARED_DATABASE_AUTOSAVE = "sharedDatabaseAutosave";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
-    private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
     private static final String SHARED_DATABASE_EXPERT_MODE = "sharedDatabaseExpertMode";
     private static final String SHARED_DATABASE_JDBC_URL = "sharedDatabaseJdbcUrl";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
+    private final String keyringAccount;
 
     public SharedDatabasePreferences() {
         this(DEFAULT_NODE);
@@ -42,6 +47,7 @@ public class SharedDatabasePreferences {
 
     public SharedDatabasePreferences(String sharedDatabaseID) {
         internalPrefs = Preferences.userRoot().node(PREFERENCES_PATH_NAME).node(sharedDatabaseID);
+        keyringAccount = sharedDatabaseID;
     }
 
     public Optional<String> getType() {
@@ -64,12 +70,32 @@ public class SharedDatabasePreferences {
         return getOptionalValue(SHARED_DATABASE_USER);
     }
 
+    /// @return the plain password from the system keyring; empty if none is stored or the keyring is unavailable
     public Optional<String> getPassword() {
-        return getOptionalValue(SHARED_DATABASE_PASSWORD);
+        try (Keyring keyring = Keyring.create()) {
+            return Optional.of(keyring.getPassword(KEYRING_SERVICE, keyringAccount)).filter(StringUtil::isNotBlank);
+        } catch (PasswordAccessException e) {
+            return migrateLegacyPassword();
+        } catch (Exception e) {
+            LOGGER.warn("Could not open keyring for retrieving the shared database password", e);
+            return Optional.empty();
+        }
     }
 
-    public Optional<String> getServerTimezone() {
-        return getOptionalValue(SHARED_DATABASE_SERVER_TIMEZONE);
+    private Optional<String> migrateLegacyPassword() {
+        Optional<String> legacy = getOptionalValue(SHARED_DATABASE_PASSWORD);
+        Optional<String> user = getUser();
+        if (legacy.isEmpty() || user.isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            String password = new Password(legacy.get().toCharArray(), user.get()).decrypt();
+            setPassword(password);
+            return Optional.of(password);
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            LOGGER.error("Could not read the stored shared database password", e);
+            return Optional.empty();
+        }
     }
 
     public boolean getRememberPassword() {
@@ -108,8 +134,22 @@ public class SharedDatabasePreferences {
         internalPrefs.put(SHARED_DATABASE_USER, user);
     }
 
+    /// Stores the plain password in the system keyring; a blank password clears it.
     public void setPassword(String password) {
-        internalPrefs.put(SHARED_DATABASE_PASSWORD, password);
+        internalPrefs.remove(SHARED_DATABASE_PASSWORD);
+        try (Keyring keyring = Keyring.create()) {
+            if (StringUtil.isBlank(password)) {
+                try {
+                    keyring.deletePassword(KEYRING_SERVICE, keyringAccount);
+                } catch (PasswordAccessException e) {
+                    // nothing stored, nothing to clear
+                }
+            } else {
+                keyring.setPassword(KEYRING_SERVICE, keyringAccount, password);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Could not open keyring for storing the shared database password", e);
+        }
     }
 
     public void setRememberPassword(boolean rememberPassword) {
@@ -128,12 +168,8 @@ public class SharedDatabasePreferences {
         internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
     }
 
-    public void setServerTimezone(String serverTimezone) {
-        internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);
-    }
-
     public void clearPassword() {
-        internalPrefs.remove(SHARED_DATABASE_PASSWORD);
+        setPassword("");
     }
 
     public void setExpertMode(boolean expertMode) {
@@ -153,6 +189,7 @@ public class SharedDatabasePreferences {
     }
 
     public void clear() throws BackingStoreException {
+        clearPassword();
         internalPrefs.clear();
     }
 
@@ -173,14 +210,9 @@ public class SharedDatabasePreferences {
         setName(properties.getDatabase());
         setUser(properties.getUser());
         setUseSSL(properties.isUseSSL());
-        setServerTimezone(properties.getServerTimezone());
         setExpertMode(properties.isUseExpertMode());
         setJdbcUrl(properties.getJdbcUrl());
 
-        try {
-            setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());
-        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            LOGGER.error("Could not store the password due to encryption problems.", e);
-        }
+        setPassword(properties.getPassword());
     }
 }
