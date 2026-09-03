@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -121,7 +122,7 @@ public class BibtexParser implements Parser {
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;
         this.metaDataParser = new MetaDataParser(fileMonitor);
-        this.parsedBibDeskGroups = new HashMap<>();
+        this.parsedBibDeskGroups = new LinkedHashMap<>();
     }
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -267,8 +268,6 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
 
-        addBibDeskGroupEntriesToJabRefGroups();
-
         int startLine = line;
         int startColumn = column;
         try {
@@ -280,6 +279,12 @@ public class BibtexParser implements Parser {
                     importFormatPreferences.filePreferences().getUserAndHost());
             if (metaData.getKeywordSeparator().isEmpty()) {
                 guessedSeparator.ifPresent(metaData::setKeywordSeparator);
+            }
+            if (!parsedBibDeskGroups.isEmpty()) {
+                Character keywordSeparator = metaData.getKeywordSeparator()
+                                                    .orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                createBibDeskGroupTree(keywordSeparator);
+                addBibDeskGroupEntriesToJabRefGroups(keywordSeparator);
             }
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
@@ -415,7 +420,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Adds BibDesk group entries to the JabRef database
-    private void addBibDeskGroupEntriesToJabRefGroups() {
+    private void addBibDeskGroupEntriesToJabRefGroups(Character keywordSeparator) {
         for (String groupName : parsedBibDeskGroups.keySet()) {
             String[] citationKeys = parsedBibDeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
@@ -425,11 +430,17 @@ public class BibtexParser implements Parser {
                     bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
                 } else if (!groupValue.get().contains(groupName)) {
                     // if the citation does belong to a group already and is not yet assigned to the same group, we concatenate
-                    String concatGroup = groupValue.get() + "," + groupName;
+                    String concatGroup = groupValue.get() + keywordSeparator + groupName;
                     bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
                 }
             }
         }
+    }
+
+    private void createBibDeskGroupTree(Character keywordSeparator) {
+        bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, keywordSeparator));
+        parsedBibDeskGroups.keySet().forEach(groupName ->
+                bibDeskGroupTreeNode.addSubgroup(new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator)));
     }
 
     /// Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
@@ -442,8 +453,6 @@ public class BibtexParser implements Parser {
 
             NodeList dictList = doc.getElementsByTagName("dict");
             meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
-            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
-
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {
                 Element dictElement = (Element) dictList.item(i);
@@ -457,8 +466,6 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        ExplicitGroup staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-                        bibDeskGroupTreeNode.addSubgroup(staticGroup);
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
                     }
