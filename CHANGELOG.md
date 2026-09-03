@@ -69,7 +69,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- Searching for full text documents no longer blocks JabRef with a modal dialog; progress is shown as a cancelable background task in the status bar. TODO
+- Searching for full text documents no longer blocks JabRef with a modal dialog; progress is shown as a cancelable background task in the status bar. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
