@@ -139,6 +139,7 @@ Agents **must not**:
 
 - Do not add trivial comments just restating the code line in plain English.
 - When commenting, focus on the "why" and general idea.
+- Package- and module-level orientation belongs in `package-info.java` / `module-info.java`, see [Package and module documentation](#package-and-module-documentation).
 
 Example for trivial comments (to be avoided):
 
@@ -533,6 +534,18 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/code-howtos/` — localization, testing, fetchers, tools
 - `docs/decisions/` — Architecture Decision Records
 - `docs/requirements/` — Requirements (OpenFastTrace)
+
+### Package and module documentation
+
+`module-info.java` and `package-info.java` files carry the orientation layer of the code base.
+They are read by humans and by AI agents that have no code-graph tooling and need to find the right place by reading, so write them for routing: what lives here, where to start, and where to go instead.
+
+- Every module has a Markdown Javadoc (`///`) comment on `module-info.java`: the module's responsibility in one or two sentences, its main entry points (`[ClassName]`), and links to the devdocs pages describing it.
+- Every package with non-trivial content has a `package-info.java`. Add one when creating a package; update it when moving, renaming, or removing classes it mentions.
+- Structure: first sentence states the package's purpose. Then the entry-point classes as `[ClassName]` links. Then adjacent packages for related concerns ("Parsing of `.bib` files is in [org.jabref.logic.importer.fileformat]"). Then deep links to developer documentation.
+- Deep links use absolute URLs into <https://devdocs.jabref.org/>, which renders `docs/`: `docs/<path>.md` becomes `https://devdocs.jabref.org/<path>.html` (for example `docs/code-howtos/localization.md` → <https://devdocs.jabref.org/code-howtos/localization.html>). Link the ADR in `docs/decisions/` that motivated the package's design where one exists.
+- Tone: neutral, professional software-engineering prose. No change history, no issue references, no marketing. Do not repeat class-level Javadoc; point to it.
+- Existing examples: `jablib/src/main/java/org/jabref/logic/bibtex/comparator/package-info.java`, `jabgui/src/main/java/org/jabref/gui/preferences/forms/package-info.java`.
 
 ---
 
