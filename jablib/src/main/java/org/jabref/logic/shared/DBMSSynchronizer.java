@@ -1,5 +1,6 @@
 package org.jabref.logic.shared;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
+import org.jabref.logic.shared.event.ConnectionRestoredEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.SharedWriteFailedEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
@@ -32,6 +34,7 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.logic.shared.notifications.Notifier;
+import org.jabref.logic.util.Directories;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -68,14 +71,23 @@ import org.slf4j.LoggerFactory;
 ///   the notification listener thread applies concurrently with the caller. EventBus-dispatched
 ///   `listen` methods only `tryLock` and skip the work when the lock is contended - they may hold
 ///   EventBus monitors that the lock holder needs for posting its own events.
+///
+/// Connection loss: once a write finds the connection dead, the synchronizer goes offline - every
+/// change is recorded in [OfflineChanges] (in memory and on disk) instead of being written, pulls
+/// are skipped, and a background loop reconnects with backoff. Back online, the recorded changes
+/// are written through the same optimistic lock as any other change, then everything is pulled.
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
+    private static final long MAX_RECONNECT_DELAY_MILLIS = 30_000L;
+
+    private DatabaseConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private Connection currentConnection;
     private Notifier notifier;
     private String dbName;
+    private OfflineChanges offlineChanges;
 
     private MetaData metaData;
     private final BibDatabaseContext bibDatabaseContext;
@@ -87,14 +99,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final FieldPreferences fieldPreferences;
 
     private final FileUpdateMonitor fileMonitor;
+    private final Path offlineChangesDirectory;
 
     // Buffered micro-edits; set from EventBus dispatch threads, taken by the database worker
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
-    // Every queued operation fails once the connection is gone - the user is asked only once
-    private final AtomicBoolean connectionLostReported = new AtomicBoolean();
-    // Entries whose local changes were refused (see UpdateRefusedEvent): they keep their local
-    // state until the user merges - a pull must not overwrite them meanwhile
+    // Cleared when the connection is found dead; set again by the reconnect loop
+    private final AtomicBoolean connected = new AtomicBoolean(true);
+    private volatile boolean closed;
+    // Entries whose local changes were refused (see UpdateRefusedEvent) or are about to be
+    // written after a reconnect: they keep their local state until written or merged - a pull
+    // must not overwrite them meanwhile
     private final Set<Integer> sharedIdsInConflict = ConcurrentHashMap.newKeySet();
     private final String userAndHost;
     private final Executor remoteUpdateExecutor;
@@ -106,6 +121,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private record RemoteChanges(Set<Integer> removedIds, List<BibEntry> changedEntries) {
     }
 
+    @FunctionalInterface
+    private interface DatabaseWrite {
+        void run() throws SQLException;
+    }
+
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
                             Character keywordSeparator,
                             FieldPreferences fieldPreferences,
@@ -113,7 +133,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             FileUpdateMonitor fileMonitor,
                             String userAndHost) {
         // Direct executors keep everything synchronous - for tests and headless use
-        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, Runnable::run, Runnable::run);
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost,
+                Runnable::run, Runnable::run, Directories.getSharedDatabaseDirectory());
     }
 
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
@@ -125,7 +146,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             Executor remoteUpdateExecutor) {
         // One background worker so that typing never waits for the database (which may be remote)
         this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, remoteUpdateExecutor,
-                Executors.newSingleThreadExecutor(runnable -> Thread.ofVirtual().name("JabRef - shared database writer").unstarted(runnable)));
+                Executors.newSingleThreadExecutor(runnable -> Thread.ofVirtual().name("JabRef - shared database writer").unstarted(runnable)),
+                Directories.getSharedDatabaseDirectory());
     }
 
     @VisibleForTesting
@@ -136,7 +158,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                      FileUpdateMonitor fileMonitor,
                      String userAndHost,
                      Executor remoteUpdateExecutor,
-                     Executor syncExecutor) {
+                     Executor syncExecutor,
+                     Path offlineChangesDirectory) {
         this.syncExecutor = syncExecutor;
         this.ownedSyncExecutor = (syncExecutor instanceof ExecutorService executorService) ? executorService : null;
         this.bibDatabaseContext = bibDatabaseContext;
@@ -144,6 +167,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.metaData = bibDatabaseContext.getMetaData();
         this.fieldPreferences = fieldPreferences;
         this.fileMonitor = fileMonitor;
+        this.offlineChangesDirectory = offlineChangesDirectory;
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
@@ -160,14 +184,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         applySaveActionsToBufferedEntry();
         syncExecutor.execute(() -> {
             writeBufferedEntry();
-            try {
-                dbmsProcessor.insertEntries(event.getBibEntries());
-                // Insertions are not described by a single field change, so other clients have to pull
-                notifier.notifyClientsToPull();
-            } catch (SQLException e) {
-                LOGGER.error("Could not insert entries into the shared database", e);
-                reportWriteFailure();
-            }
+            insertSharedEntries(event.getBibEntries());
         });
     }
 
@@ -216,21 +233,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         applySaveActionsToBufferedEntry();
         syncExecutor.execute(() -> {
             writeBufferedEntry();
-            try {
-                dbmsProcessor.removeEntries(event.getBibEntries());
-                // Removals are not described by a single field change, so other clients have to pull
-                notifier.notifyClientsToPull();
-            } catch (SQLException e) {
-                LOGGER.error("Could not remove entries from the shared database", e);
-                reportWriteFailure();
-            }
+            removeSharedEntries(event.getBibEntries());
         });
     }
 
     /// Listening method. Synchronizes the shared [MetaData] and applies them locally.
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
-        syncExecutor.execute(() -> synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern));
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(event.getMetaData(), globalCiteKeyPattern);
+        syncExecutor.execute(() -> writeSharedMetaData(serializedMetaData));
         // Other clients are notified through the upsert_metadata function (see DBMSProcessor.setUp)
         ifNotPullingAlready(this::doApplyMetaData);
     }
@@ -259,6 +270,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             applyRemoteMetaData(sharedMetaData);
             applyRemoteChanges(remoteChanges);
         });
+        // Changes recorded by an earlier session that lost its connection
+        replayOfflineChanges();
     }
 
     /// Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
@@ -289,6 +302,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// worker, applies on the model thread. A failed fetch leaves the local library as it is.
     private void pullEntries() {
         syncExecutor.execute(() -> {
+            if (!connected.get()) {
+                // Everything is pulled once the connection is back
+                return;
+            }
             // A buffered edit is written first: if it conflicts with what is pulled, the write
             // is refused and the user merges - instead of the pull silently overwriting the edit
             writeBufferedEntry();
@@ -306,6 +323,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private void pullMetaData() {
         syncExecutor.execute(() -> {
+            if (!connected.get()) {
+                return;
+            }
             Map<String, String> sharedMetaData;
             try {
                 sharedMetaData = dbmsProcessor.getSharedMetaData();
@@ -406,10 +426,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// @return whether the entry reached the shared database - a refused or failed (and thus
     ///         rolled back) update must not be announced to other clients
     private boolean writeSharedEntry(BibEntry bibEntry) {
+        if (!connected.get()) {
+            offlineChanges.recordChange(bibEntry);
+            return false;
+        }
         int sharedId = bibEntry.getSharedBibEntryData().getSharedIdAsInt();
         try {
             dbmsProcessor.updateEntry(bibEntry);
             sharedIdsInConflict.remove(sharedId);
+            offlineChanges.forget(bibEntry);
             return true;
         } catch (OfflineLockException exception) {
             sharedIdsInConflict.add(sharedId);
@@ -418,18 +443,58 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             // Deleted on the shared side: the pull removes it locally and tells the user
             pullEntries();
         } catch (SQLException e) {
-            LOGGER.error("Could not write entry to the shared database", e);
-            reportWriteFailure();
+            handleWriteFailure("Could not write entry to the shared database", e, () -> offlineChanges.recordChange(bibEntry));
         }
         return false;
     }
 
-    /// Tells the user that local changes did not reach the shared database. If the connection is
-    /// down, checking it posts a [ConnectionLostEvent] (reconnect dialog); otherwise the failure
-    /// is transient and reported as a [SharedWriteFailedEvent].
-    private void reportWriteFailure() {
+    /// Database worker
+    private void insertSharedEntries(List<BibEntry> bibEntries) {
+        writeOrRecord("Could not insert entries into the shared database",
+                () -> dbmsProcessor.insertEntries(bibEntries),
+                () -> offlineChanges.recordInsert(bibEntries));
+    }
+
+    /// Database worker
+    private void removeSharedEntries(List<BibEntry> bibEntries) {
+        writeOrRecord("Could not remove entries from the shared database",
+                () -> dbmsProcessor.removeEntries(bibEntries),
+                () -> offlineChanges.recordRemoval(bibEntries));
+    }
+
+    /// Database worker. Other clients are notified by the database function (see DBMSProcessor.setUp).
+    private void writeSharedMetaData(Map<String, String> serializedMetaData) {
+        writeOrRecord("Could not write metadata to the shared database",
+                () -> dbmsProcessor.setSharedMetaData(serializedMetaData),
+                () -> offlineChanges.recordMetaData(serializedMetaData));
+    }
+
+    /// Database worker: runs the write and asks other clients to pull, or records the change
+    /// when the connection is gone
+    private void writeOrRecord(String failureMessage, DatabaseWrite write, Runnable record) {
+        if (!connected.get()) {
+            record.run();
+            return;
+        }
+        try {
+            write.run();
+            // Insertions and removals are not described by a single field change, so other
+            // clients have to pull; for metadata, the notification is a harmless duplicate
+            notifier.notifyClientsToPull();
+        } catch (SQLException e) {
+            handleWriteFailure(failureMessage, e, record);
+        }
+    }
+
+    /// Database worker. A dead connection takes the synchronizer offline and the change is
+    /// recorded for later; a failure on a live connection is transient and only reported
+    /// (repeating that write would fail the same way).
+    private void handleWriteFailure(String message, SQLException exception, Runnable record) {
+        LOGGER.error(message, exception);
         if (checkCurrentConnection()) {
             eventBus.post(new SharedWriteFailedEvent(bibDatabaseContext));
+        } else {
+            record.run();
         }
     }
 
@@ -442,16 +507,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             LOGGER.error("Parse error", e);
         } finally {
             metaData.setEventPropagation(true);
-        }
-    }
-
-    /// Database worker
-    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPatterns globalCiteKeyPattern) {
-        try {
-            dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
-        } catch (SQLException e) {
-            LOGGER.error("Could not write metadata to the shared database", e);
-            reportWriteFailure();
         }
     }
 
@@ -548,6 +603,151 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
+    /// Takes the synchronizer offline: from now on changes are recorded instead of written, and
+    /// a background loop tries to get a new connection.
+    private void goOffline() {
+        if (!connected.compareAndSet(true, false)) {
+            return;
+        }
+        LOGGER.warn("Lost the connection to the shared database - keeping changes locally until it is back");
+        eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
+        Thread.ofVirtual().name("JabRef - shared database reconnect").start(this::reconnect);
+    }
+
+    // [impl->req~shared-database.automatic-reconnect~1]
+    private void reconnect() {
+        long delayMillis = 1000;
+        while (!closed) {
+            try {
+                Thread.sleep(delayMillis);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            delayMillis = Math.min(delayMillis * 2, MAX_RECONNECT_DELAY_MILLIS);
+            DatabaseConnection newConnection;
+            try {
+                newConnection = dbmsConnection.openNewConnection();
+            } catch (SQLException e) {
+                LOGGER.debug("Reconnecting to the shared database failed - next attempt in {} ms", delayMillis, e);
+                continue;
+            }
+            // On the database worker: queued writes recorded themselves offline, the swap must
+            // not interleave with them
+            syncExecutor.execute(() -> useConnection(newConnection));
+            return;
+        }
+    }
+
+    /// Database worker: replaces the dead connection, then synchronizes what happened meanwhile
+    private void useConnection(DatabaseConnection newConnection) {
+        if (closed) {
+            closeQuietly(newConnection.getConnection());
+            return;
+        }
+        dbmsProcessor.stopNotificationListener();
+        closeQuietly(currentConnection);
+        dbmsConnection = newConnection;
+        currentConnection = newConnection.getConnection();
+        dbmsProcessor = new DBMSProcessor(newConnection);
+        notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
+        dbmsProcessor.startNotificationListener(this);
+        connected.set(true);
+        LOGGER.info("Reconnected to the shared database");
+        eventBus.post(new ConnectionRestoredEvent(bibDatabaseContext));
+        if (!replayOfflineChanges()) {
+            // Nothing to write, but the shared side may have moved on during the outage
+            pullChanges();
+        }
+    }
+
+    /// Writes the changes recorded while offline through the same paths as live changes:
+    /// applied to the local library (model thread) where a restart lost them, then written
+    /// (database worker) - a shared entry that moved on meanwhile refuses the write and the
+    /// user merges, like any other conflict. Ends with a pull.
+    ///
+    /// @return whether there was anything to replay
+    private boolean replayOfflineChanges() {
+        OfflineChanges.Recorded recorded = offlineChanges.take();
+        if (recorded.isEmpty()) {
+            return false;
+        }
+        LOGGER.info("Synchronizing the changes made while the shared database was unavailable");
+        remoteUpdateExecutor.execute(() -> withPullLock(() -> {
+            Map<Integer, BibEntry> localEntriesById = new HashMap<>();
+            for (BibEntry localEntry : bibDatabase.getEntriesSnapshot()) {
+                localEntriesById.put(localEntry.getSharedBibEntryData().getSharedIdAsInt(), localEntry);
+            }
+
+            List<BibEntry> entriesToRemove = new ArrayList<>();
+            List<BibEntry> locallyPresentRemovedEntries = new ArrayList<>();
+            for (int sharedId : recorded.removedIds()) {
+                BibEntry localEntry = localEntriesById.get(sharedId);
+                if (localEntry != null) {
+                    // Pulled back in by a fresh session
+                    locallyPresentRemovedEntries.add(localEntry);
+                }
+                BibEntry removedEntry = new BibEntry();
+                removedEntry.getSharedBibEntryData().setSharedId(sharedId);
+                entriesToRemove.add(removedEntry);
+            }
+            if (!locallyPresentRemovedEntries.isEmpty()) {
+                bibDatabase.removeEntries(locallyPresentRemovedEntries, EntriesEventSource.SHARED);
+            }
+
+            List<BibEntry> entriesToWrite = new ArrayList<>();
+            List<BibEntry> entriesToInsert = new ArrayList<>();
+            recorded.changedEntries().forEach((sharedId, state) -> {
+                BibEntry localEntry = localEntriesById.get(sharedId);
+                if (localEntry == null) {
+                    // Deleted on the shared side meanwhile - the user's version is kept as a new entry
+                    BibEntry restoredEntry = state.toBibEntry();
+                    bibDatabase.insertEntries(List.of(restoredEntry), EntriesEventSource.SHARED);
+                    entriesToInsert.add(restoredEntry);
+                    return;
+                }
+                // After a reconnect the local entry already is in this state; after a restart
+                // it holds the pulled shared state and is brought back to the local one
+                state.applyTo(localEntry);
+                // Protected from the pull that follows until written (or refused and merged)
+                sharedIdsInConflict.add(sharedId);
+                entriesToWrite.add(localEntry);
+            });
+            recorded.newEntries().forEach((localId, state) -> {
+                BibEntry newEntry = bibDatabase.getEntryById(localId).orElseGet(() -> {
+                    BibEntry restoredEntry = state.toBibEntry();
+                    bibDatabase.insertEntries(List.of(restoredEntry), EntriesEventSource.SHARED);
+                    return restoredEntry;
+                });
+                entriesToInsert.add(newEntry);
+            });
+            if (recorded.metaData() != null) {
+                applyRemoteMetaData(recorded.metaData());
+            }
+
+            syncExecutor.execute(() -> {
+                if (!entriesToRemove.isEmpty()) {
+                    removeSharedEntries(entriesToRemove);
+                }
+                if (!entriesToInsert.isEmpty()) {
+                    insertSharedEntries(entriesToInsert);
+                }
+                boolean written = false;
+                for (BibEntry bibEntry : entriesToWrite) {
+                    written |= writeSharedEntry(bibEntry);
+                }
+                if (written) {
+                    notifier.notifyClientsToPull();
+                }
+                if (recorded.metaData() != null) {
+                    writeSharedMetaData(recorded.metaData());
+                }
+                pullChanges();
+            });
+        }));
+        return true;
+    }
+
     private void withPullLock(Runnable work) {
         pullLock.lock();
         try {
@@ -572,21 +772,19 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         return true;
     }
 
-    /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new [ConnectionLostEvent] is going to be sent.
+    /// Checks whether the current SQL connection is valid; a dead one takes the synchronizer offline.
     ///
     /// @return `true` if the connection is valid, else `false`.
     private boolean checkCurrentConnection() {
         try {
-            boolean isValid = currentConnection.isValid(0);
-            if (!isValid && connectionLostReported.compareAndSet(false, true)) {
-                LOGGER.warn("Lost SQL connection.");
-                eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
+            if (currentConnection.isValid(0)) {
+                return true;
             }
-            return isValid;
         } catch (SQLException e) {
-            LOGGER.error("SQL Error during connection check", e);
-            return false;
+            LOGGER.debug("SQL Error during connection check", e);
         }
+        goOffline();
+        return false;
     }
 
     /// Only local changes (and their undo) are written; changes applied from the shared side are not echoed back.
@@ -597,23 +795,30 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     @Override
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException {
+        this.dbmsConnection = connection;
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
         this.dbmsProcessor = new DBMSProcessor(connection);
         this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
+        this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
         initializeDatabases();
     }
 
     @Override
     public void closeSharedDatabase() {
+        closed = true;
         applySaveActionsToBufferedEntry();
+        BibEntry bufferedEntry = entryWithPendingChanges.get();
+        if ((bufferedEntry != null) && isPresentLocalBibEntry(bufferedEntry)) {
+            // Recorded before the flush is even attempted: a dead or slow connection must not
+            // cost the edit - a successful flush forgets it again
+            offlineChanges.recordChange(bufferedEntry);
+        }
         // Flush the buffered micro-edits as the last queued write, then let the queue drain.
         // Strictly bounded: a dead remote connection must not block application shutdown -
         // the writer is a daemon thread and the connection is closed underneath it below.
         if (ownedSyncExecutor != null) {
-            if (!connectionLostReported.get()) {
-                ownedSyncExecutor.execute(this::writeBufferedEntry);
-            }
+            ownedSyncExecutor.execute(this::writeBufferedEntry);
             ownedSyncExecutor.shutdown();
             try {
                 if (!ownedSyncExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
@@ -626,11 +831,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } else {
             writeBufferedEntry();
         }
+        dbmsProcessor.stopNotificationListener();
+        closeQuietly(currentConnection);
+    }
+
+    private static void closeQuietly(Connection connection) {
         try {
-            dbmsProcessor.stopNotificationListener();
-            currentConnection.close();
+            connection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            LOGGER.debug("Could not close the shared database connection", e);
         }
     }
 

@@ -139,10 +139,8 @@ class GroupTreeSharedDatabaseProfileTest {
             }
 
             @Override
-            public java.sql.Connection openNewConnection() {
-                java.sql.Connection connection = postgres.getConnection();
-                assertNotNull(connection);
-                return connection;
+            public DatabaseConnection openNewConnection() {
+                return openConnection(postgres);
             }
         };
     }
