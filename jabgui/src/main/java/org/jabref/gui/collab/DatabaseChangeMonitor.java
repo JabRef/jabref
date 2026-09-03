@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.value.ChangeListener;
@@ -31,6 +32,8 @@ import org.slf4j.LoggerFactory;
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
+    private static final int STABLE_FILE_ATTEMPTS = 20;
+    private static final long STABLE_FILE_INTERVAL_MILLIS = 250;
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
@@ -236,7 +239,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
-            BackgroundTask.wrap(() -> scanner.scanForChanges())
+            BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableFile))
                           .onSuccess(changes -> {
                               if (generation != scanGeneration) {
                                   LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
@@ -250,7 +253,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                           .executeWith(taskExecutor);
             return;
         }
-        BackgroundTask.wrap(() -> scanner.scanForChanges())
+        BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableFile))
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
                               listeners.forEach(listener -> listener.databaseChanged(changes));
@@ -258,6 +261,33 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       })
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// Sync clients and editors may write the file in several steps. A file that is still growing must not be parsed:
+    /// half of a library parses fine and would look like every later entry had been deleted. Waits (bounded) until
+    /// size and modification time stop changing; the last snapshot seen becomes the known disk state.
+    private void awaitStableFile() {
+        Path path = monitoredPath.orElse(null);
+        if (path == null) {
+            return;
+        }
+        FileSnapshot last = FileSnapshot.read(path);
+        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS; attempt++) {
+            try {
+                Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            FileSnapshot current = FileSnapshot.read(path);
+            if (Objects.equals(current, last)) {
+                break;
+            }
+            last = current;
+        }
+        synchronized (database) {
+            knownDiskState = last;
+        }
     }
 
     /// Applies what changed on disk only, and offers the review for what changed on both sides.

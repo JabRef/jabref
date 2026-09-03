@@ -34,9 +34,16 @@ public class ChangeScanner {
     }
 
     public List<DatabaseChange> scanForChanges() {
+        return scanForChanges(() -> {
+        });
+    }
+
+    /// @param beforeParsing run right before the file is parsed, e.g. to wait until a sync client has finished writing it
+    public List<DatabaseChange> scanForChanges(Runnable beforeParsing) {
         if (database.getDatabasePath().isEmpty()) {
             return List.of();
         }
+        beforeParsing.run();
 
         try {
             return getDatabaseChanges(database.getDatabasePath().get());
