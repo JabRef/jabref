@@ -13,8 +13,8 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.directorylibrary.BibMirror;
 import org.jabref.logic.directorylibrary.DirectoryLibraryConverter;
-import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -82,7 +82,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
             return;
         }
 
-        Path mirrorTarget = root.resolve(DirectoryLibrarySynchronizer.mirrorFileName(root));
+        Path mirrorTarget = root.resolve(BibMirror.fileName(root));
         boolean overwritesForeignFile = context.getDatabasePath().filter(not(mirrorTarget::equals)).isPresent() && Files.exists(mirrorTarget);
         if (overwritesForeignFile) {
             dialogService.showErrorDialogAndWait(title,

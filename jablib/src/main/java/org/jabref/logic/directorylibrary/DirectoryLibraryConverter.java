@@ -80,12 +80,12 @@ public class DirectoryLibraryConverter {
     /// @return the mirror file
     public Path convert(BibDatabaseContext context, Path root, FilePreferences filePreferences) throws IOException {
         Path bibFile = context.getDatabasePath().orElseThrow();
-        Path mirror = root.resolve(DirectoryLibrarySynchronizer.mirrorFileName(root));
+        Path mirror = root.resolve(BibMirror.fileName(root));
         writeSidecars(context, root, filePreferences);
         if (!mirror.equals(bibFile)) {
             Files.move(bibFile, mirror);
         }
-        Path base = DirectoryLibrarySynchronizer.mirrorBaseFile(root);
+        Path base = BibMirror.baseFile(root);
         Files.createDirectories(base.getParent());
         Files.copy(mirror, base, StandardCopyOption.REPLACE_EXISTING);
         return mirror;

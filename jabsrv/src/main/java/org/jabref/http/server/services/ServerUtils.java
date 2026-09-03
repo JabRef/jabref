@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.chatting.util.ChatModelFactory;
-import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
+import org.jabref.logic.directorylibrary.BibMirror;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -51,7 +51,7 @@ public class ServerUtils {
     /// @throws NotFoundException if no library with the given id is found
     public static @NonNull Path getLibraryFile(String id, SrvStateManager srvStateManager) {
         Path path = getLibraryPath(id, srvStateManager);
-        return Files.isDirectory(path) ? path.resolve(DirectoryLibrarySynchronizer.mirrorFileName(path)) : path;
+        return Files.isDirectory(path) ? path.resolve(BibMirror.fileName(path)) : path;
     }
 
     /// Returns ids of all libraries the state manager currently considers
