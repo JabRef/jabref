@@ -157,8 +157,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         generateButton.getStyleClass().add("customGenerateButton");
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        double width = Math.clamp(bounds.getWidth() * 0.6, 400, 1100);
-        double height = Math.clamp(bounds.getHeight() * 0.8, 300, 650);
+        double width = Math.clamp(bounds.getWidth() * 0.60, 400, 1100);
+        double height = Math.clamp(bounds.getHeight() * 0.85, 300, 650);
         getDialogPane().setPrefSize(width, height);
         getDialogPane().setMinSize(400, 300);
 
