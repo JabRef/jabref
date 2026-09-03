@@ -20,10 +20,9 @@ testModuleInfo {
     runtimeOnly("org.tinylog.api")
     runtimeOnly("org.tinylog.impl")
     runtimeOnly("org.apache.logging.log4j.to.slf4j")
-    // Add Jersey's external test container for the native jabsrv smoke test.
-    if (project.hasProperty("jabsrv.native.smoke")) {
-        runtimeOnly("org.glassfish.jersey.tests.framework.provider.external")
-    }
+    // Jersey's external test container, used by nativeSmokeTest. Harmless for the regular
+    // test task: with both providers present JerseyTest picks its default (Grizzly).
+    runtimeOnly("org.glassfish.jersey.tests.framework.provider.external")
 }
 
 tasks.test {
