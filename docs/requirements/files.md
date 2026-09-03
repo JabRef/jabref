@@ -33,4 +33,20 @@ A Markdown file sharing its base name with another associated or linked file (e.
 
 Needs: impl, utest
 
+## Searching unlinked files must not block result scrolling
+`req~jabgui.externalfiles.unlinked-files.search.non-blocking-results~1`
+
+When searching for unlinked local files, related entries must be resolved before displaying the results.
+Rendering or scrolling the result tree must not perform file-system searches.
+
+Needs: impl, utest
+
+## The unlinked-files PDF preview can be closed
+`req~jabgui.externalfiles.unlinked-files.preview.close~1`
+
+The user can close the PDF preview side pane in the unlinked-files dialog and show it again when needed.
+Closing the side pane releases the displayed PDF document.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

@@ -14,12 +14,10 @@ import org.jspecify.annotations.NonNull;
 
 /// Helper class to get a Layout object.
 ///
-/// <pre>
-/// <code>
+/// ```java
 /// LayoutHelper helper = new LayoutHelper(...a reader...);
 /// Layout layout = helper.getLayoutFromText();
-/// </code>
-/// </pre>
+/// ```
 public class LayoutHelper {
 
     public static final int IS_LAYOUT_TEXT = 1;

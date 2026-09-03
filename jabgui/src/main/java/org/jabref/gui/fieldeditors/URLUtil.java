@@ -9,7 +9,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 /// URL utilities for URLs in the JabRef GUI.
 ///
-/// For logic-oriented URL utilities see {@link org.jabref.logic.util.URLUtil}.
+/// For logic-oriented URL utilities see [org.jabref.logic.util.URLUtil].
 public class URLUtil {
 
     private URLUtil() {

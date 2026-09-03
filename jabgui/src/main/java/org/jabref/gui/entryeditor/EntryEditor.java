@@ -33,7 +33,6 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BaseDialog;
@@ -43,6 +42,7 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.DirectoryMonitor;
 import org.jabref.logic.util.TaskExecutor;
@@ -67,7 +67,7 @@ import org.jspecify.annotations.Nullable;
 /// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
 /// the text fields to update themselves if the change is made from somewhere else.
 ///
-/// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
+/// The editors for fields are created via [org.jabref.gui.fieldeditors.FieldEditors].
 public class EntryEditor extends BorderPane implements PreviewControls {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
@@ -91,7 +91,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private StateManager stateManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private DirectoryMonitor directoryMonitor;
-    @Inject private CountingUndoManager undoManager;
+    @Inject private UndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;

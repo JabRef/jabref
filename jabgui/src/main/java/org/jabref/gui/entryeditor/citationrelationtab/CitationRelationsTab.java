@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -58,6 +56,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
@@ -67,9 +66,6 @@ import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.URLs;
@@ -86,6 +82,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -97,6 +94,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -662,7 +661,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
-    /// @implNote This code is similar to {@link org.jabref.gui.collab.entrychange.PreviewWithSourceTab}.
+    /// @implNote This code is similar to [org.jabref.gui.collab.entrychange.PreviewWithSourceTab].
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
@@ -1045,16 +1044,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            database.removeEntry(mergeResult.originalLeftEntry());
-            libraryTab.get().getMainTable().setCitationMergeMode(true);
-            database.insertEntry(mergedEntry);
-
-            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
-            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
-            compoundEdit.end();
-
-            undoManager.addEdit(compoundEdit);
+            undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
+                edit.applyEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+                libraryTab.get().getMainTable().setCitationMergeMode(true);
+                edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));
+            });
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

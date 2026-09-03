@@ -41,14 +41,14 @@ import static org.jabref.model.entry.field.StandardField.URL;
 /// This class contains bundles OS specific implementations for file directories and file/application open handling methods.
 /// In case the default does not work, subclasses provide the correct behavior.
 ///
-/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
 ///
 /// See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
 /// https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
 ///
-/// For non-GUI things, see {@link org.jabref.logic.os.OS}.
+/// For non-GUI things, see [org.jabref.logic.os.OS].
 @AllowedToUseAwt("Because of moveToTrash() is not available elsewhere.")
 public abstract class NativeDesktop {
     // No LOGGER may be initialized directly
@@ -58,7 +58,7 @@ public abstract class NativeDesktop {
 
     /// Open a http/pdf/ps viewer for the given link string.
     ///
-    /// Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
+    /// Opening a PDF file at the file field is done at [org.jabref.gui.fieldeditors.LinkedFileViewModel#open]
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           GuiPreferences preferences,
                                           String initialLink,
@@ -350,7 +350,7 @@ public abstract class NativeDesktop {
 
     /// Moves the given file to the trash.
     ///
-    /// @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
+    /// @throws UnsupportedOperationException if the current platform does not support the [Desktop.Action#MOVE_TO_TRASH] action
     /// @see Desktop#moveToTrash(java.io.File)
     public void moveToTrash(Path path) {
         boolean success = Desktop.getDesktop().moveToTrash(path.toFile());

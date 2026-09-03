@@ -4,8 +4,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -18,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -96,7 +95,6 @@ public class MainTableColumnModel {
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
 
     private final CliPreferences preferences;
-    private final UndoManager undoManager;
 
     /// This is used by the preferences dialog, to initialize available columns the user can add to the table.
     ///
@@ -107,7 +105,6 @@ public class MainTableColumnModel {
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
         this.preferences = Injector.instantiateModelOrService(CliPreferences.class);
-        this.undoManager = Injector.instantiateModelOrService(UndoManager.class);
 
         if (Type.ICON_COLUMNS.contains(type)) {
             this.widthProperty.setValue(ColumnPreferences.ICON_COLUMN_WIDTH);
@@ -158,7 +155,11 @@ public class MainTableColumnModel {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
             // "author/editor(Custom)" instead of "author/editor" in the output
 
-            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferences, undoManager);
+            // Asked for here rather than in the constructor: preference migrations build column
+            // models before the GUI has started, and nothing registers an undo journal that early.
+            // Only a special field's display name needs one, and by then the window exists.
+            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()),
+                    preferences, Injector.instantiateModelOrService(UndoManager.class));
         }
     }
 

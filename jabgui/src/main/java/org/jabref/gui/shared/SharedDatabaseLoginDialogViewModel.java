@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -31,6 +29,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
@@ -90,7 +89,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -110,7 +109,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
                                               JournalAbbreviationRepository journalAbbreviationRepository) {
