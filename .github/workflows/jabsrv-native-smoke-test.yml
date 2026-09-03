@@ -1,4 +1,4 @@
-name: Native Smoke Tests
+name: JabSrv Native Smoke Test
 
 on:
   push:
@@ -6,29 +6,25 @@ on:
       - main
       - main-release
     paths:
-      - 'jabls/**'
-      - 'jabls-cli/**'
       - 'jabsrv/**'
       - 'jabsrv-cli/**'
       - 'jablib/**'
       - '!jablib/src/test/**'
       - 'versions/**'
-      - '.github/workflows/native-smoke-tests.yml'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
   pull_request:
     paths:
-      - 'jabls/**'
-      - 'jabls-cli/**'
       - 'jabsrv/**'
       - 'jabsrv-cli/**'
       - 'jablib/**'
       - '!jablib/src/test/**'
       - 'versions/**'
-      - '.github/workflows/native-smoke-tests.yml'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
   merge_group:
   workflow_dispatch:
     inputs:
       upload-as-artifact:
-        description: "Upload the native binaries as workflow artifacts"
+        description: "Upload the native binary as a workflow artifact"
         type: boolean
         default: false
 
@@ -45,46 +41,7 @@ concurrency:
 # push to main/main-release and workflow_dispatch.
 
 jobs:
-  jabls:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'merge_group') && '["ubuntu-22.04"]' || '["ubuntu-22.04", "macos-15"]') }}
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }} JabLS native smoke test
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-          submodules: 'true'
-          show-progress: 'false'
-
-      - uses: ./.github/actions/setup-gradle
-
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
-        with:
-          distribution: 'graalvm'
-          java-version: '25'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build JabLS native binary
-        run: gradle :jabls-cli:nativeCompile
-
-      - name: Run JabLS native smoke test
-        run: python3 jabls-cli/src/test/nativeimage/jabls-smoke-test.py
-
-      - name: Upload JabLS native binary
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: jabls-native-${{ matrix.os }}
-          path: jabls-cli/build/native/nativeCompile/
-          if-no-files-found: error
-
-  jabsrv:
+  native-smoke-test:
     strategy:
       fail-fast: false
       matrix:
@@ -94,7 +51,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -107,7 +64,7 @@ jobs:
       # cannot compile JavaFX's Glass toolkit). AWT native libs still aren't bundled, so CAYW
       # detects headless defensively at runtime.
       - name: Set up Liberica NIK (native-image with AWT + JavaFX support)
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1.6.6
         with:
           distribution: 'liberica'
           java-package: 'jdk+fx'
@@ -163,7 +120,7 @@ jobs:
 
       - name: Upload JabSrv native binary
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: jabsrv-native-${{ matrix.os }}
           path: jabsrv-cli/build/native/nativeCompile/
