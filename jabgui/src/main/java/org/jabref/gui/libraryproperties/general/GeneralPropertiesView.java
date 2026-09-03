@@ -2,12 +2,14 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.UnaryOperator;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.icon.JabRefIconView;
@@ -89,6 +91,10 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+        // Limit the keyword separator to a single character (same as the global preference control)
+        UnaryOperator<TextFormatter.Change> singleCharacterFilter =
+                change -> change.getControlNewText().length() <= 1 ? change : null;
+        keywordSeparator.setTextFormatter(new TextFormatter<>(singleCharacterFilter));
 
         userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: %0", preferences.getFilePreferences().getUserAndHost()));
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);

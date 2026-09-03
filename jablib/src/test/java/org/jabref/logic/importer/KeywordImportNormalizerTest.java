@@ -75,6 +75,22 @@ class KeywordImportNormalizerTest {
     }
 
     @Test
+    void guessSeparatorIgnoresEscapedDelimiters() {
+        List<BibEntry> entries = List.of(
+                new BibEntry(StandardEntryType.Article).withField(StandardField.KEYWORDS, "one\\;two\\;three, four"));
+
+        assertEquals(Optional.of(','), KeywordImportNormalizer.guessSeparator(entries, new BibEntryPreferences(',', ";,")));
+    }
+
+    @Test
+    void guessSeparatorIgnoresDelimitersInsideBraces() {
+        List<BibEntry> entries = List.of(
+                new BibEntry(StandardEntryType.Article).withField(StandardField.KEYWORDS, "{a;b;c}, {d;e}"));
+
+        assertEquals(Optional.of(','), KeywordImportNormalizer.guessSeparator(entries, new BibEntryPreferences(',', ";,")));
+    }
+
+    @Test
     void normalizeKeywordsDoesNotSplitConfiguredDelimitersInsideBraces() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.KEYWORDS, "test1; {2,1}; test3");
