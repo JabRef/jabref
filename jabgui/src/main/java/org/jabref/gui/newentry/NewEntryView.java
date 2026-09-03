@@ -24,7 +24,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -155,12 +154,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton.getStyleClass().add("customGenerateButton");
-
-        final Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        stage.setHeight(650);
-        stage.setWidth(931);
-        stage.setMinHeight(300);
-        stage.setMinWidth(400);
+        
+        getDialogPane().setPrefSize(1000, 650);
 
         ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
         setOnCloseRequest(_ -> cancel());
