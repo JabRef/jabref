@@ -34,9 +34,7 @@ class HayagrivaRoundTripTest {
     private final HayagrivaImporter importer = new HayagrivaImporter();
 
     private List<BibEntry> exportAndReimport(List<BibEntry> entries) throws IOException {
-        Path file = tempDir.resolve("roundtrip-" + entries.hashCode() + ".yml");
-        Files.deleteIfExists(file);
-        Files.createFile(file);
+        Path file = Files.createTempFile(tempDir, "roundtrip", ".yml");
         exporter.export(new BibDatabaseContext(), file, entries);
         return importer.importDatabase(file).getDatabase().getEntries();
     }
@@ -62,6 +60,7 @@ class HayagrivaRoundTripTest {
                         .withField(StandardField.TITLE, "Achieving Low Tail Latency")
                         .withField(StandardField.AUTHOR, "Prekas, George and Kogias, Marios")
                         .withField(StandardField.BOOKTITLE, "Proceedings of the 26th Symposium on Operating Systems Principles")
+                        .withField(StandardField.SERIES, "SOSP")
                         .withField(StandardField.PAGES, "325-341")),
                 Arguments.of(new BibEntry(StandardEntryType.Book)
                         .withCitationKey("donne")
@@ -69,7 +68,7 @@ class HayagrivaRoundTripTest {
                         .withField(StandardField.EDITOR, "Stringer, Gary A. and Pebworth, Ted-Larry")
                         .withField(StandardField.ADDRESS, "Bloomington")
                         .withField(StandardField.PUBLISHER, "Indiana University Press")
-                        .withField(StandardField.EDITION, "2")
+                        .withField(StandardField.EDITION, "1.10")
                         .withField(StandardField.VOLUMES, "7")
                         .withField(StandardField.SERIES, "The Variorum Edition")
                         .withField(StandardField.ISBN, "978-0747551003")

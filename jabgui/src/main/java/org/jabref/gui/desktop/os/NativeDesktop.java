@@ -237,10 +237,6 @@ public abstract class NativeDesktop {
     ///
     /// @param fileOrDirectory Location the console should be opened at.
     public static void openConsole(Path fileOrDirectory, GuiPreferences preferences, DialogService dialogService) throws IOException {
-        if (fileOrDirectory == null) {
-            return;
-        }
-
         Path absolute = fileOrDirectory.toAbsolutePath();
         String absolutePath = Files.isDirectory(absolute) ? absolute.toString() : absolute.getParent().toString();
 

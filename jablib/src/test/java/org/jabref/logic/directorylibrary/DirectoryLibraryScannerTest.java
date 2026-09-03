@@ -18,6 +18,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -34,6 +35,7 @@ import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -230,7 +232,7 @@ class DirectoryLibraryScannerTest {
         BibEntry nested = result.databaseContext().getDatabase().getEntries().stream()
                                 .filter(entry -> entry.getCitationKey().equals(Optional.of("zygos")))
                                 .findFirst().orElseThrow();
-        GroupTreeNode conference = ((DirectoryStructureGroup) directoryGroup).createSubgroups(nested).iterator().next();
+        GroupTreeNode conference = assertInstanceOf(DirectoryStructureGroup.class, directoryGroup).createSubgroups(nested).iterator().next();
         assertEquals("conference", conference.getGroup().getName());
         assertTrue(conference.getGroup().contains(nested));
     }
@@ -278,8 +280,33 @@ class DirectoryLibraryScannerTest {
         ScanResult result = scan();
 
         assertEquals(List.of(), result.databaseContext().getDatabase().getEntries());
-        assertEquals(1, result.warnings().size());
-        assertTrue(result.warnings().getFirst().contains("broken.yml"));
+        assertEquals(List.of(Localization.lang("Could not parse the Hayagriva file '%0'.", root.resolve("broken.yml").toString())),
+                result.warnings());
+    }
+
+    @Test
+    void extensionsAreMatchedCaseInsensitively() throws IOException {
+        Files.writeString(root.resolve("smith2020.YML"), ARTICLE_YAML);
+        Files.createFile(root.resolve("smith2020.PDF"));
+        Files.createFile(root.resolve("other.Pdf"));
+
+        ScanResult result = scan();
+
+        List<BibEntry> entries = result.databaseContext().getDatabase().getEntries();
+        assertEquals(List.of(new LinkedFile("", Path.of("smith2020.PDF"), "PDF")), entries.getFirst().getFiles());
+        assertEquals(List.of(new LinkedFile("", Path.of("other.Pdf"), "PDF")), entries.getLast().getFiles());
+        assertEquals(2, entries.size());
+    }
+
+    @Test
+    void gitignoredPdfIsNotPairedWithSidecar() throws IOException {
+        Files.writeString(root.resolve(".gitignore"), "*.pdf\n");
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        Files.createFile(root.resolve("smith2020.pdf"));
+
+        ScanResult result = scan();
+
+        assertEquals(List.of(), singleEntry(result).getFiles());
     }
 
     @Test

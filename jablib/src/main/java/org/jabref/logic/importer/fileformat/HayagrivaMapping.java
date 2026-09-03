@@ -50,13 +50,6 @@ public final class HayagrivaMapping {
     /// Report. Unlisted types are written as `misc`.
     public static final Map<EntryType, String> ENTRY_TYPE_TO_TYPE;
 
-    public static final Set<String> JOURNAL_PARENT_TYPES = Set.of("periodical", "newspaper", "blog");
-    public static final Set<String> BOOKTITLE_PARENT_TYPES = Set.of("proceedings", "anthology", "conference");
-    public static final Set<EntryType> BOOK_PART_TYPES = Set.of(StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
-
-    public static final Field RUNTIME_FIELD = new UnknownField("runtime");
-    public static final Field TIME_RANGE_FIELD = new UnknownField("time-range");
-
     /// Prefix of JabRef's per-user comment fields
     /// ([org.jabref.model.entry.field.UserSpecificCommentField]), mapped to equally named
     /// extension keys (see [#SCALAR_FIELDS] on extension keys).
@@ -82,6 +75,13 @@ public final class HayagrivaMapping {
             "holder", "compiler", "founder", "collaborator", "organizer", "cast-member",
             "composer", "producer", "executive-producer", "writer", "cinematography", "director",
             "illustrator", "narrator");
+
+    private static final Set<String> JOURNAL_PARENT_TYPES = Set.of("periodical", "newspaper", "blog");
+    private static final Set<String> BOOKTITLE_PARENT_TYPES = Set.of("proceedings", "anthology", "conference");
+    private static final Set<EntryType> BOOK_PART_TYPES = Set.of(StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
+
+    private static final Field RUNTIME_FIELD = new UnknownField("runtime");
+    private static final Field TIME_RANGE_FIELD = new UnknownField("time-range");
 
     static {
         Map<EntryType, String> inverseTypes = new HashMap<>();
@@ -170,17 +170,10 @@ public final class HayagrivaMapping {
     /// (journal as a `periodical` parent, series as a `book` parent). A missing or unmapped
     /// parent type falls back by entry type: articles are most likely contained in a journal,
     /// everything else in some book-like container. The first parent providing a value for a
-    /// field wins; nested parents are not descended into.
+    /// field wins. Nesting is only followed one level down, for the series of a booktitle
+    /// container (the writer's shape for book parts with both fields).
     static void applyParents(BibEntry bibEntry, @Nullable JsonNode parentNode) {
-        if (parentNode == null) {
-            return;
-        }
-
-        List<JsonNode> parents = parentNode.isArray() ? List.copyOf(parentNode.values()) : List.of(parentNode);
-        for (JsonNode parent : parents) {
-            if (!parent.isObject()) {
-                continue;
-            }
+        for (JsonNode parent : parentNodes(parentNode)) {
             String parentType = scalarText(parent.get("type")).map(type -> type.toLowerCase(Locale.ROOT)).orElse("");
 
             StandardField targetField;
@@ -195,12 +188,25 @@ public final class HayagrivaMapping {
             }
 
             formattedText(parent.get("title")).ifPresent(title -> setIfAbsent(bibEntry, targetField, title));
+            if (targetField == StandardField.BOOKTITLE) {
+                parentNodes(parent.get("parent")).forEach(series ->
+                        formattedText(series.get("title")).ifPresent(title -> setIfAbsent(bibEntry, StandardField.SERIES, title)));
+            }
             if (targetField == StandardField.JOURNAL) {
                 scalarText(parent.get("volume")).ifPresent(volume -> setIfAbsent(bibEntry, StandardField.VOLUME, volume));
                 scalarText(parent.get("issue")).ifPresent(issue -> setIfAbsent(bibEntry, StandardField.NUMBER, issue));
                 scalarText(parent.get("publisher")).ifPresent(publisher -> setIfAbsent(bibEntry, StandardField.PUBLISHER, publisher));
             }
         }
+    }
+
+    /// `parent` is either a single map or a list of maps.
+    private static List<JsonNode> parentNodes(@Nullable JsonNode parentNode) {
+        if (parentNode == null) {
+            return List.of();
+        }
+        List<JsonNode> parents = parentNode.isArray() ? List.copyOf(parentNode.values()) : List.of(parentNode);
+        return parents.stream().filter(JsonNode::isObject).toList();
     }
 
     /// Per-user comment extension keys (`comment-<name>`, see [#SCALAR_FIELDS]) map to the
@@ -274,7 +280,7 @@ public final class HayagrivaMapping {
 
     /// Reads a Hayagriva "formattable string": either a plain scalar or a map holding the actual
     /// string under `value` (next to `short`, `verbatim`, ... which JabRef cannot represent).
-    public static Optional<String> formattedText(@Nullable JsonNode node) {
+    private static Optional<String> formattedText(@Nullable JsonNode node) {
         if (node != null && node.isObject()) {
             return scalarText(node.get("value"));
         }

@@ -21,7 +21,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -223,15 +222,12 @@ class AutoSetFileLinksUtilTest {
 
     /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
     @Nested
-    @DisplayName("linkAssociatedFiles")
     class linkAssociatedFiles {
 
         @Nested
-        @DisplayName("byCitationKeyOnly")
         class byCitationKeyOnly {
 
             @Nested
-            @DisplayName("configuredCitationKeyDependencyWithStart")
             class configuredCitationKeyDependencyWithStart {
 
                 /// ```
@@ -395,7 +391,6 @@ class AutoSetFileLinksUtilTest {
             }
 
             @Nested
-            @DisplayName("configuredCitationKeyDependencyWithExact")
             class configuredCitationKeyDependencyWithExact {
 
                 /// ```
@@ -502,7 +497,6 @@ class AutoSetFileLinksUtilTest {
         }
 
         @Nested
-        @DisplayName("byBrokenLinkedFileNameOnly")
         class byBrokenLinkedFileNameOnly {
             /// ```
             /// CK: WeDoNotCare
@@ -784,7 +778,6 @@ class AutoSetFileLinksUtilTest {
         }
 
         @Nested
-        @DisplayName("byCitationKeyAndBrokenLinkedFileName")
         class byCitationKeyAndBrokenLinkedFileName {
 
             /// ```

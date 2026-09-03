@@ -165,13 +165,14 @@ public class OpenDatabaseAction extends SimpleCommand {
     public void openFiles(List<Path> filesToOpen) {
         // Directories are directory libraries (e.g. restored from the last session)
         // [impl->req~directory-library.session-restore~1]
+        OpenDirectoryLibraryAction openDirectoryLibraryAction = new OpenDirectoryLibraryAction(tabContainer, dialogService, preferences,
+                aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipboardManager, taskExecutor);
         filesToOpen.stream()
                    .map(FileUtil::resolveIfShortcut)
                    .filter(Files::isDirectory)
+                   .map(directory -> directory.toAbsolutePath().normalize())
                    .distinct()
-                   .forEach(directory -> new OpenDirectoryLibraryAction(tabContainer, dialogService, preferences,
-                           aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager,
-                           clipboardManager, taskExecutor).openDirectory(directory));
+                   .forEach(openDirectoryLibraryAction::openDirectory);
 
         // Resolve any shortcuts to their targets and filter to only .bib files.
         // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).

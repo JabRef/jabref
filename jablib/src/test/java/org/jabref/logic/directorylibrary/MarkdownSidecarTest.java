@@ -146,7 +146,7 @@ class MarkdownSidecarTest {
                 .withField(StandardField.COMMENT, "Shared comment text.")
                 .withField(new UserSpecificCommentField("koppor"), "Per-user comment text.");
 
-        String document = sidecar.merge(null, List.of(new HayagrivaEntryWriter.KeyedEntry("", "smith2020", entry)));
+        String document = sidecar.merge("", List.of(new HayagrivaEntryWriter.KeyedEntry("", "smith2020", entry)));
         Path file = write("smith2020.md", document);
 
         assertTrue(document.startsWith("---\n"), () -> "missing frontmatter: " + document);
