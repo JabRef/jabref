@@ -104,6 +104,32 @@ class GitMergeDriverTest extends AbstractJabKitTest {
     }
 
     @Test
+    void reportsConflictOnDivergingEntryTypes(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-current-type.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other-type.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Smith2020"));
+        assertEquals(Files.readString(getClassResourceAsPath("merge-current-type.bib")), Files.readString(current));
+    }
+
+    @Test
+    void reportsConflictOnEntryTypeChangedAndDeleted(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-current-type.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other-deleted.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Smith2020"));
+        assertEquals(Files.readString(getClassResourceAsPath("merge-current-type.bib")), Files.readString(current));
+    }
+
+    @Test
     void gitWithoutSubcommandFails() {
         int exitCode = commandLine.executeToLog("git");
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.merge.execution.GitMergeApplier;
@@ -26,6 +28,7 @@ import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -94,16 +97,24 @@ class GitMergeDriver implements Callable<Integer> {
         BibDatabaseContext current = ImportService.importBibTexFile(currentFile, git.jabKit.cliPreferences, porcelain).getDatabaseContext();
         BibDatabaseContext other = ImportService.importBibTexFile(otherFile, git.jabKit.cliPreferences, porcelain).getDatabaseContext();
 
-        Optional<String> unmergeable = checkMergeable(base, current, other);
-        if (unmergeable.isPresent()) {
-            System.err.println(unmergeable.get());
+        List<String> unmergeable = checkMergeable(base, current, other);
+        if (!unmergeable.isEmpty()) {
+            unmergeable.forEach(System.err::println);
             return CONFLICT;
         }
 
         MergeAnalysis analysis = SemanticMergeAnalyzer.analyze(base, current, other);
+        List<ThreeWayEntryConflict> conflicts = new ArrayList<>(analysis.conflicts());
+        List<ThreeWayEntryConflict> typeConflicts = mergeEntryTypes(base, current, other, conflicts);
+        conflicts.addAll(typeConflicts);
+        if (!typeConflicts.isEmpty()) {
+            // The field-level plan cannot be applied to some entries only, and CURRENT already is the
+            // version the conflicting entries have to keep - so it is left untouched altogether.
+            reportConflicts(conflicts);
+            return CONFLICT;
+        }
+
         GitMergeApplier.applyAutoPlan(current, analysis.autoPlan());
-        List<ThreeWayEntryConflict> conflicts = analysis.conflicts();
-        applyEntryTypeChanges(base, current, other, conflicts);
 
         try {
             GitFileWriter.write(currentFile, current, git.jabKit.cliPreferences.getImportFormatPreferences());
@@ -120,38 +131,46 @@ class GitMergeDriver implements Callable<Integer> {
             return CommandLine.ExitCode.OK;
         }
 
+        reportConflicts(conflicts);
+        return CONFLICT;
+    }
+
+    private static void reportConflicts(List<ThreeWayEntryConflict> conflicts) {
         System.err.println(Localization.lang("%0 entries could not be merged automatically:", conflicts.size()));
         for (ThreeWayEntryConflict conflict : conflicts) {
             System.err.println("  " + describe(conflict));
         }
-        return CONFLICT;
     }
 
     /// The merge plan is keyed by citation key and only covers entries carrying one. Content the
     /// planner does not see has to be rejected instead of being silently dropped: duplicate citation
     /// keys (planning looks at the last entry, patching at the first one), and content taken from
     /// CURRENT as is - entries without a citation key, `@String`s, preamble, epilogue and metadata.
-    private Optional<String> checkMergeable(BibDatabaseContext base, BibDatabaseContext current, BibDatabaseContext other) {
-        List<Path> ambiguous = new ArrayList<>();
+    ///
+    /// @return one message per reason why the files cannot be merged; empty if they can
+    private List<String> checkMergeable(BibDatabaseContext base, BibDatabaseContext current, BibDatabaseContext other) {
+        List<String> reasons = new ArrayList<>();
+
+        List<Path> duplicates = new ArrayList<>();
         if (hasDuplicateCitationKeys(base)) {
-            ambiguous.add(baseFile);
+            duplicates.add(baseFile);
         }
         if (hasDuplicateCitationKeys(current)) {
-            ambiguous.add(currentFile);
+            duplicates.add(currentFile);
         }
         if (hasDuplicateCitationKeys(other)) {
-            ambiguous.add(otherFile);
+            duplicates.add(otherFile);
         }
-        if (!ambiguous.isEmpty()) {
-            return Optional.of(Localization.lang("Cannot merge %0: citation keys must be unique.",
-                    ambiguous.stream().map(Path::toString).collect(Collectors.joining(", "))));
+        if (!duplicates.isEmpty()) {
+            reasons.add(Localization.lang("Cannot merge %0: citation keys must be unique.",
+                    duplicates.stream().map(Path::toString).collect(Collectors.joining(", "))));
         }
 
         List<Object> otherContent = nonEntryContent(other);
         if (!otherContent.equals(nonEntryContent(base)) && !otherContent.equals(nonEntryContent(current))) {
-            return Optional.of(Localization.lang("Cannot merge %0: content outside of entries with a citation key changed on both sides.", currentFile));
+            reasons.add(Localization.lang("Cannot merge %0: content outside of entries with a citation key changed on both sides.", currentFile));
         }
-        return Optional.empty();
+        return reasons;
     }
 
     private static boolean hasDuplicateCitationKeys(BibDatabaseContext context) {
@@ -161,36 +180,81 @@ class GitMergeDriver implements Callable<Integer> {
                       .anyMatch(key -> !keys.add(key));
     }
 
-    private static List<Object> nonEntryContent(BibDatabaseContext context) {
+    /// Everything that is written to the file but never looked at by the merge planner. Metadata is
+    /// compared in its serialized form, because [MetaData#equals] ignores unknown metadata items.
+    private List<Object> nonEntryContent(BibDatabaseContext context) {
         BibDatabase database = context.getDatabase();
         return List.of(
-                database.getEntries().stream().filter(entry -> entry.getCitationKey().isEmpty()).map(BibEntry::getFieldMap).toList(),
+                database.getEntries().stream()
+                        .filter(entry -> entry.getCitationKey().isEmpty())
+                        .map(entry -> List.of(entry.getType(), entry.getFieldMap()))
+                        .toList(),
                 database.getStringValues().stream().collect(Collectors.toMap(BibtexString::getName, BibtexString::getContent)),
                 database.getPreamble().orElse(""),
                 database.getEpilog(),
-                context.getMetaData());
+                MetaDataSerializer.getSerializedStringMap(context.getMetaData(),
+                        git.jabKit.cliPreferences.getImportFormatPreferences().citationKeyPatternPreferences().getKeyPatterns()));
     }
 
-    /// [MergePlan][org.jabref.logic.git.model.MergePlan] carries field values only, so an entry type
-    /// changed in OTHER alone would not reach CURRENT.
-    private static void applyEntryTypeChanges(BibDatabaseContext base, BibDatabaseContext current, BibDatabaseContext other, List<ThreeWayEntryConflict> conflicts) {
-        Set<String> conflictingKeys = conflicts.stream().map(GitMergeDriver::citationKeyOf).collect(Collectors.toSet());
+    /// [ConflictRules][org.jabref.logic.git.merge.planning.util.ConflictRules] compares field maps,
+    /// which do not contain the entry type, and [MergePlan][org.jabref.logic.git.model.MergePlan]
+    /// cannot carry a type change. Entry types are therefore merged here: a type changed in OTHER
+    /// alone is applied to CURRENT, every other divergence is a conflict.
+    ///
+    /// @return the entries whose type cannot be merged automatically
+    private static List<ThreeWayEntryConflict> mergeEntryTypes(BibDatabaseContext base,
+                                                               BibDatabaseContext current,
+                                                               BibDatabaseContext other,
+                                                               List<ThreeWayEntryConflict> knownConflicts) {
+        Set<String> knownConflictKeys = knownConflicts.stream().map(GitMergeDriver::citationKeyOf).collect(Collectors.toSet());
         Map<String, BibEntry> baseEntries = entriesByCitationKey(base);
         Map<String, BibEntry> currentEntries = entriesByCitationKey(current);
+        Map<String, BibEntry> otherEntries = entriesByCitationKey(other);
 
-        for (BibEntry otherEntry : other.getDatabase().getEntries()) {
-            otherEntry.getCitationKey()
-                      .filter(key -> !conflictingKeys.contains(key))
-                      .ifPresent(key -> {
-                          BibEntry baseEntry = baseEntries.get(key);
-                          BibEntry currentEntry = currentEntries.get(key);
-                          if ((baseEntry != null) && (currentEntry != null)
-                                  && baseEntry.getType().equals(currentEntry.getType())
-                                  && !baseEntry.getType().equals(otherEntry.getType())) {
-                              currentEntry.setType(otherEntry.getType());
-                          }
-                      });
+        Set<String> keys = new LinkedHashSet<>(baseEntries.keySet());
+        keys.addAll(currentEntries.keySet());
+        keys.addAll(otherEntries.keySet());
+
+        List<ThreeWayEntryConflict> typeConflicts = new ArrayList<>();
+        for (String key : keys) {
+            if (knownConflictKeys.contains(key)) {
+                continue;
+            }
+            @Nullable BibEntry baseEntry = baseEntries.get(key);
+            @Nullable BibEntry currentEntry = currentEntries.get(key);
+            @Nullable BibEntry otherEntry = otherEntries.get(key);
+
+            if (baseEntry == null) {
+                // added on both sides - the planner unions their fields, but cannot union their types
+                if ((currentEntry != null) && (otherEntry != null) && !currentEntry.getType().equals(otherEntry.getType())) {
+                    typeConflicts.add(new ThreeWayEntryConflict(null, currentEntry, otherEntry));
+                }
+                continue;
+            }
+            if (currentEntry == null) {
+                // deleted in CURRENT: accepting the deletion would drop a type change of OTHER
+                if ((otherEntry != null) && !baseEntry.getType().equals(otherEntry.getType())) {
+                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, null, otherEntry));
+                }
+                continue;
+            }
+            if (otherEntry == null) {
+                if (!baseEntry.getType().equals(currentEntry.getType())) {
+                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, null));
+                }
+                continue;
+            }
+            boolean changedInCurrent = !baseEntry.getType().equals(currentEntry.getType());
+            boolean changedInOther = !baseEntry.getType().equals(otherEntry.getType());
+            if (changedInCurrent && changedInOther) {
+                if (!currentEntry.getType().equals(otherEntry.getType())) {
+                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, otherEntry));
+                }
+            } else if (changedInOther) {
+                currentEntry.setType(otherEntry.getType());
+            }
         }
+        return typeConflicts;
     }
 
     private static Map<String, BibEntry> entriesByCitationKey(BibDatabaseContext context) {
