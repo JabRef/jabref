@@ -35,17 +35,20 @@ import jakarta.inject.Inject;
 /// Displays status and metadata for an AI chat session.
 ///
 /// This component provides information about:
+///
 /// - The currently selected chat model
 /// - The response engine in use
 /// - Entries included in the chat context
 /// - The ingestion status of linked files, including any errors encountered
 ///
 /// It also offers actions to:
+///
 /// - Export the chat history
 /// - Clear the chat history
 ///
 /// Typical usage:
 /// This component is primarily used within the AiChatView, where:
+///
 /// - The chat model and response engine are bound to this component
 /// - The chat history is provided by the AI chat and displayed here
 ///
@@ -53,7 +56,7 @@ import jakarta.inject.Inject;
 /// The component is intended to support configuration of chat parameters,
 /// such as selecting a different chat model per session instead of relying
 /// on global preferences. Currently, only the response engine can be modified.
-// [impl->req~ai.chat.ingestion-status~1]
+// [impl->feat~ai.chat.ingestion-status~1]
 public class AiChatStatusView extends VBox {
     // [impl->req~ai.chat.model-visibility~1]
     @FXML private Label chatModelLabel;
@@ -191,7 +194,7 @@ public class AiChatStatusView extends VBox {
         viewModel.exportMarkdown();
     }
 
-    // [impl->req~ai.chat.clear-history~1]
+    // [impl->feat~ai.chat.clear-history~1]
     @FXML
     private void clearChatHistory() {
         viewModel.clearChatHistory();

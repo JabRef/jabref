@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -35,6 +33,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -47,6 +46,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -61,9 +61,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
@@ -104,6 +105,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     /// Creates an import dialog for entries from file sources.
     /// This constructor is used for importing entries from local files, BibTeX files,
@@ -115,13 +117,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         this(database, task, null);
     }
 
-    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and
-    /// assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()}
-    /// / {@link #getImportTarget()}).
+    /// Variant that pre-selects `targetGroup` in the group picker. The group is created and
+    /// assigned by the caller only after the dialog is confirmed (see [#getImportedEntries()]
+    /// / [#getImportTarget()]).
     ///
     /// @param database    the database to import into
     /// @param task        the task executed for parsing the selected files(s).
-    /// @param targetGroup name of the group to pre-select, or {@code null} for none
+    /// @param targetGroup name of the group to pre-select, or `null` for none
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup) {
         this.database = database;
         this.task = task;
@@ -451,8 +453,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
-            bibTeXData.moveTo(0);
-            bibTeXData.requestFollowCaret();
+            bibTeXData.moveDocumentStart();
         } else {
             bibTeXData.clear();
         }
@@ -466,6 +467,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
+        bibTeXData.setSyntaxDecorator(new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter));
     }
 
     public void unselectAll() {

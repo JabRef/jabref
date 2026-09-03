@@ -108,7 +108,7 @@ to the test class. A temporary file is now created by `Files.createFile(path)`. 
 Sometimes it is necessary to load a specific resource or to access the resource directory
 
 ```java
-Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+Path resourceDir = Paths.get(MSBibImportExportRoundTripFilesTest.class.getResource("MsBibImportExportRoundTripTest1.bib").toURI()).getParent();
 ```
 
 When the directory is needed, it is important to first point to an actual existing file. Otherwise the wrong directory will be returned.
@@ -179,17 +179,17 @@ Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTes
 Since API keys are required and some providers block requests from unknown IP addresses, these tests are not executed by default.
 Detailed information is available at [JabRef's fetcher documentation](fetchers.md).
 
-Each fetcher test is marked by `@org.jabref.testutils.category.FetcherTest`.
+Each fetcher test is marked by `@org.jabref.testutils.category.ExternalServicesTest`.
 Some of them are also marked with `@org.jabref.support.DisabledOnCIServer`, to indicate that they are not executed on the CI server.
 These test are not executed on the CI, because the rate limits of the API providers are too often reached during the build process.
 
-Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. This can be done by running the following command in the command line:
+Fetcher tests can be run locally by executing the Gradle task `externalServicesTest`. This can be done by running the following command in the command line:
 
 ```shell
-./gradlew fetcherTest
+./gradlew externalServicesTest
 ```
 
-Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `fetcherTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > fetcherTest`).
+Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `externalServicesTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > externalServicesTest`).
 
 ### "No matching tests found"
 
@@ -204,8 +204,8 @@ Example
 ```
 
 This tells Gradle that `PdfMergeMetadataImporterTest` should be executed as database test.
-However, it is marked as `@FetcherTest`.
-Thus, change `:databaseTest` to `:fetcherTest` to get the test running.
+However, it is marked as `@ExternalServicesTest`.
+Thus, change `:databaseTest` to `:externalServicesTest` to get the test running.
 
 ## Advanced testing and further reading
 

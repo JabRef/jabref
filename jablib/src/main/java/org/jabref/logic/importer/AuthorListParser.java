@@ -111,7 +111,7 @@ public class AuthorListParser {
 
     /// Tries to get a simple BibTeX author list of the given string.
     ///
-    /// This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
+    /// This is an intermediate step in [#parse]. Since parse does not work in all cases,
     /// this method can be used to get more valid BibTeX.
     ///
     /// @return Optional.empty if there was no normalization.
@@ -222,7 +222,7 @@ public class AuthorListParser {
 
     /// Parses one author name and returns preformatted information.
     ///
-    /// @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is empty.
+    /// @return Preformatted author name; `Optional.empty()` if author name is empty.
     private Optional<Author> getAuthor() {
         List<Object> tokens = new ArrayList<>();
         int vonStart = -1;
@@ -423,26 +423,26 @@ public class AuthorListParser {
 
     /// Parses the next token.
     ///
-    /// The string being parsed is stored in global variable <CODE>original</CODE>, and position which parsing has to
+    /// The string being parsed is stored in global variable `original`, and position which parsing has to
     /// start from is stored in global variable
-    /// <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
-    /// to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>; thus, subsequent invocations do not
+    /// `token_end`; thus, `token_end` has to be set
+    /// to 0 before the first invocation. Procedure updates `token_end`; thus, subsequent invocations do not
     /// require any additional variable settings.
     ///
-    /// The type of the token is returned; if it is <CODE>Token.WORD</CODE>, additional information is given in global
-    /// variables <CODE>token_start</CODE>,
-    /// <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
-    /// and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE> is the text of the
-    /// token, <CODE>original.substring(token_start,token_abbr)</CODE> is the token abbreviation, <CODE>token_term</CODE>
-    /// contains token terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>, if token is
-    /// upper-case and <CODE>false</CODE> if token is lower-case.
+    /// The type of the token is returned; if it is `Token.WORD`, additional information is given in global
+    /// variables `token_start`,
+    /// `token_end`, `token_abbr`, `token_term`,
+    /// and `token_case`; namely: `original.substring(token_start,token_end)` is the text of the
+    /// token, `original.substring(token_start,token_abbr)` is the token abbreviation, `token_term`
+    /// contains token terminator (space or dash), and `token_case` is `true`, if token is
+    /// upper-case and `false` if token is lower-case.
     ///
-    /// @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> --
-    /// token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
-    /// <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables
-    /// <CODE>token_start</CODE>, <CODE>token_end</CODE>,
-    /// <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
-    /// <CODE>token_case</CODE>.
+    /// @return `Token.EOF` -- no more tokens, `Token.COMMA` --
+    /// token is comma, `Token.AND` -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
+    /// `Token.WORD` -- token is a word; additional information is given in global variables
+    /// `token_start`, `token_end`,
+    /// `token_abbr`, `token_term`, and
+    /// `token_case`.
     private Token getToken() {
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {

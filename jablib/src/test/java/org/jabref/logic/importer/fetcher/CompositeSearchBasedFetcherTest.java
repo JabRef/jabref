@@ -22,7 +22,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +39,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 @DisabledOnCIServer("Produces too many requests on CI")
 class CompositeSearchBasedFetcherTest {
 
@@ -130,7 +130,6 @@ class CompositeSearchBasedFetcherTest {
                 new DBLPFetcher(importFormatPreferences),
                 new SpringerNatureWebFetcher(importerPreferences),
                 new CrossRef(),
-                new CiteSeer(),
                 new DOAJFetcher(importFormatPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
                 new Scopus(importerPreferences));

@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -24,6 +22,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -304,5 +303,36 @@ class ImportHandlerTest {
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsTrueForBibFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.bib")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.BIB")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForPdfFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.pdf")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.PDF")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsTrueForRisFile() {
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.ris")));
+        assertTrue(importHandler.canImportAsBibEntry(Path.of("test.RIS")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForGenericExtensions() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("notes.txt")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("data.xml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yml")));
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("config.yaml")));
+    }
+
+    @Test
+    void canImportAsBibEntryReturnsFalseForUnknownFile() {
+        assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
     }
 }

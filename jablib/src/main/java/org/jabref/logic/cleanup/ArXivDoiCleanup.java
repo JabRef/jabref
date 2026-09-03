@@ -23,6 +23,7 @@ import org.jabref.model.entry.identifier.DOI;
 /// See the [arXiv DOI documentation](https://info.arxiv.org/help/doi.html).
 ///
 /// Rules:
+///
 ///  1. eprint holds an arXiv ID and there is no valid DOI (absent or unparseable) -> create the DOI from the eprint.
 ///  2. the DOI field holds an arXiv DOI matching the eprint -> drop the redundant eprint fields.
 ///  3. otherwise (e.g. a real publisher DOI next to an arXiv eprint, or no arXiv data) -> keep both.

@@ -8,6 +8,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,8 +23,7 @@ import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This class monitors a set of files for changes. Upon detecting a change it notifies the registered {@link
-/// FileUpdateListener}s.
+/// This class monitors a set of files for changes. Upon detecting a change it notifies the registered [FileUpdateListener]s.
 ///
 /// Implementation based on <a href="https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory">https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory</a>.
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
@@ -80,7 +80,11 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     private void notifyAboutChange(Path path) {
-        listeners.get(path).forEach(FileUpdateListener::fileUpdated);
+        List<FileUpdateListener> listenersForPath;
+        synchronized (listeners) {
+            listenersForPath = List.copyOf(listeners.get(path));
+        }
+        listenersForPath.forEach(FileUpdateListener::fileUpdated);
     }
 
     @Override
@@ -89,7 +93,9 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();
             directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
-            listeners.put(file, listener);
+            synchronized (listeners) {
+                listeners.put(file, listener);
+            }
         } else {
             LOGGER.warn("Not adding listener {} to file {} because the file update monitor isn't active", listener, file);
         }
@@ -97,7 +103,9 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void removeListener(Path path, FileUpdateListener listener) {
-        listeners.remove(path, listener);
+        synchronized (listeners) {
+            listeners.remove(path, listener);
+        }
     }
 
     @Override

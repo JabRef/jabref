@@ -39,10 +39,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Converts string representation of groups to a parsed {@link GroupTreeNode}.
+/// Converts string representation of groups to a parsed [GroupTreeNode].
 public class GroupsParser {
 
-    /// Identifier for SmartGroup (deprecated, replaced by {@link ExplicitGroup}).
+    /// Identifier for SmartGroup (deprecated, replaced by [ExplicitGroup]).
     ///
     /// @deprecated Kept for backward compatibility during migration.
     @Deprecated

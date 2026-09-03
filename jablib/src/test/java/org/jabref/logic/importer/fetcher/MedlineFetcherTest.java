@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 class MedlineFetcherTest {
     // default value is empty string in BulidInfo
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey).filter(StringUtil::isNotBlank);
@@ -204,6 +204,17 @@ class MedlineFetcherTest {
         List<BibEntry> entryList = fetcher.performSearch("author=vigmond AND year-range=2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
+    }
+
+    @Test
+    void performRawSearchQueryWithBlankQueryReturnsEmptyList() throws FetcherException {
+        assertEquals(List.of(), fetcher.performRawSearchQuery(""));
+    }
+
+    @Test
+    void performRawSearchQueryFindsEntries() throws FetcherException {
+        List<BibEntry> entryList = fetcher.performRawSearchQuery("vigmond[au] AND 2021[dp]");
+        assertEquals(18, entryList.size());
     }
 
     @Test
