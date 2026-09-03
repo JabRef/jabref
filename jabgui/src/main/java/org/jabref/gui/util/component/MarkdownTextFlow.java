@@ -3,6 +3,7 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Hyperlink;
@@ -46,8 +47,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
-    private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
-    private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
+    private static final Pattern BULLET_LIST_PATTERN = Pattern.compile("^\\s*[-*•]\\s+$");
+    private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
@@ -242,9 +243,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return astNode.getChars().toString();
         } else if (astNode instanceof BlockQuote) {
             return renderedText;
-        } else if (renderedText.matches(BULLET_LIST_PATTERN)) {
+        } else if (BULLET_LIST_PATTERN.matcher(renderedText).matches()) {
             return renderedText.replace(UNICODE_BULLET, "-");
-        } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {
+        } else if (NUMBERED_LIST_PATTERN.matcher(renderedText).matches()) {
             return renderedText;
         } else {
             return renderedText;
