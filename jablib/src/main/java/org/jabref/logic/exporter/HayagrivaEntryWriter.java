@@ -6,11 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.SequencedSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fileformat.HayagrivaMapping;
 import org.jabref.model.entry.AuthorList;
@@ -22,7 +22,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
@@ -48,9 +47,12 @@ public class HayagrivaEntryWriter {
     /// synthesized `periodical` parent instead of the entry itself.
     private static final Set<String> JOURNAL_RELOCATED_KEYS = Set.of("volume", "issue", "publisher");
 
+    /// Number-looking strings (`edition: 1.10`, `volume: 1e3`) must stay quoted, otherwise the
+    /// YAML reader resolves them as numbers and the text changes (`1.10` -> `1.1`).
     private static final YAMLMapper MAPPER = new YAMLMapper(YAMLFactory.builder()
                                                                        .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
                                                                        .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
+                                                                       .enable(YAMLWriteFeature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
                                                                        .build());
 
     /// One entry of a directory-library sidecar during write-back: `previousKey` locates the
@@ -96,13 +98,13 @@ public class HayagrivaEntryWriter {
         return MAPPER.writeValueAsString(root);
     }
 
-    public ObjectNode toEntryNode(BibEntry entry) {
+    ObjectNode toEntryNode(BibEntry entry) {
         return mergeIntoNode(entry, MAPPER.createObjectNode());
     }
 
     /// Merges the entry into an existing Hayagriva entry node (read-modify-write, see class doc).
     /// On an empty node this produces a fresh entry in canonical key order.
-    public ObjectNode mergeIntoNode(BibEntry entry, ObjectNode node) {
+    ObjectNode mergeIntoNode(BibEntry entry, ObjectNode node) {
         BibEntry current = HayagrivaMapping.toBibEntry("current", node);
 
         mergeType(node, entry);
@@ -111,9 +113,21 @@ public class HayagrivaEntryWriter {
         mergePersons(node, "editor", StandardField.EDITOR, entry, current);
 
         boolean hasJournal = entry.hasField(StandardField.JOURNAL);
+        boolean journalRemoved = !hasJournal && current.hasField(StandardField.JOURNAL);
         HayagrivaMapping.SCALAR_FIELDS.forEach((key, field) -> {
-            if (hasJournal && JOURNAL_RELOCATED_KEYS.contains(key)) {
-                node.remove(key);
+            if (!JOURNAL_RELOCATED_KEYS.contains(key)) {
+                mergeScalar(node, key, field, entry, current);
+            } else if (hasJournal) {
+                // Journal details live in the periodical parent (see mergeParent). A top-level
+                // value wins on import, so an unchanged one is left where it is — removing it
+                // would silently surface the parent's (different) value.
+                if (fieldDiffers(field, entry, current)) {
+                    node.remove(key);
+                }
+            } else if (journalRemoved) {
+                // The parent goes away with the journal, so the details it carried must
+                // resurface at the top level even though their value did not change
+                scalarValue(entry, field).ifPresentOrElse(value -> node.put(key, value), () -> node.remove(key));
             } else {
                 mergeScalar(node, key, field, entry, current);
             }
@@ -128,12 +142,13 @@ public class HayagrivaEntryWriter {
         return node;
     }
 
+    /// An equivalent existing type string (e.g. `post`, importing as Misc) is kept as-is.
     private void mergeType(ObjectNode node, BibEntry entry) {
-        @Nullable EntryType currentType = HayagrivaMapping.scalarText(node.get("type"))
-                                                          .map(type -> HayagrivaMapping.TYPE_TO_ENTRY_TYPE.getOrDefault(type.toLowerCase(Locale.ROOT), StandardEntryType.Misc))
-                                                          .orElse(null);
-        // An equivalent existing type string (e.g. `post`, importing as Misc) is kept as-is
-        if (!entry.getType().equals(currentType)) {
+        boolean typeUnchanged = HayagrivaMapping.scalarText(node.get("type"))
+                                                .map(type -> HayagrivaMapping.TYPE_TO_ENTRY_TYPE.getOrDefault(type.toLowerCase(Locale.ROOT), StandardEntryType.Misc))
+                                                .filter(entry.getType()::equals)
+                                                .isPresent();
+        if (!typeUnchanged) {
             node.put("type", HayagrivaMapping.ENTRY_TYPE_TO_TYPE.getOrDefault(entry.getType(), "misc"));
         }
     }
@@ -155,16 +170,10 @@ public class HayagrivaEntryWriter {
     /// JabRef's per-user comment fields are written as equally named `comment-<name>` extension
     /// keys, symmetric to [HayagrivaMapping#applyUserComments].
     private void mergeUserComments(ObjectNode node, BibEntry entry, BibEntry current) {
-        SequencedSet<String> keys = new LinkedHashSet<>();
-        for (Map.Entry<String, JsonNode> property : node.properties()) {
-            if (property.getKey().startsWith(HayagrivaMapping.USER_COMMENT_PREFIX)) {
-                keys.add(property.getKey());
-            }
-        }
-        entry.getFields().stream()
-             .map(Field::getName)
-             .filter(name -> name.startsWith(HayagrivaMapping.USER_COMMENT_PREFIX))
-             .forEach(keys::add);
+        List<String> keys = Stream.concat(node.propertyNames().stream(), entry.getFields().stream().map(Field::getName))
+                                  .filter(name -> name.startsWith(HayagrivaMapping.USER_COMMENT_PREFIX))
+                                  .distinct()
+                                  .toList();
         keys.forEach(key -> mergeScalar(node, key, FieldFactory.parseField(key), entry, current));
     }
 
@@ -200,7 +209,7 @@ public class HayagrivaEntryWriter {
     private void mergeSerialNumber(ObjectNode node, BibEntry entry, BibEntry current) {
         boolean changed = !arxivEprint(entry).equals(arxivEprint(current))
                 || HayagrivaMapping.SERIAL_NUMBER_FIELDS.values().stream()
-                                                        .anyMatch(field -> !entry.getField(field).equals(current.getField(field)));
+                                                        .anyMatch(field -> fieldDiffers(field, entry, current));
         if (!changed) {
             return;
         }
@@ -233,37 +242,38 @@ public class HayagrivaEntryWriter {
         if (entry.hasField(StandardField.NUMBER) || current.getField(StandardField.NUMBER).isEmpty()) {
             return;
         }
-        JsonNode serialNumber = node.get("serial-number");
-        if (serialNumber instanceof ObjectNode serialNumberObject) {
-            serialNumberObject.remove("serial");
-            if (serialNumberObject.isEmpty()) {
+        node.optional("serial-number").ifPresent(serialNumber -> {
+            if (serialNumber instanceof ObjectNode serialNumberObject) {
+                serialNumberObject.remove("serial");
+                if (serialNumberObject.isEmpty()) {
+                    node.remove("serial-number");
+                }
+            } else {
                 node.remove("serial-number");
             }
-        } else if (serialNumber != null) {
-            node.remove("serial-number");
-        }
+        });
     }
 
     private Optional<String> arxivEprint(BibEntry entry) {
-        boolean isArxiv = entry.getField(StandardField.EPRINTTYPE)
-                               .map(eprintType -> "arxiv".equalsIgnoreCase(eprintType))
-                               .orElse(false);
-        return isArxiv ? entry.getField(StandardField.EPRINT) : Optional.empty();
+        return entry.getField(StandardField.EPRINTTYPE)
+                    .filter("arxiv"::equalsIgnoreCase)
+                    .flatMap(_ -> entry.getField(StandardField.EPRINT));
     }
 
     private void mergeAffiliated(ObjectNode node, BibEntry entry, BibEntry current) {
+        // Last item per role wins, like on import
         SequencedMap<String, JsonNode> existingByRole = new LinkedHashMap<>();
         if (node.get("affiliated") instanceof ArrayNode existing) {
             for (JsonNode item : existing.values()) {
                 if (item.isObject()) {
                     HayagrivaMapping.scalarText(item.get("role"))
-                                    .ifPresent(role -> existingByRole.putIfAbsent(role.toLowerCase(Locale.ROOT), item));
+                                    .ifPresent(role -> existingByRole.put(role.toLowerCase(Locale.ROOT), item));
                 }
             }
         }
         // Existing roles first, so untouched items keep their position; spec roles cover fields
         // added in JabRef
-        LinkedHashSet<String> roles = new LinkedHashSet<>(existingByRole.keySet());
+        SequencedSet<String> roles = new LinkedHashSet<>(existingByRole.keySet());
         roles.addAll(HayagrivaMapping.AFFILIATED_ROLES);
 
         boolean changed = false;
@@ -272,10 +282,7 @@ public class HayagrivaEntryWriter {
             Field field = FieldFactory.parseField(role);
             Optional<String> target = entry.getField(field);
             if (target.equals(current.getField(field))) {
-                JsonNode item = existingByRole.get(role);
-                if (item != null) {
-                    result.add(item);
-                }
+                Optional.ofNullable(existingByRole.get(role)).ifPresent(result::add);
                 continue;
             }
             changed = true;
@@ -294,9 +301,7 @@ public class HayagrivaEntryWriter {
             node.remove("affiliated");
             return;
         }
-        ArrayNode affiliated = MAPPER.createArrayNode();
-        result.forEach(affiliated::add);
-        node.set("affiliated", affiliated);
+        node.set("affiliated", MAPPER.createArrayNode().addAll(result));
     }
 
     private void mergeParent(ObjectNode node, BibEntry entry, BibEntry current) {
@@ -314,48 +319,43 @@ public class HayagrivaEntryWriter {
 
         List<ObjectNode> parents = new ArrayList<>();
         entry.getField(StandardField.JOURNAL).ifPresent(journal -> {
-            ObjectNode parent = MAPPER.createObjectNode();
-            parent.put("type", "periodical");
-            parent.put("title", journal);
+            ObjectNode parent = parentNode("periodical", journal);
             entry.getField(StandardField.VOLUME).ifPresent(volume -> parent.put("volume", volume));
             entry.getField(StandardField.NUMBER).ifPresent(issue -> parent.put("issue", issue));
             entry.getField(StandardField.PUBLISHER).ifPresent(publisher -> parent.put("publisher", publisher));
             parents.add(parent);
         });
-        entry.getField(StandardField.BOOKTITLE).ifPresent(booktitle -> {
-            ObjectNode parent = MAPPER.createObjectNode();
-            parent.put("type", booktitleParentType(entry.getType()));
-            parent.put("title", booktitle);
+        Optional<ObjectNode> seriesParent = entry.getField(StandardField.SERIES).map(series -> parentNode("book", series));
+        entry.getField(StandardField.BOOKTITLE).ifPresentOrElse(booktitle -> {
+            ObjectNode parent = parentNode(booktitleParentType(entry.getType()), booktitle);
+            // Hayagriva nests containers: the series is the parent of the proceedings/book the
+            // part appears in, which is also what makes both fields survive a re-import
+            seriesParent.ifPresent(series -> parent.set("parent", series));
             parents.add(parent);
-        });
-        // For book parts a `book` parent re-imports as booktitle, so a series written next to a
-        // booktitle survives in the YAML but not a re-import (documented asymmetry)
-        entry.getField(StandardField.SERIES).ifPresent(series -> {
-            ObjectNode parent = MAPPER.createObjectNode();
-            parent.put("type", "book");
-            parent.put("title", series);
-            parents.add(parent);
-        });
+        }, () -> seriesParent.ifPresent(parents::add));
 
         if (parents.isEmpty()) {
             node.remove("parent");
         } else if (parents.size() == 1) {
             node.set("parent", parents.getFirst());
         } else {
-            ArrayNode parentArray = MAPPER.createArrayNode();
-            parents.forEach(parentArray::add);
-            node.set("parent", parentArray);
+            node.set("parent", MAPPER.createArrayNode().addAll(parents));
         }
     }
 
+    private ObjectNode parentNode(String type, String title) {
+        ObjectNode parent = MAPPER.createObjectNode();
+        parent.put("type", type);
+        parent.put("title", title);
+        return parent;
+    }
+
     private String booktitleParentType(EntryType entryType) {
-        if (StandardEntryType.InProceedings == entryType) {
-            return "proceedings";
-        }
-        if (StandardEntryType.InBook == entryType) {
-            return "book";
-        }
-        return "anthology";
+        return switch (entryType) {
+            case StandardEntryType.InProceedings -> "proceedings";
+            case StandardEntryType.InBook -> "book";
+            default -> "anthology";
+        };
     }
 
     private boolean fieldDiffers(Field field, BibEntry entry, BibEntry current) {
