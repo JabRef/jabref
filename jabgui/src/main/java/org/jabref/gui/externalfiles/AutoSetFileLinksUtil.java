@@ -242,27 +242,18 @@ public class AutoSetFileLinksUtil {
         // Only keep associated files that are not linked
         return associatedFiles
                 .stream()
-                .filter(associatedFile -> !isMarkdownCompanion(associatedFile, associatedFiles, linkedFiles))
+                .filter(associatedFile -> !isMarkdownSidecar(associatedFile))
                 .filter(associatedFile -> !isFileAlreadyLinked(associatedFile, linkedFiles))
                 .map(this::buildLinkedFileFromPath)
                 .toList();
     }
 
-    /// A Markdown file sharing its base name with another associated or linked file (e.g. `X.md`
-    /// next to `X.pdf`) holds notes on that file rather than being a document of its own, so it
-    /// must not be auto-linked. The same holds for a Markdown sidecar (Hayagriva frontmatter,
-    /// see [MarkdownSidecar]) even without such a partner: it is an entry's source, not an
-    /// attachment. Any other Markdown file is still linked.
-    private boolean isMarkdownCompanion(Path file, List<Path> associatedFiles, List<Path> linkedFiles) {
+    /// A Markdown sidecar of a directory library (Hayagriva frontmatter, see [MarkdownSidecar])
+    /// is an entry's source, not an attachment, so it must not be auto-linked. Any other
+    /// Markdown file is still linked.
+    private boolean isMarkdownSidecar(Path file) {
         if (!MarkdownSidecar.hasMarkdownExtension(file)) {
             return false;
-        }
-        String baseName = FileUtil.getBaseName(file);
-        boolean hasPartner = Stream.concat(associatedFiles.stream(), linkedFiles.stream())
-                                   .filter(other -> !other.equals(file))
-                                   .anyMatch(other -> baseName.equalsIgnoreCase(FileUtil.getBaseName(other)));
-        if (hasPartner) {
-            return true;
         }
         try {
             return markdownSidecar.looksLikeSidecar(file);
