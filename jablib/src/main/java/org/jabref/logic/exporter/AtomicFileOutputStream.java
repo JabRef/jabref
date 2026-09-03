@@ -18,6 +18,7 @@ import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.EnumSet;
@@ -386,54 +387,54 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /// Copies everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
-    /// `source` to `target`. Each part is independent and best-effort: a file system may lack the view, and setting
-    /// a group the user is not a member of is refused by the OS. POSIX permissions are restored separately after the
-    /// move, so that they also apply to a freshly created target.
+    /// `source` to `target`, which must be on the same file system. Each part is independent and best-effort: a
+    /// mounted file system may lack support the default file system advertises, and setting a group the user is not
+    /// a member of is refused by the OS. POSIX permissions are restored separately after the move, so that they also
+    /// apply to a freshly created target.
     private static void copyAttributes(Path source, Path target) {
-        PosixFileAttributeView sourcePosix = Files.getFileAttributeView(source, PosixFileAttributeView.class);
-        PosixFileAttributeView targetPosix = Files.getFileAttributeView(target, PosixFileAttributeView.class);
-        if ((sourcePosix != null) && (targetPosix != null)) {
+        Set<String> views = source.getFileSystem().supportedFileAttributeViews();
+
+        if (views.contains("posix")) {
             try {
-                targetPosix.setGroup(sourcePosix.readAttributes().group());
+                Files.getFileAttributeView(target, PosixFileAttributeView.class)
+                     .setGroup(Files.readAttributes(source, PosixFileAttributes.class).group());
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy group of {} to {}", source, target, exception);
             }
         }
 
-        DosFileAttributeView sourceDos = Files.getFileAttributeView(source, DosFileAttributeView.class);
-        DosFileAttributeView targetDos = Files.getFileAttributeView(target, DosFileAttributeView.class);
-        if ((sourceDos != null) && (targetDos != null)) {
+        if (views.contains("dos")) {
             try {
-                DosFileAttributes attributes = sourceDos.readAttributes();
-                targetDos.setHidden(attributes.isHidden());
-                targetDos.setSystem(attributes.isSystem());
-                targetDos.setArchive(attributes.isArchive());
+                DosFileAttributes attributes = Files.readAttributes(source, DosFileAttributes.class);
+                DosFileAttributeView targetView = Files.getFileAttributeView(target, DosFileAttributeView.class);
+                targetView.setHidden(attributes.isHidden());
+                targetView.setSystem(attributes.isSystem());
+                targetView.setArchive(attributes.isArchive());
                 // Last: a read-only file refuses further attribute changes on some platforms
-                targetDos.setReadOnly(attributes.isReadOnly());
+                targetView.setReadOnly(attributes.isReadOnly());
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy DOS attributes of {} to {}", source, target, exception);
             }
         }
 
-        AclFileAttributeView sourceAcl = Files.getFileAttributeView(source, AclFileAttributeView.class);
-        AclFileAttributeView targetAcl = Files.getFileAttributeView(target, AclFileAttributeView.class);
-        if ((sourceAcl != null) && (targetAcl != null)) {
+        if (views.contains("acl")) {
             try {
-                targetAcl.setAcl(sourceAcl.getAcl());
+                Files.getFileAttributeView(target, AclFileAttributeView.class)
+                     .setAcl(Files.getFileAttributeView(source, AclFileAttributeView.class).getAcl());
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy ACL of {} to {}", source, target, exception);
             }
         }
 
-        UserDefinedFileAttributeView sourceUserDefined = Files.getFileAttributeView(source, UserDefinedFileAttributeView.class);
-        UserDefinedFileAttributeView targetUserDefined = Files.getFileAttributeView(target, UserDefinedFileAttributeView.class);
-        if ((sourceUserDefined != null) && (targetUserDefined != null)) {
+        if (views.contains("user")) {
             try {
-                for (String name : sourceUserDefined.list()) {
-                    ByteBuffer value = ByteBuffer.allocate(sourceUserDefined.size(name));
-                    sourceUserDefined.read(name, value);
+                UserDefinedFileAttributeView sourceView = Files.getFileAttributeView(source, UserDefinedFileAttributeView.class);
+                UserDefinedFileAttributeView targetView = Files.getFileAttributeView(target, UserDefinedFileAttributeView.class);
+                for (String name : sourceView.list()) {
+                    ByteBuffer value = ByteBuffer.allocate(sourceView.size(name));
+                    sourceView.read(name, value);
                     value.flip();
-                    targetUserDefined.write(name, value);
+                    targetView.write(name, value);
                 }
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy extended attributes of {} to {}", source, target, exception);

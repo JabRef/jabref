@@ -63,7 +63,7 @@ class AtomicFileOutputStreamTest {
         Path out = tempDir.resolve("tagged.txt");
         Files.writeString(out, FIFTY_CHARS);
         UserDefinedFileAttributeView view = Files.getFileAttributeView(out, UserDefinedFileAttributeView.class);
-        assumeTrue(view != null, "file system has no user-defined attribute view");
+        assumeTrue(out.getFileSystem().supportedFileAttributeViews().contains("user"), "file system has no user-defined attribute view");
         try {
             view.write("jabref.test", StandardCharsets.UTF_8.encode("tagged"));
         } catch (IOException exception) {
