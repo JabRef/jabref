@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -44,9 +45,12 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         return target;
     }
 
+    private ParserResult read(Path file) throws IOException {
+        return new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(file);
+    }
+
     private List<BibEntry> parse(Path file) throws IOException {
-        return new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())
-                .importDatabase(file).getDatabase().getEntries();
+        return read(file).getDatabase().getEntries();
     }
 
     @Test
@@ -175,6 +179,32 @@ class GitMergeDriverTest extends AbstractJabKitTest {
 
         assertEquals(1, exitCode);
         assertEquals(Files.readString(getClassResourceAsPath("merge-duplicate-keys.bib")), Files.readString(current));
+    }
+
+    @Test
+    void keepsCustomEntryTypes(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-custom-type-base.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-custom-type-other.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(0, exitCode, commandLine.getErrorOutput());
+        assertEquals(read(source).getEntryTypes(), read(current).getEntryTypes());
+    }
+
+    @Test
+    void reportsConflictOnDuplicateStrings(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-duplicate-strings.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(source, tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(source), Files.readString(current));
     }
 
     @Test

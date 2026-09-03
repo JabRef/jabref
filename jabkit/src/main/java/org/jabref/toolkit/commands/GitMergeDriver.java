@@ -9,9 +9,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
@@ -20,10 +23,12 @@ import org.jabref.logic.git.merge.execution.GitMergeApplier;
 import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.toolkit.converter.CygWinPathConverter;
@@ -96,11 +101,14 @@ class GitMergeDriver implements Callable<Integer> {
     // [impl->req~jabkit.git.merge-driver~1]
     public Integer call() throws ImportServiceException {
         boolean porcelain = sharedOptions.porcelain;
-        BibDatabaseContext base = ImportService.importBibTexFile(baseFile, git.jabKit.cliPreferences, porcelain).getDatabaseContext();
-        BibDatabaseContext current = ImportService.importBibTexFile(currentFile, git.jabKit.cliPreferences, porcelain).getDatabaseContext();
-        BibDatabaseContext other = ImportService.importBibTexFile(otherFile, git.jabKit.cliPreferences, porcelain).getDatabaseContext();
+        ParserResult baseResult = ImportService.importBibTexFile(baseFile, git.jabKit.cliPreferences, porcelain);
+        ParserResult currentResult = ImportService.importBibTexFile(currentFile, git.jabKit.cliPreferences, porcelain);
+        ParserResult otherResult = ImportService.importBibTexFile(otherFile, git.jabKit.cliPreferences, porcelain);
+        BibDatabaseContext base = baseResult.getDatabaseContext();
+        BibDatabaseContext current = currentResult.getDatabaseContext();
+        BibDatabaseContext other = otherResult.getDatabaseContext();
 
-        List<String> unmergeable = checkMergeable(base, current, other);
+        List<String> unmergeable = checkMergeable(baseResult, currentResult, otherResult);
         if (!unmergeable.isEmpty()) {
             unmergeable.forEach(System.err::println);
             return CONFLICT;
@@ -115,7 +123,9 @@ class GitMergeDriver implements Callable<Integer> {
         GitMergeApplier.applyAutoPlan(current, withoutEntries(analysis.autoPlan(), typeConflicts));
 
         try {
-            GitFileWriter.write(currentFile, current, git.jabKit.cliPreferences.getImportFormatPreferences());
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+            entryTypesManager.addCustomOrModifiedTypes(List.copyOf(currentResult.getEntryTypes()), current.getMode());
+            GitFileWriter.write(currentFile, current, git.jabKit.cliPreferences.getImportFormatPreferences(), entryTypesManager);
         } catch (IOException e) {
             LOGGER.error("Unable to write merge result to {}", currentFile, e);
             System.err.println(Localization.lang("Unable to write to %0.", currentFile));
@@ -160,22 +170,18 @@ class GitMergeDriver implements Callable<Integer> {
     /// CURRENT as is - entries without a citation key, `@String`s, preamble, epilogue and metadata.
     ///
     /// @return one message per reason why the files cannot be merged; empty if they can
-    private List<String> checkMergeable(BibDatabaseContext base, BibDatabaseContext current, BibDatabaseContext other) {
+    private List<String> checkMergeable(ParserResult base, ParserResult current, ParserResult other) {
         List<String> reasons = new ArrayList<>();
 
-        List<Path> duplicates = new ArrayList<>();
-        if (hasDuplicateCitationKeys(base)) {
-            duplicates.add(baseFile);
-        }
-        if (hasDuplicateCitationKeys(current)) {
-            duplicates.add(currentFile);
-        }
-        if (hasDuplicateCitationKeys(other)) {
-            duplicates.add(otherFile);
-        }
+        List<Path> duplicates = filesWhere(base, current, other, result -> hasDuplicateCitationKeys(result.getDatabaseContext()));
         if (!duplicates.isEmpty()) {
-            reasons.add(Localization.lang("Cannot merge %0: citation keys must be unique.",
-                    duplicates.stream().map(Path::toString).collect(Collectors.joining(", "))));
+            reasons.add(Localization.lang("Cannot merge %0: citation keys must be unique.", join(duplicates)));
+        }
+
+        // A warning means that the parser could not read everything - writing the file back would drop it
+        List<Path> withWarnings = filesWhere(base, current, other, ParserResult::hasWarnings);
+        if (!withWarnings.isEmpty()) {
+            reasons.add(Localization.lang("Cannot merge %0: the file was not parsed without warnings.", join(withWarnings)));
         }
 
         List<Object> otherContent = nonEntryContent(other);
@@ -183,6 +189,17 @@ class GitMergeDriver implements Callable<Integer> {
             reasons.add(Localization.lang("Cannot merge %0: content outside of entries with a citation key changed on both sides.", currentFile));
         }
         return reasons;
+    }
+
+    private List<Path> filesWhere(ParserResult base, ParserResult current, ParserResult other, Predicate<ParserResult> predicate) {
+        return Stream.of(Map.entry(baseFile, base), Map.entry(currentFile, current), Map.entry(otherFile, other))
+                     .filter(entry -> predicate.test(entry.getValue()))
+                     .map(Map.Entry::getKey)
+                     .toList();
+    }
+
+    private static String join(List<Path> files) {
+        return files.stream().map(Path::toString).collect(Collectors.joining(", "));
     }
 
     private static boolean hasDuplicateCitationKeys(BibDatabaseContext context) {
@@ -194,16 +211,19 @@ class GitMergeDriver implements Callable<Integer> {
 
     /// Everything that is written to the file but never looked at by the merge planner. Metadata is
     /// compared in its serialized form, because [MetaData#equals] ignores unknown metadata items.
-    private List<Object> nonEntryContent(BibDatabaseContext context) {
+    private List<Object> nonEntryContent(ParserResult result) {
+        BibDatabaseContext context = result.getDatabaseContext();
         BibDatabase database = context.getDatabase();
         return List.of(
                 database.getEntries().stream()
                         .filter(entry -> entry.getCitationKey().isEmpty())
                         .map(entry -> List.of(entry.getType(), entry.getFieldMap()))
                         .toList(),
-                database.getStringValues().stream().collect(Collectors.toMap(BibtexString::getName, BibtexString::getContent)),
+                database.getStringValues().stream()
+                        .collect(Collectors.toMap(BibtexString::getName, string -> List.of(string.getContent(), string.getUserComments()))),
                 database.getPreamble().orElse(""),
                 database.getEpilog(),
+                result.getEntryTypes(),
                 MetaDataSerializer.getSerializedStringMap(context.getMetaData(),
                         git.jabKit.cliPreferences.getImportFormatPreferences().citationKeyPatternPreferences().getKeyPatterns()));
     }
@@ -223,7 +243,7 @@ class GitMergeDriver implements Callable<Integer> {
         Map<String, BibEntry> currentEntries = entriesByCitationKey(current);
         Map<String, BibEntry> otherEntries = entriesByCitationKey(other);
 
-        Set<String> keys = new LinkedHashSet<>(baseEntries.keySet());
+        SequencedSet<String> keys = new LinkedHashSet<>(baseEntries.keySet());
         keys.addAll(currentEntries.keySet());
         keys.addAll(otherEntries.keySet());
 

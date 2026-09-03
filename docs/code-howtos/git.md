@@ -83,7 +83,7 @@ The driver writes `current + (other - base)` into `%A`.
 Exit code 0 means a clean merge, exit code 1 marks the file as conflicted; conflicting entries keep the current side's version and their citation keys are printed to stderr.
 
 The merge plan is keyed by citation key and covers entries only.
-Therefore the driver refuses the merge (exit code 1, `CURRENT` untouched) when an input file contains duplicate citation keys, and when content outside of entries with a citation key (entries without one, `@String` definitions, preamble, epilogue, metadata) differs between `OTHER` and both other versions.
+Therefore the driver refuses the merge (exit code 1, `CURRENT` untouched) when an input file contains duplicate citation keys, when the parser reported a warning for it (the file cannot be written back without loss then), and when content outside of entries with a citation key (entries without one, `@String` definitions, custom entry types, preamble, epilogue, metadata) differs between `OTHER` and both other versions.
 Entry types are merged by the driver as well, because the plan carries field values only: a type changed in `OTHER` alone is applied to `CURRENT`, any other divergence is reported as a conflict.
 
 ## Related Test Cases

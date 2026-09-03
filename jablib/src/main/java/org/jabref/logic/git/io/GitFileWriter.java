@@ -17,8 +17,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public class GitFileWriter {
     private static final ConcurrentHashMap<Path, Object> FILE_LOCKS = new ConcurrentHashMap<>();
 
-    /// @implNote this should be in sync with [org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase]
     public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs) throws IOException {
+        write(file, bibDatabaseContext, importPrefs, new BibEntryTypesManager());
+    }
+
+    /// @param entryTypesManager the custom entry types of the library; without them, the `@Comment{jabref-entrytype: ...}` definitions of the file are lost
+    /// @implNote this should be in sync with [org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase]
+    public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs, BibEntryTypesManager entryTypesManager) throws IOException {
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
 
@@ -30,7 +35,7 @@ public class GitFileWriter {
                         saveConfiguration,
                         importPrefs.fieldPreferences(),
                         importPrefs.citationKeyPatternPreferences(),
-                        new BibEntryTypesManager()
+                        entryTypesManager
                 );
                 writer.writeDatabase(bibDatabaseContext);
 
