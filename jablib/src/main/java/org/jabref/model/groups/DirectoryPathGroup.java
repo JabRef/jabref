@@ -7,9 +7,12 @@ import java.util.function.Function;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
+
 /// One directory of a directory library, materialized as a subgroup of
 /// [DirectoryStructureGroup]: matches every entry whose source file lies in this directory or
 /// anywhere below it. These nodes are recomputed from the entries and never persisted.
+@NullMarked
 public class DirectoryPathGroup extends AbstractGroup {
 
     private final Path relativeDirectory;
@@ -21,10 +24,6 @@ public class DirectoryPathGroup extends AbstractGroup {
         super(relativeDirectory.getFileName().toString(), GroupHierarchyType.INDEPENDENT);
         this.relativeDirectory = relativeDirectory;
         this.sourceFileLookup = sourceFileLookup;
-    }
-
-    public Path getRelativeDirectory() {
-        return relativeDirectory;
     }
 
     @Override

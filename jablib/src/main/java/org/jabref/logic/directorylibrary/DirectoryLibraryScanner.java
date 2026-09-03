@@ -133,8 +133,9 @@ public class DirectoryLibraryScanner {
     private void installDirectoryGroups(BibDatabaseContext databaseContext, DirectoryLibraryCatalog catalog, Path root) {
         Function<BibEntry, Optional<Path>> sourceFileLookup = sourceFileLookup(catalog, root);
         GroupTreeNode groupsRoot = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
-        groupsRoot.addSubgroup(new DirectoryStructureGroup(
-                root.getFileName().toString(), GroupHierarchyType.INDEPENDENT, sourceFileLookup));
+        // A filesystem root (`/`, `C:\\`) has no file name
+        String rootName = Optional.ofNullable(root.getFileName()).map(Path::toString).orElseGet(root::toString);
+        groupsRoot.addSubgroup(new DirectoryStructureGroup(rootName, GroupHierarchyType.INDEPENDENT, sourceFileLookup));
         databaseContext.getMetaData().setGroups(groupsRoot);
     }
 
