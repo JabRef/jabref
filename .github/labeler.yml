@@ -214,7 +214,7 @@
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
 
-"component: merge":
+"component: diff-merge":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
 
