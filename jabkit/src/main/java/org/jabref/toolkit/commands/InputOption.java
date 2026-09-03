@@ -78,13 +78,13 @@ class InputOption {
         }
     }
 
+    // [impl->adr~allow-positional-input-file-argument~1]
     private static class InputSource {
         // [impl->req~jabkit.cli.input-flag~2]
         @Parameters(index = "0", paramLabel = "FILE",
                 description = "Input file, or an http(s)/ftp URL. Alternatively, pass it via --input.")
         private String positionalInput;
 
-        // [impl->adr~use-input-flag-always-for-input-files~1]
         @Option(names = {"--input"},
                 description = "Input file, or an http(s)/ftp URL (alias for the positional FILE argument).")
         private String optionInput;

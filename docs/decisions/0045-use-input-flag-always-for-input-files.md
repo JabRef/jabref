@@ -4,9 +4,6 @@ parent: Decision Records
 status: "superseded by ADR-0057"
 ---
 # Use `--input` Flag Consistently for Reading Input Files
-`adr~use-input-flag-always-for-input-files~1`
-
-Needs: impl
 
 > [!NOTE]
 > This decision is **superseded by [ADR-0057](0057-allow-positional-input-file-argument.md)**.
@@ -77,5 +74,3 @@ jabkit format --input references.bib
 
 * [GitHub Discussion prompting this ADR](https://github.com/JabRef/jabref/pull/13158#discussion_r2106254233)
 * [Command Line Interface Guidelines](https://clig.dev/)
-
-<!-- markdownlint-disable-file MD022 -->
