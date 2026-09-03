@@ -3,6 +3,7 @@ package org.jabref.logic.directorylibrary;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,12 +56,18 @@ public class MarkdownSidecar {
     /// opens with a frontmatter block that is recognized as Hayagriva. Arbitrary Markdown
     /// (READMEs, plain notes) is no sidecar.
     public boolean looksLikeSidecar(Path file) throws IOException {
-        Optional<Document> document = split(Files.readString(file, StandardCharsets.UTF_8));
-        if (document.isEmpty()) {
-            return false;
-        }
-        try (BufferedReader reader = new BufferedReader(Reader.of(document.get().frontmatter()))) {
+        return split(Files.readString(file, StandardCharsets.UTF_8))
+                .map(Document::frontmatter)
+                .map(this::isHayagrivaFrontmatter)
+                .orElse(false);
+    }
+
+    private boolean isHayagrivaFrontmatter(String frontmatter) {
+        try (BufferedReader reader = new BufferedReader(Reader.of(frontmatter))) {
             return importer.isRecognizedFormat(reader);
+        } catch (IOException e) {
+            // Reading from an in-memory string cannot fail
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -68,17 +75,22 @@ public class MarkdownSidecar {
     /// into the first entry's comment fields. A file without a frontmatter block yields an empty
     /// result (callers recognize sidecars via [#looksLikeSidecar] first).
     public ParserResult read(Path file) throws IOException {
-        Optional<Document> document = split(Files.readString(file, StandardCharsets.UTF_8));
-        if (document.isEmpty()) {
-            return new ParserResult();
-        }
+        return split(Files.readString(file, StandardCharsets.UTF_8))
+                .map(this::read)
+                .orElseGet(ParserResult::new);
+    }
+
+    private ParserResult read(Document document) {
         ParserResult result;
-        try (BufferedReader reader = new BufferedReader(Reader.of(document.get().frontmatter()))) {
+        try (BufferedReader reader = new BufferedReader(Reader.of(document.frontmatter()))) {
             result = importer.importDatabase(reader);
+        } catch (IOException e) {
+            // Reading from an in-memory string cannot fail
+            throw new UncheckedIOException(e);
         }
         List<BibEntry> entries = result.getDatabase().getEntries();
         if (!entries.isEmpty()) {
-            applyBody(entries.getFirst(), document.get().body());
+            applyBody(entries.getFirst(), document.body());
         }
         return result;
     }

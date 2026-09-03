@@ -83,6 +83,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
@@ -484,6 +485,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
+        // Background enrichment of a directory library is system-initiated (SHARED-sourced),
+        // not something the user would be asked to save
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY
+                && event instanceof EntriesEvent entriesEvent
+                && entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED) {
+            return;
+        }
         this.changedProperty.setValue(true);
     }
 
@@ -657,8 +665,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         String filename = getBibDatabaseContext()
-                .getDatabasePath()
-                .or(() -> getBibDatabaseContext().getDirectoryLibraryRoot())
+                .getPathOnDisk()
                 .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));

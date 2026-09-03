@@ -287,6 +287,12 @@ public class BibDatabaseContext {
         return Optional.ofNullable(directoryLibraryRoot);
     }
 
+    /// The place this library lives at on disk: the `.bib` file, or the root of a directory
+    /// library. Empty for unsaved and shared libraries.
+    public Optional<Path> getPathOnDisk() {
+        return getDatabasePath().or(this::getDirectoryLibraryRoot);
+    }
+
     public void attachDirectorySynchronizer(DirectoryLibrarySynchronizer directorySynchronizer) {
         this.directorySynchronizer = directorySynchronizer;
     }
