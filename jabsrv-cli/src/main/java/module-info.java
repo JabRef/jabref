@@ -1,6 +1,7 @@
 /// Standalone launcher for the HTTP server in `org.jabref.jabsrv`.
 ///
 /// Entry point: [org.jabref.http.server.cli.ServerCli].
+///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/http-server.html">HTTP server code howto</a>
 module org.jabref.jabsrv.cli {
     opens org.jabref.http.server.cli to info.picocli;
