@@ -32,4 +32,95 @@ Since some data fetchers take time, we need to open the dialog and wait until al
 
 Needs: impl
 
+## Main Table Focus
+`req~maintable.focus~1`
+
+Prevents the main table from losing focus when adding a new library or  when changing tabs.
+This provides immediate keyboard interaction capabilities (such as Ctrl+V for pasting operations when changing tabs) without requiring explicit focus via mouse click.
+
+Needs: impl
+
+## Critical startup failures show an error dialog
+`req~ux.startup.critical-error-dialog~1`
+
+If a critical error occurs before the main window is fully constructed, it must not fail silently.
+The user needs a visible error dialog, in addition to the log entry, since [digging through log files is not accessible to most users](https://github.com/JabRef/jabref/issues/14967).
+
+Needs: impl
+
+## Merge entries dialog allows selecting empty field values
+`req~ux.merge-entries.select-empty-field~1`
+
+When the merge entries dialog shows a field that is missing in one of the source entries, the user must be able to explicitly select that empty value so the merged entry is cleared for that field.
+
+Needs: impl
+
+## Updating an entry via entry data applies the confirmed merge result
+`req~ux.update-entry-web-info.apply-merge-result~1`
+
+When a user chooses `Update with bibliographic information via entry data` and confirms the merge dialog, the selected merged values must be written back to the original entry as one undoable update.
+
+Needs: impl
+
+## Activating large libraries keeps entry previews responsive
+`req~ux.active-library.preview-responsiveness~1`
+
+When a user activates a large library, automatic group construction and group-count evaluation must not delay rendering the selected entry preview.
+
+Needs: impl
+
+## Creating a new explicit group can reuse the current selection
+`req~ux.groups.create-explicit-from-selection~1`
+
+When a user creates a new explicit group, JabRef should allow reusing the currently selected entries for that group and should keep the newly created group selected afterwards.
+
+Needs: impl
+
+## Saving keeps external change detection active
+`req~ux.external-library-changes.after-save~1`
+
+When JabRef saves a library, it must keep observing filesystem changes, defer change detection until the save has finished, and then inspect the resulting file for external changes that require conflict resolution.
+Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
+
+Needs: impl
+
+## Deleting many entries keeps the main table responsive
+`req~ux.large-library.bulk-entry-removal~1`
+
+When a user deletes many entries from a large library, JabRef must keep the main table responsive.
+
+Needs: impl
+
+## Focus the text field in text dialogs
+`req~ux.textdialogs.focus~1`
+
+When a dialog with text input as a main component is opened, the text field should be focused.
+
+Needs: impl
+
+## Automatically paste clipboard content when useful
+`req~ux.textdialogs.autopaste~1`
+
+When a dialog with text input as a main component is opened, and it is expected that while working with it, the user will paste from clipboard, JabRef should already automatically paste it.
+
+Example: new entry dialog by ID. It is expected that user would copy some paper ID (from browser, PDF, etc.), and then paste it in the dialog. As said above, JabRef automatically pastes the ID into the text field.
+
+Needs: impl
+
+### Automatic Identifier Detection and Focus in New Entry Dialog
+`req~newentry.clipboard.autofocus~1`
+
+When the "New Entry" dialog is opened:
+
+- If the clipboard contains a valid identifier (e.g., DOI, ISBN, ArXiv, RFC):
+
+  - The dialog automatically switches to the "Enter Identifier" tab.
+  - The identifier input field is automatically filled with the clipboard content.
+  - The field receives keyboard focus and its content is selected.
+  - The corresponding fetcher (e.g., DOI, ISBN) is automatically selected based on the detected identifier type.
+
+This behavior streamlines the process of creating new entries by allowing users to copy an identifier and open the dialog, without needing to manually select the input field, switch tabs, or choose a fetcher manually.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

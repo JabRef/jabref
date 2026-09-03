@@ -30,13 +30,13 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Represents the link to an external file (e.g. associated PDF file).
-/// This class is {@link Serializable} which is needed for drag and drop in gui
+/// This class is [Serializable] which is needed for drag and drop in gui
 /// The conversion from String ([org.jabref.model.entry.field.StandardField.FILE]) is done at [org.jabref.logic.importer.util.FileFieldParser#parse(String)]
 @AllowedToUseLogic("Uses FileUtil from logic")
 @NullMarked
 public class LinkedFile implements Serializable {
 
-    private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
+    private static final String REGEX_URL = "^((?:https?\\:\\/\\/|ftps?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
@@ -182,7 +182,7 @@ public class LinkedFile implements Serializable {
         out.flush();
     }
 
-    /// Reads serialized object from {@link ObjectInputStream}, automatically called
+    /// Reads serialized object from [ObjectInputStream], automatically called
     @Serial
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());
@@ -192,10 +192,16 @@ public class LinkedFile implements Serializable {
     }
 
     /// Checks if the given String is an online link
+    /// Recognizes http://, https://, ftp://, ftps://, and www. prefixes.
     ///
     /// @param toCheck The String to check
-    /// @return `true`, if it starts with "http://", "https://" or contains "www."; `false` otherwise
+    /// @return `true`, if it starts with "http://", "https://", "ftp://", "ftps://" or contains "www."; `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
+        // We use an explicit regex instead of delegating to URLUtil because
+        // isOnlineLink() specifically filters for *remote* links. URLUtil.isURL()
+        // accepts any valid URL scheme (including file://), which would misclassify
+        // local file URLs as online links.
+
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return URL_PATTERN.matcher(normalizedFilePath).matches();
     }

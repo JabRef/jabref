@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,6 +34,7 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
@@ -152,7 +151,7 @@ public class MainTableColumnFactory {
 
     /// Creates a column for the match category.
     /// This column is always hidden but is used for sorting the table
-    /// in the floating mode. The order of the {@link MatchCategory} enum constants
+    /// in the floating mode. The order of the [MatchCategory] enum constants
     /// determines the sorting order.
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
@@ -251,7 +250,7 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findJabRefIcon(group.getIconName().get())
+                                                   .flatMap(group -> IconTheme.findGroupIcon(group.getIconName().get())
                                                                               .map(icon -> icon.withColor(group.getColor()
                                                                                                                .map(Color::valueOf)
                                                                                                                .orElse(IconTheme.DEFAULT_GROUP_COLOR)))
@@ -287,7 +286,7 @@ public class MainTableColumnFactory {
         return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
-    /// Creates a column that displays a {@link SpecialField}
+    /// Creates a column that displays a [SpecialField]
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
         return new SpecialFieldColumn(columnModel, preferences, undoManager);
     }
@@ -298,8 +297,7 @@ public class MainTableColumnFactory {
         return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
-    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
-    /// #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
+    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like [createExtraFileColumn][#createExtraFileColumn(MainTableColumnModel)] does, this creates one single column collecting all file links.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,

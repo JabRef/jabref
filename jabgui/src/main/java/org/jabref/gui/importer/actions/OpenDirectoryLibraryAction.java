@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -16,6 +14,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -50,7 +49,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
@@ -61,7 +60,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                                       StateManager stateManager,
                                       FileUpdateMonitor fileUpdateMonitor,
                                       BibEntryTypesManager entryTypesManager,
-                                      UndoManager undoManager,
+                                      GuiUndoManager undoManager,
                                       ClipBoardManager clipBoardManager,
                                       TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;

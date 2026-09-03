@@ -33,6 +33,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public final class LinkedFilesSearcher {
 
     private final FilePreferences filePreferences;
     private final BibDatabaseContext databaseContext;
-    private final SearcherManager searcherManager;
+    private final @Nullable SearcherManager searcherManager;
     private final MultiFieldQueryParser parser;
 
     public LinkedFilesSearcher(BibDatabaseContext databaseContext, LuceneIndexer linkedFilesIndexer, FilePreferences filePreferences) {
@@ -69,8 +70,15 @@ public final class LinkedFilesSearcher {
             return new SearchResults();
         }
 
+        Optional<SearcherManager> maybeSearcherManager = Optional.ofNullable(searcherManager);
+        if (maybeSearcherManager.isEmpty()) {
+            LOGGER.warn("Linked files search is unavailable because the searcher manager could not be initialized");
+            return new SearchResults();
+        }
+
         LOGGER.debug("Searching in linked files with query: {}", luceneQuery.get());
         try {
+            SearcherManager searcherManager = maybeSearcherManager.orElseThrow();
             IndexSearcher linkedFilesIndexSearcher = acquireIndexSearcher(searcherManager);
             SearchResults searchResults = search(linkedFilesIndexSearcher, luceneQuery.get());
             releaseIndexSearcher(searcherManager, linkedFilesIndexSearcher);

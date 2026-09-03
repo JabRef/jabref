@@ -26,6 +26,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBinding;
+import org.jspecify.annotations.NonNull;
 
 /// This class manages the GUI-state of JabRef, including:
 ///
@@ -36,7 +37,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 /// - active number of search results
 /// - focus owner
 /// - dialog window sizes/positions
-/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+/// - opened AI chat window (controlled by [org.jabref.logic.ai.AiService])
 ///
 public interface StateManager extends SrvStateManager {
 
@@ -63,6 +64,8 @@ public interface StateManager extends SrvStateManager {
     void clearSelectedGroups(BibDatabaseContext context);
 
     void setActiveDatabase(BibDatabaseContext database);
+
+    void replaceActiveDatabase(@NonNull BibDatabaseContext database);
 
     OptionalObjectProperty<Node> focusOwnerProperty();
 

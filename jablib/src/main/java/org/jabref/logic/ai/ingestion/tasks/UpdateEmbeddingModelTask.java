@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Downloads (or verifies) the local embedding model and returns the ready-to-use
-/// {@link DeepJavaEmbeddingModel}. The caller is responsible for updating any
+/// [DeepJavaEmbeddingModel]. The caller is responsible for updating any
 /// property / field once the task succeeds (via `onSuccess`).
 public class UpdateEmbeddingModelTask extends BackgroundTask<DeepJavaEmbeddingModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateEmbeddingModelTask.class);

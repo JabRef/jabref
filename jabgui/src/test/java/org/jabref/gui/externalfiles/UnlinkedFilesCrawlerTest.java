@@ -3,17 +3,29 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.nio.file.DirectoryStream.Filter;
@@ -44,7 +56,7 @@ class UnlinkedFilesCrawlerTest {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
         when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
 
-        UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPDFFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, mock(BibDatabaseContext.class), mock(FilePreferences.class));
+        UnlinkedFilesCrawler unlinkedFilesCrawler = newCrawler(testRoot, unlinkedPDFFileFilter, mock(BibDatabaseContext.class), mock(FilePreferences.class));
 
         FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPDFFileFilter);
 
@@ -64,7 +76,7 @@ class UnlinkedFilesCrawlerTest {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
         when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
 
-        UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPDFFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, mock(BibDatabaseContext.class), mock(FilePreferences.class));
+        UnlinkedFilesCrawler unlinkedFilesCrawler = newCrawler(testRoot, unlinkedPDFFileFilter, mock(BibDatabaseContext.class), mock(FilePreferences.class));
 
         FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPDFFileFilter);
 
@@ -87,7 +99,7 @@ class UnlinkedFilesCrawlerTest {
         FilePreferences filePreferences = mock(FilePreferences.class);
         UnlinkedPDFFileFilter unlinkedPdfFileFilter = new UnlinkedPDFFileFilter(fileExtensionFilter, databaseContext, filePreferences);
 
-        UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPdfFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, databaseContext, filePreferences);
+        UnlinkedFilesCrawler unlinkedFilesCrawler = newCrawler(testRoot, unlinkedPdfFileFilter, databaseContext, filePreferences);
         FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPdfFileFilter);
 
         // checking to see if the database file has been filtered
@@ -95,5 +107,119 @@ class UnlinkedFilesCrawlerTest {
             int count = (int) filesInitially.count();
             assertEquals(fileNodeViewModel.getFileCount(), count - 1);
         }
+    }
+
+    /// [utest->req~jabgui.externalfiles.unlinked-files.search.non-blocking-results~1]
+    @Test
+    void cachesRelatedEntriesForUnlinkedFiles(@TempDir Path testRoot) throws IOException {
+        Path file = testRoot.resolve("citeKey.pdf");
+        Files.createFile(file);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(testRoot));
+
+        UnlinkedFilesSearchResult result = newCrawler(
+                testRoot,
+                path -> true,
+                databaseContext,
+                filePreferences).call();
+
+        assertEquals(List.of(entry), result.relatedEntries(file));
+    }
+
+    @Test
+    void cachesRelatedEntriesForSameFileNameInEveryFileDirectory(@TempDir Path testRoot) throws IOException {
+        Path firstDirectory = Files.createDirectory(testRoot.resolve("first"));
+        Path secondDirectory = Files.createDirectory(testRoot.resolve("second"));
+        Path firstFile = Files.createFile(firstDirectory.resolve("citeKey.pdf"));
+        Path secondFile = Files.createFile(secondDirectory.resolve("citeKey.pdf"));
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(firstDirectory, secondDirectory));
+
+        UnlinkedFilesSearchResult result = newCrawler(testRoot, path -> true, databaseContext, filePreferences).call();
+
+        assertEquals(List.of(entry), result.relatedEntries(firstFile));
+        assertEquals(List.of(entry), result.relatedEntries(secondFile));
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void cachesRelatedEntriesForSymlinkedSearchDirectory(@TempDir Path testRoot) throws IOException {
+        Path fileDirectory = Files.createDirectory(testRoot.resolve("files"));
+        Files.createFile(fileDirectory.resolve("citeKey.pdf"));
+        Path link = Files.createSymbolicLink(testRoot.resolve("link"), fileDirectory);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(fileDirectory));
+
+        UnlinkedFilesSearchResult result = newCrawler(link, path -> true, databaseContext, filePreferences).call();
+
+        assertEquals(List.of(entry), result.relatedEntries(link.resolve("citeKey.pdf")));
+    }
+
+    @Test
+    void skipsRelatedEntryLookupWhenCancelled(@TempDir Path testRoot) throws IOException {
+        Files.createFile(testRoot.resolve("citeKey.pdf"));
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("citeKey");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(databaseContext.getDatabase()).thenReturn(database);
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(testRoot));
+
+        UnlinkedFilesCrawler crawler = newCrawler(testRoot, path -> true, databaseContext, filePreferences);
+        crawler.cancel();
+
+        assertEquals(Map.of(), crawler.call().relatedEntriesByFile());
+    }
+
+    private static UnlinkedFilesCrawler newCrawler(Path directory,
+                                                   Filter<Path> fileFilter,
+                                                   BibDatabaseContext databaseContext,
+                                                   FilePreferences filePreferences) {
+        return new UnlinkedFilesCrawler(
+                directory,
+                fileFilter,
+                DateRange.ALL_TIME,
+                ExternalFileSorter.DEFAULT,
+                databaseContext,
+                filePreferences,
+                externalApplicationsPreferences(),
+                autoLinkPreferences());
+    }
+
+    private static ExternalApplicationsPreferences externalApplicationsPreferences() {
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        return externalApplicationsPreferences;
+    }
+
+    private static AutoLinkPreferences autoLinkPreferences() {
+        AutoLinkPreferences autoLinkPreferences = mock(AutoLinkPreferences.class);
+        when(autoLinkPreferences.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
+        return autoLinkPreferences;
     }
 }

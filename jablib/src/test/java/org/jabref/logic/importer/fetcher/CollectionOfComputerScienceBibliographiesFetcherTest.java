@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/259")
-@FetcherTest
+@ExternalServicesTest
 class CollectionOfComputerScienceBibliographiesFetcherTest {
     private CollectionOfComputerScienceBibliographiesFetcher fetcher;
 
