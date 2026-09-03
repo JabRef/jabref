@@ -2,8 +2,6 @@ package org.jabref.gui.maintable.columns;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -23,6 +21,7 @@ import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.SpecialFieldComparator;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;

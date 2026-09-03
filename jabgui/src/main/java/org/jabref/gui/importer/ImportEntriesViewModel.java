@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -37,6 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -304,6 +303,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                         if (newEntries != null && !newEntries.isEmpty()) {
                             allEntries.addAll(newEntries);
                             updateTotalPages();
+                            goToNextPage();
                         } else {
                             LOGGER.warn("No new entries fetched from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
                             dialogService.notify(Localization.lang("No new entries found from %0", fetcher.get().getName()));

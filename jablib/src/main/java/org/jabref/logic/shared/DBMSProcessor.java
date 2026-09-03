@@ -132,14 +132,14 @@ public abstract class DBMSProcessor {
 
     /// For use in test only. Inserts the BibEntry into the shared database.
     ///
-    /// @param bibEntry {@link BibEntry} to be inserted.
+    /// @param bibEntry [BibEntry] to be inserted.
     public void insertEntry(BibEntry bibEntry) {
         insertEntries(List.of(bibEntry));
     }
 
     /// Inserts the List of BibEntry into the shared database.
     ///
-    /// @param bibEntries List of {@link BibEntry} to be inserted
+    /// @param bibEntries List of [BibEntry] to be inserted
     public void insertEntries(List<BibEntry> bibEntries) {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
         if (notYetExistingEntries.isEmpty()) {
@@ -151,7 +151,7 @@ public abstract class DBMSProcessor {
 
     /// Inserts the given List of BibEntry into the ENTRY table.
     ///
-    /// @param bibEntries List of {@link BibEntry} to be inserted
+    /// @param bibEntries List of [BibEntry] to be inserted
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
@@ -187,7 +187,7 @@ public abstract class DBMSProcessor {
 
     /// Filters a list of BibEntry to and returns those which do not exist in the database
     ///
-    /// @param bibEntries {@link BibEntry} to be checked
+    /// @param bibEntries [BibEntry] to be checked
     /// @return `true` if existent, else `false`
     private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
         List<Integer> remoteIds = new ArrayList<>();
@@ -219,7 +219,7 @@ public abstract class DBMSProcessor {
 
     /// Inserts the given list of BibEntry into FIELD table.
     ///
-    /// @param bibEntries {@link BibEntry} to be inserted
+    /// @param bibEntries [BibEntry] to be inserted
     protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         try {
             // Inserting into FIELD table
@@ -266,9 +266,9 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /// Updates the whole {@link BibEntry} on shared database.
+    /// Updates the whole [BibEntry] on shared database.
     ///
-    /// @param localBibEntry {@link BibEntry} affected by changes
+    /// @param localBibEntry [BibEntry] affected by changes
     /// @throws SQLException in case of error
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
@@ -412,7 +412,7 @@ public abstract class DBMSProcessor {
 
     /// Removes the shared bibEntry.
     ///
-    /// @param bibEntries {@link BibEntry} to be deleted
+    /// @param bibEntries [BibEntry] to be deleted
     public void removeEntries(@NonNull List<BibEntry> bibEntries) {
         if (bibEntries.isEmpty()) {
             return;
@@ -437,7 +437,7 @@ public abstract class DBMSProcessor {
     }
 
     /// @param sharedID Entry ID
-    /// @return instance of {@link BibEntry}
+    /// @return instance of [BibEntry]
     public Optional<BibEntry> getSharedEntry(int sharedID) {
         List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {
@@ -610,7 +610,7 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /// Returns a new instance of the abstract type {@link DBMSProcessor}
+    /// Returns a new instance of the abstract type [DBMSProcessor]
     public static DBMSProcessor getProcessorInstance(DatabaseConnection connection) {
         return new PostgreSQLProcessor(connection);
     }
@@ -621,7 +621,7 @@ public abstract class DBMSProcessor {
 
     /// Listens for notifications from DBMS. Needs to be implemented if LiveUpdate is supported by the DBMS
     ///
-    /// @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
+    /// @param dbmsSynchronizer [DBMSSynchronizer] which handles the notification.
     public void startNotificationListener(@SuppressWarnings("unused") DBMSSynchronizer dbmsSynchronizer) {
         // nothing to do
     }
@@ -631,7 +631,7 @@ public abstract class DBMSProcessor {
         // nothing to do
     }
 
-    /// Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS. Needs to be implemented if
+    /// Notifies all clients ([DBMSSynchronizer]) which are connected to the same DBMS. Needs to be implemented if
     /// LiveUpdate is supported by the DBMS
     public void notifyClients() {
         // nothing to do

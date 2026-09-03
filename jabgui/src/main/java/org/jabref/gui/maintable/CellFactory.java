@@ -3,8 +3,6 @@ package org.jabref.gui.maintable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -12,10 +10,10 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 
 public class CellFactory {
 
@@ -30,10 +28,6 @@ public class CellFactory {
         icon = IconTheme.JabRefIcons.WWW;
         // icon.setToolTipText(Localization.lang("Open") + " URL");
         TABLE_ICONS.put(StandardField.URL, icon);
-
-        icon = IconTheme.JabRefIcons.WWW;
-        // icon.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
-        TABLE_ICONS.put(new UnknownField("citeseerurl"), icon);
 
         icon = IconTheme.JabRefIcons.WWW;
         // icon.setToolTipText(Localization.lang("Open") + " ArXivFetcher URL");

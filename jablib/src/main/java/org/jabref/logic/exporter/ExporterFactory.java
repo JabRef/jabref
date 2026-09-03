@@ -35,12 +35,12 @@ public class ExporterFactory {
         List<Exporter> exporters = new ArrayList<>();
 
         // Initialize build-in exporters
-        exporters.add(new TemplateExporter("HTML", "html", "html", null, StandardFileType.HTML, layoutPreferences, saveOrder));
-        exporters.add(new TemplateExporter(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, StandardFileType.HTML, layoutPreferences, saveOrder));
-        exporters.add(new TemplateExporter("DocBook 5.1", "docbook5", "docbook5", null, StandardFileType.XML, layoutPreferences, saveOrder));
-        exporters.add(new TemplateExporter("DocBook 4", "docbook4", "docbook4", null, StandardFileType.XML, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter("HTML", "html", "html", "", StandardFileType.HTML, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", "", StandardFileType.HTML, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter("DocBook 5.1", "docbook5", "docbook5", "", StandardFileType.XML, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter("DocBook 4", "docbook4", "docbook4", "", StandardFileType.XML, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("DIN 1505", "din1505", "din1505winword", "din1505", StandardFileType.RTF, layoutPreferences, saveOrder));
-        exporters.add(new TemplateExporter("BibO RDF", "bibordf", "bibordf", null, StandardFileType.RDF, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter("BibO RDF", "bibordf", "bibordf", "", StandardFileType.RDF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", StandardFileType.HTML, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter(Localization.lang("HTML list"), "listrefs", "listrefs", "listrefs", StandardFileType.HTML, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter(Localization.lang("HTML table (with Abstract & BibTeX)"), "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", StandardFileType.HTML, layoutPreferences, saveOrder));
@@ -53,8 +53,8 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("CSV", "csv", "csv", "csv", StandardFileType.CSV, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("RIS", "ris", "ris", "ris", StandardFileType.RIS, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
         exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, saveOrder));
-        exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
-        exporters.add(new TemplateExporter("Hayagriva YAML", "hayagrivayaml", "hayagrivayaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
+        exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", "", StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
+        exporters.add(new HayagrivaExporter());
         exporters.add(new OpenOfficeDocumentCreator());
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());

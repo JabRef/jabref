@@ -3,7 +3,7 @@ name: Check PR Format
 on:
   # _target to run even in the case of merge conflicts
   pull_request_target:
-    types: [ opened, reopened, edited ]
+    types: [ opened, reopened, edited, synchronize, ready_for_review ]
 
 permissions:
   contents: read
@@ -25,24 +25,20 @@ jobs:
       )
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Check PR title
         run: |
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+.+'; then
-            echo "❌ Title contains 'issue <number>' — not allowed."
+          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+|fix(es|ed)? ?(for ?)?#[0-9]+'; then
+            echo "❌ Title references an issue number instead of describing the change — not allowed."
             exit 1
           fi
 
           echo "✅ Title format OK"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   no-html-comments:
     if: >
@@ -59,12 +55,6 @@ jobs:
     name: No HTML comments
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-
       - name: Check for existence of section "Checklist"
         id: check_mandatory_section
         run: |
@@ -81,6 +71,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   mandatory-checks-section-exists:
     if: >
@@ -97,12 +88,6 @@ jobs:
     name: Mandatory Checklist present
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-
       - name: Check for existence of section "Checklist"
         id: check_mandatory_section
         run: |
@@ -118,6 +103,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   checklist-checked:
     if: >
@@ -135,11 +121,6 @@ jobs:
     runs-on: ubuntu-slim
     needs: [ mandatory-checks-section-exists ]
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Check for PR checklist
         id: check_changelog_modification
         run: |
@@ -160,14 +141,15 @@ jobs:
 
           LINE_COUNT=$(echo "$BOXES" | wc -l)
 
-          if [ "$LINE_COUNT" -ne 8 ]; then
-            echo "❌ Found $LINE_COUNT lines instead of 8 required lines"
+          if [ "$LINE_COUNT" -ne 7 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 7 required lines"
             exit 1
           fi
 
           echo "✅ All checkboxes are present and in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
 
   upload-pr-number:
     runs-on: ubuntu-slim

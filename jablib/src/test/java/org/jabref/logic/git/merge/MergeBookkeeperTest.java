@@ -42,6 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /// Agreement:
+///
 /// - We produce a PullPlan through GitSyncService.prepareMerge(...);
 /// - The final merged content has been written to disk on the GUI layer;
 /// - Then call DefaultMergeBookkeeper.resultRecord(...) to perform "bookkeeping";

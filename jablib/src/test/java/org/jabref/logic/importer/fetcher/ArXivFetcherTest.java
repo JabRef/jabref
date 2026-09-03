@@ -23,7 +23,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
     private static ImportFormatPreferences importFormatPreferences;
 
@@ -120,7 +120,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.FILE, ":https\\://arxiv.org/pdf/1405.2249v1:PDF")
                 .withField(StandardField.KEYWORDS, "Mathematical Physics (math-ph), Differential Geometry (math.DG), Symplectic Geometry (math.SG), FOS: Physical sciences, FOS: Mathematics, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42")
-                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1405.2249")
+                .withField(InternalField.KEY_FIELD, "Diez:2013fdp")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
     }
 
@@ -345,6 +345,24 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchEntryByIdWith4Digits() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249"));
+    }
+
+    @Test
+    void citationKeyIsAdoptedFromInspireWhenPaperIsIndexedThere() throws FetcherException {
+        // 1405.2249 has no manually-assigned (journal) DOI, so ArXivFetcher's own DOI-based
+        // enrichment never produces a citation key for it; but it is indexed on INSPIRE, which
+        // should supply its curated texkey instead of leaving the entry keyless.
+        Optional<BibEntry> entry = fetcher.performSearchById("1405.2249");
+        assertEquals(Optional.of("Diez:2013fdp"), entry.flatMap(BibEntry::getCitationKey));
+    }
+
+    @Test
+    void urlShapedCitationKeyIsLeftUnchangedWhenPaperIsNotIndexedOnInspire() throws FetcherException {
+        // 1811.10364 (mainResultPaper, a cs.IR paper) has no manually-assigned DOI, so it ends up
+        // with a URL-shaped key from the automatically-assigned arXiv DOI's metadata. It is not
+        // indexed on INSPIRE (a physics-only database), so that key is left as-is.
+        Optional<BibEntry> entry = fetcher.performSearchById("1811.10364");
+        assertEquals(Optional.of("https://doi.org/10.48550/arxiv.1811.10364"), entry.flatMap(BibEntry::getCitationKey));
     }
 
     @Test
