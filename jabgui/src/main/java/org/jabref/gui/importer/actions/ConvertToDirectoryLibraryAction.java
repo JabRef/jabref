@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -18,6 +16,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryConverter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -56,7 +55,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
                                            FileUpdateMonitor fileUpdateMonitor,
                                            BibEntryTypesManager entryTypesManager,
                                            JournalAbbreviationRepository journalAbbreviationRepository,
-                                           UndoManager undoManager,
+                                           GuiUndoManager undoManager,
                                            ClipBoardManager clipBoardManager,
                                            TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
@@ -112,7 +111,7 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
             return;
         }
 
-        if (!new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository).save()) {
+        if (new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository).save() != SaveDatabaseAction.SaveResult.SUCCESS) {
             return;
         }
         try {
