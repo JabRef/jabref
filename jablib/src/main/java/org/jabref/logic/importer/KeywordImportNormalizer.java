@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.formatter.Formatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeKeywordDelimitersFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
@@ -59,28 +62,13 @@ public final class KeywordImportNormalizer {
         return (max > 0) && (winners.size() == 1) ? Optional.of(winners.getFirst()) : Optional.empty();
     }
 
+    /// Applies [NormalizeKeywordDelimitersFormatter] to the entry, i.e. the same cleanup that is available as a save action.
     public static void normalizeKeywords(BibEntry entry, BibEntryPreferences preferences, @Nullable Character requestedSeparator) {
-        Character separator = Optional.ofNullable(requestedSeparator)
-                                      .orElse(BibEntryPreferences.getDefault().getKeywordSeparator());
-        List<Character> importKeywordDelimiters = parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
-        BibEntryPreferences.ImportDelimiterParsingStrategy parsingStrategy = Optional.ofNullable(preferences.getImportDelimiterParsingStrategy())
-                                                                                     .orElse(BibEntryPreferences.ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
-
-        entry.getField(StandardField.KEYWORDS).ifPresent(rawKeywords -> {
-            KeywordList importedKeywords = switch (parsingStrategy) {
-                case SPLIT_ON_ALL_DELIMITERS ->
-                        KeywordList.parseWithMultipleDelimiters(rawKeywords, importKeywordDelimiters);
-                case INFER_DELIMITER_BY_PRIORITY ->
-                        KeywordList.parseWithPrioritizedDelimiters(rawKeywords, importKeywordDelimiters);
-            };
-            // Only rewrite fields that actually use a different delimiter; a field already using the separator keeps its original formatting
-            if (!importedKeywords.equals(KeywordList.parse(rawKeywords, separator))) {
-                entry.setField(StandardField.KEYWORDS, KeywordList.serializeWithSpaces(importedKeywords.stream().toList(), separator));
-            }
-        });
+        Formatter formatter = new NormalizeKeywordDelimitersFormatter(preferences, requestedSeparator);
+        new FieldFormatterCleanup(StandardField.KEYWORDS, formatter).cleanup(entry);
     }
 
-    static List<Character> parseConfiguredDelimiters(@Nullable String configuredDelimiters) {
+    public static List<Character> parseConfiguredDelimiters(@Nullable String configuredDelimiters) {
         return Optional.ofNullable(configuredDelimiters)
                        .filter(delimiters -> !delimiters.isBlank())
                        .map(KeywordImportNormalizer::splitDelimiters)
