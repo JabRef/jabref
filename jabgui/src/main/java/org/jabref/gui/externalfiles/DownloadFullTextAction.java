@@ -49,10 +49,12 @@ public class DownloadFullTextAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::execute);
+    }
 
+    /// The database context is captured before the (non-modal) search starts: the user may switch libraries
+    /// while it runs, and the downloads must go to the library the entries actually belong to.
+    private void execute(BibDatabaseContext databaseContext) {
         List<BibEntry> entries = stateManager.getSelectedEntries();
         if (entries.isEmpty()) {
             LOGGER.debug("No entry selected for fulltext download.");
@@ -100,8 +102,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setTitle(Localization.lang("Download full text documents"))
                          .withInitialMessage(Localization.lang("Looking for full text document..."))
                          .showToUser(true)
-                         .onSuccess(downloads -> stateManager.getActiveDatabase()
-                                                            .ifPresent(databaseContext -> downloadFullTexts(downloads, databaseContext)))
+                         .onSuccess(downloads -> downloadFullTexts(downloads, databaseContext))
                          .executeWith(taskExecutor);
     }
 
