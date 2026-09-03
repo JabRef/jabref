@@ -15,6 +15,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
@@ -31,12 +32,12 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public interface DialogService extends NotificationService {
 
-    /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a default choice and a collection of possible choices
+    /// This will create and display new [javafx.scene.control.ChoiceDialog] of type T with a default choice and a collection of possible choices
     ///
-    /// @implNote The implementation should accept `null` for `defaultChoice`, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
+    /// @implNote The implementation should accept `null` for `defaultChoice`, but callers should use [#showChoiceDialogAndWait(String, String, String, Collection)].
     <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
 
-    /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a collection of possible choices
+    /// This will create and display new [javafx.scene.control.ChoiceDialog] of type T with a collection of possible choices
     default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
         return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
     }
@@ -47,28 +48,28 @@ public interface DialogService extends NotificationService {
         return showEditableChoiceDialogAndWait(title, content, okButtonLabel, null, choices, converter);
     }
 
-    /// This will create and display new {@link javafx.scene.control.TextInputDialog} with a text fields to enter data
+    /// This will create and display new [javafx.scene.control.TextInputDialog] with a text fields to enter data
     Optional<String> showInputDialogAndWait(String title, String content);
 
-    /// This will create and display new {@link javafx.scene.control.TextInputDialog} with a text field with a default value to enter data
+    /// This will create and display new [javafx.scene.control.TextInputDialog] with a text field with a default value to enter data
     Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
 
     /// This will create and display a new information dialog.
     /// It will include a blue information icon on the left and
     /// a single OK Button. To create an information dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)]
     void showInformationDialogAndWait(String title, String content);
 
     /// This will create and display a new information dialog.
     /// It will include a yellow warning icon on the left and
     /// a single OK Button. To create a warning dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)]
     void showWarningDialogAndWait(String title, String content);
 
     /// This will create and display a new error dialog.
     /// It will include a red error icon on the left and
     /// a single OK Button. To create a error dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)]
     void showErrorDialogAndWait(String title, String content);
 
     /// Create and display error dialog displaying the given exception.
@@ -97,7 +98,7 @@ public interface DialogService extends NotificationService {
     /// This will create and display a new confirmation dialog.
     /// It will include a blue question icon on the left and
     /// a OK and Cancel button. To create a confirmation dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)]
     ///
     /// @return true if the use clicked "OK" otherwise false
     boolean showConfirmationDialogAndWait(String title, String content);
@@ -105,7 +106,7 @@ public interface DialogService extends NotificationService {
     /// Create and display a new confirmation dialog.
     /// It will include a blue question icon on the left and
     /// a OK (with given label) and Cancel button. To create a confirmation dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)].
     ///
     /// @return true if the use clicked "OK" otherwise false
     boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
@@ -113,7 +114,7 @@ public interface DialogService extends NotificationService {
     /// Create and display a new confirmation dialog.
     /// It will include a blue question icon on the left and
     /// a OK (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)].
     ///
     /// @return true if the use clicked "OK" otherwise false
     boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel);
@@ -121,7 +122,7 @@ public interface DialogService extends NotificationService {
     /// Create and display a new confirmation dialog.
     /// It will include a blue question icon on the left and
     /// a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)].
     /// Moreover, the dialog contains a opt-out checkbox with the given text to support "Do not ask again"-behaviour.
     ///
     /// @return true if the use clicked "YES" otherwise false
@@ -131,7 +132,7 @@ public interface DialogService extends NotificationService {
     /// Create and display a new confirmation dialog.
     /// It will include a blue question icon on the left and
     /// a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
-    /// buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+    /// buttons see also [#showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)].
     /// Moreover, the dialog contains a opt-out checkbox with the given text to support "Do not ask again"-behaviour.
     ///
     /// @return true if the use clicked "YES" otherwise false
@@ -139,7 +140,7 @@ public interface DialogService extends NotificationService {
                                                     String okButtonLabel, String cancelButtonLabel,
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
-    /// This will create and display new {@link org.controlsfx.control.textfield.CustomPasswordField} that doesn't show the text, and two buttons
+    /// This will create and display new [org.controlsfx.control.textfield.CustomPasswordField] that doesn't show the text, and two buttons
     /// one cancel and one ok.
     ///
     /// @return the entered password if pressed "OK", null otherwise
@@ -156,15 +157,15 @@ public interface DialogService extends NotificationService {
     void showCustomDialogModal(BaseDialog<?> dialog);
 
     /// This will create and display a new dialog of the specified
-    /// {@link Alert.AlertType} but with user defined buttons as optional
-    /// {@link ButtonType}s.
+    /// [Alert.AlertType] but with user defined buttons as optional
+    /// [ButtonType]s.
     ///
     /// @return Optional with the pressed Button as ButtonType
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
                                                        ButtonType... buttonTypes);
 
-    /// This will create and display a new dialog showing a custom {@link DialogPane}
-    /// using custom {@link ButtonType}s, and attaches optional {@link javafx.scene.control.Tooltip}s to the buttons.
+    /// This will create and display a new dialog showing a custom [DialogPane]
+    /// using custom [ButtonType]s, and attaches optional [javafx.scene.control.Tooltip]s to the buttons.
     /// Useful for providing additional context to the user through tooltips
     /// without cluttering the main dialog content.
     ///
@@ -176,8 +177,8 @@ public interface DialogService extends NotificationService {
                                                                    Map<ButtonType, String> tooltips,
                                                                    ButtonType... buttonTypes);
 
-    /// This will create and display a new dialog showing a custom {@link DialogPane}
-    /// and using custom {@link ButtonType}s.
+    /// This will create and display a new dialog showing a custom [DialogPane]
+    /// and using custom [ButtonType]s.
     ///
     /// @return Optional with the pressed Button as ButtonType
     Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
@@ -188,21 +189,21 @@ public interface DialogService extends NotificationService {
     /// @param <R>    type of result
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
-    /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
+    /// Constructs and shows a cancelable [org.controlsfx.dialog.ProgressDialog].
     /// Clicking cancel will cancel the underlying service and close the dialog
     ///
     /// @param title   title of the dialog
     /// @param content message to show above the progress bar
-    /// @param task    The {@link Task} which executes the work and for which to show the dialog
+    /// @param task    The [Task] which executes the work and for which to show the dialog
     <V> void showProgressDialog(String title, String content, Task<V> task);
 
-    /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
+    /// Constructs and shows a cancelable [org.controlsfx.dialog.ProgressDialog].
     /// Clicking cancel will cancel the underlying service and close the dialog,
     /// otherwise will wait for the task to finish.
     ///
     /// @param title   title of the dialog
     /// @param content message to show above the progress bar
-    /// @param task    The {@link Task} which executes the work and for which to show the dialog
+    /// @param task    The [Task] which executes the work and for which to show the dialog
     <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /// Constructs and shows a dialog showing the progress of running background tasks.
@@ -211,40 +212,53 @@ public interface DialogService extends NotificationService {
     ///
     /// @param title        title of the dialog
     /// @param content      message to show below the list of background tasks
-    /// @param stateManager The {@link StateManager} which contains the background tasks
+    /// @param stateManager The [StateManager] which contains the background tasks
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /// Shows a new file save dialog. The method doesn't return until the
     /// displayed file save dialog is dismissed. The return value specifies the
-    /// file chosen by the user or an empty {@link Optional} if no selection has been made.
+    /// file chosen by the user or an empty [Optional] if no selection has been made.
     /// After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
     ///
-    /// @return the selected file or an empty {@link Optional} if no file has been selected
+    /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /// Shows a new file open dialog. The method doesn't return until the
     /// displayed open dialog is dismissed. The return value specifies
-    /// the file chosen by the user or an empty {@link Optional} if no selection has been
+    /// the file chosen by the user or an empty [Optional] if no selection has been
     /// made.
     /// After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
     ///
-    /// @return the selected file or an empty {@link Optional} if no file has been selected
+    /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /// Shows a new file open dialog. The method doesn't return until the
+    /// displayed open dialog is dismissed.
+    ///
+    /// Use this overload when the file chooser is opened from a dialog other than the main
+    /// window: with the main window as owner, closing the chooser returns focus to the main
+    /// window instead of the calling dialog (observed on macOS), hiding the dialog behind it.
+    ///
+    /// @param fileDialogConfiguration configuration for the file open dialog
+    /// @param owner                   the window that owns the file open dialog and regains
+    ///                                focus after it closes; typically the calling dialog's window
+    /// @return the selected file or an empty [Optional] if no file has been selected
+    Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner);
+
+    /// Shows a new file open dialog. The method doesn't return until the
     /// displayed open dialog is dismissed. The return value specifies
-    /// the files chosen by the user or an empty {@link List} if no selection has been
+    /// the files chosen by the user or an empty [List] if no selection has been
     /// made.
     ///
-    /// @return the selected files or an empty {@link List} if no file has been selected
+    /// @return the selected files or an empty [List] if no file has been selected
     List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
 
     /// Shows a new directory selection dialog. The method doesn't return until the
     /// displayed open dialog is dismissed. The return value specifies
-    /// the file chosen by the user or an empty {@link Optional} if no selection has been
+    /// the file chosen by the user or an empty [Optional] if no selection has been
     /// made.
     ///
-    /// @return the selected directory or an empty {@link Optional} if no directory has been selected
+    /// @return the selected directory or an empty [Optional] if no directory has been selected
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
 
     /// Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
@@ -257,9 +271,9 @@ public interface DialogService extends NotificationService {
 
     /// Shows a new dialog that list all files contained in the given archive and which lets the user select one of these
     /// files. The method doesn't return until the displayed open dialog is dismissed. The return value specifies the
-    /// file chosen by the user or an empty {@link Optional} if no selection has been made.
+    /// file chosen by the user or an empty [Optional] if no selection has been made.
     ///
-    /// @return the selected file or an empty {@link Optional} if no file has been selected
+    /// @return the selected file or an empty [Optional] if no file has been selected
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 
     List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();

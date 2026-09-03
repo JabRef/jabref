@@ -2,8 +2,6 @@ package org.jabref.gui.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -32,8 +30,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
-import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 
 public class GitCommitDialogViewModel extends AbstractViewModel {
 
@@ -126,53 +122,16 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
         String message = commitMessage.get();
         if (message == null || message.isBlank()) {
-            DiffDatabases diff = computeDiffDatabases();
-            message = generateCommitMessage(diff);
+            message = Localization.lang("Update references");
         }
 
         boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());
-
+        // TODO: Replace control-flow-by-exception with a proper control structure
         if (!committed) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
         }
     }
 
-    private String generateCommitMessage(DiffDatabases diff) {
-        BibDatabaseDiff databaseDiff = BibDatabaseDiff.compare(
-                diff.headDatabase(),
-                diff.workingTreeDatabase()
-        );
-
-        int added = 0;
-        int deleted = 0;
-        int modified = 0;
-
-        for (BibEntryDiff entryDiff : databaseDiff.getEntryDifferences()) {
-            if (entryDiff.originalEntry() == null) {
-                added++;
-            } else if (entryDiff.newEntry() == null) {
-                deleted++;
-            } else {
-                modified++;
-            }
-        }
-        List<String> changes = new ArrayList<>();
-
-        if (added > 0) {
-            changes.add("Add " + added + (added == 1 ? " entry" : " entries"));
-        }
-
-        if (deleted > 0) {
-            changes.add("Delete " + deleted + (deleted == 1 ? " entry" : " entries"));
-        }
-
-        if (modified > 0) {
-            changes.add("Modify " + modified + (modified == 1 ? " entry" : " entries"));
-        }
-
-        return String.join(", ", changes);
-
-    }
     private TrackedFile getTrackedBibFile() throws JabRefException {
         Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
         if (activeDatabaseOpt.isEmpty()) {

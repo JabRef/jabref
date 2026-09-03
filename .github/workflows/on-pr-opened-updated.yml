@@ -22,9 +22,18 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
+      # A human push invalidates the bot's earlier approval; "automerge" must be granted again explicitly.
+      # The merge commit pushed by this workflow (as jabref-machine) is exempt, as it does not change the PR's content.
+      - name: Remove automerge label on push
+        if: github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR_NUMBER" --remove-label automerge
       - name: Get PR info
         id: pr_info
         env:
@@ -33,8 +42,9 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -ex
-          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,maintainerCanModify \
-            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nmaintainer_can_modify=\(.maintainerCanModify)"' \
+          # approved_automerge is read before the merge commit below is pushed: that push may dismiss the approval.
+          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,baseRefName,maintainerCanModify,reviewDecision,autoMergeRequest \
+            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nbase_ref=\(.baseRefName)\nmaintainer_can_modify=\(.maintainerCanModify)\napproved_automerge=\(.reviewDecision == "APPROVED" and .autoMergeRequest != null)"' \
             >> $GITHUB_OUTPUT
       - name: Check PR mergeability
         id: check_mergeable
@@ -59,15 +69,36 @@ jobs:
           done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
           echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
+          echo "head_sha=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" >> $GITHUB_OUTPUT
 
           if [ "$MERGEABLE" != "CONFLICTING" ]; then
             echo "✅ No merge conflicts"
             echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
           fi
 
-      # In case of a conflict, try to resolve it automatically by merging main:
-      # maven-flow/merge resolves conflicts in CHANGELOG.md semantically and lets "git merge"
-      # fail on any other conflict - then, nothing is pushed.
+      # Once the conflict is resolved, drop the old comment (posted as jabref-machine by
+      # pr-comment.yml, or as github-actions by the dispatch path below). Otherwise, the next
+      # conflict is silently skipped by the "Already commented" check below.
+      # Requires an explicit MERGEABLE: after five retries the check may still report UNKNOWN.
+      - name: Remove stale conflict comments
+        if: steps.check_mergeable.outputs.mergeable == 'MERGEABLE'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          set -exo pipefail
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select((.user.login == "github-actions[bot]" or .user.login == "jabref-machine") and (.body | contains("Conflicts with target branch"))) | .id' |
+          while read -r id; do
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
+            echo "Removed stale conflict comment $id" >> $GITHUB_STEP_SUMMARY
+          done
+
+      # In case of a conflict, try to resolve it automatically by merging the PR's base branch
+      # (main, or the next lower PR's head branch for a stacked PR):
+      # the changelog merge driver resolves conflicts in CHANGELOG.md semantically and lets
+      # "git merge" fail on any other conflict - then, nothing is pushed.
       # Thus, a merge commit is pushed if and only if CHANGELOG.md is the only conflicting file.
       # Pushing is possible for branches in JabRef/jabref and for forks allowing maintainer edits.
       # All steps use continue-on-error; if anything fails, the conflict is reported as before.
@@ -75,7 +106,7 @@ jobs:
         id: checkout_pr
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && (steps.pr_info.outputs.head_repo == 'JabRef/jabref' || steps.pr_info.outputs.maintainer_can_modify == 'true')
         continue-on-error: true
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: ${{ steps.pr_info.outputs.head_repo }}
           ref: ${{ steps.pr_info.outputs.head_ref }}
@@ -83,42 +114,34 @@ jobs:
           fetch-depth: 0
           show-progress: 'false'
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
-      - name: Fetch upstream main
-        id: fetch_upstream
+      # Pushes the resolved merge back to the PR branch. This is the whole point:
+      # the push triggers a fresh run that then reports no conflicts (no comment).
+      # "$/" resolves the action from this workflow's own (trusted) commit, not from the
+      # workspace - the workspace holds the untrusted PR head, whose copy of the action
+      # must never run with write credentials.
+      - name: Merge ${{ steps.pr_info.outputs.base_ref }} into PR branch
+        id: automerge
         if: steps.checkout_pr.outcome == 'success'
         continue-on-error: true
-        run: |
-          set -ex
-          git remote add upstream "https://github.com/JabRef/jabref.git" || true
-          git fetch upstream main
-      # ubuntu-slim does not provide Java, which is required by the changelog merge driver
-      - name: Setup Java
-        id: setup_java
-        if: steps.fetch_upstream.outcome == 'success'
-        continue-on-error: true
-        uses: actions/setup-java@v6
+        uses: $/.github/actions/merge-upstream-branch
         with:
-          distribution: 'temurin'
-          java-version: '25'
-      - name: Merge main into PR branch
-        id: automerge
-        if: steps.setup_java.outcome == 'success'
-        continue-on-error: true
-        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
-        with:
-          changelog-file: CHANGELOG.md
-          changelog-rebase: true
-          pom-file: 'match-nothing.txt'
-          source-branch: 'upstream/main'
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
-          # Push the resolved merge back to the PR branch. This is the whole point:
-          # the push triggers a fresh run that then reports no conflicts (no comment).
-          push-changes: true
+          base-branch: ${{ steps.pr_info.outputs.base_ref }}
+      # After the merge, HEAD is the merge commit that was pushed.
+      - name: Record pushed merge commit
+        id: merge_commit
+        if: steps.automerge.outcome == 'success'
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Handle merge conflict
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING'
         env:
           AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
+          APPROVED_AUTOMERGE: ${{ steps.pr_info.outputs.approved_automerge }}
+          HEAD_REPO: ${{ steps.pr_info.outputs.head_repo }}
+          BASE_REF: ${{ steps.pr_info.outputs.base_ref }}
+          MERGE_COMMIT: ${{ steps.merge_commit.outputs.sha }}
+          PAT: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -127,9 +150,27 @@ jobs:
           set -ex
 
           if [ "$AUTOMERGE_OUTCOME" = "success" ]; then
-            # CHANGELOG.md was the only conflicting file - main was merged and pushed.
-            # No comment, no label: the push triggers a new run, which then reports no conflicts.
-            echo "✅ Conflict in CHANGELOG.md only - resolved by merging main" >> $GITHUB_STEP_SUMMARY
+            # CHANGELOG.md was the only conflicting file - the base branch was merged and pushed.
+            # No comment: the push triggers a new run, which then reports no conflicts.
+            echo "✅ Conflict in CHANGELOG.md only - resolved by merging $BASE_REF" >> $GITHUB_STEP_SUMMARY
+            if [ "$APPROVED_AUTOMERGE" = "true" ]; then
+              # The pushed merge commit dismisses the approval and thereby stalls auto-merge.
+              # The label triggers "On PR labeled", which approves again and re-enables auto-merge.
+              # Needs the PAT: label events created with GITHUB_TOKEN do not trigger workflows.
+              # "On PR labeled" only approves heads in JabRef/jabref; for forks, the label would be a dead promise.
+              if [ "$HEAD_REPO" != "JabRef/jabref" ]; then
+                echo "⚠️ Approved fork PR with auto-merge - approval must be renewed manually" >> $GITHUB_STEP_SUMMARY
+              elif [ "$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" != "$MERGE_COMMIT" ]; then
+                # A human commit landed after our push: it is not covered by the approval read above.
+                echo "⚠️ PR head moved past the merge commit - not re-approving" >> $GITHUB_STEP_SUMMARY
+              else
+                # Remove first: the label may still be attached from the original auto-merge request,
+                # and re-adding an attached label produces no "labeled" event.
+                gh pr edit "$PR_NUMBER" --remove-label automerge
+                GH_TOKEN="$PAT" gh pr edit "$PR_NUMBER" --add-label automerge
+                echo "✅ Approved PR with auto-merge - added label \"automerge\"" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
             exit 0
           fi
 
@@ -142,8 +183,9 @@ jobs:
           if [ "$EVENT" = "workflow_dispatch" ]; then
             # Fail closed: a failing "gh api" must abort the step (via set -e), not be
             # swallowed into "no comment found" - which would post a duplicate comment.
-            # Redirected to a file rather than captured in a variable, because xtrace
-            # would echo the expanded assignment - all 20 comment bodies - into the log.
+            # jq matches the complete workflow-owned marker (a shell grep would either split a
+            # multi-line -F pattern into per-line alternatives or loosely match free text quoting
+            # the phrase), and only matches reach the file - so xtrace never echoes comment bodies.
             gh api graphql -f query="
                 query {
                   repository(owner: \"JabRef\", name: \"JabRef\") {
@@ -154,21 +196,21 @@ jobs:
                     }
                   }
                 }
-              " --jq '.data.repository.pullRequest.comments.nodes[].body' > comments.txt
+              " --jq '.data.repository.pullRequest.comments.nodes[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
 
-            if grep -q "Conflicts with target branch" comments.txt; then
+            if [ -s marker_comments.txt ]; then
               echo "Already commented about conflicts."
               # When triggered by another workflow, success is also if there is a merge conflict
               exit 0;
             fi
 
             echo "Commenting on PR..."
-            # Quoted delimiter: the body contains backticks, which an unquoted
-            # heredoc would run as command substitution - swallowing the link text.
-            cat > body.txt <<'EOF'
+            # Backticks are escaped: the heredoc is unquoted to expand $BASE_REF, and an
+            # unquoted heredoc would otherwise run them as command substitution.
+            cat > body.txt <<EOF
           Your pull request conflicts with the target branch.
 
-          Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
+          Please [merge \`upstream/$BASE_REF\`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 
           <!-- ghprcomment
           On PR opened/updated
@@ -194,11 +236,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          HEAD_SHA: ${{ steps.check_mergeable.outputs.head_sha }}
         run: |
           set -exo pipefail
-          MARKER=$'<!-- ghprcomment\nOn PR opened/updated\nConflicts with target branch\n-->'
-          # File, not pipe: "grep -q" exits on the first match and would SIGPIPE "gh", which pipefail turns into a skip.
-          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body' > comments.txt
-          if grep -qzF -- "$MARKER" comments.txt; then
-            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID"
+          # jq matches the complete workflow-owned marker, per page of the paginated response
+          # (a shell grep would either split a multi-line -F pattern into per-line alternatives
+          # or loosely match free text quoting the phrase).
+          gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[].body | select(test("<!-- ghprcomment\\r?\\nOn PR opened/updated\\r?\\nConflicts with target branch\\r?\\n-->"))' > marker_comments.txt
+          if [ -s marker_comments.txt ]; then
+            gh workflow run "Comment on PR" --ref main --field pr_number="$PR_NUMBER" --field workflow_run_id="$GITHUB_RUN_ID" --field head_sha="$HEAD_SHA"
           fi

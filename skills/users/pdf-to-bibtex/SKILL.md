@@ -87,5 +87,6 @@ jabkit citationkeys generate library.bib --output library.bib
 
 ## Related
 
+- Extract the works a paper *cites* (its "References" section): the `pdf-extract-references` skill.
 - Write metadata back into PDFs (reverse direction): `jabkit pdf update --citation-key <key> --input library.bib --input-format bibtex`
 - Full CLI reference: the `jabkit` skill in this repository.

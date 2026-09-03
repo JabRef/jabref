@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is used to determine the status of a Git repository from any given path inside it.
-/// If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+/// If no repository is found, it returns a [GitStatusSnapshot] with tracking = false.
 /// Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
@@ -41,7 +41,7 @@ public class GitStatusChecker {
             SyncStatus syncStatus;
 
             if (remoteHead == null) {
-                // [impl->req~ux.git-commit.remote-independent~1]
+                // [impl->req~git.commit.remote-independent~1]
                 syncStatus = determineSyncStatusWithoutRemoteHead(gitHandler);
             } else {
                 syncStatus = determineSyncStatus(repo, localHead, remoteHead);
