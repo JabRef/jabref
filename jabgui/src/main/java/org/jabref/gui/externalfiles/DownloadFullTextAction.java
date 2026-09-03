@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
+///
+/// [impl->req~fetchers.fulltext-background-search~1]
 public class DownloadFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFullTextAction.class);
@@ -55,7 +57,8 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// The database context is captured before the (non-modal) search starts: the user may switch libraries
     /// while it runs, and the downloads must go to the library the entries actually belong to.
     private void execute(BibDatabaseContext databaseContext) {
-        List<BibEntry> entries = stateManager.getSelectedEntries();
+        // Snapshot: the state manager's selection is a live observable list that the UI keeps mutating while the search runs.
+        List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
         if (entries.isEmpty()) {
             LOGGER.debug("No entry selected for fulltext download.");
             return;
@@ -68,7 +71,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     Localization.lang("Download full text documents"),
                     Localization.lang(
                             "You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.",
-                            String.valueOf(stateManager.getSelectedEntries().size())),
+                            String.valueOf(entries.size())),
                     // [impl->req~ui.dialogs.confirmation.naming~1]
                     Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
@@ -107,6 +110,11 @@ public class DownloadFullTextAction extends SimpleCommand {
     }
 
     private void downloadFullTexts(Map<BibEntry, Optional<FetcherResult>> downloads, BibDatabaseContext databaseContext) {
+        if (!stateManager.getOpenDatabases().contains(databaseContext)) {
+            // The library was closed while the search ran; its entries are detached and would never be saved.
+            LOGGER.debug("Library closed before the full text search finished; skipping downloads.");
+            return;
+        }
         for (Map.Entry<BibEntry, Optional<FetcherResult>> download : downloads.entrySet()) {
             BibEntry entry = download.getKey();
             Optional<FetcherResult> result = download.getValue();
