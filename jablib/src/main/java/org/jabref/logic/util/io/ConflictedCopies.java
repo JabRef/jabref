@@ -58,11 +58,8 @@ public final class ConflictedCopies {
         String baseName = Pattern.quote(FileUtil.getBaseName(fileName));
         String quotedExtension = Pattern.quote(extension);
         String alternatives = baseName + " \\(.*conflicted copy.*\\)" + quotedExtension
-                + "|" + baseName + "\\.sync-conflict-\\d{8}-\\d{6}-[A-Z0-9]+" + quotedExtension;
-        Optional<String> computerName = localComputerName();
-        if (computerName.isPresent()) {
-            alternatives += "|" + baseName + "-" + Pattern.quote(computerName.get()) + "(-\\d+)?" + quotedExtension;
-        }
+                + "|" + baseName + "\\.sync-conflict-\\d{8}-\\d{6}-[A-Z0-9]+" + quotedExtension
+                + localComputerName().map(name -> "|" + baseName + "-" + Pattern.quote(name) + "(-\\d+)?" + quotedExtension).orElse("");
         return Pattern.compile(alternatives, Pattern.CASE_INSENSITIVE);
     }
 

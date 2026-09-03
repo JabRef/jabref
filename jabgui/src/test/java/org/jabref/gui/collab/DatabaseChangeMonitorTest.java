@@ -13,9 +13,11 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -28,6 +30,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -282,5 +285,53 @@ class DatabaseChangeMonitorTest {
         monitor.notifyExternalChanges(List.of(secondChange));
 
         assertEquals(1, fileNotifications.getNotifications().size());
+    }
+
+    /// A monitor with synchronization on, whose background work runs immediately on the calling thread
+    private DatabaseChangeMonitor createSynchronizingMonitor(BibDatabaseContext databaseContext, DialogService dialogService) {
+        GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getLibraryPreferences().shouldAutoSave()).thenReturn(true);
+        when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
+        when(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        return new DatabaseChangeMonitor(
+                databaseContext,
+                mock(FileUpdateMonitor.class),
+                new CurrentThreadTaskExecutor(),
+                dialogService,
+                preferences,
+                new JabRefUndoManager(),
+                mock(StateManager.class),
+                mock(LibraryTab.class));
+    }
+
+    @Test
+    void allConflictedCopiesAreMergedOnOpen(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("library.bib");
+        Files.writeString(library, "@Article{a, title = {A}}");
+        Files.writeString(tempDir.resolve("library (conflicted copy 2026-09-03).bib"), "@Article{a, title = {A}}\n@Article{b, title = {B}}");
+        Files.writeString(tempDir.resolve("library.sync-conflict-20260903-120000-ABCDEFG.bib"), "@Article{a, title = {A}}\n@Article{c, title = {C}}");
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withCitationKey("a").withField(StandardField.TITLE, "A")));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        databaseContext.setDatabasePath(library);
+
+        createSynchronizingMonitor(databaseContext, mock(DialogService.class));
+
+        assertEquals(List.of("a", "b", "c"), database.getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
+    }
+
+    @Test
+    void unreadableConflictedCopyIsNotOfferedForDeletion(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("library.bib");
+        Files.writeString(library, "@Article{a, title = {A}}");
+        // A directory with the name of a copy cannot be read as a library
+        Files.createDirectory(tempDir.resolve("library (conflicted copy 2026-09-03).bib"));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry().withCitationKey("a").withField(StandardField.TITLE, "A"))));
+        databaseContext.setDatabasePath(library);
+        DialogService dialogService = mock(DialogService.class);
+
+        createSynchronizingMonitor(databaseContext, dialogService);
+
+        verify(dialogService, never()).notify(any(Notifications.FileNotification.class));
+        verify(dialogService).notify(any(String.class));
     }
 }
