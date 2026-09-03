@@ -1,10 +1,8 @@
 package org.jabref.gui.importer.actions;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
@@ -13,27 +11,25 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryConverter;
+import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Converts the current `.bib` library into a directory library (see
-/// [DirectoryLibraryConverter]): sidecars are written next to the linked files, the `.bib`
-/// moves into the root as the library's mirror, and the root is reopened as a directory
-/// library. Only offered for saved local libraries; aborts with an explanation when linked
-/// files do not all live under the designated root.
+/// [DirectoryLibraryConverter]) and reopens its root as such. Only offered for saved local
+/// libraries; aborts with an explanation when the library does not fit under one root.
 public class ConvertToDirectoryLibraryAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConvertToDirectoryLibraryAction.class);
@@ -46,17 +42,16 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OpenDirectoryLibraryAction openDirectoryLibraryAction;
+    private final TaskExecutor taskExecutor;
+    private final DirectoryLibraryConverter converter = new DirectoryLibraryConverter();
 
     public ConvertToDirectoryLibraryAction(LibraryTabContainer tabContainer,
                                            DialogService dialogService,
                                            GuiPreferences preferences,
-                                           AiService aiService,
                                            StateManager stateManager,
-                                           FileUpdateMonitor fileUpdateMonitor,
                                            BibEntryTypesManager entryTypesManager,
                                            JournalAbbreviationRepository journalAbbreviationRepository,
-                                           GuiUndoManager undoManager,
-                                           ClipBoardManager clipBoardManager,
+                                           OpenDirectoryLibraryAction openDirectoryLibraryAction,
                                            TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
@@ -64,8 +59,8 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
-        this.openDirectoryLibraryAction = new OpenDirectoryLibraryAction(tabContainer, dialogService, preferences,
-                aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
+        this.openDirectoryLibraryAction = openDirectoryLibraryAction;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
@@ -74,57 +69,57 @@ public class ConvertToDirectoryLibraryAction extends SimpleCommand {
     public void execute() {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-        Optional<Path> bibPath = context.getDatabasePath();
-        Optional<Path> root = DirectoryLibraryConverter.determineRoot(context);
-        if (bibPath.isEmpty() || root.isEmpty()) {
-            return;
-        }
+        DirectoryLibraryConverter.determineRoot(context, preferences.getFilePreferences())
+                                 .ifPresent(root -> convert(libraryTab, context, root));
+    }
 
-        DirectoryLibraryConverter converter = new DirectoryLibraryConverter();
-        List<String> obstacles = converter.obstacles(context, root.get(), preferences.getFilePreferences());
+    private void convert(LibraryTab libraryTab, BibDatabaseContext context, Path root) {
+        String title = Localization.lang("Convert to folder library");
+        List<String> obstacles = converter.obstacles(context, root, preferences.getFilePreferences());
         if (!obstacles.isEmpty()) {
-            String reported = obstacles.stream()
-                                       .limit(MAX_REPORTED_OBSTACLES)
-                                       .collect(Collectors.joining("\n"));
-            if (obstacles.size() > MAX_REPORTED_OBSTACLES) {
-                reported += "\n" + Localization.lang("... and %0 more", obstacles.size() - MAX_REPORTED_OBSTACLES);
-            }
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Convert to folder library"),
-                    Localization.lang("The library cannot be converted:") + "\n\n" + reported);
+            dialogService.showErrorDialogAndWait(title,
+                    Localization.lang("The library cannot be converted.") + "\n\n" + reportedObstacles(obstacles));
             return;
         }
 
-        Path rootName = root.get().getFileName();
-        Path mirrorTarget = root.get().resolve((rootName == null ? "library" : rootName.toString()) + ".bib");
-        if (!mirrorTarget.equals(bibPath.get()) && Files.exists(mirrorTarget)) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Convert to folder library"),
+        Path mirrorTarget = root.resolve(DirectoryLibrarySynchronizer.mirrorFileName(root));
+        boolean overwritesForeignFile = context.getDatabasePath().filter(not(mirrorTarget::equals)).isPresent() && Files.exists(mirrorTarget);
+        if (overwritesForeignFile) {
+            dialogService.showErrorDialogAndWait(title,
                     Localization.lang("'%0' already exists and would be overwritten.", mirrorTarget.toString()));
             return;
         }
 
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Convert to folder library"),
+        boolean confirmed = dialogService.showConfirmationDialogAndWait(title,
                 Localization.lang("Every entry gets a Markdown sidecar next to its linked file, and the library file moves to '%0', staying in sync with the folder from now on.", mirrorTarget.toString()));
         if (!confirmed) {
             return;
         }
-
         if (new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository).save() != SaveDatabaseAction.SaveResult.SUCCESS) {
             return;
         }
-        try {
-            converter.writeSidecars(context, root.get(), preferences.getFilePreferences());
-            if (!mirrorTarget.equals(bibPath.get())) {
-                Files.move(bibPath.get(), mirrorTarget);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not convert {} to a folder library", bibPath.get(), e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Convert to folder library"), e);
-            return;
+
+        BackgroundTask.wrap(() -> converter.convert(context, root, preferences.getFilePreferences()))
+                      .onSuccess(_ -> {
+                          if (!tabContainer.closeTab(libraryTab)) {
+                              LOGGER.warn("The converted library's tab stays open although its file moved to {}", mirrorTarget);
+                          }
+                          openDirectoryLibraryAction.openDirectory(root);
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("Could not convert the library to a folder library at {}", root, exception);
+                          dialogService.showErrorDialogAndWait(title, exception);
+                      })
+                      .executeWith(taskExecutor);
+    }
+
+    private static String reportedObstacles(List<String> obstacles) {
+        String reported = obstacles.stream()
+                                   .limit(MAX_REPORTED_OBSTACLES)
+                                   .collect(Collectors.joining("\n"));
+        if (obstacles.size() > MAX_REPORTED_OBSTACLES) {
+            return reported + "\n" + Localization.lang("... and %0 more", Integer.toString(obstacles.size() - MAX_REPORTED_OBSTACLES));
         }
-        tabContainer.closeTab(libraryTab);
-        openDirectoryLibraryAction.openDirectory(root.get());
+        return reported;
     }
 }

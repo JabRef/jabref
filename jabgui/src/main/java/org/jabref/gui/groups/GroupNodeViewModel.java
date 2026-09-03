@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -123,15 +122,12 @@ public class GroupNodeViewModel {
         displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
-            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
-                                     .stream()
-                                     .map(this::toViewModel)
-                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = FXCollections.observableArrayList(automaticSubgroups(automaticGroup));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
-        if (groupNode.getGroup() instanceof TexGroup) {
+        if (groupNode.getGroup() instanceof TexGroup || groupNode.getGroup() instanceof DirectoryStructureGroup) {
+            // Both derive their subgroups from files that change while the library is open
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
             SearchContext searchContext = stateManager.getSearchContext(databaseContext);
@@ -335,8 +331,19 @@ public class GroupNodeViewModel {
         }
     }
 
+    private List<GroupNodeViewModel> automaticSubgroups(AutomaticGroup automaticGroup) {
+        return automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries())
+                             .stream()
+                             .map(this::toViewModel)
+                             .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                             .toList();
+    }
+
     private void refreshGroup() {
         UiTaskExecutor.runInJavaFXThread(() -> {
+            if (groupNode.getGroup() instanceof DirectoryStructureGroup directoryStructureGroup) {
+                children.setAll(automaticSubgroups(directoryStructureGroup));
+            }
             updateMatchedEntries(); // Update the entries matched by the group
             // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
             ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroups(this.databaseContext);

@@ -133,13 +133,13 @@ public class JabRefFrameViewModel {
         // [impl->req~directory-library.session-restore~1]
         List<Path> openedLibraries = tabContainer.getLibraryTabs().stream()
                                                  .map(LibraryTab::getBibDatabaseContext)
-                                                 .map(context -> context.getDatabasePath().or(context::getDirectoryLibraryRoot))
+                                                 .map(BibDatabaseContext::getPathOnDisk)
                                                  .flatMap(Optional::stream)
                                                  .map(Path::toAbsolutePath)
                                                  .toList();
         Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
                                         .map(LibraryTab::getBibDatabaseContext)
-                                        .flatMap(context -> context.getDatabasePath().or(context::getDirectoryLibraryRoot))
+                                        .flatMap(BibDatabaseContext::getPathOnDisk)
                                         .map(Path::toAbsolutePath)
                                         .orElse(null);
 

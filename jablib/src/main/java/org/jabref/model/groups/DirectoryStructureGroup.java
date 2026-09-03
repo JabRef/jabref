@@ -1,12 +1,13 @@
 package org.jabref.model.groups;
 
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 import org.jabref.model.entry.BibEntry;
+
+import org.jspecify.annotations.NullMarked;
 
 /// Mirrors the folder structure of a directory library in the groups panel
 /// (<https://github.com/JabRef/jabref/issues/10930>): each subdirectory containing entries
@@ -15,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 /// itself — the directory synchronizer already updates the entries and invalidates the groups
 /// view. When parsed back from a `.bib` file (after "Save as"), the lookup yields nothing and
 /// the group simply stays empty.
+@NullMarked
 public class DirectoryStructureGroup extends AutomaticGroup {
 
     private final Function<BibEntry, Optional<Path>> sourceFileLookup;
@@ -25,23 +27,23 @@ public class DirectoryStructureGroup extends AutomaticGroup {
         this.sourceFileLookup = sourceFileLookup;
     }
 
+    /// Files directly in the library root need no subgroup.
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        Optional<Path> directory = sourceFileLookup.apply(entry).map(Path::getParent);
-        if (directory.isEmpty()) {
-            // Files directly in the library root need no subgroup
-            return Set.of();
-        }
-        GroupTreeNode top = null;
-        GroupTreeNode current = null;
-        for (int depth = 1; depth <= directory.get().getNameCount(); depth++) {
-            GroupTreeNode node = new GroupTreeNode(new DirectoryPathGroup(directory.get().subpath(0, depth), sourceFileLookup));
-            if (current == null) {
-                top = node;
-            } else {
-                current.addChild(node);
-            }
-            current = node;
+        return sourceFileLookup.apply(entry)
+                               .map(Path::getParent)
+                               .map(this::directoryChain)
+                               .orElse(Set.of());
+    }
+
+    /// `conference/2020` becomes the chain `conference` > `2020`.
+    private Set<GroupTreeNode> directoryChain(Path directory) {
+        GroupTreeNode top = new GroupTreeNode(new DirectoryPathGroup(directory.subpath(0, 1), sourceFileLookup));
+        GroupTreeNode current = top;
+        for (int depth = 2; depth <= directory.getNameCount(); depth++) {
+            GroupTreeNode child = new GroupTreeNode(new DirectoryPathGroup(directory.subpath(0, depth), sourceFileLookup));
+            current.addChild(child);
+            current = child;
         }
         return Set.of(top);
     }
@@ -49,22 +51,5 @@ public class DirectoryStructureGroup extends AutomaticGroup {
     @Override
     public AbstractGroup deepCopy() {
         return new DirectoryStructureGroup(name.getValue(), context, sourceFileLookup);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        DirectoryStructureGroup that = (DirectoryStructureGroup) o;
-        return Objects.equals(getName(), that.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName());
     }
 }

@@ -210,7 +210,10 @@ public class BibDatabaseContext {
         Path bibOrMainFileDirectory;
 
         // BIB file directory or Main file directory (according to (global) preferences)
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+        if (location == DatabaseLocation.DIRECTORY) {
+            // Sidecar links are relative to the root, whatever the global preference says
+            bibOrMainFileDirectory = getDirectoryLibraryRoot().map(Path::toAbsolutePath).orElse(null);
+        } else if (preferences.shouldStoreFilesRelativeToBibFile()) {
             bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
         } else {
             bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
@@ -290,6 +293,12 @@ public class BibDatabaseContext {
         return Optional.ofNullable(directoryLibraryRoot);
     }
 
+    /// The place this library lives at on disk: the `.bib` file, or the root of a directory
+    /// library. Empty for unsaved and shared libraries.
+    public Optional<Path> getPathOnDisk() {
+        return getDatabasePath().or(this::getDirectoryLibraryRoot);
+    }
+
     public void attachDirectorySynchronizer(DirectoryLibrarySynchronizer directorySynchronizer) {
         this.directorySynchronizer = directorySynchronizer;
         // Relays entry events keystroke-filtered to the synchronizer's write-back direction,
@@ -320,10 +329,6 @@ public class BibDatabaseContext {
             // Flushes pending sidecar writes and stops the directory watcher
             directorySynchronizer.shutdown();
             this.directorySynchronizer = null;
-        }
-        if (directorySynchronizer != null) {
-            directorySynchronizer.shutdown();
-            directorySynchronizer = null;
         }
 
         this.directoryLibraryRoot = null;

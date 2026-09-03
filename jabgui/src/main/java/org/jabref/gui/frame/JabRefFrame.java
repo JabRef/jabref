@@ -809,7 +809,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         @Override
         public void execute() {
             // For a directory library, reveal the library's root directory itself
-            Optional.of(databaseContext.get()).flatMap(context -> context.getDatabasePath().or(context::getDirectoryLibraryRoot)).ifPresent(path -> {
+            Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getPathOnDisk).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
