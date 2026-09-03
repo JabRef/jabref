@@ -4,7 +4,7 @@ package org.jabref.logic.util.io;
 /// extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
 /// Replaces illegal characters in given file paths.
 ///
-/// Regarding the maximum length, see {@link FileUtil#getValidFileName(String)}
+/// Regarding the maximum length, see [FileUtil#getValidFileName(String)]
 public class FileNameCleaner {
 
     private FileNameCleaner() {

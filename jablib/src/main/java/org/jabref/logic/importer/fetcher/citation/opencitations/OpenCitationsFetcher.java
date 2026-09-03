@@ -33,10 +33,11 @@ public class OpenCitationsFetcher implements CitationFetcher {
     private static final Gson GSON = new Gson();
 
     private final ImporterPreferences importerPreferences;
-    private final CrossRef crossRefFetcher = new CrossRef();
+    private final CrossRef crossRefFetcher;
 
     public OpenCitationsFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
+        this.crossRefFetcher = new CrossRef(importerPreferences);
     }
 
     @Override

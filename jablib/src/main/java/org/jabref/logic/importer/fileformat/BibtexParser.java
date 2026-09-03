@@ -76,10 +76,10 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 ///
 /// **Usage**
 ///
-/// <code><pre>
+/// ```java
 /// BibtexParser parser = new BibtexParser(importFormatPreferences);
 /// ParserResult result = parser.parse();
-/// </pre></code>
+/// ```
 ///
 /// Can be used standalone.
 ///
@@ -165,7 +165,7 @@ public class BibtexParser implements Parser {
     ///
     /// Multiple calls to parse() return the same results
     ///
-    /// Handling of encoding is done at {@link BibtexImporter}
+    /// Handling of encoding is done at [BibtexImporter]
     public ParserResult parse(@NonNull Reader in) throws IOException {
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /// Utility class for trying to resolve URLs to full-text PDF for articles.
 ///
-/// Combines multiple {@link FulltextFetcher}s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
+/// Combines multiple [FulltextFetcher]s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
@@ -39,6 +39,7 @@ public class FulltextFetchers {
     private static final int FETCHER_TIMEOUT = 120;
 
     private final Set<FulltextFetcher> fetchers;
+    private final ImporterPreferences importerPreferences;
 
     private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
         try {
@@ -52,12 +53,17 @@ public class FulltextFetchers {
     };
 
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences), importerPreferences);
     }
 
     @VisibleForTesting
     FulltextFetchers(Set<FulltextFetcher> fetchers) {
+        this(fetchers, ImporterPreferences.getDefault());
+    }
+
+    private FulltextFetchers(Set<FulltextFetcher> fetchers, ImporterPreferences importerPreferences) {
         this.fetchers = new HashSet<>(fetchers);
+        this.importerPreferences = importerPreferences;
     }
 
     public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
@@ -76,13 +82,12 @@ public class FulltextFetchers {
                      .filter(Optional::isPresent)
                      .map(Optional::get)
                      .filter(res -> (res.source()) != null)
-                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()).reversed())
-                     .findFirst();
+                     .max(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()));
     }
 
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
-            WebFetchers.getIdFetcherForIdentifier(DOI.class)
+            WebFetchers.getIdFetcherForIdentifier(DOI.class, importerPreferences)
                        .findIdentifier(clonedEntry)
                        .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {

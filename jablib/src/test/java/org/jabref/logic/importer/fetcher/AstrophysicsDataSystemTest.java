@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 @Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/843")
 public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
@@ -218,6 +218,18 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
         assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
         assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void performRawSearchQueryPagedFindsEntry() throws FetcherException {
+        Page<BibEntry> page = fetcher.performRawSearchQueryPaged("bibcode:2000JGR...10520297L", 0);
+        assertEquals(List.of(luceyPaulEntry), page.getContent());
     }
 
     @Override

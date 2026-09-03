@@ -3,20 +3,19 @@ package org.jabref.gui.maintable.columns;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -52,10 +51,11 @@ public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
         for (String item : values) {
             MenuItem menuItem = new MenuItem(item);
             menuItem.setOnAction(event -> {
-                String oldValue = entry.getField(field).orElse(null);
-                entry.setField(field, item);
-                if (undoManager != null) {
-                    undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, item));
+                UndoableFieldChange change = new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), item);
+                if (undoManager == null) {
+                    change.apply();
+                } else {
+                    undoManager.applyEdit(change);
                 }
             });
             menu.getItems().add(menuItem);

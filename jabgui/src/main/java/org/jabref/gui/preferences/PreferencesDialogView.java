@@ -4,7 +4,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
@@ -13,6 +15,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -34,7 +37,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");
     @FXML private CustomTextField searchBox;
-    @FXML private ListView<PreferencesTab> preferenceTabList;
+    @FXML private ListView<PreferencesTab> preferencesTabList;
+    @FXML private Label tabTitle;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
     @FXML private ButtonType cancelButton;
@@ -72,56 +76,62 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private void initialize() {
         viewModel = new PreferencesDialogViewModel(dialogService, preferences);
 
-        preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
+        preferencesTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
         // The list view does not respect the listener for the dialog and needs its own
-        preferenceTabList.setOnKeyReleased(key -> {
+        preferencesTabList.setOnKeyReleased(key -> {
             if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
                 this.closeDialog();
             }
         });
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
-        preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
+        preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
-            preferenceTabList.getSelectionModel().clearSelection();
-            preferenceTabList.getSelectionModel().selectFirst();
+            preferencesTabList.getSelectionModel().clearSelection();
+            preferencesTabList.getSelectionModel().selectFirst();
         });
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
-        EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
-                preferencesContainer.setContent(preferencesTab.getBuilder());
-                preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
-                preferencesTab.getStyleClass().add("preferencesTab");
-                this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                        if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
-                            this.closeDialog();
-                            event.consume();
-                        }
-                    }
-                });
-            } else {
-                preferencesContainer.setContent(null);
+        this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
+                    this.closeDialog();
+                    event.consume();
+                }
             }
         });
 
+        EasyBind.subscribe(preferencesTabList.getSelectionModel().selectedItemProperty(), tab -> {
+            if (tab == null) {
+                tabTitle.setText("");
+                preferencesContainer.setContent(null);
+                return;
+            }
+            tabTitle.setText(tab.getTitle());
+            Node content = tab.getContent();
+            preferencesContainer.setContent(content);
+            if (content instanceof Region region) {
+                region.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
+            }
+            content.getStyleClass().add("preferencesTab");
+        });
+
         if (this.preferencesTabToSelectClass != null) {
-            Optional<PreferencesTab> tabToSelectIfExist = preferenceTabList.getItems()
-                                                                           .stream()
-                                                                           .filter(prefTab -> prefTab.getClass().equals(preferencesTabToSelectClass))
-                                                                           .findFirst();
-            tabToSelectIfExist.ifPresent(preferencesTab -> preferenceTabList.getSelectionModel().select(preferencesTab));
+            Optional<PreferencesTab> tabToSelectIfExist = preferencesTabList.getItems()
+                                                                            .stream()
+                                                                            .filter(prefTab -> prefTab.getClass().equals(preferencesTabToSelectClass))
+                                                                            .findFirst();
+            tabToSelectIfExist.ifPresent(preferencesTab -> preferencesTabList.getSelectionModel().select(preferencesTab));
         } else {
-            preferenceTabList.getSelectionModel().selectFirst();
+            preferencesTabList.getSelectionModel().selectFirst();
         }
 
         new ViewModelListCellFactory<PreferencesTab>()
                 .withText(PreferencesTab::getTabName)
-                .install(preferenceTabList);
+                .install(preferencesTabList);
 
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
@@ -135,8 +145,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void savePreferencesAndCloseDialog() {
-        if (viewModel.validSettings()) {
-            viewModel.storeAllSettings();
+        if (viewModel.storeAllSettings()) {
             closeDialog();
         }
     }

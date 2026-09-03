@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
@@ -25,7 +26,7 @@
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
                     </VBox.margin>
                 </CustomTextField>
-                <ListView fx:id="preferenceTabList" VBox.vgrow="ALWAYS"/>
+                <ListView fx:id="preferencesTabList" VBox.vgrow="ALWAYS"/>
                 <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES"/>
                 <HBox alignment="BOTTOM_LEFT" spacing="3.0">
                     <padding>
@@ -73,7 +74,14 @@
                     </ToggleButton>
                 </HBox>
             </VBox>
-            <ScrollPane fx:id="preferencesContainer"/>
+            <VBox>
+                <Label fx:id="tabTitle" styleClass="titleHeader">
+                    <padding>
+                        <Insets bottom="4.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Label>
+                <ScrollPane fx:id="preferencesContainer" VBox.vgrow="ALWAYS"/>
+            </VBox>
         </SplitPane>
     </content>
     <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>

@@ -17,61 +17,171 @@ jobs:
   stale:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-slim
+    env:
+      DAYS_BEFORE_PR_STALE: 3
+      DAYS_BEFORE_PR_CLOSE: 7
+      STALE_LABEL: "status: stale"
+      CHANGES_REQUIRED_LABEL: "status: changes-required"
+      # "dev: no-bot-comments" is deliberately not exempt: it usually stays on a PR even after
+      # "status: changes-required" was set, so exempting it would take most PRs out of the process.
+      EXEMPT_LABELS: "📌 Pinned"
     steps:
-      - uses: actions/stale@v10
+      # Marking only. Closing is done below, because actions/stale measures
+      # days-before-close against the GitHub field `updated_at`, which is bumped by any
+      # activity on the pull request - including activity that is not the contributor's.
+      # PRs whose `updated_at` keeps moving therefore never reach the close threshold.
+      - uses: actions/stale@v11
         id: stale
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          exempt-pr-labels: "📌 Pinned,dev: no-bot-comments"
+          exempt-pr-labels: ${{ env.EXEMPT_LABELS }}
 
           days-before-issue-stale: -1
           days-before-issue-close: -1
 
-          only-pr-labels: "status: changes-required"
-          stale-pr-label: "status: stale"
+          only-pr-labels: ${{ env.CHANGES_REQUIRED_LABEL }}
+          stale-pr-label: ${{ env.STALE_LABEL }}
           remove-pr-stale-when-updated: false
 
-          days-before-pr-stale: 10
+          days-before-pr-stale: ${{ env.DAYS_BEFORE_PR_STALE }}
           stale-pr-message: >
-            The requested changes were not addressed for 10 days.
-            Please follow-up in the next 10 days or your PR will be automatically closed.
+            The requested changes were not addressed for ${{ env.DAYS_BEFORE_PR_STALE }} days.
+            Please follow-up in the next ${{ env.DAYS_BEFORE_PR_CLOSE }} days or your PR will be automatically closed.
             You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
 
-          days-before-pr-close: 10
-          close-pr-message: >
-            This PR is being closed due to continued inactivity.
-      - uses: actions/checkout@v7
-        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
-      - name: Process closed issues/PRs
-        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
+          days-before-pr-close: -1
+
+      - name: Close PRs labeled stale for more than ${{ env.DAYS_BEFORE_PR_CLOSE }} days
+        id: close
         env:
-          CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          # This workflow also runs on pull requests that touch it - those runs must not
+          # close anything for real.
+          DRY_RUN: ${{ github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+
+          # The moment the stale label was applied is a fixed point in time, unlike `updated_at`.
+          cutoff="$(date -u -d "-${DAYS_BEFORE_PR_CLOSE} days" +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Assessing PRs labeled '$STALE_LABEL' on or before $cutoff"
+
+          closed=""
+          # Both labels are required, mirroring the only-pr-labels of the marking step above:
+          # a PR whose requested changes were addressed is no longer a candidate.
+          # gh paginates internally up to --limit, so this is not a page size.
+          candidates="$(gh pr list --repo "$REPO" --state open --limit 1000 \
+            --label "$STALE_LABEL" --label "$CHANGES_REQUIRED_LABEL" \
+            --json number --jq '.[].number')"
+
+          IFS=',' read -ra exempt_labels <<< "$EXEMPT_LABELS"
+
+          # Events by a human after $labeled_at, one line each. $1: API path, $2: timestamp field
+          # ($2 is null for pending reviews; jq sorts null before strings, so they never count).
+          human_events() {
+            gh api "repos/$REPO/$1?per_page=100" --paginate \
+              --jq "[.[] | select(.$2 > \"$labeled_at\" and .user.type != \"Bot\" and .user.login != \"jabref-machine\") | .user.login] | .[]"
+          }
+
+          for pr in $candidates; do
+            # Re-read the labels: they can have been removed since the candidate list was built.
+            labels="$(gh pr view "$pr" --repo "$REPO" --json labels --jq '.labels[].name')"
+            for required in "$STALE_LABEL" "$CHANGES_REQUIRED_LABEL"; do
+              if ! printf '%s\n' "$labels" | grep -Fxq "$required"; then
+                echo "#$pr: label '$required' is gone, skipping"
+                continue 2
+              fi
+            done
+
+            exempt=""
+            for label in "${exempt_labels[@]}"; do
+              if printf '%s\n' "$labels" | grep -Fxq "$label"; then
+                exempt="$label"
+                break
+              fi
+            done
+            if [ -n "$exempt" ]; then
+              echo "#$pr: exempted by label '$exempt'"
+              continue
+            fi
+
+            # The label can have been applied, removed and applied again - the last one counts.
+            # --paginate applies the filter per page, hence the trailing tail.
+            labeled_at="$(gh api "repos/$REPO/issues/$pr/events?per_page=100" --paginate \
+              --jq "[.[] | select(.event == \"labeled\" and .label.name == \"$STALE_LABEL\") | .created_at] | last" \
+              | grep -v '^null$' | tail -n 1 || true)"
+
+            if [ -z "$labeled_at" ]; then
+              echo "#$pr: no '$STALE_LABEL' label event found, skipping"
+              continue
+            fi
+            if [ "$labeled_at" \> "$cutoff" ]; then
+              echo "#$pr: labeled stale at $labeled_at, not old enough yet"
+              continue
+            fi
+
+            # Real activity after the label: a push, or a comment/review by a human. Nothing
+            # removes the stale label in that case (pr-comment.yml only does so for pull requests
+            # from forks), so it is checked here - and the label is dropped, which lets the marking
+            # step above start a new round if the pull request falls idle again.
+            last_commit="$(gh pr view "$pr" --repo "$REPO" --json commits --jq '.commits[-1].committedDate' \
+              | grep -v '^null$' || true)"
+            human_comments="$( { human_events "issues/$pr/comments" created_at
+                human_events "pulls/$pr/comments" created_at
+                human_events "pulls/$pr/reviews" submitted_at; } | wc -l)"
+
+            if [ -n "$last_commit" ] && [ "$last_commit" \> "$labeled_at" ]; then
+              activity="pushed at $last_commit"
+            elif [ "$human_comments" -gt 0 ]; then
+              activity="$human_comments comment(s)/review(s) by a human"
+            else
+              activity=""
+            fi
+            if [ -n "$activity" ]; then
+              echo "#$pr: $activity after the stale label, removing the label"
+              if [ "$DRY_RUN" != "true" ]; then
+                gh issue edit "$pr" --repo "$REPO" --remove-label "$STALE_LABEL"
+              fi
+              continue
+            fi
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "#$pr: labeled stale at $labeled_at, would be closed (dry run)"
+              continue
+            fi
+
+            echo "#$pr: labeled stale at $labeled_at, closing"
+            gh pr comment "$pr" --repo "$REPO" --body "This PR is being closed due to continued inactivity."
+            gh pr close "$pr" --repo "$REPO"
+            closed="$closed $pr"
+          done
+
+          echo "closed_prs=${closed# }" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        if: ${{ steps.close.outputs.closed_prs != '' }}
+      - name: Process closed PRs
+        if: ${{ steps.close.outputs.closed_prs != '' }}
+        env:
+          CLOSED_PRS: ${{ steps.close.outputs.closed_prs }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          set -x
-          PS4='+ ${LINENO}: '
-          echo "Raw payload:"
-          cat <<EOF
-          ${{ steps.stale.outputs.closed-issues-prs }}
-          EOF
-
-          echo "PR numbers:"
-          echo "$CLOSED_JSON" | jq -r '.[] | select(.pull_request != null) | .number' | while read -r n; do
-            [ -n "$n" ] || continue
+          for n in $CLOSED_PRS; do
             echo "Handling #$n"
             gh workflow run "On PR closed" --ref main --field pr_number="$n"
           done
       - name: Write closed PR URLs to summary
         if: always()
         env:
-          CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+          CLOSED_PRS: ${{ steps.close.outputs.closed_prs }}
+          REPO: ${{ github.repository }}
         run: |
           {
             echo "## Closed PRs"
             echo
-            echo "$CLOSED_JSON" \
-              | jq -r '.[] | select(.pull_request != null) | "- [#\(.number)](\(.pull_request.html_url))"' \
-              || true
+            for n in ${CLOSED_PRS:-}; do
+              echo "- [#$n](https://github.com/$REPO/pull/$n)"
+            done
             echo
           } >> "$GITHUB_STEP_SUMMARY"

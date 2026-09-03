@@ -96,6 +96,12 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
 
+    listOf("org.apache.sshd:sshd-osgi", "org.apache.sshd:sshd-sftp").forEach { sshd ->
+        module(sshd) {
+            // sshd logs via slf4j directly; the declared JCL bridge conflicts with commons-logging (needed by pdfbox)
+            removeDependency("org.slf4j:jcl-over-slf4j")
+        }
+    }
     module("org.testfx:testfx-core") {
         removeDependency("org.osgi:org.osgi.core")
     }
@@ -121,6 +127,12 @@ jvmDependencyConflicts.patch {
     module("org.libreoffice:libreoffice") {
         // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
         addRuntimeOnlyDependency("org.libreoffice:unoloader")
+    }
+    module("io.zonky.test:embedded-postgres") {
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64-alpine")
     }
 }
 
@@ -166,29 +178,6 @@ extraJavaModuleInfo {
     }
 
     module("com.github.javakeyring:java-keyring", "java.keyring")
-
-    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.lihaoyi:fastparse_2.13", "fastparse") {
-        overrideModuleName() // fastparse_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:sourcecode_2.13", "com.lihaoyi.sourcecode") {
-        overrideModuleName() // sourcecode_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:geny_2.13", "com.lihaoyi.geny") {
-        overrideModuleName() // geny_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
 
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
@@ -299,11 +288,43 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.sshd:sshd-osgi", "org.apache.sshd.osgi") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("java.management") // Reason: ExceptionUtils unwraps javax.management exceptions
+        requires("java.rmi") // Reason: ExceptionUtils unwraps java.rmi exceptions
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.apache.sshd.common.io.IoServiceFactoryFactory")
+    }
+    module("org.apache.sshd:sshd-sftp", "org.apache.sshd.sftp") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.slf4j")
+    }
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
         exportAllPackages()
         requires("org.slf4j")
         uses("org.eclipse.jgit.lib.SignerFactory")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache", "org.eclipse.jgit.ssh.apache") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.apache.sshd.sftp")
+        requires("org.eclipse.jgit")
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.transport.sshd.agent.ConnectorFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent", "org.eclipse.jgit.ssh.apache.agent") {
+        exportAllPackages()
+        requires("com.sun.jna")
+        requires("com.sun.jna.platform")
+        requires("org.eclipse.jgit")
+        requires("org.eclipse.jgit.ssh.apache")
+        requires("org.slf4j")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
@@ -319,7 +340,6 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
         requiresTransitive("java.xml")
     }
-    module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {

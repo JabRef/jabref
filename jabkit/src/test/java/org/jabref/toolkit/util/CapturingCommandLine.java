@@ -19,12 +19,12 @@ public class CapturingCommandLine extends CommandLine {
         super(command, factory);
     }
 
-    /// Executes the configured {@link picocli.CommandLine} command while capturing its
+    /// Executes the configured [picocli.CommandLine] command while capturing its
     /// standard output and error streams.
     ///
     /// This method temporarily redirects `System.out` and `System.err` to
     /// internal buffers during the command execution, allowing the captured output to be
-    /// retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.
+    /// retrieved later using [#getStandardOutput()] and [#getErrorOutput()].
     ///
     /// NOTE: Running execute in parallel might lead to instructive and subtle false negatives.
     ///
