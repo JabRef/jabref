@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,7 +32,7 @@ public class AutosaveManager {
     private final EventBus eventBus;
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter coarseChangeFilter;
-    private boolean needsSave = false;
+    private final AtomicBoolean needsSave = new AtomicBoolean(false);
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -41,9 +42,9 @@ public class AutosaveManager {
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.executor.scheduleAtFixedRate(
                 () -> {
-                    if (needsSave) {
+                    // Clear before posting, so a change arriving while the save runs is not lost
+                    if (needsSave.getAndSet(false)) {
                         eventBus.post(new AutosaveEvent());
-                        needsSave = false;
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
@@ -51,11 +52,16 @@ public class AutosaveManager {
                 TimeUnit.SECONDS);
     }
 
+    /// Every change counts, including the keystrokes the filter marks as minor: the filter exists to spare listeners
+    /// expensive work per keystroke, but a flag is cheap and the timer throttles the saves anyway. Ignoring minor
+    /// changes would leave a field the user only types in unsaved until the user moves to another field.
     @Subscribe
     public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFilteredOut()) {
-            this.needsSave = true;
-        }
+        needsSave.set(true);
+    }
+
+    boolean isSavePending() {
+        return needsSave.get();
     }
 
     private void shutdown() {
