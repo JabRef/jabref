@@ -10,6 +10,15 @@ The GitHub sharing dialog must allow users to verify that their personal access 
 
 Needs: impl
 
+## Git merge driver for `.bib` files
+`req~jabkit.git.merge-driver~1`
+
+`jabkit git merge-driver BASE CURRENT OTHER` must perform the semantic three-way merge and write the result to `CURRENT`, following Git's merge driver contract (`%O %A %B`).
+It must exit with `0` when all changes merge cleanly and with `1` when semantic conflicts remain.
+Conflicting entries must keep the `CURRENT` version and be reported on stderr by citation key.
+
+Needs: impl
+
 ## Git pull with unrelated histories
 `req~git.pull.unrelated-histories~1`
 

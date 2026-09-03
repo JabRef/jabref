@@ -73,6 +73,30 @@ However, JabRef is able to analyze the entries and determine that:
 
 Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
 
+## Using the semantic merge as Git merge driver
+
+`jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver).
+Git then merges `.bib` files entry by entry instead of line by line.
+
+```bash
+git config --global merge.jabref.name "JabRef semantic .bib merge"
+git config --global merge.jabref.driver "jabkit git merge-driver --porcelain %O %A %B"
+```
+
+With `jbang`, replace `jabkit` by `jbang jabkit@jabref`.
+
+Enable it per repository in `.gitattributes`:
+
+```text
+*.bib merge=jabref
+```
+
+Git calls the driver with the base (`%O`), current (`%A`), and other (`%B`) version.
+The driver writes `current + (other - base)` into `%A`.
+Exit code 0 means a clean merge.
+Exit code 1 means semantic conflicts: the conflicting entries keep the current side's version, and their citation keys are printed to stderr.
+Git then marks the file as conflicted, so the merge can be finished in JabRef or with `git checkout --theirs`.
+
 ## Related Test Cases
 
 The semantic conflict detection and merge resolution logic is covered by:
