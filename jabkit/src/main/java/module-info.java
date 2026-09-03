@@ -6,7 +6,7 @@ module org.jabref.jabkit {
     opens org.jabref.toolkit.converter;
     opens org.jabref.toolkit;
 
-    requires transitive org.jspecify;
+    requires org.jspecify;
     requires java.prefs;
 
     requires javafx.base;

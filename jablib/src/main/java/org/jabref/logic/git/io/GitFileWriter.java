@@ -35,6 +35,8 @@ public class GitFileWriter {
                 writer.writeDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {
+                    // Without the abort, closing the writer would replace the target file with the lossy content
+                    fileWriter.abort();
                     throw new IOException("Encoding problem detected when saving .bib file: "
                             + fileWriter.getEncodingProblems().toString());
                 }

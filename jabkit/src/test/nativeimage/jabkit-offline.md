@@ -15,8 +15,9 @@ $ "$JABKIT" pseudonymize --porcelain --force --input=src/test/resources/org/jabr
 $ grep -c "Pseudonymizing library" build/tmp/pseudonymize.out
 1
 $ cp src/test/resources/org/jabref/toolkit/commands/merge-current.bib build/tmp/merge-current.bib
-$ "$JABKIT" git merge-driver --porcelain src/test/resources/org/jabref/toolkit/commands/merge-base.bib build/tmp/merge-current.bib src/test/resources/org/jabref/toolkit/commands/merge-other.bib 2>/dev/null; echo $?
+$ "$JABKIT" git merge-driver --porcelain src/test/resources/org/jabref/toolkit/commands/merge-base.bib build/tmp/merge-current.bib src/test/resources/org/jabref/toolkit/commands/merge-other.bib 2>build/tmp/merge-driver.err; echo $?
 0
+$ cat build/tmp/merge-driver.err
 $ grep -c "Newton1999" build/tmp/merge-current.bib
 1
 $ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output=build/tmp/convert.bib 2>/dev/null; echo $?

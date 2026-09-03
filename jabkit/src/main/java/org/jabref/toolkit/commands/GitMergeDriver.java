@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,13 @@ import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.merge.execution.GitMergeApplier;
 import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.MergeAnalysis;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.field.Field;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
@@ -107,14 +110,9 @@ class GitMergeDriver implements Callable<Integer> {
         List<ThreeWayEntryConflict> conflicts = new ArrayList<>(analysis.conflicts());
         List<ThreeWayEntryConflict> typeConflicts = mergeEntryTypes(base, current, other, conflicts);
         conflicts.addAll(typeConflicts);
-        if (!typeConflicts.isEmpty()) {
-            // The field-level plan cannot be applied to some entries only, and CURRENT already is the
-            // version the conflicting entries have to keep - so it is left untouched altogether.
-            reportConflicts(conflicts);
-            return CONFLICT;
-        }
 
-        GitMergeApplier.applyAutoPlan(current, analysis.autoPlan());
+        // The analyzer did not see the type conflicts, so its plan still contains their entries
+        GitMergeApplier.applyAutoPlan(current, withoutEntries(analysis.autoPlan(), typeConflicts));
 
         try {
             GitFileWriter.write(currentFile, current, git.jabKit.cliPreferences.getImportFormatPreferences());
@@ -133,6 +131,20 @@ class GitMergeDriver implements Callable<Integer> {
 
         reportConflicts(conflicts);
         return CONFLICT;
+    }
+
+    /// Removes the given entries from the plan, so that they keep their CURRENT version.
+    private static MergePlan withoutEntries(MergePlan plan, List<ThreeWayEntryConflict> conflicts) {
+        if (conflicts.isEmpty()) {
+            return plan;
+        }
+        Set<String> keys = conflicts.stream().map(GitMergeDriver::citationKeyOf).collect(Collectors.toSet());
+        Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>(plan.fieldPatches());
+        fieldPatches.keySet().removeAll(keys);
+        return new MergePlan(
+                fieldPatches,
+                plan.newEntries().stream().filter(entry -> entry.getCitationKey().stream().noneMatch(keys::contains)).toList(),
+                plan.deletedEntryKeys().stream().filter(key -> !keys.contains(key)).toList());
     }
 
     private static void reportConflicts(List<ThreeWayEntryConflict> conflicts) {
