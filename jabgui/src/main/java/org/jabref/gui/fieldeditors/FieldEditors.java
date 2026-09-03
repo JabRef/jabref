@@ -83,7 +83,7 @@ public class FieldEditors {
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.GROUPS) {
-            return new GroupsEditor(field, suggestionProvider, fieldCheckers, databaseContext);
+            return new GroupsEditor(field, suggestionProvider, fieldCheckers, preferences.getBibEntryPreferences(), databaseContext);
         } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {

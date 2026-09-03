@@ -8,9 +8,9 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.MscCodeUtils;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -36,7 +36,7 @@ public class KeywordsEditor extends TagsEditor {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()),
+                databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()),
                 undoManager);
 
         setupTagsField(

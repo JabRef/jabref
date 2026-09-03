@@ -54,7 +54,7 @@ public class ThreeWayMergeView extends VBox {
                 leftHeader,
                 rightHeader);
         Character separator = stateManager.getActiveDatabase()
-                                          .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()))
+                                          .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
                                           .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         this.fieldMergerFactory = new FieldMergerFactory(separator);
         this.keywordSeparator = separator.toString();
