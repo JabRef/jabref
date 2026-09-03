@@ -144,7 +144,8 @@ public class KeywordList implements Iterable<Keyword> {
     /// Uses the same recognition rules as [#parseWithMultipleDelimiters(String, List)].
     public static long countEffectiveDelimiters(@NonNull String keywordString, @NonNull Character delimiter) {
         long[] count = {0};
-        scanTopLevel(keywordString, List.of(delimiter), _ -> { }, () -> count[0]++);
+        scanTopLevel(keywordString, List.of(delimiter), _ -> {
+        }, () -> count[0]++);
         return count[0];
     }
 

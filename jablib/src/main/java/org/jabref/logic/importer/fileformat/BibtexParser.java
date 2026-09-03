@@ -78,9 +78,9 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// **Usage**
 ///
 /// ```java
- /// BibtexParser parser = new BibtexParser(importFormatPreferences);
- /// ParserResult result = parser.parse();
- ///```
+/// BibtexParser parser = new BibtexParser(importFormatPreferences);
+/// ParserResult result = parser.parse();
+/// ```
 ///
 /// Can be used standalone.
 ///
