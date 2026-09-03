@@ -80,6 +80,8 @@ public class DownloadFullTextAction extends SimpleCommand {
             }
         }
 
+        // Subclass instead of BackgroundTask.wrap(Callable): updateProgress, updateMessage and isCancelled are
+        // protected, and the per-entry progress, the "n/m entries" message and the cancel check need them.
         BackgroundTask<Map<BibEntry, Optional<FetcherResult>>> findFullTextsTask = new BackgroundTask<>() {
             @Override
             public Map<BibEntry, Optional<FetcherResult>> call() {
