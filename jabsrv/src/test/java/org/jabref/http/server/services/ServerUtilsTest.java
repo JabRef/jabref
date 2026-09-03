@@ -3,12 +3,12 @@ package org.jabref.http.server.services;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import jakarta.ws.rs.NotFoundException;
@@ -37,7 +37,7 @@ class ServerUtilsTest {
     }
 
     private String rootId() {
-        return root.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(root);
+        return ServerUtils.libraryId(directoryLibrary()).orElseThrow();
     }
 
     private SrvStateManager stateManagerWith(BibDatabaseContext context) {
@@ -60,6 +60,16 @@ class ServerUtilsTest {
     void directoryLibraryContextResolvesById() throws IOException {
         BibDatabaseContext context = directoryLibrary();
         assertSame(context, ServerUtils.getBibDatabaseContext(rootId(), stateManagerWith(context), mock(ImportFormatPreferences.class)));
+    }
+
+    @Test
+    void directoryLibraryFileIsItsMirror() {
+        assertEquals(root.resolve(root.getFileName() + ".bib"), ServerUtils.getLibraryFile(rootId(), stateManagerWith(directoryLibrary())));
+    }
+
+    @Test
+    void unsavedLibraryHasNoId() {
+        assertEquals(Optional.empty(), ServerUtils.libraryId(new BibDatabaseContext()));
     }
 
     @Test

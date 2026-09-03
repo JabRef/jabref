@@ -264,17 +264,16 @@ public class JabRefFrameViewModel {
     /// unchanged. If the library is not open yet, it is opened in a new (raised) tab; the actual
     /// loading happens in the background, so callers must run the append via
     /// [#waitForLoadingFinished(Runnable)] to let the new tab finish loading first. A path
-    /// that does not exist (or is not a .bib file) is silently ignored by
+    /// that does not exist (or is neither a .bib file nor a directory) is silently ignored by
     /// [OpenDatabaseAction#openFile(Path)] and the current tab is kept (the server side
     /// already rejects unknown ids with 404, so this is only a defensive fallback).
     private void selectLibraryTab(Optional<Path> library) {
         library.map(path -> path.toAbsolutePath().normalize()).ifPresent(normalized ->
                 tabContainer.getLibraryTabs().stream()
-                            // A directory library has no .bib path; it is identified by its root
-                            // directory, the same path the server derives its id from
+                            // A directory library is identified by its root directory, the same
+                            // path the server derives its id from
                             // [impl->req~directory-library.rest-api~1]
-                            .filter(tab -> tab.getBibDatabaseContext().getDatabasePath()
-                                              .or(tab.getBibDatabaseContext()::getDirectoryLibraryRoot)
+                            .filter(tab -> tab.getBibDatabaseContext().getPathOnDisk()
                                               .map(path -> path.toAbsolutePath().normalize().equals(normalized))
                                               .orElse(false))
                             .findFirst()

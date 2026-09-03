@@ -86,7 +86,7 @@ public class MapResource {
     }
 
     private java.nio.file.Path getJabMapPath(String id) {
-        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, srvStateManager);
+        java.nio.file.Path libraryPath = ServerUtils.getLibraryFile(id, srvStateManager);
         String newName = libraryPath.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
         return libraryPath.getParent().resolve(newName);
     }

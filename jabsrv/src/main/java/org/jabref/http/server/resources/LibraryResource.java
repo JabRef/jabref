@@ -87,7 +87,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, srvStateManager);
+        java.nio.file.Path library = ServerUtils.getLibraryFile(id, srvStateManager);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);

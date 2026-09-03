@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.chatting.util.ChatModelFactory;
+import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -30,18 +32,26 @@ import org.jspecify.annotations.NonNull;
 
 public class ServerUtils {
 
-    /// The on-disk path that identifies a library: the `.bib` file of a regular library, or the
-    /// root directory of a directory library (which has no `.bib` path of its own). This is the
-    /// same identity the GUI session store uses to remember open libraries, so a directory
-    /// library keeps a stable id across everything.
+    /// The stable id used in URLs: derived from the `.bib` file of a regular library, or from
+    /// the root directory of a directory library (which has no `.bib` path of its own) — the
+    /// same identity the GUI session store uses, so a directory library keeps one id across
+    /// everything. Empty for unsaved libraries.
     /// [impl->req~directory-library.rest-api~1]
-    public static Optional<Path> libraryIdentifyingPath(BibDatabaseContext context) {
-        return context.getDatabasePath().or(context::getDirectoryLibraryRoot);
+    public static Optional<String> libraryId(BibDatabaseContext context) {
+        return context.getPathOnDisk().map(ServerUtils::libraryId);
     }
 
-    /// The stable id string used in URLs for a library at the given identifying path.
     private static String libraryId(Path path) {
         return path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path);
+    }
+
+    /// The file holding the library's BibTeX for endpoints that read or derive files: the
+    /// `.bib` itself, or, for a directory library, its `.bib` mirror inside the root.
+    ///
+    /// @throws NotFoundException if no library with the given id is found
+    public static @NonNull Path getLibraryFile(String id, SrvStateManager srvStateManager) {
+        Path path = getLibraryPath(id, srvStateManager);
+        return Files.isDirectory(path) ? path.resolve(DirectoryLibrarySynchronizer.mirrorFileName(path)) : path;
     }
 
     /// Returns ids of all libraries the state manager currently considers
@@ -49,9 +59,8 @@ public class ServerUtils {
     /// collection (libraries listing, batch query, ...).
     public static List<String> openLibraryIds(SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases().stream()
-                              .map(ServerUtils::libraryIdentifyingPath)
-                              .flatMap(Optional::stream)
                               .map(ServerUtils::libraryId)
+                              .flatMap(Optional::stream)
                               .toList();
     }
 
@@ -64,7 +73,7 @@ public class ServerUtils {
     public static @NonNull Path getLibraryPath(String id, SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases()
                               .stream()
-                              .map(ServerUtils::libraryIdentifyingPath)
+                              .map(BibDatabaseContext::getPathOnDisk)
                               .flatMap(Optional::stream)
                               .filter(p -> libraryId(p).equals(id))
                               .findAny()
@@ -93,9 +102,7 @@ public class ServerUtils {
             return srvStateManager.getActiveDatabase().orElseThrow(NotFoundException::new);
         }
         return srvStateManager.getOpenDatabases().stream()
-                              .filter(context -> libraryIdentifyingPath(context)
-                                      .map(p -> libraryId(p).equals(id))
-                                      .orElse(false))
+                              .filter(context -> libraryId(context).filter(id::equals).isPresent())
                               .findFirst()
                               .orElseThrow(() -> new NotFoundException("No library with id " + HtmlEscapers.htmlEscaper().escape(id) + " found"));
     }
