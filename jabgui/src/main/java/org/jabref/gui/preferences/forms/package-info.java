@@ -39,7 +39,7 @@
 ///
 /// The tabs using this DSL live in the sibling packages of `org.jabref.gui.preferences`.
 ///
-/// See <https://devdocs.jabref.org/architecture-and-components.html#preferences>,
-/// <https://devdocs.jabref.org/code-howtos/ui-recommendations.html#form-validation> and
-/// <https://devdocs.jabref.org/decisions/0069-preferences-search-registration-vs-scene-graph-scan.html>.
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html#preferences">Preferences component</a>
+/// @see <a href="https://devdocs.jabref.org/code-howtos/ui-recommendations.html#form-validation">Form validation</a>
+/// @see <a href="https://devdocs.jabref.org/decisions/0069-preferences-search-registration-vs-scene-graph-scan.html">ADR 0069: preferences search registration</a>
 package org.jabref.gui.preferences.forms;

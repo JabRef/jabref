@@ -6,6 +6,6 @@
 ///
 /// Fuzzy similarity (duplicate detection) is not here but in [org.jabref.logic.database.DuplicateCheck].
 ///
-/// See <https://devdocs.jabref.org/architecture-and-components.html#duplicate-finder>.
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html#duplicate-finder">Duplicate finder</a>
 
 package org.jabref.logic.bibtex.comparator;

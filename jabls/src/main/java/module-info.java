@@ -4,7 +4,7 @@
 /// Entry points: [org.jabref.languageserver.LspLauncher],
 /// [org.jabref.languageserver.BibtexTextDocumentService].
 ///
-/// See <https://devdocs.jabref.org/architecture-and-components.html>.
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
 module org.jabref.jabls {
     exports org.jabref.languageserver;
     opens org.jabref.languageserver to org.eclipse.lsp4j, org.eclipse.lsp4j.jsonrpc, com.google.gson;

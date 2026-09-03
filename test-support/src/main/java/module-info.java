@@ -4,7 +4,7 @@
 /// Entry points: [org.jabref.support.CommonArchitectureTest],
 /// [org.jabref.support.BibEntryAssert], [org.jabref.support.DisabledOnCIServer].
 ///
-/// See <https://devdocs.jabref.org/code-howtos/testing.html>.
+/// @see <a href="https://devdocs.jabref.org/code-howtos/testing.html">Testing code howto</a>
 open module org.jabref.testsupport {
     requires transitive com.tngtech.archunit.junit5.api;
     requires transitive com.tngtech.archunit;

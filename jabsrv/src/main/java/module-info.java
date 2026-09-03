@@ -3,7 +3,7 @@
 ///
 /// Entry points: [org.jabref.http.server.Server], [org.jabref.http.manager.HttpServerManager].
 ///
-/// See <https://devdocs.jabref.org/code-howtos/http-server.html>.
+/// @see <a href="https://devdocs.jabref.org/code-howtos/http-server.html">HTTP server code howto</a>
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
     exports org.jabref.http.manager;

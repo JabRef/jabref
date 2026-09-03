@@ -6,7 +6,7 @@
 /// [org.jabref.model.entry.BibEntry], [org.jabref.logic.importer.ImportFormatReader],
 /// [org.jabref.logic.exporter.ExporterFactory].
 ///
-/// See <https://devdocs.jabref.org/architecture-and-components.html>.
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
 open module org.jabref.jablib {
     exports org.jabref.model;
     exports org.jabref.model.undo;

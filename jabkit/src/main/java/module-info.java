@@ -4,7 +4,7 @@
 /// Entry point: [org.jabref.toolkit.JabKitLauncher]; commands live in
 /// `org.jabref.toolkit.commands`.
 ///
-/// See <https://devdocs.jabref.org/code-howtos/cli.html>.
+/// @see <a href="https://devdocs.jabref.org/code-howtos/cli.html">CLI code howto</a>
 module org.jabref.jabkit {
     requires org.jabref.jablib;
 
