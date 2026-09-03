@@ -24,6 +24,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -275,9 +277,13 @@ public abstract class NativeDesktop {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
             processBuilder.directory(Path.of(absolutePath).toFile());
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-            processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
             Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
 
             process.onExit().thenAccept(p -> {
                 if (p.exitValue() != 0) {
