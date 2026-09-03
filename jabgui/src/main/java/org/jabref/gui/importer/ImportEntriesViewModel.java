@@ -195,10 +195,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
-        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences())).mergeStrings(
+        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())).mergeStrings(
                 databaseContext.getDatabase(),
                 parserResult.getDatabase());
-        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences())).mergeMetaData(
+        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())).mergeMetaData(
                 databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
@@ -217,7 +217,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             // database), not to the originals. The import runs asynchronously, so this must happen in the
             // tracker's onFinish callback after all entries have been inserted/merged.
             tracker.setOnFinish(() ->
-                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences())));
+                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())));
         }
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }

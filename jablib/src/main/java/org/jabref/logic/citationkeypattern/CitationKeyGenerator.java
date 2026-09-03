@@ -42,7 +42,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 citationKeyPatternPreferences,
-                bibDatabaseContext.getMetaData().getKeywordSeparator().orElse(citationKeyPatternPreferences.getKeywordSeparator()));
+                bibDatabaseContext.getKeywordSeparator(citationKeyPatternPreferences.getKeywordSeparator()));
     }
 
     public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,

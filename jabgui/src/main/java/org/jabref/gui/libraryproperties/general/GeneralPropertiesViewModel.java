@@ -87,7 +87,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
-        keywordSeparatorProperty.setValue(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()).toString());
+        keywordSeparatorProperty.setValue(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()).toString());
     }
 
     @Override

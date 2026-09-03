@@ -36,7 +36,7 @@ public class KeywordsEditor extends TagsEditor {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()),
+                databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()),
                 undoManager);
 
         setupTagsField(

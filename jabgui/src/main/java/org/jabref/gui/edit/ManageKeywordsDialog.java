@@ -54,7 +54,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         Character keywordSeparator = stateManager.getActiveDatabase()
-                                                 .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences()))
+                                                 .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
                                                  .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         viewModel = new ManageKeywordsViewModel(keywordSeparator, entries, undoManager);
 

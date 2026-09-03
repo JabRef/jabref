@@ -28,7 +28,7 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
 
     public InMemoryLibrarySearcher(BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
-        this.keywordSeparator = databaseContext.getKeywordSeparator(bibEntryPreferences);
+        this.keywordSeparator = databaseContext.getKeywordSeparator(bibEntryPreferences.getKeywordSeparator());
     }
 
     @Override
