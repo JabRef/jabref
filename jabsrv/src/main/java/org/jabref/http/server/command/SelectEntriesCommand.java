@@ -10,7 +10,6 @@ import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -75,5 +74,4 @@ public class SelectEntriesCommand extends Command {
 
         return Response.ok().build();
     }
-
 }
