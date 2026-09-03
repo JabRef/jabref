@@ -706,6 +706,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Shows the unsaved in-memory changes compared to the file on disk (or to an empty library if never saved).
+    // [impl->req~ux.close.show-diff~1]
     private void showDiffToSavedFile() {
         BibDatabaseContext savedDatabase;
         try {
