@@ -29,7 +29,7 @@ After a file is linked to an entry, the user might move the file to another dire
 
 The function `Quality -> Automatically set file links` can help user to auto-link the moved files based on the broken file name, or the entry citation key.
 
-A Markdown file sharing its base name with another associated or linked file (e.g. `X.md` next to `X.pdf`) is treated as a notes companion of that file and is never auto-linked. The same holds for a Markdown sidecar of a directory library (a Hayagriva frontmatter block) even without such a partner: it is an entry's source, not an attachment. Any other Markdown file is still linked.
+A Markdown sidecar of a directory library (a Markdown file opening with a Hayagriva frontmatter block) is an entry's source, not an attachment, and is never auto-linked. Any other Markdown file is still linked.
 
 Needs: impl, utest
 
