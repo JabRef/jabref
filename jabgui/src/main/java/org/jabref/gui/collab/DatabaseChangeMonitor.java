@@ -1,9 +1,12 @@
 package org.jabref.gui.collab;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,6 +22,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.ConflictedCopies;
 import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateListener;
@@ -65,6 +69,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private final ChangeListener<Boolean> synchronizingListener = (_, _, enabled) -> onSynchronizingChanged(enabled);
 
+    /// Conflicted copies already merged, with the state they had at that time; a copy is written once by the sync
+    /// client, so the same file is not merged again on every scan.
+    private final Map<Path, FileSnapshot> mergedConflictedCopies = new HashMap<>();
+
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
@@ -99,12 +107,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         });
 
         addListener(this::notifyExternalChanges);
+        mergeConflictedCopies();
     }
 
     void notifyExternalChanges(List<DatabaseChange> changes) {
+        notifyExternalChanges(changes, Localization.lang("The library has been modified by another program.") + "\n" +
+                database.getDatabasePath().map(Path::toString).orElse(""));
+    }
+
+    private void notifyExternalChanges(List<DatabaseChange> changes, String description) {
         Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
 
-        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes);
+        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes, description);
         dialogService.notify(notification);
         activeNotification = notification;
     }
@@ -116,12 +130,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
-        public ExternalLibraryChangeNotification(List<DatabaseChange> changes) {
-            super(Localization.lang("External changes detected"),
-                    Localization.lang("The library has been modified by another program.") + "\n" +
-                            database.getDatabasePath()
-                                    .map(Path::toString)
-                                    .orElse(""));
+        public ExternalLibraryChangeNotification(List<DatabaseChange> changes, String description) {
+            super(Localization.lang("External changes detected"), description);
             setOnClick(_ -> OnClickBehaviour.NONE);
 
             NotificationAction<Path> dismissAction = new NotificationAction<>(Localization.lang("Dismiss changes"), _ -> {
@@ -292,11 +302,19 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     /// Applies what changed on disk only, and offers the review for what changed on both sides.
     private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage) {
+        synchronize(scannedBaseline, triage, Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())), null);
+        mergeConflictedCopies();
+    }
+
+    /// @param conflictedCopy the merged file when it is a conflicted copy rather than the library file itself; its changes needing review are announced as such, and the copy is offered for deletion once nothing of it is left to review
+    private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage, String mergedMessage, @Nullable Path conflictedCopy) {
         List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
         unresolved.addAll(triage.memoryOnly());
+        // A conflicted copy is never the file the library must match, so the library stays marked as changed
+        boolean matchesDisk = conflictedCopy == null && unresolved.isEmpty() && !libraryTab.isModified();
         if (!triage.diskOnly().isEmpty()) {
-            applyResolvedChanges(triage.diskOnly(), unresolved.isEmpty() && !libraryTab.isModified());
-            dialogService.notify(Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())));
+            applyResolvedChanges(triage.diskOnly(), matchesDisk);
+            dialogService.notify(mergedMessage);
         }
         synchronized (database) {
             LibraryBaseline updated = captureBaseline();
@@ -305,8 +323,65 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             }
             baseline = updated;
         }
-        if (!triage.bothSides().isEmpty()) {
-            listeners.forEach(listener -> listener.databaseChanged(triage.bothSides()));
+        if (conflictedCopy == null) {
+            if (!triage.bothSides().isEmpty()) {
+                listeners.forEach(listener -> listener.databaseChanged(triage.bothSides()));
+            }
+        } else if (!triage.bothSides().isEmpty()) {
+            notifyExternalChanges(triage.bothSides(), Localization.lang("The conflicted copy '%0' contains changes that need review.", conflictedCopy.getFileName().toString()));
+        } else {
+            dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy));
+        }
+    }
+
+    /// Merges the copies a sync client left next to the library file (see [ConflictedCopies]) the same way as the
+    /// library file itself: against the baseline, with a review only for real conflicts. Runs after each scan, since
+    /// a client writes the copy together with the library file, and once when the library is opened.
+    /// [impl->req~ux.external-library-changes.conflicted-copies~1]
+    private void mergeConflictedCopies() {
+        LibraryBaseline scannedBaseline = baseline;
+        Path path = monitoredPath.orElse(null);
+        if (path == null || scannedBaseline == null || !isSynchronizing()) {
+            return;
+        }
+        for (Path copy : ConflictedCopies.find(path)) {
+            FileSnapshot state = FileSnapshot.read(copy);
+            if (state == null || state.equals(mergedConflictedCopies.get(copy))) {
+                continue;
+            }
+            mergedConflictedCopies.put(copy, state);
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
+            int generation = ++scanGeneration;
+            BackgroundTask.wrap(() -> scanner.scanFile(copy))
+                          .onSuccess(changes -> {
+                              if (generation != scanGeneration) {
+                                  return;
+                              }
+                              LibraryBaseline.Triage triage = scanner.triage(scannedBaseline, changes);
+                              synchronize(scannedBaseline, triage,
+                                      Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
+                                      copy);
+                          })
+                          .onFailure(e -> LOGGER.error("Error while merging conflicted copy {}", copy, e))
+                          .executeWith(taskExecutor);
+        }
+    }
+
+    /// Everything in the copy is in the library now, so the copy only clutters the folder; deleting stays the user's call.
+    private class ConflictedCopyMergedNotification extends Notifications.FileNotification {
+        ConflictedCopyMergedNotification(Path copy) {
+            super(Localization.lang("Conflicted copy merged"),
+                    Localization.lang("All changes of '%0' are in the library.", copy.getFileName().toString()));
+            setOnClick(_ -> OnClickBehaviour.REMOVE);
+            getActions().add(new NotificationAction<>(Localization.lang("Delete copy"), _ -> {
+                try {
+                    Files.deleteIfExists(copy);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete conflicted copy {}", copy, e);
+                    dialogService.notify(Localization.lang("Could not delete '%0'.", copy.getFileName().toString()));
+                }
+                return OnClickBehaviour.REMOVE;
+            }));
         }
     }
 

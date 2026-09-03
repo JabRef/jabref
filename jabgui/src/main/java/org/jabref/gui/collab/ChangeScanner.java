@@ -53,6 +53,16 @@ public class ChangeScanner {
         }
     }
 
+    /// The differences between the in-memory library and the given file, e.g. a conflicted copy left by a sync client.
+    public List<DatabaseChange> scanFile(Path file) {
+        try {
+            return getDatabaseChanges(file);
+        } catch (IOException e) {
+            LOGGER.warn("Error while parsing {}", file, e);
+            return List.of();
+        }
+    }
+
     /// @return the given external changes sorted by the side they happened on, see [LibraryBaseline#triage]
     public LibraryBaseline.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
         return baseline.triage(changes, database, databaseChangeResolverFactory);

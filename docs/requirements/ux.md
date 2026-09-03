@@ -93,6 +93,14 @@ Fields changed only in the file are taken over even when other fields of the sam
 
 Needs: impl
 
+## Conflicted copies of a synchronized library are merged
+`req~ux.external-library-changes.conflicted-copies~1`
+
+When a file synchronization client (Dropbox, Nextcloud, ownCloud, OneDrive, Syncthing) leaves a conflicted copy next to a library that is set to be synchronized with its file, JabRef must merge that copy into the library with the same rules as for the library file itself, and offer to delete the copy once nothing of it is left to review.
+Deleting is the user's decision; JabRef must not remove the copy on its own.
+
+Needs: impl, utest
+
 ## Deleting many entries keeps the main table responsive
 `req~ux.large-library.bulk-entry-removal~1`
 
