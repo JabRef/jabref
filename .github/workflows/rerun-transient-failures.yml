@@ -1,0 +1,40 @@
+name: Rerun transient CI failures
+
+on:
+  schedule:
+    - cron: "47 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  rerun:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
+    permissions:
+      actions: write
+    steps:
+      - name: Rerun failed runs hit by transient infra errors
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          errors=0
+          # Only attempt 1 is retried, so a run failing transiently twice stays failed
+          # instead of looping forever.
+          while read -r run_id; do
+            # Process substitution instead of a pipe: `grep -q` exits on the first match, and
+            # the resulting SIGPIPE would make gh fail the pipeline under pipefail.
+            if grep -qE "Failed to download (action|archive) '|Response status code does not indicate success: (429|5[0-9][0-9])" \
+                 < <(gh run view "$run_id" --log-failed 2>/dev/null); then
+              url="https://github.com/$GH_REPO/actions/runs/$run_id"
+              if err=$(gh run rerun "$run_id" --failed 2>&1); then
+                echo "Reran failed jobs of $url" | tee -a "$GITHUB_STEP_SUMMARY"
+              else
+                echo "FAILED to rerun $url: $err" | tee -a "$GITHUB_STEP_SUMMARY"
+                errors=$((errors + 1))
+              fi
+              sleep 3
+            fi
+          done < <(gh run list --status failure --created ">=$(date -u -d 'yesterday' +%F)" --limit 200 \
+                     --json databaseId,attempt --jq '.[] | select(.attempt == 1) | .databaseId')
+          [ "$errors" -eq 0 ]

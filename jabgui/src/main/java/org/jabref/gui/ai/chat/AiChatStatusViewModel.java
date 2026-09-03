@@ -278,7 +278,7 @@ public class AiChatStatusViewModel extends AbstractViewModel {
     }
 
     public void clearChatHistory() {
-        // [guard->req~ai.chat.clear-history~1]
+        // [guard->feat~ai.chat.clear-history~1]
         boolean confirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Clear chat history"),
                 Localization.lang("Are you sure you want to clear the chat history?")

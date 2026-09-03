@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -48,6 +46,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -118,13 +117,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         this(database, task, null);
     }
 
-    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and
-    /// assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()}
-    /// / {@link #getImportTarget()}).
+    /// Variant that pre-selects `targetGroup` in the group picker. The group is created and
+    /// assigned by the caller only after the dialog is confirmed (see [#getImportedEntries()]
+    /// / [#getImportTarget()]).
     ///
     /// @param database    the database to import into
     /// @param task        the task executed for parsing the selected files(s).
-    /// @param targetGroup name of the group to pre-select, or {@code null} for none
+    /// @param targetGroup name of the group to pre-select, or `null` for none
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup) {
         this.database = database;
         this.task = task;

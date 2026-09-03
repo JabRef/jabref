@@ -24,9 +24,9 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-/// {@link JabRefIcon} backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
-/// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}. Immutable: {@link #withColor} and
-/// {@link #withSize} return copies.
+/// [JabRefIcon] backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
+/// [FontIcon]. The font-backed counterpart to [SvgIcon]. Immutable: [#withColor] and
+/// [#withSize] return copies.
 @NullMarked
 public final class IkonliIcon implements JabRefIcon {
 
@@ -72,7 +72,7 @@ public final class IkonliIcon implements JabRefIcon {
         return IkonliIcons.ALL;
     }
 
-    /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first
+    /// Holds every [Ikon] discovered via the [IkonProvider] service loader. Initialization on first
     /// access guaranteed by JVM.
     private static final class IkonliIcons {
         private static final SequencedSet<Ikon> ALL = load();
@@ -119,6 +119,7 @@ public final class IkonliIcon implements JabRefIcon {
         }
 
         // Override the default color from the css files
+        // FIXME: Inline style should be removed eventually.
         if (color != null) {
             fontIcon.setStyle(fontIcon.getStyle() +
                     "-fx-fill: %s;".formatted(ColorUtil.toRGBCode(color)) +

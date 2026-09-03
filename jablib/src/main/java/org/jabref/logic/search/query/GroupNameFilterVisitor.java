@@ -10,8 +10,8 @@ import org.jabref.search.SearchParser;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /// Evaluates a Search.g4 parse tree against a group display name string.
-/// Key behavioral difference from {@link SearchQueryVisitor}:
-/// {@code visitImplicitAndExpression} uses OR semantics (anyMatch) instead of AND,
+/// Key behavioral difference from [SearchQueryVisitor]:
+/// `visitImplicitAndExpression` uses OR semantics (anyMatch) instead of AND,
 /// so space-separated bare terms like "machine learning" match any group containing
 /// either word. Explicit AND/OR/NOT and parentheses work as expected.
 public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {

@@ -16,8 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
@@ -45,6 +43,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -323,6 +322,7 @@ public class JabRefFrameViewModel {
     /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
     ///
     /// Paths:
+    ///
     ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
     ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
     ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)

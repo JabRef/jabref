@@ -94,8 +94,8 @@ public class AiPrivacyNoticeView extends ScrollPane {
         viewModel.onPrivacyAgree();
     }
 
-    // [impl->req~ai.chat.entries.hide-tab~1]
-    // [impl->req~ai.chat.groups.hide-context-menu~1]
+    // [impl->feat~ai.chat.entries.hide-tab~1]
+    // [impl->feat~ai.chat.groups.hide-context-menu~1]
     @FXML
     private void onPrivacyDisagree() {
         viewModel.privacyDisagree();

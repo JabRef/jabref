@@ -153,7 +153,7 @@ public class MetaData {
 
     /// Updates the stored key patterns to the given key patterns.
     ///
-    /// @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+    /// @param bibtexKeyPatterns the key patterns to update to. A reference to this object is stored internally and is returned at getCiteKeyPattern();
     public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
@@ -328,7 +328,7 @@ public class MetaData {
         postChange();
     }
 
-    /// Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
+    /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
@@ -361,7 +361,7 @@ public class MetaData {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
-    /// If disabled {@link MetaDataChangedEvent} will not be posted.
+    /// If disabled [MetaDataChangedEvent] will not be posted.
     public void setEventPropagation(boolean enabled) {
         this.isEventPropagationEnabled = enabled;
     }

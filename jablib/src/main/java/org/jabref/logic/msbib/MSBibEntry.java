@@ -26,10 +26,14 @@ import org.w3c.dom.NodeList;
 /// @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
 class MSBibEntry {
 
-    /// reduced subset, supports only "CITY , STATE, COUNTRY" <br>
-    /// **\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b** <br>
-    /// WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
-    /// Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+    /// reduced subset, supports only "CITY , STATE, COUNTRY"
+    ///
+    /// **\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b**
+    ///
+    /// WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more)
+    ///
+    /// Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA
+    ///
     /// tested using http://www.regexpal.com/
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
@@ -76,7 +80,7 @@ class MSBibEntry {
         // empty
     }
 
-    /// Create a new {@link MSBibEntry} to import from an XML element
+    /// Create a new [MSBibEntry] to import from an XML element
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }

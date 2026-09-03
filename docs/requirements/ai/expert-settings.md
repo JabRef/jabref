@@ -3,46 +3,35 @@ parent: ai
 ---
 
 # AI expert settings
-`feat~ai.expert-settings~1`
 
-Rationale: to provide advanced configuration options for controlling AI behavior and defaults across the application
+Provides advanced configuration options for controlling AI behavior and defaults across the application.
 
-Covers: `feat~ai~1`
+## User can modify AI templates in expert settings
+`feat~ai.expert-settings.templates~1`
 
-## Allow modification of AI templates in AI expert settings
-`req~ai.expert-settings.templates~1`
-
-Rationale: users need to adjust the underlying prompt structures to refine AI outputs and behavior patterns
+User needs to adjust the underlying prompt structures to refine AI outputs and behavior patterns.
 
 Needs: impl
 
-Covers: `feat~ai.expert-settings~1`
+## User can modify global AI chat inference parameters
+`feat~ai.expert-settings.chat-inference-global~1`
 
-## Allow modification of global chat inference parameters in AI expert settings
-`req~ai.expert-settings.chat-inference-global~1`
-
-Rationale: users need to adjust the underlying settings of the inference to refine AI outputs and behavior patterns
+User needs to adjust the underlying settings of the inference to refine AI outputs and behavior patterns.
 
 Needs: impl
 
-Covers: `feat~ai.expert-settings~1`
+## User can modify global RAG parameters
+`feat~ai.expert-settings.rag-global~1`
 
-## Allow modification of global RAG parameters in AI expert settings
-`req~ai.expert-settings.rag-global~1`
-
-Rationale: users need to adjust the RAG parameters to refine AI outputs
+User needs to adjust the RAG parameters to refine AI outputs.
 
 Needs: impl
 
-Covers: `feat~ai.expert-settings~1`
+## User can modify local AI summarization parameters
+`feat~ai.expert-settings.summarization-local~1`
 
-## Allow modification of local summarization parameters in AI expert settings
-`req~ai.expert-settings.summarization-local~1`
-
-Rationale: users need to adjust the underlying prompt structures to refine AI outputs
+User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
-
-Covers: `feat~ai.expert-settings~1`
 
 <!-- markdownlint-disable-file MD022 -->

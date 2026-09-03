@@ -101,7 +101,7 @@ class ZoteroDocumentPreferencesTest {
     }
 
     private static CitationStyle citationStyle(String filePath, String styleId, String title) {
-        return new CitationStyle(filePath, styleId, "in-text", title, title, false, true, false, title, true);
+        return new CitationStyle(filePath, styleId, "in-text", title, title, false, true, false, false, title, true);
     }
 
     private static final class TestDocument {
