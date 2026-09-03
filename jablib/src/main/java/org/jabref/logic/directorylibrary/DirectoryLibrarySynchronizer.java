@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -23,14 +22,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
+import java.util.SequencedSet;
 import java.util.Set;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.exporter.AtomicFileOutputStream;
 import org.jabref.logic.exporter.HayagrivaEntryWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.HayagrivaImporter;
@@ -45,6 +50,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
@@ -58,6 +64,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
 
 /// Keeps an open directory library in sync with external file changes (inbound direction:
 /// file system to [BibDatabaseContext]). Registered as a [FileAlterationListener] with the
@@ -85,7 +92,8 @@ import org.slf4j.LoggerFactory;
 /// entry without a sidecar creates one (next to its PDF, sharing the base name), a citation-key
 /// edit renames the YAML map key, and deleting an entry removes it from its file (disposing the
 /// file once its last entry is gone — the paired PDF is never touched). Writes are debounced
-/// per file; [#flush] forces them, and shutdown flushes implicitly.
+/// per file; [#flush] forces them, and shutdown flushes implicitly. A file that could not be
+/// written stays pending and is reported by [#flush], so the GUI can tell the user.
 // [impl->req~directory-library.inbound-sync~2]
 // [impl->req~directory-library.write-back~2]
 @NullMarked
@@ -93,16 +101,17 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryLibrarySynchronizer.class);
 
-    /// Two poll cycles of [DirectoryMonitor] (1 s each), so a rename's create event can arrive
-    /// in the poll cycle after its delete event.
-    private static final Duration RENAME_GRACE = Duration.ofMillis(2500);
+    /// Two poll cycles of [DirectoryMonitor], so a rename's create event can arrive in the poll
+    /// cycle after its delete event.
+    private static final Duration RENAME_GRACE = DirectoryMonitor.POLL_INTERVAL.multipliedBy(2).plusMillis(500);
 
-    private static final Set<String> SIDECAR_EXTENSIONS = Set.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
+    /// In precedence order when several sidecars share a base name.
+    private static final List<String> SIDECAR_EXTENSIONS = List.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
     private static final String PDF_EXTENSION = "pdf";
 
     /// Collects keystroke-level bursts into one write per file. Trailing edge: every change
-    /// event re-arms the timer, so the write fires once typing pauses and always persists the
-    /// latest state.
+    /// event re-arms the file's timer, so the write fires once typing pauses and always
+    /// persists the latest state.
     private static final Duration WRITE_DEBOUNCE = Duration.ofMillis(500);
 
     private final BibDatabaseContext databaseContext;
@@ -117,15 +126,24 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private final Map<Path, StagedDeletion> stagedDeletions = new HashMap<>();
     private final Map<Path, String> lastWrittenFingerprints = new HashMap<>();
+    /// Content of each sidecar as last read or written, so a write notices an external edit
+    /// that landed in between and takes it into the model first instead of overwriting it.
+    private final Map<Path, String> lastSeenFingerprints = new HashMap<>();
+    /// Entries (by Hayagriva key) as last read from or written to each file: the base of the
+    /// three-way merge in [#applyChangedFile], so an external edit only touches the fields it
+    /// changed and in-memory edits of other fields survive.
+    private final Map<Path, SequencedMap<String, BibEntry>> baselines = new HashMap<>();
     private final HayagrivaEntryWriter entryWriter = new HayagrivaEntryWriter();
-    private final Set<Path> dirtyFiles = new LinkedHashSet<>();
+    private final SequencedSet<Path> dirtyFiles = new LinkedHashSet<>();
+    private final Map<Path, ScheduledFuture<?>> scheduledWrites = new HashMap<>();
     private final Consumer<Path> fileDisposer;
-    private @Nullable ScheduledFuture<?> scheduledWrite;
 
-    private @Nullable FileAlterationObserver observer;
-    private @Nullable DirectoryMonitor directoryMonitor;
+    private @Nullable Watch watch;
 
     private record StagedDeletion(List<BibEntry> entries, Instant expiry) {
+    }
+
+    private record Watch(DirectoryMonitor monitor, FileAlterationObserver observer) {
     }
 
     public DirectoryLibrarySynchronizer(BibDatabaseContext databaseContext,
@@ -150,15 +168,18 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 () -> new IllegalArgumentException("Context is not a directory library"));
         this.modelUpdateMarshaller = modelUpdateMarshaller;
         this.clock = clock;
-        this.syncExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "directory-sync");
-            thread.setDaemon(true);
-            return thread;
-        });
+        // A dedicated single thread (not BackgroundTask: events must be serialized and writes
+        // debounced). Events polled while this synchronizer shuts down are dropped instead of
+        // throwing into the shared monitor thread.
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
+                Thread.ofPlatform().name("directory-sync").daemon(true).factory());
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        // Pending debounce and grace timers are superseded by the final flush on shutdown
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        this.syncExecutor = executor;
     }
 
     public void startWatching(DirectoryMonitor monitor) {
-        this.directoryMonitor = monitor;
         IOFileFilter relevantFiles = FileFilterUtils.or(
                 FileFilterUtils.directoryFileFilter(),
                 FileFilterUtils.suffixFileFilter(".yml", IOCase.INSENSITIVE),
@@ -166,34 +187,71 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 FileFilterUtils.suffixFileFilter(".md", IOCase.INSENSITIVE),
                 FileFilterUtils.suffixFileFilter(".pdf", IOCase.INSENSITIVE));
         IOFileFilter notHidden = FileFilterUtils.notFileFilter(FileFilterUtils.prefixFileFilter("."));
-        observer = FileAlterationObserver.builder()
-                                         .setRootEntry(new FileEntry(root.toFile()))
-                                         .setFileFilter(FileFilterUtils.and(notHidden, relevantFiles))
-                                         .getUnchecked();
+        FileAlterationObserver observer = FileAlterationObserver.builder()
+                                                                .setRootEntry(new FileEntry(root.toFile()))
+                                                                .setFileFilter(FileFilterUtils.and(notHidden, relevantFiles))
+                                                                .getUnchecked();
+        watch = new Watch(monitor, observer);
         // The monitor is already running and never initializes late-joining observers, so the
         // first poll would report every existing file as created. Checking once without any
-        // listener attached takes the baseline snapshot silently.
-        observer.checkAndNotify();
-        monitor.addObserver(observer, this);
+        // listener attached takes the baseline snapshot silently — off the caller's thread,
+        // since it walks the whole tree.
+        syncExecutor.execute(() -> {
+            takeBaseline();
+            observer.checkAndNotify();
+            monitor.addObserver(observer, this);
+        });
     }
 
-    public void shutdown() {
-        if (observer != null && directoryMonitor != null) {
-            directoryMonitor.removeObserver(observer);
+    /// Records the scanned files' content as the merge base; the live entries still equal it
+    /// at this point.
+    synchronized void takeBaseline() {
+        for (Path file : catalog.files()) {
+            currentHash(file).ifPresent(fingerprint -> lastSeenFingerprints.put(file.toAbsolutePath().normalize(), fingerprint));
+            baselines.put(file, copiesByKey(entriesOf(file)));
         }
-        flush();
+    }
+
+    /// The sidecar an entry is written to (tests).
+    Path sidecarOf(BibEntry entry) {
+        return catalog.sourceOf(entry).map(DirectoryLibraryCatalog.EntrySource::yamlFile).orElseThrow();
+    }
+
+    /// Waits until every event queued so far has been handled (tests).
+    void awaitPendingEvents() throws InterruptedException, ExecutionException {
+        syncExecutor.submit(() -> { }).get();
+    }
+
+    /// Stops watching and writes what is still pending. Events already queued (the last
+    /// keystroke) are drained first, so the final flush sees every change.
+    ///
+    /// @return the files whose changes could not be written
+    public List<Path> shutdown() {
+        Optional.ofNullable(watch).ifPresent(active -> active.monitor().removeObserver(active.observer()));
         syncExecutor.shutdown();
+        try {
+            syncExecutor.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return flush();
     }
 
     /// Writes all pending sidecar changes now (they are otherwise debounced).
-    public synchronized void flush() {
-        writeDirtyFiles();
+    ///
+    /// @return the files whose changes could not be written; they stay pending
+    public synchronized List<Path> flush() {
+        scheduledWrites.values().forEach(pending -> pending.cancel(false));
+        scheduledWrites.clear();
+        return writeFiles(List.copyOf(dirtyFiles), true);
     }
 
     /// Registers the fingerprint of a file this application just wrote itself, so the next
     /// change event for it is recognized as a self-echo and not re-imported. Consumed on match.
     public synchronized void recordWrittenFile(Path file, byte[] content) {
-        lastWrittenFingerprints.put(file.toAbsolutePath().normalize(), hash(content));
+        String fingerprint = hash(content);
+        lastWrittenFingerprints.put(file.toAbsolutePath().normalize(), fingerprint);
+        lastSeenFingerprints.put(file.toAbsolutePath().normalize(), fingerprint);
     }
 
     @Override
@@ -272,76 +330,113 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     synchronized void handleLocalChange(BibEntry entry) {
-        Path file = catalog.sourceOf(entry)
-                           .map(DirectoryLibraryCatalog.EntrySource::yamlFile)
-                           .orElseGet(() -> assignSidecar(entry));
-        dirtyFiles.add(file);
-        scheduleWrite();
+        scheduleWrite(catalog.sourceOf(entry)
+                             .map(DirectoryLibraryCatalog.EntrySource::yamlFile)
+                             .orElseGet(() -> assignSidecar(entry)));
     }
 
+    /// The catalog keeps the removed entries' sources until the debounced write runs, so an
+    /// undo within that window lands the entry back in its own file instead of a fresh one.
     synchronized void handleLocalRemoval(List<BibEntry> entries) {
-        Set<Path> affectedFiles = new LinkedHashSet<>();
-        for (BibEntry entry : entries) {
-            catalog.sourceOf(entry).ifPresent(source -> {
-                affectedFiles.add(source.yamlFile());
-                catalog.removeEntry(entry);
-            });
-        }
-        for (Path file : affectedFiles) {
-            if (catalog.entryIdsIn(file).isEmpty()) {
-                dirtyFiles.remove(file);
-                if (Files.exists(file)) {
-                    fileDisposer.accept(file);
-                }
-            } else {
-                dirtyFiles.add(file);
-                scheduleWrite();
-            }
-        }
+        entries.stream()
+               .flatMap(entry -> catalog.sourceOf(entry).stream())
+               .map(DirectoryLibraryCatalog.EntrySource::yamlFile)
+               .distinct()
+               .forEach(this::scheduleWrite);
     }
 
     /// The first user change of an entry without a source materializes its sidecar — a Markdown
     /// sidecar (see [MarkdownSidecar]): next to the entry's PDF (sharing the base name, per the
     /// pairing convention), or named after the citation key for entries without a file.
     private Path assignSidecar(BibEntry entry) {
-        Optional<Path> pairedFile = entry.getFiles().stream()
-                                         .filter(linkedFile -> !linkedFile.isOnlineLink())
-                                         .findFirst()
-                                         .map(linkedFile -> root.resolve(linkedFile.getLink()).normalize());
-        Path sidecar;
-        if (pairedFile.isPresent() && pairedFile.get().startsWith(root)) {
-            Path parent = pairedFile.get().getParent();
-            sidecar = parent.resolve(FileUtil.getBaseName(pairedFile.get()) + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
-        } else {
-            String baseName = entry.getCitationKey().filter(key -> !key.isBlank()).orElse("entry");
-            sidecar = root.resolve(baseName + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
-            int counter = 1;
-            while (Files.exists(sidecar)) {
-                sidecar = root.resolve(baseName + "-" + counter++ + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
-            }
-        }
+        Path sidecar = entry.getFiles().stream()
+                            .filter(linkedFile -> !linkedFile.isOnlineLink())
+                            .map(linkedFile -> root.resolve(linkedFile.getLink()).normalize())
+                            .filter(linkedPath -> linkedPath.startsWith(root))
+                            .findFirst()
+                            .map(paired -> paired.resolveSibling(FileUtil.getBaseName(paired) + "." + MarkdownSidecar.MARKDOWN_EXTENSION))
+                            // A second entry linking the same PDF, or a foreign file of that name, cannot share it
+                            .filter(candidate -> !Files.exists(candidate) && catalog.entryIdsIn(candidate).isEmpty())
+                            .orElseGet(() -> unusedSidecar(entry.getCitationKey().filter(key -> !key.isBlank()).orElse("entry")));
         catalog.register(entry, sidecar, entry.getCitationKey().orElse(""));
         return sidecar;
     }
 
-    private synchronized void scheduleWrite() {
-        if (scheduledWrite != null) {
-            scheduledWrite.cancel(false);
+    /// Also skips names already assigned to entries whose sidecar is not written yet.
+    private Path unusedSidecar(String baseName) {
+        Path candidate = root.resolve(baseName + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
+        for (int counter = 1; Files.exists(candidate) || !catalog.entryIdsIn(candidate).isEmpty(); counter++) {
+            candidate = root.resolve(baseName + "-" + counter + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
         }
-        scheduledWrite = syncExecutor.schedule(this::writeDirtyFiles, WRITE_DEBOUNCE.toMillis(), TimeUnit.MILLISECONDS);
+        return candidate;
     }
 
-    private synchronized void writeDirtyFiles() {
-        scheduledWrite = null;
-        List<Path> files = List.copyOf(dirtyFiles);
-        dirtyFiles.clear();
-        files.forEach(this::writeFile);
-    }
-
-    private void writeFile(Path file) {
-        List<BibEntry> entries = entriesOf(file);
-        if (entries.isEmpty()) {
+    private synchronized void scheduleWrite(Path file) {
+        dirtyFiles.add(file);
+        Optional.ofNullable(scheduledWrites.remove(file)).ifPresent(pending -> pending.cancel(false));
+        if (syncExecutor.isShutdown()) {
+            // Written by the final flush
             return;
+        }
+        scheduledWrites.put(file, syncExecutor.schedule(() -> writeScheduled(file), WRITE_DEBOUNCE.toMillis(), TimeUnit.MILLISECONDS));
+    }
+
+    private synchronized void writeScheduled(Path file) {
+        scheduledWrites.remove(file);
+        writeFiles(List.of(file), false);
+    }
+
+    /// Files that could not be written stay dirty: the next flush retries them and the caller
+    /// can report them. `immediate` writes even if the file changed externally in between (the
+    /// external edit has then been taken into the model on the caller's thread, see
+    /// [#writeFile]).
+    private synchronized List<Path> writeFiles(List<Path> files, boolean immediate) {
+        List<Path> failed = new ArrayList<>();
+        for (Path file : files) {
+            if (!dirtyFiles.contains(file)) {
+                continue;
+            }
+            try {
+                if (writeFile(file, immediate)) {
+                    dirtyFiles.remove(file);
+                } else {
+                    scheduleWrite(file);
+                }
+            } catch (IOException | JacksonException e) {
+                LOGGER.error("Could not write sidecar {}", file, e);
+                failed.add(file);
+            }
+        }
+        return failed;
+    }
+
+    /// @return whether the file was written; `false` defers the write until the model has taken
+    /// in an external edit that landed since the file was last read or written
+    private boolean writeFile(Path file, boolean immediate) throws IOException {
+        Path normalized = file.toAbsolutePath().normalize();
+        boolean changedExternally = Optional.ofNullable(lastSeenFingerprints.get(normalized))
+                                            .map(lastSeen -> Files.exists(file) && !currentHash(file).equals(Optional.of(lastSeen)))
+                                            .orElse(false);
+        if (changedExternally) {
+            // The model update is marshalled (asynchronously in the GUI), so the write is retried
+            // one debounce later — unless the caller flushes, where the user's state must win
+            handleFileChanged(file);
+            if (!immediate) {
+                return false;
+            }
+        }
+
+        List<BibEntry> entries = entriesOf(file);
+        Set<String> liveIds = entries.stream().map(BibEntry::getId).collect(Collectors.toSet());
+        catalog.entryIdsIn(file).stream().filter(id -> !liveIds.contains(id)).forEach(catalog::removeEntry);
+        if (entries.isEmpty()) {
+            catalog.removeFile(file);
+            lastSeenFingerprints.remove(normalized);
+            baselines.remove(file);
+            if (Files.exists(file)) {
+                fileDisposer.accept(file);
+            }
+            return true;
         }
         List<HayagrivaEntryWriter.KeyedEntry> keyedEntries = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();
@@ -359,22 +454,22 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             }
             keyedEntries.add(new HayagrivaEntryWriter.KeyedEntry(previousKey, uniqueKey, entry));
         }
-        try {
-            String existingDocument = Files.exists(file) ? Files.readString(file, StandardCharsets.UTF_8) : null;
-            String document = MarkdownSidecar.hasMarkdownExtension(file)
-                              ? markdownSidecar.merge(existingDocument, keyedEntries)
-                              : entryWriter.mergeIntoDocument(existingDocument, keyedEntries);
-            byte[] content = document.getBytes(StandardCharsets.UTF_8);
-            recordWrittenFile(file, content);
-            // Written atomically: the polling watcher (or another process) must never see a
-            // half-written sidecar
-            Path temporary = file.resolveSibling(file.getFileName() + ".jabref-write.tmp");
-            Files.write(temporary, content);
-            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            keyedEntries.forEach(keyedEntry -> catalog.updateHayagrivaKey(keyedEntry.entry(), keyedEntry.targetKey()));
-        } catch (IOException e) {
-            LOGGER.error("Could not write sidecar {}", file, e);
+        String existingDocument = Files.exists(file) ? Files.readString(file, StandardCharsets.UTF_8) : "";
+        String document = MarkdownSidecar.hasMarkdownExtension(file)
+                          ? markdownSidecar.merge(existingDocument, keyedEntries)
+                          : entryWriter.mergeIntoDocument(existingDocument, keyedEntries);
+        byte[] content = document.getBytes(StandardCharsets.UTF_8);
+        // Written atomically: the polling watcher (or another process) must never see a
+        // half-written sidecar. The fingerprint is recorded only once the file is really there.
+        try (AtomicFileOutputStream output = new AtomicFileOutputStream(file, false)) {
+            output.write(content);
         }
+        recordWrittenFile(file, content);
+        keyedEntries.forEach(keyedEntry -> catalog.updateHayagrivaKey(keyedEntry.entry(), keyedEntry.targetKey()));
+        SequencedMap<String, BibEntry> written = new LinkedHashMap<>();
+        keyedEntries.forEach(keyedEntry -> written.put(keyedEntry.targetKey(), new BibEntry(keyedEntry.entry())));
+        baselines.put(file, written);
+        return true;
     }
 
     synchronized void handleFileCreated(Path file) {
@@ -400,16 +495,16 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             return;
         }
         if (!looksLikeSidecar(file)) {
-            // The file stopped being a sidecar (e.g. replaced by unrelated YAML or Markdown)
-            removeEntries(knownEntries, file);
+            // The file stopped being a sidecar — or an editor that truncates and rewrites was
+            // polled mid-write, so the entries are only staged: a complete sidecar arriving
+            // within the grace window keeps them
+            stageDeletion(file, knownEntries);
             return;
         }
-        Optional<List<BibEntry>> parsed = parse(file);
-        if (parsed.isEmpty()) {
-            LOGGER.warn("Not applying changes of unparseable Hayagriva file {}", file);
-            return;
-        }
-        applyChangedFile(file, knownEntries, parsed.get());
+        parse(file).ifPresentOrElse(parsedEntries -> {
+            stagedDeletions.remove(file);
+            applyChangedFile(file, knownEntries, parsedEntries);
+        }, () -> LOGGER.warn("Not applying changes of unparseable Hayagriva file {}", file));
     }
 
     synchronized void handleFileDeleted(Path file) {
@@ -419,12 +514,15 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             if (entries.isEmpty()) {
                 return;
             }
-            stagedDeletions.put(file, new StagedDeletion(entries, clock.instant().plus(RENAME_GRACE)));
-            syncExecutor.schedule(this::commitExpiredStagedDeletions,
-                    RENAME_GRACE.toMillis() + 100, TimeUnit.MILLISECONDS);
+            stageDeletion(file, entries);
         } else if (isPdf(file)) {
             handlePdfDeleted(file);
         }
+    }
+
+    private void stageDeletion(Path file, List<BibEntry> entries) {
+        stagedDeletions.put(file, new StagedDeletion(entries, clock.instant().plus(RENAME_GRACE)));
+        syncExecutor.schedule(this::commitExpiredStagedDeletions, RENAME_GRACE.toMillis() + 100, TimeUnit.MILLISECONDS);
     }
 
     synchronized void commitExpiredStagedDeletions() {
@@ -440,32 +538,35 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private void importFile(Path file) {
         if (!entriesOf(file).isEmpty()) {
-            // Already known (e.g. a create event for a file the scan covered) — diff instead
+            // Already known: a create event for a file the scan covered, or a deletion undone
+            // within the grace window — diff instead of importing twice
+            stagedDeletions.remove(file);
             handleFileChanged(file);
             return;
         }
         if (!looksLikeSidecar(file)) {
             return;
         }
-        Optional<List<BibEntry>> parsed = parse(file);
-        if (parsed.isEmpty() || parsed.get().isEmpty()) {
+        List<BibEntry> newEntries = parse(file).orElse(List.of());
+        if (newEntries.isEmpty()) {
             return;
         }
-        List<BibEntry> newEntries = parsed.get();
 
         // A staged deletion with equal content is this file being moved, not new content
-        Optional<Path> movedFrom = stagedDeletions.entrySet().stream()
-                                                  .filter(staged -> entriesMatch(staged.getValue().entries(), newEntries))
-                                                  .map(Map.Entry::getKey)
-                                                  .findFirst();
-        if (movedFrom.isPresent()) {
-            stagedDeletions.remove(movedFrom.get());
-            catalog.relocateFile(movedFrom.get(), file);
-            LOGGER.debug("Detected move {} -> {}", movedFrom.get(), file);
-            return;
-        }
+        stagedDeletions.entrySet().stream()
+                       .filter(staged -> entriesMatch(staged.getValue().entries(), newEntries))
+                       .map(Map.Entry::getKey)
+                       .findFirst()
+                       .ifPresentOrElse(movedFrom -> {
+                           stagedDeletions.remove(movedFrom);
+                           catalog.relocateFile(movedFrom, file);
+                           Optional.ofNullable(baselines.remove(movedFrom)).ifPresent(baseline -> baselines.put(file, baseline));
+                           LOGGER.debug("Detected move {} -> {}", movedFrom, file);
+                       }, () -> insertNewEntries(file, newEntries));
+    }
 
-        newEntries.forEach(entry -> catalog.register(entry, file, entry.getCitationKey().orElse("")));
+    private void insertNewEntries(Path file, List<BibEntry> newEntries) {
+        newEntries.forEach(entry -> catalog.register(entry, file, entry.getCitationKey().orElseThrow()));
         // Safe without event source: the entry is not yet inserted, so no listeners see this
         findPairedPdf(file).ifPresent(pdf -> newEntries.getFirst()
                                                        .addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName())));
@@ -481,15 +582,14 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         List<BibEntry> toRemove = new ArrayList<>();
         List<Runnable> fieldUpdates = new ArrayList<>();
 
-        parsedByKey.forEach((key, parsedEntry) -> {
-            BibEntry knownEntry = knownByKey.get(key);
-            if (knownEntry == null) {
-                catalog.register(parsedEntry, file, key);
-                toInsert.add(parsedEntry);
-            } else {
-                fieldUpdates.add(() -> copyContent(parsedEntry, knownEntry));
-            }
-        });
+        Map<String, BibEntry> baseline = baselines.getOrDefault(file, new LinkedHashMap<>());
+        parsedByKey.forEach((key, parsedEntry) ->
+                Optional.ofNullable(knownByKey.get(key)).ifPresentOrElse(
+                        knownEntry -> fieldUpdates.add(() -> copyContent(parsedEntry, knownEntry, Optional.ofNullable(baseline.get(key)))),
+                        () -> {
+                            catalog.register(parsedEntry, file, key);
+                            toInsert.add(parsedEntry);
+                        }));
         knownByKey.forEach((key, knownEntry) -> {
             if (!parsedByKey.containsKey(key)) {
                 toRemove.add(knownEntry);
@@ -510,41 +610,60 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             BibEntry target = knownByKey.getOrDefault(key, parsedEntry);
             catalog.register(target, file, key);
         });
+        baselines.put(file, copiesByKey(parsedEntries));
     }
 
-    /// Applies `source`'s type and fields onto `target` without replacing the instance, so
-    /// selection, undo history, and group membership survive external edits.
-    private void copyContent(BibEntry source, BibEntry target) {
-        if (!target.getType().equals(source.getType())) {
+    /// Applies what changed on disk (`source` versus `base`) onto `target` without replacing
+    /// the instance, so selection, undo history, group membership — and in-memory edits of
+    /// other fields — survive external edits. Without a base, the file wins entirely.
+    private void copyContent(BibEntry source, BibEntry target, Optional<BibEntry> base) {
+        boolean typeChangedOnDisk = base.map(BibEntry::getType).map(type -> !type.equals(source.getType())).orElse(true);
+        if (typeChangedOnDisk && !target.getType().equals(source.getType())) {
             target.setType(source.getType(), EntriesEventSource.SHARED);
         }
         // The PDF link is maintained by this synchronizer, not by the file content
-        Optional<String> preservedFiles = target.getField(StandardField.FILE);
-        source.getFields().forEach(field ->
-                source.getField(field).ifPresent(value -> target.setField(field, value, EntriesEventSource.SHARED)));
-        target.getFields().stream()
-              .filter(field -> StandardField.FILE != field)
-              .filter(field -> source.getField(field).isEmpty())
-              .toList()
-              .forEach(field -> target.clearField(field, EntriesEventSource.SHARED));
-        preservedFiles.ifPresent(files -> target.setField(StandardField.FILE, files, EntriesEventSource.SHARED));
+        Set<Field> candidates = new LinkedHashSet<>(source.getFields());
+        base.ifPresentOrElse(baseEntry -> candidates.addAll(baseEntry.getFields()), () -> candidates.addAll(target.getFields()));
+        candidates.remove(StandardField.FILE);
+        for (Field field : candidates) {
+            Optional<String> onDisk = source.getField(field);
+            boolean unchangedOnDisk = base.map(baseEntry -> baseEntry.getField(field).equals(onDisk)).orElse(false);
+            if (unchangedOnDisk) {
+                continue;
+            }
+            onDisk.ifPresentOrElse(value -> target.setField(field, value, EntriesEventSource.SHARED),
+                    () -> target.clearField(field, EntriesEventSource.SHARED));
+        }
+    }
+
+    private static SequencedMap<String, BibEntry> copiesByKey(List<BibEntry> entries) {
+        SequencedMap<String, BibEntry> copies = new LinkedHashMap<>();
+        entries.forEach(entry -> copies.putIfAbsent(entry.getCitationKey().orElse(""), new BibEntry(entry)));
+        return copies;
     }
 
     private void handlePdfCreated(Path pdf) {
-        Optional<BibEntry> sidecarEntry = findSidecarEntry(pdf);
-        if (sidecarEntry.isPresent()) {
-            BibEntry entry = sidecarEntry.get();
+        findSidecarEntry(pdf).ifPresentOrElse(entry -> {
             if (entry.getFiles().isEmpty()) {
                 List<LinkedFile> files = List.of(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName()));
                 modelUpdateMarshaller.accept(() ->
                         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(files), EntriesEventSource.SHARED));
             }
-            return;
-        }
-        BibEntry entry = pdfEntryFactory.createEntry(pdf, root, databaseContext);
+        }, () -> {
+            BibEntry stub = pdfEntryFactory.createStub(pdf, root);
+            modelUpdateMarshaller.accept(() ->
+                    databaseContext.getDatabase().insertEntries(List.of(stub), EntriesEventSource.SHARED));
+            // Metadata extraction may hit the network, so it runs without this synchronizer's
+            // monitor: flush and shutdown on the UI thread must never wait for it
+            syncExecutor.execute(() -> enrichStub(stub, pdf));
+        });
+    }
+
+    private void enrichStub(BibEntry stub, Path pdf) {
+        Optional<BibEntry> extracted = pdfEntryFactory.extractMetadata(pdf, databaseContext);
         modelUpdateMarshaller.accept(() -> {
-            databaseContext.getDatabase().insertEntries(List.of(entry), EntriesEventSource.SHARED);
-            pdfEntryFactory.generateCitationKeyIfMissing(entry, databaseContext);
+            extracted.ifPresent(metadata -> pdfEntryFactory.applyExtractedMetadata(metadata, stub));
+            pdfEntryFactory.generateCitationKeyIfMissing(stub, databaseContext);
         });
     }
 
@@ -571,17 +690,24 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private void removeEntries(List<BibEntry> entries, Path file) {
         catalog.removeFile(file);
+        baselines.remove(file);
         modelUpdateMarshaller.accept(() ->
                 databaseContext.getDatabase().removeEntries(entries, EntriesEventSource.SHARED));
     }
 
+    /// Only entries still in the database: removed entries stay cataloged until their file is
+    /// rewritten (see [#handleLocalRemoval]).
     private List<BibEntry> entriesOf(Path file) {
         List<String> ids = catalog.entryIdsIn(file);
         if (ids.isEmpty()) {
             return List.of();
         }
         Map<String, BibEntry> byId = new HashMap<>();
-        databaseContext.getDatabase().getEntries().forEach(entry -> byId.put(entry.getId(), entry));
+        List<BibEntry> allEntries = databaseContext.getDatabase().getEntries();
+        // The UI thread mutates the (synchronized) list concurrently; field reads need no lock
+        synchronized (allEntries) {
+            allEntries.forEach(entry -> byId.put(entry.getId(), entry));
+        }
         return ids.stream().flatMap(id -> Optional.ofNullable(byId.get(id)).stream()).toList();
     }
 
@@ -592,15 +718,19 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     private static boolean entriesMatch(List<BibEntry> staged, List<BibEntry> parsed) {
-        if (staged.size() != parsed.size()) {
-            return false;
-        }
-        for (int i = 0; i < staged.size(); i++) {
-            if (!staged.get(i).equals(parsed.get(i))) {
-                return false;
-            }
-        }
-        return true;
+        return staged.size() == parsed.size()
+                && IntStream.range(0, staged.size()).allMatch(i -> sameContent(staged.get(i), parsed.get(i)));
+    }
+
+    /// Live entries carry the PDF link this synchronizer maintains; freshly parsed ones do not.
+    private static boolean sameContent(BibEntry live, BibEntry parsed) {
+        return live.getType().equals(parsed.getType()) && fieldsWithoutFile(live).equals(fieldsWithoutFile(parsed));
+    }
+
+    private static Map<Field, String> fieldsWithoutFile(BibEntry entry) {
+        return entry.getFieldMap().entrySet().stream()
+                    .filter(field -> StandardField.FILE != field.getKey())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Optional<List<BibEntry>> parse(Path file) {
@@ -611,6 +741,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             if (parserResult.isInvalid()) {
                 return Optional.empty();
             }
+            currentHash(file).ifPresent(fingerprint -> lastSeenFingerprints.put(file.toAbsolutePath().normalize(), fingerprint));
             return Optional.of(parserResult.getDatabase().getEntries());
         } catch (IOException e) {
             LOGGER.warn("Could not read {}", file, e);
@@ -633,45 +764,33 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     private Optional<BibEntry> findSidecarEntry(Path pdf) {
-        Path parent = pdf.getParent();
-        if (parent == null) {
-            return Optional.empty();
-        }
         String baseName = FileUtil.getBaseName(pdf);
-        for (String extension : SIDECAR_EXTENSIONS) {
-            List<BibEntry> entries = entriesOf(parent.resolve(baseName + "." + extension));
-            if (!entries.isEmpty()) {
-                return Optional.of(entries.getFirst());
-            }
-        }
-        return Optional.empty();
+        return SIDECAR_EXTENSIONS.stream()
+                                 .map(extension -> entriesOf(pdf.resolveSibling(baseName + "." + extension)))
+                                 .filter(entries -> !entries.isEmpty())
+                                 .map(List::getFirst)
+                                 .findFirst();
     }
 
     private Optional<Path> findPairedPdf(Path yamlFile) {
-        Path parent = yamlFile.getParent();
-        if (parent == null) {
-            return Optional.empty();
-        }
-        Path pdf = parent.resolve(FileUtil.getBaseName(yamlFile) + ".pdf");
-        return Files.exists(pdf) ? Optional.of(pdf) : Optional.empty();
+        return Optional.of(yamlFile.resolveSibling(FileUtil.getBaseName(yamlFile) + ".pdf")).filter(Files::exists);
     }
 
     private boolean consumeSelfEcho(Path file) {
         Path normalized = file.toAbsolutePath().normalize();
-        String recorded = lastWrittenFingerprints.get(normalized);
-        if (recorded == null) {
+        if (!lastWrittenFingerprints.containsKey(normalized)) {
             return false;
         }
+        return currentHash(file).map(current -> lastWrittenFingerprints.remove(normalized, current)).orElse(false);
+    }
+
+    private static Optional<String> currentHash(Path file) {
         try {
-            String current = hash(Files.readAllBytes(file));
-            if (recorded.equals(current)) {
-                lastWrittenFingerprints.remove(normalized);
-                return true;
-            }
+            return Optional.of(hash(Files.readAllBytes(file)));
         } catch (IOException e) {
             LOGGER.debug("Could not fingerprint {}", file, e);
+            return Optional.empty();
         }
-        return false;
     }
 
     private static String hash(byte[] content) {

@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -62,21 +63,12 @@ public class HayagrivaEntryWriter {
     /// class doc). The result contains exactly the given entries in the given order — top-level
     /// keys without a corresponding entry are dropped, because their entries no longer belong
     /// to this file — while inside each kept entry everything JabRef does not own survives.
-    public String mergeIntoDocument(@Nullable String existingDocument, List<KeyedEntry> entries) {
-        ObjectNode existingRoot;
-        if (existingDocument == null || existingDocument.isBlank()) {
-            existingRoot = MAPPER.createObjectNode();
-        } else {
-            JsonNode parsed;
-            try {
-                parsed = MAPPER.readTree(existingDocument);
-            } catch (JacksonException e) {
-                // Write-back only touches files it imported, so this is unexpected; rebuilding
-                // from scratch keeps the user's current entries authoritative
-                parsed = null;
-            }
-            existingRoot = parsed instanceof ObjectNode objectNode ? objectNode : MAPPER.createObjectNode();
-        }
+    ///
+    /// @param existingDocument the document's current text, empty for a new file
+    /// @throws IOException if the existing document is not a YAML map (it is then not
+    ///                     overwritten: the user may be mid-edit)
+    public String mergeIntoDocument(String existingDocument, List<KeyedEntry> entries) throws IOException {
+        ObjectNode existingRoot = existingDocument.isBlank() ? MAPPER.createObjectNode() : parseRoot(existingDocument);
         ObjectNode result = MAPPER.createObjectNode();
         for (KeyedEntry keyedEntry : entries) {
             ObjectNode entryNode = existingRoot.get(keyedEntry.previousKey()) instanceof ObjectNode existing
@@ -85,6 +77,17 @@ public class HayagrivaEntryWriter {
             result.set(keyedEntry.targetKey(), mergeIntoNode(keyedEntry.entry(), entryNode));
         }
         return MAPPER.writeValueAsString(result);
+    }
+
+    private static ObjectNode parseRoot(String document) throws IOException {
+        try {
+            if (MAPPER.readTree(document) instanceof ObjectNode root) {
+                return root;
+            }
+        } catch (JacksonException e) {
+            throw new IOException("Existing Hayagriva document is not valid YAML", e);
+        }
+        throw new IOException("Existing Hayagriva document is not a map of entries");
     }
 
     public String serialize(SequencedMap<String, BibEntry> keyedEntries) {

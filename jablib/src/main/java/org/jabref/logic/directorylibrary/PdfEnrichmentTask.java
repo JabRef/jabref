@@ -16,8 +16,8 @@ import org.jspecify.annotations.NullMarked;
 /// fills progressively and opening the folder never blocks on PDF parsing or identifier
 /// lookups. Cancelling keeps the stubs created by the scan.
 ///
-/// Extraction runs on the background thread; entry mutations (and progress updates, which drive
-/// JavaFX properties) go through the injected marshaller.
+/// Extraction runs on the background thread; entry mutations go through the injected
+/// marshaller (the JavaFX thread in the GUI).
 // [impl->req~directory-library.scan~5]
 @NullMarked
 public class PdfEnrichmentTask extends BackgroundTask<Void> {
@@ -47,11 +47,8 @@ public class PdfEnrichmentTask extends BackgroundTask<Void> {
                 break;
             }
             counter++;
-            final int progress = counter;
-            modelUpdateMarshaller.accept(() -> {
-                updateMessage(pending.pdfFile().getFileName().toString());
-                updateProgress(progress, pendingImports.size());
-            });
+            updateMessage(pending.pdfFile().getFileName().toString());
+            updateProgress(counter, pendingImports.size());
 
             Optional<BibEntry> extracted = pdfEntryFactory.extractMetadata(pending.pdfFile(), databaseContext);
             modelUpdateMarshaller.accept(() -> {
