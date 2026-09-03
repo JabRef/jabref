@@ -1,5 +1,13 @@
 import org.jabref.gui.icon.JabRefIconProvider;
 
+/// JavaFX desktop application. Contains the views, view models, dialogs and actions;
+/// no business logic beyond glue code (that belongs in `org.jabref.jablib`).
+///
+/// Entry points: [org.jabref.Launcher] (`main`), [org.jabref.gui.JabRefGUI],
+/// [org.jabref.gui.frame.JabRefFrame], [org.jabref.gui.LibraryTab].
+///
+/// See <https://devdocs.jabref.org/architecture-and-components.html> and
+/// <https://devdocs.jabref.org/code-howtos/javafx.html>.
 open module org.jabref {
     requires org.jabref.jablib;
     requires org.jabref.jabls;

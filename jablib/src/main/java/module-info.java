@@ -1,3 +1,12 @@
+/// Core library of JabRef: the data model (`org.jabref.model`), the business logic
+/// (`org.jabref.logic`) including importers, exporters, fetchers and search, and the
+/// preferences. Has no JavaFX UI; all other modules build on it.
+///
+/// Entry points: [org.jabref.model.database.BibDatabaseContext] (an open library),
+/// [org.jabref.model.entry.BibEntry], [org.jabref.logic.importer.ImportFormatReader],
+/// [org.jabref.logic.exporter.ExporterFactory].
+///
+/// See <https://devdocs.jabref.org/architecture-and-components.html>.
 open module org.jabref.jablib {
     exports org.jabref.model;
     exports org.jabref.model.undo;

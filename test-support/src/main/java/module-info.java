@@ -1,3 +1,10 @@
+/// Test utilities shared by the test source sets of all modules: architecture tests
+/// (ArchUnit), CI-conditional JUnit extensions and test data builders.
+///
+/// Entry points: [org.jabref.support.CommonArchitectureTest],
+/// [org.jabref.support.BibEntryAssert], [org.jabref.support.DisabledOnCIServer].
+///
+/// See <https://devdocs.jabref.org/code-howtos/testing.html>.
 open module org.jabref.testsupport {
     requires transitive com.tngtech.archunit.junit5.api;
     requires transitive com.tngtech.archunit;
