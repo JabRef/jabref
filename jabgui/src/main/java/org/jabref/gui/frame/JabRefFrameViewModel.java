@@ -43,6 +43,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -99,7 +101,7 @@ public class JabRefFrameViewModel {
         this.taskExecutor = taskExecutor;
     }
 
-    void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
+    void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase, List<String> sharedDatabaseIds) {
         if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
@@ -109,7 +111,22 @@ public class JabRefFrameViewModel {
                 preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
                 preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
+            preferences.getLastFilesOpenedPreferences().setLastSharedDatabasesOpened(sharedDatabaseIds);
         }
+    }
+
+    /// Shared databases that are backed by a local file are reopened through that file (it carries the shared database id).
+    /// The others only live in the connection, so their connection properties are persisted under a generated id here.
+    private static List<String> persistSharedDatabases(List<LibraryTab> tabs) {
+        return tabs.stream()
+                   .map(LibraryTab::getBibDatabaseContext)
+                   .filter(context -> context.getLocation() == DatabaseLocation.SHARED && context.getDatabasePath().isEmpty())
+                   .map(context -> {
+                       String id = context.getDatabase().getSharedDatabaseID().orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
+                       new SharedDatabasePreferences(id).putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+                       return id;
+                   })
+                   .toList();
     }
 
     /// Quit JabRef
@@ -140,13 +157,14 @@ public class JabRefFrameViewModel {
                                         .flatMap(BibDatabaseContext::getDatabasePath)
                                         .map(Path::toAbsolutePath)
                                         .orElse(null);
+        List<String> sharedDatabaseIds = persistSharedDatabases(tabContainer.getLibraryTabs());
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!tabContainer.closeTabs(tabContainer.getLibraryTabs(), false)) {
             return false;
         }
 
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+        storeLastOpenedFiles(openedLibraries, focusedLibraries, sharedDatabaseIds); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
         processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());

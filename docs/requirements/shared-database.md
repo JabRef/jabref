@@ -52,4 +52,11 @@ The login dialog accepts a connection URL as handed out by hosting providers (`p
 
 Needs: impl
 
+## Connected databases are reopened on startup
+`req~shared-database.reopen-on-startup~1`
+
+A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
