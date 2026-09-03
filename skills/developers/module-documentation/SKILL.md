@@ -7,6 +7,13 @@ license: MIT
 
 # Package and module documentation
 
+> [!IMPORTANT]
+> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
+>
+> Read and follow:
+> • [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md)
+> • [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)
+
 `module-info.java` and `package-info.java` are the orientation layer of the JabRef code base.
 They are read by humans and by AI agents that have no code-graph tooling and need to find the right place by reading, so write them for routing: what lives here, where to start, and where to go instead.
 
@@ -34,4 +41,4 @@ They are read by humans and by AI agents that have no code-graph tooling and nee
 
 ## Verification
 
-`./gradlew :<module>:javadoc` must pass; it reports unresolved `[ClassName]` references.
+`./gradlew :<module>:javadoc` must pass. Unresolved `[ClassName]` references do not fail the build (reference checking is off because tests are cross-linked), so grep the output for `reference not found` and fix every hit in the touched files.
