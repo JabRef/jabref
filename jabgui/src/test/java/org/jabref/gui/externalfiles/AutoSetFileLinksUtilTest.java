@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -72,17 +73,18 @@ class AutoSetFileLinksUtilTest {
 
     /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
     @Test
-    void markdownCompanionOfAssociatedFileIsIgnored() throws IOException {
+    void plainMarkdownNextToPdfIsLinkedToo() throws IOException {
         Files.createFile(path.getParent().resolve("CiteKey.md"));
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
-        assertEquals(List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF")), actual);
+        assertEquals(List.of(new LinkedFile("", Path.of("CiteKey.md"), "Markdown"), new LinkedFile("", Path.of("CiteKey.pdf"), "PDF")),
+                actual.stream().sorted(Comparator.comparing(LinkedFile::getLink)).toList());
     }
 
     /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
     @Test
-    void markdownFileWithoutCompanionIsLinked(@TempDir Path tempDir) throws IOException {
+    void plainMarkdownFileIsLinked(@TempDir Path tempDir) throws IOException {
         Files.createFile(tempDir.resolve("CiteKey.md"));
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
@@ -92,7 +94,7 @@ class AutoSetFileLinksUtilTest {
 
     /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
     @Test
-    void markdownSidecarWithoutPartnerIsIgnored(@TempDir Path tempDir) throws IOException {
+    void markdownSidecarIsNotLinked(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("CiteKey.md"), """
                 ---
                 CiteKey:
