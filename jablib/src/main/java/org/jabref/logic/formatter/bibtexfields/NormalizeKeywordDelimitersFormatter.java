@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.KeywordSeparatorAware;
 import org.jabref.logic.formatter.Formatter;
@@ -64,7 +65,11 @@ public class NormalizeKeywordDelimitersFormatter extends Formatter implements Ke
         Character separator = Optional.ofNullable(keywordSeparator)
                                       .or(() -> Optional.ofNullable(preferences.getKeywordSeparator()))
                                       .orElse(BibEntryPreferences.getDefault().getKeywordSeparator());
-        List<Character> delimiters = KeywordImportNormalizer.parseConfiguredDelimiters(preferences.getImportKeywordDelimiters());
+        List<Character> delimiters = Stream.concat(
+                KeywordImportNormalizer.parseConfiguredDelimiters(preferences.getImportKeywordDelimiters()).stream(),
+                Stream.of(separator))
+                                           .distinct()
+                                           .toList();
         BibEntryPreferences.ImportDelimiterParsingStrategy strategy = Optional.ofNullable(preferences.getImportDelimiterParsingStrategy())
                                                                               .orElse(BibEntryPreferences.ImportDelimiterParsingStrategy.SPLIT_ON_ALL_DELIMITERS);
 

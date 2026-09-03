@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.model.entry.BibEntryPreferences;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -40,5 +41,11 @@ class NormalizeKeywordDelimitersFormatterTest {
     void withKeywordSeparatorBindsLibrarySeparator(String expected, String input) {
         NormalizeKeywordDelimitersFormatter formatter = new NormalizeKeywordDelimitersFormatter(new BibEntryPreferences(',', ";,"), null);
         assertEquals(expected, formatter.withKeywordSeparator(';').format(input));
+    }
+
+    @Test
+    void formatKeepsFieldsUsingLibrarySeparatorExcludedFromImportDelimiters() {
+        NormalizeKeywordDelimitersFormatter formatter = new NormalizeKeywordDelimitersFormatter(new BibEntryPreferences(',', ","), ';');
+        assertEquals("keywordOne; keywordTwo", formatter.format("keywordOne; keywordTwo"));
     }
 }
