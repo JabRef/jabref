@@ -100,7 +100,8 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setTitle(Localization.lang("Download full text documents"))
                          .withInitialMessage(Localization.lang("Looking for full text document..."))
                          .showToUser(true)
-                         .onSuccess(downloads -> downloadFullTexts(downloads, stateManager.getActiveDatabase().get()))
+                         .onSuccess(downloads -> stateManager.getActiveDatabase()
+                                                            .ifPresent(databaseContext -> downloadFullTexts(downloads, databaseContext)))
                          .executeWith(taskExecutor);
     }
 
