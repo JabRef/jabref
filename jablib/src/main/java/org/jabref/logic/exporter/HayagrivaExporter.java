@@ -12,7 +12,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import tools.jackson.core.JacksonException;
 
@@ -31,7 +30,7 @@ public class HayagrivaExporter extends Exporter {
     }
 
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
         if (entries.isEmpty()) {
             return;
         }

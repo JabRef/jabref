@@ -5,11 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -19,7 +22,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /// [utest->req~directory-library.convert~1]
@@ -44,7 +46,7 @@ class DirectoryLibraryConverterTest {
         context.setDatabasePath(elsewhere.resolve("library.bib"));
         context.getMetaData().setLibrarySpecificFileDirectory(root.toString());
 
-        assertEquals(Optional.of(root), DirectoryLibraryConverter.determineRoot(context));
+        assertEquals(Optional.of(root), DirectoryLibraryConverter.determineRoot(context, filePreferences));
     }
 
     @Test
@@ -52,7 +54,7 @@ class DirectoryLibraryConverterTest {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(root.resolve("library.bib"));
 
-        assertEquals(Optional.of(root), DirectoryLibraryConverter.determineRoot(context));
+        assertEquals(Optional.of(root), DirectoryLibraryConverter.determineRoot(context, filePreferences));
     }
 
     @Test
@@ -76,19 +78,22 @@ class DirectoryLibraryConverterTest {
                 .withCitationKey("outside2020")
                 .withFiles(List.of(new LinkedFile("", elsewhere.resolve("outside.pdf").toString(), "PDF")));
 
-        List<String> obstacles = converter.obstacles(contextWith(missing, outside), root, filePreferences);
-
-        assertEquals(2, obstacles.size());
-        assertTrue(obstacles.getFirst().contains("gone.pdf"));
-        assertTrue(obstacles.getLast().contains("outside.pdf"));
+        assertEquals(List.of(
+                        Localization.lang("Linked file '%0' of entry '%1' was not found.", "gone.pdf", "missing2020"),
+                        Localization.lang("Linked file '%0' of entry '%1' is outside of '%2'.", elsewhere.resolve("outside.pdf").toString(), "outside2020", root.toString())),
+                converter.obstacles(contextWith(missing, outside), root, filePreferences));
     }
 
     @Test
     void preambleAndStringsAreObstacles() {
         BibDatabaseContext context = contextWith();
         context.getDatabase().setPreamble("preamble");
+        context.getDatabase().addString(new BibtexString("acm", "Association for Computing Machinery"));
 
-        assertEquals(1, converter.obstacles(context, root, filePreferences).size());
+        assertEquals(List.of(
+                        Localization.lang("The library contains a preamble, which a folder library cannot represent."),
+                        Localization.lang("The library contains BibTeX strings, which a folder library cannot represent.")),
+                converter.obstacles(context, root, filePreferences));
     }
 
     @Test
@@ -105,10 +110,35 @@ class DirectoryLibraryConverterTest {
 
         converter.writeSidecars(contextWith(paired, unpaired), root, filePreferences);
 
-        Path pairedSidecar = root.resolve("sub/paper.md");
-        assertTrue(Files.readString(pairedSidecar).contains("A Paired Article"));
+        assertEquals("""
+                ---
+                smith2020:
+                  type: article
+                  title: A Paired Article
+                ---
+                """, Files.readString(root.resolve("sub/paper.md")));
         List<BibEntry> readBack = new MarkdownSidecar().read(root.resolve("doe2021.md")).getDatabase().getEntries();
         assertEquals(Optional.of("An Unpaired Article"), readBack.getFirst().getField(StandardField.TITLE));
+    }
+
+    @Test
+    void convertMovesBibIntoRootAsMirrorWithBase() throws IOException {
+        Files.createFile(root.resolve("paper.pdf"));
+        Path bibFile = root.resolve("library.bib");
+        Files.writeString(bibFile, "@Article{smith2020, title = {A Paired Article}, file = {:paper.pdf:PDF}}\n");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("smith2020")
+                .withField(StandardField.TITLE, "A Paired Article")
+                .withFiles(List.of(new LinkedFile("", "paper.pdf", "PDF")));
+
+        Path mirror = converter.convert(contextWith(entry), root, filePreferences);
+
+        assertEquals(root.resolve(root.getFileName() + ".bib"), mirror);
+        try (Stream<Path> files = Files.list(root)) {
+            assertEquals(Stream.of(".jabref", "paper.md", "paper.pdf", root.getFileName() + ".bib").sorted().toList(),
+                    files.map(file -> file.getFileName().toString()).sorted().toList());
+        }
+        assertEquals(Files.readString(mirror), Files.readString(root.resolve(".jabref").resolve("mirror-base.bib")));
     }
 
     @Test
@@ -123,7 +153,9 @@ class DirectoryLibraryConverterTest {
 
         converter.writeSidecars(contextWith(first, second), root, filePreferences);
 
-        assertTrue(Files.exists(root.resolve("shared.md")));
-        assertTrue(Files.exists(root.resolve("shared-1.md")));
+        try (Stream<Path> files = Files.list(root)) {
+            assertEquals(List.of("shared-1.md", "shared.md", "shared.pdf"),
+                    files.map(file -> file.getFileName().toString()).sorted().toList());
+        }
     }
 }

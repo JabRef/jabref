@@ -38,7 +38,7 @@ public class ActionHelper {
     /// Like [#needsSavedLocalDatabase], but also accepts a directory library: both have a
     /// location on disk to reveal in the file explorer or open a terminal in.
     public static BooleanExpression needsDatabaseOnDisk(StateManager stateManager) {
-        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getDatabasePath().or(c::getDirectoryLibraryRoot).isPresent()).isPresent());
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getPathOnDisk().isPresent()).isPresent());
         return BooleanExpression.booleanExpression(binding);
     }
 

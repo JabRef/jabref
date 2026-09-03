@@ -9,8 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -39,8 +42,8 @@ import org.slf4j.LoggerFactory;
 /// (first) entry, and PDFs without a sidecar become entries with metadata extracted from the
 /// PDF itself (see [PdfEntryFactory]). The directory itself is the library — the resulting
 /// [BibDatabaseContext] has [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and no
-/// database path; linked files are stored relative to the root, which is registered as the
-/// library-specific file directory.
+/// database path; linked files are stored relative to the root, against which the context
+/// resolves them.
 // [impl->req~directory-library.scan~5]
 @NullMarked
 public class DirectoryLibraryScanner {
@@ -73,8 +76,6 @@ public class DirectoryLibraryScanner {
     public ScanResult scan(Path root) throws IOException {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.convertToDirectoryLibrary(root);
-        // Makes the relative PDF links resolvable although the context has no database path
-        databaseContext.getMetaData().setLibrarySpecificFileDirectory(root.toAbsolutePath().toString());
 
         DirectoryLibraryCatalog catalog = new DirectoryLibraryCatalog();
         List<String> warnings = new ArrayList<>();
@@ -82,6 +83,10 @@ public class DirectoryLibraryScanner {
         List<Path> sidecarFiles = new ArrayList<>();
         List<Path> pdfFiles = new ArrayList<>();
         collectFiles(root, sidecarFiles, pdfFiles);
+        // The sidecar convention: `X.yml` (or `X.md`) next to `X.pdf` (same directory, same
+        // base name); only PDFs that passed the skip rules above can be paired
+        Map<Path, Path> pdfByStem = new HashMap<>();
+        pdfFiles.forEach(pdf -> pdfByStem.put(pdf.resolveSibling(FileUtil.getBaseName(pdf)), pdf));
 
         List<BibEntry> entries = new ArrayList<>();
         Set<Path> pairedPdfs = new HashSet<>();
@@ -101,8 +106,8 @@ public class DirectoryLibraryScanner {
                 warnings.add(Localization.lang("Could not parse the Hayagriva file '%0'.", sidecarFile.toString()));
                 continue;
             }
-            fileEntries.forEach(entry -> catalog.register(entry, sidecarFile, entry.getCitationKey().orElse("")));
-            findPairedPdf(sidecarFile).ifPresent(pdf -> {
+            fileEntries.forEach(entry -> catalog.register(entry, sidecarFile, entry.getCitationKey().orElseThrow()));
+            Optional.ofNullable(pdfByStem.get(sidecarFile.resolveSibling(FileUtil.getBaseName(sidecarFile)))).ifPresent(pdf -> {
                 pairedPdfs.add(pdf);
                 linkPdf(fileEntries.getFirst(), root, pdf);
             });
@@ -133,8 +138,9 @@ public class DirectoryLibraryScanner {
     private void installDirectoryGroups(BibDatabaseContext databaseContext, DirectoryLibraryCatalog catalog, Path root) {
         Function<BibEntry, Optional<Path>> sourceFileLookup = sourceFileLookup(catalog, root);
         GroupTreeNode groupsRoot = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
-        groupsRoot.addSubgroup(new DirectoryStructureGroup(
-                root.getFileName().toString(), GroupHierarchyType.INDEPENDENT, sourceFileLookup));
+        // A filesystem root (`/`, `C:\\`) has no file name
+        String rootName = Optional.ofNullable(root.getFileName()).map(Path::toString).orElseGet(root::toString);
+        groupsRoot.addSubgroup(new DirectoryStructureGroup(rootName, GroupHierarchyType.INDEPENDENT, sourceFileLookup));
         databaseContext.getMetaData().setGroups(groupsRoot);
     }
 
@@ -167,7 +173,7 @@ public class DirectoryLibraryScanner {
                 if (isHidden(file) || !gitIgnoreFilter.accept(file)) {
                     return FileVisitResult.CONTINUE;
                 }
-                String extension = FileUtil.getFileExtension(file).orElse("");
+                String extension = FileUtil.getFileExtension(file).map(ext -> ext.toLowerCase(Locale.ROOT)).orElse("");
                 if (YAML_EXTENSIONS.contains(extension) || MarkdownSidecar.MARKDOWN_EXTENSION.equals(extension)) {
                     sidecarFiles.add(file);
                 } else if (PDF_EXTENSION.equals(extension)) {
@@ -187,8 +193,10 @@ public class DirectoryLibraryScanner {
     }
 
     private static boolean isHidden(Path path) {
-        Path fileName = path.getFileName();
-        return fileName != null && fileName.toString().startsWith(".");
+        return Optional.ofNullable(path.getFileName())
+                       .map(Path::toString)
+                       .filter(name -> name.startsWith("."))
+                       .isPresent();
     }
 
     /// Uses the lookahead-based recognition (a `type:` line naming a Hayagriva entry type)
@@ -199,22 +207,6 @@ public class DirectoryLibraryScanner {
         try (BufferedReader reader = Files.newBufferedReader(yamlFile, StandardCharsets.UTF_8)) {
             return importer.isRecognizedFormat(reader);
         }
-    }
-
-    /// The sidecar convention: `X.yml` (or `X.md`) next to `X.pdf` (same directory, same base name).
-    private Optional<Path> findPairedPdf(Path yamlFile) {
-        Path parent = yamlFile.getParent();
-        if (parent == null) {
-            return Optional.empty();
-        }
-        String baseName = FileUtil.getBaseName(yamlFile);
-        for (String candidate : List.of(baseName + ".pdf", baseName + ".PDF")) {
-            Path pdf = parent.resolve(candidate);
-            if (Files.exists(pdf)) {
-                return Optional.of(pdf);
-            }
-        }
-        return Optional.empty();
     }
 
     private void linkPdf(BibEntry entry, Path root, Path pdf) {

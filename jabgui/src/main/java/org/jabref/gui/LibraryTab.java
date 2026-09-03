@@ -50,6 +50,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -83,6 +84,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
@@ -481,6 +483,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
+        // Background enrichment of a directory library is system-initiated (SHARED-sourced),
+        // not something the user would be asked to save
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY
+                && event instanceof EntriesEvent entriesEvent
+                && entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED) {
+            return;
+        }
         this.changedProperty.setValue(true);
     }
 
@@ -631,12 +640,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public boolean requestClose() {
-        // DIRECTORY needs no prompt: edits are persisted into the sidecar files; pending
-        // debounced writes are flushed by the synchronizer teardown on close
         if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {
             if (isModified()) {
                 return confirmClose();
             }
+        }
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
+            // Edits are persisted into the sidecar files; only a failed write needs the user
+            List<Path> unwritable = Optional.ofNullable(bibDatabaseContext.getDirectorySynchronizer())
+                                            .map(DirectoryLibrarySynchronizer::flush)
+                                            .orElse(List.of());
+            return unwritable.isEmpty() || dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Close library"),
+                    Localization.lang("Could not write the changes to the following files: %0", SaveDatabaseAction.joinPaths(unwritable)),
+                    Localization.lang("Close anyway"));
         }
         return true;
     }
@@ -654,8 +671,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         String filename = getBibDatabaseContext()
-                .getDatabasePath()
-                .or(() -> getBibDatabaseContext().getDirectoryLibraryRoot())
+                .getPathOnDisk()
                 .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));

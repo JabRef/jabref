@@ -4,12 +4,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.exporter.GroupSerializer;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GroupsParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DirectoryStructureGroupTest {
@@ -36,7 +39,7 @@ class DirectoryStructureGroupTest {
 
     @Test
     void rootLevelEntryCreatesNoSubgroup() {
-        assertEquals(0, group.createSubgroups(rootEntry).size());
+        assertEquals(Set.of(), group.createSubgroups(rootEntry));
     }
 
     @Test
@@ -70,15 +73,15 @@ class DirectoryStructureGroupTest {
     }
 
     @Test
-    void serializedGroupParsesBackAsEmptyDirectoryStructureGroup() throws Exception {
+    void serializedGroupParsesBackAsEmptyDirectoryStructureGroup() throws ParseException {
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup("All entries"));
         root.addSubgroup(group);
 
         List<String> serialized = new GroupSerializer().serializeTree(root);
         GroupTreeNode parsed = GroupsParser.importGroups(serialized, ',', new DummyFileUpdateMonitor(), new MetaData(), "user-host");
 
-        AbstractGroup parsedGroup = parsed.getChildren().getFirst().getGroup();
+        DirectoryStructureGroup parsedGroup = assertInstanceOf(DirectoryStructureGroup.class, parsed.getChildren().getFirst().getGroup());
         assertEquals(group, parsedGroup);
-        assertEquals(0, ((DirectoryStructureGroup) parsedGroup).createSubgroups(nestedEntry).size());
+        assertEquals(Set.of(), parsedGroup.createSubgroups(nestedEntry));
     }
 }

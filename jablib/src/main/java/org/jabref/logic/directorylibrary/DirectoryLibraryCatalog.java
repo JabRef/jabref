@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -36,25 +37,21 @@ public class DirectoryLibraryCatalog {
         return Optional.ofNullable(sourceByEntryId.get(entry.getId()));
     }
 
-    public void removeEntry(BibEntry entry) {
-        EntrySource source = sourceByEntryId.remove(entry.getId());
-        if (source != null) {
-            List<String> ids = entryIdsByFile.get(source.yamlFile());
-            if (ids != null) {
-                ids.remove(entry.getId());
-                if (ids.isEmpty()) {
-                    entryIdsByFile.remove(source.yamlFile());
-                }
-            }
-        }
+    public void removeEntry(String entryId) {
+        Optional.ofNullable(sourceByEntryId.remove(entryId)).ifPresent(source ->
+                entryIdsByFile.computeIfPresent(source.yamlFile(), (_, ids) -> {
+                    ids.remove(entryId);
+                    return ids.isEmpty() ? null : ids;
+                }));
     }
 
     /// Records the Hayagriva key the entry was last written under (after a citation-key edit).
     public void updateHayagrivaKey(BibEntry entry, String hayagrivaKey) {
-        EntrySource source = sourceByEntryId.get(entry.getId());
-        if (source != null) {
-            sourceByEntryId.put(entry.getId(), new EntrySource(source.yamlFile(), hayagrivaKey));
-        }
+        sourceByEntryId.computeIfPresent(entry.getId(), (_, source) -> new EntrySource(source.yamlFile(), hayagrivaKey));
+    }
+
+    public Set<Path> files() {
+        return Set.copyOf(entryIdsByFile.keySet());
     }
 
     /// Entry ids of all entries read from the given file, in file order.
@@ -64,24 +61,15 @@ public class DirectoryLibraryCatalog {
 
     /// Re-homes all entries of `oldFile` to `newFile` (a rename/move on disk).
     public void relocateFile(Path oldFile, Path newFile) {
-        List<String> entryIds = entryIdsByFile.remove(oldFile);
-        if (entryIds == null) {
-            return;
-        }
-        entryIdsByFile.put(newFile, entryIds);
-        entryIds.forEach(entryId -> {
-            EntrySource source = sourceByEntryId.get(entryId);
-            if (source != null) {
-                sourceByEntryId.put(entryId, new EntrySource(newFile, source.hayagrivaKey()));
-            }
+        Optional.ofNullable(entryIdsByFile.remove(oldFile)).ifPresent(entryIds -> {
+            entryIdsByFile.put(newFile, entryIds);
+            entryIds.forEach(entryId -> sourceByEntryId.computeIfPresent(entryId,
+                    (_, source) -> new EntrySource(newFile, source.hayagrivaKey())));
         });
     }
 
     /// Forgets all entries of the given file (deleted on disk or re-registered afterwards).
     public void removeFile(Path yamlFile) {
-        List<String> entryIds = entryIdsByFile.remove(yamlFile);
-        if (entryIds != null) {
-            entryIds.forEach(sourceByEntryId::remove);
-        }
+        Optional.ofNullable(entryIdsByFile.remove(yamlFile)).ifPresent(entryIds -> entryIds.forEach(sourceByEntryId::remove));
     }
 }

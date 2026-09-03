@@ -19,7 +19,7 @@ online and the metadata behind it fills only the fields the PDF did not provide.
 and `.md` files without a Hayagriva frontmatter
 are skipped; unparseable Hayagriva files are reported as warnings without aborting the scan.
 Scanning must not write or modify any file in the directory.
-See [ADR 66](../decisions/0066-directory-as-library-with-hayagriva-sidecars.md) for more details.
+See [ADR 71](../decisions/0071-directory-as-library-with-hayagriva-sidecars.md) for more details.
 
 Needs: impl
 
@@ -121,7 +121,9 @@ the library carries no BibTeX strings or preamble; otherwise the obstacles are r
 nothing is changed. On conversion, every entry gets a single-entry Markdown sidecar next to its
 first linked file (or named after its citation key in the root), the `.bib` file moves to the
 root as `<root-name>.bib` and becomes the library's mirror (preserving groups via the mirror
-metadata), and the root is reopened as a directory library.
+metadata) together with its merge base, and the root is reopened as a directory library without
+a merge. Sidecars pair with a PDF of the same base name only: further linked files, and a first
+linked file that is no PDF, survive solely through the mirror.
 
 Needs: impl, utest
 
