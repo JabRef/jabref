@@ -92,6 +92,23 @@ class BibDatabaseDiffTest {
     }
 
     @Test
+    void compareOfEntryDeletedFromDatabaseReportsDifference() {
+        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE)
+                .withField(StandardField.TITLE, "test");
+
+        BibDatabaseContext originalDatabase =
+                new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        BibDatabaseContext newDatabase =
+                new BibDatabaseContext(new BibDatabase());
+
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(originalDatabase, newDatabase);
+
+        assertEquals(1, diff.getEntryDifferences().size());
+        assertEquals(entry, diff.getEntryDifferences().getFirst().originalEntry());
+        assertNull(diff.getEntryDifferences().getFirst().newEntry());
+    }
+
+    @Test
     void compareOfThreeDifferentEntriesWithDifferentDataReportsDifferences() {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "another test");
