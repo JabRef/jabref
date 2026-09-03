@@ -16,6 +16,7 @@ import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
@@ -31,6 +32,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -87,10 +89,8 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
-                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.GET_FULLTEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
+                createMoreFileOperationsSubMenu(factory, libraryTab, dialogService, stateManager, preferences, taskExecutor),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
                 factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
@@ -234,6 +234,22 @@ public class RightClickMenu {
         );
 
         return sendMenu;
+    }
+
+    private static Menu createMoreFileOperationsSubMenu(ActionFactory factory,
+                                                        LibraryTab libraryTab,
+                                                        DialogService dialogService,
+                                                        StateManager stateManager,
+                                                        GuiPreferences preferences,
+                                                        TaskExecutor taskExecutor) {
+        Menu moreFileOperationsMenu = factory.createMenu(StandardActions.MORE_FILE_OPERATIONS);
+        moreFileOperationsMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor))
+        );
+        return moreFileOperationsMenu;
     }
 
     private static Menu createSearchSubMenu(ActionFactory factory,
