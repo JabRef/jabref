@@ -78,6 +78,8 @@ class InputOption {
         }
     }
 
+    /// `--input` is a backward-compatible alias here; the positional form and the alias both come from
+    /// ADR 57, which superseded the `--input`-only ADR 45.
     // [impl->adr~allow-positional-input-file-argument~1]
     private static class InputSource {
         // [impl->req~jabkit.cli.input-flag~2]
