@@ -97,6 +97,9 @@ Exit code 0 means a clean merge.
 Exit code 1 means semantic conflicts: the conflicting entries keep the current side's version, and their citation keys are printed to stderr.
 Git then marks the file as conflicted, so the merge can be finished in JabRef or with `git checkout --theirs`.
 
+The merge plan is keyed by citation key and covers entries only.
+Therefore the driver refuses the merge (exit code 1, `CURRENT` untouched) when an input file contains duplicate citation keys, and when content outside of entries with a citation key (entries without one, `@String` definitions, preamble, epilogue, metadata) differs between `OTHER` and both other versions.
+
 ## Related Test Cases
 
 The semantic conflict detection and merge resolution logic is covered by:

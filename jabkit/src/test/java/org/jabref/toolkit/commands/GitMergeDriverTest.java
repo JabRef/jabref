@@ -66,6 +66,44 @@ class GitMergeDriverTest extends AbstractJabKitTest {
     }
 
     @Test
+    void appliesEntryTypeChangeFromOther(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-current.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other-type.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(0, exitCode, commandLine.getErrorOutput());
+        String merged = Files.readString(current);
+        assertTrue(merged.contains("@Book{Smith2020,"));
+        assertTrue(merged.contains("Current Title"));
+    }
+
+    @Test
+    void reportsConflictOnStringChangeInOther(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-current.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other-string.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(getClassResourceAsPath("merge-current.bib")), Files.readString(current));
+    }
+
+    @Test
+    void reportsConflictOnDuplicateCitationKeys(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-duplicate-keys.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(getClassResourceAsPath("merge-duplicate-keys.bib")), Files.readString(current));
+    }
+
+    @Test
     void gitWithoutSubcommandFails() {
         int exitCode = commandLine.executeToLog("git");
 
