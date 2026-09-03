@@ -23,13 +23,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -104,6 +104,11 @@ class DirectoryLibrarySynchronizerTest {
         when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
         return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS),
                 DirectoryLibraryScannerTest.authYearPatternPreferences(), mock(CrossRef.class), mock(DoiFetcher.class));
+    }
+
+    @AfterEach
+    void shutdown() {
+        synchronizer.shutdown();
     }
 
     private List<BibEntry> entries() {
@@ -229,8 +234,44 @@ class DirectoryLibrarySynchronizerTest {
         clock.advance(Duration.ofSeconds(3));
         synchronizer.commitExpiredStagedDeletions();
 
-        assertEquals(1, entries().size());
-        assertSame(entry, entries().getFirst());
+        assertEquals(List.of(entry), entries());
+    }
+
+    @Test
+    void renameOfSidecarWithPairedPdfIsDetectedAsMove() throws IOException {
+        Path oldFile = root.resolve("smith2020.yml");
+        Files.writeString(oldFile, ARTICLE_YAML);
+        Files.createFile(root.resolve("smith2020.pdf"));
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        Path newFile = root.resolve("renamed.yml");
+        Files.move(oldFile, newFile);
+        synchronizer.handleFileDeleted(oldFile);
+        synchronizer.handleFileCreated(newFile);
+        clock.advance(Duration.ofSeconds(3));
+        synchronizer.commitExpiredStagedDeletions();
+
+        assertEquals(List.of(entry), entries());
+        assertEquals("smith2020.pdf", entry.getFiles().getFirst().getLink());
+    }
+
+    @Test
+    void deletionUndoneWithinGraceWindowKeepsEntry() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        Files.delete(sidecar);
+        synchronizer.handleFileDeleted(sidecar);
+        Files.writeString(sidecar, ARTICLE_YAML.replace("first version", "restored version"));
+        synchronizer.handleFileCreated(sidecar);
+        clock.advance(Duration.ofSeconds(3));
+        synchronizer.commitExpiredStagedDeletions();
+
+        assertEquals(List.of(entry), entries());
+        assertEquals(Optional.of("restored version"), entry.getField(StandardField.NOTE));
     }
 
     @Test
@@ -247,7 +288,7 @@ class DirectoryLibrarySynchronizerTest {
     }
 
     @Test
-    void changeToNonHayagrivaContentRemovesItsEntries() throws IOException {
+    void changeToNonHayagrivaContentRemovesItsEntriesAfterGraceWindow() throws IOException {
         Path file = root.resolve("smith2020.yml");
         Files.writeString(file, ARTICLE_YAML);
         openLibrary();
@@ -258,8 +299,30 @@ class DirectoryLibrarySynchronizerTest {
                         runs-on: ubuntu-latest
                 """);
         synchronizer.handleFileChanged(file);
+        assertEquals(1, entries().size());
 
-        assertEquals(0, entries().size());
+        clock.advance(Duration.ofSeconds(3));
+        synchronizer.commitExpiredStagedDeletions();
+        assertEquals(List.of(), entries());
+    }
+
+    /// Editors that truncate and rewrite can be polled mid-write.
+    @Test
+    void sidecarCompletedWithinGraceWindowKeepsEntry() throws IOException {
+        Path file = root.resolve("smith2020.yml");
+        Files.writeString(file, ARTICLE_YAML);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        Files.writeString(file, "smith2020:\n");
+        synchronizer.handleFileChanged(file);
+        Files.writeString(file, ARTICLE_YAML.replace("first version", "second version"));
+        synchronizer.handleFileChanged(file);
+        clock.advance(Duration.ofSeconds(3));
+        synchronizer.commitExpiredStagedDeletions();
+
+        assertEquals(List.of(entry), entries());
+        assertEquals(Optional.of("second version"), entry.getField(StandardField.NOTE));
     }
 
     @Test
@@ -304,6 +367,6 @@ class DirectoryLibrarySynchronizerTest {
         Files.delete(root.resolve("smith2020.pdf"));
         synchronizer.handleFileDeleted(root.resolve("smith2020.pdf"));
         assertEquals(1, entries().size());
-        assertTrue(entries().getFirst().getFiles().isEmpty());
+        assertEquals(List.of(), entries().getFirst().getFiles());
     }
 }

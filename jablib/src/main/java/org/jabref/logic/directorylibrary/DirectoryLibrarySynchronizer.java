@@ -20,11 +20,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.ParserResult;
@@ -36,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.commons.io.IOCase;
@@ -73,11 +76,12 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryLibrarySynchronizer.class);
 
-    /// Two poll cycles of [DirectoryMonitor] (1 s each), so a rename's create event can arrive
-    /// in the poll cycle after its delete event.
-    private static final Duration RENAME_GRACE = Duration.ofMillis(2500);
+    /// Two poll cycles of [DirectoryMonitor], so a rename's create event can arrive in the poll
+    /// cycle after its delete event.
+    private static final Duration RENAME_GRACE = DirectoryMonitor.POLL_INTERVAL.multipliedBy(2).plusMillis(500);
 
-    private static final Set<String> SIDECAR_EXTENSIONS = Set.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
+    /// In precedence order when several sidecars share a base name.
+    private static final List<String> SIDECAR_EXTENSIONS = List.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
     private static final String PDF_EXTENSION = "pdf";
 
     private final BibDatabaseContext databaseContext;
@@ -93,10 +97,12 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     private final Map<Path, StagedDeletion> stagedDeletions = new HashMap<>();
     private final Map<Path, String> lastWrittenFingerprints = new HashMap<>();
 
-    private @Nullable FileAlterationObserver observer;
-    private @Nullable DirectoryMonitor directoryMonitor;
+    private @Nullable Watch watch;
 
     private record StagedDeletion(List<BibEntry> entries, Instant expiry) {
+    }
+
+    private record Watch(DirectoryMonitor monitor, FileAlterationObserver observer) {
     }
 
     public DirectoryLibrarySynchronizer(BibDatabaseContext databaseContext,
@@ -118,15 +124,16 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 () -> new IllegalArgumentException("Context is not a directory library"));
         this.modelUpdateMarshaller = modelUpdateMarshaller;
         this.clock = clock;
-        this.syncExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "directory-sync");
-            thread.setDaemon(true);
-            return thread;
-        });
+        // A dedicated single thread (not BackgroundTask: events must be serialized and writes
+        // debounced). Events polled while this synchronizer shuts down are dropped instead of
+        // throwing into the shared monitor thread.
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
+                Thread.ofPlatform().name("directory-sync").daemon(true).factory());
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        this.syncExecutor = executor;
     }
 
     public void startWatching(DirectoryMonitor monitor) {
-        this.directoryMonitor = monitor;
         IOFileFilter relevantFiles = FileFilterUtils.or(
                 FileFilterUtils.directoryFileFilter(),
                 FileFilterUtils.suffixFileFilter(".yml", IOCase.INSENSITIVE),
@@ -134,21 +141,23 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 FileFilterUtils.suffixFileFilter(".md", IOCase.INSENSITIVE),
                 FileFilterUtils.suffixFileFilter(".pdf", IOCase.INSENSITIVE));
         IOFileFilter notHidden = FileFilterUtils.notFileFilter(FileFilterUtils.prefixFileFilter("."));
-        observer = FileAlterationObserver.builder()
-                                         .setRootEntry(new FileEntry(root.toFile()))
-                                         .setFileFilter(FileFilterUtils.and(notHidden, relevantFiles))
-                                         .getUnchecked();
+        FileAlterationObserver observer = FileAlterationObserver.builder()
+                                                                .setRootEntry(new FileEntry(root.toFile()))
+                                                                .setFileFilter(FileFilterUtils.and(notHidden, relevantFiles))
+                                                                .getUnchecked();
+        watch = new Watch(monitor, observer);
         // The monitor is already running and never initializes late-joining observers, so the
         // first poll would report every existing file as created. Checking once without any
-        // listener attached takes the baseline snapshot silently.
-        observer.checkAndNotify();
-        monitor.addObserver(observer, this);
+        // listener attached takes the baseline snapshot silently — off the caller's thread,
+        // since it walks the whole tree.
+        syncExecutor.execute(() -> {
+            observer.checkAndNotify();
+            monitor.addObserver(observer, this);
+        });
     }
 
     public void shutdown() {
-        if (observer != null && directoryMonitor != null) {
-            directoryMonitor.removeObserver(observer);
-        }
+        Optional.ofNullable(watch).ifPresent(active -> active.monitor().removeObserver(active.observer()));
         syncExecutor.shutdown();
     }
 
@@ -221,16 +230,16 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             return;
         }
         if (!looksLikeSidecar(file)) {
-            // The file stopped being a sidecar (e.g. replaced by unrelated YAML or Markdown)
-            removeEntries(knownEntries, file);
+            // The file stopped being a sidecar — or an editor that truncates and rewrites was
+            // polled mid-write, so the entries are only staged: a complete sidecar arriving
+            // within the grace window keeps them
+            stageDeletion(file, knownEntries);
             return;
         }
-        Optional<List<BibEntry>> parsed = parse(file);
-        if (parsed.isEmpty()) {
-            LOGGER.warn("Not applying changes of unparseable Hayagriva file {}", file);
-            return;
-        }
-        applyChangedFile(file, knownEntries, parsed.get());
+        parse(file).ifPresentOrElse(parsedEntries -> {
+            stagedDeletions.remove(file);
+            applyChangedFile(file, knownEntries, parsedEntries);
+        }, () -> LOGGER.warn("Not applying changes of unparseable Hayagriva file {}", file));
     }
 
     synchronized void handleFileDeleted(Path file) {
@@ -240,12 +249,15 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             if (entries.isEmpty()) {
                 return;
             }
-            stagedDeletions.put(file, new StagedDeletion(entries, clock.instant().plus(RENAME_GRACE)));
-            syncExecutor.schedule(this::commitExpiredStagedDeletions,
-                    RENAME_GRACE.toMillis() + 100, TimeUnit.MILLISECONDS);
+            stageDeletion(file, entries);
         } else if (isPdf(file)) {
             handlePdfDeleted(file);
         }
+    }
+
+    private void stageDeletion(Path file, List<BibEntry> entries) {
+        stagedDeletions.put(file, new StagedDeletion(entries, clock.instant().plus(RENAME_GRACE)));
+        syncExecutor.schedule(this::commitExpiredStagedDeletions, RENAME_GRACE.toMillis() + 100, TimeUnit.MILLISECONDS);
     }
 
     synchronized void commitExpiredStagedDeletions() {
@@ -261,32 +273,34 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private void importFile(Path file) {
         if (!entriesOf(file).isEmpty()) {
-            // Already known (e.g. a create event for a file the scan covered) — diff instead
+            // Already known: a create event for a file the scan covered, or a deletion undone
+            // within the grace window — diff instead of importing twice
+            stagedDeletions.remove(file);
             handleFileChanged(file);
             return;
         }
         if (!looksLikeSidecar(file)) {
             return;
         }
-        Optional<List<BibEntry>> parsed = parse(file);
-        if (parsed.isEmpty() || parsed.get().isEmpty()) {
+        List<BibEntry> newEntries = parse(file).orElse(List.of());
+        if (newEntries.isEmpty()) {
             return;
         }
-        List<BibEntry> newEntries = parsed.get();
 
         // A staged deletion with equal content is this file being moved, not new content
-        Optional<Path> movedFrom = stagedDeletions.entrySet().stream()
-                                                  .filter(staged -> entriesMatch(staged.getValue().entries(), newEntries))
-                                                  .map(Map.Entry::getKey)
-                                                  .findFirst();
-        if (movedFrom.isPresent()) {
-            stagedDeletions.remove(movedFrom.get());
-            catalog.relocateFile(movedFrom.get(), file);
-            LOGGER.debug("Detected move {} -> {}", movedFrom.get(), file);
-            return;
-        }
+        stagedDeletions.entrySet().stream()
+                       .filter(staged -> entriesMatch(staged.getValue().entries(), newEntries))
+                       .map(Map.Entry::getKey)
+                       .findFirst()
+                       .ifPresentOrElse(movedFrom -> {
+                           stagedDeletions.remove(movedFrom);
+                           catalog.relocateFile(movedFrom, file);
+                           LOGGER.debug("Detected move {} -> {}", movedFrom, file);
+                       }, () -> insertNewEntries(file, newEntries));
+    }
 
-        newEntries.forEach(entry -> catalog.register(entry, file, entry.getCitationKey().orElse("")));
+    private void insertNewEntries(Path file, List<BibEntry> newEntries) {
+        newEntries.forEach(entry -> catalog.register(entry, file, entry.getCitationKey().orElseThrow()));
         // Safe without event source: the entry is not yet inserted, so no listeners see this
         findPairedPdf(file).ifPresent(pdf -> newEntries.getFirst()
                                                        .addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName())));
@@ -302,15 +316,13 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         List<BibEntry> toRemove = new ArrayList<>();
         List<Runnable> fieldUpdates = new ArrayList<>();
 
-        parsedByKey.forEach((key, parsedEntry) -> {
-            BibEntry knownEntry = knownByKey.get(key);
-            if (knownEntry == null) {
-                catalog.register(parsedEntry, file, key);
-                toInsert.add(parsedEntry);
-            } else {
-                fieldUpdates.add(() -> copyContent(parsedEntry, knownEntry));
-            }
-        });
+        parsedByKey.forEach((key, parsedEntry) ->
+                Optional.ofNullable(knownByKey.get(key)).ifPresentOrElse(
+                        knownEntry -> fieldUpdates.add(() -> copyContent(parsedEntry, knownEntry)),
+                        () -> {
+                            catalog.register(parsedEntry, file, key);
+                            toInsert.add(parsedEntry);
+                        }));
         knownByKey.forEach((key, knownEntry) -> {
             if (!parsedByKey.containsKey(key)) {
                 toRemove.add(knownEntry);
@@ -413,15 +425,19 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     private static boolean entriesMatch(List<BibEntry> staged, List<BibEntry> parsed) {
-        if (staged.size() != parsed.size()) {
-            return false;
-        }
-        for (int i = 0; i < staged.size(); i++) {
-            if (!staged.get(i).equals(parsed.get(i))) {
-                return false;
-            }
-        }
-        return true;
+        return staged.size() == parsed.size()
+                && IntStream.range(0, staged.size()).allMatch(i -> sameContent(staged.get(i), parsed.get(i)));
+    }
+
+    /// Live entries carry the PDF link this synchronizer maintains; freshly parsed ones do not.
+    private static boolean sameContent(BibEntry live, BibEntry parsed) {
+        return live.getType().equals(parsed.getType()) && fieldsWithoutFile(live).equals(fieldsWithoutFile(parsed));
+    }
+
+    private static Map<Field, String> fieldsWithoutFile(BibEntry entry) {
+        return entry.getFieldMap().entrySet().stream()
+                    .filter(field -> StandardField.FILE != field.getKey())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Optional<List<BibEntry>> parse(Path file) {
@@ -454,45 +470,33 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     private Optional<BibEntry> findSidecarEntry(Path pdf) {
-        Path parent = pdf.getParent();
-        if (parent == null) {
-            return Optional.empty();
-        }
         String baseName = FileUtil.getBaseName(pdf);
-        for (String extension : SIDECAR_EXTENSIONS) {
-            List<BibEntry> entries = entriesOf(parent.resolve(baseName + "." + extension));
-            if (!entries.isEmpty()) {
-                return Optional.of(entries.getFirst());
-            }
-        }
-        return Optional.empty();
+        return SIDECAR_EXTENSIONS.stream()
+                                 .map(extension -> entriesOf(pdf.resolveSibling(baseName + "." + extension)))
+                                 .filter(entries -> !entries.isEmpty())
+                                 .map(List::getFirst)
+                                 .findFirst();
     }
 
     private Optional<Path> findPairedPdf(Path yamlFile) {
-        Path parent = yamlFile.getParent();
-        if (parent == null) {
-            return Optional.empty();
-        }
-        Path pdf = parent.resolve(FileUtil.getBaseName(yamlFile) + ".pdf");
-        return Files.exists(pdf) ? Optional.of(pdf) : Optional.empty();
+        return Optional.of(yamlFile.resolveSibling(FileUtil.getBaseName(yamlFile) + ".pdf")).filter(Files::exists);
     }
 
     private boolean consumeSelfEcho(Path file) {
         Path normalized = file.toAbsolutePath().normalize();
-        String recorded = lastWrittenFingerprints.get(normalized);
-        if (recorded == null) {
+        if (!lastWrittenFingerprints.containsKey(normalized)) {
             return false;
         }
+        return currentHash(file).map(current -> lastWrittenFingerprints.remove(normalized, current)).orElse(false);
+    }
+
+    private static Optional<String> currentHash(Path file) {
         try {
-            String current = hash(Files.readAllBytes(file));
-            if (recorded.equals(current)) {
-                lastWrittenFingerprints.remove(normalized);
-                return true;
-            }
+            return Optional.of(hash(Files.readAllBytes(file)));
         } catch (IOException e) {
             LOGGER.debug("Could not fingerprint {}", file, e);
+            return Optional.empty();
         }
-        return false;
     }
 
     private static String hash(byte[] content) {

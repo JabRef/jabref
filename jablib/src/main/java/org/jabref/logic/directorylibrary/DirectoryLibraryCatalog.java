@@ -43,24 +43,15 @@ public class DirectoryLibraryCatalog {
 
     /// Re-homes all entries of `oldFile` to `newFile` (a rename/move on disk).
     public void relocateFile(Path oldFile, Path newFile) {
-        List<String> entryIds = entryIdsByFile.remove(oldFile);
-        if (entryIds == null) {
-            return;
-        }
-        entryIdsByFile.put(newFile, entryIds);
-        entryIds.forEach(entryId -> {
-            EntrySource source = sourceByEntryId.get(entryId);
-            if (source != null) {
-                sourceByEntryId.put(entryId, new EntrySource(newFile, source.hayagrivaKey()));
-            }
+        Optional.ofNullable(entryIdsByFile.remove(oldFile)).ifPresent(entryIds -> {
+            entryIdsByFile.put(newFile, entryIds);
+            entryIds.forEach(entryId -> sourceByEntryId.computeIfPresent(entryId,
+                    (_, source) -> new EntrySource(newFile, source.hayagrivaKey())));
         });
     }
 
     /// Forgets all entries of the given file (deleted on disk or re-registered afterwards).
     public void removeFile(Path yamlFile) {
-        List<String> entryIds = entryIdsByFile.remove(yamlFile);
-        if (entryIds != null) {
-            entryIds.forEach(sourceByEntryId::remove);
-        }
+        Optional.ofNullable(entryIdsByFile.remove(yamlFile)).ifPresent(entryIds -> entryIds.forEach(sourceByEntryId::remove));
     }
 }
