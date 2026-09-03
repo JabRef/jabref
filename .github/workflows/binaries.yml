@@ -144,27 +144,27 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: github.event_name == 'pull_request'
         with:
           fetch-depth: 0
           show-progress: 'false'
       - id: changed-non-workflow-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@v47
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-binaries-workflow
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@v47
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
           files: |
             .github/workflows/binaries.yml
       - id: changed-binaries-resource-markdown
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@v47
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
           files: |
             jabgui/buildres/**/*.md
@@ -518,20 +518,20 @@ jobs:
         run: echo "Skipping pre-build because no build-relevant files changed."
       - name: Fetch all history for all tags and branches
         if: needs.conditions.outputs.should-build == 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           show-progress: 'false'
       - name: Install GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: pre-gitversion
-        uses: gittools/actions/gitversion/setup@v4.7.0
+        uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
         with:
           versionSpec: "6.x"
       - name: Run GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v4.7.0
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
       - name: Normalize branch name
         if: needs.conditions.outputs.should-build == 'true'
         id: normalize
@@ -584,7 +584,7 @@ jobs:
         run: echo "Skipping binary build because no build-relevant files changed."
       - name: Checkout
         if: needs.conditions.outputs.should-build == 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -601,7 +601,7 @@ jobs:
         id: pigz
         if: needs.conditions.outputs.should-build == 'true' && startsWith(matrix.os, 'ubuntu')
         background: true
-        uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: pigz
           version: 1.0
@@ -635,7 +635,7 @@ jobs:
       # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
         if: ${{ needs.conditions.outputs.should-build == 'true' && needs.conditions.outputs.useEaJdk == 'true' }}
-        uses: oracle-actions/setup-java@v1
+        uses: oracle-actions/setup-java@ec7274acdd237c7fe61395ed2edda22d756b5afe # v1
         with:
           website: jdk.java.net
           release: EA
@@ -880,7 +880,7 @@ jobs:
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}-tbn
@@ -903,7 +903,7 @@ jobs:
         run: echo "Skipping native binary build because it is not needed for this event."
       - name: Checkout
         if: needs.conditions.outputs.should-build == 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -924,7 +924,7 @@ jobs:
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
         if: needs.conditions.outputs.should-build == 'true'
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1
         with:
           distribution: 'liberica'
           java-package: ${{ matrix.javaPackage }}
@@ -940,7 +940,7 @@ jobs:
 
       - name: Install clitest
         if: needs.conditions.outputs.should-build == 'true'
-        uses: ethanjli/cached-download-action@v0.1.4
+        uses: ethanjli/cached-download-action@f1d109e4eca8d988e012ed5565366717aba90d0f # v0.1.4
         with:
           # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
           url: https://raw.githubusercontent.com/aureliojargas/clitest/8bdaae2f56e524f8824307d5c443e6353fe0dbd9/clitest
@@ -980,7 +980,7 @@ jobs:
 
       - name: Upload jabkit native to GitHub artifacts store
         if: ${{ needs.conditions.outputs.should-build == 'true' && (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: jabkit-native (${{ matrix.displayName }})
           path: jabkit/build/native-dist/*.*
@@ -988,7 +988,7 @@ jobs:
 
       - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           # tbn = to-be-notarized
           name: jabkit-native-${{ matrix.os }}-tbn
@@ -1020,7 +1020,7 @@ jobs:
     steps:
       - name: Comment PR
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
           message: |
             The build of this PR is available at <${{ needs.build.outputs.url }}>.
@@ -1040,7 +1040,7 @@ jobs:
           printf 'PR Body:\n%s\n' "$PR_BODY"
       - name: Determine issue number
         id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
+        uses: koppor/ticket-check-action@5c5d28364fe8d3c2822611e0556fcacdde473b49 # add-output
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
@@ -1053,7 +1053,7 @@ jobs:
           outputOnly: true
       - name: Comment on issue (build available)
         if: ${{ (steps.get_issue_number.outputs.ticketNumber != '-1') && (needs.disk-space-check.outputs.available == 'true') }}
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
           pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           message: >
@@ -1097,7 +1097,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: JabRef-${{ matrix.os }}-tbn
       - name: Notarize dmg
@@ -1124,7 +1124,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.displayName }}
           path: |
@@ -1137,7 +1137,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: jabkit-native-macos-15-tbn
           path: jabkit/build/native-dist
@@ -1155,7 +1155,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools/
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact == 'true' }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: jabkit-native (macOS-silicon)
           path: jabkit/build/native-dist/jabkit-native_macos-silicon.zip
@@ -1171,7 +1171,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: pr_number
           path: pr_number.txt

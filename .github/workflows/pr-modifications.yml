@@ -29,11 +29,11 @@ jobs:
       )
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
-        uses: olivernybroe/action-conflict-finder@v4.1
+        uses: olivernybroe/action-conflict-finder@1a949ebd954a9eaee58802229ea5f9c69fb93a50 # v4.1
 
   no-force-push:
     if: >
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
       - name: Check force push
@@ -80,7 +80,7 @@ jobs:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
       - name: Get all submodule changes
         id: changes
-        uses: tj-actions/changed-files@v47
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
           files: |
             jablib/src/main/abbrv.jabref.org
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - if: github.head_ref == 'main'
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
@@ -118,7 +118,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: pr_number
           path: pr_number.txt
