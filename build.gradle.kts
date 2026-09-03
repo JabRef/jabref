@@ -60,7 +60,8 @@ requirementTracing {
             "guard",
             "pp",
             "feat",
-            "req"
+            "req",
+            "adr"
         )
 
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer

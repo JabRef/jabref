@@ -173,7 +173,6 @@ open module org.jabref {
     requires com.dlsc.pdfviewfx;
     // requires com.sun.jna;
     // requires dd.plist;
-    requires static io.github.eadr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;
