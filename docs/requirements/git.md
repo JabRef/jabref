@@ -54,13 +54,14 @@ Declining the offer must leave the directory unchanged, because the user may wan
 
 Needs: impl, utest
 
-## Committing a library with unsaved changes
+## Committing a library with unsaved changes offers to save first
 `req~git.commit.unsaved-changes~1`
 
-Git commits operate on the file on disk, so unsaved changes are not part of a commit.
-With autosave disabled the user decides when the library is written,
-so JabRef must let them choose between writing those changes first and committing what is already on disk,
-because the user may deliberately want to commit only the saved work.
+When a user commits a library with unsaved changes and autosave is disabled,
+JabRef must offer to write those changes before committing,
+and must allow committing only what is already on disk.
+Git commits operate on the file on disk, so unsaved changes would otherwise be silently left out,
+but the user may deliberately want to commit only the saved work.
 
 Needs: impl, utest
 
