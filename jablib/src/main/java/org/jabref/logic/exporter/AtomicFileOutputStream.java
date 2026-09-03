@@ -362,8 +362,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
 
             if (!keepBackup) {
-                // Remove backup file for saving
-                Files.deleteIfExists(backupFile);
+                try {
+                    Files.deleteIfExists(backupFile);
+                } catch (IOException exception) {
+                    // The commit itself succeeded — a leftover backup is not worth reporting the write as failed
+                    LOGGER.warn("Could not delete backup file {} after successful write", backupFile, exception);
+                }
             }
         } finally {
             // Remove temporary file (but not the backup!)
