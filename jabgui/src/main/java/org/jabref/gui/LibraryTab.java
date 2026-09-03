@@ -33,12 +33,15 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.git.GitDiffDialogView;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -50,6 +53,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -651,20 +655,27 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));
 
+        // LEFT: same position on every platform's button order, and never the default button
+        ButtonType showDiff = new ButtonType(Localization.lang("Show diff"), ButtonBar.ButtonData.LEFT);
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
         ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Save before closing"),
-                Localization.lang("Library '%0' has been modified.", filename),
-                saveChanges, discardChanges, returnToLibrary);
-
-        if (response.isEmpty()) {
-            return true;
-        }
-
-        ButtonType buttonType = response.get();
+        ButtonType buttonType;
+        // Any button closes the alert, so "Show diff" re-asks after the diff dialog was closed
+        do {
+            Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                    Localization.lang("Save before closing"),
+                    Localization.lang("Library '%0' has been modified.", filename),
+                    showDiff, saveChanges, discardChanges, returnToLibrary);
+            if (response.isEmpty()) {
+                return true;
+            }
+            buttonType = response.get();
+            if (buttonType.equals(showDiff)) {
+                showDiffToSavedFile();
+            }
+        } while (buttonType.equals(showDiff));
 
         if (buttonType.equals(returnToLibrary)) {
             return false;
@@ -692,6 +703,23 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         return false;
+    }
+
+    /// Shows the unsaved in-memory changes compared to the file on disk (or to an empty library if never saved).
+    private void showDiffToSavedFile() {
+        BibDatabaseContext savedDatabase;
+        try {
+            savedDatabase = bibDatabaseContext.getDatabasePath().isPresent()
+                            ? GitDiffChecker.checkSavedWorkingTreeVersion(bibDatabaseContext.getDatabasePath().get(), preferences.getImportFormatPreferences(), fileUpdateMonitor)
+                            : BibDatabaseContext.empty();
+        } catch (IOException e) {
+            LOGGER.error("Could not read saved library for diff", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), e);
+            return;
+        }
+        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+        dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
+                Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
     }
 
     private void onCloseRequest(Event event) {
