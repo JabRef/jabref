@@ -93,6 +93,24 @@ The installers point the native-messaging manifest at `jabext_host.py`
 (Linux/macOS, run via its `#!/usr/bin/env python3` shebang) or
 `jabext_host.bat` → `jabext_host.ps1` (Windows).
 
+### Troubleshooting: JabRef does not list the extension
+
+JabRef discovers the provider through `jabext-bridge.<port>.json` in the
+`fulltext-providers` directory. The host writes that file on start and removes
+it on exit, so the extension is listed under **Preferences → Web search →
+External Fetchers** only while the host runs.
+
+If it is missing, the browser most likely failed to launch the host. The
+native-messaging manifest stores an **absolute** path to `jabext_host.py` /
+`jabext_host.bat`; moving, deleting or re-cloning the checkout breaks the
+registration silently. Tell-tales: `about:debugging` shows **Background script:
+Stopped** for the extension, and its console logs `[native-bridge] connectNative
+failed` or `No such native application jabext_bridge`.
+
+Fix: re-run the installer for your platform (see above) and click **Reload** on
+the extension. The discovery file should then appear; reopen the JabRef
+preferences to refresh the list.
+
 ### Windows: HTTP.sys and URL reservations
 
 `jabext_host.ps1` serves HTTP through `System.Net.HttpListener`, i.e. HTTP.sys.
