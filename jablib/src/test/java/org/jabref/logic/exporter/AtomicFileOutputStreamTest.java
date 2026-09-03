@@ -4,11 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -29,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
@@ -51,6 +55,30 @@ class AtomicFileOutputStreamTest {
         }
 
         // Written file still has the contents as before the error
+        assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
+    }
+
+    @Test
+    void userDefinedAttributesArePreserved(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("tagged.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        UserDefinedFileAttributeView view = Files.getFileAttributeView(out, UserDefinedFileAttributeView.class);
+        assumeTrue(view != null, "file system has no user-defined attribute view");
+        try {
+            view.write("jabref.test", StandardCharsets.UTF_8.encode("tagged"));
+        } catch (IOException exception) {
+            assumeTrue(false, "file system does not support user-defined attributes: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        UserDefinedFileAttributeView savedView = Files.getFileAttributeView(out, UserDefinedFileAttributeView.class);
+        ByteBuffer value = ByteBuffer.allocate(savedView.size("jabref.test"));
+        savedView.read("jabref.test", value);
+        value.flip();
+        assertEquals("tagged", StandardCharsets.UTF_8.decode(value).toString());
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
     }
 

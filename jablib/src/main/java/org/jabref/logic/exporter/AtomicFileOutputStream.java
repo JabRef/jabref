@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -13,7 +14,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.DosFileAttributeView;
+import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -37,7 +43,9 @@ import org.slf4j.LoggerFactory;
 /// 2. Create a backup (with .sav suffix) of the original file (if it exists) in the same directory.
 /// 3. Atomically move the temporary file to the correct place, overwriting any file that already exists at that
 /// location. On Linux and macOS, files with hard links are overwritten in place to preserve their inode. An in-place
-/// overwrite is also used when the file system does not support atomic moves.
+/// overwrite is also used when the file system does not support atomic moves. Before the move, the group, DOS
+/// attributes, ACL and user-defined extended attributes of the original file are copied to the temporary file on a
+/// best-effort basis (the owner cannot be restored without elevated privileges).
 /// 4. Delete the backup file (if configured to do so).
 ///
 /// If all goes well, no temporary or backup files will remain on disk after closing the stream.
@@ -336,6 +344,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 throw exception;
             }
 
+            if (Files.exists(targetFile)) {
+                // An in-place overwrite keeps the attributes anyway; copying them nonetheless is harmless and covers
+                // the fallback to a move when no backup could be created
+                copyAttributes(targetFile, temporaryFile);
+            }
+
             if (mustOverwriteTargetInPlace) {
                 if (!backupCreated) {
                     LOGGER.warn("Could not create a backup for linked file {} (backup created: {}). Replacing the file without preserving its links.", targetFile, backupCreated);
@@ -368,6 +382,62 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         } finally {
             // Remove temporary file (but not the backup!)
             cleanup();
+        }
+    }
+
+    /// Copies everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
+    /// `source` to `target`. Each part is independent and best-effort: a file system may lack the view, and setting
+    /// a group the user is not a member of is refused by the OS. POSIX permissions are restored separately after the
+    /// move, so that they also apply to a freshly created target.
+    private static void copyAttributes(Path source, Path target) {
+        PosixFileAttributeView sourcePosix = Files.getFileAttributeView(source, PosixFileAttributeView.class);
+        PosixFileAttributeView targetPosix = Files.getFileAttributeView(target, PosixFileAttributeView.class);
+        if ((sourcePosix != null) && (targetPosix != null)) {
+            try {
+                targetPosix.setGroup(sourcePosix.readAttributes().group());
+            } catch (IOException | UnsupportedOperationException exception) {
+                LOGGER.debug("Could not copy group of {} to {}", source, target, exception);
+            }
+        }
+
+        DosFileAttributeView sourceDos = Files.getFileAttributeView(source, DosFileAttributeView.class);
+        DosFileAttributeView targetDos = Files.getFileAttributeView(target, DosFileAttributeView.class);
+        if ((sourceDos != null) && (targetDos != null)) {
+            try {
+                DosFileAttributes attributes = sourceDos.readAttributes();
+                targetDos.setHidden(attributes.isHidden());
+                targetDos.setSystem(attributes.isSystem());
+                targetDos.setArchive(attributes.isArchive());
+                // Last: a read-only file refuses further attribute changes on some platforms
+                targetDos.setReadOnly(attributes.isReadOnly());
+            } catch (IOException | UnsupportedOperationException exception) {
+                LOGGER.debug("Could not copy DOS attributes of {} to {}", source, target, exception);
+            }
+        }
+
+        AclFileAttributeView sourceAcl = Files.getFileAttributeView(source, AclFileAttributeView.class);
+        AclFileAttributeView targetAcl = Files.getFileAttributeView(target, AclFileAttributeView.class);
+        if ((sourceAcl != null) && (targetAcl != null)) {
+            try {
+                targetAcl.setAcl(sourceAcl.getAcl());
+            } catch (IOException | UnsupportedOperationException exception) {
+                LOGGER.debug("Could not copy ACL of {} to {}", source, target, exception);
+            }
+        }
+
+        UserDefinedFileAttributeView sourceUserDefined = Files.getFileAttributeView(source, UserDefinedFileAttributeView.class);
+        UserDefinedFileAttributeView targetUserDefined = Files.getFileAttributeView(target, UserDefinedFileAttributeView.class);
+        if ((sourceUserDefined != null) && (targetUserDefined != null)) {
+            try {
+                for (String name : sourceUserDefined.list()) {
+                    ByteBuffer value = ByteBuffer.allocate(sourceUserDefined.size(name));
+                    sourceUserDefined.read(name, value);
+                    value.flip();
+                    targetUserDefined.write(name, value);
+                }
+            } catch (IOException | UnsupportedOperationException exception) {
+                LOGGER.debug("Could not copy extended attributes of {} to {}", source, target, exception);
+            }
         }
     }
 
