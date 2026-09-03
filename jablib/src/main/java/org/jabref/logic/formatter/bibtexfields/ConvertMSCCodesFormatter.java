@@ -37,7 +37,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     }
 
     @Override
-    public Formatter withKeywordSeparator(Character keywordSeparator) {
+    public Formatter withKeywordSeparator(@NonNull Character keywordSeparator) {
         return new ConvertMSCCodesFormatter(cliPreferences, keywordSeparator);
     }
 
