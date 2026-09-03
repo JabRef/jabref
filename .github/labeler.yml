@@ -216,7 +216,12 @@
 
 "component: diff-merge":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+          - 'jablib/src/**/org/jabref/logic/bibtex/comparator/**'
+          - 'jablib/src/**/org/jabref/logic/git/conflicts/**'
+          - 'jablib/src/**/org/jabref/logic/git/diff/**'
+          - 'jablib/src/**/org/jabref/logic/git/merge/**'
 
 "component: microsoft-word-integration":
   - changed-files:
