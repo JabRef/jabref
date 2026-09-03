@@ -19,4 +19,11 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Autosave reacts to library changes
+`req~jabgui.autosaveandbackup.autosave-listens~1`
+
+While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

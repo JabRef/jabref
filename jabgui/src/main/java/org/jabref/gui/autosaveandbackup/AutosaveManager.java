@@ -68,10 +68,12 @@ public class AutosaveManager {
     }
 
     /// Starts the Autosaver which is associated with the given [BibDatabaseContext].
+    /// [impl->req~jabgui.autosaveandbackup.autosave-listens~1]
     ///
     /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
         AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext, coarseChangeFilter);
+        coarseChangeFilter.registerListener(autosaveManager);
         runningInstances.add(autosaveManager);
         return autosaveManager;
     }
