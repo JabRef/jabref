@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javafx.concurrent.Task;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -17,6 +15,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -78,31 +77,31 @@ public class DownloadFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<FetcherResult>>> findFullTextsTask = new Task<>() {
+        BackgroundTask<Map<BibEntry, Optional<FetcherResult>>> findFullTextsTask = new BackgroundTask<>() {
             @Override
-            protected Map<BibEntry, Optional<FetcherResult>> call() {
+            public Map<BibEntry, Optional<FetcherResult>> call() {
                 Map<BibEntry, Optional<FetcherResult>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : entries) {
+                    if (isCancelled()) {
+                        break;
+                    }
                     FulltextFetchers fetchers = new FulltextFetchers(
                             preferences.getImportFormatPreferences(),
                             preferences.getImporterPreferences());
                     downloads.put(entry, fetchers.findFullTextPDF(entry));
                     updateProgress(++count, entries.size());
+                    updateMessage(Localization.lang("%0/%1 entries", count, entries.size()));
                 }
                 return downloads;
             }
         };
 
-        findFullTextsTask.setOnSucceeded(value ->
-                downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
-
-        dialogService.showProgressDialog(
-                Localization.lang("Download full text documents"),
-                Localization.lang("Looking for full text document..."),
-                findFullTextsTask);
-
-        taskExecutor.execute(findFullTextsTask);
+        findFullTextsTask.setTitle(Localization.lang("Download full text documents"))
+                         .withInitialMessage(Localization.lang("Looking for full text document..."))
+                         .showToUser(true)
+                         .onSuccess(downloads -> downloadFullTexts(downloads, stateManager.getActiveDatabase().get()))
+                         .executeWith(taskExecutor);
     }
 
     private void downloadFullTexts(Map<BibEntry, Optional<FetcherResult>> downloads, BibDatabaseContext databaseContext) {
