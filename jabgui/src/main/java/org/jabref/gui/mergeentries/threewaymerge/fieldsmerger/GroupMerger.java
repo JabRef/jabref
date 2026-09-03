@@ -16,7 +16,6 @@ public class GroupMerger implements FieldMerger {
 
     @Override
     public String merge(String groupsA, String groupsB) {
-
         if (StringUtil.isBlank(groupsA) && StringUtil.isBlank(groupsB)) {
             return "";
         } else if (StringUtil.isBlank(groupsA)) {
