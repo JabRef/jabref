@@ -33,7 +33,7 @@ import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Parsing is done at {@link org.jabref.logic.importer.fileformat.BibtexParser}
+/// Parsing is done at [org.jabref.logic.importer.fileformat.BibtexParser]
 public class BibEntryWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);

@@ -57,14 +57,12 @@ public class MedlineImporter extends Importer implements Parser {
 
     public MedlineImporter() {
         this.xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // Not supported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         // required for reading Unicode characters such as &#xf6;
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
     }
 
     @Override
@@ -1055,7 +1053,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    /// Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
@@ -1064,7 +1062,7 @@ public class MedlineImporter extends Importer implements Parser {
         handleText(reader, textList, startElement, result);
     }
 
-    /// Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities of abstracts that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)

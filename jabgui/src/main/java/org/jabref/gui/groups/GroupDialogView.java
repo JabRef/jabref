@@ -1,8 +1,13 @@
 package org.jabref.gui.groups;
 
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.SequencedSet;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -33,6 +38,9 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.IkonliIcon;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.icon.JabRefMaterialDesignIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -81,6 +89,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton entryTypeRadioButton;
 
     // Option Groups
+    @FXML private CheckBox explicitIncludeSelected;
+
     @FXML private TextField keywordGroupSearchTerm;
     @FXML private TextField keywordGroupSearchField;
     @FXML private CheckBox keywordGroupCaseSensitive;
@@ -206,6 +216,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
         entryTypeRadioButton.selectedProperty().bindBidirectional(viewModel.typeEntryTypeProperty());
 
+        explicitIncludeSelected.selectedProperty().bindBidirectional(viewModel.explicitIncludeSelectedProperty());
+        explicitIncludeSelected.disableProperty().bind(viewModel.editingGroupProperty().or(viewModel.selectedEntriesAvailableProperty().not()));
+
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
         keywordGroupCaseSensitive.selectedProperty().bindBidirectional(viewModel.keywordGroupCaseSensitiveProperty());
@@ -278,16 +291,18 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
-        ObservableList<IconTheme.JabRefIcons> ikonList = FXCollections.observableArrayList(IconTheme.JabRefIcons.values());
-        FilteredList<IconTheme.JabRefIcons> filteredList = new FilteredList<>(ikonList);
+        ObservableList<GroupIconPickerItem> ikonList = FXCollections.observableArrayList(GroupIconPickerItems.ALL);
+        FilteredList<GroupIconPickerItem> filteredList = new FilteredList<>(ikonList);
 
         CustomTextField searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-        searchBox.textProperty().addListener((_, _, newValue) ->
-                filteredList.setPredicate(icon -> newValue.isEmpty() || icon.name().toLowerCase().contains(newValue.toLowerCase())));
+        searchBox.textProperty().addListener((_, _, newValue) -> {
+            String normalizedQuery = newValue.toLowerCase(Locale.ENGLISH);
+            filteredList.setPredicate(ikon -> normalizedQuery.isEmpty() || ikon.searchText().contains(normalizedQuery));
+        });
 
-        GridView<IconTheme.JabRefIcons> ikonGridView = new GridView<>(FXCollections.observableArrayList());
+        GridView<GroupIconPickerItem> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
         ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
@@ -310,21 +325,48 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         popOver.show(iconPickerButton);
     }
 
-    public class IkonliCell extends GridCell<IconTheme.JabRefIcons> {
+    private record GroupIconPickerItem(JabRefIcon icon, String persistedIdentifier, String searchText) {
+        private GroupIconPickerItem {
+            searchText = searchText.toLowerCase(Locale.ENGLISH);
+        }
+    }
+
+    private static final class GroupIconPickerItems {
+        private static final List<GroupIconPickerItem> ALL = load();
+
+        private static List<GroupIconPickerItem> load() {
+            SequencedSet<GroupIconPickerItem> pickerItems = Arrays.stream(IconTheme.JabRefIcons.values())
+                                                                  .map(ikon -> new GroupIconPickerItem(
+                                                                          ikon,
+                                                                          ikon.name(),
+                                                                          ikon.name()))
+                                                                  .collect(Collectors.toCollection(LinkedHashSet::new));
+            IkonliIcon.allIcons().stream()
+                      .filter(ikon -> !(ikon instanceof JabRefMaterialDesignIcon))
+                      .map(ikon -> new GroupIconPickerItem(
+                              new IkonliIcon(ikon),
+                              ikon.getDescription(),
+                              "%s %s".formatted(ikon, ikon.getDescription())))
+                      .forEach(pickerItems::add);
+            return List.copyOf(pickerItems);
+        }
+    }
+
+    public class IkonliCell extends GridCell<GroupIconPickerItem> {
         @Override
-        protected void updateItem(IconTheme.JabRefIcons ikon, boolean empty) {
+        protected void updateItem(GroupIconPickerItem ikon, boolean empty) {
             super.updateItem(ikon, empty);
             if (empty || (ikon == null)) {
                 setText(null);
                 setGraphic(null);
             } else {
-                setGraphic(ikon.withSize(22).getGraphicNode());
+                setGraphic(ikon.icon().withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
                 setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(event -> {
-                    iconField.textProperty().setValue(ikon.name());
+                    iconField.textProperty().setValue(ikon.persistedIdentifier());
                     PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
                     stage.hide();
                 });

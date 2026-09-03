@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /// Writes given BibEntries into the XMP part of a PDF file.
 ///
 /// The conversion of a BibEntry to the XMP data (using Dublin Core) is done at
-/// {@link DublinCoreExtractor#fillDublinCoreSchema()}
+/// [DublinCoreExtractor#fillDublinCoreSchema()]
 public class XmpUtilWriter {
 
     private static final String XMP_BEGIN_END_TAG = "?xpacket";
@@ -186,7 +186,7 @@ public class XmpUtilWriter {
     /// Existing fields values are overridden if the bibtex entry has the
     /// corresponding value set.
     ///
-    /// The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+    /// The method to write DublinCore is [DublinCoreExtractor#fillDublinCoreSchema()]
     ///
     /// @param document The pdf document to write to.
     /// @param entry    The BibEntry that is written into the PDF properties.
@@ -253,7 +253,7 @@ public class XmpUtilWriter {
     /// The method will overwrite existing BibTeX-XMP-data, but keep other
     /// existing metadata.
     ///
-    /// The code for using PDFBox is also used at {@link org.jabref.logic.exporter.EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
+    /// The code for using PDFBox is also used at [org.jabref.logic.exporter.EmbeddedBibFilePdfExporter#embedBibTex(String, Path)].
     ///
     /// @param path          The file to write the entries to.
     /// @param bibtexEntries The entries to write to the file. *

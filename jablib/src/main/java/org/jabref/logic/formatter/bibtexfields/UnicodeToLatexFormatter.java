@@ -1,70 +1,17 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Map;
-
+import org.jabref.latexconv.LatexConv;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatter {
 
-    public static final NormalizeUnicodeFormatter UNICODE_NORMALIZER = new NormalizeUnicodeFormatter();
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnicodeToLatexFormatter.class);
-
     @Override
     public String format(@NonNull String text) {
-        if (text.isEmpty()) {
-            return text;
-        }
-
-        String result = UNICODE_NORMALIZER.format(text);
-
-        // Standard symbols
-        for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP
-                .entrySet()) {
-            result = result.replace(unicodeLatexPair.getKey(), unicodeLatexPair.getValue());
-        }
-
-        // Combining accents
-        StringBuilder sb = new StringBuilder();
-        boolean consumed = false;
-        for (int i = 0; i <= (result.length() - 2); i++) {
-            if (!consumed && (i < (result.length() - 1))) {
-                int cpCurrent = result.codePointAt(i);
-                Integer cpNext = result.codePointAt(i + 1);
-                String code = HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(cpNext);
-                if (code == null) {
-                    // skip next index to avoid reading surrogate as a separate char
-                    if (!Character.isBmpCodePoint(cpCurrent)) {
-                        i++;
-                    }
-                    sb.appendCodePoint(cpCurrent);
-                } else {
-                    sb.append("{\\").append(code).append('{').append((char) cpCurrent).append("}}");
-                    consumed = true;
-                }
-            } else {
-                consumed = false;
-            }
-        }
-        if (!consumed) {
-            sb.append((char) result.codePointAt(result.length() - 1));
-        }
-        result = sb.toString();
-
-        // Check if any symbols is not converted
-        for (int i = 0; i <= (result.length() - 1); i++) {
-            int cp = result.codePointAt(i);
-            if (cp >= 129) {
-                LOGGER.warn("Unicode character not converted: {}", cp);
-            }
-        }
-        return result;
+        return LatexConv.toLatex(text);
     }
 
     @Override

@@ -5,14 +5,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
@@ -21,16 +25,22 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.FileUtils;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +48,10 @@ import org.slf4j.LoggerFactory;
 /// This provides an easy-to-use interface to manage a git repository
 public class GitHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
+
+    static {
+        SshAgentConnectorFactory.install();
+    }
 
     final Path repositoryPath;
 
@@ -82,6 +96,79 @@ public class GitHandler {
         }
     }
 
+    /// Resolves symlinks so repository detection and repository-relative paths refer to the real file.
+    /// Falls back to the lexical absolute path when resolution fails (e.g. the file vanished meanwhile).
+    public static @NonNull Path resolveToRealPath(@NonNull Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            LOGGER.warn("Could not resolve the library path {} — using it as given", path, e);
+            return path.toAbsolutePath().normalize();
+        }
+    }
+
+    /// Creates the repository and commits `fileToCommit` together with the generated `.gitignore`.
+    /// Unlike [#initIfNeeded()] this stages nothing else, so unrelated files in the directory
+    /// (PDFs, notes, other libraries) stay untracked until the user adds them deliberately.
+    ///
+    /// Fails with a [JabRefException] if there already is a repository, or if the file cannot be staged —
+    /// an ignore rule excludes it from `git add` silently. Everything this call created is removed again
+    /// on failure, so the user can fix the cause and retry, or clone into the directory instead.
+    ///
+    /// `synchronized` so that concurrent invocations (the GUI submits this as a background task) cannot
+    /// interleave: the rollback below may only ever delete a `.git` directory this invocation created,
+    /// which the entry check guarantees while the lock is held. The registry hands out one handler per
+    /// repository path, so the lock covers all in-process callers.
+    public synchronized void initAndCommit(@NonNull Path fileToCommit) throws IOException, GitAPIException, JabRefException {
+        // NOFOLLOW_LINKS: a dangling .git symlink is invisible to isGitRepository() but is still a
+        // pre-existing user-owned entry — initializing over it would let rollback delete it
+        if (isGitRepository() || Files.exists(repositoryPath.resolve(Constants.DOT_GIT), LinkOption.NOFOLLOW_LINKS)) {
+            throw new JabRefException(Localization.lang("There already is a Git repository in %0", repositoryPath.toString()));
+        }
+        Path repositoryRoot = repositoryPath.toAbsolutePath().normalize();
+        Path fileInRepository = fileToCommit.toAbsolutePath().normalize();
+        if (!fileInRepository.startsWith(repositoryRoot)) {
+            throw new JabRefException("%s is not inside the repository root %s".formatted(fileInRepository, repositoryRoot));
+        }
+        Path gitignore = repositoryRoot.resolve(".gitignore");
+        // NOFOLLOW_LINKS: a dangling .gitignore symlink is still a pre-existing user-owned entry that rollback must not delete
+        boolean gitignoreExisted = Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS);
+        // The Git index always uses forward slashes, independent of the platform
+        String pathInRepository = repositoryRoot.relativize(fileInRepository).toString().replace('\\', '/');
+        try (Git git = Git.init()
+                          .setDirectory(repositoryPathAsFile)
+                          .setInitialBranch("main")
+                          .call()) {
+            copyGitIgnoreIfAbsent();
+            // A pre-existing .gitignore is user-owned: honor its rules, but do not commit it uninvited
+            List<String> pathsToCommit = gitignoreExisted ? List.of(pathInRepository) : List.of(pathInRepository, ".gitignore");
+            AddCommand add = git.add();
+            pathsToCommit.forEach(add::addFilepattern);
+            add.call();
+            DirCache index = git.getRepository().readDirCache();
+            for (String path : pathsToCommit) {
+                if (index.findEntry(path) < 0) {
+                    throw new JabRefException(Localization.lang("Could not add %0 to the Git repository. Check the .gitignore file.", path));
+                }
+            }
+            git.commit()
+               .setMessage("Initial commit")
+               .call();
+        } catch (IOException | GitAPIException | JabRefException e) {
+            LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
+            try {
+                FileUtils.delete(repositoryRoot.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
+                if (!gitignoreExisted) {
+                    Files.deleteIfExists(gitignore);
+                }
+            } catch (IOException cleanupException) {
+                LOGGER.warn("Could not clean up after failed Git repository initialization at {}", repositoryPath, cleanupException);
+                e.addSuppressed(cleanupException);
+            }
+            throw e;
+        }
+    }
+
     private static Optional<String> currentRemoteUrl(Repository repo) {
         try {
             StoredConfig config = repo.getConfig();
@@ -123,12 +210,18 @@ public class GitHandler {
     }
 
     void setupGitIgnore() {
-        Path gitignore = Path.of(repositoryPath.toString(), ".gitignore");
-        if (!Files.exists(gitignore)) {
+        try {
+            copyGitIgnoreIfAbsent();
+        } catch (IOException e) {
+            LOGGER.error("Error occurred during copying of the gitignore file into the git repository.", e);
+        }
+    }
+
+    private void copyGitIgnoreIfAbsent() throws IOException {
+        Path gitignore = repositoryPath.resolve(".gitignore");
+        if (!Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS)) {
             try (InputStream inputStream = this.getClass().getResourceAsStream("git.gitignore")) {
                 Files.copy(inputStream, gitignore);
-            } catch (IOException e) {
-                LOGGER.error("Error occurred during copying of the gitignore file into the git repository.", e);
             }
         }
     }
@@ -221,11 +314,10 @@ public class GitHandler {
     }
 
     /// Pushes all commits made to the branch that is tracked by the currently checked out branch.
-    /// If pushing to remote fails, it fails silently.
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
 
             boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
             if (needCreds && credsOpt.isEmpty()) {
@@ -233,10 +325,10 @@ public class GitHandler {
             }
 
             PushCommand pushCommand = git.push();
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing current branch to the configured remote.");
+            verifyPushResults(pushCommand.call());
+            LOGGER.info("Push to the configured remote completed.");
         }
     }
 
@@ -246,7 +338,7 @@ public class GitHandler {
             StoredConfig config = repo.getConfig();
             String remoteUrl = config.getString("remote", "origin", "url");
 
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             boolean needCreds = (remoteUrl != null) && requiresCredentialsForUrl(remoteUrl);
             if (needCreds && credsOpt.isEmpty()) {
                 throw new IOException("Missing Git credentials (username and Personal Access Token).");
@@ -258,14 +350,14 @@ public class GitHandler {
                                          .setRemote("origin")
                                          .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
 
-            if (credsOpt.isPresent()) {
-                pushCommand.setCredentialsProvider(credsOpt.get());
-            }
-            pushCommand.call();
+            credsOpt.ifPresent(pushCommand::setCredentialsProvider);
+            LOGGER.info("Pushing branch {} to origin and configuring its upstream.", branch);
+            verifyPushResults(pushCommand.call());
 
             config.setString("branch", branch, "remote", "origin");
             config.setString("branch", branch, "merge", "refs/heads/" + branch);
             config.save();
+            LOGGER.info("Push to origin completed and upstream configured for branch {}.", branch);
         }
     }
 
@@ -274,11 +366,9 @@ public class GitHandler {
     /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credsOpt = getCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentialsProvider();
             PullCommand pullCommand = git.pull();
-            if (credsOpt.isPresent()) {
-                pullCommand.setCredentialsProvider(credsOpt.get());
-            }
+            credsOpt.ifPresent(pullCommand::setCredentialsProvider);
             pullCommand.call();
         } catch (GitAPIException e) {
             LOGGER.info("Failed to pull.");
@@ -293,7 +383,7 @@ public class GitHandler {
 
     public void fetchOnCurrentBranch() throws JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credentials = getCredentials();
+            Optional<CredentialsProvider> credentials = getCredentialsProvider();
             boolean needCredentials = currentRemoteUrl(git.getRepository())
                     .map(GitHandler::requiresCredentialsForUrl)
                     .orElse(false);
@@ -372,7 +462,7 @@ public class GitHandler {
         }
     }
 
-    private Optional<CredentialsProvider> getCredentials() {
+    public Optional<CredentialsProvider> getCredentialsProvider() {
         if (gitPreferences.getPat().isEmpty()) {
             return Optional.empty();
         }
@@ -380,5 +470,39 @@ public class GitHandler {
                 new UsernamePasswordCredentialsProvider(
                         gitPreferences.getUsername(),
                         gitPreferences.getPat()));
+    }
+
+    private static void verifyPushResults(Iterable<PushResult> pushResults) throws JabRefException {
+        // [impl->req~git.push.rejected-update-reporting~1]
+        for (PushResult pushResult : pushResults) {
+            String remoteMessage = pushResult.getMessages();
+            if (StringUtil.isNotBlank(remoteMessage)) {
+                LOGGER.info("Remote push response: {}", remoteMessage);
+            }
+            for (RemoteRefUpdate update : pushResult.getRemoteUpdates()) {
+                LOGGER.info("Push update for {} completed with status {}.", update.getRemoteName(), update.getStatus());
+                if (update.getStatus() != RemoteRefUpdate.Status.OK
+                        && update.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE) {
+                    String localizedMessage = getLocalizedPushRejectionMessage(update, remoteMessage);
+                    LOGGER.warn("Push update for {} was rejected with status {}. Update message: {}. Remote response: {}.",
+                            update.getRemoteName(), update.getStatus(), update.getMessage(), remoteMessage);
+                    throw new JabRefException("Git push rejected", localizedMessage);
+                }
+            }
+        }
+    }
+
+    private static String getLocalizedPushRejectionMessage(RemoteRefUpdate update, String remoteMessage) {
+        String updateMessage = update.getMessage();
+        if (StringUtil.isNotBlank(updateMessage) && StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2 %3", update.getRemoteName(), update.getStatus(), updateMessage, remoteMessage);
+        }
+        if (StringUtil.isNotBlank(updateMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), updateMessage);
+        }
+        if (StringUtil.isNotBlank(remoteMessage)) {
+            return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), remoteMessage);
+        }
+        return Localization.lang("Push to %0 was rejected (%1).", update.getRemoteName(), update.getStatus());
     }
 }

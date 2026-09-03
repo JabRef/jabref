@@ -8,14 +8,14 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@FetcherTest
+@ExternalServicesTest
 class HelpFileTest {
 
     private final String jabrefHelp = "https://docs.jabref.org/";

@@ -37,9 +37,9 @@ public class AiChatMessageView extends HBox {
     @FXML private ContextMenu contextMenu;
 
     @FXML private VBox buttons;
-    // [impl->req~ai.chat.regenerate-response~1]
+    // [impl->feat~ai.chat.regenerate-response~1]
     @FXML private Button regenerateButton;
-    // [impl->req~ai.chat.delete-messages~1]
+    // [impl->feat~ai.chat.delete-messages~1]
     @FXML private Button deleteButton;
 
     @Inject private ClipBoardManager clipboardManager;

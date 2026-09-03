@@ -3,8 +3,6 @@ package org.jabref.gui.sidepane;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
@@ -16,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
@@ -41,7 +40,7 @@ public class SidePane extends VBox {
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
                     ClipBoardManager clipBoardManager,
-                    UndoManager undoManager) {
+                    GuiUndoManager undoManager) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.viewModel = new SidePaneViewModel(

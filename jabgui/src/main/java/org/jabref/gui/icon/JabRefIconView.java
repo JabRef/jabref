@@ -26,15 +26,15 @@ import org.jabref.gui.util.ColorUtil;
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
 
-/// View for a {@link JabRefIcons} usable in FXML (e.g. {@code <JabRefIconView glyph="REFRESH"/>}).
+/// View for a [JabRefIcons] usable in FXML (e.g. `<JabRefIconView glyph="REFRESH"/>`).
 ///
-/// Hosts the backing node produced by {@link JabRefIcons#getGraphicNode()} instead of being a {@code FontIcon}
-/// itself, so it renders both Ikonli-font-backed glyphs (as a {@code FontIcon}) and SVG-backed glyphs
-/// (see {@link SvgIcon}, rendered as a {@link JabRefSvgIcon}).
+/// Hosts the backing node produced by [JabRefIcons#getGraphicNode()] instead of being a `FontIcon`
+/// itself, so it renders both Ikonli-font-backed glyphs (as a `FontIcon`) and SVG-backed glyphs
+/// (see [SvgIcon], rendered as a [JabRefSvgIcon]).
 ///
-/// Theme coloring is handled by the hosted child itself (a {@code FontIcon} or {@link JabRefSvgIcon}, both of
+/// Theme coloring is handled by the hosted child itself (a `FontIcon` or [JabRefSvgIcon], both of
 /// which carry the icon style classes), so this view stays unclassed to avoid double-theming. The styleable
-/// {@code -fx-icon-color} here is an explicit override knob — e.g. an inline {@code style="-fx-icon-color: ..."}
+/// `-fx-icon-color` here is an explicit override knob — e.g. an inline `style="-fx-icon-color: ..."`
 /// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
 @NullMarked
 public class JabRefIconView extends Group {
@@ -60,13 +60,13 @@ public class JabRefIconView extends Group {
         CSS_META_DATA = Collections.unmodifiableList(metaData);
     }
 
-    /// CSS-styleable color, fed by {@code -fx-icon-color} rules (e.g. an inline {@code style="-fx-icon-color: ..."}).
+    /// CSS-styleable color, fed by `-fx-icon-color` rules (e.g. an inline `style="-fx-icon-color: ..."`).
     /// Forwarded to an SVG child as a user-origin color.
     private final StyleableObjectProperty<Paint> iconColor =
             new SimpleStyleableObjectProperty<>(ICON_COLOR, this, "iconColor");
 
     /// This property is only needed to get proper IDE support in FXML files
-    /// (e.g. validation that parameter passed to "icon" is indeed of type {@link IconTheme.JabRefIcons}).
+    /// (e.g. validation that parameter passed to "icon" is indeed of type [IconTheme.JabRefIcons]).
     private final ObjectProperty<IconTheme.JabRefIcons> glyph;
     private final ObjectProperty<Number> glyphSize;
 
@@ -101,13 +101,14 @@ public class JabRefIconView extends Group {
         applyColor();
     }
 
-    /// Forwards an explicit {@link #iconColor} override to an SVG child. Applied as an inline style (INLINE origin)
+    /// Forwards an explicit [#iconColor] override to an SVG child. Applied as an inline style (INLINE origin)
     /// rather than a programmatic set, so it beats the author `.glyph-icon { -fx-icon-color }` theme rule the child
     /// also matches. When unset (the common case) the child colors itself from theme CSS, so it is left untouched.
     private void applyColor() {
         Paint color = iconColor.get();
         if ((color instanceof Color iconColorValue) && !getChildren().isEmpty()
                 && (getChildren().getFirst() instanceof JabRefSvgIcon svgIcon)) {
+            // FIXME: Inline style should be removed eventually.
             svgIcon.setStyle("-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(iconColorValue)));
         }
     }

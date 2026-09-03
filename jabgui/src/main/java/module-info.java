@@ -18,7 +18,7 @@ open module org.jabref {
     requires javafx.fxml;
     requires javafx.graphics;
     requires org.jabref.htmltonode;
-    requires /*runtime*/ jfx.incubator.richtext;
+    requires jfx.incubator.richtext;
 
     requires com.tobiasdiez.easybind;
 
@@ -118,12 +118,6 @@ open module org.jabref {
     // requires org.apache.commons.logging;
     // endregion
 
-    // region: latex2unicode
-    // requires com.github.tomtung.latex2unicode;
-    // requires fastparse;
-    // requires scala.library;
-    // endregion
-
     // requires jbibtex;
     // requires citeproc.java;
 
@@ -185,5 +179,6 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires veneer;
     // endregion
 }

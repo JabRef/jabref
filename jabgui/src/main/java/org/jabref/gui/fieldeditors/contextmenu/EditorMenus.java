@@ -22,10 +22,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 
-/// Provides context menus for the text fields of the entry editor. Note that we use {@link Supplier} to prevent an early
+/// Provides context menus for the text fields of the entry editor. Note that we use [Supplier] to prevent an early
 /// instantiation of the menus. Therefore, they are attached to each text field but instantiation happens on the first
-/// right-click of the user in that field. The late instantiation is done by {@link
-/// org.jabref.gui.fieldeditors.EditorTextArea#initContextMenu(java.util.function.Supplier, org.jabref.gui.keyboard.KeyBindingRepository) EditorTextArea#initContextMenu}.
+/// right-click of the user in that field. The late instantiation is done by [EditorTextArea#initContextMenu][org.jabref.gui.fieldeditors.EditorTextArea#initContextMenu(java.util.function.Supplier, org.jabref.gui.keyboard.KeyBindingRepository)].
 public class EditorMenus {
 
     /// The default context menu with a specific menu for normalizing person names regarding to BibTex rules.

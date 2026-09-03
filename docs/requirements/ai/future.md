@@ -7,56 +7,56 @@ parent: ai
 # Future features
 `feat~ai.future~1`
 
-Rationale: to capture upcoming enhancements and architectural refactoring for the AI system
+Captures upcoming enhancements and architectural refactoring for the AI system.
 
 Needs: impl
 
-Covers: `feat~ai~1`
+Status: draft
 
-## Allow modification of the LLM in AI chat
-`req~ai.chatting.llm-selection~1`
+## User can change LLM in AI chat
+`feat~ai.chatting.llm-selection~1`
 
-Rationale: users may prefer specific models for conversation based on cost, speed, or reasoning capability
-
-Needs: impl
-
-Covers: `feat~ai.chatting~1`
-
-## Allow modification of the LLM in AI summary
-`req~ai.summarization.llm-selection~1`
-
-Rationale: summarization tasks may require different model strengths or token limits compared to interactive chat
+User may prefer specific models for conversation based on cost, speed, or reasoning capability.
 
 Needs: impl
 
-Covers: `feat~ai.summarization~1`
+Status: draft
 
-## Support editing of user messages in AI chat
-`req~ai.chatting.user-message-editing~1`
+## User can change LLM for AI summarization
+`feat~ai.summarization.llm-selection~1`
 
-Rationale: users need to correct typos or refine their queries without restarting the entire conversation context
+Summarization tasks may require different model strengths or token limits compared to interactive AI chat.
 
 Needs: impl
 
-Covers: `feat~ai.chatting~1`
+Status: draft
 
-## Introduce AI profiles
-`req~ai.chatting.ai-profiles~1`
+## User can edit messages in AI chat
+`feat~ai.chatting.user-message-editing~1`
 
-Rationale: currently it is hard to test other chat model in an AI chat, because the model setting is global and only one.
+User needs to correct typos or refine their queries without restarting the entire conversation context.
+
+Needs: impl
+
+Status: draft
+
+## User can create AI profiles
+`feat~ai.chatting.ai-profiles~1`
+
+Currently it is hard to test other AI chat model in an AI chat, because the model setting is global and only one.
 
 Needs: impl, dsn, utest
 
-Covers: `feat~ai.chatting~1`
+Status: draft
 
-## Allow modification of local RAG parameters in AI expert settings
-`req~ai.expert-settings.rag-local~1`
+## User can modify local RAG parameters
+`feat~ai.expert-settings.rag-local~1`
 
-Rationale: users need to adjust the RAG parameters to refine AI outputs
+User needs to adjust the RAG parameters to refine AI outputs.
 
 Needs: impl
 
-Covers: `feat~ai.expert-settings~1`
+Status: draft
 
 <!-- oft:on -->
 
