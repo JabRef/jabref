@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +18,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.StandardActions;
@@ -96,6 +99,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -661,23 +665,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
         ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        ButtonType buttonType;
-        // Any button closes the alert, so "Show diff" re-asks after the diff dialog was closed.
-        // Not a do-while: IntelliJ's formatter mangles those (puts the brace on its own line).
-        while (true) {
-            Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                    Localization.lang("Save before closing"),
-                    Localization.lang("Library '%0' has been modified.", filename),
-                    showDiff, saveChanges, discardChanges, returnToLibrary);
-            if (response.isEmpty()) {
-                return true;
-            }
-            buttonType = response.get();
-            if (!buttonType.equals(showDiff)) {
-                break;
-            }
+        FXDialog dialog = new FXDialog(Alert.AlertType.CONFIRMATION, Localization.lang("Save before closing"), true);
+        dialog.setHeaderText(null);
+        dialog.setResizable(true);
+        TextArea content = new TextArea(Localization.lang("Library '%0' has been modified.", filename));
+        content.setWrapText(true);
+        dialog.getDialogPane().setContent(content);
+        dialog.getButtonTypes().setAll(showDiff, saveChanges, discardChanges, returnToLibrary);
+        // Consuming the action keeps the dialog open: the diff is informational, the user still has to decide
+        dialog.getDialogPane().lookupButton(showDiff).addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
             showDiffToSavedFile();
+        });
+
+        Optional<ButtonType> response = dialogService.showCustomDialogAndWait(dialog);
+        if (response.isEmpty()) {
+            return true;
         }
+        ButtonType buttonType = response.get();
 
         if (buttonType.equals(returnToLibrary)) {
             return false;
@@ -710,19 +715,30 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Shows the unsaved in-memory changes compared to the file on disk (or to an empty library if never saved).
     // [impl->req~ux.close.show-diff~1]
     private void showDiffToSavedFile() {
-        BibDatabaseContext savedDatabase;
-        try {
-            savedDatabase = bibDatabaseContext.getDatabasePath().isPresent()
-                            ? GitDiffChecker.checkSavedWorkingTreeVersion(bibDatabaseContext.getDatabasePath().get(), preferences.getImportFormatPreferences(), fileUpdateMonitor)
-                            : BibDatabaseContext.empty();
-        } catch (IOException e) {
-            LOGGER.error("Could not read saved library for diff", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), e);
-            return;
-        }
-        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
-        dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
-                Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
+        BackgroundTask.wrap(this::loadSavedFile)
+                      .onSuccess(savedDatabase -> {
+                          List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+                          dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
+                                  Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("Could not read saved library for diff", exception);
+                          dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), exception);
+                      })
+                      .executeWith(taskExecutor);
+    }
+
+    private BibDatabaseContext loadSavedFile() {
+        // The snapshot is discarded after the diff, so its TeX groups must not register with the shared file monitor
+        return bibDatabaseContext.getDatabasePath()
+                                 .map(path -> {
+                                     try {
+                                         return GitDiffChecker.checkSavedWorkingTreeVersion(path, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+                                     } catch (IOException e) {
+                                         throw new UncheckedIOException(e);
+                                     }
+                                 })
+                                 .orElseGet(BibDatabaseContext::empty);
     }
 
     private void onCloseRequest(Event event) {
