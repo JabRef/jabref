@@ -113,10 +113,10 @@ class AboutDialogViewTest extends JavaFxTest {
 
     private Button button(String text) {
         return aboutDialogView.getDialogPane().lookupAll(".button")
-                            .stream()
-                            .map(Button.class::cast)
-                            .filter(button -> button.getText().equals(text))
-                            .findFirst()
-                            .orElseThrow();
+                              .stream()
+                              .map(Button.class::cast)
+                              .filter(button -> button.getText().equals(text))
+                              .findFirst()
+                              .orElseThrow();
     }
 }
