@@ -8,6 +8,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
@@ -29,12 +30,19 @@ public class MergeTwoEntriesAction extends SimpleCommand {
             return;
         }
 
-        BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
+        BibDatabase database = databaseContext.getDatabase();
         List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
+        BibEntry mergedEntry = entriesMergeResult.mergedEntry();
 
         undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
-            edit.applyEdit(new UndoableInsertEntries(database, entriesMergeResult.mergedEntry()));
+            edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));
             edit.applyEdit(new UndoableRemoveEntries(database, entriesToRemove));
         });
+
+        stateManager.setSelectedEntries(List.of(mergedEntry));
+        stateManager.activeTabProperty().get()
+                    .filter(tab -> databaseContext.getUid().equals(tab.getBibDatabaseContext().getUid()))
+                    .ifPresent(tab -> tab.clearAndSelect(mergedEntry));
     }
 }
