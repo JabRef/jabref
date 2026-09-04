@@ -42,7 +42,7 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_NUMBER: ${{ inputs.pr_number }}
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const {owner, repo} = context.repo;
@@ -112,7 +112,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Remove assignee
         env:
           ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
@@ -144,7 +144,7 @@ jobs:
 
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
           gh issue edit "$ISSUE_NUMBER" --remove-assignee "$PR_USER" || true
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
@@ -177,7 +177,7 @@ jobs:
           gh issue edit "$ISSUE_NUMBER" --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
       - name: Move issue to "Free to take" in "Good First Issues"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -189,7 +189,7 @@ jobs:
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -234,7 +234,7 @@ jobs:
       issues: write
     steps:
       - name: Comment on issue
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
           pr-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           message: |
@@ -252,7 +252,7 @@ jobs:
       issues: write
     steps:
       - name: Delete download comment
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
           pr-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           comment-tag: download-link

@@ -20,13 +20,16 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.logic.formatter.bibtexfields.KeywordSeparatorMigration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.undo.UndoableKeywordSeparatorChange;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -43,6 +46,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -50,13 +54,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
+    private final UndoManager undoManager;
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.undoManager = undoManager;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
 
@@ -86,6 +92,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
+        keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
     }
 
     @Override
@@ -116,7 +123,31 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
+        storeKeywordSeparator(newMetaData);
+
         databaseContext.setMetaData(newMetaData);
+    }
+
+    private void storeKeywordSeparator(MetaData newMetaData) {
+        Optional<Character> previousSeparator = newMetaData.getKeywordSeparator();
+        Optional<Character> newSeparator = Optional.of(keywordSeparatorProperty.getValue().trim())
+                                                   .filter(separator -> !separator.isEmpty())
+                                                   .map(separator -> separator.charAt(0));
+        if (previousSeparator.equals(newSeparator)) {
+            return;
+        }
+
+        Character previousEffectiveSeparator = previousSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        Character newEffectiveSeparator = newSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        undoManager.addEdit(Localization.lang("Change keyword separator"), edit -> {
+            edit.applyEdit(new UndoableKeywordSeparatorChange(newMetaData, previousSeparator, newSeparator));
+            if (!previousEffectiveSeparator.equals(newEffectiveSeparator)) {
+                KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
+                                         .forEach(fieldChange -> edit.addEdit(fieldChange));
+                KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, newEffectiveSeparator)
+                                         .forEach(groupChange -> edit.addEdit(groupChange));
+            }
+        });
     }
 
     ValidationStatus librarySpecificFileDirectoryStatus() {
@@ -193,6 +224,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
+    }
+
+    public StringProperty keywordSeparatorProperty() {
+        return this.keywordSeparatorProperty;
     }
 
     private Path getBrowseDirectory(String configuredDir) {

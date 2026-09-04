@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install TeX Live
-        uses: zauguin/install-texlive@v4
+        uses: zauguin/install-texlive@f5e7d0b117035fff797d4392ea94131747e03d60 # v4
         with:
           package_file: jablib/src/test/latex/Texlivefile
   check-latex:
@@ -85,10 +85,10 @@ jobs:
             bibengine: biber
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install TeX Live
-        uses: zauguin/install-texlive@v4
+        uses: zauguin/install-texlive@f5e7d0b117035fff797d4392ea94131747e03d60 # v4
         with:
           package_file: jablib/src/test/latex/Texlivefile
 
@@ -104,7 +104,7 @@ jobs:
         working-directory: ${{ matrix.directory }}
 
       - name: Upload build result
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: PDF-${{ matrix.tex }}
           path: |
