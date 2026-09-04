@@ -27,6 +27,7 @@
             <RowConstraints/>
             <RowConstraints/>
             <RowConstraints/>
+            <RowConstraints/>
         </rowConstraints>
 
         <Label styleClass="sectionHeader" text="%Override default file directories"
@@ -130,6 +131,10 @@
                GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <ComboBox fx:id="encoding" prefWidth="150.0"
                   GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6"/>
+        <Label text="%Keyword separator"
+               GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <TextField fx:id="keywordSeparator" prefWidth="50.0" maxWidth="50.0"
+                   GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
     </GridPane>
 </fx:root>

@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel;
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -19,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class FieldRowViewModelTest {
 
@@ -32,8 +29,6 @@ public class FieldRowViewModelTest {
     BibEntry mergedEntry;
 
     FieldMergerFactory fieldMergerFactory;
-
-    BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @BeforeEach
     void setup() {
@@ -71,9 +66,7 @@ public class FieldRowViewModelTest {
                 .withField(StandardField.YEAR, "2013");
 
         mergedEntry = new BibEntry();
-        fieldMergerFactory = new FieldMergerFactory(bibEntryPreferences);
-
-        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+        fieldMergerFactory = new FieldMergerFactory(',');
     }
 
     @Test

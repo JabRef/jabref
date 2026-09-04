@@ -30,7 +30,7 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
             return;
         }
 
-        char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
+        char keywordSeparator = metaData.getKeywordSeparator().orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         GroupTreeNode root = metaData.getGroups().orElseGet(() -> {
             GroupTreeNode newRoot = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
             metaData.setGroups(newRoot);

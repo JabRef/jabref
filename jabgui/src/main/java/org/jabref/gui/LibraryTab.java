@@ -46,6 +46,7 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -924,13 +925,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
+        InsertUtil.FeedbackMessage successMessage;
+        InsertUtil.FeedbackMessage partialMessage;
+        if (mode == TransferMode.MOVE) {
+            successMessage = params -> Localization.lang("Moved %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params);
+        } else {
+            successMessage = params -> Localization.lang("Copied %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped", params);
+        }
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
+                new TransferInformation(sourceBibDatabaseContext, mode, originalEntries),
                 entriesToAdd,
                 bibDatabaseContext,
-                params -> Localization.lang("Moved %0 entry(s) to %1", params),
-                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
+                successMessage,
+                partialMessage,
                 dialogService,
                 importHandler,
                 stateManager
