@@ -34,13 +34,14 @@ public interface Identifier {
         }
         String trimmedIdentifier = identifier.trim();
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
+                             () -> SWHID.parse(trimmedIdentifier),
                              () -> DOI.findInText(trimmedIdentifier),
                              () -> ArXivIdentifier.findInText(trimmedIdentifier),
                              () -> ISBN.parse(trimmedIdentifier),
                              () -> SSRN.parse(trimmedIdentifier),
                              () -> RFC.parse(trimmedIdentifier),
-                             () -> IacrEprint.parse(trimmedIdentifier),
-                             () -> SWHID.parse(trimmedIdentifier)
+                             () -> IacrEprint.parse(trimmedIdentifier)
+
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)

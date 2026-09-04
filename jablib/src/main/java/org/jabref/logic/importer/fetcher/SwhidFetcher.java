@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,9 @@ public class SwhidFetcher implements IdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SwhidFetcher.class);
     private static final String API_URL = "https://archive.softwareheritage.org/api/1/raw-intrinsic-metadata/citation/swhid/";
 
+    // Software Heritage allows 120 requests per hour for anonymous users
+    // [impl->req~fetchers.rate-limiting~1]
+    static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval(FETCHER_NAME, 120, Duration.ofHours(1));
     private final ImportFormatPreferences importFormatPreferences;
 
     public SwhidFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -64,6 +68,7 @@ public class SwhidFetcher implements IdBasedFetcher {
         }
 
         String canonicalSwhid = parsedSwhid.get().asString();
+        RATE_LIMITER.acquire(canonicalSwhid);
 
         URL url;
         try {
@@ -99,7 +104,10 @@ public class SwhidFetcher implements IdBasedFetcher {
 
             return Optional.of(entry);
         } catch (FetcherClientException e) {
-            if (e.getHttpResponse().isPresent() && e.getHttpResponse().get().statusCode() == 404) {
+            boolean isNotFound = e.getHttpResponse()
+                                  .map(response -> response.statusCode() == 404)
+                                  .orElse(false);
+            if (isNotFound) {
                 LOGGER.debug("No citation metadata found for SWHID: {}", canonicalSwhid, e);
                 return Optional.empty();
             }

@@ -2,6 +2,7 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,11 +12,15 @@ import org.jabref.model.entry.field.Field;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class SWHID implements Identifier {
 
     public static final String SWHID_PREFIX = "https://archive.softwareheritage.org/";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SWHID.class);
 
     private static final String SWHID_REGEX =
             "^(?:https?://archive\\.softwareheritage\\.org/)?(swh:1:(?:cnt|dir|rel|rev|snp):[0-9a-fA-F]{40}(?:;[a-zA-Z0-9_]+=[^;\\s]+)*)$";
@@ -58,6 +63,7 @@ public class SWHID implements Identifier {
         try {
             return Optional.of(new URI(SWHID_PREFIX + swhid));
         } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create URI for SWHID {}", swhid, e);
             return Optional.empty();
         }
     }
@@ -70,12 +76,12 @@ public class SWHID implements Identifier {
         if (!(o instanceof SWHID other)) {
             return false;
         }
-        return swhid.equalsIgnoreCase(other.swhid);
+        return swhid.equals(other.swhid);
     }
 
     @Override
     public int hashCode() {
-        return swhid.toLowerCase().hashCode();
+        return Objects.hash(swhid);
     }
 
     @Override

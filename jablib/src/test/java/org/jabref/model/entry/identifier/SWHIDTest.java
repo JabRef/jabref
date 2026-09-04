@@ -5,14 +5,14 @@ import java.util.Optional;
 
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 public class SWHIDTest {
 
     private static final String DIRECTORY_SWHID = "swh:1:dir:2dc0f462d191524530f5612d2935851505af41dd";
@@ -22,24 +22,21 @@ public class SWHIDTest {
     @Test
     void parse_validPlainSwhid_returnsSwhid() {
         Optional<SWHID> swhid = SWHID.parse(DIRECTORY_SWHID);
-        assertTrue(swhid.isPresent());
-        assertEquals(DIRECTORY_SWHID, swhid.get().asString());
-        assertEquals(BiblatexSoftwareField.SWHID, swhid.get().getDefaultField());
-        assertEquals(Optional.of(URI.create("https://archive.softwareheritage.org/" + DIRECTORY_SWHID)), swhid.get().getExternalURI());
+        assertEquals(Optional.of(new SWHID(DIRECTORY_SWHID)), swhid);
+        assertEquals(BiblatexSoftwareField.SWHID, swhid.map(SWHID::getDefaultField).orElse(null));
+        assertEquals(Optional.of(URI.create("https://archive.softwareheritage.org/" + DIRECTORY_SWHID)), swhid.flatMap(SWHID::getExternalURI));
     }
 
     @Test
     void parse_qualifiedSwhid_returnsSwhid() {
         Optional<SWHID> swhid = SWHID.parse(QUALIFIED_SWHID);
-        assertTrue(swhid.isPresent());
-        assertEquals(QUALIFIED_SWHID, swhid.get().asString());
+        assertEquals(Optional.of(new SWHID(QUALIFIED_SWHID)), swhid);
     }
 
     @Test
     void parse_urlPrefixedSwhid_returnsStrippedSwhid() {
         Optional<SWHID> swhid = SWHID.parse("https://archive.softwareheritage.org/" + DIRECTORY_SWHID);
-        assertTrue(swhid.isPresent());
-        assertEquals(DIRECTORY_SWHID, swhid.get().asString());
+        assertEquals(Optional.of(new SWHID(DIRECTORY_SWHID)), swhid);
     }
 
     @ParameterizedTest
@@ -51,6 +48,6 @@ public class SWHIDTest {
             "swh:1:dir2dc0f462d191524530f5612d2935851505af41dd",
             "swh:1:dir:short"})
     void parse_invalidInputs_returnsEmpty(String invalidInput) {
-        assertFalse(SWHID.parse(invalidInput).isPresent());
+        assertEquals(Optional.empty(), SWHID.parse(invalidInput));
     }
 }
