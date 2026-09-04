@@ -23,11 +23,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - title: 'JabCon 2026 | contribute.jabref.org'
+          - title: 'JabCon 2026'
             start: '2026-09-03'
             end: ''
             file: 'jabcon-2026.mp4'
-            seconds_per_day: '20'
+            seconds_per_day: '100'
 
     steps:
       - name: Checkout
