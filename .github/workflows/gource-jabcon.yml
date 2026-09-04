@@ -23,11 +23,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - title: 'JabCon 2026 | contribute.jabref.org'
-            start: '2026-09-04'
+          - title: 'JabCon 2026'
+            start: '2026-09-03'
             end: ''
             file: 'jabcon-2026.mp4'
-            seconds_per_day: '20'
+            seconds_per_day: '100'
 
     steps:
       - name: Checkout
@@ -45,6 +45,8 @@ jobs:
           gource_start_date: ${{ matrix.start }}
           gource_stop_date: ${{ matrix.end }}
           gource_seconds_per_day: ${{ matrix.seconds_per_day }}
+          # skip only long idle stretches (nights); the default 3 s would compress the whole day into jumps
+          gource_auto_skip_seconds: '30'
           gource_file_filter: 'buildres/csl|\.csl'
 
       - name: Store video
