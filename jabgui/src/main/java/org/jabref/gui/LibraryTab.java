@@ -602,7 +602,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
     ///
     /// @param numberOfEntries number of entries user is selecting
-    /// @return true if user confirm to delete entry
+     /// @return true if user confirm to delete entry
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferences.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -662,8 +662,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         ButtonType buttonType;
-        // Any button closes the alert, so "Show diff" re-asks after the diff dialog was closed
-        do {
+        // Any button closes the alert, so "Show diff" re-asks after the diff dialog was closed.
+        // Not a do-while: IntelliJ's formatter mangles those (puts the brace on its own line).
+        while (true) {
             Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                     Localization.lang("Save before closing"),
                     Localization.lang("Library '%0' has been modified.", filename),
@@ -672,10 +673,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 return true;
             }
             buttonType = response.get();
-            if (buttonType.equals(showDiff)) {
-                showDiffToSavedFile();
+            if (!buttonType.equals(showDiff)) {
+                break;
             }
-        } while (buttonType.equals(showDiff));
+            showDiffToSavedFile();
+        }
 
         if (buttonType.equals(returnToLibrary)) {
             return false;
@@ -1097,7 +1099,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Creates a new library tab. Contents are loaded by the `dataLoadingTask`. Most of the other parameters are required by `resetChangeMonitor()`.
     ///
     /// @param dataLoadingTask The task to execute to load the data asynchronously.
-    /// @param file            the path to the file (loaded by the dataLoadingTask)
+     /// @param file            the path to the file (loaded by the dataLoadingTask)
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,
