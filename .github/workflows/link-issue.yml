@@ -37,7 +37,7 @@ jobs:
           printf 'PR Body:\n%s\n' "$PR_BODY"
       - name: Determine issue number
         id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
+        uses: koppor/ticket-check-action@5c5d28364fe8d3c2822611e0556fcacdde473b49 # add-output
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
@@ -90,7 +90,7 @@ jobs:
       issues: write
     steps:
       - name: Move issue to "In Progress" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -101,7 +101,7 @@ jobs:
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "In Progress" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -122,10 +122,10 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0

@@ -39,6 +39,10 @@
   - changed-files:
       - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/browserext/**'
 
+"component: bst":
+  - changed-files:
+      - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/bst/**'
+
 "component: citationkey-generator":
   - changed-files:
       - any-glob-to-any-file:
@@ -71,6 +75,17 @@
 "component: css":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/*.css'
+
+"component: diff-merge":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/externalfiles/PdfMergeDialog.java'
+          - 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+          - 'jablib/src/**/org/jabref/logic/bibtex/comparator/**'
+          - 'jablib/src/**/org/jabref/logic/git/conflicts/**'
+          - 'jablib/src/**/org/jabref/logic/git/diff/**'
+          - 'jablib/src/**/org/jabref/logic/git/merge/**'
+          - 'jablib/src/**/org/jabref/logic/importer/fetcher/MergingIdBasedFetcher.java'
 
 "component: duplicate-finder":
   - changed-files:
@@ -153,7 +168,7 @@
           - 'jablib/src/**/org/jabref/logic/l10n/**'
           - 'jabgui/src/**/org/jabref/gui/l10n/**'
 
-"component: JabKit [cli]":
+"component: jabkit":
   - changed-files:
       - any-glob-to-any-file: 'jabkit/**'
 
@@ -163,7 +178,7 @@
           - 'jabsrv/**'
           - 'jabsrv-cli/**'
 
-"component: journal abbreviations":
+"component: journal-abbreviations":
   - changed-files:
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/journals/**'
@@ -172,6 +187,20 @@
 "component: keybinding":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/keyboard/**'
+
+# AUX/BLG/BST/TEX files JabRef reads or writes alongside a LaTeX document.
+"component: latex-file-support":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/auxparser/**'
+          - 'jablib/src/**/org/jabref/logic/biblog/**'
+          - 'jablib/src/**/org/jabref/logic/blg/**'
+          - 'jablib/src/**/org/jabref/logic/bst/**'
+          - 'jablib/src/**/org/jabref/logic/texparser/**'
+          - 'jablib/src/**/org/jabref/model/biblog/**'
+          - 'jablib/src/**/org/jabref/model/texparser/**'
+          - 'jabgui/src/**/org/jabref/gui/auximport/**'
+          - 'jabgui/src/**/org/jabref/gui/texparser/**'
 
 "component: libre-office":
   - changed-files:
@@ -195,10 +224,6 @@
 "component: maintable":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
-
-"component: merge":
-  - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
 
 "component: microsoft-word-integration":
   - changed-files:
@@ -246,6 +271,12 @@
           - 'jabgui/src/**/*.fxml'
           - 'jabgui/src/**/*.css'
 
+"component: special-fields":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/specialfields/**'
+          - 'jablib/src/**/org/jabref/model/entry/field/SpecialField*.java'
+
 "component: theming":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/theme/**'
@@ -257,3 +288,10 @@
 "component: welcome-walkthrough":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/walkthrough/**'
+
+"component: xmp":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/xmp/**'
+          - 'jablib/src/**/*Xmp*.java'
+          - 'jabgui/src/**/org/jabref/gui/preferences/xmp/**'

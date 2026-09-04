@@ -14,16 +14,16 @@ jobs:
       packages: write
     steps:
       - name: Cancel workflow "binaries" run
-        uses: styfle/cancel-workflow-action@0.13.1
+        uses: styfle/cancel-workflow-action@d07a454dad7609a92316b57b23c9ccfd4f59af66 # 0.13.1
         with:
           ignore_sha: true
           workflow_id: 9160969135
       - name: Cancel workflow "binaries (ea)" run
-        uses: styfle/cancel-workflow-action@0.13.1
+        uses: styfle/cancel-workflow-action@d07a454dad7609a92316b57b23c9ccfd4f59af66 # 0.13.1
         with:
           ignore_sha: true
           workflow_id: 160969125
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: "Check for 'dev: binaries' label"
         id: check_label
         run: |
@@ -37,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Delete folder on builds.jabref.org
         if: steps.check_label.outputs.has_label_binaries == 'yes'
-        uses: appleboy/ssh-action@v1.2.5
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
           host: build-upload.jabref.org
@@ -56,7 +56,7 @@ jobs:
       - name: Remove Docker Tag
         if: steps.changed-docker-files.outputs.any_changed == 'true'
         # A separate action is needed to delete a tag - see https://github.com/orgs/community/discussions/26267
-        uses: rafalkk/remove-dockertag-action@v1
+        uses: rafalkk/remove-dockertag-action@581f14f26a4a127cbe4145f7584975483a58b4e8 # v1
         with:
           tag_name: pr-${{ github.event.pull_request.number }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
