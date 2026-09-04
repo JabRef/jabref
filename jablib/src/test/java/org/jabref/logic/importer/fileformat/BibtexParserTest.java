@@ -1585,7 +1585,7 @@ class BibtexParserTest {
         assertEquals(Optional.of(';'), reopened.getMetaData().getKeywordSeparator());
         assertEquals("existing;static", reopenedEntry.getField(StandardField.GROUPS).orElseThrow());
         assertEquals(List.of(new ExplicitGroup("static", GroupHierarchyType.INDEPENDENT, ';')),
-                reopenedRoot.findChildrenSatisfying(groupTreeNode -> groupTreeNode.getGroup().getName().equals("static"))
+                reopenedRoot.findChildrenSatisfying(groupTreeNode -> "static".equals(groupTreeNode.getGroup().getName()))
                             .stream()
                             .map(GroupTreeNode::getGroup)
                             .toList());
