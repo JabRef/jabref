@@ -64,7 +64,6 @@ public class SidePaneContentFactory {
                             preferences,
                             dialogService,
                             aiService,
-                            undoManager,
                             fileUpdateMonitor,
                             taskExecutor);
             case OPEN_OFFICE ->

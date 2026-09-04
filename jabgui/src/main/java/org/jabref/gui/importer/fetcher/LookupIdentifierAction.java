@@ -12,10 +12,10 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.undo.CompoundEdit;
@@ -33,18 +33,15 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private final IdFetcher<T> fetcher;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
     public LookupIdentifierAction(IdFetcher<T> fetcher,
                                   StateManager stateManager,
-                                  UndoManager undoManager,
                                   DialogService dialogService,
                                   TaskExecutor taskExecutor) {
         this.fetcher = fetcher;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -55,7 +52,10 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
     @Override
     public void execute() {
         try {
-            BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
+            // The library is read here rather than when the lookup finishes: the entries are
+            // recorded against the one the user started on, not the one in front at the end.
+            Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+            BackgroundTask.wrap(() -> lookupIdentifiers(databaseContext, stateManager.getSelectedEntries()))
                           .onSuccess(dialogService::notify)
                           .executeWith(taskExecutor);
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         return fetcher::getIdentifierName;
     }
 
-    private String lookupIdentifiers(List<BibEntry> bibEntries) {
+    private String lookupIdentifiers(Optional<BibDatabaseContext> databaseContext, List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
         CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;
@@ -101,7 +101,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 }
             }
         }
-        undoManager.addEdit(compoundEdit.toChangeSet());
+        databaseContext.ifPresent(database -> stateManager.getUndoManager(database).addEdit(compoundEdit.toChangeSet()));
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }
 }

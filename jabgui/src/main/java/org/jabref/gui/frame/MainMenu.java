@@ -235,7 +235,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
-                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService, undoManager)));
+                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService)));
         SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();
         specialFieldsSeparator.visibleProperty().bind(preferences.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
 
@@ -290,7 +290,7 @@ public class MainMenu extends MenuBar {
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())) {
-            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, undoManager, dialogService, taskExecutor);
+            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, dialogService, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 

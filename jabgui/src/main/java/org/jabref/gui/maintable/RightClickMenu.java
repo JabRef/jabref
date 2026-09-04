@@ -103,7 +103,7 @@ public class RightClickMenu {
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
-                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor))
+                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor))
         );
 
         EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
