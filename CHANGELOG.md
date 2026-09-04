@@ -193,7 +193,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
 - We fixed an issue where deleting an entry removed the group filter and defaulted to the home view. [#16036](https://github.com/JabRef/jabref/issues/16036)
-- We fixed the search box `styleProperty` replacing the hardcoded color with PseudoClasses. [#15721](https://github.com/JabRef/jabref/issues/15721), also the search box text was invisible with `JabRef - Light theme` - fixed as a side effect. 
+- We fixed the search box invisible text with `JabRef - Light theme` - fixed as a side effect for [#15721](https://github.com/JabRef/jabref/issues/15721).
 
 ### Removed
 
