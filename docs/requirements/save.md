@@ -12,6 +12,15 @@ The detection is best-effort: it is based on the file's size and modification ti
 
 Needs: impl, utest
 
+## File attributes survive an atomic save
+`req~logic.exporter.preserve-file-attributes~1`
+
+An atomic save replaces the target file with a newly created one.
+The group, DOS attributes (hidden, system, archive, read-only), ACL, and user-defined extended attributes (e.g., macOS Finder tags) of the previous file must be carried over to the new file.
+This is best-effort: an attribute class the file system does not support, or the OS refuses to set (e.g., a group the user is not a member of), is skipped without failing the save. Ownership is not restored, because that requires elevated privileges.
+
+Needs: impl, utest
+
 ## Failed backup writes do not replace recoverable files
 `req~jabgui.autosaveandbackup.complete-backup~1`
 

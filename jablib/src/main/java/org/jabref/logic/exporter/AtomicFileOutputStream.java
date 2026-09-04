@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -14,14 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.AclFileAttributeView;
-import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.DosFileAttributes;
-import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jabref.logic.os.OS;
@@ -327,6 +323,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
+            if (Files.exists(targetFile)) {
+                // An in-place overwrite keeps the attributes anyway; copying them nonetheless is harmless and covers
+                // the fallback to a move when no backup could be created. Done before the final change check, because
+                // ACL and extended-attribute I/O take time on network shares.
+                copyAttributes(targetFile, temporaryFile);
+            }
+
             // Re-check right before the commit: creating the backup of a large file can take a while, so the first
             // check may be long in the past by now
             try {
@@ -343,12 +346,6 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     }
                 }
                 throw exception;
-            }
-
-            if (Files.exists(targetFile)) {
-                // An in-place overwrite keeps the attributes anyway; copying them nonetheless is harmless and covers
-                // the fallback to a move when no backup could be created
-                copyAttributes(targetFile, temporaryFile);
             }
 
             if (mustOverwriteTargetInPlace) {
@@ -391,13 +388,16 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// mounted file system may lack support the default file system advertises, and setting a group the user is not
     /// a member of is refused by the OS. POSIX permissions are restored separately after the move, so that they also
     /// apply to a freshly created target.
+    ///
+    /// The string-based attribute API is used instead of the typed views: it never yields `null` and transfers each
+    /// extended attribute completely or throws, so a partial transfer cannot go unnoticed.
+    // [impl->req~logic.exporter.preserve-file-attributes~1]
     private static void copyAttributes(Path source, Path target) {
         Set<String> views = source.getFileSystem().supportedFileAttributeViews();
 
         if (views.contains("posix")) {
             try {
-                Files.getFileAttributeView(target, PosixFileAttributeView.class)
-                     .setGroup(Files.readAttributes(source, PosixFileAttributes.class).group());
+                Files.setAttribute(target, "posix:group", Files.readAttributes(source, PosixFileAttributes.class).group());
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy group of {} to {}", source, target, exception);
             }
@@ -406,12 +406,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         if (views.contains("dos")) {
             try {
                 DosFileAttributes attributes = Files.readAttributes(source, DosFileAttributes.class);
-                DosFileAttributeView targetView = Files.getFileAttributeView(target, DosFileAttributeView.class);
-                targetView.setHidden(attributes.isHidden());
-                targetView.setSystem(attributes.isSystem());
-                targetView.setArchive(attributes.isArchive());
+                Files.setAttribute(target, "dos:hidden", attributes.isHidden());
+                Files.setAttribute(target, "dos:system", attributes.isSystem());
+                Files.setAttribute(target, "dos:archive", attributes.isArchive());
                 // Last: a read-only file refuses further attribute changes on some platforms
-                targetView.setReadOnly(attributes.isReadOnly());
+                Files.setAttribute(target, "dos:readonly", attributes.isReadOnly());
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy DOS attributes of {} to {}", source, target, exception);
             }
@@ -419,8 +418,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         if (views.contains("acl")) {
             try {
-                Files.getFileAttributeView(target, AclFileAttributeView.class)
-                     .setAcl(Files.getFileAttributeView(source, AclFileAttributeView.class).getAcl());
+                Files.setAttribute(target, "acl:acl", Files.getAttribute(source, "acl:acl"));
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy ACL of {} to {}", source, target, exception);
             }
@@ -428,13 +426,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         if (views.contains("user")) {
             try {
-                UserDefinedFileAttributeView sourceView = Files.getFileAttributeView(source, UserDefinedFileAttributeView.class);
-                UserDefinedFileAttributeView targetView = Files.getFileAttributeView(target, UserDefinedFileAttributeView.class);
-                for (String name : sourceView.list()) {
-                    ByteBuffer value = ByteBuffer.allocate(sourceView.size(name));
-                    sourceView.read(name, value);
-                    value.flip();
-                    targetView.write(name, value);
+                for (Map.Entry<String, Object> attribute : Files.readAttributes(source, "user:*").entrySet()) {
+                    Files.setAttribute(target, "user:" + attribute.getKey(), attribute.getValue());
                 }
             } catch (IOException | UnsupportedOperationException exception) {
                 LOGGER.debug("Could not copy extended attributes of {} to {}", source, target, exception);

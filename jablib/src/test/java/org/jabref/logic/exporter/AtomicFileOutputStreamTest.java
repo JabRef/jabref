@@ -4,14 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -28,6 +26,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -58,15 +57,15 @@ class AtomicFileOutputStreamTest {
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
     }
 
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
     @Test
     void userDefinedAttributesArePreserved(@TempDir Path tempDir) throws IOException {
         Path out = tempDir.resolve("tagged.txt");
         Files.writeString(out, FIFTY_CHARS);
-        UserDefinedFileAttributeView view = Files.getFileAttributeView(out, UserDefinedFileAttributeView.class);
-        assumeTrue(out.getFileSystem().supportedFileAttributeViews().contains("user"), "file system has no user-defined attribute view");
+        byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
         try {
-            view.write("jabref.test", StandardCharsets.UTF_8.encode("tagged"));
-        } catch (IOException exception) {
+            Files.setAttribute(out, "user:jabref.test", tag);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
             assumeTrue(false, "file system does not support user-defined attributes: " + exception);
         }
 
@@ -74,11 +73,7 @@ class AtomicFileOutputStreamTest {
             atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
         }
 
-        UserDefinedFileAttributeView savedView = Files.getFileAttributeView(out, UserDefinedFileAttributeView.class);
-        ByteBuffer value = ByteBuffer.allocate(savedView.size("jabref.test"));
-        savedView.read("jabref.test", value);
-        value.flip();
-        assertEquals("tagged", StandardCharsets.UTF_8.decode(value).toString());
+        assertArrayEquals(tag, (byte[]) Files.getAttribute(out, "user:jabref.test"));
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
     }
 

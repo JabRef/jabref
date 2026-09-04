@@ -104,7 +104,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where saving a library, writing a backup, or writing PDF metadata dropped the file's group, hidden/read-only flags, ACL and extended attributes (e.g. macOS Finder tags). [koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
+- We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first (if autosave is enabled) or asks to save it, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
