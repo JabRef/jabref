@@ -4,11 +4,8 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.transformation.FilteredList;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,12 +22,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -196,18 +191,14 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setAnimations() {
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
+        PseudoClass flash = PseudoClass.getPseudoClass("flash");
 
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
         invalidateSearch = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
-                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0), event -> searchBox.pseudoClassStateChanged(flash, false)),
+                new KeyFrame(Duration.seconds(0.25), event -> searchBox.pseudoClassStateChanged(flash, true)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
                 new KeyFrame(Duration.seconds(0.25), (ActionEvent _) -> addAbbreviationActions()),
-                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
+                new KeyFrame(Duration.seconds(0.5), event -> searchBox.pseudoClassStateChanged(flash, false))
         );
     }
 
