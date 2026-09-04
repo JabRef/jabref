@@ -222,10 +222,10 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager)),
                 RightClickMenu.createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -264,7 +264,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.ADD_ENTRY_IDENTIFIER, new NewEntryAction(NewEntryDialogTab.ENTER_IDENTIFIER, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.ADD_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryDialogTab.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
 

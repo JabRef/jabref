@@ -417,10 +417,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
