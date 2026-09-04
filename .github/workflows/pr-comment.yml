@@ -69,7 +69,7 @@ jobs:
 
       - name: Download PR number
         if: ${{ github.event_name == 'workflow_run' }}
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         continue-on-error: true
         with:
           name: pr_number
@@ -114,12 +114,12 @@ jobs:
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
@@ -136,7 +136,7 @@ jobs:
 
       # Set a common variable for PR number and workflow_run_id from either event.
       - name: Set variables
-        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || steps.read-pr_number.outputs.pr_number != '' }}
         id: set-vars
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -160,7 +160,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # No setup-gradle here: this job never runs Gradle, it only needs a JDK and JBang.
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         with:
           distribution: 'corretto'
@@ -172,7 +172,7 @@ jobs:
       - name: Cache JBang
         # Own key: ghprcomment pulls different dependencies than the other JBang jobs.
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -219,7 +219,10 @@ jobs:
         # Every workflow in this workflow's workflow_run trigger list is a label-relevant producer:
         # the pending guard below defers evaluation to whichever of them finishes last, so each of
         # their completion events must be allowed to run this step - not only Source Code Tests.
-        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        # Deliberately not restricted to fork PRs (unlike ghprcomment, which only forks need):
+        # labels are computed nowhere else, and with the restriction a same-repo PR whose Qodo
+        # review arrived while a check was still running never got a second chance to be labelled.
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event_name, 'pull_request_review') || steps.read-pr_number.outputs.pr_number != '' }}
         run: |
           # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
           # this step's own mutations (ghprcomment may have run for a while in between).
@@ -312,6 +315,11 @@ jobs:
             fi
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # On the pull_request_review* events of a fork PR the default GITHUB_TOKEN is read-only,
+          # so writing the label fails with "Resource not accessible by integration". The PAT is
+          # unaffected. Labels set by it do emit "labeled" events, which is harmless here: the only
+          # listener acting on a status label ("Adapt PR status") marks drafts ready for review,
+          # and this step never puts "status: ready-for-review" on a draft.
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
           HEAD_SHA: ${{ github.event.inputs.head_sha }}
