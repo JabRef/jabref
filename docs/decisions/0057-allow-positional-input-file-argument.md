@@ -4,6 +4,9 @@ parent: Decision Records
 status: "accepted; supersedes ADR-0045"
 ---
 # Allow a Positional Input File Argument for `jabkit` Commands
+`adr~allow-positional-input-file-argument~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 
@@ -91,3 +94,5 @@ Tests in `jabkit` exercise both the positional and the `--input` form.
 * [ADR-0045](0045-use-input-flag-always-for-input-files.md), which this decision supersedes
 * [Command Line Interface Guidelines](https://clig.dev/)
 * [GitHub Discussion prompting ADR-0045](https://github.com/JabRef/jabref/pull/13158#discussion_r2106254233)
+
+<!-- markdownlint-disable-file MD022 -->
