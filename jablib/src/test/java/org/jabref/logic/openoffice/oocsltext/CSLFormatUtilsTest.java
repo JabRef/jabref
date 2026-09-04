@@ -235,8 +235,8 @@ class CSLFormatUtilsTest {
 
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
-                        "(1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        getStyle("ACS Guide 2022 revision")
+                        "(1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb<p></p>",
+                        getStyle("ACS Guide 2026 revision")
                 ),
 
                 // Numeric with right parenthesis - "1)"
@@ -329,7 +329,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        getStyle("ACS Guide 2022 revision")
+                        getStyle("ACS Guide 2026 revision")
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
@@ -451,7 +451,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        getStyle("ACS Guide 2022 revision")
+                        getStyle("ACS Guide 2026 revision")
                 ),
 
                 Arguments.of(
