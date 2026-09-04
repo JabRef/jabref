@@ -36,19 +36,29 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
+    private final Character keywordSeparator;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
-                citationKeyPatternPreferences);
+                citationKeyPatternPreferences,
+                bibDatabaseContext.getKeywordSeparator(citationKeyPatternPreferences.getKeywordSeparator()));
     }
 
     public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
                                 @NonNull BibDatabase database,
                                 @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(citeKeyPattern, database, citationKeyPatternPreferences, citationKeyPatternPreferences.getKeywordSeparator());
+    }
+
+    private CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern,
+                                 BibDatabase database,
+                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                 Character keywordSeparator) {
         this.citeKeyPattern = citeKeyPattern;
         this.database = database;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.keywordSeparator = keywordSeparator;
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
@@ -236,7 +246,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// @param entry the [BibEntry] that a citation key is generated for
     /// @return a cleaned citation key for the given [BibEntry]
     private Function<String, String> expandBracketContent(BibEntry entry) {
-        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordSeparator();
+        Character keywordDelimiter = keywordSeparator;
 
         return (String bracket) -> {
             String expandedPattern;

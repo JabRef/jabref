@@ -3,7 +3,6 @@ package org.jabref.gui.mergeentries;
 import java.util.stream.Stream;
 
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.GroupMerger;
-import org.jabref.model.entry.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +18,7 @@ class GroupMergerTest {
 
     @BeforeEach
     void setup() {
-        BibEntryPreferences bibEntryPreferences = new BibEntryPreferences(delimiter);
-        this.groupMerger = new GroupMerger(bibEntryPreferences);
+        this.groupMerger = new GroupMerger(delimiter);
     }
 
     private static Stream<Arguments> mergeShouldMergeGroupsCorrectly() {
