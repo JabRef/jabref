@@ -45,6 +45,8 @@ jobs:
           gource_start_date: ${{ matrix.start }}
           gource_stop_date: ${{ matrix.end }}
           gource_seconds_per_day: ${{ matrix.seconds_per_day }}
+          # skip only long idle stretches (nights); the default 3 s would compress the whole day into jumps
+          gource_auto_skip_seconds: '30'
           gource_file_filter: 'buildres/csl|\.csl'
 
       - name: Store video
