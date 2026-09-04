@@ -716,29 +716,35 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     // [impl->req~ux.close.show-diff~1]
     private void showDiffToSavedFile() {
         BackgroundTask.wrap(this::loadSavedFile)
-                      .onSuccess(savedDatabase -> {
-                          List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
-                          dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
-                                  Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
-                      })
-                      .onFailure(exception -> {
-                          LOGGER.error("Could not read saved library for diff", exception);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), exception);
-                      })
+                      .onSuccess(this::showDiffDialog)
+                      .onFailure(this::showDiffError)
                       .executeWith(taskExecutor);
     }
 
+    /// Parses the file on disk; its TeX groups must not register with the shared file monitor because the snapshot is discarded after the diff.
     private BibDatabaseContext loadSavedFile() {
-        // The snapshot is discarded after the diff, so its TeX groups must not register with the shared file monitor
         return bibDatabaseContext.getDatabasePath()
-                                 .map(path -> {
-                                     try {
-                                         return GitDiffChecker.checkSavedWorkingTreeVersion(path, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
-                                     } catch (IOException e) {
-                                         throw new UncheckedIOException(e);
-                                     }
-                                 })
+                                 .map(this::parseSavedFile)
                                  .orElseGet(BibDatabaseContext::empty);
+    }
+
+    private BibDatabaseContext parseSavedFile(Path path) {
+        try {
+            return GitDiffChecker.checkSavedWorkingTreeVersion(path, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void showDiffDialog(BibDatabaseContext savedDatabase) {
+        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+        dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
+                Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
+    }
+
+    private void showDiffError(Exception exception) {
+        LOGGER.error("Could not read saved library for diff", exception);
+        dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), exception);
     }
 
     private void onCloseRequest(Event event) {
