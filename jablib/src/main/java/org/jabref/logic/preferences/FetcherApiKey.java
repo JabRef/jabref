@@ -9,11 +9,17 @@ public class FetcherApiKey {
     private final StringProperty name;
     private final BooleanProperty use;
     private final StringProperty key;
+    private final BooleanProperty persist;
 
-    public FetcherApiKey(String name, boolean use, String key) {
+    public FetcherApiKey(String name, boolean use, String key, boolean persist) {
         this.name = new SimpleStringProperty(name);
         this.use = new SimpleBooleanProperty(use);
         this.key = new SimpleStringProperty(key);
+        this.persist = new SimpleBooleanProperty(persist);
+    }
+
+    public FetcherApiKey(String name, boolean use, String key) {
+        this(name, use, key, false);
     }
 
     public String getName() {
@@ -46,5 +52,17 @@ public class FetcherApiKey {
 
     public void setKey(String key) {
         this.key.setValue(key);
+    }
+
+    public boolean shouldPersist() {
+        return persist.getValue();
+    }
+
+    public BooleanProperty persistProperty() {
+        return persist;
+    }
+
+    public void setPersist(boolean persist) {
+        this.persist.setValue(persist);
     }
 }

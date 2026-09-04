@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2360,7 +2361,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport()),
                 getCustomImportFormats(defaultValues.getCustomImporters()),
                 getFetcherKeys(defaultValues.getApiKeys()),
-                getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys()),
                 hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaultValues.getCatalogs(),
                 getDefaultPlainCitationParser(defaultValues.getDefaultPlainCitationParser()),
                 getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaultValues.getCitationsRelationsStoreTTL()),
@@ -2371,9 +2371,6 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
-        // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
-        // decide whether to write the keyring, so the flag has to be in place first.
-        bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),
                 () -> getFetcherKeys(defaultValues.getApiKeys()));
@@ -2436,6 +2433,25 @@ public class JabRefCliPreferences implements CliPreferences {
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
         List<String> keys = getFetcherKeysFromKeyring(names);
 
+        // Backward compatibility for persists: if the key exists as a single boolean (legacy), expand to match names
+        List<String> persists;
+        if (hasKey(FETCHER_CUSTOM_KEY_PERSIST)) {
+            List<String> rawPersists = getStringList(FETCHER_CUSTOM_KEY_PERSIST);
+            if (rawPersists.size() == 1 && names.size() > 1) {
+                boolean legacyPersist = Boolean.parseBoolean(rawPersists.getFirst());
+                persists = Collections.nCopies(names.size(), String.valueOf(legacyPersist));
+            } else if (rawPersists.size() == names.size()) {
+                persists = rawPersists;
+            } else {
+                // Size mismatch but not the legacy single case -> treat as missing/defaults
+                LOGGER.warn("Could not load fetcher keys from preferences (persist size mismatch). Will ignore.");
+                return defaults;
+            }
+        } else {
+            // No persist key at all -> assume all false
+            persists = Collections.nCopies(names.size(), "false");
+        }
+
         if (names.size() != uses.size() || names.size() != keys.size()) {
             LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
             return defaults;
@@ -2444,9 +2460,9 @@ public class JabRefCliPreferences implements CliPreferences {
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
-                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
                     (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
-                    i < keys.size() ? keys.get(i) : ""));
+                    i < keys.size() ? keys.get(i) : "",
+                    (i < persists.size()) && Boolean.parseBoolean(persists.get(i))));
         }
 
         return fetcherApiKeys;
@@ -2466,28 +2482,32 @@ public class JabRefCliPreferences implements CliPreferences {
     private void storeFetcherKeys(ImporterPreferences defaults) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        Map<KeyringSlot, String> keys = new HashMap<>();
+        List<String> persists = new ArrayList<>();
+        Map<KeyringSlot, String> keyringUpdates = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
             names.add(apiKey.getName());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            persists.add(String.valueOf(apiKey.shouldPersist()));
+            String valueToStore = apiKey.shouldPersist() ? apiKey.getKey() : "";
+            keyringUpdates.put(KeyringSlot.customApiKey(apiKey.getName()), valueToStore);
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+        putStringList(FETCHER_CUSTOM_KEY_PERSIST, persists);
 
-        if (defaults.shouldPersistCustomKeys()) {
-            writeKeyring(keys);
-        } else {
-            clearCustomFetcherKeys();
+        if (!keyringUpdates.isEmpty()) {
+            writeKeyring(keyringUpdates);
         }
     }
 
     private void clearCustomFetcherKeys() {
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
         Map<KeyringSlot, String> cleared = new HashMap<>();
-        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
-            cleared.put(KeyringSlot.customApiKey(name), "");
+        for (KeyringSlot slot : slots) {
+            cleared.put(slot, "");
         }
         writeKeyring(cleared);
     }
