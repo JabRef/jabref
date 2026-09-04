@@ -66,8 +66,8 @@ public class NormalizeKeywordDelimitersFormatter extends Formatter implements Ke
                                       .or(() -> Optional.ofNullable(preferences.getKeywordSeparator()))
                                       .orElse(BibEntryPreferences.getDefault().getKeywordSeparator());
         List<Character> delimiters = Stream.concat(
-                KeywordImportNormalizer.parseConfiguredDelimiters(preferences.getImportKeywordDelimiters()).stream(),
-                Stream.of(separator))
+                                                   KeywordImportNormalizer.parseConfiguredDelimiters(preferences.getImportKeywordDelimiters()).stream(),
+                                                   Stream.of(separator))
                                            .distinct()
                                            .toList();
         BibEntryPreferences.ImportDelimiterParsingStrategy strategy = Optional.ofNullable(preferences.getImportDelimiterParsingStrategy())

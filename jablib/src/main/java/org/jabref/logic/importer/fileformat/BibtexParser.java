@@ -282,7 +282,7 @@ public class BibtexParser implements Parser {
             }
             if (!parsedBibDeskGroups.isEmpty()) {
                 Character keywordSeparator = metaData.getKeywordSeparator()
-                                                    .orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                                                     .orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 createBibDeskGroupTree(keywordSeparator);
                 addBibDeskGroupEntriesToJabRefGroups(keywordSeparator);
             }
