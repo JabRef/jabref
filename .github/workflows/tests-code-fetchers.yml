@@ -1,4 +1,4 @@
-name: Fetcher Tests
+name: External Services Tests
 
 on:
   push:
@@ -36,6 +36,7 @@ env:
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
+  ScholarApiKey: ${{ secrets.SCHOLARAPIKEY_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   CROSSREF_EMAIL: ${{ secrets.CROSSREF_EMAIL_FOR_TESTS }}
 
@@ -49,17 +50,17 @@ permissions:
 jobs:
   fetchertests:
     if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
-    name: Fetcher tests
+    name: External services tests
     # On ubuntu-slim, it takes more than 15 minutes
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - name: Run fetcher tests
-        run: gradle fetcherTest
+      - name: Run external services tests
+        run: gradle externalServicesTest
         env:
           CI: "true"

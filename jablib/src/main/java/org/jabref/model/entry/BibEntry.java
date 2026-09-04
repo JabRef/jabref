@@ -97,8 +97,7 @@ import static java.util.function.Predicate.not;
 /// - citation key --&gt; contained in [#fields] using they hashmap key `KEY_FIELD`
 /// - fields --&gt; contained in [#fields]
 ///
-/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
-///
+/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to `false`. In case `changed`, use [#withChanged(boolean)].
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry {
 
@@ -312,7 +311,7 @@ public class BibEntry {
     /// If a database is given, this function will try to resolve any string
     /// references in the field-value.
     /// Also, if a database is given, this function will try to find values for
-    /// unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
+    /// unset fields in the entry linked by the "crossref" ([StandardField#CROSSREF]) field, if any.
     ///
     /// @param field    The field to return the value of.
     /// @param database The database of the bibtex entry.
@@ -361,7 +360,7 @@ public class BibEntry {
     ///
     /// This id changes on each run of JabRef (because it is currently generated as increasing number).
     ///
-    /// For more stable ids, check {@link org.jabref.model.entry.SharedBibEntryData#getSharedID}
+    /// For more stable ids, check [org.jabref.model.entry.SharedBibEntryData#getSharedID]
     public String getId() {
         return id;
     }
@@ -383,7 +382,7 @@ public class BibEntry {
     /// Sets the citation key. Note: This is *not* the internal Id of this entry.
     /// The internal Id is always present, whereas the citation key might not be present.
     ///
-    /// @param newKey The cite key to set. Must not be null; use {@link #clearCitationKey()} to remove the cite key.
+    /// @param newKey The cite key to set. Must not be null; use [#clearCitationKey()] to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
     }
@@ -423,7 +422,8 @@ public class BibEntry {
         return setType(type, EntriesEventSource.LOCAL);
     }
 
-    /// Sets this entry's type and sets the changed flag to true <br>
+    /// Sets this entry's type and sets the changed flag to true
+    ///
     /// If the new entry type equals the old entry type no changed flag is set.
     public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
         EntryType oldType = type.get();
@@ -482,7 +482,7 @@ public class BibEntry {
 
     /// Internal method used to get the content of a field (or its alias)
     ///
-    /// Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
+    /// Used by [#getFieldOrAlias(Field)] and [#getFieldOrAliasLatexFree(Field)]
     ///
     /// @param field         the field
     /// @param getFieldValue the method to get the value of a given field in a given entry
@@ -559,14 +559,13 @@ public class BibEntry {
     /// The fields 'year' and 'month' are used if the 'date'
     /// field is empty. Conversely, getFieldOrAlias("year") also tries to
     /// extract the year from the 'date' field (analogously for 'month').
-    ///
     public Optional<String> getFieldOrAlias(Field field) {
         return genericGetFieldOrAlias(field, BibEntry::getField);
     }
 
     /// Return the LaTeX-free contents of the given field or its alias an Optional
     ///
-    /// For details see also {@link #getFieldOrAlias(Field)}
+    /// For details see also [#getFieldOrAlias(Field)]
     ///
     /// @param name the name of the field
     /// @return the stored latex-free content of the field (or its alias)
@@ -628,10 +627,10 @@ public class BibEntry {
     }
 
     /// Remove the mapping for the field name, and notify listeners about
-    /// the change including the {@link EntriesEventSource}.
+    /// the change including the [EntriesEventSource].
     ///
     /// @param field       the field to clear.
-    /// @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
+    /// @param eventSource the source a new [FieldChangedEvent] should be posten from.
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
         if (oldValue.isEmpty()) {
@@ -666,7 +665,6 @@ public class BibEntry {
     /// We do it this way to
     ///   a) enable debugging the internal representation and
     ///   b) save time at this method.
-    ///
     ///
     /// This returns canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
     /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
@@ -901,15 +899,13 @@ public class BibEntry {
                 && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
-    /// On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
+    /// On purpose, this hashes the "content" of the BibEntry, not the [#sharedBibEntryData].
     ///
     /// The content is
     ///
-    ///
     /// - comments before entry
     /// - entry type
-    /// - fields (including the citation key {@link InternalField#KEY_FIELD}
-    ///
+    /// - fields (including the citation key [InternalField#KEY_FIELD])
     @Override
     public int hashCode() {
         return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
@@ -1039,7 +1035,7 @@ public class BibEntry {
     /// Gets a list of linked files.
     ///
     /// @return the list of linked files, is never null but can be empty.
-    /// Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
+    /// Changes to the underlying list will have no effect on the entry itself. Use [#addFile(LinkedFile)].
     public List<LinkedFile> getFiles() {
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
@@ -1084,7 +1080,7 @@ public class BibEntry {
     }
     // endregion
 
-    /// Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+    /// Checks [StandardField#CITES] for a list of citation keys and returns them.
     ///
     /// Empty citation keys are not returned. There is no consistency check made.
     ///

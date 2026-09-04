@@ -14,9 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
 
@@ -27,7 +24,6 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
@@ -47,6 +43,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -65,6 +62,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -161,7 +160,7 @@ public class ImportHandler {
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
-                CompoundEdit compoundEdit = new CompoundEdit();
+                CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Import entries"));
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -253,12 +252,12 @@ public class ImportHandler {
                     allEntriesToAdd.addAll(entriesToAdd);
 
                     compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
-                    compoundEdit.end();
-                    // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
 
                     counter++;
                 }
+
+                // The whole import is one undo step, so this is pushed once, after the loop.
+                undoManager.addEdit(compoundEdit.toChangeSet());
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
                 UiTaskExecutor.runInJavaFXThread(() -> importEntries(allEntriesToAdd));

@@ -36,4 +36,16 @@ Needs: impl
 
 MODS and Medline XML imports and PICA, MARC, ISIDORE, and arXiv XML fetcher responses disable DTD processing so that external entities cannot be resolved.
 
+## Create an entry from an arbitrary URL
+`req~fetchers.generic-url~1`
+
+The user can enter an arbitrary URL to create an entry from it. JabRef tries URL-based fetchers first; if none handles the URL, it falls back to creating a `@Misc` entry with the plain URL, using the linked page's title when it can be reached (falling back to the URL itself otherwise) and recording the date the link was added (`urldate`).
+
+Needs: impl
+
+## Download full text from ScholarAPI
+`req~fetchers.scholarapi-fulltext~1`
+
+For entries that contain a ScholarAPI identifier and have a PDF available, JabRef discovers the ScholarAPI PDF endpoint and uses the configured ScholarAPI API key to download the full text.
+
 <!-- markdownlint-disable-file MD022 -->

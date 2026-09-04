@@ -35,6 +35,16 @@ class BSTFormatUtilsTest {
     }
 
     @Test
+    void normalizeBibItemLabelReplacesBracedEtalcharMacro() {
+        assertEquals("TLY+21", BSTFormatUtils.normalizeBibItemLabel("TLY{\\etalchar{+}}21"));
+    }
+
+    @Test
+    void normalizeBibItemLabelReplacesStandaloneEtalcharMacro() {
+        assertEquals("TLY+21", BSTFormatUtils.normalizeBibItemLabel("TLY\\etalchar{+}21"));
+    }
+
+    @Test
     void mapsPandocSmallcapsStyleToOO() {
         String html = "<p><span style=\"font-variant: small-caps\">Name</span></p>";
         String mapped = BSTFormatUtils.mapPandocInlineToOO(html);

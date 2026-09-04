@@ -46,6 +46,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -87,6 +88,7 @@ class PreferencesSearchCoverageTest {
         Injector.setModelOrService(LanguageServerController.class, mock(LanguageServerController.class));
         Injector.setModelOrService(UiMessageHandler.class, mock(UiMessageHandler.class));
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        Injector.setModelOrService(UndoManager.class, mock(UndoManager.class));
     }
 
     /// The tabs are created inside the test rather than here, because a parameter source runs

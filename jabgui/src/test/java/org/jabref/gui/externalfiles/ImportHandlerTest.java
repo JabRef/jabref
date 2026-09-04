@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -24,6 +22,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabase;

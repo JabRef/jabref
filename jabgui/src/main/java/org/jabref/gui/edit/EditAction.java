@@ -2,8 +2,6 @@ package org.jabref.gui.edit;
 
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
 import javafx.scene.control.TextInputControl;
 
@@ -13,6 +11,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.undo.GuiUndoManager;
 
 import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
@@ -28,10 +27,10 @@ public class EditAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final StandardActions action;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
 
     public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
-                      UndoManager undoManager) {
+                      GuiUndoManager undoManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;

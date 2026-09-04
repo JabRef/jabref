@@ -75,10 +75,32 @@ A field's row shows a small gray "remove field" icon button pinned to its top-ri
 
 Needs: impl
 
+## Files found in the file directory are suggested even when no file is linked
+`req~entry-editor.main-tab.autolink-suggestions~1`
+
+When "Automatically search and show unlinked files in the entry editor" is enabled and files in the file directory match the entry but are not linked in it, the file editor is shown in the files and links section even if the entry has no file field, listing those files as suggestions with a gray background and an accept button. This matches the file editor's behavior for entries that already have linked files.
+
+Needs: impl, utest
+
+## Custom tabs show a user-defined list of field patterns
+`req~entry-editor.custom-tabs~1`
+
+Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again on upgrade — except stored tabs that are exactly one of the former default tabs "General", "Abstract", "Comments", or "Review" (localized name paired with the field set shipped in JabRef ≤ 5.x or a 6.0 alpha), which are dropped, since the "Main" tab already shows all their fields.
+
+Needs: impl
+
 ## Special fields are edited with the same icon controls as the main table
 `req~entry-editor.special-field-editors~1`
 
 Special fields (ranking, priority, read status, printed, quality, relevance) are edited with the same icon-based controls the main table's special field columns use: a five-star rating for the ranking, one icon toggle per value for priority and read status (deselecting the active toggle clears the field), and a single icon toggle for the one-value fields printed, quality, and relevance. Field labels and add-chips show the localized special field name instead of the raw field name. Values changed elsewhere (main table, source tab, undo) are reflected live.
+
+Needs: impl
+
+## Source tab replaces its content atomically when entries change
+`req~entry-editor.source-tab.atomic-replacement~1`
+
+When changing the selected entry, the Source tab replaces its full document in one operation so transient model states cannot prevent the newly selected entry's source from being displayed.
+While a new selection is still settling, saving or leaving the Source tab writes the visible source back to the entry it was rendered from, not the newly selected one.
 
 Needs: impl
 
