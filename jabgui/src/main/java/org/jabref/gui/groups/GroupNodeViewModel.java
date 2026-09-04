@@ -63,7 +63,6 @@ import org.jabref.model.search.event.IndexStartedEvent;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
-import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +83,7 @@ public class GroupNodeViewModel {
     /// Kept as a plain `Set` instead of an `ObservableSet`, because group refreshes and search-index updates can
     /// overlap while the UI stays responsive (for example inside modal dialogs). Exposing collection change events
     /// for this cache made bulk refreshes re-entrant and could trigger `ConcurrentModificationException`.
-    @ADR(38)
+    // [impl->adr~use-entryid-for-bibentries~1]
     private final Set<String> matchedEntries = new HashSet<>();
     /// Guards both the matched-entry cache and the derived hit-count property so readers observe a consistent pair.
     private final Object matchedEntriesLock = new Object();
