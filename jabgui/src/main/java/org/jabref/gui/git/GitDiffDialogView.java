@@ -61,14 +61,22 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     private final String newVersionLabel;
     private final Map<DatabaseChange, Node> detailsViewCache = new HashMap<>();
 
+    /// Diff dialog labeled for the Git commit use case: committed version (left) vs. saved file (right).
+    ///
+    /// @param changes             the changes to list, as computed by `DatabaseChangeList.compareAndGetChanges`
+    /// @param headDatabase        the committed version (left side)
+    /// @param workingTreeDatabase the saved file (right side)
     public GitDiffDialogView(List<DatabaseChange> changes,
                              BibDatabaseContext headDatabase,
                              BibDatabaseContext workingTreeDatabase) {
         this(changes, headDatabase, workingTreeDatabase, Localization.lang("Committed version"), Localization.lang("Saved file"));
     }
 
+    /// @param changes             the changes to list, as computed by `DatabaseChangeList.compareAndGetChanges`
     /// @param headDatabase        the older version (left side)
     /// @param workingTreeDatabase the newer version (right side)
+    /// @param oldVersionLabel     heading shown above the older version
+    /// @param newVersionLabel     heading shown above the newer version
     public GitDiffDialogView(List<DatabaseChange> changes,
                              BibDatabaseContext headDatabase,
                              BibDatabaseContext workingTreeDatabase,
