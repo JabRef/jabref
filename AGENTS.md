@@ -534,6 +534,8 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/decisions/` — Architecture Decision Records
 - `docs/requirements/` — Requirements (OpenFastTrace)
 
+When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
+
 ---
 
 ## Authority

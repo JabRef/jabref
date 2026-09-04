@@ -1,3 +1,10 @@
+/// `jabkit`, the command-line interface to JabRef: picocli commands for converting,
+/// checking, fetching and searching without the GUI.
+///
+/// Entry point: [org.jabref.toolkit.JabKitLauncher]; commands live in
+/// `org.jabref.toolkit.commands`.
+///
+/// @see <a href="https://devdocs.jabref.org/code-howtos/cli.html">CLI code howto</a>
 module org.jabref.jabkit {
     requires org.jabref.jablib;
 
