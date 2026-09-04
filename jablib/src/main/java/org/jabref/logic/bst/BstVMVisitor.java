@@ -78,17 +78,18 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
         FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), List.of()));
         for (BstEntry e : bstVMContext.entries()) {
+            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
+                String crossref = e.entry.getResolvedFieldOrAlias(StandardField.CROSSREF, bstVMContext.bibDatabase())
+                                         .map(content -> normalizeFieldValue(content, fieldWriter, StandardField.CROSSREF))
+                                         .orElse(null);
+                e.fields.put(StandardField.CROSSREF.getName(), crossref);
+            }
+
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
                 e.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
                        .map(content -> normalizeFieldValue(content, fieldWriter, field))
                        .ifPresent(mEntry::setValue);
-            }
-        }
-
-        for (BstEntry e : bstVMContext.entries()) {
-            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
-                e.fields.put(StandardField.CROSSREF.getName(), null);
             }
         }
 
