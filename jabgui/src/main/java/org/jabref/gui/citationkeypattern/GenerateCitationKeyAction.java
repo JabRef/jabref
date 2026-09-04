@@ -15,10 +15,10 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableFieldChange;
@@ -34,20 +34,17 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
-    private final UndoManager undoManager;
 
     public GenerateCitationKeyAction(Supplier<LibraryTab> tabSupplier,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      TaskExecutor taskExecutor,
-                                     CliPreferences preferences,
-                                     UndoManager undoManager) {
+                                     CliPreferences preferences) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
-        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -106,6 +103,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     }
 
     private BackgroundTask<Void> generateKeysInBackground() {
+        // Read here rather than inside call(): the task records against the library the user
+        // started it on, which they may have switched away from by the time it runs.
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+
         return new BackgroundTask<>() {
             private CompoundEdit compound;
 
@@ -118,11 +119,11 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     updateProgress(0, entries.size());
                     messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
                 });
-                stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                databaseContext.ifPresent(database -> {
                     // generate the new citation keys for each entry
                     compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
                     CitationKeyGenerator keyGenerator =
-                            new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+                            new CitationKeyGenerator(database, preferences.getCitationKeyPatternPreferences());
                     int entriesDone = 0;
                     for (BibEntry entry : entries) {
                         String newKey = keyGenerator.generateKey(entry);
@@ -146,7 +147,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
                 // register the undo event only if new citation keys were generated
                 if (compound.hasEdits()) {
-                    undoManager.addEdit(compound.toChangeSet());
+                    databaseContext.ifPresent(database -> stateManager.getUndoManager(database).addEdit(compound.toChangeSet()));
                 }
 
                 tabSupplier.get().markBaseChanged();

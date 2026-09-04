@@ -1,5 +1,6 @@
 package org.jabref.gui.cleanup;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -9,8 +10,8 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 
 public class CleanupAction extends SimpleCommand {
 
@@ -19,7 +20,6 @@ public class CleanupAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
@@ -27,14 +27,12 @@ public class CleanupAction extends SimpleCommand {
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
-                         UndoManager undoManager,
                          JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -42,16 +40,17 @@ public class CleanupAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        if (databaseContext.isEmpty()) {
             return;
         }
 
         CleanupDialog cleanupDialog = new CleanupDialog(
-                stateManager.getActiveDatabase().get(),
+                databaseContext.get(),
                 preferences,
                 dialogService,
                 stateManager,
-                undoManager,
+                stateManager.getUndoManager(databaseContext.get()),
                 tabSupplier,
                 taskExecutor,
                 journalAbbreviationRepository

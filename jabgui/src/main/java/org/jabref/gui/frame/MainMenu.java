@@ -181,7 +181,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, taskExecutor, undoManager, frame)),
+                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, taskExecutor, frame)),
 
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
@@ -230,7 +230,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame::getCurrentLibraryTab, stateManager, dialogService)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences)),
 
                 new SeparatorMenuItem(),
 
@@ -278,14 +278,14 @@ public class MainMenu extends MenuBar {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, journalAbbreviationRepository)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor))
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, (UiTaskExecutor) taskExecutor))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -300,15 +300,15 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.MERGE_WITH_FETCHED_ENTRY,
-                        new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                        new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
 
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
-                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
+                        new BatchEntryMergeWithFetchedDataAction(stateManager, preferences, dialogService, taskExecutor)),
 
                 factory.createMenuItem(
                         StandardActions.UPDATE_WITH_WEB_INFO,
-                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor, undoManager)),
+                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor)),
                 // endregion
 
                 new SeparatorMenuItem(),

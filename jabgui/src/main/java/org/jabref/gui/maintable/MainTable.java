@@ -423,7 +423,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
-        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

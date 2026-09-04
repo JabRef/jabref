@@ -155,7 +155,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, this);

@@ -71,7 +71,7 @@ public class RightClickMenu {
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -102,7 +102,7 @@ public class RightClickMenu {
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
                 factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor))
         );
 
