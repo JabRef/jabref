@@ -53,6 +53,17 @@ public class ChangeScanner {
         }
     }
 
+    /// The differences between the in-memory library and the given file, e.g. a conflicted copy left by a sync client.
+    ///
+    /// @throws IOException when the file cannot be read or parsed; unlike for the library file itself, an unreadable copy must not pass as "nothing to merge"
+    public List<DatabaseChange> scanFile(Path file) throws IOException {
+        ParserResult result = OpenDatabase.loadDatabase(file, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        if (result.isInvalid()) {
+            throw new IOException("Could not parse " + file + ": " + result.getErrorMessage());
+        }
+        return DatabaseChangeList.compareAndGetChanges(database, result.getDatabaseContext(), databaseChangeResolverFactory);
+    }
+
     /// @return the given external changes sorted by the side they happened on, see [LibraryBaseline#triage]
     public LibraryBaseline.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
         return baseline.triage(changes, database, databaseChangeResolverFactory);
