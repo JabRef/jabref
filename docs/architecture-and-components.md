@@ -27,11 +27,11 @@ Note that we are currently switching to JavaFX's observables, as we aim for a st
 Permitted dependencies in our architecture are:
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph shared["Accessible from every layer"]
-        direction LR
+        direction TD
         preferences["Preferences"]
-        global["global classes"]
+        global["Global Classes"]
     end
     gui["gui"] --> logic["logic"]
     cli["cli"] --> logic
