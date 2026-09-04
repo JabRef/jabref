@@ -10,6 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -18,16 +19,13 @@ import org.jabref.logic.util.BuildInfo;
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.matcher.base.NodeMatchers.isVisible;
 
-class AboutDialogViewTest extends ApplicationTest {
+class AboutDialogViewTest extends JavaFxTest {
 
     private AboutDialogView aboutDialogView;
     private ClipBoardManager clipBoardManager;
@@ -38,7 +36,7 @@ class AboutDialogViewTest extends ApplicationTest {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         GuiPreferences preferences = mock(GuiPreferences.class);
         DialogService dialogService = mock(DialogService.class);
         clipBoardManager = mock(ClipBoardManager.class);
@@ -71,20 +69,22 @@ class AboutDialogViewTest extends ApplicationTest {
 
     @Test
     void aboutDialogHeading() {
-        verifyThat(".about-heading", isVisible());
+        assertTrue(aboutDialogView.getDialogPane().lookup(".about-heading").isVisible());
     }
 
     @Test
     void copyVersionButton() {
-        verifyThat("Copy Version", isVisible());
-        clickOn("Copy Version");
+        Button copyVersionButton = button("Copy Version");
+        assertTrue(copyVersionButton.isVisible());
+        interact(copyVersionButton::fire);
         verify(clipBoardManager).setContent(anyString());
     }
 
     @Test
     void closeButton() {
-        verifyThat("Close", isVisible());
-        clickOn("Close");
+        Button closeButton = button("Close");
+        assertTrue(closeButton.isVisible());
+        interact(closeButton::fire);
     }
 
     @Test
@@ -109,5 +109,14 @@ class AboutDialogViewTest extends ApplicationTest {
             // for debugging purpises
             // Thread.sleep(4000);
         }
+    }
+
+    private Button button(String text) {
+        return aboutDialogView.getDialogPane().lookupAll(".button")
+                            .stream()
+                            .map(Button.class::cast)
+                            .filter(button -> button.getText().equals(text))
+                            .findFirst()
+                            .orElseThrow();
     }
 }

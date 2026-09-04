@@ -9,11 +9,14 @@ import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.testutils.JavaFxTest;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,22 +24,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(ApplicationExtension.class)
-class MarkdownTextFlowTest {
+@ExtendWith(JavaFxExtension.class)
+class MarkdownTextFlowTest extends JavaFxTest {
     private StackPane rootPane;
     private RecordingClipBoardManager clipBoardManager;
 
-    @Start
-    void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
         clipBoardManager = new RecordingClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
@@ -51,9 +51,9 @@ class MarkdownTextFlowTest {
         clipBoardManager.clear();
     }
 
-    private MarkdownTextFlow markdownTextFlow(FxRobot robot) {
+    private MarkdownTextFlow markdownTextFlow() {
         AtomicReference<MarkdownTextFlow> textFlowReference = new AtomicReference<>();
-        robot.interact(() -> {
+        interact(() -> {
             MarkdownTextFlow textFlow = new MarkdownTextFlow(rootPane);
             rootPane.getChildren().setAll(textFlow);
             textFlow.setPrefWidth(380);
@@ -63,9 +63,9 @@ class MarkdownTextFlowTest {
     }
 
     /// Concatenation of the text of every [Text] child, i.e. what the user actually sees.
-    private static String renderedText(FxRobot robot, MarkdownTextFlow textFlow) {
+    private static String renderedText(MarkdownTextFlow textFlow) {
         AtomicReference<String> renderedTextReference = new AtomicReference<>();
-        robot.interact(() -> {
+        JavaFxExtension.runAndWait(() -> {
             StringBuilder builder = new StringBuilder();
             for (Node child : textFlow.getChildren()) {
                 if (child instanceof Text text) {
@@ -78,93 +78,93 @@ class MarkdownTextFlowTest {
     }
 
     @Test
-    void setPlainTextKeepsMarkdownMarkupLiteral(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void setPlainTextKeepsMarkdownMarkupLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> textFlow.setPlainText("Hello **world**"));
+        interact(() -> textFlow.setPlainText("Hello **world**"));
 
         // Plain text is rendered as a single, unparsed Text node.
-        assertEquals(1, childCount(robot, textFlow));
-        assertEquals("Hello **world**", renderedText(robot, textFlow));
+        assertEquals(1, childCount(textFlow));
+        assertEquals("Hello **world**", renderedText(textFlow));
     }
 
     @Test
-    void setPlainTextPreservesNewlines(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void setPlainTextPreservesNewlines() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> textFlow.setPlainText("line1\nline2"));
+        interact(() -> textFlow.setPlainText("line1\nline2"));
 
-        assertEquals("line1\nline2", renderedText(robot, textFlow));
+        assertEquals("line1\nline2", renderedText(textFlow));
     }
 
     @Test
-    void setMarkdownStripsBoldMarkupAndStylesIt(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void setMarkdownStripsBoldMarkupAndStylesIt() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> textFlow.setMarkdown("**bold**"));
+        interact(() -> textFlow.setMarkdown("**bold**"));
 
-        assertEquals("bold", renderedText(robot, textFlow));
-        assertTrue(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertEquals("bold", renderedText(textFlow));
+        assertTrue(hasChildWithStyleClass(textFlow, "markdown-bold"));
     }
 
     @Test
-    void setMarkdownStripsInlineMarkupButKeepsText(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void setMarkdownStripsInlineMarkupButKeepsText() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> textFlow.setMarkdown("Hello **world**"));
+        interact(() -> textFlow.setMarkdown("Hello **world**"));
 
         // The '**' markers are consumed by the parser; the words remain.
-        assertEquals("Hello world", renderedText(robot, textFlow));
+        assertEquals("Hello world", renderedText(textFlow));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "\n"})
-    void blankInputRendersNothing(String blank, FxRobot robot) {
-        MarkdownTextFlow markdown = markdownTextFlow(robot);
-        MarkdownTextFlow plain = markdownTextFlow(robot);
+    void blankInputRendersNothing(String blank) {
+        MarkdownTextFlow markdown = markdownTextFlow();
+        MarkdownTextFlow plain = markdownTextFlow();
 
-        robot.interact(() -> {
+        interact(() -> {
             markdown.setMarkdown(blank);
             plain.setPlainText(blank);
         });
 
-        assertTrue(hasNoChildren(robot, markdown));
-        assertTrue(hasNoChildren(robot, plain));
+        assertTrue(hasNoChildren(markdown));
+        assertTrue(hasNoChildren(plain));
     }
 
     @Test
-    void switchingFromMarkdownToPlainTextReplacesContent(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void switchingFromMarkdownToPlainTextReplacesContent() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> {
+        interact(() -> {
             textFlow.setMarkdown("**bold**");
             textFlow.setPlainText("**bold**");
         });
 
         // Now interpreted verbatim: markup is visible and no bold styling remains.
-        assertEquals(1, childCount(robot, textFlow));
-        assertEquals("**bold**", renderedText(robot, textFlow));
-        assertFalse(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertEquals(1, childCount(textFlow));
+        assertEquals("**bold**", renderedText(textFlow));
+        assertFalse(hasChildWithStyleClass(textFlow, "markdown-bold"));
     }
 
     @Test
-    void switchingFromPlainTextToMarkdownReplacesContent(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void switchingFromPlainTextToMarkdownReplacesContent() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> {
+        interact(() -> {
             textFlow.setPlainText("**bold**");
             textFlow.setMarkdown("**bold**");
         });
 
-        assertEquals("bold", renderedText(robot, textFlow));
-        assertTrue(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertEquals("bold", renderedText(textFlow));
+        assertTrue(hasChildWithStyleClass(textFlow, "markdown-bold"));
     }
 
     @Test
-    void copySelectedTextFromPlainTextUsesVerbatimClipboardContent(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void copySelectedTextFromPlainTextUsesVerbatimClipboardContent() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> {
+        interact(() -> {
             textFlow.setPlainText("**bold**");
             rootPane.applyCss();
             rootPane.layout();
@@ -172,8 +172,8 @@ class MarkdownTextFlowTest {
             textFlow.autosize();
             textFlow.layout();
         });
-        dragAcrossText(robot, textFlow);
-        robot.interact(() -> {
+        dragAcrossText(textFlow);
+        interact(() -> {
             assertTrue(textFlow.isSelectionActive());
             textFlow.copySelectedText();
         });
@@ -182,10 +182,10 @@ class MarkdownTextFlowTest {
     }
 
     @Test
-    void copySelectedTextFromMarkdownUsesMarkdownClipboardContent(FxRobot robot) {
-        MarkdownTextFlow textFlow = markdownTextFlow(robot);
+    void copySelectedTextFromMarkdownUsesMarkdownClipboardContent() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
 
-        robot.interact(() -> {
+        interact(() -> {
             textFlow.setMarkdown("**bold**");
             rootPane.applyCss();
             rootPane.layout();
@@ -193,8 +193,8 @@ class MarkdownTextFlowTest {
             textFlow.autosize();
             textFlow.layout();
         });
-        dragAcrossText(robot, textFlow);
-        robot.interact(() -> {
+        dragAcrossText(textFlow);
+        interact(() -> {
             assertTrue(textFlow.isSelectionActive());
             textFlow.copySelectedText();
         });
@@ -203,37 +203,39 @@ class MarkdownTextFlowTest {
         assertTrue(clipBoardManager.htmlContent.get().contains("<strong>bold</strong>"));
     }
 
-    private static int childCount(FxRobot robot, MarkdownTextFlow textFlow) {
+    private static int childCount(MarkdownTextFlow textFlow) {
         AtomicReference<Integer> childCountReference = new AtomicReference<>();
-        robot.interact(() -> childCountReference.set(textFlow.getChildren().size()));
+        JavaFxExtension.runAndWait(() -> childCountReference.set(textFlow.getChildren().size()));
         return childCountReference.get();
     }
 
-    private static boolean hasNoChildren(FxRobot robot, MarkdownTextFlow textFlow) {
+    private static boolean hasNoChildren(MarkdownTextFlow textFlow) {
         AtomicReference<Boolean> hasNoChildrenReference = new AtomicReference<>();
-        robot.interact(() -> hasNoChildrenReference.set(textFlow.getChildren().isEmpty()));
+        JavaFxExtension.runAndWait(() -> hasNoChildrenReference.set(textFlow.getChildren().isEmpty()));
         return hasNoChildrenReference.get();
     }
 
-    private static boolean hasChildWithStyleClass(FxRobot robot, MarkdownTextFlow textFlow, String styleClass) {
+    private static boolean hasChildWithStyleClass(MarkdownTextFlow textFlow, String styleClass) {
         AtomicReference<Boolean> hasChildWithStyleClassReference = new AtomicReference<>();
-        robot.interact(() -> hasChildWithStyleClassReference.set(textFlow.getChildren().stream().anyMatch(child -> child.getStyleClass().contains(styleClass))));
+        JavaFxExtension.runAndWait(() -> hasChildWithStyleClassReference.set(textFlow.getChildren().stream().anyMatch(child -> child.getStyleClass().contains(styleClass))));
         return hasChildWithStyleClassReference.get();
     }
 
-    private static void dragAcrossText(FxRobot robot, MarkdownTextFlow textFlow) {
-        Bounds bounds = firstTextBounds(robot, textFlow);
-        double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
-
-        robot.moveTo(bounds.getMinX() + 1, centerY)
-             .press(MouseButton.PRIMARY)
-             .moveTo(bounds.getMaxX() - 1, centerY)
-             .release(MouseButton.PRIMARY);
+    private static void dragAcrossText(MarkdownTextFlow textFlow) {
+        JavaFxExtension.runAndWait(() -> {
+            Bounds bounds = firstTextBounds(textFlow);
+            double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getMinX() + 1, centerY);
+            robot.mousePress(MouseButton.PRIMARY);
+            robot.mouseMove(bounds.getMaxX() - 1, centerY);
+            robot.mouseRelease(MouseButton.PRIMARY);
+        });
     }
 
-    private static Bounds firstTextBounds(FxRobot robot, MarkdownTextFlow textFlow) {
+    private static Bounds firstTextBounds(MarkdownTextFlow textFlow) {
         AtomicReference<Bounds> boundsReference = new AtomicReference<>();
-        robot.interact(() -> {
+        JavaFxExtension.runAndWait(() -> {
             for (Node child : textFlow.getChildren()) {
                 Bounds childBounds = child.localToScreen(child.getBoundsInLocal());
                 if (childBounds != null && childBounds.getWidth() > 2) {

@@ -157,8 +157,6 @@ dependencies.constraints {
     api("org.postgresql:postgresql:42.7.13")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")
-    api("org.testfx:testfx-core:4.0.18")
-    api("org.testfx:testfx-junit5:4.0.18")
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")

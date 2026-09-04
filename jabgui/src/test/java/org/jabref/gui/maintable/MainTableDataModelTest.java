@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -23,6 +24,7 @@ import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
@@ -46,8 +48,6 @@ import org.jabref.model.search.query.SearchResults;
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,7 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class MainTableDataModelTest {
 
     @Test
@@ -337,7 +337,7 @@ class MainTableDataModelTest {
     void deletingEntryKeepsSelectedGroupFilter() {
         List<BibEntry> visibleEntries = new ArrayList<>();
 
-        WaitForAsyncUtils.asyncFx(() -> {
+        Platform.runLater(() -> {
             BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
             BibEntry matchingEntry = new BibEntry()
@@ -371,7 +371,7 @@ class MainTableDataModelTest {
                                        .map(BibEntryTableViewModel::getEntry)
                                        .toList());
         });
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         assertEquals(List.of(), visibleEntries);
     }

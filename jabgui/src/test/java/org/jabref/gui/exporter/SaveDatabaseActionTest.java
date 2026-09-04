@@ -17,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
@@ -41,7 +42,6 @@ import org.jabref.model.metadata.SaveOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -201,7 +201,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    @ExtendWith(ApplicationExtension.class)
+    @ExtendWith(JavaFxExtension.class)
     void encodingRetryAbortsWhenFileWasSavedExternallyWhileDialogWasOpen() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Café");
         entry.setChanged(true);
@@ -225,7 +225,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    @ExtendWith(ApplicationExtension.class)
+    @ExtendWith(JavaFxExtension.class)
     void ignoredEncodingProblemsReportFailureWhenFileWasSavedExternallyWhileDialogWasOpen() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Café");
         entry.setChanged(true);

@@ -48,9 +48,6 @@ testModuleInfo {
     requires("org.hamcrest")
     requires("org.mockito")
 
-    // Required for LocalizationConsistencyTest
-    requires("org.testfx.junit5")
-
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
 
@@ -312,6 +309,9 @@ tasks.javadoc {
 }
 
 tasks.test {
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+
     useJUnitPlatform {
         excludeTags("DatabaseTest", "ExternalServicesTest")
     }
