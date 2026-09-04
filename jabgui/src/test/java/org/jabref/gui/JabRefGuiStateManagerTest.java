@@ -4,14 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class JabRefGuiStateManagerTest {
+
+    /// The journal the application shares is the one every library resolves to, so a caller that
+    /// names its library records where the rest of the application does.
+    @Test
+    void everyLibraryResolvesToTheJournalTheStateManagerWasGiven() {
+        GuiUndoManager sharedJournal = new HeadlessGuiUndoManager();
+        JabRefGuiStateManager stateManager = new JabRefGuiStateManager(sharedJournal);
+
+        assertSame(sharedJournal, stateManager.getUndoManager(new BibDatabaseContext()));
+        assertSame(sharedJournal, stateManager.getGuiUndoManager(new BibDatabaseContext()));
+    }
+
+    @Test
+    void aStateManagerWithoutOneUsesAJournalOfItsOwn() {
+        assertNotSame(new JabRefGuiStateManager().getUndoManager(new BibDatabaseContext()),
+                new JabRefGuiStateManager().getUndoManager(new BibDatabaseContext()));
+    }
 
     @Test
     void replacingActiveDatabaseContextNotifiesListeners() {

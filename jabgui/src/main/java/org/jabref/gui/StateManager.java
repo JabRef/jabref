@@ -13,11 +13,13 @@ import javafx.scene.Node;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.search.SearchContext;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,6 +48,20 @@ public interface StateManager extends SrvStateManager {
     CustomLocalDragboard getLocalDragboard();
 
     OptionalObjectProperty<LibraryTab> activeTabProperty();
+
+    /// The undo journal to record a change to `context` on.
+    ///
+    /// One journal serves every open library, so the same journal comes back for every context.
+    /// The parameter is what a caller uses to name the library it is recording against, instead of
+    /// holding a journal handed to it when it was built.
+    ///
+    /// Recording is all most callers do, which is why this hands out the narrow type; the classes
+    /// that drive the stacks ask for [#getGuiUndoManager].
+    UndoManager getUndoManager(BibDatabaseContext context);
+
+    /// The same journal as [#getUndoManager], for the few classes that undo, redo, track the saved
+    /// position, or bind menu enablement to the stacks.
+    GuiUndoManager getGuiUndoManager(BibDatabaseContext context);
 
     OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type);
 

@@ -26,11 +26,14 @@ import javafx.util.Pair;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.AbstractSrvStateManager;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -61,6 +64,8 @@ import org.slf4j.LoggerFactory;
 public class JabRefGuiStateManager extends AbstractSrvStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
+
+    private final GuiUndoManager undoManager;
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -86,6 +91,16 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForward = new SimpleBooleanProperty(false);
 
+    /// Uses a journal of its own. For tests and for any caller that does not share one with the
+    /// rest of the application.
+    public JabRefGuiStateManager() {
+        this(new JabRefGuiUndoManager());
+    }
+
+    public JabRefGuiStateManager(GuiUndoManager undoManager) {
+        this.undoManager = undoManager;
+    }
+
     @Override
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -109,6 +124,16 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     @Override
     public OptionalObjectProperty<LibraryTab> activeTabProperty() {
         return activeTab;
+    }
+
+    @Override
+    public UndoManager getUndoManager(BibDatabaseContext context) {
+        return getGuiUndoManager(context);
+    }
+
+    @Override
+    public GuiUndoManager getGuiUndoManager(BibDatabaseContext context) {
+        return undoManager;
     }
 
     @Override

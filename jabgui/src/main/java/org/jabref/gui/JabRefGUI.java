@@ -198,7 +198,15 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
-        JabRefGUI.stateManager = new JabRefGuiStateManager();
+        JabRefGUI.undoManager = new JabRefGuiUndoManager();
+        // Two keys, one instance: almost everything asks for the recording interface, while the
+        // classes that build the undo UI ask for the one that can drive the stacks and be bound to.
+        Injector.setModelOrService(UndoManager.class, undoManager);
+        Injector.setModelOrService(GuiUndoManager.class, undoManager);
+
+        // Handed to the state manager, which answers getUndoManager(context) with it: callers that
+        // name the library they record against go through there rather than holding this one.
+        JabRefGUI.stateManager = new JabRefGuiStateManager(undoManager);
         Injector.setModelOrService(StateManager.class, stateManager);
 
         // our Default task executor is the UITaskExecutor which can use the fx thread
@@ -241,12 +249,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
-
-        JabRefGUI.undoManager = new JabRefGuiUndoManager();
-        // Two keys, one instance: almost everything asks for the recording interface, while the
-        // classes that build the undo UI ask for the one that can drive the stacks and be bound to.
-        Injector.setModelOrService(UndoManager.class, undoManager);
-        Injector.setModelOrService(GuiUndoManager.class, undoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
