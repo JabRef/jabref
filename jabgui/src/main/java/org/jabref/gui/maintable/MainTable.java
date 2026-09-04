@@ -143,7 +143,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 database,
                 preferences,
                 preferences.getMainTableColumnPreferences(),
-                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor);

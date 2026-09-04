@@ -58,7 +58,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
@@ -91,7 +90,6 @@ public class GlobalSearchBar extends HBox {
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
     private final GuiPreferences preferences;
-    private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
@@ -104,7 +102,6 @@ public class GlobalSearchBar extends HBox {
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
                            GuiPreferences preferences,
-                           UndoManager undoManager,
                            DialogService dialogService,
                            SearchType searchType) {
         super();
@@ -112,7 +109,6 @@ public class GlobalSearchBar extends HBox {
         this.preferences = preferences;
         this.searchPreferences = preferences.getSearchPreferences();
         this.filePreferences = preferences.getFilePreferences();
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
         this.searchType = searchType;
@@ -345,7 +341,7 @@ public class GlobalSearchBar extends HBox {
         }
         globalSearchActive.setValue(true);
         if (globalSearchResultDialog == null) {
-            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
+            globalSearchResultDialog = new GlobalSearchResultDialog(tabContainer);
         }
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query ->
                 stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));

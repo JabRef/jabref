@@ -9,6 +9,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -21,7 +23,6 @@ import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.SpecialFieldComparator;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -34,18 +35,18 @@ import org.controlsfx.control.Rating;
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
     private final CliPreferences preferences;
-    private final UndoManager undoManager;
+    private final StateManager stateManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, CliPreferences preferences, UndoManager undoManager) {
+    public SpecialFieldColumn(MainTableColumnModel model, CliPreferences preferences, StateManager stateManager) {
         super(model);
         this.preferences = preferences;
-        this.undoManager = undoManager;
+        this.stateManager = stateManager;
 
         SpecialField specialField = (SpecialField) FieldFactory.parseField(model.getQualifier());
-        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferences, undoManager);
+        Action fieldAction = SpecialFieldViewModel.getAction(specialField);
 
-        Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
+        Node headerGraphic = fieldAction.getIcon().orElseThrow().getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(fieldAction.getText()));
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
 
@@ -61,17 +62,17 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
             if (specialField.isSingleValueField()) {
                 new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
-                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, fieldAction))
                         .withOnMouseClickedEvent((entry, value) -> event -> {
                             if (event.getButton() == MouseButton.PRIMARY) {
-                                specialFieldViewModel.toggle(entry.getEntry());
+                                writerFor(specialField, entry).toggle(entry.getEntry());
                             }
                         })
                         .install(this);
             } else {
                 new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
-                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
-                        .withMenu((entry, value) -> createSpecialFieldMenu(entry.getEntry(), specialFieldViewModel))
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, fieldAction))
+                        .withMenu((entry, value) -> createSpecialFieldMenu(entry.getEntry(), writerFor(specialField, entry)))
                         .install(this);
             }
         }
@@ -106,7 +107,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         });
 
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
-                new SpecialFieldViewModel(SpecialField.RANKING, preferences, undoManager)
+                writerFor(SpecialField.RANKING, entry)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
 
         return ranking;
@@ -124,11 +125,18 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         return contextMenu;
     }
 
-    private Node createSpecialFieldIcon(Optional<SpecialFieldValueViewModel> fieldValue, SpecialFieldViewModel specialField) {
+    /// Writes go to the journal of the library the row belongs to. One column serves rows of
+    /// several libraries in the global search results, so the journal is a property of the row
+    /// rather than of the column.
+    private SpecialFieldViewModel writerFor(SpecialField specialField, BibEntryTableViewModel entry) {
+        return new SpecialFieldViewModel(specialField, preferences, stateManager.getUndoManager(entry.getBibDatabaseContext()));
+    }
+
+    private Node createSpecialFieldIcon(Optional<SpecialFieldValueViewModel> fieldValue, Action fieldAction) {
         return fieldValue.flatMap(SpecialFieldValueViewModel::getIcon)
                          .map(JabRefIcon::getGraphicNode)
                          .orElseGet(() -> {
-                             Node node = specialField.getEmptyIcon().getGraphicNode();
+                             Node node = fieldAction.getIcon().orElseThrow().getGraphicNode();
                              node.getStyleClass().add("empty-special-field");
                              return node;
                          });

@@ -169,7 +169,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this,
                 stateManager,
                 this.preferences,
-                undoManager,
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
