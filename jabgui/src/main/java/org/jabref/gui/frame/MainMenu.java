@@ -78,7 +78,6 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
@@ -110,7 +109,6 @@ public class MainMenu extends MenuBar {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
@@ -129,7 +127,6 @@ public class MainMenu extends MenuBar {
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
-                    GuiUndoManager undoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
@@ -148,7 +145,6 @@ public class MainMenu extends MenuBar {
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.aiService = aiService;
@@ -241,14 +237,12 @@ public class MainMenu extends MenuBar {
 
         edit.getItems().addAll(
                 specialFieldsSeparator,
-                // ToDo: SpecialField needs the active BasePanel to mark it as changed.
-                //  Refactor BasePanel, should mark the BibDatabaseContext or the GuiUndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager));
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferences, stateManager));
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.

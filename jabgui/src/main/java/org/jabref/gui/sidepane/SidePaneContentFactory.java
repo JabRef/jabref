@@ -10,7 +10,6 @@ import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -29,7 +28,6 @@ public class SidePaneContentFactory {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
-    private final GuiUndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
@@ -40,8 +38,7 @@ public class SidePaneContentFactory {
                                   StateManager stateManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
-                                  ClipBoardManager clipBoardManager,
-                                  GuiUndoManager undoManager) {
+                                  ClipBoardManager clipBoardManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
@@ -52,7 +49,6 @@ public class SidePaneContentFactory {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
-        this.undoManager = undoManager;
     }
 
     public Node create(SidePaneType sidePaneType) {
@@ -77,8 +73,7 @@ public class SidePaneContentFactory {
                             stateManager,
                             fileUpdateMonitor,
                             entryTypesManager,
-                            clipBoardManager,
-                            undoManager).getContent();
+                            clipBoardManager).getContent();
             case WEB_SEARCH ->
                     new WebSearchPaneView(
                             preferences,

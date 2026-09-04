@@ -35,7 +35,6 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
@@ -67,7 +66,6 @@ public class WelcomeTab extends Tab {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
@@ -88,7 +86,6 @@ public class WelcomeTab extends Tab {
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
-                      GuiUndoManager undoManager,
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
@@ -103,7 +100,6 @@ public class WelcomeTab extends Tab {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -242,7 +238,7 @@ public class WelcomeTab extends Tab {
 
         Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
-                        stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
+                        stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager,
                         taskExecutor).execute());
 
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
@@ -290,7 +286,7 @@ public class WelcomeTab extends Tab {
             ParserResult result = bibtexParser.parse(reader);
             BibDatabaseContext databaseContext = result.getDatabaseContext();
             LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,
-                    preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
+                    preferences, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor);
             tabContainer.addTab(libraryTab, true);
         } catch (IOException e) {
             LOGGER.error("Failed to load example library", e);

@@ -63,6 +63,10 @@ public interface StateManager extends SrvStateManager {
     /// position, or bind menu enablement to the stacks.
     GuiUndoManager getGuiUndoManager(BibDatabaseContext context);
 
+    /// Discards the journal of a library that is closing, with the changes it holds and the entries
+    /// those changes keep alive.
+    void removeUndoManager(BibDatabaseContext context);
+
     OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type);
 
     StringProperty searchQueryProperty();

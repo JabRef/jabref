@@ -54,7 +54,6 @@ import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
@@ -94,7 +93,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
-    private final GuiUndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
@@ -125,7 +123,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.dialogService = dialogService;
         this.model = model;
         this.taskExecutor = taskExecutor;
-        this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
@@ -161,7 +158,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         dialogService,
                         stateManager,
                         preferences,
-                        undoManager,
                         clipBoardManager,
                         taskExecutor,
                         journalAbbreviationRepository,

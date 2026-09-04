@@ -15,7 +15,6 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -60,7 +59,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private GuiUndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
@@ -105,7 +103,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 journalAbbreviationRepository);

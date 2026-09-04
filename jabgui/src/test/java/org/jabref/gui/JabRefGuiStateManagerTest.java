@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.undo.GuiUndoManager;
-import org.jabref.gui.undo.HeadlessGuiUndoManager;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -17,21 +16,41 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 class JabRefGuiStateManagerTest {
 
-    /// The journal the application shares is the one every library resolves to, so a caller that
-    /// names its library records where the rest of the application does.
+    /// Each library gets a journal of its own, so that undo does not cross libraries and saving
+    /// one does not stamp another's saved position.
     @Test
-    void everyLibraryResolvesToTheJournalTheStateManagerWasGiven() {
-        GuiUndoManager sharedJournal = new HeadlessGuiUndoManager();
-        JabRefGuiStateManager stateManager = new JabRefGuiStateManager(sharedJournal);
+    void eachLibraryGetsItsOwnJournal() {
+        JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
+        BibDatabaseContext one = new BibDatabaseContext();
+        BibDatabaseContext another = new BibDatabaseContext();
 
-        assertSame(sharedJournal, stateManager.getUndoManager(new BibDatabaseContext()));
-        assertSame(sharedJournal, stateManager.getGuiUndoManager(new BibDatabaseContext()));
+        assertNotSame(stateManager.getUndoManager(one), stateManager.getUndoManager(another));
     }
 
+    /// The same library has to resolve to the same journal every time, including after an entry is
+    /// added: a context's hashCode changes when its database does, which is why the journals are
+    /// keyed by its uid.
     @Test
-    void aStateManagerWithoutOneUsesAJournalOfItsOwn() {
-        assertNotSame(new JabRefGuiStateManager().getUndoManager(new BibDatabaseContext()),
-                new JabRefGuiStateManager().getUndoManager(new BibDatabaseContext()));
+    void aLibraryKeepsItsJournalAfterItsContentChanges() {
+        JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
+        BibDatabaseContext context = new BibDatabaseContext();
+        UndoManager journal = stateManager.getUndoManager(context);
+
+        context.getDatabase().insertEntry(new BibEntry());
+
+        assertSame(journal, stateManager.getUndoManager(context));
+    }
+
+    /// Closing a library discards its history, and the entries the recorded changes keep alive.
+    @Test
+    void closingALibraryDiscardsItsJournal() {
+        JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
+        BibDatabaseContext context = new BibDatabaseContext();
+        UndoManager journal = stateManager.getUndoManager(context);
+
+        stateManager.removeUndoManager(context);
+
+        assertNotSame(journal, stateManager.getUndoManager(context));
     }
 
     @Test

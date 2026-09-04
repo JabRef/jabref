@@ -118,7 +118,6 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -190,13 +189,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       GuiUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.tabContainer = tabContainer;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -242,7 +239,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 bibDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 dialogService,
                 taskExecutor);
@@ -591,7 +588,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Put an asterisk behind the filename to indicate the database has changed.
     public synchronized void markChangedOrUnChanged() {
-        if (undoManager.hasChanged()) {
+        if (getUndoManager().hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -777,6 +774,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
+        stateManager.removeUndoManager(bibDatabaseContext);
+
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
@@ -826,8 +825,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
+    /// The journal of this library.
+    ///
+    /// Resolved on each call rather than held: the context a tab shows is replaced once loading
+    /// finishes (see [#setDatabaseContext]), and the journal follows the library the tab holds now.
     public GuiUndoManager getUndoManager() {
-        return undoManager;
+        return stateManager.getGuiUndoManager(bibDatabaseContext);
     }
 
     public MainTable getMainTable() {
@@ -858,7 +861,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 this));
     }
@@ -1146,7 +1149,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
@@ -1161,7 +1163,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 true);
@@ -1182,7 +1183,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         return new LibraryTab(
@@ -1194,7 +1194,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 false);

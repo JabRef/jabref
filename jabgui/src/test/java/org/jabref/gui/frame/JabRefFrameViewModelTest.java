@@ -64,7 +64,6 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(UndoManager.class, undoManager);
 
         when(stateManager.getOpenDatabases()).thenReturn(FXCollections.observableArrayList());
         when(stateManager.getUndoManager(any())).thenReturn(undoManager);

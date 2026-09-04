@@ -17,7 +17,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -51,7 +50,6 @@ public class SharedDatabaseUIManager {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
@@ -62,7 +60,6 @@ public class SharedDatabaseUIManager {
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
-                                   GuiUndoManager undoManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
@@ -72,7 +69,6 @@ public class SharedDatabaseUIManager {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
@@ -142,7 +138,7 @@ public class SharedDatabaseUIManager {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
 
         if (libraryTab != null) {
-            undoManager.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
+            libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
@@ -176,7 +172,6 @@ public class SharedDatabaseUIManager {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor);
         tabContainer.addTab(libraryTab, true);

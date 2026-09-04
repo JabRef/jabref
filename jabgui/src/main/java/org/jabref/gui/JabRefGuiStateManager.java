@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javafx.beans.Observable;
@@ -65,7 +66,11 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
 
-    private final GuiUndoManager undoManager;
+    /// Keyed by [BibDatabaseContext#getUid], as `selectedGroups` is: a context's `hashCode`
+    /// changes whenever an entry is added, so a map keyed by the context itself loses its entries.
+    /// Concurrent because changes are recorded from background tasks as well as from the JavaFX
+    /// thread.
+    private final Map<String, JabRefGuiUndoManager> undoManagers = new ConcurrentHashMap<>();
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -90,16 +95,6 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
     private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForward = new SimpleBooleanProperty(false);
-
-    /// Uses a journal of its own. For tests and for any caller that does not share one with the
-    /// rest of the application.
-    public JabRefGuiStateManager() {
-        this(new JabRefGuiUndoManager());
-    }
-
-    public JabRefGuiStateManager(GuiUndoManager undoManager) {
-        this.undoManager = undoManager;
-    }
 
     @Override
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -133,7 +128,12 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
 
     @Override
     public GuiUndoManager getGuiUndoManager(BibDatabaseContext context) {
-        return undoManager;
+        return undoManagers.computeIfAbsent(context.getUid(), _ -> new JabRefGuiUndoManager());
+    }
+
+    @Override
+    public void removeUndoManager(BibDatabaseContext context) {
+        undoManagers.remove(context.getUid());
     }
 
     @Override
