@@ -2,7 +2,9 @@ package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -21,10 +23,14 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -35,8 +41,10 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
@@ -142,7 +150,7 @@ public class BackupManager {
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
     /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
     /// In the case of an exception `true` is returned to ensure that the user checks the output.
-    public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
+    public static boolean backupFileDiffers(Path originalPath, Path backupDir, ImportFormatPreferences importFormatPreferences) {
         Path discardedFile = determineDiscardedFile(originalPath, backupDir);
         if (Files.exists(discardedFile)) {
             try {
@@ -176,17 +184,37 @@ public class BackupManager {
                 return false;
             }
             try {
-                boolean result = Files.mismatch(originalPath, latestBackupPath) != -1L;
-                if (result) {
-                    LOGGER.info("Backup file {} differs from current file {}", latestBackupPath, originalPath);
+                if (Files.mismatch(originalPath, latestBackupPath) == -1L) {
+                    return false;
                 }
-                return result;
-            } catch (IOException e) {
+                if (differsOnlyInModificationDate(originalPath, latestBackupPath, importFormatPreferences)) {
+                    LOGGER.info("Backup file {} differs from current file {} only in modification dates", latestBackupPath, originalPath);
+                    return false;
+                }
+                LOGGER.info("Backup file {} differs from current file {}", latestBackupPath, originalPath);
+                return true;
+            } catch (IOException | IllegalCharsetNameException | UnsupportedCharsetException e) {
                 LOGGER.debug("Could not compare original file and backup file.", e);
                 // User has to investigate in this case
                 return true;
             }
         }).orElse(false);
+    }
+
+    /// An edit that was reverted still leaves a new `modificationdate` behind, so the backup written afterwards differs
+    /// from the file without containing anything worth restoring. Parsing both files is only done once the bytes are
+    /// known to differ, so that the common case of opening a library stays cheap. An invalid `% Encoding:` line makes
+    /// the parser throw an unchecked charset exception; the caller treats that like an I/O failure.
+    /// [impl->req~jabgui.autosaveandbackup.ignore-modification-date~1]
+    private static boolean differsOnlyInModificationDate(Path originalPath, Path backupPath, ImportFormatPreferences importFormatPreferences) throws IOException {
+        ParserResult original = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
+        ParserResult backup = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor());
+        // Custom entry type definitions live in the parser result, not in the database context
+        if (original.isInvalid() || backup.isInvalid() || !original.getEntryTypes().equals(backup.getEntryTypes())) {
+            return false;
+        }
+        return BibDatabaseDiff.compare(original.getDatabaseContext(), backup.getDatabaseContext())
+                              .differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE));
     }
 
     /// Restores the backup file by copying and overwriting the original one.

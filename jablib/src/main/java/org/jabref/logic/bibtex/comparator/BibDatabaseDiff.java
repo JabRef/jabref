@@ -1,8 +1,10 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,11 +13,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class BibDatabaseDiff {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseDiff.class);
@@ -25,8 +30,13 @@ public class BibDatabaseDiff {
     private final Optional<PreambleDiff> preambleDiff;
     private final List<BibStringDiff> bibStringDiffs;
     private final List<BibEntryDiff> entryDiffs;
+    /// [MetaDataDiff] reports only user-visible differences and nothing covers the epilog, so the strict comparison
+    /// [#differsOnlyInFields(Set)] needs is kept separately.
+    private final boolean sameMetaDataAndEpilog;
 
     private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+        sameMetaDataAndEpilog = originalDatabase.getMetaData().equals(newDatabase.getMetaData())
+                && originalDatabase.getDatabase().getEpilog().equals(newDatabase.getDatabase().getEpilog());
         metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());
         preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
@@ -146,6 +156,32 @@ public class BibDatabaseDiff {
 
     public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
         return new BibDatabaseDiff(base, changed);
+    }
+
+    /// Whether the two libraries differ in nothing but the given fields of otherwise identical entries: no metadata,
+    /// epilog, preamble or string differences, no added or removed entries, no type or comment changes. `false` when there is no
+    /// entry difference at all, so that a byte-level difference the parser does not reproduce is not mistaken for one of
+    /// the given fields.
+    public boolean differsOnlyInFields(Set<Field> fields) {
+        if (!sameMetaDataAndEpilog || preambleDiff.isPresent() || !bibStringDiffs.isEmpty() || entryDiffs.isEmpty()) {
+            return false;
+        }
+        return entryDiffs.stream().allMatch(entryDiff -> {
+            BibEntry original = entryDiff.originalEntry();
+            BibEntry changed = entryDiff.newEntry();
+            if ((original == null) || (changed == null)) {
+                return false;
+            }
+            return original.getType().equals(changed.getType())
+                    && original.getUserComments().equals(changed.getUserComments())
+                    && without(original, fields).equals(without(changed, fields));
+        });
+    }
+
+    private static Map<Field, String> without(BibEntry entry, Set<Field> fields) {
+        Map<Field, String> remaining = new HashMap<>(entry.getFieldMap());
+        remaining.keySet().removeAll(fields);
+        return remaining;
     }
 
     public Optional<MetaDataDiff> getMetaDataDifferences() {

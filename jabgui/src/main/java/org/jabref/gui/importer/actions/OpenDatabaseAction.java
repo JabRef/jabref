@@ -262,7 +262,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
-        if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
+        if (BackupManager.backupFileDiffers(fileToLoad, backupDir, preferences.getImportFormatPreferences())) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
             parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)

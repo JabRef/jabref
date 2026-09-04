@@ -19,6 +19,13 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## A backup differing only in modification dates is not offered for restoring
+`req~jabgui.autosaveandbackup.ignore-modification-date~1`
+
+When JabRef opens a library and finds a newer backup, it must not ask the user to restore that backup if the only difference between the two is the automatically maintained `modificationdate` of entries, since restoring it would change nothing the user cares about.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
 
 ## Keyword delimiter normalization is a cleanup
