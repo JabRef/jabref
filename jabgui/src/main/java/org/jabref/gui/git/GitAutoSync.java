@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -132,10 +133,10 @@ public class GitAutoSync {
 
     /// Pulls remote changes if the library is inside a Git repository. Skips quietly when there are
     /// uncommitted changes or the merge has conflicts, because no user started this operation.
-    public void pull(Path bibFilePath, BibDatabaseContext databaseContext) {
+    public void pull(Path bibFilePath, BibDatabaseContext databaseContext, BooleanSupplier hasUnsavedChanges) {
         gitHandlerRegistry.fromAnyPath(bibFilePath).ifPresent(gitHandler ->
                 BackgroundTask.wrap(() -> preparePull(gitHandler, databaseContext, bibFilePath))
-                              .onSuccess(pullPlan -> pullPlan.ifPresent(plan -> applyCleanMerge(bibFilePath, databaseContext, plan)))
+                              .onSuccess(pullPlan -> pullPlan.ifPresent(plan -> applyCleanMerge(bibFilePath, databaseContext, plan, hasUnsavedChanges)))
                               .onFailure(this::showPullError)
                               .executeWith(taskExecutor));
     }
@@ -148,9 +149,13 @@ public class GitAutoSync {
         return syncService().prepareMerge(databaseContext, bibFilePath);
     }
 
-    private void applyCleanMerge(Path bibFilePath, BibDatabaseContext databaseContext, PullPlan pullPlan) {
+    private void applyCleanMerge(Path bibFilePath, BibDatabaseContext databaseContext, PullPlan pullPlan, BooleanSupplier hasUnsavedChanges) {
         if (!pullPlan.conflicts().isEmpty()) {
             dialogService.notify(Localization.lang("Detected conflicting changes during pull."));
+            return;
+        }
+        // Checked again after the fetch, edits made while it ran would otherwise be written into the merge commit
+        if (hasUnsavedChanges.getAsBoolean()) {
             return;
         }
         MergePlan autoPlan = pullPlan.autoPlan();

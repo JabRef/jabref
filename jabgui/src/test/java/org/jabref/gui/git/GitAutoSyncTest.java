@@ -48,7 +48,7 @@ class GitAutoSyncTest {
 
     @Test
     void pullDoesNothingOutsideGitRepository() {
-        gitAutoSync.pull(BIB_FILE, mock(BibDatabaseContext.class));
+        gitAutoSync.pull(BIB_FILE, mock(BibDatabaseContext.class), () -> false);
 
         verifyNoInteractions(dialogService);
     }

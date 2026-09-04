@@ -56,7 +56,7 @@ public class GitPullScheduler {
             if (hasUnsavedChanges.getAsBoolean() || !bibDatabaseContext.getMetaData().isGitAutoPull()) {
                 return;
             }
-            bibDatabaseContext.getDatabasePath().ifPresent(path -> gitAutoSync.pull(path, bibDatabaseContext));
+            bibDatabaseContext.getDatabasePath().ifPresent(path -> gitAutoSync.pull(path, bibDatabaseContext, hasUnsavedChanges));
         } catch (Exception e) {
             LOGGER.warn("Scheduled Git pull failed", e);
         }
