@@ -70,7 +70,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 - We added an offer to initialize a Git repository when committing a library that is not yet version controlled. [#16722](https://github.com/JabRef/jabref/pull/16722)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
-- We added a "Show diff" button to the "Save before closing" dialog, showing the unsaved changes compared to the file on disk. [#16341](https://github.com/JabRef/jabref/issues/16341)
 
 ### Changed
 
