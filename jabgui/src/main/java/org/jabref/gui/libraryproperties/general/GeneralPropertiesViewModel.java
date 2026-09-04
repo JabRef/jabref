@@ -131,8 +131,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private void storeKeywordSeparator(MetaData newMetaData) {
         Optional<Character> previousSeparator = newMetaData.getKeywordSeparator();
         Optional<Character> newSeparator = Optional.of(keywordSeparatorProperty.getValue().trim())
-                                                    .filter(separator -> !separator.isEmpty())
-                                                    .map(separator -> separator.charAt(0));
+                                                   .filter(separator -> !separator.isEmpty())
+                                                   .map(separator -> separator.charAt(0));
         if (previousSeparator.equals(newSeparator)) {
             return;
         }

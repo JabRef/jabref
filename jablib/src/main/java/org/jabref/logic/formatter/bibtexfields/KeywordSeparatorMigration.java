@@ -11,8 +11,6 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.undo.UndoableGroupChange;
 
@@ -50,9 +48,9 @@ public final class KeywordSeparatorMigration {
     }
 
     private static Optional<FieldChange> migrateField(BibEntry entry,
-                                                       StandardField field,
-                                                       Character previousSeparator,
-                                                       Character newSeparator) {
+                                                      StandardField field,
+                                                      Character previousSeparator,
+                                                      Character newSeparator) {
         return entry.getField(field)
                     .flatMap(value -> entry.setField(field, KeywordList.serializeWithSpaces(
                             KeywordList.parse(value, previousSeparator).stream().toList(), newSeparator)));
@@ -60,10 +58,12 @@ public final class KeywordSeparatorMigration {
 
     private static AbstractGroup withKeywordSeparator(AbstractGroup group, Character newSeparator) {
         return switch (group) {
-            case ExplicitGroup explicitGroup -> explicitGroup.withKeywordSeparator(newSeparator);
-            case WordKeywordGroup wordKeywordGroup -> wordKeywordGroup.withKeywordSeparator(newSeparator);
-            case AutomaticKeywordGroup automaticKeywordGroup -> automaticKeywordGroup.withKeywordSeparator(newSeparator);
-            default -> group;
+            case WordKeywordGroup wordKeywordGroup ->
+                    wordKeywordGroup.withKeywordSeparator(newSeparator);
+            case AutomaticKeywordGroup automaticKeywordGroup ->
+                    automaticKeywordGroup.withKeywordSeparator(newSeparator);
+            default ->
+                    group;
         };
     }
 }
