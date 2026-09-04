@@ -60,10 +60,10 @@ public class GitAutoSync {
     }
 
     /// Commits the library if it is inside a Git repository, and pushes afterwards if requested.
-    /// does nothing if the repository is clean
+    /// does nothing if the library file is unchanged
     public void commit(Path bibFilePath, BibDatabaseContext databaseContext, boolean pushAfterCommit) {
         gitHandlerRegistry.fromAnyPath(bibFilePath).ifPresent(gitHandler ->
-                BackgroundTask.wrap(() -> doCommit(gitHandler))
+                BackgroundTask.wrap(() -> doCommit(gitHandler, bibFilePath))
                               .onSuccess(committed -> {
                                   if (committed && pushAfterCommit) {
                                       pullThenPush(bibFilePath, databaseContext);
@@ -73,11 +73,11 @@ public class GitAutoSync {
                               .executeWith(taskExecutor));
     }
 
-    private boolean doCommit(GitHandler gitHandler) throws JabRefException, GitAPIException, IOException {
+    private boolean doCommit(GitHandler gitHandler, Path bibFilePath) throws JabRefException, GitAPIException, IOException {
         if (GitStatusChecker.checkStatus(gitHandler).conflict()) {
             throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
         }
-        return gitHandler.createCommitOnCurrentBranch(Localization.lang("Update references"), false);
+        return gitHandler.createCommitForFileOnCurrentBranch(bibFilePath, Localization.lang("Update references"));
     }
 
     private void pullThenPush(Path bibFilePath, BibDatabaseContext databaseContext) {
