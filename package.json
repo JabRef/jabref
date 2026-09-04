@@ -1,0 +1,11 @@
+{
+  "name": "jabref",
+  "private": true,
+  "devDependencies": {
+    "textlint": "^15.7.1",
+    "textlint-rule-common-misspellings": "^1.0.1"
+  },
+  "scripts": {
+    "textlint": "textlint -f github \"*.md\" \"docs/**/*.md\""
+  }
+}
