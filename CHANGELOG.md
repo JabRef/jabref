@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a "Commit and push" button which allows to commit and then push in one go for Git operations. [#16339](https://github.com/JabRef/jabref/issues/16339)
+- We added a progress spinner and status indicator to the "Enter Identifier" tab in the New Entry dialog. [#16756](https://github.com/JabRef/jabref/issues/16756)
 - We added the option to close and reopen the PDF preview in the unlinked files dialog. [#16159](https://github.com/JabRef/jabref/issues/16159)
 - We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764]([https://github.com/JabRef/jabref/issues/16357](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764))
 - We added support for bibliography-defined ordering of numeric CSL styles in the LibreOffice integration. [#16692](https://github.com/JabRef/jabref/pull/16692)
