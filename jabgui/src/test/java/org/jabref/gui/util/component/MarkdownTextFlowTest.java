@@ -15,13 +15,11 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -30,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(JavaFxExtension.class)
 class MarkdownTextFlowTest extends JavaFxTest {
     private StackPane rootPane;
     private RecordingClipBoardManager clipBoardManager;

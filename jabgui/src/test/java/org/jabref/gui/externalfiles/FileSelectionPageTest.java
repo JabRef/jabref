@@ -16,7 +16,6 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -25,7 +24,6 @@ import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(JavaFxExtension.class)
 class FileSelectionPageTest extends JavaFxTest {
 
     private FileSelectionPage page;

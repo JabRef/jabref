@@ -52,7 +52,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
         });
     }
 
-    private static synchronized void initializeToolkit() throws InterruptedException {
+    private static void initializeToolkit() throws InterruptedException {
         if (toolkitInitialized) {
             return;
         }

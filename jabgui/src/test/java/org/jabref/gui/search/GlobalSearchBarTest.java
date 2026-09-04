@@ -17,7 +17,6 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.undo.UndoManager;
@@ -26,7 +25,6 @@ import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(JavaFxExtension.class)
 public class GlobalSearchBarTest extends JavaFxTest {
     private HBox hBox;
 
