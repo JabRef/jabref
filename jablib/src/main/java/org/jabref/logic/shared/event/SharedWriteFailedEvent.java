@@ -4,10 +4,11 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
 
-/// A new [ConnectionLostEvent] is fired, when the connection to the shared database gets lost.
+/// Fired when a local change could not be written to the shared database although the connection
+/// is still alive - the affected local changes are not synchronized.
 ///
 /// @param bibDatabaseContext Affected [BibDatabaseContext]
 @NullMarked
-public record ConnectionLostEvent(
+public record SharedWriteFailedEvent(
         BibDatabaseContext bibDatabaseContext) {
 }
