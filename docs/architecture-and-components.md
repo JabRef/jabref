@@ -29,7 +29,7 @@ Permitted dependencies in our architecture are:
 ```mermaid
 flowchart TD
     subgraph shared["Accessible from every layer"]
-        direction LR
+        direction TD
         preferences["Preferences"]
         global["global classes"]
     end
