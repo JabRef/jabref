@@ -113,8 +113,4 @@ public class GitPullScheduler {
             return true;
         });
     }
-
-    private void shutdown() {
-        executor.shutdown();
-    }
 }
