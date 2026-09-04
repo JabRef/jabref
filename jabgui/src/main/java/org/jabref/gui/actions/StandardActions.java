@@ -54,6 +54,8 @@ public enum StandardActions implements Action {
     UPDATE_WITH_WEB_INFO(Localization.lang("Update with bibliographic information via entry data")),
     ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     ATTACH_FILE_FROM_URL(Localization.lang("Attach file from URL"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
+    GET_FULLTEXT(Localization.lang("Get fulltext"), IconTheme.JabRefIcons.FETCH_FULLTEXT, KeyBinding.DOWNLOAD_FULL_TEXT),
+    MORE_FILE_OPERATIONS(Localization.lang("More file operations..."), IconTheme.JabRefIcons.FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
     CLEAR_PRIORITY(Localization.lang("Clear priority")),
     PRIORITY_HIGH(Localization.lang("Set priority to high"), IconTheme.JabRefIcons.PRIORITY_HIGH),
