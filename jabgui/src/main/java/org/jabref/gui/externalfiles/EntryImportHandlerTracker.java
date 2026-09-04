@@ -3,7 +3,6 @@ package org.jabref.gui.externalfiles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -83,12 +82,8 @@ public class EntryImportHandlerTracker {
         }
 
         stateManager.activeTabProperty().get()
-                    .filter(this::isTargetLibraryTab)
+                    .filter(tab -> targetDatabaseContext == tab.getBibDatabaseContext())
                     .ifPresent(tab -> tab.clearAndSelect(importedEntriesSnapshot));
-    }
-
-    private boolean isTargetLibraryTab(LibraryTab libraryTab) {
-        return targetDatabaseContext.getUid().equals(libraryTab.getBibDatabaseContext().getUid());
     }
 
     /// Returns an immutable snapshot of the actually imported `BibEntry` instances (the copies inserted
