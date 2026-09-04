@@ -56,7 +56,7 @@ import jakarta.inject.Inject;
 /// The component is intended to support configuration of chat parameters,
 /// such as selecting a different chat model per session instead of relying
 /// on global preferences. Currently, only the response engine can be modified.
-// [impl->req~ai.chat.ingestion-status~1]
+// [impl->feat~ai.chat.ingestion-status~1]
 public class AiChatStatusView extends VBox {
     // [impl->req~ai.chat.model-visibility~1]
     @FXML private Label chatModelLabel;
@@ -194,7 +194,7 @@ public class AiChatStatusView extends VBox {
         viewModel.exportMarkdown();
     }
 
-    // [impl->req~ai.chat.clear-history~1]
+    // [impl->feat~ai.chat.clear-history~1]
     @FXML
     private void clearChatHistory() {
         viewModel.clearChatHistory();
