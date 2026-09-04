@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - title: 'JabCon 2026 | contribute.jabref.org'
-            start: '2026-09-04'
+            start: '2026-09-03'
             end: ''
             file: 'jabcon-2026.mp4'
             seconds_per_day: '20'
