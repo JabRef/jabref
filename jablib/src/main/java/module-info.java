@@ -312,7 +312,6 @@ open module org.jabref.jablib {
     requires cuid;
     requires com.dd.plist;
     requires io.github.darvil.terminal.textformatter;
-    requires static io.github.eadr;
     requires mslinks;
     requires transitive org.antlr.antlr4.runtime;
     requires org.jooq.jool;
