@@ -142,7 +142,8 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             metadataChange,
                             preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                             Localization.lang("Committed version"),
-                            Localization.lang("Saved file")
+                            Localization.lang("Saved file"),
+                            getDiffMethod()
                     );
             case GroupChange groupChange ->
                     new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');
