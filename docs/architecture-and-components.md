@@ -31,7 +31,7 @@ flowchart TD
     subgraph shared["Accessible from every layer"]
         direction TD
         preferences["Preferences"]
-        global["global classes"]
+        global["Global Classes"]
     end
     gui["gui"] --> logic["logic"]
     cli["cli"] --> logic
