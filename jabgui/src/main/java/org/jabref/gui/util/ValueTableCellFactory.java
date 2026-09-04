@@ -146,6 +146,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
 
                     if (contextMenuFactory != null) {
+                        // We only create the context menu when really necessary
                         setOnContextMenuRequested(event -> {
                             if (!isEmpty()) {
                                 setContextMenu(contextMenuFactory.apply(item));
