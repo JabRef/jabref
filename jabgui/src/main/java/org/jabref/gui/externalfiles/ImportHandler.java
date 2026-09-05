@@ -693,11 +693,14 @@ public class ImportHandler {
                 boolean finalIsTemporaryFile = isTemporaryFile;
                 entries.forEach(entry -> {
                     if (finalIsTemporaryFile) {
-                        List<LinkedFile> updatedFiles = entry.getFiles().stream()
-                                                             .map(file -> file.getLink().equalsIgnoreCase(targetFile.toString())
-                                                                     ? new LinkedFile("", pdfUrl, StandardFileType.PDF.getName())
-                                                                     : file)
-                                                             .toList();
+                        List<LinkedFile> updatedFiles = new ArrayList<>();
+                        for (LinkedFile file : entry.getFiles()) {
+                            if (file.getLink().equalsIgnoreCase(targetFile.toString())) {
+                                updatedFiles.add(new LinkedFile("", pdfUrl, StandardFileType.PDF.getName()));
+                            } else {
+                                updatedFiles.add(file);
+                            }
+                        }
                         entry.setFiles(updatedFiles);
                     } else if (entry.getFiles().isEmpty()) {
                         entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
