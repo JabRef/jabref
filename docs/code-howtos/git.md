@@ -73,6 +73,20 @@ However, JabRef is able to analyze the entries and determine that:
 
 Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
 
+## Using the semantic merge as Git merge driver
+
+`jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver), so that Git merges `.bib` files entry by entry.
+The setup is described in the user documentation, [Share](https://docs.jabref.org/collaborative-work/) → "Merging a Bib(la)TeX Library with Git".
+
+Git calls the driver with the base (`%O`), current (`%A`), and other (`%B`) version.
+The driver writes `current + (other - base)` into `%A`.
+Exit code 0 means a clean merge, exit code 1 marks the file as conflicted; conflicting entries keep the current side's version and their citation keys are printed to stderr.
+
+The merge plan is keyed by citation key and covers entries only.
+Therefore the driver refuses the merge (exit code 1, `CURRENT` untouched) when an input file contains duplicate citation keys, when the parser reported a warning for it (the file cannot be written back without loss then), and when content outside of entries with a citation key (entries without one, `@String` definitions, custom entry types, preamble, epilogue, metadata, shared database ID, encoding) differs between `OTHER` and both other versions.
+The entry type and the comment written above an entry are merged by the driver itself, because the plan carries field values only: a value changed in `OTHER` alone is applied to `CURRENT`, any other divergence is reported as a conflict.
+A comment in front of an `@Comment` block is refused as well, because JabRef's parser drops it (as it does on every other save).
+
 ## Related Test Cases
 
 The semantic conflict detection and merge resolution logic is covered by:

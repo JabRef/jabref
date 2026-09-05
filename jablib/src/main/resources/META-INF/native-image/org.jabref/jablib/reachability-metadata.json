@@ -267,10 +267,32 @@
       "serializable": true
     },
     {
-      "type": "org.jabref.model.database.BibDatabase"
+      "type": "org.jabref.model.database.BibDatabase",
+      "methods": [
+        {
+          "name": "relayEntryChangeEvent",
+          "parameterTypes": [
+            "org.jabref.model.entry.event.FieldChangedEvent"
+          ]
+        }
+      ]
     },
     {
-      "type": "org.jabref.model.database.KeyChangeListener"
+      "type": "org.jabref.model.database.KeyChangeListener",
+      "methods": [
+        {
+          "name": "listen",
+          "parameterTypes": [
+            "org.jabref.model.entry.event.FieldChangedEvent"
+          ]
+        },
+        {
+          "name": "listen",
+          "parameterTypes": [
+            "org.jabref.model.database.event.EntriesRemovedEvent"
+          ]
+        }
+      ]
     },
     {
       "type": "sun.text.resources.cldr.FormatData"
