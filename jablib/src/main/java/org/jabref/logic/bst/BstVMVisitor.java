@@ -80,16 +80,16 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         for (BstEntry bstEntry : bstVMContext.entries()) {
             if (!bstEntry.fields.containsKey(StandardField.CROSSREF.getName())) {
                 String crossref = bstEntry.entry.getResolvedFieldOrAlias(StandardField.CROSSREF, bstVMContext.bibDatabase())
-                                         .map(content -> normalizeFieldValue(content, fieldWriter, StandardField.CROSSREF))
-                                         .orElse(null);
+                                                .map(content -> normalizeFieldValue(content, fieldWriter, StandardField.CROSSREF))
+                                                .orElse(null);
                 bstEntry.fields.put(StandardField.CROSSREF.getName(), crossref);
             }
 
             for (Map.Entry<String, @Nullable String> fieldMapEntry : bstEntry.fields.entrySet()) {
                 Field field = FieldFactory.parseField(fieldMapEntry.getKey());
                 bstEntry.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
-                       .map(content -> normalizeFieldValue(content, fieldWriter, field))
-                       .ifPresent(fieldMapEntry::setValue);
+                              .map(content -> normalizeFieldValue(content, fieldWriter, field))
+                              .ifPresent(fieldMapEntry::setValue);
             }
         }
 
