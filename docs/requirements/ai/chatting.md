@@ -1,5 +1,7 @@
 ---
-parent: ai
+parent: AI
+grand_parent: Requirements
+nav_order: 2
 ---
 
 # Chat with AI

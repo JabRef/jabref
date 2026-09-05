@@ -1,5 +1,7 @@
 ---
-parent: ai
+parent: AI
+grand_parent: Requirements
+nav_order: 1
 ---
 
 # General requirements for AI features
