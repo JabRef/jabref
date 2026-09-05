@@ -56,7 +56,6 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        // [impl->req~ux.combobox.escape-closes-popup-only~1]
         getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {

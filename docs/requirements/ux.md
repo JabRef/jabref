@@ -82,8 +82,6 @@ Needs: impl
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
 The enclosing dialog must remain open.
 
-Needs: impl
-
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 

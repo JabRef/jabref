@@ -38,7 +38,6 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     private void setupKeyBindings(DialogPane dialogPane) {
-        // [impl->req~ux.combobox.escape-closes-popup-only~1]
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
