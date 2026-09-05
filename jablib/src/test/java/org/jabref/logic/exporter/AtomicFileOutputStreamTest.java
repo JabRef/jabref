@@ -4,12 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -17,6 +25,7 @@ import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,10 +34,13 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
@@ -52,6 +64,149 @@ class AtomicFileOutputStreamTest {
 
         // Written file still has the contents as before the error
         assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    void userDefinedAttributesArePreserved(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("tagged.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
+        try {
+            Files.setAttribute(out, "user:jabref.test", tag);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support user-defined attributes: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertArrayEquals(tag, (byte[]) Files.getAttribute(out, "user:jabref.test"));
+        assertEquals(FIVE_THOUSAND_CHARS, Files.readString(out));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    // Replacing a read-only file fails on Windows (no DELETE access), independent of attribute preservation
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void readOnlyFlagDoesNotBlockUserDefinedAttributes(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("read-only.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
+        try {
+            Files.setAttribute(out, "user:jabref.test", tag);
+            Files.setAttribute(out, "dos:readonly", true);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support user-defined or DOS attributes: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertArrayEquals(tag, (byte[]) Files.getAttribute(out, "user:jabref.test"));
+        assertEquals(true, Files.getAttribute(out, "dos:readonly"));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    void hiddenFlagIsPreserved(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("hidden.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        try {
+            Files.setAttribute(out, "dos:hidden", true);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support DOS attributes: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(true, Files.getAttribute(out, "dos:hidden"));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    @EnabledOnOs({OS.LINUX, OS.MAC})
+    void groupIsPreserved(@TempDir Path tempDir) throws IOException, InterruptedException {
+        Path out = tempDir.resolve("grouped.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        GroupPrincipal defaultGroup = (GroupPrincipal) Files.getAttribute(out, "posix:group");
+
+        // Any supplementary group of the current user works; there is no Java API for that list
+        Process id = new ProcessBuilder("id", "-Gn").start();
+        String groups = new String(id.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        assumeTrue(id.waitFor() == 0, "id -Gn failed");
+        Optional<String> otherGroupName = Stream.of(groups.trim().split("\\s+"))
+                                                .filter(name -> !name.equals(defaultGroup.getName()))
+                                                .findFirst();
+        assumeTrue(otherGroupName.isPresent(), "user is a member of one group only");
+        GroupPrincipal otherGroup = out.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByGroupName(otherGroupName.get());
+        Files.setAttribute(out, "posix:group", otherGroup);
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(otherGroup, Files.getAttribute(out, "posix:group"));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void aclIsPreservedAndAppliedAfterOtherAttributes(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("acl.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
+        // The owner is the only principal available without a localized name; denying WRITE_OWNER neither blocks
+        // reading, writing, nor deleting the file
+        UserPrincipal owner = Files.getOwner(out);
+        AclEntry entry = AclEntry.newBuilder()
+                                 .setType(AclEntryType.DENY)
+                                 .setPrincipal(owner)
+                                 .setPermissions(AclEntryPermission.WRITE_OWNER)
+                                 .build();
+        try {
+            Files.setAttribute(out, "user:jabref.test", tag);
+            @SuppressWarnings("unchecked")
+            List<AclEntry> acl = new ArrayList<>((List<AclEntry>) Files.getAttribute(out, "acl:acl"));
+            acl.addFirst(entry);
+            Files.setAttribute(out, "acl:acl", acl);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support user-defined attributes or ACLs: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        @SuppressWarnings("unchecked")
+        List<AclEntry> savedAcl = (List<AclEntry>) Files.getAttribute(out, "acl:acl");
+        assertTrue(savedAcl.stream().anyMatch(saved -> saved.principal().equals(owner)
+                && (saved.type() == AclEntryType.DENY)
+                && saved.permissions().contains(AclEntryPermission.WRITE_OWNER)));
+        assertArrayEquals(tag, (byte[]) Files.getAttribute(out, "user:jabref.test"));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void clearedArchiveFlagIsPreserved(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("archive.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        try {
+            Files.setAttribute(out, "dos:archive", false);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support DOS attributes: " + exception);
+        }
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(false, Files.getAttribute(out, "dos:archive"));
     }
 
     @Test

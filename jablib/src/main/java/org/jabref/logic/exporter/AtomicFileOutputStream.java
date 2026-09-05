@@ -15,6 +15,10 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.os.OS;
@@ -37,7 +41,9 @@ import org.slf4j.LoggerFactory;
 /// 2. Create a backup (with .sav suffix) of the original file (if it exists) in the same directory.
 /// 3. Atomically move the temporary file to the correct place, overwriting any file that already exists at that
 /// location. On Linux and macOS, files with hard links are overwritten in place to preserve their inode. An in-place
-/// overwrite is also used when the file system does not support atomic moves.
+/// overwrite is also used when the file system does not support atomic moves. Afterwards, the group, DOS attributes,
+/// ACL and user-defined extended attributes of the original file are applied to the new file on a best-effort basis
+/// (the owner cannot be restored without elevated privileges).
 /// 4. Delete the backup file (if configured to do so).
 ///
 /// If all goes well, no temporary or backup files will remain on disk after closing the stream.
@@ -318,6 +324,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
+            // Read before the final change check, because ACL and extended-attribute I/O take time on network shares.
+            // Applied to the target only after the commit: the temporary file must stay readable by this process for
+            // the in-place fallbacks, which a restrictive ACL of the target could prevent.
+            Map<String, Object> preservedAttributes = Files.exists(targetFile) ? readPreservableAttributes(targetFile, temporaryFile) : Map.of();
+
             // Re-check right before the commit: creating the backup of a large file can take a while, so the first
             // check may be long in the past by now
             try {
@@ -352,6 +363,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // own is as small as possible
             committedTargetFileState = FileSnapshot.read(targetFile);
 
+            // Before the permission restore: a read-only target refuses attribute writes on some platforms. Skipped
+            // when the target no longer matches the committed state, so that a concurrent writer's file is left alone
+            // (the remaining race between the check and the write cannot be closed by a path-based API)
+            Optional.ofNullable(committedTargetFileState)
+                    .filter(state -> state.matches(targetFile))
+                    .ifPresent(state -> applyAttributes(targetFile, preservedAttributes));
+
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
                 try {
@@ -369,6 +387,80 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // Remove temporary file (but not the backup!)
             cleanup();
         }
+    }
+
+    /// Reads everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
+    /// `file`, keyed by attribute name for [Files#setAttribute], in the order they have to be applied: the ACL
+    /// after the group and extended attributes because it may revoke the access to write them, the DOS flags after
+    /// the ACL because writing it sets the archive bit, and read-only last of all.
+    /// Each part is independent and best-effort: a mounted file system may lack support the default file system
+    /// advertises. Ownership is not included, because restoring it needs elevated privileges. POSIX permissions are
+    /// restored separately, so that they also apply to a freshly created target.
+    ///
+    /// The string-based attribute API is used instead of the typed views: it never yields `null` and transfers each
+    /// extended attribute completely or throws, so a partial transfer cannot go unnoticed.
+    ///
+    /// @param replacement the file that is going to replace `file`; only DOS flags differing from its flags are included, because writing an unchanged `false` on Linux adds a DOSATTRIB xattr to every saved file
+    // [impl->req~logic.exporter.preserve-file-attributes~1]
+    private static Map<String, Object> readPreservableAttributes(Path file, Path replacement) {
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        Set<String> views = file.getFileSystem().supportedFileAttributeViews();
+
+        if (views.contains("posix")) {
+            try {
+                attributes.put("posix:group", Files.getAttribute(file, "posix:group"));
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read group of {}", file, exception);
+            }
+        }
+
+        if (views.contains("user")) {
+            try {
+                Files.readAttributes(file, "user:*").forEach((name, value) -> attributes.put("user:" + name, value));
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read extended attributes of {}", file, exception);
+            }
+        }
+
+        if (views.contains("acl")) {
+            try {
+                attributes.put("acl:acl", Files.getAttribute(file, "acl:acl"));
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read ACL of {}", file, exception);
+            }
+        }
+
+        if (views.contains("dos")) {
+            try {
+                String dosFlagNames = "dos:hidden,system,archive,readonly";
+                Map<String, Object> replacementFlags = Files.readAttributes(replacement, dosFlagNames);
+                Map<String, Object> dosFlags = new LinkedHashMap<>(Files.readAttributes(file, dosFlagNames));
+                dosFlags.entrySet().removeIf(flag -> flag.getValue().equals(replacementFlags.get(flag.getKey())));
+                // After the ACL: Windows sets the archive bit again when the security descriptor is written.
+                // Read-only last of all, because it blocks further attribute writes.
+                for (String flag : List.of("hidden", "system", "archive", "readonly")) {
+                    if (dosFlags.containsKey(flag)) {
+                        attributes.put("dos:" + flag, dosFlags.get(flag));
+                    }
+                }
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read DOS attributes of {}", file, exception);
+            }
+        }
+
+        return attributes;
+    }
+
+    /// Applies the attributes read by [#readPreservableAttributes(Path,Path)] in their order, skipping (and logging)
+    /// each one the OS refuses, e.g. a group the user is not a member of.
+    private static void applyAttributes(Path file, Map<String, Object> attributes) {
+        attributes.forEach((name, value) -> {
+            try {
+                Files.setAttribute(file, name, value);
+            } catch (IOException | UnsupportedOperationException | IllegalArgumentException | SecurityException exception) {
+                LOGGER.debug("Could not set attribute {} on {}", name, file, exception);
+            }
+        });
     }
 
     private boolean createBackup() {
