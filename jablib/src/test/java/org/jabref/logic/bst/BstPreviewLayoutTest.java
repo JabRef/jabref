@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -13,6 +14,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -62,94 +66,29 @@ class BstPreviewLayoutTest {
         assertEquals("O.\u00a0Kopp. \u03a3\u0394 modulator.", preview);
     }
 
-    @Test
-    void smallCapsFormattingIsRendered() throws URISyntaxException {
+    @ParameterizedTest
+    @MethodSource
+    void generatePreviewHandlesInlineFormatting(String title, String expectedPreview) throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "\\textsc{L{\\'o}pez}");
+                                       .withField(StandardField.TITLE, title);
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
+        assertEquals(expectedPreview, preview);
     }
 
-    @Test
-    void legacySmallCapsFormattingIsRendered() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "{\\sc L{\\'o}pez}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
-    }
-
-    @Test
-    void nestedSmallCapsFormattingIsRendered() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "\\textsc{Outer \\textsc{inner} text}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>", preview);
-    }
-
-    @Test
-    void smallCapsFormattingAllowsWhitespaceAfterCommand() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "\\textsc {L{\\'o}pez}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
-    }
-
-    @Test
-    void smallCapsFormattingHandlesEscapedBracesWithoutBreakingTheSpan() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "\\textsc{A\\{B\\}C}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>", preview);
-    }
-
-    @Test
-    void legacySmallCapsDoesNotMatchLongerCommands() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "{\\scshape Lopez}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. Lopez.", preview);
-    }
-
-    @Test
-    void unterminatedSmallCapsCommandIsIgnoredGracefully() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "\\textsc{L{\\'o}pez");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. López.", preview);
-    }
-
-    @Test
-    void unterminatedLegacySmallCapsCommandIsIgnoredGracefully() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "{\\sc L{\\'o}pez");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. lópez.", preview);
-    }
-
-    @Test
-    void superscriptFormattingIsRendered() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "Proceedings of the 9\\textsuperscript{th} symposium");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium.", preview);
-    }
-
-    @Test
-    void subscriptFormattingIsRendered() throws URISyntaxException {
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
-                                       .withField(StandardField.TITLE, "{H\\textsubscript{2}O}");
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. H₂O.", preview);
+    private static Stream<Arguments> generatePreviewHandlesInlineFormatting() {
+        return Stream.of(
+                Arguments.of("\\textsc{L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("{\\sc L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("\\textsc{Outer \\textsc{inner} text}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>"),
+                Arguments.of("\\textsc {L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("\\textsc{A\\{B\\}C}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
+                Arguments.of("{\\scshape Lopez}", "O.\u00a0Kopp. Lopez."),
+                Arguments.of("\\textsc{L{\\'o}pez", "O.\u00a0Kopp. López."),
+                Arguments.of("{\\sc L{\\'o}pez", "O.\u00a0Kopp. lópez."),
+                Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium."),
+                Arguments.of("{H\\textsubscript{2}O}", "O.\u00a0Kopp. H₂O.")
+        );
     }
 
     @Test

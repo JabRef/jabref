@@ -179,17 +179,17 @@ public final class BstPreviewLayout implements PreviewLayout {
     }
 
     private static String replaceCommandWithBalancedArgument(String input, String command) {
-        String needle = "\\" + command;
+        String commandPrefix = "\\" + command;
         StringBuilder output = new StringBuilder(input.length());
         int index = 0;
         while (index < input.length()) {
-            if (!input.startsWith(needle, index) || isEscaped(input, index)) {
+            if (!input.startsWith(commandPrefix, index) || isEscaped(input, index)) {
                 output.append(input.charAt(index));
                 index++;
                 continue;
             }
 
-            int commandEnd = index + needle.length();
+            int commandEnd = index + commandPrefix.length();
             if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
                 output.append(input.charAt(index));
                 index++;
@@ -219,17 +219,17 @@ public final class BstPreviewLayout implements PreviewLayout {
     }
 
     private static String replaceLegacySwitchWithBalancedArgument(String input, String command) {
-        String needle = "{\\" + command;
+        String legacyCommandPrefix = "{\\" + command;
         StringBuilder output = new StringBuilder(input.length());
         int index = 0;
         while (index < input.length()) {
-            if (!input.startsWith(needle, index)) {
+            if (!input.startsWith(legacyCommandPrefix, index)) {
                 output.append(input.charAt(index));
                 index++;
                 continue;
             }
 
-            int commandEnd = index + needle.length();
+            int commandEnd = index + legacyCommandPrefix.length();
             if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
                 output.append(input.charAt(index));
                 index++;
