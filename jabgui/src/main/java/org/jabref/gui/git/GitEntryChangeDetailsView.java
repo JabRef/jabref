@@ -8,7 +8,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.threewaymerge.DiffMethod;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -29,7 +29,8 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      GuiPreferences preferences,
                                      BibEntryTypesManager entryTypesManager,
                                      String oldVersionLabel,
-                                     String newVersionLabel) {
+                                     String newVersionLabel,
+                                     DiffMethod diffMethod) {
         Label committedVersion = new Label(oldVersionLabel);
         committedVersion.getStyleClass().add("lib-change-header");
         Label savedFile = new Label(newVersionLabel);
