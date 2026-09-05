@@ -107,6 +107,19 @@ class GroupDialogViewModelTest {
     }
 
     @Test
+    void validateExistingRelativePathFallsBackToLibraryWhenLatexDirectoryMissesTheAuxFile() throws IOException {
+        Path anAuxFile = Path.of("auxfile.aux");
+        Path latexDirectory = Files.createDirectory(temporaryFolder.resolve("latex"));
+
+        Files.createFile(temporaryFolder.resolve(anAuxFile));
+        metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
+        bibDatabaseContext.setDatabasePath(temporaryFolder.resolve("library.bib"));
+
+        viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
+        assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
     void hierarchicalContextFromGroup() {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);

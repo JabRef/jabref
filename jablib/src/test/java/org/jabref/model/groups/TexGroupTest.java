@@ -98,6 +98,19 @@ class TexGroupTest {
         assertEquals(latexAuxFile, group.getFilePathResolved());
     }
 
+    @Test
+    void libraryPathIsUsedWhenLatexDirectoryDoesNotContainTheAuxFile(@TempDir Path tempDir) throws Exception {
+        Path libraryDirectory = Files.createDirectory(tempDir.resolve("library"));
+        Path latexDirectory = Files.createDirectory(tempDir.resolve("latex"));
+        Path libraryAuxFile = copyPaperAux(libraryDirectory);
+
+        metaData.setLibraryPath(libraryDirectory.resolve("library.bib"));
+        metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, Path.of("paper.aux"), new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, USER_AND_HOST);
+
+        assertEquals(libraryAuxFile, group.getFilePathResolved());
+    }
+
     /// "Save as" moves the library. The aux file then resolves to another directory.
     @Test
     void resolvedPathFollowsTheLibrary(@TempDir Path tempDir) throws Exception {
