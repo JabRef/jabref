@@ -10,6 +10,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -89,7 +90,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
                 return List.of();
             }
         }
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
+        String term = SearchQuery.unescapeSearchValue(ctx.searchValue());
 
         // unfielded terms, check the search bar flags
         if (ctx.FIELD() == null) {

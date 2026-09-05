@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import org.jabref.model.search.LinkedFilesConstants;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
@@ -62,7 +63,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitComparison(SearchParser.ComparisonContext ctx) {
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
+        String term = SearchQuery.unescapeSearchValue(ctx.searchValue());
         boolean isQuoted = ctx.searchValue().getStart().getType() == SearchParser.STRING_LITERAL;
 
         // unfielded expression

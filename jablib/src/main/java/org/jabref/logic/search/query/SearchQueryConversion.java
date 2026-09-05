@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.search.query.SqlQueryNode;
-import org.jabref.search.SearchParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +32,6 @@ public class SearchQueryConversion {
     public static List<SearchQueryNode> extractSearchTerms(SearchQuery searchQuery) {
         LOGGER.debug("Extracting search terms from search expression: {}", searchQuery.getSearchExpression());
         return new SearchQueryExtractorVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
-    }
-
-    /// Unescapes search value based on the Search grammar rules.
-    ///
-    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"`
-    ///
-    /// - TERM: Unescapes `\=, \!, \~, \(, \)`
-    public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
-        return SearchQuery.unescapeSearchValue(ctx);
     }
 
     /// Escapes a literal term so it can be used as a regular expression in both Java and PostgreSQL.

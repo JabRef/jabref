@@ -109,6 +109,11 @@ public class SearchQuery {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
     }
 
+    /// Unescapes search value based on the Search grammar rules.
+    ///
+    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"`
+    ///
+    /// - TERM: Unescapes `\=, \!, \~, \(, \)`
     public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
         if (ctx == null) {
             return "";
