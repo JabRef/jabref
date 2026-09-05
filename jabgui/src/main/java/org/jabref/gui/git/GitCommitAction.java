@@ -1,7 +1,12 @@
 package org.jabref.gui.git;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -9,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.SaveDatabaseAction.AutoCommit;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -64,7 +70,7 @@ public class GitCommitAction extends SimpleCommand {
     @Override
     public void execute() {
         // Git operates on the file on disk, so in-memory changes would silently be left out of the commit.
-        if (!isLibrarySaved()) {
+        if (!isReadyToCommit()) {
             return;
         }
 
@@ -122,38 +128,53 @@ public class GitCommitAction extends SimpleCommand {
                       .executeWith(taskExecutor);
     }
 
-    private boolean isLibrarySaved() {
+    private boolean isReadyToCommit() {
         LibraryTab libraryTab = tabSupplier.get();
         if (libraryTab == null || !libraryTab.isModified()) {
             return true;
         }
 
-        if (!preferences.getLibraryPreferences().shouldAutoSave()) {
-            // Without autosave the user decides when the library is written, so the commit is left to them, too.
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Git commit"),
-                    Localization.lang("The library has unsaved changes. Please save it before committing."));
-            return false;
+        if (preferences.getLibraryPreferences().shouldAutoSave()) {
+            return save(libraryTab);
         }
+        return commitWithUnsavedChanges(libraryTab);
+    }
 
+    /// Without autosave the user decides when the library is written, so committing only the work
+    /// already on disk stays available, as in other Git clients.
+    /// [impl->req~git.commit.unsaved-changes~1]
+    private boolean commitWithUnsavedChanges(LibraryTab libraryTab) {
+        ButtonType saveAndCommit = new ButtonType(Localization.lang("Save and commit"), ButtonBar.ButtonData.YES);
+        ButtonType commitWithoutSaving = new ButtonType(Localization.lang("Commit without saving"), ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> choice = dialogService.showCustomButtonDialogAndWait(
+                Alert.AlertType.CONFIRMATION,
+                Localization.lang("Git commit"),
+                Localization.lang("The library has unsaved changes that are not in the file on disk."),
+                saveAndCommit, commitWithoutSaving, cancel);
+
+        if (choice.filter(saveAndCommit::equals).isPresent()) {
+            return save(libraryTab);
+        }
+        return choice.filter(commitWithoutSaving::equals).isPresent();
+    }
+
+    /// The save must not commit by itself: this one is on its way to the commit dialog.
+    private boolean save(LibraryTab libraryTab) {
         SaveResult saveResult = new SaveDatabaseAction(
                 libraryTab,
                 dialogService,
                 preferences,
                 entryTypesManager,
                 stateManager,
-                journalAbbreviationRepository).save(SaveDatabaseMode.NORMAL);
-        switch (saveResult) {
-            case SUCCESS -> {
-                return true;
-            }
+                journalAbbreviationRepository).save(SaveDatabaseMode.NORMAL, AutoCommit.DISABLED);
+        if (saveResult == SaveResult.ALREADY_SAVING) {
             // A save is still running (e.g. autosave), so the file on disk is not yet what the user sees.
-            case ALREADY_SAVING ->
-                    dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));
-            case FAILURE ->
-                    dialogService.notify(Localization.lang("Unable to save library"));
+            dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));
         }
-        return false;
+        // The action needs a saved local database, so a failed save has already reported itself.
+        return saveResult == SaveResult.SUCCESS;
     }
 
     private boolean hasNothingToCommit(Path bibFilePath) {

@@ -22,7 +22,6 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
-import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -58,10 +57,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final Validator proxyUsernameValidator;
     private final Validator proxyPasswordValidator;
 
-    private final StringProperty gitUsernameProperty = new SimpleStringProperty("");
-    private final StringProperty gitPatProperty = new SimpleStringProperty("");
-    private final BooleanProperty gitPersistPatProperty = new SimpleBooleanProperty();
-
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
 
@@ -69,22 +64,18 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final ProxyPreferences backupProxyPreferences;
     private final InternalPreferences internalPreferences;
 
-    private final GitPreferences gitPreferences;
-
     private final TrustStoreManager trustStoreManager;
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService,
                                ProxyPreferences proxyPreferences,
-                               GitPreferences gitPreferences,
                                InternalPreferences internalPreferences,
                                SSLPreferences sslPreferences,
                                FilePreferences filePreferences) {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.proxyPreferences = proxyPreferences;
-        this.gitPreferences = gitPreferences;
         this.internalPreferences = internalPreferences;
 
         backupProxyPreferences = new ProxyPreferences(
@@ -136,7 +127,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         versionCheckProperty.setValue(internalPreferences.isVersionCheckEnabled());
 
         setProxyValues();
-        setGitValues();
         setSSLValues();
     }
 
@@ -149,12 +139,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
         proxyPersistPasswordProperty.setValue(proxyPreferences.shouldPersistPassword());
         passwordPersistAvailable.setValue(OS.isKeyringAvailable());
-    }
-
-    private void setGitValues() {
-        gitUsernameProperty.setValue(gitPreferences.getUsername());
-        gitPatProperty.setValue(gitPreferences.getPat());
-        gitPersistPatProperty.setValue(gitPreferences.getPersistPat());
     }
 
     private void setSSLValues() {
@@ -186,10 +170,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPreferences.setPersistPassword(proxyPersistPasswordProperty.getValue()); // Set before the password to actually persist
         proxyPreferences.setPassword(proxyPasswordProperty.getValue());
         ProxyRegisterer.register(proxyPreferences);
-
-        gitPreferences.setUsername(gitUsernameProperty.getValue().trim());
-        gitPreferences.setPersistPat(gitPersistPatProperty.getValue()); // Set before the password to actually persist
-        gitPreferences.setPat(gitPatProperty.getValue().trim());
 
         trustStoreManager.flush();
     }
@@ -321,18 +301,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public ReadOnlyBooleanProperty passwordPersistAvailable() {
         return passwordPersistAvailable;
-    }
-
-    public StringProperty gitUsernameProperty() {
-        return gitUsernameProperty;
-    }
-
-    public StringProperty gitPatProperty() {
-        return gitPatProperty;
-    }
-
-    public BooleanProperty gitPersistPatProperty() {
-        return gitPersistPatProperty;
     }
 
     public ListProperty<CustomCertificateViewModel> customCertificateListProperty() {
