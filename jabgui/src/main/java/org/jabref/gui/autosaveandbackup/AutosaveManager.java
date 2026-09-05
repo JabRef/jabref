@@ -35,16 +35,23 @@ public class AutosaveManager {
     private final AtomicBoolean needsSave = new AtomicBoolean(false);
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
+        this(bibDatabaseContext, coarseChangeFilter, new ScheduledThreadPoolExecutor(2));
+    }
+
+    AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, ScheduledThreadPoolExecutor executor) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.coarseChangeFilter = coarseChangeFilter;
         this.eventBus = new EventBus();
 
-        this.executor = new ScheduledThreadPoolExecutor(2);
+        this.executor = executor;
         this.executor.scheduleAtFixedRate(
                 () -> {
-                    // Clear before posting, so a change arriving while the save runs is not lost
-                    if (needsSave.getAndSet(false)) {
-                        eventBus.post(new AutosaveEvent());
+                    synchronized (this) {
+                        // Serialize posting with shutdown so a callback cannot post after disposal.
+                        // Clear before posting, so a change arriving while the save runs is not lost
+                        if (!executor.isShutdown() && needsSave.getAndSet(false)) {
+                            eventBus.post(new AutosaveEvent());
+                        }
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
@@ -64,7 +71,9 @@ public class AutosaveManager {
         return needsSave.get();
     }
 
-    private void shutdown() {
+    synchronized void shutdown() {
+        executor.shutdownNow();
+        needsSave.set(false);
         try {
             coarseChangeFilter.unregisterListener(this);
         } catch (IllegalArgumentException e) {

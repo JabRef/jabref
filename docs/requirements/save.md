@@ -24,6 +24,8 @@ Needs: impl, utest
 
 While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
 
+When the autosave manager is shut down, its periodic task must stop and pending callbacks must not post further autosave events.
+
 Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
