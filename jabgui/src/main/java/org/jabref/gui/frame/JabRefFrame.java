@@ -170,8 +170,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, dialogService, stateManager));
+                new UndoAction(dialogService, stateManager),
+                new RedoAction(dialogService, stateManager));
         Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.sidePane = new SidePane(

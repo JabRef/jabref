@@ -1,5 +1,6 @@
 package org.jabref.gui.undo;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -15,6 +16,7 @@ import org.jabref.model.undo.UndoableFieldChange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,7 +31,12 @@ class UndoRedoActionTest {
 
     private final HeadlessGuiUndoManager journalOfA = new HeadlessGuiUndoManager();
     private final HeadlessGuiUndoManager journalOfB = new HeadlessGuiUndoManager();
+    /// Given distinct paths on purpose: `BibDatabaseContext#equals` compares content, so two empty
+    /// libraries are equal, and stubbing by one would answer for the other.
+    private final BibDatabaseContext libraryA = libraryAt("a.bib");
+    private final BibDatabaseContext libraryB = libraryAt("b.bib");
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
 
     private BibEntry entryInA;
     private BibEntry entryInB;
@@ -44,16 +51,29 @@ class UndoRedoActionTest {
         entryInB = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Curie");
 
         tabA = mock(LibraryTab.class);
-        when(tabA.getGuiUndoManager()).thenReturn(journalOfA);
+        when(tabA.getBibDatabaseContext()).thenReturn(libraryA);
         tabB = mock(LibraryTab.class);
-        when(tabB.getGuiUndoManager()).thenReturn(journalOfB);
+        when(tabB.getBibDatabaseContext()).thenReturn(libraryB);
 
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeTabProperty()).thenReturn(activeTab);
-        when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.ofNullable(new BibDatabaseContext()));
+        when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
+        when(stateManager.getGuiUndoManager(libraryA)).thenReturn(journalOfA);
+        when(stateManager.getGuiUndoManager(libraryB)).thenReturn(journalOfB);
 
-        undoAction = new UndoAction(() -> activeTab.get().orElseThrow(), mock(DialogService.class), stateManager);
-        redoAction = new RedoAction(() -> activeTab.get().orElseThrow(), mock(DialogService.class), stateManager);
+        undoAction = new UndoAction(mock(DialogService.class), stateManager);
+        redoAction = new RedoAction(mock(DialogService.class), stateManager);
+    }
+
+    private static BibDatabaseContext libraryAt(String fileName) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(Path.of(fileName));
+        return context;
+    }
+
+    private void showLibrary(LibraryTab tab, BibDatabaseContext context) {
+        activeTab.set(Optional.of(tab));
+        activeDatabase.set(Optional.of(context));
     }
 
     private UndoableFieldChange setAuthor(BibEntry entry, String value) {
@@ -66,7 +86,7 @@ class UndoRedoActionTest {
     void undoReversesTheChangeInTheActiveLibraryOnly() {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
         journalOfB.addEdit(setAuthor(entryInB, "Meitner"));
-        activeTab.set(Optional.of(tabA));
+        showLibrary(tabA, libraryA);
 
         undoAction.execute();
 
@@ -81,9 +101,9 @@ class UndoRedoActionTest {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
         journalOfB.addEdit(setAuthor(entryInB, "Meitner"));
 
-        activeTab.set(Optional.of(tabA));
+        showLibrary(tabA, libraryA);
         undoAction.execute();
-        activeTab.set(Optional.of(tabB));
+        showLibrary(tabB, libraryB);
         undoAction.execute();
 
         assertEquals(Optional.of("Einstein"), entryInA.getField(StandardField.AUTHOR));
@@ -96,7 +116,7 @@ class UndoRedoActionTest {
         journalOfB.addEdit(setAuthor(entryInB, "Meitner"));
         journalOfA.undo();
         journalOfB.undo();
-        activeTab.set(Optional.of(tabA));
+        showLibrary(tabA, libraryA);
 
         redoAction.execute();
 
@@ -108,10 +128,10 @@ class UndoRedoActionTest {
     void enablementTracksTheActiveLibraryRatherThanAnyLibrary() {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
 
-        activeTab.set(Optional.of(tabA));
+        showLibrary(tabA, libraryA);
         assertTrue(undoAction.executableProperty().get());
 
-        activeTab.set(Optional.of(tabB));
+        showLibrary(tabB, libraryB);
         assertFalse(undoAction.executableProperty().get(), "enabled over a library with an empty journal");
     }
 
@@ -121,5 +141,13 @@ class UndoRedoActionTest {
 
         assertFalse(undoAction.executableProperty().get());
         assertFalse(redoAction.executableProperty().get());
+    }
+
+    /// Enablement keeps this out of reach from the UI, but nothing about the class enforces that,
+    /// and a no-op beats a NullPointerException.
+    @Test
+    void executingWithNoLibraryOpenDoesNothing() {
+        assertDoesNotThrow(() -> undoAction.execute());
+        assertDoesNotThrow(() -> redoAction.execute());
     }
 }

@@ -590,7 +590,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Put an asterisk behind the filename to indicate the database has changed.
     public synchronized void markChangedOrUnChanged() {
-        if (getGuiUndoManager().hasChanged()) {
+        if (journal().hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -830,21 +830,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// The journal to record a change to this library on.
     ///
-    /// Recording is all most callers do, which is why this hands out the narrow type; the few that
-    /// drive the stacks ask for [#getGuiUndoManager].
+    /// Recording is what a tab's collaborators do with the journal. The few classes that undo, redo
+    /// or track the saved position name the library to the state manager instead.
     public UndoManager getUndoManager() {
-        return getGuiUndoManager();
+        return journal();
     }
 
-    /// The same journal as [#getUndoManager], for undoing, redoing and the saved position.
-    ///
     /// Resolved on each call rather than held: the context a tab shows is replaced once loading
     /// finishes (see [#setDatabaseContext]), and the journal follows the library the tab holds now.
     ///
     /// Once the library is closed its journal is no longer the state manager's to hand out — asking
     /// for it there would put a fresh one back in a map nothing will clear again — so what is
     /// returned from then on is the journal this library had, which goes when this tab does.
-    public GuiUndoManager getGuiUndoManager() {
+    private GuiUndoManager journal() {
         if (journalAfterClose != null) {
             LOGGER.warn("The undo journal of {} was requested after the library was closed", bibDatabaseContext.getDatabasePath());
             return journalAfterClose;

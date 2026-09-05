@@ -213,8 +213,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
