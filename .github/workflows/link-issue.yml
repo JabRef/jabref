@@ -137,7 +137,7 @@ jobs:
           PR_AUTHOR="${{ github.event.pull_request.user.login }}"
 
           echo "Checking assignees for issue #$ISSUE_NUMBER"
-          ASSIGNEES=$(gh api  api /repos/JabRef/jabref/issues/$ISSUE_NUMBER --jq '[.assignees[].login]')
+          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/$ISSUE_NUMBER --jq '[.assignees[].login]')
 
           if echo "$ASSIGNEES" | jq -e --arg u "$PR_AUTHOR" 'index($u)' >/dev/null; then
             echo "✅ '$PR_AUTHOR' is already assigned. Pinning."
