@@ -33,8 +33,8 @@
                                 <fx:define>
                                     <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
                                 </fx:define>
-                                <RadioButton fx:id="highlightWordsRadioButton" mnemonicParsing="false" selected="true" text="%Highlight words" toggleGroup="$diffHighlightingMethodToggleGroup" />
-                                <RadioButton fx:id="highlightCharactersRadioButton" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
+                                <RadioButton fx:id="highlightWordsRadioButton" mnemonicParsing="false" text="%Highlight words" toggleGroup="$diffHighlightingMethodToggleGroup" />
+                                <RadioButton fx:id="highlightCharactersRadioButton" mnemonicParsing="false" selected="true" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
                             </HBox>
                         </top>
                     </BorderPane>

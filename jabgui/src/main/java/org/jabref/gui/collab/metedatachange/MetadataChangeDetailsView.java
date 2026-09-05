@@ -20,10 +20,14 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
     public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
-        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"), DiffHighlighter.BasicDiffMethod.WORDS);
+        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"), DiffHighlighter.BasicDiffMethod.CHARS);
     }
 
-    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
+    public MetadataChangeDetailsView(MetadataChange metadataChange,
+                                     GlobalCitationKeyPatterns globalCitationKeyPatterns,
+                                     String leftLabelText,
+                                     String rightLabelText,
+                                     DiffHighlighter.BasicDiffMethod diffMethod) {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
@@ -44,7 +48,12 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /// @param container      The parent container to add the difference view to
     /// @param diff           The metadata difference to display
     /// @param metadataChange The metadata change object containing all changes
-    private void addDifferenceView(VBox container, MetaDataDiff.Difference diff, MetadataChange metadataChange, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
+    private void addDifferenceView(VBox container,
+                                   MetaDataDiff.Difference diff,
+                                   MetadataChange metadataChange,
+                                   String leftLabelText,
+                                   String rightLabelText,
+                                   DiffHighlighter.BasicDiffMethod diffMethod) {
         Label typeLabel = new Label(getDifferenceString(diff.differenceType()));
         typeLabel.getStyleClass().add("diff-type-label");
         container.getChildren().add(typeLabel);
@@ -146,7 +155,9 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /// @param metadata The metadata containing groups
     /// @return String representation of groups tree, or empty string if no groups
     private String getMetadataGroupsContent(MetaData metadata) {
-        return metadata.getGroups().map(this::convertGroupTreeToString).orElse("");
+        return metadata.getGroups()
+                       .map(this::convertGroupTreeToString)
+                       .orElse("");
     }
 
     /// Converts a group tree to a string representation with indentation.
@@ -165,7 +176,9 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /// @param builder The string builder to append to
     /// @param level   The current depth level in the tree (for indentation)
     private void appendGroupTreeNode(GroupTreeNode node, StringBuilder builder, int level) {
-        builder.append("|  ".repeat(level)).append(node.getName()).append("\n");
+        builder.append("|  ".repeat(level))
+               .append(node.getName())
+               .append("\n");
 
         for (GroupTreeNode child : node.getChildren()) {
             appendGroupTreeNode(child, builder, level + 1);
