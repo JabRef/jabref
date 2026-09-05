@@ -687,7 +687,7 @@ public class ImportHandler {
             if (parserResult.hasWarnings()) {
                 LOGGER.warn("PDF import had warnings: {}", parserResult.getErrorMessage());
             }
-            List<BibEntry> entries = parserResult.getDatabase().getEntries();
+            List<BibEntry> entries = new ArrayList<>(parserResult.getDatabase().getEntries());
             if (!entries.isEmpty()) {
                 boolean finalIsTemporaryFile = isTemporaryFile;
                 entries.forEach(entry -> {

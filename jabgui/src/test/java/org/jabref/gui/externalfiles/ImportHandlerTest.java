@@ -326,6 +326,6 @@ class ImportHandlerTest {
     void handleStringDataWithPdfUrlWhenNoTargetDirectoryPresent() throws Exception {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.empty());
         List<BibEntry> entries = importHandler.handleStringData("https://invalid.domain.example/test.pdf");
-        assertTrue(entries.isEmpty());
+        assertEquals(List.of(), entries);
     }
 }
