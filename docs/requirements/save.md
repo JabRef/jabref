@@ -28,7 +28,6 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
-
 ## Keyword delimiter normalization is a cleanup
 `req~save.keywords.normalize-delimiters~1`
 
