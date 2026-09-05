@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /// This class contains Linux specific implementations for file directories and file/application open handling methods.
 ///
-/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
@@ -70,6 +70,11 @@ public class Linux extends NativeDesktop {
         } else {
             nativeOpenFile(filePath);
         }
+    }
+
+    @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder("xdg-open", url).start();
     }
 
     @Override

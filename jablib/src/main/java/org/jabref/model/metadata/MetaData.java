@@ -44,6 +44,7 @@ public class MetaData {
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
+    public static final String KEYWORD_SEPARATOR = "keywordSeparator";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
@@ -79,6 +80,7 @@ public class MetaData {
     @Nullable private FieldFormatterCleanupActions saveActions;
     @Nullable private BibDatabaseMode mode;
     @Nullable private AbbreviationType libraryAbbreviationType;
+    @Nullable private Character keywordSeparator;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
 
@@ -153,7 +155,7 @@ public class MetaData {
 
     /// Updates the stored key patterns to the given key patterns.
     ///
-    /// @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+    /// @param bibtexKeyPatterns the key patterns to update to. A reference to this object is stored internally and is returned at getCiteKeyPattern();
     public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
@@ -219,6 +221,27 @@ public class MetaData {
             return;
         }
         this.libraryAbbreviationType = null;
+        postChange();
+    }
+
+    /// The separator used in this library's keyword fields; absent if the library does not declare one (then the global preference applies)
+    public Optional<Character> getKeywordSeparator() {
+        return Optional.ofNullable(keywordSeparator);
+    }
+
+    public void setKeywordSeparator(@NonNull Character keywordSeparator) {
+        if (keywordSeparator.equals(this.keywordSeparator)) {
+            return;
+        }
+        this.keywordSeparator = keywordSeparator;
+        postChange();
+    }
+
+    public void clearKeywordSeparator() {
+        if (this.keywordSeparator == null) {
+            return;
+        }
+        this.keywordSeparator = null;
         postChange();
     }
 
@@ -328,7 +351,7 @@ public class MetaData {
         postChange();
     }
 
-    /// Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
+    /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
@@ -361,7 +384,7 @@ public class MetaData {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
-    /// If disabled {@link MetaDataChangedEvent} will not be posted.
+    /// If disabled [MetaDataChangedEvent] will not be posted.
     public void setEventPropagation(boolean enabled) {
         this.isEventPropagationEnabled = enabled;
     }
@@ -422,6 +445,7 @@ public class MetaData {
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
                 && (libraryAbbreviationType == that.libraryAbbreviationType)
+                && Objects.equals(keywordSeparator, that.keywordSeparator)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
                 && Objects.equals(versionDBStructure, that.versionDBStructure)
@@ -431,12 +455,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

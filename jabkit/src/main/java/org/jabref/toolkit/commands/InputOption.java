@@ -3,15 +3,14 @@ package org.jabref.toolkit.commands;
 import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.exception.ImportServiceException;
 
-import io.github.adr.linked.ADR;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -38,15 +37,24 @@ class InputOption {
 
     /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
     /// @throws ImportServiceException if a URL was supplied and could not be downloaded
-    // [impl->req~jabkit.cli.input-url~1]
-    @ADR(65)
     Path getInputFile() throws ImportServiceException {
-        String input = inputSource.positionalInput != null
-                       ? inputSource.positionalInput
-                       : inputSource.optionInput;
+        return resolveInput(inputSource.positionalInput != null
+                            ? inputSource.positionalInput
+                            : inputSource.optionInput);
+    }
 
-        String lowerCaseInput = input.toLowerCase(Locale.ROOT);
-        if (lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://")) {
+    /// Resolves a single input argument to a local file: a URL is downloaded to a temporary file,
+    /// anything else is taken as a (possibly Cygwin-style) local path.
+    ///
+    /// Commands reading more than one input cannot use this mixin — its [ArgGroup] binds a single
+    /// argument — and call this method per input instead.
+    ///
+    /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
+    /// @throws ImportServiceException if a URL was supplied and could not be downloaded
+    // [impl->req~jabkit.cli.input-url~2]
+    // [impl->adr~download-url-input-files~1]
+    static Path resolveInput(String input) throws ImportServiceException {
+        if (URLUtil.isURL(input)) {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
@@ -70,13 +78,15 @@ class InputOption {
         }
     }
 
+    /// `--input` is a backward-compatible alias here; the positional form and the alias both come from
+    /// ADR 57, which superseded the `--input`-only ADR 45.
+    // [impl->adr~allow-positional-input-file-argument~1]
     private static class InputSource {
         // [impl->req~jabkit.cli.input-flag~2]
         @Parameters(index = "0", paramLabel = "FILE",
                 description = "Input file, or an http(s)/ftp URL. Alternatively, pass it via --input.")
         private String positionalInput;
 
-        @ADR(45)
         @Option(names = {"--input"},
                 description = "Input file, or an http(s)/ftp URL (alias for the positional FILE argument).")
         private String optionInput;

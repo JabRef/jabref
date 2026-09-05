@@ -8,9 +8,9 @@ import java.util.Objects;
 import org.jabref.model.entry.field.StandardField;
 
 /// This group contains entries, which were manually assigned to it.
-/// Assignments are stored in the {@link StandardField#GROUPS} field.
-/// Thus, internally, we represent {@link ExplicitGroup} as a special {@link WordKeywordGroup} operating on
-/// {@link StandardField#GROUPS}.
+/// Assignments are stored in the [StandardField#GROUPS] field.
+/// Thus, internally, we represent [ExplicitGroup] as a special [WordKeywordGroup] operating on
+/// [StandardField#GROUPS].
 public class ExplicitGroup extends WordKeywordGroup {
 
     /// Previous versions of JabRef stored the linked entries directly in the "jabref-meta" comment at the end of the
@@ -28,6 +28,13 @@ public class ExplicitGroup extends WordKeywordGroup {
     @Override
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), keywordSeparator);
+        copy.legacyEntryKeys.addAll(legacyEntryKeys);
+        return copy;
+    }
+
+    @Override
+    public ExplicitGroup withKeywordSeparator(Character newKeywordSeparator) {
+        ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), newKeywordSeparator);
         copy.legacyEntryKeys.addAll(legacyEntryKeys);
         return copy;
     }

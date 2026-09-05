@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Assign the user or unassign stale assignments
         id: assign
-        uses: takanome-dev/assign-issue-action@edge
+        uses: takanome-dev/assign-issue-action@fad4b83750f7df31e03c2a42e8f1880b0b4b3573 # edge
         with:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
@@ -46,6 +46,7 @@ jobs:
             We're excited to have you on board.
             Start by exploring our [Contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), and set up your local development workspace by following the steps in our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
 
+            When using AI tools, please use them as an assistant rather than simply copying their output. See [Don't paste the AI, please.](https://dontpastetheai.com/).
 
             For questions on JabRef functionality, you can consult the [JabRef Guru](https://gurubase.io/g/jabref).
             For questions related to the codebase, please start using [DeepWiki](https://deepwiki.com/JabRef/jabref).
@@ -85,7 +86,7 @@ jobs:
             - Ask a maintainer to assign you again.
             </details>
       - name: Move issue corresponding column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
@@ -96,7 +97,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move issue corresponding column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}

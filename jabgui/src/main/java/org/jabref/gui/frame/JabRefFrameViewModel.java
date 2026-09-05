@@ -288,7 +288,7 @@ public class JabRefFrameViewModel {
         if (StringUtil.isNotBlank(targetGroup)) {
             // TODO: if an existing group is not assignable (e.g. a search or automatic group),
             //       the assignment silently does nothing - no error is reported to the caller.
-            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
+            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
         }
     }
 
@@ -316,6 +316,7 @@ public class JabRefFrameViewModel {
     /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
     ///
     /// Paths:
+    ///
     ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
     ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
     ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)

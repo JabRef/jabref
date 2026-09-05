@@ -40,7 +40,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
+/// Writing is done at [org.jabref.logic.exporter.MetaDataSerializer].
 public class MetaDataParser {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
@@ -93,12 +93,12 @@ public class MetaDataParser {
         return Optional.of(entryTypeBuilder.build());
     }
 
-    /// Parses the given data map and returns a new resulting {@link MetaData} instance.
+    /// Parses the given data map and returns a new resulting [MetaData] instance.
     public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         return parse(new MetaData(), data, keywordSeparator, userAndHost);
     }
 
-    /// Parses the data map and changes the given {@link MetaData} instance respectively.
+    /// Parses the data map and changes the given [MetaData] instance respectively.
     ///
     /// @return the given metaData instance (which is modified, too)
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
@@ -134,6 +134,13 @@ public class MetaDataParser {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
+            } else if (MetaData.KEYWORD_SEPARATOR.equals(entry.getKey())) {
+                String separator = getSingleItem(values);
+                if (separator.length() == 1) {
+                    metaData.setKeywordSeparator(separator.charAt(0));
+                } else {
+                    LOGGER.debug("Ignoring invalid keyword separator: {}", separator);
+                }
             } else if (MetaData.LIBRARY_ABBREVIATION_TYPE.equals(entry.getKey())) {
                 try {
                     metaData.setLibraryAbbreviationType(AbbreviationType.valueOf(getSingleItem(values)));
@@ -151,7 +158,8 @@ public class MetaDataParser {
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
+                // groups are processed last (see above), so a keyword separator declared in the library is already known here
+                metaData.setGroups(GroupsParser.importGroups(values, metaData.getKeywordSeparator().orElse(keywordSeparator), fileMonitor, metaData, userAndHost));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
@@ -200,7 +208,7 @@ public class MetaDataParser {
     }
 
     /// Returns the first item in the list.
-    /// If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
+    /// If the specified list does not contain exactly one item, then a [ParseException] will be thrown.
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
             return value.getFirst();

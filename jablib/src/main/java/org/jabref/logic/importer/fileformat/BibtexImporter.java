@@ -82,7 +82,7 @@ public class BibtexImporter extends Importer {
     }
 
     /// Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
-    /// If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
+    /// If there is none present, [com.ibm.icu.text.CharsetDetector#CharsetDetector()] is used.
     private static EncodingResult getEncodingResult(Path filePath) throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
@@ -126,9 +126,10 @@ public class BibtexImporter extends Importer {
         return result;
     }
 
-    /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
+    /// Postprocessing for imported entries that normalizes keyword separators to the library's delimiter.
     private void normalizeKeywordDelimiters(ParserResult result) {
-        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences());
+        Character separator = result.getDatabaseContext().getKeywordSeparator(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences(), separator);
     }
 
     @Override

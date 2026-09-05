@@ -58,6 +58,7 @@ public class Pseudonymization {
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        bibDatabaseContext.getMetaData().getKeywordSeparator().ifPresent(result.getMetaData()::setKeywordSeparator);
 
         pseudonymizedGroups.ifPresent(newGroups -> result.getMetaData().setGroups(newGroups));
 
@@ -95,7 +96,7 @@ public class Pseudonymization {
         return newEntries;
     }
 
-    /// Pseudonymizes the {@link StandardField#GROUPS} field content.
+    /// Pseudonymizes the [StandardField#GROUPS] field content.
     /// Groups not present in the group tree are also pseudonymized.
     private String pseudonymizeGroupsField(String fieldContent,
                                            Map<String, String> groupNameMapping,

@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +18,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.StandardActions;
@@ -33,22 +36,28 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.git.GitDiffDialogView;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -63,7 +72,6 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -92,6 +100,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -109,7 +118,7 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final UndoManager undoManager;
+    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -168,7 +177,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Runnable autoCompleterChangedListener;
 
-    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path [BibDatabaseContext#getFulltextIndexPath()].
     /// If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
     /// Closing the index takes time and will slow down opening the library.
     ///
@@ -181,7 +190,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       UndoManager undoManager,
+                       GuiUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
@@ -651,19 +660,29 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));
 
+        // LEFT: same position on every platform's button order, and never the default button
+        ButtonType showDiff = new ButtonType(Localization.lang("Show diff"), ButtonBar.ButtonData.LEFT);
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
         ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Save before closing"),
-                Localization.lang("Library '%0' has been modified.", filename),
-                saveChanges, discardChanges, returnToLibrary);
+        FXDialog dialog = new FXDialog(Alert.AlertType.CONFIRMATION, Localization.lang("Save before closing"), true);
+        dialog.setHeaderText(null);
+        dialog.setResizable(true);
+        TextArea content = new TextArea(Localization.lang("Library '%0' has been modified.", filename));
+        content.setWrapText(true);
+        dialog.getDialogPane().setContent(content);
+        dialog.getButtonTypes().setAll(showDiff, saveChanges, discardChanges, returnToLibrary);
+        // Consuming the action keeps the dialog open: the diff is informational, the user still has to decide
+        dialog.getDialogPane().lookupButton(showDiff).addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            showDiffToSavedFile();
+        });
 
+        Optional<ButtonType> response = dialogService.showCustomDialogAndWait(dialog);
         if (response.isEmpty()) {
             return true;
         }
-
         ButtonType buttonType = response.get();
 
         if (buttonType.equals(returnToLibrary)) {
@@ -673,7 +692,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (buttonType.equals(saveChanges)) {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
-                if (saveAction.save()) {
+                if (saveAction.save() != SaveDatabaseAction.SaveResult.FAILURE) {
                     return true;
                 }
                 // The action was either canceled or unsuccessful.
@@ -692,6 +711,41 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         return false;
+    }
+
+    /// Shows the unsaved in-memory changes compared to the file on disk (or to an empty library if never saved).
+    // [impl->req~ux.close.show-diff~1]
+    private void showDiffToSavedFile() {
+        BackgroundTask.wrap(this::loadSavedFile)
+                      .onSuccess(this::showDiffDialog)
+                      .onFailure(this::showDiffError)
+                      .executeWith(taskExecutor);
+    }
+
+    /// Parses the file on disk; its TeX groups must not register with the shared file monitor because the snapshot is discarded after the diff.
+    private BibDatabaseContext loadSavedFile() {
+        return bibDatabaseContext.getDatabasePath()
+                                 .map(this::parseSavedFile)
+                                 .orElseGet(BibDatabaseContext::empty);
+    }
+
+    private BibDatabaseContext parseSavedFile(Path path) {
+        try {
+            return GitDiffChecker.checkSavedWorkingTreeVersion(path, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void showDiffDialog(BibDatabaseContext savedDatabase) {
+        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+        dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
+                Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
+    }
+
+    private void showDiffError(Exception exception) {
+        LOGGER.error("Could not read saved library for diff", exception);
+        dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), exception);
     }
 
     private void onCloseRequest(Event event) {
@@ -772,7 +826,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public UndoManager getUndoManager() {
+    public GuiUndoManager getUndoManager() {
         return undoManager;
     }
 
@@ -895,7 +949,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
         addEntriesWithFeedback(
-                clipBoardManager.getJabRefClipboardTransferData(),
+                clipBoardManager.getJabRefClipboardTransferData().orElse(null),
                 entriesToAdd,
                 bibDatabaseContext,
                 params -> Localization.lang("Pasted %0 entry(s) to %1", params),
@@ -924,13 +978,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
+        InsertUtil.FeedbackMessage successMessage;
+        InsertUtil.FeedbackMessage partialMessage;
+        if (mode == TransferMode.MOVE) {
+            successMessage = params -> Localization.lang("Moved %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params);
+        } else {
+            successMessage = params -> Localization.lang("Copied %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped", params);
+        }
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
+                new TransferInformation(sourceBibDatabaseContext, mode, originalEntries),
                 entriesToAdd,
                 bibDatabaseContext,
-                params -> Localization.lang("Moved %0 entry(s) to %1", params),
-                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
+                successMessage,
+                partialMessage,
                 dialogService,
                 importHandler,
                 stateManager
@@ -974,7 +1037,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().apply(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().applyEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
 
         if (mode != StandardActions.CUT) {
             List<LinkedFile> linkedFileList = entries.stream()
@@ -1078,7 +1141,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
@@ -1114,7 +1177,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager,
+                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         return new LibraryTab(

@@ -6,9 +6,8 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -19,13 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ManageKeywordsViewModelTest {
 
-    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-    private final UndoManager undoManager = new UndoManager();
+    private final JabRefUndoManager undoManager = new JabRefUndoManager();
     private ManageKeywordsViewModel keywordsViewModel;
     private List<BibEntry> entries;
 
@@ -56,9 +52,7 @@ class ManageKeywordsViewModelTest {
 
         entries = List.of(entryOne, entryTwo);
 
-        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
-
-        keywordsViewModel = new ManageKeywordsViewModel(bibEntryPreferences, entries, undoManager);
+        keywordsViewModel = new ManageKeywordsViewModel(',', entries, undoManager);
     }
 
     @Test

@@ -12,4 +12,21 @@ The detection is best-effort: it is based on the file's size and modification ti
 
 Needs: impl, utest
 
+## Failed backup writes do not replace recoverable files
+`req~jabgui.autosaveandbackup.complete-backup~1`
+
+When creating a backup, a serialization failure must not replace a previous backup with incomplete content. JabRef must not restore an empty backup over an existing library.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
+
+## Keyword delimiter normalization is a cleanup
+`req~save.keywords.normalize-delimiters~1`
+
+Rewriting a keyword field from an accepted import delimiter to the library's keyword separator is a field formatter cleanup ("Normalize keyword delimiters").
+It is part of the default save actions and available in the cleanup dialog, so users see it, can disable it per library, and can run it on demand.
+A field that already uses the library's separator is returned unchanged, including its spacing.
+Cleanups that depend on the keyword separator use the separator declared by the library the entry belongs to and fall back to the global preference when the library declares none.
+
+Needs: impl, utest

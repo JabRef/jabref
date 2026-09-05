@@ -63,7 +63,6 @@ import org.jabref.model.search.event.IndexStartedEvent;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
-import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +83,7 @@ public class GroupNodeViewModel {
     /// Kept as a plain `Set` instead of an `ObservableSet`, because group refreshes and search-index updates can
     /// overlap while the UI stays responsive (for example inside modal dialogs). Exposing collection change events
     /// for this cache made bulk refreshes re-entrant and could trigger `ConcurrentModificationException`.
-    @ADR(38)
+    // [impl->adr~use-entryid-for-bibentries~1]
     private final Set<String> matchedEntries = new HashSet<>();
     /// Guards both the matched-entry cache and the derived hit-count property so readers observe a consistent pair.
     private final Object matchedEntriesLock = new Object();
@@ -295,7 +294,7 @@ public class GroupNodeViewModel {
 
     /// Gets invoked if an entry in the current database changes.
     ///
-    /// @implNote Search groups are updated in {@link SearchIndexListener}.
+    /// @implNote Search groups are updated in [SearchIndexListener].
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
@@ -445,10 +444,10 @@ public class GroupNodeViewModel {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
-    /// Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+    /// Decides if the content stored in the given [Dragboard] can be dropped on the given target row. Currently, the following sources are allowed:
     ///
     /// - another group (will be added as subgroup on drop)
-    /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    /// - entries if the group implements [GroupEntryChanger] (will be assigned to group on drop)
     ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant

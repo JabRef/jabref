@@ -24,10 +24,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 
-/// Builds the {@link EntryEditorTab} controls shown in the {@link EntryEditor}.
+/// Builds the [EntryEditorTab] controls shown in the [EntryEditor].
 ///
-/// Analogous to {@link org.jabref.gui.maintable.MainTableColumnFactory}: it turns the tab configuration
-/// ({@link EntryEditorTabModel}) plus the fixed, always-present tabs into the concrete JavaFX tab views,
+/// Analogous to [org.jabref.gui.maintable.MainTableColumnFactory]: it turns the tab configuration
+/// ([EntryEditorTabModel]) plus the fixed, always-present tabs into the concrete JavaFX tab views,
 /// keeping tab creation (and the GUI dependencies it needs) out of the view and the view model.
 public class EntryEditorTabFactory {
 
@@ -82,7 +82,7 @@ public class EntryEditorTabFactory {
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
     }
 
-    /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
+    /// Creates all tabs that can possibly be shown from [EntryEditorTabModel], in display order.
     public List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
@@ -93,7 +93,7 @@ public class EntryEditorTabFactory {
         return tabs;
     }
 
-    /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view, wiring in the
+    /// Maps a single [EntryEditorTabModel] to its concrete [EntryEditorTab] view, wiring in the
     /// user-controlled visibility derived from the same model. The Preview tab's toggle lives in the preview
     /// preferences ("show preview as a separate tab"), not in its tab model.
     public EntryEditorTab createTab(EntryEditorTabModel model) {
