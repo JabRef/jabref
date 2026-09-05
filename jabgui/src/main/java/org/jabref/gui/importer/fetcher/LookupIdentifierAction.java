@@ -51,10 +51,15 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     @Override
     public void execute() {
+        // Read here rather than when the lookup finishes: the entries are recorded against the
+        // library the user started on, not the one in front at the end.
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
+            return;
+        }
+
         try {
-            // The library is read here rather than when the lookup finishes: the entries are
-            // recorded against the one the user started on, not the one in front at the end.
-            Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+            BibDatabaseContext databaseContext = activeDatabase.get();
             BackgroundTask.wrap(() -> lookupIdentifiers(databaseContext, stateManager.getSelectedEntries()))
                           .onSuccess(dialogService::notify)
                           .executeWith(taskExecutor);
@@ -67,7 +72,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         return fetcher::getIdentifierName;
     }
 
-    private String lookupIdentifiers(Optional<BibDatabaseContext> databaseContext, List<BibEntry> bibEntries) {
+    private String lookupIdentifiers(BibDatabaseContext databaseContext, List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
         CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;
@@ -101,7 +106,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 }
             }
         }
-        databaseContext.ifPresent(database -> stateManager.getUndoManager(database).addEdit(compoundEdit.toChangeSet()));
+        stateManager.getUndoManager(databaseContext).addEdit(compoundEdit.toChangeSet());
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }
 }

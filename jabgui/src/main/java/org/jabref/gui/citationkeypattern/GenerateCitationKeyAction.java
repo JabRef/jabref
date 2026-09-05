@@ -53,6 +53,14 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     public void execute() {
         entries = stateManager.getSelectedEntries();
 
+        // Read here, on the JavaFX thread: the keys are generated for, and recorded against, the
+        // library the user started on, which they may have switched away from by the time the task
+        // runs.
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
+            return;
+        }
+
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate citation keys"),
                     Localization.lang("First select the entries you want keys to be generated for."));
@@ -63,7 +71,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         checkOverwriteKeysChosen();
 
         if (!this.isCanceled) {
-            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground();
+            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(activeDatabase.get());
             backgroundTask.showToUser(true);
             backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
             backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
@@ -102,13 +110,9 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private BackgroundTask<Void> generateKeysInBackground() {
-        // Read here rather than inside call(): the task records against the library the user
-        // started it on, which they may have switched away from by the time it runs.
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-
+    private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
         return new BackgroundTask<>() {
-            private CompoundEdit compound;
+            private final CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
 
             @Override
             public Void call() {
@@ -119,27 +123,24 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     updateProgress(0, entries.size());
                     messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
                 });
-                databaseContext.ifPresent(database -> {
-                    // generate the new citation keys for each entry
-                    compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
-                    CitationKeyGenerator keyGenerator =
-                            new CitationKeyGenerator(database, preferences.getCitationKeyPatternPreferences());
-                    int entriesDone = 0;
-                    for (BibEntry entry : entries) {
-                        String newKey = keyGenerator.generateKey(entry);
-                        // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
-                        Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
-                        if (fieldChange != null) {
-                            fieldChange.ifPresent(change -> compound.addEdit(new UndoableFieldChange(change)));
-                        }
-                        entriesDone++;
-                        int finalEntriesDone = entriesDone;
-                        UiTaskExecutor.runInJavaFXThread(() -> {
-                            updateProgress(finalEntriesDone, entries.size());
-                            messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
-                        });
+                // generate the new citation keys for each entry
+                CitationKeyGenerator keyGenerator =
+                        new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+                int entriesDone = 0;
+                for (BibEntry entry : entries) {
+                    String newKey = keyGenerator.generateKey(entry);
+                    // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
+                    Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
+                    if (fieldChange != null) {
+                        fieldChange.ifPresent(change -> compound.addEdit(new UndoableFieldChange(change)));
                     }
-                });
+                    entriesDone++;
+                    int finalEntriesDone = entriesDone;
+                    UiTaskExecutor.runInJavaFXThread(() -> {
+                        updateProgress(finalEntriesDone, entries.size());
+                        messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
+                    });
+                }
                 return null;
             }
 
@@ -147,7 +148,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
                 // register the undo event only if new citation keys were generated
                 if (compound.hasEdits()) {
-                    databaseContext.ifPresent(database -> stateManager.getUndoManager(database).addEdit(compound.toChangeSet()));
+                    stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet());
                 }
 
                 tabSupplier.get().markBaseChanged();
