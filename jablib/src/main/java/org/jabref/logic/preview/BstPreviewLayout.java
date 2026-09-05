@@ -211,7 +211,7 @@ public final class BstPreviewLayout implements PreviewLayout {
             }
 
             output.append("<span style=\"font-variant: small-caps\">")
-                  .append(convertInlineSmallCapsToHtml(input.substring(contentStart, groupEnd)))
+                  .append(input, contentStart, groupEnd)
                   .append("</span>");
             index = groupEnd + 1;
         }
@@ -249,7 +249,7 @@ public final class BstPreviewLayout implements PreviewLayout {
             }
 
             output.append("<span style=\"font-variant: small-caps\">")
-                  .append(convertInlineSmallCapsToHtml(input.substring(contentStart, groupEnd)))
+                  .append(input, contentStart, groupEnd)
                   .append("</span>");
             index = groupEnd + 1;
         }

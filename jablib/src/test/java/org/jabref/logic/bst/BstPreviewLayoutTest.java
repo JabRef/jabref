@@ -81,6 +81,15 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void nestedSmallCapsFormattingIsRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc{Outer \\textsc{inner} text}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>", preview);
+    }
+
+    @Test
     void superscriptFormattingIsRendered() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
