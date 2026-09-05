@@ -76,6 +76,12 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Pressing Escape when a combo box popup is open closes only the combo box
+`req~ux.combobox.escape-closes-popup-only~1`
+
+When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
+The enclosing dialog must remain open.
+
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 

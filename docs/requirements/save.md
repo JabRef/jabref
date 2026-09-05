@@ -19,6 +19,15 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Autosave reacts to library changes
+`req~jabgui.autosaveandbackup.autosave-listens~1`
+
+While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
+
+When the autosave manager is shut down, its periodic task must stop and pending callbacks must not post further autosave events.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
 
 ## Keyword delimiter normalization is a cleanup

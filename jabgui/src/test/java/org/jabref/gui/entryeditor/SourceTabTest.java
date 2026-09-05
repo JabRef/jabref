@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -21,8 +22,11 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -50,15 +54,18 @@ class SourceTabTest extends JavaFxTest {
     private FieldPreferences fieldPreferences;
     private BibEntryTypesManager entryTypesManager;
     private KeyBindingRepository keyBindingRepository;
+    private OptionalObjectProperty<BibDatabaseContext> activeDatabase;
+    private StateManager stateManager;
 
     @Override
     public void start(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        StateManager stateManager = mock(StateManager.class);
+        stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.searchQueryProperty()).thenReturn(mock(StringProperty.class));
-        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        activeDatabase = OptionalObjectProperty.empty();
+        when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
         keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
         keyBindingRepository.put(KeyBinding.SAVE_LIBRARY, "Ctrl+S");
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -93,6 +100,31 @@ class SourceTabTest extends JavaFxTest {
 
         // select the area's tab
         pane.getSelectionModel().select(0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void sourceLabelUpdatesWhenStartupDatabaseBecomesAvailable(BibDatabaseMode mode, FxRobot robot) {
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setMode(mode);
+
+        robot.interact(() -> {
+            activeDatabase.set(Optional.of(database));
+
+            assertEquals(Localization.lang("%0 source", mode.getFormattedName()), sourceTab.getText());
+            assertEquals(Localization.lang("Show/edit %0 source", mode.getFormattedName()), sourceTab.getTooltip().getText());
+        });
+    }
+
+    @Test
+    void sourceLabelResetsWhenDatabaseCloses(FxRobot robot) {
+        robot.interact(() -> {
+            activeDatabase.set(Optional.of(new BibDatabaseContext()));
+            activeDatabase.set(Optional.empty());
+
+            assertEquals(Localization.lang("Source"), sourceTab.getText());
+            assertEquals(Localization.lang("Show/edit source"), sourceTab.getTooltip().getText());
+        });
     }
 
     @Test
