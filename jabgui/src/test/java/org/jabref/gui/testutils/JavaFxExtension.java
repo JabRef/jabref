@@ -1,5 +1,6 @@
 package org.jabref.gui.testutils;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -37,15 +38,12 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
             installFailureHandler();
 
             Object testInstance = context.getRequiredTestInstance();
-            Stage stage = invokeAndWait(Stage::new);
+            Stage stage = callAndWait(Stage::new);
 
             if (testInstance instanceof JavaFxTest javaFxTest) {
-                runAndWait(() -> javaFxTest.start(stage));
+                invokeAndWait(() -> javaFxTest.start(stage));
             }
-        } catch (InterruptedException exception) {
-            TEST_LOCK.unlock();
-            throw exception;
-        } catch (RuntimeException | Error exception) {
+        } catch (InterruptedException | RuntimeException | Error exception) {
             TEST_LOCK.unlock();
             throw exception;
         }
@@ -57,16 +55,19 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
             awaitEvents();
         } finally {
             try {
-                runAndWait(() -> Window.getWindows().forEach(Window::hide));
-                restoreFailureHandler();
+                invokeAndWait(() -> List.copyOf(Window.getWindows()).forEach(Window::hide));
             } finally {
-                TEST_LOCK.unlock();
+                try {
+                    restoreFailureHandler();
+                } finally {
+                    TEST_LOCK.unlock();
+                }
             }
         }
     }
 
-    public static void runAndWait(Runnable action) {
-        invokeAndWait(() -> {
+    public static void invokeAndWait(Runnable action) {
+        callAndWait(() -> {
             action.run();
             return true;
         });
@@ -74,7 +75,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
 
     public static void awaitEvents() {
         for (int pass = 0; pass < EVENT_DRAIN_PASSES; pass++) {
-            runAndWait(() -> {
+            invokeAndWait(() -> {
             });
         }
         throwAsynchronousFailures();
@@ -97,7 +98,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
     }
 
     private static void installFailureHandler() {
-        runAndWait(() -> {
+        invokeAndWait(() -> {
             Thread fxApplicationThread = Thread.currentThread();
             previousFxUncaughtExceptionHandler = fxApplicationThread.getUncaughtExceptionHandler();
             fxApplicationThread.setUncaughtExceptionHandler((thread, throwable) -> ASYNCHRONOUS_FAILURES.add(throwable));
@@ -105,7 +106,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
     }
 
     private static void restoreFailureHandler() {
-        runAndWait(() -> {
+        invokeAndWait(() -> {
             Thread fxApplicationThread = Thread.currentThread();
             Optional.ofNullable(previousFxUncaughtExceptionHandler)
                     .ifPresent(fxApplicationThread::setUncaughtExceptionHandler);
@@ -114,7 +115,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
     }
 
     private static void throwAsynchronousFailures() {
-        @Nullable Throwable failure = ASYNCHRONOUS_FAILURES.poll();
+        Throwable failure = ASYNCHRONOUS_FAILURES.poll();
         if (failure == null) {
             return;
         }
@@ -126,7 +127,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
         throw assertionError;
     }
 
-    private static <T> T invokeAndWait(Supplier<T> action) {
+    private static <T> T callAndWait(Supplier<T> action) {
         if (Platform.isFxApplicationThread()) {
             return action.get();
         }

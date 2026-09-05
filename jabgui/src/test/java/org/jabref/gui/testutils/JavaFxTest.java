@@ -14,11 +14,10 @@ public abstract class JavaFxTest {
     }
 
     protected final void interact(Runnable action) {
-        JavaFxExtension.runAndWait(action);
+        JavaFxExtension.invokeAndWait(action);
     }
 
     protected final void awaitEvents() {
-        interact(() -> {
-        });
+        JavaFxExtension.awaitEvents();
     }
 }

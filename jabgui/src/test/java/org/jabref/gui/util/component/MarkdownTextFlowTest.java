@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -62,7 +63,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
     /// Concatenation of the text of every [Text] child, i.e. what the user actually sees.
     private static String renderedText(MarkdownTextFlow textFlow) {
         AtomicReference<String> renderedTextReference = new AtomicReference<>();
-        JavaFxExtension.runAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             StringBuilder builder = new StringBuilder();
             for (Node child : textFlow.getChildren()) {
                 if (child instanceof Text text) {
@@ -202,24 +203,24 @@ class MarkdownTextFlowTest extends JavaFxTest {
 
     private static int childCount(MarkdownTextFlow textFlow) {
         AtomicReference<Integer> childCountReference = new AtomicReference<>();
-        JavaFxExtension.runAndWait(() -> childCountReference.set(textFlow.getChildren().size()));
+        JavaFxExtension.invokeAndWait(() -> childCountReference.set(textFlow.getChildren().size()));
         return childCountReference.get();
     }
 
     private static boolean hasNoChildren(MarkdownTextFlow textFlow) {
         AtomicReference<Boolean> hasNoChildrenReference = new AtomicReference<>();
-        JavaFxExtension.runAndWait(() -> hasNoChildrenReference.set(textFlow.getChildren().isEmpty()));
+        JavaFxExtension.invokeAndWait(() -> hasNoChildrenReference.set(textFlow.getChildren().isEmpty()));
         return hasNoChildrenReference.get();
     }
 
     private static boolean hasChildWithStyleClass(MarkdownTextFlow textFlow, String styleClass) {
         AtomicReference<Boolean> hasChildWithStyleClassReference = new AtomicReference<>();
-        JavaFxExtension.runAndWait(() -> hasChildWithStyleClassReference.set(textFlow.getChildren().stream().anyMatch(child -> child.getStyleClass().contains(styleClass))));
+        JavaFxExtension.invokeAndWait(() -> hasChildWithStyleClassReference.set(textFlow.getChildren().stream().anyMatch(child -> child.getStyleClass().contains(styleClass))));
         return hasChildWithStyleClassReference.get();
     }
 
     private static void dragAcrossText(MarkdownTextFlow textFlow) {
-        JavaFxExtension.runAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             Bounds bounds = firstTextBounds(textFlow);
             double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
             Robot robot = new Robot();
@@ -232,7 +233,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
 
     private static Bounds firstTextBounds(MarkdownTextFlow textFlow) {
         AtomicReference<Bounds> boundsReference = new AtomicReference<>();
-        JavaFxExtension.runAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             for (Node child : textFlow.getChildren()) {
                 Bounds childBounds = child.localToScreen(child.getBoundsInLocal());
                 if (childBounds != null && childBounds.getWidth() > 2) {
