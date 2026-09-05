@@ -284,8 +284,9 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()));
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
-        BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).join()
-                                       .orElseGet(BibEntry::new);
+        BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
+                .join()
+                .orElseGet(BibEntry::new);
 
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
         assertEquals(mergedEntry, result);
