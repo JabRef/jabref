@@ -345,6 +345,7 @@ public class ImportHandler {
     /// @param decision the duplicate resolution strategy to apply
     /// @param tracker  tracks the import status of the entry
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
+        // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
 

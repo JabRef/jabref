@@ -12,6 +12,8 @@ Keyword fields that already use the library's separator are left untouched, so o
 
 Delimiter characters that are part of a keyword remain part of that keyword and are escaped when necessary.
 
+Needs: impl, utest
+
 ## PDF URL import metadata extraction without target directory
 `req~jabgui.externalfiles.pdf-url-import.temp-download~1`
 
