@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import java.util.Calendar
 
@@ -321,12 +320,6 @@ tasks.test {
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-        showStandardStreams = false
-    }
 }
 
 jmh {
@@ -354,11 +347,6 @@ tasks.register<Test>("databaseTest") {
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
-    }
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
 }

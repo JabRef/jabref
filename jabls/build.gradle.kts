@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 plugins {
     id("org.jabref.gradle.module")
     id("java-library")
@@ -14,10 +12,5 @@ testModuleInfo {
 }
 
 tasks.test {
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-    }
     maxParallelForks = 1
 }
