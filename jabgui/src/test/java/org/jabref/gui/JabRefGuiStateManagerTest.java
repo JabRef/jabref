@@ -20,6 +20,7 @@ class JabRefGuiStateManagerTest {
     /// one does not stamp another's saved position.
     @Test
     void eachLibraryGetsItsOwnJournal() {
+        // [utest->req~logic.undo.journal-per-library~1]
         JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
         BibDatabaseContext one = new BibDatabaseContext();
         BibDatabaseContext another = new BibDatabaseContext();
@@ -44,6 +45,7 @@ class JabRefGuiStateManagerTest {
     /// Closing a library discards its history, and the entries the recorded changes keep alive.
     @Test
     void closingALibraryDiscardsItsJournal() {
+        // [utest->req~logic.undo.journal-per-library~1]
         JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
         BibDatabaseContext context = new BibDatabaseContext();
         UndoManager journal = stateManager.getUndoManager(context);

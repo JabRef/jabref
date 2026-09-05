@@ -126,6 +126,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
         return getGuiUndoManager(context);
     }
 
+    // [impl->req~logic.undo.journal-per-library~1]
     @Override
     public GuiUndoManager getGuiUndoManager(BibDatabaseContext context) {
         return undoManagers.computeIfAbsent(context.getUid(), _ -> new JabRefGuiUndoManager());

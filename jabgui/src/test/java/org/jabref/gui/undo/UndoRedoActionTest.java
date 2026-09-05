@@ -84,6 +84,7 @@ class UndoRedoActionTest {
 
     @Test
     void undoReversesTheChangeInTheActiveLibraryOnly() {
+        // [utest->req~logic.undo.journal-per-library~1]
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
         journalOfB.addEdit(setAuthor(entryInB, "Meitner"));
         showLibrary(tabA, libraryA);
