@@ -11,6 +11,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -24,22 +25,12 @@ import com.airhacks.afterburner.injection.Injector;
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
-        getDialogPane().getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                close();
-            } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
-                getDefaultButton().ifPresent(Button::fire);
-            }
-
-            // all buttons in base dialogs react on enter
-            if (event.getCode() == KeyCode.ENTER) {
-                if (event.getTarget() instanceof Button) {
-                    ((Button) event.getTarget()).fire();
-                    event.consume();
-                }
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupKeyBindings(newPane);
             }
         });
+        setupKeyBindings(getDialogPane());
 
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
@@ -52,6 +43,27 @@ public class BaseDialog<T> extends Dialog<T> {
 
         setDialogIcon(IconTheme.getJabRefIcon());
         setResizable(true);
+    }
+
+    private void setupKeyBindings(DialogPane dialogPane) {
+        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                close();
+                event.consume();
+            } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
+                getDefaultButton().ifPresent(Button::fire);
+                event.consume();
+            }
+
+            // all buttons in base dialogs react on enter
+            if (event.getCode() == KeyCode.ENTER) {
+                if (event.getTarget() instanceof Button button) {
+                    button.fire();
+                    event.consume();
+                }
+            }
+        });
     }
 
     private Optional<Button> getDefaultButton() {

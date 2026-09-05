@@ -340,6 +340,25 @@
     -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
+/* File found in the file directory but not (yet) linked in the entry.
+   Deliberately not -color-warning-subtle: orange signals "linked but not found".
+   -color-selection-inactive is a neutral gray that stays readable in dark themes,
+   where a translucent black fill would sink into the panel background. */
+.linked-files-list .list-cell:auto-found {
+    -fx-background-color: -color-selection-inactive;
+    -fx-background-radius: 4px;
+}
+
+/* The suggestion background must not mask the list's interaction affordances
+   (same colors the themes use for cell hover and selection). */
+.linked-files-list .list-cell:auto-found:filled:hover {
+    -fx-background-color: -color-border-default;
+}
+
+.linked-files-list .list-cell:auto-found:filled:selected {
+    -fx-background-color: -color-selection;
+}
+
 /* Sidepane */
 
 .sidePaneComponent {
@@ -2429,4 +2448,8 @@ journalInfo .grid-cell-b {
 .bibtex-code-area .search-highlight {
     -fx-fill: -color-warning-subtle !important;
     -fx-stroke: transparent !important;
+}
+
+.flashing-danger {
+    -fx-background-color: -color-danger;
 }

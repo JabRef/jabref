@@ -1,0 +1,70 @@
+# Renders a gource video of the JabCon period every 15 minutes for the JabCon board
+# (https://github.com/JabRef/jabcon-board). Remove or switch to workflow_dispatch only after JabCon.
+name: Gource (JabCon)
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# a render can take longer than the interval as the video grows; let runs queue rather than cancel each other
+concurrency:
+  group: gource-jabcon
+  cancel-in-progress: false
+
+jobs:
+  gource:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - title: 'JabCon 2026'
+            start: '2026-09-04 09:00:00'
+            end: ''
+            file: 'jabcon-2026.mp4'
+            seconds_per_day: '100'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          show-progress: 'false'
+
+      - name: Generate Gource video
+        uses: nbprojekt/gource-action@d2fdf85904db416b69445dae5551282528e052ae # v1
+        env:
+          # Berlin time for the clock in the video and the start date. POSIX rule string because the action's
+          # Alpine image has no tzdata, so a zone name would silently fall back to UTC.
+          TZ: 'CET-1CEST,M3.5.0,M10.5.0/3'
+        with:
+          gource_title: ${{ matrix.title }}
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          avatars_auto_fetch: true
+          gource_start_date: ${{ matrix.start }}
+          gource_stop_date: ${{ matrix.end }}
+          gource_seconds_per_day: ${{ matrix.seconds_per_day }}
+          # skip only long idle stretches (nights); the default 3 s would compress the whole day into jumps
+          gource_auto_skip_seconds: '30'
+          gource_fps: '30'
+          gource_file_filter: 'buildres/csl|\.csl'
+
+      - name: Store video
+        run: mv ./gource/gource.mp4 ${{ matrix.file }}
+
+      - name: Upload to files.jabref.org
+        uses: Pendect/action-rsyncer@8e05ffa5c93e5d9c9b167796b26044d2c616b2b9 # v2.0.0
+        env:
+          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
+        with:
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial
+          options: ''
+          ssh_options: '-p 9922'
+          src: '${{ matrix.file }}'
+          dest: jrrsync@build-upload.jabref.org:/var/www/files.jabref.org/www/gource/

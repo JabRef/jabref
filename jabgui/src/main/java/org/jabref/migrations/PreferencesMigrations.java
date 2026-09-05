@@ -2,10 +2,13 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.SequencedMap;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -44,6 +47,31 @@ public class PreferencesMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
+    /// The names the default tabs were stored under, in every translation shipped between JabRef 3.8.2 and
+    /// the 6.0 alphas (harvested from the v3.8.2, v4.3.1, and v5.15 tags plus the current bundles), lower-cased.
+    /// Inlined instead of read from the current bundles: translations change and languages get dropped (the
+    /// "Review" l10n key is already gone), which would silently stop the migration from recognizing names
+    /// stored by old versions. Untranslated languages fell back to the English name.
+    private static final Set<String> LEGACY_GENERAL_TAB_NAMES = Set.of(
+            "algemeen", "allgemein", "allmänt", "genel", "general", "generale", "generellt", "generelt",
+            "geral", "général", "ogólne", "pangkalahatan", "tổng quát", "umum", "yleinen", "γενικά",
+            "общие", "一般", "基本设置", "通用", "일반");
+
+    private static final Set<String> LEGACY_ABSTRACT_TAB_NAMES = Set.of(
+            "abstract", "abstrak", "abstrakt", "resumen", "resumo", "résumé", "sammanfattning",
+            "sammendrag", "sommario", "tóm tắt", "zusammenfassung", "özet", "περίληψη", "абстракція",
+            "резюме", "الملخص", "چکیده", "摘要", "概要", "개요");
+
+    private static final Set<String> LEGACY_COMMENTS_TAB_NAMES = Set.of(
+            "comentarios", "comentários", "commentaires", "commenti", "comments", "komentar",
+            "komentarze", "komento", "kommentare", "kommentarer", "kommentit", "nhận xét",
+            "opmerkingen", "yorumlar", "σχόλια", "коментарі", "комментарии", "تعليقات", "نظرات",
+            "コメント", "注释", "註解", "코멘트");
+
+    private static final Set<String> LEGACY_REVIEW_TAB_NAMES = Set.of(
+            "review", "gözden geçir", "kommentarer", "mag balig-aral", "periksa ulang", "recensie",
+            "remarques", "revisar", "rivedi", "überprüfung", "xem xét lại", "просмотр", "論評", "评论");
+
     private PreferencesMigrations() {
     }
 
@@ -77,7 +105,7 @@ public class PreferencesMigrations {
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
     /// series (`customTabName_0`/`customTabFields_0`, ...). Since [#16598](https://github.com/JabRef/jabref/pull/16598)
-    /// they are stored as one JSON object, `{"tab name": ["field pattern", ...], ...}`. The old keys are
+    /// they are stored as one JSON object, `{"tab name": ["field pattern",...], ...}`. The old keys are
     /// kept in case an old version of JabRef is used with these preferences; they are only read when the
     /// new key does not exist yet.
     static void upgradeEntryEditorCustomTabs(JabRefGuiPreferences prefs) {
@@ -91,15 +119,70 @@ public class PreferencesMigrations {
 
         SequencedMap<String, List<String>> customTabs = new LinkedHashMap<>();
         String tabName;
+        boolean anyStored = false;
         for (int i = 0; (tabName = prefs.get(V6_0_ALPHA_CUSTOM_TAB_NAME + i, null)) != null; i++) {
-            customTabs.put(tabName, prefs.getStringList(V6_0_ALPHA_CUSTOM_TAB_FIELDS + i));
+            anyStored = true;
+            List<String> fields = prefs.getStringList(V6_0_ALPHA_CUSTOM_TAB_FIELDS + i);
+            if (isLegacyDefaultTab(tabName, fields)) {
+                LOGGER.info("Dropping entry editor tab '{}': it only repeats fields of the \"Main\" tab.", tabName);
+            } else {
+                customTabs.put(tabName, fields);
+            }
         }
-        if (customTabs.isEmpty()) {
+        if (!anyStored) {
             return;
         }
 
         LOGGER.info("Migrating {} custom entry editor tab(s) to the JSON preference format.", customTabs.size());
         prefs.put(V6_0_ENTRY_EDITOR_CUSTOM_TABS, new ObjectMapper().writeValueAsString(customTabs));
+    }
+
+    /// Whether a pre-v6.0-alpha.7 custom tab is one of the former default tabs "General", "Abstract",
+    /// "Comments" (JabRef 5.x), or "Review" (JabRef ≤ 4.x).
+    ///
+    /// Old versions wrote the default tabs to the store as if the user had defined them (any "Save" in the
+    /// preferences dialog and the former per-startup General-fields migration did), so the store cannot
+    /// tell defaults from customizations. Since [#12711](https://github.com/JabRef/jabref/issues/12711) the
+    /// "Main" tab shows all these fields, so such a tab is pure duplication. A tab counts as a default only
+    /// if its name and its fields match as a shipped pair: a translation of "Abstract"/"Comments"/"Review"
+    /// (names were stored localized, and not necessarily in the current language) with exactly its shipped
+    /// single field, or a translation of "General" with exactly one of the shipped default field sets. A
+    /// cross-match (e.g. an "Abstract" tab holding the General fields) is a customization and is kept.
+    private static boolean isLegacyDefaultTab(String name, List<String> fields) {
+        String normalizedName = name.trim().toLowerCase(Locale.ROOT);
+        // Locale.ROOT: a Turkish UI locale would fold "I" to a dotless "ı" and break the comparison.
+        Set<String> stored = fields.stream().map(field -> field.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+        if (stored.equals(Set.of(StandardField.ABSTRACT.getName()))) {
+            return LEGACY_ABSTRACT_TAB_NAMES.contains(normalizedName);
+        }
+        if (stored.equals(Set.of(StandardField.COMMENT.getName()))) {
+            return LEGACY_COMMENTS_TAB_NAMES.contains(normalizedName);
+        }
+        if (stored.equals(Set.of(StandardField.REVIEW.getName()))) {
+            return LEGACY_REVIEW_TAB_NAMES.contains(normalizedName);
+        }
+        return legacyGeneralFieldSets().contains(stored) && LEGACY_GENERAL_TAB_NAMES.contains(normalizedName);
+    }
+
+    /// The "General" default field set as shipped over time: `comment` variant (JabRef ≤ 4.0), `groups`
+    /// variant (4.x); with special fields: 2019 base set, then `doi`, `eprint`, `url` (v5);
+    /// `citationcount` and `icore` (v6.0-alpha, in either order); `eprinttype` (v6.0-alpha.5).
+    private static Set<Set<String>> legacyGeneralFieldSets() {
+        Set<String> v3 = Set.of("crossref", "keywords", "file", "doi", "url", "comment", "owner", "timestamp");
+        Set<String> v4 = Set.of("crossref", "keywords", "file", "doi", "url", "groups", "owner", "timestamp");
+        Set<String> v5 = EnumSet.allOf(SpecialField.class).stream().map(SpecialField::getName).collect(Collectors.toSet());
+        v5.addAll(List.of("crossref", "keywords", "file", "groups", "owner", "timestamp"));
+        Set<String> v5_1 = withFields(v5, "doi", "eprint", "url");
+        Set<String> alphaCitationCount = withFields(v5_1, "citationcount");
+        Set<String> alphaIcore = withFields(v5_1, "icore");
+        Set<String> alphaBoth = withFields(alphaCitationCount, "icore");
+        return Set.of(v3, v4, v5, v5_1, alphaCitationCount, alphaIcore, alphaBoth, withFields(alphaBoth, "eprinttype"));
+    }
+
+    private static Set<String> withFields(Set<String> fields, String... more) {
+        Set<String> result = new HashSet<>(fields);
+        result.addAll(List.of(more));
+        return result;
     }
 
     /// The legacy key `smartFileAnnotations` toggled a "smart visibility" mode. Mode was adapted for all tabs in

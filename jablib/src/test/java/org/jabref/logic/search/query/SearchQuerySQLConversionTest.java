@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SqlQueryNode;
+import org.jabref.testutils.category.DatabaseTest;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.AfterAll;
@@ -24,6 +25,7 @@ import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
 import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class SearchQuerySQLConversionTest {
     private static EmbeddedPostgres pg;
