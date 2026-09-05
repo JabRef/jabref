@@ -12,9 +12,10 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.URLs;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -42,6 +43,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 Injector.instantiateModelOrService(HttpServerManager.class),
                 Injector.instantiateModelOrService(LanguageServerController.class),
                 Injector.instantiateModelOrService(UiMessageHandler.class),
+                Injector.instantiateModelOrService(OAuthSessionRegistry.class),
                 Injector.instantiateModelOrService(RemoteListenerServerManager.class),
                 Injector.instantiateModelOrService(StateManager.class));
         buildView();

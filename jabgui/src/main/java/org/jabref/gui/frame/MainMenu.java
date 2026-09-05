@@ -17,6 +17,8 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.citedrive.CiteDriveLoginAction;
+import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.MergeLibraryAction;
@@ -84,6 +86,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
@@ -117,6 +120,7 @@ public class MainMenu extends MenuBar {
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -135,7 +139,8 @@ public class MainMenu extends MenuBar {
                     AiService aiService,
                     PreviewControls previewControls,
                     GitHandlerRegistry gitHandlerRegistry,
-                    JournalAbbreviationRepository journalAbbreviationRepository
+                    JournalAbbreviationRepository journalAbbreviationRepository,
+                    OAuthSessionRegistry oAuthSessionRegistry
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -155,6 +160,7 @@ public class MainMenu extends MenuBar {
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
 
         createMenu();
     }
@@ -202,6 +208,9 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
+                factory.createSubMenu(StandardActions.CITE_DRIVE,
+                        factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
+                        factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry))),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
                         factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
