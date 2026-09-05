@@ -121,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the unreadable hit count on group badges that turn green because they contain selected entries. [#16700](https://github.com/JabRef/jabref/pull/16700)
 - We fixed an issue where resolving external library conflicts through the merge dialog could discard the merged result. [#16537](https://github.com/JabRef/jabref/issues/16537)
 - We fixed an issue where switching entries in the source tab could throw an exception or overwrite another entry. [#16534](https://github.com/JabRef/jabref/issues/16534)
+- We fixed the source tab showing the wrong library mode at startup. [#16844](https://github.com/JabRef/jabref/issues/16844)
 - We fixed an issue where a PDF imported as a new entry via the merge dialog lost its file link. [#16677](https://github.com/JabRef/jabref/pull/16677)
 - We fixed the Add file link dialog moving behind the main window on macOS. [#16549](https://github.com/JabRef/jabref/issues/16549)
 - We fixed an issue where importing several files at once created one undo entry per file instead of one for the whole import, and undoing more than once afterwards failed. [#16627](https://github.com/JabRef/jabref/pull/16627)
