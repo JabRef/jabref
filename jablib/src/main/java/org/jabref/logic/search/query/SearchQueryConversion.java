@@ -1,6 +1,7 @@
 package org.jabref.logic.search.query;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class SearchQueryConversion {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQueryConversion.class);
+    private static final Pattern REGEX_META_CHARACTERS = Pattern.compile("([\\\\.\\[\\]{}()*+?^$|])");
 
     public static SqlQueryNode searchToSql(String table, SearchQuery searchQuery) {
         LOGGER.debug("Converting search expression to SQL: {}", searchQuery.getSearchExpression());
@@ -39,21 +41,11 @@ public class SearchQueryConversion {
     ///
     /// - TERM: Unescapes `\=, \!, \~, \(, \)`
     public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
-        if (ctx == null) {
-            return "";
-        }
+        return SearchQuery.unescapeSearchValue(ctx);
+    }
 
-        String term = ctx.getText();
-
-        if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
-            return term.substring(1, term.length() - 1)
-                       .replace("\\\"", "\"");
-        }
-
-        if (ctx.getStart().getType() == SearchParser.TERM) {
-            return term.replaceAll("\\\\([=!~()])", "$1");
-        }
-
-        return term;
+    /// Escapes a literal term so it can be used as a regular expression in both Java and PostgreSQL.
+    public static String escapeRegexLiteral(String term) {
+        return REGEX_META_CHARACTERS.matcher(term).replaceAll("\\\\$1");
     }
 }

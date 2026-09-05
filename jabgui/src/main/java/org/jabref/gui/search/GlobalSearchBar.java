@@ -59,6 +59,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
@@ -378,8 +379,8 @@ public class GlobalSearchBar extends HBox {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Updated search query: {}", searchField.getText());
 
-        // An empty search field should cause the search to be cleared.
-        if (searchField.getText().isEmpty()) {
+        // A blank search field should cause the search to be cleared.
+        if (StringUtil.isBlank(searchField.getText())) {
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
             illegalSearch.set(false);
             return;
