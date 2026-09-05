@@ -55,6 +55,7 @@ tasks.register<Test>("nativeSmokeTest") {
     }
 
     val smokePort = providers.gradleProperty("jabsrv.native.smoke")
+    inputs.property("jabsrv.native.smoke", smokePort.orElse(""))
     doFirst {
         val port = smokePort.orNull?.toIntOrNull()
             ?: throw GradleException("nativeSmokeTest requires -Pjabsrv.native.smoke=<port> (the port the running native jabsrv binary serves on).")
