@@ -394,8 +394,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// The string-based attribute API is used instead of the typed views: it never yields `null` and transfers each
     /// extended attribute completely or throws, so a partial transfer cannot go unnoticed.
     ///
-    /// @param replacement the file that is going to replace `file`; only DOS flags differing from its flags are
-     ///                    included, because writing an unchanged `false` on Linux adds a DOSATTRIB xattr to every saved file
+    /// @param replacement the file that is going to replace `file`; only DOS flags differing from its flags are included, because writing an unchanged `false` on Linux adds a DOSATTRIB xattr to every saved file
     // [impl->req~logic.exporter.preserve-file-attributes~1]
     private static Map<String, Object> readPreservableAttributes(Path file, Path replacement) {
         Map<String, Object> attributes = new LinkedHashMap<>();
