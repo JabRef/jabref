@@ -76,7 +76,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         });
     }
 
-    // [impl->req~ux.git-commit.preview-current-library~1]
+    // [impl->req~git.commit.preview-current-library~1]
     @FXML
     private void showDiff() {
         viewModel.diffTask()

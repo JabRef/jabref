@@ -101,8 +101,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                         embedding -> embedding.validate(viewModel.selectedEmbeddingModelProperty()))
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
-                                                // [impl->req~ai.expert-settings.chat-inference-global~1]
-                                                // [impl->req~ai.expert-settings.rag-global~1]
+                                                // [impl->feat~ai.expert-settings.chat-inference-global~1]
+                                                // [impl->feat~ai.expert-settings.rag-global~1]
                                                 .columns(expertColumns -> expertColumns
                                                         .group(leftColumn -> leftColumn
                                                                 .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
@@ -125,28 +125,28 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                   .disableWhen(viewModel.disableExpertSettingsProperty())),
                         expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
 
-                // [impl->req~ai.expert-settings.templates~1]
+                // [impl->feat~ai.expert-settings.templates~1]
                 .section(Localization.lang("Templates"), templates -> templates
                                 .custom(buildTemplatesRegion()),
                         templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
 
                 .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
-                        // [impl->req~ai.ingestion.automatic-trigger~1]
+                        // [impl->feat~ai.ingestion.automatic-trigger~1]
                         .checkbox(Localization.lang("Automatically generate embeddings for new entries"), viewModel.autoGenerateEmbeddings(),
                                 embeddings -> embeddings.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateEmbeddings())))
-                        // [impl->req~ai.summarization.entries.auto~1]
+                        // [impl->feat~ai.summarization.entries.auto~1]
                         .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
                                 summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
                         .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
                                 followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
                         .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
-                        // [impl->req~ai.response-engines.default~1]
+                        // [impl->feat~ai.response-engines.default~1]
                         .combo(Localization.lang("Default response engine"),
                                 viewModel.responseEngineKindsProperty(),
                                 viewModel.responseEngineProperty(),
                                 AiNamingUtils::getDisplayName,
                                 engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
-                        // [impl->req~ai.summarization.algorithm.default~1]
+                        // [impl->feat~ai.summarization.algorithm.default~1]
                         .combo(Localization.lang("Default summarization algorithm"),
                                 viewModel.summarizationAlgorithmsProperty(),
                                 viewModel.summarizationAlgorithmProperty(),
@@ -204,18 +204,18 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private Node buildTemplatesRegion() {
         templatesTabPane = new TabPane();
         templatesTabPane.getTabs().addAll(
-                // [impl->req~ai.chat.customize-system-prompt~1]
+                // [impl->feat~ai.chat.customize-system-prompt~1]
                 templateTab(Localization.lang("System message for chatting"), viewModel.chattingSystemMessageTemplateProperty(), viewModel::resetChattingSystemMessageTemplate),
-                // [impl->req~ai.response-engines.embeddings-search.prompt~1]
-                // [impl->req~ai.response-engines.full-document.prompt~1]
+                // [impl->feat~ai.response-engines.embeddings-search.prompt~1]
+                // [impl->feat~ai.response-engines.full-document.prompt~1]
                 templateTab(Localization.lang("User message for chatting"), viewModel.chattingUserMessageTemplateProperty(), viewModel::resetChattingUserMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
+                // [impl->feat~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
                 templateTab(Localization.lang("System message for summarization of a chunk"), viewModel.summarizationChunkSystemMessageTemplateProperty(), viewModel::resetSummarizationChunkSystemMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-combine~1]
+                // [impl->feat~ai.summarization.algorithms.chunked.system-prompt-combine~1]
                 templateTab(Localization.lang("System message for summarization of several chunks"), viewModel.summarizationCombineSystemMessageTemplateProperty(), viewModel::resetSummarizationCombineSystemMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.full.system-prompt~1]
+                // [impl->feat~ai.summarization.algorithms.full.system-prompt~1]
                 templateTab(Localization.lang("System message for 'full document' summarization"), viewModel.summarizationFullDocumentSystemMessageTemplateProperty(), viewModel::resetSummarizationFullDocumentSystemMessageTemplate),
-                // [impl->req~ai.citation-parsing.system-prompt-config~1]
+                // [impl->feat~ai.citation-parsing.system-prompt-config~1]
                 templateTab(Localization.lang("System message for parsing raw citations"), viewModel.citationParsingSystemMessageTemplateProperty(), viewModel::resetCitationParsingSystemMessageTemplate),
                 templateTab(Localization.lang("Markdown chat export template"), viewModel.markdownChatExportTemplateProperty(), viewModel::resetMarkdownChatExportTemplate),
                 templateTab(Localization.lang("Template for follow-up questions"), viewModel.followUpQuestionsTemplateProperty(), viewModel::resetFollowUpQuestionsTemplate));

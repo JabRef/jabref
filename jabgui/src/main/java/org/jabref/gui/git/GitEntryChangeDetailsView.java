@@ -27,10 +27,12 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      BibDatabaseContext oldDatabaseContext,
                                      BibDatabaseContext newDatabaseContext,
                                      GuiPreferences preferences,
-                                     BibEntryTypesManager entryTypesManager) {
-        Label committedVersion = new Label(Localization.lang("Committed version"));
+                                     BibEntryTypesManager entryTypesManager,
+                                     String oldVersionLabel,
+                                     String newVersionLabel) {
+        Label committedVersion = new Label(oldVersionLabel);
         committedVersion.getStyleClass().add("lib-change-header");
-        Label savedFile = new Label(Localization.lang("Saved file"));
+        Label savedFile = new Label(newVersionLabel);
         savedFile.getStyleClass().add("lib-change-header");
 
         StyleClassedTextArea oldSourceArea = createConfiguredTextArea(oldEntry, oldDatabaseContext, preferences, entryTypesManager);

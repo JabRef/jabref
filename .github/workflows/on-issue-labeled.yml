@@ -15,7 +15,7 @@ jobs:
       issues: write
     steps:
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -25,7 +25,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Assigned" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -41,7 +41,7 @@ jobs:
       issues: write
     steps:
       - name: GreetingFirstTimeCodeContribution
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
           body: |
@@ -59,7 +59,7 @@ jobs:
 
             Happy coding! 🚀
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -69,7 +69,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Assigned" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -78,7 +78,7 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
@@ -89,7 +89,7 @@ jobs:
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
@@ -103,7 +103,7 @@ jobs:
     if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
@@ -118,7 +118,7 @@ jobs:
     if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
@@ -137,7 +137,7 @@ jobs:
       contents: read
     steps:
       - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
           message: >
             👋 Hey, looks like you’re eager to work on this issue—great! 🎉
@@ -146,7 +146,7 @@ jobs:
           comment-tag:
             wisdom
           mode: recreate
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "dev: wisdom"

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -21,10 +22,10 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -120,6 +121,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
+    @FXML private HBox idSearchingBox;
 
     @FXML private TextField urlText;
     @FXML private Label urlErrorInvalidText;
@@ -150,12 +152,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton.getStyleClass().add("customGenerateButton");
-
-        final Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        stage.setHeight(650);
-        stage.setWidth(931);
-        stage.setMinHeight(300);
-        stage.setMinWidth(400);
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        double width = Math.clamp(bounds.getWidth() * 0.60, 400, 1100);
+        double height = Math.clamp(bounds.getHeight() * 0.85, 300, 650);
+        getDialogPane().setPrefSize(width, height);
+        getDialogPane().setMinSize(400, 300);
 
         ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
         setOnCloseRequest(_ -> cancel());
@@ -366,8 +368,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiProperty().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
-        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(idErrorInvalidText.visibleProperty());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idSearchingBox.visibleProperty().bind(viewModel.executingProperty());
+        idSearchingBox.managedProperty().bind(idSearchingBox.visibleProperty());
 
         idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
 

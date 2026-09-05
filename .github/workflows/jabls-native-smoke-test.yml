@@ -35,55 +35,46 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
+# native-image on the macOS runner is the slowest build and mac runners are scarce, so the
+# macOS entry is dropped for pull_request and merge_group (not merely skipped: a skipped-steps
+# job would still occupy a macos-15 runner slot, see #16784 and #16788). It still runs on
+# push to main/main-release and workflow_dispatch.
+
 jobs:
   native-smoke-test:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-22.04
-            runOnPullRequest: true
-          - os: macos-15
-            runOnPullRequest: false
+        os: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'merge_group') && '["ubuntu-22.04"]' || '["ubuntu-22.04", "macos-15"]') }}
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} JabLS native smoke test
     timeout-minutes: 60
-
     steps:
-      - name: Skip native build (not needed for this event)
-        if: github.event_name == 'pull_request' && matrix.runOnPullRequest != true
-        run: echo "Skipping macOS native build on pull_request; it runs in the merge queue."
-
       - name: Checkout
-        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           submodules: 'true'
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
-        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
 
       - name: Set up GraalVM
-        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1.6.6
         with:
           distribution: 'graalvm'
           java-version: '25'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabLS native binary
-        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
         run: gradle :jabls-cli:nativeCompile
 
       - name: Run JabLS native smoke test
-        if: github.event_name != 'pull_request' || matrix.runOnPullRequest == true
         run: python3 jabls-cli/src/test/nativeimage/jabls-smoke-test.py
 
       - name: Upload JabLS native binary
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: jabls-native-${{ matrix.os }}
           path: jabls-cli/build/native/nativeCompile/
