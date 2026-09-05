@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -344,7 +345,6 @@ public class ImportHandler {
     /// @param decision the duplicate resolution strategy to apply
     /// @param tracker  tracks the import status of the entry
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
-        // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
 
@@ -657,21 +657,30 @@ public class ImportHandler {
         rememberedBatchDuplicateDecision = BREAK;
     }
 
+    // [impl->req~jabgui.externalfiles.pdf-url-import.temp-download~1]
     private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
         Optional<Path> targetDirectory = targetBibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-        if (targetDirectory.isEmpty()) {
-            LOGGER.warn("File directory not available while downloading {}.", pdfUrl);
-            return List.of();
+        Path targetFile;
+        boolean isTemporaryFile = targetDirectory.isEmpty();
+
+        if (isTemporaryFile) {
+            try {
+                targetFile = new URLDownload(pdfUrl).toTemporaryFile();
+            } catch (FetcherException fe) {
+                LOGGER.error("Error downloading PDF from URL to temporary file", fe);
+                return List.of();
+            }
+        } else {
+            String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
+            targetFile = targetDirectory.orElseThrow().resolve(filename);
+            try {
+                new URLDownload(pdfUrl).toFile(targetFile);
+            } catch (FetcherException fe) {
+                LOGGER.error("Error downloading PDF from URL", fe);
+                return List.of();
+            }
         }
-        URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
-        Path targetFile = targetDirectory.get().resolve(filename);
-        try {
-            urlDownload.toFile(targetFile);
-        } catch (FetcherException fe) {
-            LOGGER.error("Error downloading PDF from URL", fe);
-            return List.of();
-        }
+
         try {
             PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(preferences.getImportFormatPreferences());
             ParserResult parserResult = importer.importDatabase(targetFile, targetBibDatabaseContext, preferences.getFilePreferences());
@@ -680,20 +689,40 @@ public class ImportHandler {
             }
             List<BibEntry> entries = parserResult.getDatabase().getEntries();
             if (!entries.isEmpty()) {
+                boolean finalIsTemporaryFile = isTemporaryFile;
                 entries.forEach(entry -> {
-                    if (entry.getFiles().isEmpty()) {
+                    if (finalIsTemporaryFile) {
+                        List<LinkedFile> updatedFiles = entry.getFiles().stream()
+                                .map(file -> file.getLink().equalsIgnoreCase(targetFile.toString())
+                                        ? new LinkedFile("", pdfUrl, StandardFileType.PDF.getName())
+                                        : file)
+                                .toList();
+                        entry.setFiles(updatedFiles);
+                    } else if (entry.getFiles().isEmpty()) {
                         entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
                     }
                 });
             } else {
                 BibEntry emptyEntry = new BibEntry();
-                emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                if (isTemporaryFile) {
+                    emptyEntry.addFile(new LinkedFile("", pdfUrl, StandardFileType.PDF.getName()));
+                } else {
+                    emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                }
                 entries.add(emptyEntry);
             }
             return entries;
         } catch (IOException ex) {
             LOGGER.error("Error importing PDF from URL - IO issue", ex);
             return List.of();
+        } finally {
+            if (isTemporaryFile) {
+                try {
+                    Files.deleteIfExists(targetFile);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not delete temporary PDF file {}", targetFile, e);
+                }
+            }
         }
     }
 

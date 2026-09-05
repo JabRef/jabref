@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.collections.FXCollections;
@@ -170,7 +171,6 @@ class ImportHandlerTest {
 
     @Test
     void findDuplicateTest() {
-        // Assume there is no duplicate initially
         assertTrue(importHandler.findDuplicate(testEntry).isEmpty());
     }
 
@@ -210,13 +210,12 @@ class ImportHandlerTest {
 
     @Test
     void handleDuplicatesKeepRightTest() {
-        // Arrange
         BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Duplicate2023")
                 .withField(StandardField.AUTHOR, "Duplicate Author");
 
         BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
-        bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
+        bibDatabase.insertEntry(duplicateEntry);
 
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT, null);
         importHandler = Mockito.spy(new ImportHandler(
@@ -227,27 +226,22 @@ class ImportHandlerTest {
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
-        // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
-        // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).join().get();
 
-        // Assert that the duplicate entry was removed from the database
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
-        // Assert that the original entry is returned
         assertEquals(testEntry, result);
     }
 
     @Test
     void handleDuplicatesKeepBothTest() {
-        // Arrange
         BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Duplicate2023")
                 .withField(StandardField.AUTHOR, "Duplicate Author");
 
         BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
-        bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
+        bibDatabase.insertEntry(duplicateEntry);
 
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH, null);
         importHandler = Mockito.spy(new ImportHandler(
@@ -258,20 +252,16 @@ class ImportHandlerTest {
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
-        // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
-        // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).join().get();
 
-        // Assert
-        assertTrue(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry is still in the database
-        assertEquals(testEntry, result); // Assert that the original entry is returned
+        assertTrue(bibDatabase.getEntries().contains(duplicateEntry));
+        assertEquals(testEntry, result);
     }
 
     @Test
     void handleDuplicatesKeepMergeTest() {
-        // Arrange
         BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Duplicate2023")
                 .withField(StandardField.AUTHOR, "Duplicate Author");
@@ -281,7 +271,7 @@ class ImportHandlerTest {
                 .withField(StandardField.AUTHOR, "Merged Author");
 
         BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
-        bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
+        bibDatabase.insertEntry(duplicateEntry);
 
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_MERGE, mergedEntry);
         importHandler = Mockito.spy(new ImportHandler(
@@ -292,17 +282,13 @@ class ImportHandlerTest {
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
-        // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
-        // Act
-        // create and return a default BibEntry or do other computations
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).join()
                                        .orElseGet(BibEntry::new);
 
-        // Assert
-        assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
-        assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+        assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
+        assertEquals(mergedEntry, result);
     }
 
     @Test
@@ -334,5 +320,12 @@ class ImportHandlerTest {
     @Test
     void canImportAsBibEntryReturnsFalseForUnknownFile() {
         assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
+    }
+
+    @Test
+    void handleStringDataWithPdfUrlWhenNoTargetDirectoryPresent() throws Exception {
+        when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.empty());
+        List<BibEntry> entries = importHandler.handleStringData("https://invalid.domain.example/test.pdf");
+        assertTrue(entries.isEmpty());
     }
 }
