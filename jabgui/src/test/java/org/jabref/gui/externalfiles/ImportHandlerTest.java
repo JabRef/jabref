@@ -24,6 +24,7 @@ import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -180,6 +181,7 @@ class ImportHandlerTest {
         BibDatabaseContext realContext = new BibDatabaseContext(new BibDatabase());
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         ImportHandler handler = new ImportHandler(
                 realContext,
                 preferences,
@@ -189,7 +191,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor());
 
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, 1);
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, realContext, 1);
         handler.importEntriesWithDuplicateCheck(null, List.of(testEntry), tracker);
 
         // The tracker exposes the actual inserted copy, not the original

@@ -333,7 +333,7 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
-        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager));
+        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext));
     }
 
     /// Imports an entry into the database with duplicate checking and handling.
@@ -629,7 +629,7 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(transferInformation, entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
+        importEntriesWithDuplicateCheck(transferInformation, entriesToAdd, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext, entriesToAdd.size()));
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
