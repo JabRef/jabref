@@ -148,6 +148,17 @@ val embeddedPostgresDependencyByTarget = mapOf(
     "windows-latest" to EmbeddedPostgresBinaries.windowsAmd64
 )
 
+// Browser-extension fulltext bridge (../browser-bridge). A native-messaging host
+// shipped as source — Python on Linux/macOS, PowerShell on Windows — so jpackage
+// just bundles the script(s) into the image, exactly like buildres/*/jabrefHost.py.
+// No build step, no GraalVM/JBang/mise.
+val browserBridgeDir = rootProject.layout.projectDirectory.dir("browser-bridge")
+val browserBridgeScripts =
+    if (System.getProperty("os.name").lowercase().contains("win"))
+        listOf("jabext_host.ps1", "jabext_host.bat")
+    else
+        listOf("jabext_host.py")
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
@@ -185,11 +196,14 @@ javaModulePackaging {
         targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
             include("jabref-firefox.json")
             include("jabref-chrome.json")
+            include("jabext-firefox.json")
+            include("jabext-chrome.json")
             include("JabRefHost.bat")
             include("JabRefHost.ps1")
             include("JabRefTopBanner.bmp")
             include("JabRef.VisualElementsManifest.xml")
         })
+        targetResources.from(browserBridgeDir.asFileTree.matching { browserBridgeScripts.forEach { include(it) } })
     }
     targetsWithOs("linux") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
@@ -215,6 +229,7 @@ javaModulePackaging {
             include("native-messaging-host/**")
             include("jabrefHost.py")
         })
+        targetResources.from(browserBridgeDir.asFileTree.matching { browserBridgeScripts.forEach { include(it) } })
     }
     targetsWithOs("macos") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
@@ -245,6 +260,7 @@ javaModulePackaging {
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
             include("Resources/**")
         })
+        targetResources.from(browserBridgeDir.asFileTree.matching { browserBridgeScripts.forEach { include(it) } })
     }
 }
 

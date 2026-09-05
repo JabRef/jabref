@@ -59,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
+- We added support for fetching fulltext PDFs through a locally-running browser-extension provider. [#16124](https://github.com/JabRef/jabref/pull/16124)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 - We added a `jabkit pdf extract-references` command that extracts the references from the end of one or more PDFs and outputs them as BibTeX, mirroring the GUI's "Extract references" action. Each PDF can be given as a local file or as an http(s)/ftp URL. [#16186](https://github.com/JabRef/jabref/pull/16186)

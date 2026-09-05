@@ -15,6 +15,7 @@ import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
+import org.jabref.logic.importer.fetcher.BrowserExtensionFulltextFetcher;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -267,6 +268,10 @@ public class WebFetchers {
 
         // Original
         fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));
+
+        // Browser-extension companion (vendor-neutral; no-op when no
+        // provider has dropped a discovery file).
+        fetchers.add(new BrowserExtensionFulltextFetcher());
 
         // Publishers
         fetchers.add(new ACS());

@@ -3,9 +3,13 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.logic.util.URLUtil;
@@ -14,8 +18,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +34,20 @@ class FulltextFetchersTest {
     private interface FulltextFetcherWithTrustLevel extends FulltextFetcher {
         default TrustLevel getTrustLevel() {
             return TrustLevel.UNKNOWN;
+        }
+    }
+
+    /// A fetcher trusted to return local `file:` URLs (marker interface).
+    private interface TrustedFileFetcher extends FileSchemeFulltextFetcher {
+        default TrustLevel getTrustLevel() {
+            return TrustLevel.PUBLISHER;
+        }
+    }
+
+    /// A fallback fetcher that is also trusted to return local `file:` URLs (marker interfaces).
+    private interface FallbackFileFetcher extends FallbackFulltextFetcher, FileSchemeFulltextFetcher {
+        default TrustLevel getTrustLevel() {
+            return TrustLevel.PUBLISHER;
         }
     }
 
@@ -77,6 +98,30 @@ class FulltextFetchersTest {
     }
 
     @Test
+    void rejectFileUrlFromUntrustedFetcher(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("paper.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        FulltextFetcherWithTrustLevel finder = e -> Optional.of(fileUrl);
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
+
+        assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+    }
+
+    @Test
+    void acceptFileUrlFromTrustedFetcher(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("paper.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        TrustedFileFetcher finder = e -> Optional.of(fileUrl);
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
+
+        assertEquals(Optional.of(fileUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+    }
+
+    @Test
     void downloadHeadersPropagateToResult() throws IOException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1002/we.2952");
         Map<String, String> expectedHeaders = Map.of("Wiley-TDM-Client-Token", "test-token");
@@ -90,5 +135,70 @@ class FulltextFetchersTest {
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(expectedHeaders), fetchers.findFullTextPDF(entry).map(FetcherResult::headers));
+    }
+
+    @Test
+    void fallbackFetcherNotConsultedWhenRegularFetcherFindsPdf(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("primary.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+        AtomicBoolean fallbackCalled = new AtomicBoolean(false);
+
+        TrustedFileFetcher primary = e -> Optional.of(fileUrl);
+        FallbackFileFetcher fallback = e -> {
+            fallbackCalled.set(true);
+            return Optional.of(fileUrl);
+        };
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(primary, fallback));
+
+        assertEquals(Optional.of(fileUrl), fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+        assertFalse(fallbackCalled.get(), "Fallback fetcher must not run when a regular fetcher already found a PDF");
+    }
+
+    @Test
+    void fallbackFetcherConsultedWhenRegularFetchersFindNothing(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("fallback.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+        AtomicBoolean fallbackCalled = new AtomicBoolean(false);
+
+        FulltextFetcherWithTrustLevel primary = e -> Optional.empty();
+        FallbackFileFetcher fallback = e -> {
+            fallbackCalled.set(true);
+            return Optional.of(fileUrl);
+        };
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(primary, fallback));
+
+        assertEquals(Optional.of(fileUrl), fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
+        assertTrue(fallbackCalled.get(), "Fallback fetcher must run when the regular fetchers find nothing");
+    }
+
+    @Test
+    void fallbackRunsInParallelWhenDirectFetchersAreSlow(@TempDir Path tempDir) throws IOException {
+        Path pdf = tempDir.resolve("fallback.pdf");
+        Files.writeString(pdf, "%PDF-1.4\n%fake\n");
+        URL fileUrl = pdf.toUri().toURL();
+
+        // A direct fetcher that is slow and ultimately finds nothing (like DoiResolution on IEEE).
+        FulltextFetcherWithTrustLevel slowPrimary = e -> {
+            try {
+                Thread.sleep(5_000);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return Optional.empty();
+        };
+        FallbackFileFetcher fallback = e -> Optional.of(fileUrl);
+
+        // Head start of 200 ms: the fallback must launch and win while the primary is still sleeping,
+        // instead of waiting out the primary's full run (ADR-0072).
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(slowPrimary, fallback), Duration.ofMillis(200));
+
+        long startNanos = System.nanoTime();
+        Optional<URL> result = fetchers.findFullTextPDF(new BibEntry()).map(FetcherResult::source);
+        long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000;
+
+        assertEquals(Optional.of(fileUrl), result);
+        assertTrue(elapsedMs < 3_000, "fallback should return during the head start, not after the slow primary; took " + elapsedMs + " ms");
     }
 }
