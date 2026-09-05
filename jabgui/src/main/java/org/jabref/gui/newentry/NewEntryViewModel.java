@@ -13,8 +13,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 
@@ -25,6 +23,8 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherClientException;
@@ -51,10 +51,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedObjectProperty;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedObjectProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,27 +77,22 @@ public class NewEntryViewModel {
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
 
-    private final StringProperty idText;
-    private final Validator idTextValidator;
-    private final Validator duplicateDoiValidator;
+    private final ConstrainedStringProperty<ValidationMessage> idText;
+    private final ConstrainedStringProperty<ValidationMessage> duplicateDoi;
     private final ListProperty<IdBasedFetcher> idFetchers;
-    private final ObjectProperty<IdBasedFetcher> idFetcher;
-    private final Validator idFetcherValidator;
+    private final ConstrainedObjectProperty<IdBasedFetcher, ValidationMessage> idFetcher;
     private Task<Optional<BibEntry>> idLookupWorker;
 
     private final UrlBasedFetcher urlFetcher;
-    private final StringProperty urlText;
-    private final Validator urlTextValidator;
+    private final ConstrainedStringProperty<ValidationMessage> urlText;
     private Task<List<BibEntry>> urlWorker;
 
-    private final StringProperty interpretText;
-    private final Validator interpretTextValidator;
+    private final ConstrainedStringProperty<ValidationMessage> interpretText;
     private final ListProperty<PlainCitationParserChoice> interpretParsers;
     private final ObjectProperty<PlainCitationParserChoice> interpretParser;
     private Task<Optional<List<BibEntry>>> interpretWorker;
 
-    private final StringProperty bibtexText;
-    private final Validator bibtexTextValidator;
+    private final ConstrainedStringProperty<ValidationMessage> bibtexText;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
     private final Map<String, BibEntry> doiCache;
     private BibEntry duplicateEntry;
@@ -123,40 +118,35 @@ public class NewEntryViewModel {
         executedSuccessfully = new SimpleBooleanProperty(false);
         doiCache = new HashMap<>();
 
-        idText = new SimpleStringProperty();
-        idTextValidator = new FunctionBasedValidator<>(
-                idText,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+        idText = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(StringUtil::isNotBlank,
+                        ValidationMessage.error(Localization.lang("You must specify an identifier."))));
 
-        duplicateDoiValidator = new FunctionBasedValidator<>(
-                idText,
-                input -> checkDOI(input).orElse(null));
+        duplicateDoi = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.function(this::checkDOI));
+        // Two independent validators over the same underlying text, mirrored via listener rather than merged into
+        // one property, since idTextValidator and duplicateDoi drive different, independent parts of the UI.
+        idText.addListener((_, _, newValue) -> duplicateDoi.setValue(newValue));
 
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
-        idFetcher = new SimpleObjectProperty<>();
-        idFetcherValidator = new FunctionBasedValidator<>(
-                idFetcher,
-                Objects::nonNull,
-                ValidationMessage.error(Localization.lang("You must select an identifier type.")));
+        idFetcher = new SimpleConstrainedObjectProperty<IdBasedFetcher, ValidationMessage>(
+                ValidationConstraints.predicate(Objects::nonNull,
+                        ValidationMessage.error(Localization.lang("You must select an identifier type."))));
         idLookupWorker = null;
 
         urlFetcher = new GenericUrlBasedFetcher();
-        urlText = new SimpleStringProperty();
-        urlTextValidator = new FunctionBasedValidator<>(
-                urlText,
-                input -> input != null && URLUtil.isURL(input.trim()),
-                // Same string as the error label in NewEntry.fxml -- this message itself is currently not rendered
-                // anywhere, but FunctionBasedValidator requires one.
-                ValidationMessage.error(Localization.lang("You must provide a valid URL.")));
+        urlText = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(
+                        input -> input != null && URLUtil.isURL(input.trim()),
+                        // Same string as the error label in NewEntry.fxml -- this message itself is currently not
+                        // rendered anywhere, but the constraint requires one.
+                        ValidationMessage.error(Localization.lang("You must provide a valid URL."))));
         urlWorker = null;
 
-        interpretText = new SimpleStringProperty();
-        interpretTextValidator = new FunctionBasedValidator<>(
-                interpretText,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("You must specify one (or more) citations.")));
+        interpretText = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(StringUtil::isNotBlank,
+                        ValidationMessage.error(Localization.lang("You must specify one (or more) citations."))));
         interpretParsers = new SimpleListProperty<>(FXCollections.observableArrayList());
         interpretParsers.addAll(PlainCitationParserChoice.values());
         if (!preferences.getAiPreferences().getAiFeaturesEnabled()) {
@@ -165,11 +155,9 @@ public class NewEntryViewModel {
         interpretParser = new SimpleObjectProperty<>();
         interpretWorker = null;
 
-        bibtexText = new SimpleStringProperty();
-        bibtexTextValidator = new FunctionBasedValidator<>(
-                bibtexText,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("You must specify a Bib(La)TeX source.")));
+        bibtexText = new SimpleConstrainedStringProperty<>("",
+                ValidationConstraints.predicate(StringUtil::isNotBlank,
+                        ValidationMessage.error(Localization.lang("You must specify a Bib(La)TeX source."))));
         bibtexWorker = null;
     }
 
@@ -211,44 +199,44 @@ public class NewEntryViewModel {
         return executedSuccessfully;
     }
 
-    public StringProperty idTextProperty() {
+    public ConstrainedStringProperty<ValidationMessage> idTextProperty() {
         return idText;
     }
 
     public ReadOnlyBooleanProperty idTextValidatorProperty() {
-        return idTextValidator.getValidationStatus().validProperty();
+        return idText.validProperty();
     }
 
-    public ValidationStatus duplicateDoiValidatorStatus() {
-        return duplicateDoiValidator.getValidationStatus();
+    public ConstrainedStringProperty<ValidationMessage> duplicateDoiProperty() {
+        return duplicateDoi;
     }
 
     public ListProperty<IdBasedFetcher> idFetchersProperty() {
         return idFetchers;
     }
 
-    public ObjectProperty<IdBasedFetcher> idFetcherProperty() {
+    public ConstrainedObjectProperty<IdBasedFetcher, ValidationMessage> idFetcherProperty() {
         return idFetcher;
     }
 
     public ReadOnlyBooleanProperty idFetcherValidatorProperty() {
-        return idFetcherValidator.getValidationStatus().validProperty();
+        return idFetcher.validProperty();
     }
 
-    public StringProperty urlTextProperty() {
+    public ConstrainedStringProperty<ValidationMessage> urlTextProperty() {
         return urlText;
     }
 
     public ReadOnlyBooleanProperty urlTextValidatorProperty() {
-        return urlTextValidator.getValidationStatus().validProperty();
+        return urlText.validProperty();
     }
 
-    public StringProperty interpretTextProperty() {
+    public ConstrainedStringProperty<ValidationMessage> interpretTextProperty() {
         return interpretText;
     }
 
     public ReadOnlyBooleanProperty interpretTextValidatorProperty() {
-        return interpretTextValidator.getValidationStatus().validProperty();
+        return interpretText.validProperty();
     }
 
     public ListProperty<PlainCitationParserChoice> interpretParsersProperty() {
@@ -259,12 +247,12 @@ public class NewEntryViewModel {
         return interpretParser;
     }
 
-    public StringProperty bibtexTextProperty() {
+    public ConstrainedStringProperty<ValidationMessage> bibtexTextProperty() {
         return bibtexText;
     }
 
     public ReadOnlyBooleanProperty bibtexTextValidatorProperty() {
-        return bibtexTextValidator.getValidationStatus().validProperty();
+        return bibtexText.validProperty();
     }
 
     private BibEntry withCoversDownloaded(BibEntry entry) {
@@ -296,7 +284,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            boolean textValid = idTextValidator.getValidationStatus().isValid();
+            boolean textValid = idText.isValid();
             if (!textValid) {
                 return Optional.empty();
             }
@@ -458,7 +446,7 @@ public class NewEntryViewModel {
         @Override
         protected Optional<List<BibEntry>> call() throws FetcherException {
             final String text = interpretText.getValue();
-            final boolean textValid = interpretTextValidator.getValidationStatus().isValid();
+            final boolean textValid = interpretText.isValid();
             final PlainCitationParserChoice parserChoice = interpretParser.getValue();
 
             if (text == null || !textValid || parserChoice == null) {
@@ -556,7 +544,7 @@ public class NewEntryViewModel {
         @Override
         protected Optional<List<BibEntry>> call() throws ParseException {
             final String text = bibtexText.getValue();
-            final boolean textValid = bibtexTextValidator.getValidationStatus().isValid();
+            final boolean textValid = bibtexText.isValid();
 
             if (text == null || !textValid) {
                 return Optional.empty();

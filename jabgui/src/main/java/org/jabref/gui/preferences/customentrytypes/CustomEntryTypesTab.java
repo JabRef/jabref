@@ -88,8 +88,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewField.setOnAction(_ -> addNewField());
         addNewField.textProperty().addListener((_, _, _) -> updateAddNewFieldButtonText());
 
-        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
-        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeToAddProperty().validProperty().not());
+        addNewFieldButton.disableProperty().bind(viewModel.newFieldToAddProperty().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.textProperty());
     }
@@ -107,8 +107,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private void buildView() {
         setContent(form()
                 .custom(new HBox(GAP, buildEntryTypesColumn(), buildFieldsColumn()), columns -> columns
-                        .validate(viewModel.entryTypeValidationStatus(), addNewEntryType)
-                        .validate(viewModel.fieldValidationStatus(), addNewField))
+                        .validate(viewModel.entryTypeToAddProperty(), addNewEntryType)
+                        .validate(viewModel.newFieldToAddProperty(), addNewField))
                 .build());
     }
 
@@ -459,7 +459,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     }
 
     private void addEntryType() {
-        if (!viewModel.entryTypeValidationStatus().isValid()) {
+        if (!viewModel.entryTypeToAddProperty().isValid()) {
             return;
         }
 
@@ -478,7 +478,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     }
 
     private void addNewField() {
-        if (!viewModel.fieldValidationStatus().isValid()) {
+        if (!viewModel.newFieldToAddProperty().isValid()) {
             return;
         }
 

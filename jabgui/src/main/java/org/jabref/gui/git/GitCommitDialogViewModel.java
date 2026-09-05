@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
@@ -28,11 +28,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -45,10 +43,8 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    private final StringProperty commitMessage = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> commitMessage;
     private final BooleanProperty amend = new SimpleBooleanProperty(false);
-
-    private final Validator commitMessageValidator;
 
     public GitCommitDialogViewModel(
             StateManager stateManager,
@@ -64,11 +60,11 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
-        this.commitMessageValidator = new FunctionBasedValidator<>(
-                commitMessage,
-                message -> message != null && !message.isBlank(),
-                ValidationMessage.error(Localization.lang("Commit message cannot be empty"))
-        );
+        this.commitMessage = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.predicate(
+                        message -> !StringUtil.isBlank(message),
+                        ValidationMessage.error(Localization.lang("Commit message cannot be empty"))));
     }
 
     public void commit(Runnable onSuccess) {
@@ -223,16 +219,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private record TrackedFile(GitHandler gitHandler, Path bibFilePath) {
     }
 
-    public StringProperty commitMessageProperty() {
+    public ConstrainedStringProperty<ValidationMessage> commitMessageProperty() {
         return commitMessage;
     }
 
     public BooleanProperty amendProperty() {
         return amend;
-    }
-
-    public ValidationStatus commitMessageValidation() {
-        return commitMessageValidator.getValidationStatus();
     }
 
     private record ResolvedRepository(BibDatabaseContext database, Path bibFilePath, GitHandler gitHandler) {

@@ -30,7 +30,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                                         mainDir -> mainDir.attachField(viewModel.mainFileDirectoryProperty(),
                                                 path -> path.browse(viewModel::mainFileDirBrowse)
                                                             .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
-                                                            .validate(viewModel.mainFileDirValidationStatus())))
+                                                            .validate(viewModel.mainFileDirectoryProperty())))
                                 .radio(Localization.lang("Search and store files relative to library file location"),
                                         viewModel.useBibLocationAsPrimaryProperty(),
                                         relative -> relative.tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location.")))))

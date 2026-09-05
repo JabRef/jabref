@@ -43,8 +43,8 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.icon.JabRefMaterialDesignIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -58,7 +58,6 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
@@ -117,8 +116,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
@@ -171,7 +168,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             event.consume();
         });
 
-        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
+        confirmDialogButton.disableProperty().bind(viewModel.validProperty().not());
         // handle validation before closing dialog and calling resultConverter
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
     }
@@ -249,18 +246,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         dateGroupFieldCombo.setItems(FXCollections.observableArrayList(FieldFactory.getDateFields()));
         dateGroupOptionCombo.setItems(FXCollections.observableArrayList(DateGranularity.values()));
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
-            validationVisualizer.initVisualization(viewModel.nameContainsDelimiterValidationStatus(), nameField, false);
-            validationVisualizer.initVisualization(viewModel.sameNameValidationStatus(), nameField);
-            validationVisualizer.initVisualization(viewModel.searchSearchTermEmptyValidationStatus(), searchGroupSearchTerm);
-            validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
-            validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
-            validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
-            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
-            nameField.requestFocus();
-        });
+        new ValidationVisualizer().initVisualization(viewModel.nameProperty(), nameField);
+        new ValidationVisualizer().initVisualization(viewModel.searchGroupSearchTermProperty(), searchGroupSearchTerm);
+        new ValidationVisualizer().initVisualization(viewModel.keywordGroupSearchTermProperty(), keywordGroupSearchTerm);
+        new ValidationVisualizer().initVisualization(viewModel.keywordGroupSearchFieldProperty(), keywordGroupSearchField);
+        new ValidationVisualizer().initVisualization(viewModel.texGroupFilePathProperty(), texGroupFilePath);
+        Platform.runLater(nameField::requestFocus);
 
         autoColorCheckbox.setSelected(useAutoColoring);
         autoColorCheckbox.setOnAction(event -> {

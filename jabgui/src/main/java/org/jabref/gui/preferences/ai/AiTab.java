@@ -2,7 +2,7 @@ package org.jabref.gui.preferences.ai;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -79,13 +79,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 provider -> provider.disableWhen(viewModel.disableBasicSettingsProperty()))
                         .field(Localization.lang("Chat model"), buildChatModelCombo(),
                                 chatModel -> chatModel.disableWhen(viewModel.disableBasicSettingsProperty())
-                                                      .validate(viewModel.getChatModelValidationStatus()))
+                                                      .validate(viewModel.selectedChatModelProperty()))
                         .field(Localization.lang("API key"), PasswordFieldEditor.create(viewModel.apiKeyProperty())
                                                                                 .withRevealButton()
                                                                                 .withClearButton()
                                                                                 .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
-                                          .validate(viewModel.getApiTokenValidationStatus())))
+                                          .validate(viewModel.apiKeyProperty())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -93,12 +93,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 .group(expert -> expert
                                                 .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
                                                         baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
-                                                                          .validate(viewModel.getApiBaseUrlValidationStatus()))
+                                                                          .validate(viewModel.apiBaseUrlProperty()))
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
                                                         PredefinedEmbeddingModel::fullInfo,
-                                                        embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
+                                                        embedding -> embedding.validate(viewModel.selectedEmbeddingModelProperty()))
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]
@@ -106,20 +106,18 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .columns(expertColumns -> expertColumns
                                                         .group(leftColumn -> leftColumn
                                                                 .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
-                                                                        windowSize -> windowSize.validate(viewModel.getMessageWindowSizeValidationStatus()))
+                                                                        windowSize -> windowSize.validate(viewModel.contextWindowSizeProperty()))
                                                                 .stackedField(Localization.lang("RAG - maximum results count"), integerField(viewModel.ragMaxResultsCountProperty()),
-                                                                        resultsCount -> resultsCount.validate(viewModel.getRagMaxResultsCountValidationStatus()))
+                                                                        resultsCount -> resultsCount.validate(viewModel.ragMaxResultsCountProperty()))
                                                                 .stackedField(Localization.lang("Document splitter - chunk size"), integerField(viewModel.documentSplitterChunkSizeProperty()),
-                                                                        chunkSize -> chunkSize.validate(viewModel.getDocumentSplitterChunkSizeValidationStatus())))
+                                                                        chunkSize -> chunkSize.validate(viewModel.documentSplitterChunkSizeProperty())))
                                                         .group(rightColumn -> rightColumn
                                                                 .stackedField(Localization.lang("Temperature"), textField(viewModel.temperatureProperty()),
-                                                                        temperature -> temperature.validate(viewModel.getTemperatureTypeValidationStatus())
-                                                                                                  .validate(viewModel.getTemperatureRangeValidationStatus()))
+                                                                        temperature -> temperature.validate(viewModel.temperatureProperty()))
                                                                 .stackedField(Localization.lang("RAG - minimum score"), textField(viewModel.ragMinScoreProperty()),
-                                                                        minScore -> minScore.validate(viewModel.getRagMinScoreTypeValidationStatus())
-                                                                                            .validate(viewModel.getRagMinScoreRangeValidationStatus()))
+                                                                        minScore -> minScore.validate(viewModel.ragMinScoreProperty()))
                                                                 .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
-                                                                        overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
+                                                                        overlapSize -> overlapSize.validate(viewModel.documentSplitterOverlapSizeProperty()))))
                                                 .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
                                         // Disabling the group covers every expert control above; individual controls
                                         // only add their own extra conditions on top.
@@ -189,14 +187,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     /// [IntegerInputField] holds a nullable `Integer`; mirror it onto the view model's
     /// primitive property in both directions, mapping `null` to zero.
-    private IntegerInputField integerField(IntegerProperty value) {
+    private IntegerInputField integerField(Property<Number> value) {
         IntegerInputField field = new IntegerInputField();
-        field.valueProperty().addListener((_, _, newValue) -> value.set(newValue == null ? 0 : newValue));
+        field.valueProperty().addListener((_, _, newValue) -> value.setValue(newValue == null ? 0 : newValue));
         value.addListener((_, _, newValue) -> field.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
         return field;
     }
 
-    private TextField textField(StringProperty value) {
+    private TextField textField(Property<String> value) {
         TextField field = new TextField();
         field.textProperty().bindBidirectional(value);
         return field;

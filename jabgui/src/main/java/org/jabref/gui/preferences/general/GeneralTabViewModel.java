@@ -33,6 +33,8 @@ import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
@@ -49,11 +51,11 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedObjectProperty;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
+import org.jfxcore.validation.property.SimpleConstrainedObjectProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
@@ -66,17 +68,44 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final ReadOnlyListProperty<ThemePreset> themesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemePreset.values()));
-    private final ObjectProperty<ThemePreset> selectedThemeProperty = new SimpleObjectProperty<>();
+    private final ConstrainedObjectProperty<ThemePreset, ValidationMessage> selectedThemeProperty = new SimpleConstrainedObjectProperty<>(
+            (ThemePreset) null,
+            ValidationConstraints.predicate(
+                    Objects::nonNull,
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("General"),
+                            Localization.lang("Appearance"),
+                            Localization.lang("Please set a theme.")))));
 
     private final ReadOnlyListProperty<ThemeColorScheme> colorSchemeListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeColorScheme.values()));
-    private final ObjectProperty<ThemeColorScheme> selectedThemeColorSchemeProperty = new SimpleObjectProperty<>();
+    private final ConstrainedObjectProperty<ThemeColorScheme, ValidationMessage> selectedThemeColorSchemeProperty = new SimpleConstrainedObjectProperty<>(
+            (ThemeColorScheme) null,
+            ValidationConstraints.predicate(
+                    Objects::nonNull,
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("General"),
+                            Localization.lang("Appearance"),
+                            Localization.lang("Please set a color scheme.")))));
 
     private final BooleanProperty customThemeEnabled = new SimpleBooleanProperty(false);
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
-    private final StringProperty fontSizeProperty = new SimpleStringProperty();
+    private final ConstrainedStringProperty<ValidationMessage> fontSizeProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    value -> {
+                        try {
+                            return Integer.parseInt(value) > 8;
+                        } catch (NumberFormatException ex) {
+                            return false;
+                        }
+                    },
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("General"),
+                            Localization.lang("Font settings"),
+                            Localization.lang("You must enter an integer value higher than 8.")))));
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
@@ -109,20 +138,28 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final RemoteListenerServerManager remoteListenerServerManager;
     private final StateManager stateManager;
 
-    private final Validator fontSizeValidator;
-    private final Validator themeValidator;
-    private final Validator themeColorSchemeValidator;
-
     private final List<String> restartWarning = new ArrayList<>();
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
-    private final StringProperty remotePortProperty = new SimpleStringProperty("");
-    private final Validator remotePortValidator;
+    private final ConstrainedStringProperty<ValidationMessage> remotePortProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    RemoteUtil::isStringUserPort,
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Network"),
+                            Localization.lang("Remote operation"),
+                            Localization.lang("You must enter an integer value in the interval 1025-65535")))));
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
-    private final StringProperty httpPortProperty = new SimpleStringProperty("");
-    private final Validator httpPortValidator;
-    private final Validator languageServerPortValidator;
+    private final ConstrainedStringProperty<ValidationMessage> httpPortProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    RemoteUtil::isStringUserPort,
+                    ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535")))));
     private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
-    private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> languageServerPortProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    RemoteUtil::isStringUserPort,
+                    ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
     private final TrustStoreManager trustStoreManager;
 
     public GeneralTabViewModel(DialogService dialogService,
@@ -145,67 +182,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
-        fontSizeValidator = new FunctionBasedValidator<>(
-                fontSizeProperty,
-                _ -> {
-                    try {
-                        return Integer.parseInt(fontSizeProperty().getValue()) > 8;
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("General"),
-                        Localization.lang("Font settings"),
-                        Localization.lang("You must enter an integer value higher than 8."))));
-
-        themeValidator = new FunctionBasedValidator<>(
-                selectedThemeProperty,
-                Objects::nonNull,
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("General"),
-                        Localization.lang("Appearance"),
-                        Localization.lang("Please set a theme."))));
-
-        themeColorSchemeValidator = new FunctionBasedValidator<>(
-                selectedThemeColorSchemeProperty,
-                Objects::nonNull,
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("General"),
-                        Localization.lang("Appearance"),
-                        Localization.lang("Please set a color scheme."))));
-
-        remotePortValidator = new FunctionBasedValidator<>(
-                remotePortProperty,
-                RemoteUtil::isStringUserPort,
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Network"),
-                        Localization.lang("Remote operation"),
-                        Localization.lang("You must enter an integer value in the interval 1025-65535"))));
-
-        httpPortValidator = new FunctionBasedValidator<>(
-                httpPortProperty,
-                RemoteUtil::isStringUserPort,
-                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
-
-        languageServerPortValidator = new FunctionBasedValidator<>(
-                languageServerPortProperty,
-                RemoteUtil::isStringUserPort,
-                ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535")));
-
         this.trustStoreManager = new TrustStoreManager(preferences.getSSLPreferences().getTruststorePath());
-    }
-
-    public ValidationStatus remotePortValidationStatus() {
-        return remotePortValidator.getValidationStatus();
-    }
-
-    public ValidationStatus httpPortValidationStatus() {
-        return httpPortValidator.getValidationStatus();
-    }
-
-    public ValidationStatus languageServerPortValidationStatus() {
-        return languageServerPortValidator.getValidationStatus();
     }
 
     @Override
@@ -342,44 +319,29 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         trustStoreManager.flush();
     }
 
-    public ValidationStatus fontSizeValidationStatus() {
-        return fontSizeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus themeValidationStatus() {
-        return themeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus themeColorSchemeValidationStatus() {
-        return themeColorSchemeValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        CompositeValidator validator = new CompositeValidator();
-        validator.addValidators(themeValidator, themeColorSchemeValidator);
-
+        List<ReadOnlyConstrainedProperty<?, ValidationMessage>> fieldsToCheck = new ArrayList<>();
+        fieldsToCheck.add(selectedThemeProperty);
+        fieldsToCheck.add(selectedThemeColorSchemeProperty);
         if (remoteServerProperty.getValue()) {
-            validator.addValidators(remotePortValidator);
+            fieldsToCheck.add(remotePortProperty);
         }
-
         if (enableHttpServerProperty.getValue()) {
-            validator.addValidators(httpPortValidator);
+            fieldsToCheck.add(httpPortProperty);
         }
-
         if (enableLanguageServerProperty.getValue()) {
-            validator.addValidators(languageServerPortValidator);
+            fieldsToCheck.add(languageServerPortProperty);
         }
-
         if (fontOverrideProperty.getValue()) {
-            validator.addValidators(fontSizeValidator);
+            fieldsToCheck.add(fontSizeProperty);
         }
 
-        ValidationStatus validationStatus = validator.getValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+        for (ReadOnlyConstrainedProperty<?, ValidationMessage> field : fieldsToCheck) {
+            if (field.isInvalid()) {
+                dialogService.showErrorDialogAndWait(field.getDiagnostics().invalidSubList().getFirst().message());
+                return false;
+            }
         }
         return true;
     }
@@ -401,7 +363,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.themesListProperty;
     }
 
-    public ObjectProperty<ThemePreset> selectedThemeProperty() {
+    public ConstrainedObjectProperty<ThemePreset, ValidationMessage> selectedThemeProperty() {
         return selectedThemeProperty;
     }
 
@@ -409,7 +371,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return colorSchemeListProperty;
     }
 
-    public ObjectProperty<ThemeColorScheme> selectedThemeColorSchemeProperty() {
+    public ConstrainedObjectProperty<ThemeColorScheme, ValidationMessage> selectedThemeColorSchemeProperty() {
         return selectedThemeColorSchemeProperty;
     }
 
@@ -438,7 +400,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return fontOverrideProperty;
     }
 
-    public StringProperty fontSizeProperty() {
+    public ConstrainedStringProperty<ValidationMessage> fontSizeProperty() {
         return fontSizeProperty;
     }
 
@@ -505,7 +467,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return remoteServerProperty;
     }
 
-    public StringProperty remotePortProperty() {
+    public ConstrainedStringProperty<ValidationMessage> remotePortProperty() {
         return remotePortProperty;
     }
 
@@ -513,7 +475,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return enableHttpServerProperty;
     }
 
-    public StringProperty httpPortProperty() {
+    public ConstrainedStringProperty<ValidationMessage> httpPortProperty() {
         return httpPortProperty;
     }
 
@@ -525,7 +487,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return enableLanguageServerProperty;
     }
 
-    public StringProperty languageServerPortProperty() {
+    public ConstrainedStringProperty<ValidationMessage> languageServerPortProperty() {
         return languageServerPortProperty;
     }
 
