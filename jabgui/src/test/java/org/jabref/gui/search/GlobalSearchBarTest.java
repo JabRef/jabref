@@ -2,6 +2,7 @@ package org.jabref.gui.search;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -115,5 +116,21 @@ public class GlobalSearchBarTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of(), lastSearchHistory);
+    }
+
+    @Test
+    void blankQueryClearsActiveSearch(FxRobot robot) throws InterruptedException {
+        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+
+        FxRobotInterface searchFieldRobot = robot.clickOn(searchField);
+        searchFieldRobot.write("abc");
+        Thread.sleep(401);
+        assertEquals(Optional.of(new org.jabref.model.search.query.SearchQuery("abc")), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+
+        searchFieldRobot.eraseText(3);
+        searchFieldRobot.write("   ");
+        Thread.sleep(401);
+
+        assertEquals(Optional.empty(), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
     }
 }
