@@ -175,7 +175,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
         // Close the preview automatically when the user clicks somewhere outside of it.
-        // [impl->req~entry-editor.citations.click-preview~1]
         this.previewTooltip.setAutoHide(true);
     }
 
@@ -576,6 +575,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
                     showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
                     showPreview.setOnMouseClicked(event -> {
+                        // [impl->req~entry-editor.citations.click-preview~1]
                         if (previewTooltip.isShowing()) {
                             previewTooltip.hide();
                             return;
