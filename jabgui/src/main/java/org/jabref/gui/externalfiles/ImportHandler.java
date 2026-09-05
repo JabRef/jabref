@@ -694,10 +694,10 @@ public class ImportHandler {
                 entries.forEach(entry -> {
                     if (finalIsTemporaryFile) {
                         List<LinkedFile> updatedFiles = entry.getFiles().stream()
-                                .map(file -> file.getLink().equalsIgnoreCase(targetFile.toString())
-                                        ? new LinkedFile("", pdfUrl, StandardFileType.PDF.getName())
-                                        : file)
-                                .toList();
+                                                             .map(file -> file.getLink().equalsIgnoreCase(targetFile.toString())
+                                                                     ? new LinkedFile("", pdfUrl, StandardFileType.PDF.getName())
+                                                                     : file)
+                                                             .toList();
                         entry.setFiles(updatedFiles);
                     } else if (entry.getFiles().isEmpty()) {
                         entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
