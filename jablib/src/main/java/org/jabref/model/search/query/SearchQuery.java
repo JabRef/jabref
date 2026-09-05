@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +128,7 @@ public class SearchQuery {
         return term;
     }
 
+    @NullMarked
     private static final class SearchRegularExpressionValidator extends SearchBaseVisitor<Boolean> {
 
         private final boolean searchBarRegex;

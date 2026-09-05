@@ -3,6 +3,8 @@ package org.jabref.gui.search;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,6 +26,7 @@ import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -124,13 +127,28 @@ public class GlobalSearchBarTest {
 
         FxRobotInterface searchFieldRobot = robot.clickOn(searchField);
         searchFieldRobot.write("abc");
-        Thread.sleep(401);
-        assertEquals(Optional.of(new org.jabref.model.search.query.SearchQuery("abc")), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+        awaitActiveSearchQuery(Optional.of(new SearchQuery("abc")));
+        assertEquals(Optional.of(new SearchQuery("abc")), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
 
         searchFieldRobot.eraseText(3);
         searchFieldRobot.write("   ");
-        Thread.sleep(401);
+        awaitActiveSearchQuery(Optional.empty());
 
         assertEquals(Optional.empty(), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+    }
+
+    private void awaitActiveSearchQuery(Optional<SearchQuery> expected) throws InterruptedException {
+        if (expected.equals(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get())) {
+            return;
+        }
+
+        CountDownLatch updated = new CountDownLatch(1);
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, current) -> {
+            if (expected.equals(current)) {
+                updated.countDown();
+            }
+        });
+
+        assertTrue(updated.await(5, TimeUnit.SECONDS), "Active search query was not updated in time");
     }
 }

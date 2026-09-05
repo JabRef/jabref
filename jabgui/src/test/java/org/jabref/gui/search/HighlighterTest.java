@@ -13,7 +13,6 @@ import org.jabref.model.search.query.SearchQuery;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HighlighterTest {
 
@@ -33,7 +32,7 @@ class HighlighterTest {
     void invalidRegularExpressionQueryDoesNotProduceHighlightTerms() {
         SearchQuery searchQuery = new SearchQuery("*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
 
-        assertTrue(Highlighter.groupTermsByField(searchQuery).isEmpty());
+        assertEquals(Map.of(), Highlighter.groupTermsByField(searchQuery));
     }
 
     @Test
