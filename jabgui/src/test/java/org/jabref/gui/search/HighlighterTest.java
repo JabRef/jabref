@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -25,7 +24,7 @@ class HighlighterTest {
         Map<Optional<Field>, List<String>> groupedTerms = Highlighter.groupTermsByField(searchQuery);
 
         assertEquals(
-                Optional.of(Pattern.quote("*")),
+                Optional.of("\\*"),
                 Highlighter.buildSearchPattern(groupedTerms.get(Optional.of(StandardField.TITLE)))
         );
     }

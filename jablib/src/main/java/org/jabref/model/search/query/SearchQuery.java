@@ -108,7 +108,7 @@ public class SearchQuery {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
     }
 
-    private static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
+    public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
         if (ctx == null) {
             return "";
         }
