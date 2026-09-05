@@ -67,7 +67,9 @@ import picocli.CommandLine.ParentCommand;
                 "",
                 "Setup:",
                 "  git config --global merge.jabref.name \"JabRef semantic .bib merge\"",
-                "  git config --global merge.jabref.driver \"jabkit git merge-driver --porcelain %O %A %B\"",
+                // picocli runs the help text through String.format, so the Git placeholders have to be escaped
+                "  git config --global merge.jabref.driver \\",
+                "    \"jabkit git merge-driver --porcelain %%O %%A %%B\"",
                 "  echo \"*.bib merge=jabref\" >> .gitattributes",
                 "",
                 "Exit code 0: merged cleanly. 1: semantic conflicts (CURRENT keeps its version of conflicting entries)."
