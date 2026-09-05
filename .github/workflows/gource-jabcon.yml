@@ -25,7 +25,8 @@ jobs:
       matrix:
         include:
           - title: 'JabCon 2026'
-            start: '2026-09-03'
+            # JabCon start (09:00 Europe/Berlin) in UTC, the runner's local time
+            start: '2026-09-04 07:00:00'
             end: ''
             file: 'jabcon-2026.mp4'
             seconds_per_day: '100'
