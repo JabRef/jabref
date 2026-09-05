@@ -3,6 +3,8 @@ package org.jabref.gui.preferences.openoffice;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -26,6 +28,8 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeTabViewModel.class);
 
     private final StringProperty pandocPath = new SimpleStringProperty();
+    private final BooleanProperty zoteroCompatibilityMode = new SimpleBooleanProperty();
+    private final BooleanProperty inferCslStyleFromDocument = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -40,20 +44,38 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = filePreferences;
         this.openOfficePreferences = openOfficePreferences;
         this.taskExecutor = taskExecutor;
+        zoteroCompatibilityMode.addListener((_, _, enabled) -> {
+            if (!enabled) {
+                inferCslStyleFromDocument.set(false);
+            }
+        });
     }
 
     @Override
     public void setValues() {
         pandocPath.set(openOfficePreferences.getPandocPath());
+        zoteroCompatibilityMode.set(openOfficePreferences.getZoteroCompatibilityMode());
+        inferCslStyleFromDocument.set(openOfficePreferences.shouldInferCslStyleFromDocument()
+                && zoteroCompatibilityMode.get());
     }
 
     @Override
     public void storeSettings() {
         openOfficePreferences.setPandocPath(pandocPath.get());
+        openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.get());
+        openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.get());
     }
 
     public StringProperty pandocPathProperty() {
         return pandocPath;
+    }
+
+    public BooleanProperty zoteroCompatibilityModeProperty() {
+        return zoteroCompatibilityMode;
+    }
+
+    public BooleanProperty inferCslStyleFromDocumentProperty() {
+        return inferCslStyleFromDocument;
     }
 
     public void browsePandocPath() {
