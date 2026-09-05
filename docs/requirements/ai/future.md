@@ -1,5 +1,6 @@
 ---
-parent: ai
+parent: AI
+grand_parent: Requirements
 ---
 
 <!-- oft:off -->
