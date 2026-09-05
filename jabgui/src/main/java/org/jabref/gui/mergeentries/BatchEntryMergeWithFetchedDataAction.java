@@ -49,6 +49,9 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getActiveDatabase()
                                              .map(BibDatabaseContext::getEntries)
                                              .orElse(List.of());
+        Character keywordSeparator = stateManager.getActiveDatabase()
+                                                 .map(database -> database.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
+                                                 .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
 
         if (entries.isEmpty()) {
             notificationService.notify(Localization.lang("No entries available for merging"));
@@ -61,7 +64,7 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
                 fetcher,
                 undoManager,
                 notificationService,
-                preferences.getBibEntryPreferences().getKeywordSeparator());
+                keywordSeparator);
 
         mergeTask.executeWith(taskExecutor);
     }

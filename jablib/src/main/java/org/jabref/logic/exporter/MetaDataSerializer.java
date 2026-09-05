@@ -59,6 +59,8 @@ public class MetaDataSerializer {
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, List.of(mode.getAsString())));
         metaData.getLibraryAbbreviationType().ifPresent(
                 abbreviationType -> stringyMetaData.put(MetaData.LIBRARY_ABBREVIATION_TYPE, List.of(abbreviationType.name())));
+        metaData.getKeywordSeparator().ifPresent(
+                separator -> stringyMetaData.put(MetaData.KEYWORD_SEPARATOR, List.of(separator.toString())));
         metaData.getLibrarySpecificFileDirectory().ifPresent(
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, List.of(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
