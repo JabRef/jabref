@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -57,7 +55,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void themeManagerUsesProvidedTheme() throws IOException, InterruptedException {
+    void themeManagerUsesProvidedTheme() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -72,7 +70,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void nullThemeSettingsFallBackToDefaults() throws InterruptedException {
+    void nullThemeSettingsFallBackToDefaults() {
         WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
         workspacePreferences.setTheme(null);
         workspacePreferences.setColorScheme(null);
@@ -90,7 +88,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeChangesFromBackgroundThreadAreAppliedOnJavaFxThread() throws IOException, InterruptedException {
+    void customThemeChangesFromBackgroundThreadAreAppliedOnJavaFxThread() throws IOException {
         WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
         AtomicBoolean listenerAddedOnJavaFxThread = new AtomicBoolean();
@@ -104,15 +102,12 @@ class ThemeManagerTest {
 
         workspacePreferences.setCustomTheme(StyleSheet.create(tempFolder.resolve("custom.css").toString()));
 
-        CountDownLatch updateFinished = new CountDownLatch(1);
-        Platform.runLater(updateFinished::countDown);
-
-        assertTrue(updateFinished.await(10, TimeUnit.SECONDS), "Custom theme update timed out");
+        JavaFxExtension.awaitEvents();
         assertTrue(listenerAddedOnJavaFxThread.get());
     }
 
     @Test
-    void customThemeAvailableEvenWhenDeleted() throws IOException, InterruptedException {
+    void customThemeAvailableEvenWhenDeleted() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -131,7 +126,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException, InterruptedException {
+    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(ThemePreset.JABREF);
@@ -152,7 +147,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void largeCustomThemeNotHeldInMemory() throws IOException, InterruptedException {
+    void largeCustomThemeNotHeldInMemory() throws IOException {
         // Create a temporary custom theme that is just a large comment over 48 kilobytes in size.
         Path largeCssTestFile = tempFolder.resolve("test.css");
         Files.createFile(largeCssTestFile);
@@ -189,7 +184,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void installThemeOnScene() throws IOException, InterruptedException {
+    void installThemeOnScene() throws IOException {
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
@@ -212,7 +207,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void liveReloadCssDataUrl() throws IOException, InterruptedException {
+    void liveReloadCssDataUrl() throws IOException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -242,20 +237,13 @@ class ThemeManagerTest {
                 styleSheet.orElseThrow().getSceneStylesheetLocation(), "stylesheet embedded in data: url should have reloaded");
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) throws InterruptedException {
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) {
         return createThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) {
         AtomicReference<ThemeManager> themeManager = new AtomicReference<>();
-        Platform.runLater(() -> {
-            themeManager.set(new ThemeManager(workspacePreferences, fileUpdateMonitor));
-            latch.countDown();
-        });
-
-        assertTrue(latch.await(10, TimeUnit.SECONDS), "Theme manager creation timed out");
+        JavaFxExtension.invokeAndWait(() -> themeManager.set(new ThemeManager(workspacePreferences, fileUpdateMonitor)));
 
         return themeManager.get();
     }

@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -137,55 +134,46 @@ class AllFieldsTabTest {
                 mock(PreviewPanel.class));
     }
 
-    private void runOnFxThreadAndWait(Runnable action) throws InterruptedException {
-        CountDownLatch done = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            action.run();
-            done.countDown();
-        });
-        assertTrue(done.await(30, TimeUnit.SECONDS));
-    }
-
     @Test
-    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException, InterruptedException {
+    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void fileEditorStaysHiddenWithoutMatchingFile() throws InterruptedException {
+    void fileEditorStaysHiddenWithoutMatchingFile() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException, InterruptedException {
+    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException {
         when(preferences.getEntryEditorPreferences().autoLinkFilesEnabled()).thenReturn(false);
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void staleProbeResultDoesNotAddFileEditor() throws IOException, InterruptedException {
+    void staleProbeResultDoesNotAddFileEditor() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("OtherKey");
 
         taskExecutor.deferUpcomingTasks();
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
         // The probe for "OtherKey" is still pending; by the time it runs, the key has changed
         // and its (now matching) result must be discarded.
-        runOnFxThreadAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             entry.setCitationKey("CiteKey2021");
             taskExecutor.runNextDeferredTask();
         });
