@@ -51,7 +51,7 @@ public class OpenOfficeTab extends AbstractPreferenceTabView<OpenOfficeTabViewMo
                                 .disableWhen(viewModel.zoteroCompatibilityModeDisabledProperty()))
                         .checkbox(Localization.lang("Infer CSL style from document"), viewModel.inferCslStyleFromDocumentProperty(), inference -> inference
                                 .disableWhen(viewModel.zoteroCompatibilityModeDisabledProperty()
-                                        .or(viewModel.zoteroCompatibilityModeProperty().not()))))
+                                                      .or(viewModel.zoteroCompatibilityModeProperty().not()))))
                 .build());
     }
 
