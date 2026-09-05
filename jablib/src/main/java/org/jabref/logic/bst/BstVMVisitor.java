@@ -85,7 +85,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 e.fields.put(StandardField.CROSSREF.getName(), crossref);
             }
 
-            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
+            for (Map.Entry<String, @Nullable String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
                 e.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
                        .map(content -> normalizeFieldValue(content, fieldWriter, field))
