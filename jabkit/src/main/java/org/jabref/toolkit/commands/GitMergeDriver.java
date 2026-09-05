@@ -1,6 +1,8 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +14,10 @@ import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -81,6 +86,8 @@ class GitMergeDriver implements Callable<Integer> {
     /// Exit code telling Git that the file could not be merged cleanly.
     private static final int CONFLICT = 1;
 
+    private static final Pattern COMMENT_BEFORE_COMMENT_BLOCK = Pattern.compile("^%.*(\\R\\s*)*\\R\\s*@Comment\\s*[{(]", Pattern.MULTILINE);
+
     @ParentCommand
     private Git git;
 
@@ -118,7 +125,7 @@ class GitMergeDriver implements Callable<Integer> {
 
         MergeAnalysis analysis = SemanticMergeAnalyzer.analyze(base, current, other);
         List<ThreeWayEntryConflict> conflicts = new ArrayList<>(analysis.conflicts());
-        List<ThreeWayEntryConflict> typeConflicts = mergeEntryTypes(base, current, other, conflicts);
+        List<ThreeWayEntryConflict> typeConflicts = mergeEntryProperties(base, current, other, conflicts);
         conflicts.addAll(typeConflicts);
 
         // The analyzer did not see the type conflicts, so its plan still contains their entries
@@ -186,6 +193,11 @@ class GitMergeDriver implements Callable<Integer> {
             reasons.add(Localization.lang("Cannot merge %0: the file was not parsed without warnings.", join(withWarnings)));
         }
 
+        List<Path> withDroppedComments = Stream.of(baseFile, currentFile, otherFile).filter(GitMergeDriver::hasCommentBeforeCommentBlock).toList();
+        if (!withDroppedComments.isEmpty()) {
+            reasons.add(Localization.lang("Cannot merge %0: a comment in front of an @Comment block is not preserved.", join(withDroppedComments)));
+        }
+
         List<Object> otherContent = nonEntryContent(other);
         if (!otherContent.equals(nonEntryContent(base)) && !otherContent.equals(nonEntryContent(current))) {
             reasons.add(Localization.lang("Cannot merge %0: content outside of entries with a citation key changed on both sides.", currentFile));
@@ -204,6 +216,17 @@ class GitMergeDriver implements Callable<Integer> {
         return files.stream().map(Path::toString).collect(Collectors.joining(", "));
     }
 
+    /// The parser attaches a comment to the entry or `@String` following it, but drops it in front
+    /// of an `@Comment` block (metadata, custom entry types) - as does every other JabRef save.
+    private static boolean hasCommentBeforeCommentBlock(Path file) {
+        try {
+            return COMMENT_BEFORE_COMMENT_BLOCK.matcher(Files.readString(file)).find();
+        } catch (IOException e) {
+            LOGGER.debug("Unable to read {} to look for dropped comments", file, e);
+            return false;
+        }
+    }
+
     private static boolean hasDuplicateCitationKeys(BibDatabaseContext context) {
         Set<String> keys = new HashSet<>();
         return context.getDatabase().getEntries().stream()
@@ -219,27 +242,31 @@ class GitMergeDriver implements Callable<Integer> {
         return List.of(
                 database.getEntries().stream()
                         .filter(entry -> entry.getCitationKey().isEmpty())
-                        .map(entry -> List.of(entry.getType(), entry.getFieldMap()))
+                        .map(entry -> List.of(entry.getType(), entry.getFieldMap(), entry.getUserComments()))
                         .toList(),
                 database.getStringValues().stream()
                         .collect(Collectors.toMap(BibtexString::getName, string -> List.of(string.getContent(), string.getUserComments()))),
                 database.getPreamble().orElse(""),
                 database.getEpilog(),
                 result.getEntryTypes(),
+                // written as file prolog, and not part of the serialized metadata
+                database.getSharedDatabaseID().orElse(""),
+                context.getMetaData().getEncoding().map(Charset::name).orElse(""),
+                context.getMetaData().getEncodingExplicitlySupplied(),
                 MetaDataSerializer.getSerializedStringMap(context.getMetaData(),
                         git.jabKit.cliPreferences.getImportFormatPreferences().citationKeyPatternPreferences().getKeyPatterns()));
     }
 
-    /// [ConflictRules][org.jabref.logic.git.merge.planning.util.ConflictRules] compares field maps,
-    /// which do not contain the entry type, and [MergePlan][org.jabref.logic.git.model.MergePlan]
-    /// cannot carry a type change. Entry types are therefore merged here: a type changed in OTHER
-    /// alone is applied to CURRENT, every other divergence is a conflict.
+    /// [ConflictRules][org.jabref.logic.git.merge.planning.util.ConflictRules] compares entries by
+    /// their field map, and [MergePlan][org.jabref.logic.git.model.MergePlan] carries field values
+    /// only. The entry type and the comment written above an entry are therefore merged here: a
+    /// value changed in OTHER alone is applied to CURRENT, every other divergence is a conflict.
     ///
-    /// @return the entries whose type cannot be merged automatically
-    private static List<ThreeWayEntryConflict> mergeEntryTypes(BibDatabaseContext base,
-                                                               BibDatabaseContext current,
-                                                               BibDatabaseContext other,
-                                                               List<ThreeWayEntryConflict> knownConflicts) {
+    /// @return the entries that cannot be merged automatically
+    private static List<ThreeWayEntryConflict> mergeEntryProperties(BibDatabaseContext base,
+                                                                    BibDatabaseContext current,
+                                                                    BibDatabaseContext other,
+                                                                    List<ThreeWayEntryConflict> knownConflicts) {
         Set<String> knownConflictKeys = knownConflicts.stream().map(GitMergeDriver::citationKeyOf).collect(Collectors.toSet());
         Map<String, BibEntry> baseEntries = entriesByCitationKey(base);
         Map<String, BibEntry> currentEntries = entriesByCitationKey(current);
@@ -249,7 +276,7 @@ class GitMergeDriver implements Callable<Integer> {
         keys.addAll(currentEntries.keySet());
         keys.addAll(otherEntries.keySet());
 
-        List<ThreeWayEntryConflict> typeConflicts = new ArrayList<>();
+        List<ThreeWayEntryConflict> conflicts = new ArrayList<>();
         for (String key : keys) {
             if (knownConflictKeys.contains(key)) {
                 continue;
@@ -259,36 +286,56 @@ class GitMergeDriver implements Callable<Integer> {
             @Nullable BibEntry otherEntry = otherEntries.get(key);
 
             if (baseEntry == null) {
-                // added on both sides - the planner unions their fields, but cannot union their types
-                if ((currentEntry != null) && (otherEntry != null) && !currentEntry.getType().equals(otherEntry.getType())) {
-                    typeConflicts.add(new ThreeWayEntryConflict(null, currentEntry, otherEntry));
+                // added on both sides - the planner unions the fields, but cannot union the rest
+                if ((currentEntry != null) && (otherEntry != null)
+                        && (!currentEntry.getType().equals(otherEntry.getType())
+                        || !currentEntry.getUserComments().equals(otherEntry.getUserComments()))) {
+                    conflicts.add(new ThreeWayEntryConflict(null, currentEntry, otherEntry));
                 }
                 continue;
             }
             if (currentEntry == null) {
                 // deleted in CURRENT: accepting the deletion would drop a type change of OTHER
                 if ((otherEntry != null) && !baseEntry.getType().equals(otherEntry.getType())) {
-                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, null, otherEntry));
+                    conflicts.add(new ThreeWayEntryConflict(baseEntry, null, otherEntry));
                 }
                 continue;
             }
             if (otherEntry == null) {
                 if (!baseEntry.getType().equals(currentEntry.getType())) {
-                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, null));
+                    conflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, null));
                 }
                 continue;
             }
-            boolean changedInCurrent = !baseEntry.getType().equals(currentEntry.getType());
-            boolean changedInOther = !baseEntry.getType().equals(otherEntry.getType());
-            if (changedInCurrent && changedInOther) {
-                if (!currentEntry.getType().equals(otherEntry.getType())) {
-                    typeConflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, otherEntry));
-                }
-            } else if (changedInOther) {
-                currentEntry.setType(otherEntry.getType());
+            if (diverged(baseEntry, currentEntry, otherEntry, BibEntry::getType)
+                    || diverged(baseEntry, currentEntry, otherEntry, BibEntry::getUserComments)) {
+                conflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, otherEntry));
+                continue;
             }
+            takeFromOther(baseEntry, currentEntry, otherEntry, BibEntry::getType, BibEntry::setType);
+            takeFromOther(baseEntry, currentEntry, otherEntry, BibEntry::getUserComments, GitMergeDriver::setUserComments);
         }
-        return typeConflicts;
+        return conflicts;
+    }
+
+    /// Both sides changed the value, and to something different.
+    private static <T> boolean diverged(BibEntry base, BibEntry current, BibEntry other, Function<BibEntry, T> value) {
+        return !value.apply(base).equals(value.apply(current))
+                && !value.apply(base).equals(value.apply(other))
+                && !value.apply(current).equals(value.apply(other));
+    }
+
+    /// Applies a value changed in OTHER alone, that is: as long as CURRENT still holds BASE's value.
+    private static <T> void takeFromOther(BibEntry base, BibEntry current, BibEntry other, Function<BibEntry, T> value, BiConsumer<BibEntry, T> setter) {
+        if (value.apply(base).equals(value.apply(current)) && !value.apply(base).equals(value.apply(other))) {
+            setter.accept(current, value.apply(other));
+        }
+    }
+
+    private static void setUserComments(BibEntry entry, String userComments) {
+        entry.withUserComments(userComments);
+        // an unchanged entry is written from its parsed serialization, which still holds the old comment
+        entry.setChanged(true);
     }
 
     private static Map<String, BibEntry> entriesByCitationKey(BibDatabaseContext context) {

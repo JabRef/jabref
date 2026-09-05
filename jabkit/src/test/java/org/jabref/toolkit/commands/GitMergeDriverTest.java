@@ -208,6 +208,59 @@ class GitMergeDriverTest extends AbstractJabKitTest {
     }
 
     @Test
+    void appliesEntryCommentChangeFromOther(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-comment-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-comment-base.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-comment-other.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(0, exitCode, commandLine.getErrorOutput());
+        assertEquals(parse(getClassResourceAsPath("merge-comment-other.bib")).getFirst().getUserComments(),
+                parse(current).getFirst().getUserComments());
+    }
+
+    @Test
+    void keepsCurrentEntryCommentOnDivergingComments(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-comment-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-comment-current.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-comment-other.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals(parse(getClassResourceAsPath("merge-comment-current.bib")).getFirst().getUserComments(),
+                parse(current).getFirst().getUserComments());
+    }
+
+    @Test
+    void reportsConflictOnSharedDatabaseIdAddedInOther(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-base.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-other-shared-id.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(source), Files.readString(current));
+    }
+
+    @Test
+    void reportsConflictOnCommentInFrontOfCommentBlock(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-comment-before-comment-block.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(source, tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(source), Files.readString(current));
+    }
+
+    @Test
     void gitWithoutSubcommandFails() {
         int exitCode = commandLine.executeToLog("git");
 
