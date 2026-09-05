@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -238,6 +239,19 @@ class TexGroupTest {
 
         verify(fileMonitor).removeListener(firstAuxFile, group);
         verify(fileMonitor).addListenerForFile(secondAuxFile, group);
+    }
+
+    @Test
+    void missingAuxDoesNotTriggerParsing(@TempDir Path tempDir) {
+        Path libraryDirectory = tempDir.resolve("library");
+        AuxParser auxParser = mock(AuxParser.class);
+        BibEntry inAux = new BibEntry().withCitationKey("Darwin1888");
+
+        metaData.setLibraryPath(libraryDirectory.resolve("library.bib"));
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, Path.of("paper.aux"), auxParser, new DummyFileUpdateMonitor(), metaData, USER_AND_HOST);
+
+        assertFalse(group.contains(inAux));
+        verifyNoInteractions(auxParser);
     }
 
     @Test

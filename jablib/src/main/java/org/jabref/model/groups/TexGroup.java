@@ -189,8 +189,13 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public boolean contains(BibEntry entry) {
+        Path currentAuxPath = getFilePathResolved();
+        if (!Files.exists(currentAuxPath)) {
+            return false;
+        }
+
         if (keysUsedInAux == null) {
-            AuxParserResult auxResult = auxParser.parse(getFilePathResolved());
+            AuxParserResult auxResult = auxParser.parse(currentAuxPath);
             keysUsedInAux = auxResult.getUniqueKeys();
         }
 
