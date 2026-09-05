@@ -32,6 +32,19 @@ public sealed interface EntryEditorTabModel
         ) && type == BuiltIn.PREVIEW;
     }
 
+    /// Union of the fields resolved by all [CustomizedFieldsTab]s in the given tab list.
+    /// A field shown on a custom tab is *moved* there: the Main tab uses this to exclude
+    /// it from its field list and add-chips, so no field is displayed twice.
+    static Set<Field> fieldsOnCustomTabs(List<EntryEditorTabModel> tabModels, BibEntry entry) {
+        Set<Field> result = new LinkedHashSet<>();
+        for (EntryEditorTabModel model : tabModels) {
+            if (model instanceof CustomizedFieldsTab customTab) {
+                result.addAll(customTab.resolveFields(entry));
+            }
+        }
+        return result;
+    }
+
     /// Every fixed tab in the entry editor, in display order.
     enum BuiltIn {
         // Preview tab visibility controlled by preference option
