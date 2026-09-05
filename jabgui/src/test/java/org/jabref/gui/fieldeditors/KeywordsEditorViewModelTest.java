@@ -5,7 +5,6 @@ import java.util.List;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -24,10 +23,8 @@ class KeywordsEditorViewModelTest {
     void setUp() {
         SuggestionProvider<String> suggestionProvider = mock(SuggestionProvider.class);
 
-        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(suggestionProvider.getPossibleSuggestions()).thenReturn(List.of("value", "key\\,\\\\", "parent > node > child", "father \\> inheritor"));
-        viewModel = new KeywordsEditorViewModel(mock(Field.class), suggestionProvider, mock(FieldCheckers.class), bibEntryPreferences, mock(UndoManager.class));
+        viewModel = new KeywordsEditorViewModel(mock(Field.class), suggestionProvider, mock(FieldCheckers.class), ',', mock(UndoManager.class));
     }
 
     @Test

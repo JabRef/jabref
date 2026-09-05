@@ -8,7 +8,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class GenericUrlBasedFetcherTest {
     private final GenericUrlBasedFetcher fetcher = new GenericUrlBasedFetcher();
 
     @Test
-    @FetcherTest
+    @ExternalServicesTest
     void performSearchWithValidUrlReturnsMiscEntryWithTitleAndUrldate() throws FetcherException {
         String url = "https://gi-radar.de/397-coding-unterstuetzung-im-lauf-der-zeit/";
         // Captured before performSearch, which internally calls LocalDate.now() itself during its (real, network-
@@ -41,7 +41,7 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
-    @FetcherTest
+    @ExternalServicesTest
     void performSearchWithUnreachableUrlStillCreatesEntryWithUrlAsTitleFallback() throws FetcherException {
         String url = "https://this-host-should-not-resolve.jabref-test.invalid/some-page";
         String expectedUrlDate = new Date(LocalDate.now()).getNormalized();
@@ -56,7 +56,7 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
-    @FetcherTest
+    @ExternalServicesTest
     void performSearchWithSurroundingWhitespaceStripsItFromStoredUrl() throws FetcherException {
         String url = "https://this-host-should-not-resolve.jabref-test.invalid/some-page";
 
