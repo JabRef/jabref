@@ -326,7 +326,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // Read before the final change check, because ACL and extended-attribute I/O take time on network shares.
             // Applied to the target only after the commit: the temporary file must stay readable by this process for
             // the in-place fallbacks, which a restrictive ACL of the target could prevent.
-            Map<String, Object> preservedAttributes = Files.exists(targetFile) ? readPreservableAttributes(targetFile) : Map.of();
+            Map<String, Object> preservedAttributes = Files.exists(targetFile) ? readPreservableAttributes(targetFile, temporaryFile) : Map.of();
 
             // Re-check right before the commit: creating the backup of a large file can take a while, so the first
             // check may be long in the past by now
@@ -384,68 +384,78 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 
-    /// Reads everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes), keyed
-    /// by attribute name for [Files#setAttribute]. Each part is independent and best-effort: a mounted file system
-    /// may lack support the default file system advertises. Ownership is not included, because restoring it needs
-    /// elevated privileges. POSIX permissions are restored separately, so that they also apply to a freshly created
-    /// target.
+    /// Reads everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
+    /// `file`, keyed by attribute name for [Files#setAttribute], in the order they have to be applied: the ACL
+    /// after the ordinary attributes because it may revoke the access to write them, and read-only last of all.
+    /// Each part is independent and best-effort: a mounted file system may lack support the default file system
+    /// advertises. Ownership is not included, because restoring it needs elevated privileges. POSIX permissions are
+    /// restored separately, so that they also apply to a freshly created target.
     ///
     /// The string-based attribute API is used instead of the typed views: it never yields `null` and transfers each
     /// extended attribute completely or throws, so a partial transfer cannot go unnoticed.
+    ///
+    /// @param replacement the file that is going to replace `file`; only DOS flags differing from its flags are
+     ///                    included, because writing an unchanged `false` on Linux adds a DOSATTRIB xattr to every saved file
     // [impl->req~logic.exporter.preserve-file-attributes~1]
-    private static Map<String, Object> readPreservableAttributes(Path file) {
+    private static Map<String, Object> readPreservableAttributes(Path file, Path replacement) {
         Map<String, Object> attributes = new LinkedHashMap<>();
         Set<String> views = file.getFileSystem().supportedFileAttributeViews();
 
         if (views.contains("posix")) {
             try {
                 attributes.put("posix:group", Files.getAttribute(file, "posix:group"));
-            } catch (IOException | UnsupportedOperationException exception) {
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
                 LOGGER.debug("Could not read group of {}", file, exception);
-            }
-        }
-
-        if (views.contains("acl")) {
-            try {
-                attributes.put("acl:acl", Files.getAttribute(file, "acl:acl"));
-            } catch (IOException | UnsupportedOperationException exception) {
-                LOGGER.debug("Could not read ACL of {}", file, exception);
             }
         }
 
         if (views.contains("user")) {
             try {
                 Files.readAttributes(file, "user:*").forEach((name, value) -> attributes.put("user:" + name, value));
-            } catch (IOException | UnsupportedOperationException exception) {
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
                 LOGGER.debug("Could not read extended attributes of {}", file, exception);
             }
         }
 
+        Map<String, Object> dosFlags = Map.of();
         if (views.contains("dos")) {
             try {
-                Map<String, Object> dosAttributes = Files.readAttributes(file, "dos:hidden,system,archive,readonly");
-                // Only set flags: a new file has none, and writing "false" on Linux would add a DOSATTRIB xattr to
-                // every saved file. Read-only is last of all, because it blocks further attribute writes on Windows.
-                for (String flag : List.of("hidden", "system", "archive", "readonly")) {
-                    if (Boolean.TRUE.equals(dosAttributes.get(flag))) {
-                        attributes.put("dos:" + flag, true);
+                String dosFlagNames = "dos:hidden,system,archive,readonly";
+                Map<String, Object> replacementFlags = Files.readAttributes(replacement, dosFlagNames);
+                dosFlags = new LinkedHashMap<>(Files.readAttributes(file, dosFlagNames));
+                dosFlags.entrySet().removeIf(flag -> flag.getValue().equals(replacementFlags.get(flag.getKey())));
+                for (String flag : List.of("hidden", "system", "archive")) {
+                    if (dosFlags.containsKey(flag)) {
+                        attributes.put("dos:" + flag, dosFlags.get(flag));
                     }
                 }
-            } catch (IOException | UnsupportedOperationException exception) {
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
                 LOGGER.debug("Could not read DOS attributes of {}", file, exception);
             }
+        }
+
+        if (views.contains("acl")) {
+            try {
+                attributes.put("acl:acl", Files.getAttribute(file, "acl:acl"));
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read ACL of {}", file, exception);
+            }
+        }
+
+        if (dosFlags.containsKey("readonly")) {
+            attributes.put("dos:readonly", dosFlags.get("readonly"));
         }
 
         return attributes;
     }
 
-    /// Applies the attributes read by [#readPreservableAttributes(Path)] in their order, skipping (and logging) each
-    /// one the OS refuses, e.g. a group the user is not a member of.
+    /// Applies the attributes read by [#readPreservableAttributes(Path,Path)] in their order, skipping (and logging)
+    /// each one the OS refuses, e.g. a group the user is not a member of.
     private static void applyAttributes(Path file, Map<String, Object> attributes) {
         attributes.forEach((name, value) -> {
             try {
                 Files.setAttribute(file, name, value);
-            } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            } catch (IOException | UnsupportedOperationException | IllegalArgumentException | SecurityException exception) {
                 LOGGER.debug("Could not set attribute {} on {}", name, file, exception);
             }
         });

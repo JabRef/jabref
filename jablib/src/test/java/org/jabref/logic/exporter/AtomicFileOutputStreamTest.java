@@ -25,6 +25,7 @@ import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
@@ -86,7 +87,9 @@ class AtomicFileOutputStreamTest {
     }
 
     // [utest->req~logic.exporter.preserve-file-attributes~1]
+    // Replacing a read-only file fails on Windows (no DELETE access), independent of attribute preservation
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     void readOnlyFlagDoesNotBlockUserDefinedAttributes(@TempDir Path tempDir) throws IOException {
         Path out = tempDir.resolve("read-only.txt");
         Files.writeString(out, FIFTY_CHARS);
@@ -153,14 +156,18 @@ class AtomicFileOutputStreamTest {
     // [utest->req~logic.exporter.preserve-file-attributes~1]
     @Test
     @EnabledOnOs(OS.WINDOWS)
-    void aclIsPreserved(@TempDir Path tempDir) throws IOException {
+    void aclIsPreservedAndAppliedAfterOtherAttributes(@TempDir Path tempDir) throws IOException {
         Path out = tempDir.resolve("acl.txt");
         Files.writeString(out, FIFTY_CHARS);
-        UserPrincipal everyone = out.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName("Everyone");
+        byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
+        Files.setAttribute(out, "user:jabref.test", tag);
+        // The owner is the only principal available without a localized name; denying WRITE_OWNER neither blocks
+        // reading, writing, nor deleting the file
+        UserPrincipal owner = Files.getOwner(out);
         AclEntry entry = AclEntry.newBuilder()
-                                 .setType(AclEntryType.ALLOW)
-                                 .setPrincipal(everyone)
-                                 .setPermissions(AclEntryPermission.READ_DATA)
+                                 .setType(AclEntryType.DENY)
+                                 .setPrincipal(owner)
+                                 .setPermissions(AclEntryPermission.WRITE_OWNER)
                                  .build();
         @SuppressWarnings("unchecked")
         List<AclEntry> acl = new ArrayList<>((List<AclEntry>) Files.getAttribute(out, "acl:acl"));
@@ -173,9 +180,25 @@ class AtomicFileOutputStreamTest {
 
         @SuppressWarnings("unchecked")
         List<AclEntry> savedAcl = (List<AclEntry>) Files.getAttribute(out, "acl:acl");
-        assertTrue(savedAcl.stream().anyMatch(saved -> saved.principal().equals(everyone)
-                && (saved.type() == AclEntryType.ALLOW)
-                && saved.permissions().contains(AclEntryPermission.READ_DATA)));
+        assertTrue(savedAcl.stream().anyMatch(saved -> saved.principal().equals(owner)
+                && (saved.type() == AclEntryType.DENY)
+                && saved.permissions().contains(AclEntryPermission.WRITE_OWNER)));
+        assertArrayEquals(tag, (byte[]) Files.getAttribute(out, "user:jabref.test"));
+    }
+
+    // [utest->req~logic.exporter.preserve-file-attributes~1]
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void clearedArchiveFlagIsPreserved(@TempDir Path tempDir) throws IOException {
+        Path out = tempDir.resolve("archive.txt");
+        Files.writeString(out, FIFTY_CHARS);
+        Files.setAttribute(out, "dos:archive", false);
+
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
+        }
+
+        assertEquals(false, Files.getAttribute(out, "dos:archive"));
     }
 
     @Test
