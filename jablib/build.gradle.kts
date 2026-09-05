@@ -322,6 +322,9 @@ tasks.test {
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
     testLogging {
+        // set options for log level LIFECYCLE
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
         showStandardStreams = false
     }
 }
