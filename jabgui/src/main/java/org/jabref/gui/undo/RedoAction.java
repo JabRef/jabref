@@ -27,7 +27,7 @@ public class RedoAction extends SimpleCommand {
         BooleanExpression activeLibraryHasRedo = BooleanExpression.booleanExpression(
                 stateManager.activeTabProperty().flatMap(
                         optionalTab -> optionalTab
-                                .map(libraryTab -> libraryTab.getUndoManager().redoableProperty())
+                                .map(libraryTab -> libraryTab.getGuiUndoManager().redoableProperty())
                                 .orElse(new SimpleBooleanProperty(false))));
 
         this.executable.bind(needsDatabase(stateManager).and(activeLibraryHasRedo));
@@ -36,7 +36,7 @@ public class RedoAction extends SimpleCommand {
     @Override
     public void execute() {
         LibraryTab libraryTab = tabSupplier.get();
-        GuiUndoManager undoManager = libraryTab.getUndoManager();
+        GuiUndoManager undoManager = libraryTab.getGuiUndoManager();
 
         if (undoManager.canRedo()) {
             undoManager.redo();

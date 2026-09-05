@@ -171,7 +171,7 @@ class SaveDatabaseActionTest {
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        when(libraryTab.getUndoManager()).thenReturn(mock(GuiUndoManager.class));
+        when(libraryTab.getGuiUndoManager()).thenReturn(mock(GuiUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager, mock(JournalAbbreviationRepository.class));
         return saveDatabaseAction;

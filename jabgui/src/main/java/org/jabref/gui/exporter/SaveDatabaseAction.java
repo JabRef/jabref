@@ -253,7 +253,7 @@ public class SaveDatabaseAction {
 
             FileSnapshot committedState = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder(), null);
 
-            libraryTab.getUndoManager().markUnchanged();
+            libraryTab.getGuiUndoManager().markUnchanged();
             libraryTab.resetChangedProperties(committedState);
             dialogService.notify(Localization.lang("Library saved"));
             return SaveResult.SUCCESS;

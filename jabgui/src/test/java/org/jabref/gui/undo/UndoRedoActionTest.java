@@ -44,9 +44,9 @@ class UndoRedoActionTest {
         entryInB = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Curie");
 
         tabA = mock(LibraryTab.class);
-        when(tabA.getUndoManager()).thenReturn(journalOfA);
+        when(tabA.getGuiUndoManager()).thenReturn(journalOfA);
         tabB = mock(LibraryTab.class);
-        when(tabB.getUndoManager()).thenReturn(journalOfB);
+        when(tabB.getGuiUndoManager()).thenReturn(journalOfB);
 
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeTabProperty()).thenReturn(activeTab);

@@ -29,7 +29,7 @@ public class UndoAction extends SimpleCommand {
         BooleanExpression activeLibraryHasUndo = BooleanExpression.booleanExpression(
                 stateManager.activeTabProperty().flatMap(
                         optionalTab -> optionalTab
-                                .map(libraryTab -> libraryTab.getUndoManager().undoableProperty())
+                                .map(libraryTab -> libraryTab.getGuiUndoManager().undoableProperty())
                                 .orElse(new SimpleBooleanProperty(false))));
 
         this.executable.bind(needsDatabase(stateManager).and(activeLibraryHasUndo));
@@ -38,7 +38,7 @@ public class UndoAction extends SimpleCommand {
     @Override
     public void execute() {
         LibraryTab libraryTab = tabSupplier.get();
-        GuiUndoManager undoManager = libraryTab.getUndoManager();
+        GuiUndoManager undoManager = libraryTab.getGuiUndoManager();
 
         if (undoManager.canUndo()) {
             undoManager.undo();

@@ -72,6 +72,7 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -134,6 +135,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
+    private @Nullable GuiUndoManager journalAfterClose;
 
     // All subscribers needing "coarse" change events should use this filter
     // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
@@ -588,7 +590,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Put an asterisk behind the filename to indicate the database has changed.
     public synchronized void markChangedOrUnChanged() {
-        if (getUndoManager().hasChanged()) {
+        if (getGuiUndoManager().hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -774,6 +776,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
+        journalAfterClose = stateManager.getGuiUndoManager(bibDatabaseContext);
         stateManager.removeUndoManager(bibDatabaseContext);
 
         try {
@@ -825,11 +828,27 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    /// The journal of this library.
+    /// The journal to record a change to this library on.
+    ///
+    /// Recording is all most callers do, which is why this hands out the narrow type; the few that
+    /// drive the stacks ask for [#getGuiUndoManager].
+    public UndoManager getUndoManager() {
+        return getGuiUndoManager();
+    }
+
+    /// The same journal as [#getUndoManager], for undoing, redoing and the saved position.
     ///
     /// Resolved on each call rather than held: the context a tab shows is replaced once loading
     /// finishes (see [#setDatabaseContext]), and the journal follows the library the tab holds now.
-    public GuiUndoManager getUndoManager() {
+    ///
+    /// Once the library is closed its journal is no longer the state manager's to hand out — asking
+    /// for it there would put a fresh one back in a map nothing will clear again — so what is
+    /// returned from then on is the journal this library had, which goes when this tab does.
+    public GuiUndoManager getGuiUndoManager() {
+        if (journalAfterClose != null) {
+            LOGGER.warn("The undo journal of {} was requested after the library was closed", bibDatabaseContext.getDatabasePath());
+            return journalAfterClose;
+        }
         return stateManager.getGuiUndoManager(bibDatabaseContext);
     }
 
