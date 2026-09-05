@@ -28,7 +28,6 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
-<!-- markdownlint-disable-file MD022 -->
 
 ## Keyword delimiter normalization is a cleanup
 `req~save.keywords.normalize-delimiters~1`
@@ -39,3 +38,5 @@ A field that already uses the library's separator is returned unchanged, includi
 Cleanups that depend on the keyword separator use the separator declared by the library the entry belongs to and fall back to the global preference when the library declares none.
 
 Needs: impl, utest
+
+<!-- markdownlint-disable-file MD022 -->

@@ -18,6 +18,7 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.os.OS;
@@ -362,8 +363,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // own is as small as possible
             committedTargetFileState = FileSnapshot.read(targetFile);
 
-            // Before the permission restore: a read-only target refuses attribute writes on some platforms
-            applyAttributes(targetFile, preservedAttributes);
+            // Before the permission restore: a read-only target refuses attribute writes on some platforms. Skipped
+            // when the target no longer matches the committed state, so that a concurrent writer's file is left alone
+            // (the remaining race between the check and the write cannot be closed by a path-based API)
+            Optional.ofNullable(committedTargetFileState)
+                    .filter(state -> state.matches(targetFile))
+                    .ifPresent(state -> applyAttributes(targetFile, preservedAttributes));
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
@@ -386,7 +391,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Reads everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
     /// `file`, keyed by attribute name for [Files#setAttribute], in the order they have to be applied: the ACL
-    /// after the ordinary attributes because it may revoke the access to write them, and read-only last of all.
+    /// after the group and extended attributes because it may revoke the access to write them, the DOS flags after
+    /// the ACL because writing it sets the archive bit, and read-only last of all.
     /// Each part is independent and best-effort: a mounted file system may lack support the default file system
     /// advertises. Ownership is not included, because restoring it needs elevated privileges. POSIX permissions are
     /// restored separately, so that they also apply to a freshly created target.
@@ -416,23 +422,6 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
         }
 
-        Map<String, Object> dosFlags = Map.of();
-        if (views.contains("dos")) {
-            try {
-                String dosFlagNames = "dos:hidden,system,archive,readonly";
-                Map<String, Object> replacementFlags = Files.readAttributes(replacement, dosFlagNames);
-                dosFlags = new LinkedHashMap<>(Files.readAttributes(file, dosFlagNames));
-                dosFlags.entrySet().removeIf(flag -> flag.getValue().equals(replacementFlags.get(flag.getKey())));
-                for (String flag : List.of("hidden", "system", "archive")) {
-                    if (dosFlags.containsKey(flag)) {
-                        attributes.put("dos:" + flag, dosFlags.get(flag));
-                    }
-                }
-            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
-                LOGGER.debug("Could not read DOS attributes of {}", file, exception);
-            }
-        }
-
         if (views.contains("acl")) {
             try {
                 attributes.put("acl:acl", Files.getAttribute(file, "acl:acl"));
@@ -441,8 +430,22 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
         }
 
-        if (dosFlags.containsKey("readonly")) {
-            attributes.put("dos:readonly", dosFlags.get("readonly"));
+        if (views.contains("dos")) {
+            try {
+                String dosFlagNames = "dos:hidden,system,archive,readonly";
+                Map<String, Object> replacementFlags = Files.readAttributes(replacement, dosFlagNames);
+                Map<String, Object> dosFlags = new LinkedHashMap<>(Files.readAttributes(file, dosFlagNames));
+                dosFlags.entrySet().removeIf(flag -> flag.getValue().equals(replacementFlags.get(flag.getKey())));
+                // After the ACL: Windows sets the archive bit again when the security descriptor is written.
+                // Read-only last of all, because it blocks further attribute writes.
+                for (String flag : List.of("hidden", "system", "archive", "readonly")) {
+                    if (dosFlags.containsKey(flag)) {
+                        attributes.put("dos:" + flag, dosFlags.get(flag));
+                    }
+                }
+            } catch (IOException | UnsupportedOperationException | SecurityException exception) {
+                LOGGER.debug("Could not read DOS attributes of {}", file, exception);
+            }
         }
 
         return attributes;
