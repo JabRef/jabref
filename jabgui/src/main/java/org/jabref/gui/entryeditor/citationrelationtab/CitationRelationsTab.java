@@ -574,8 +574,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
                     showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
+                    // [impl->req~entry-editor.citations.click-preview~1]
                     showPreview.setOnMouseClicked(event -> {
-                        // [impl->req~entry-editor.citations.click-preview~1]
                         if (previewTooltip.isShowing()) {
                             previewTooltip.hide();
                             return;
