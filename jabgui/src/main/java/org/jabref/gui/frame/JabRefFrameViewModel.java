@@ -288,7 +288,7 @@ public class JabRefFrameViewModel {
         if (StringUtil.isNotBlank(targetGroup)) {
             // TODO: if an existing group is not assignable (e.g. a search or automatic group),
             //       the assignment silently does nothing - no error is reported to the caller.
-            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
+            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
         }
     }
 
