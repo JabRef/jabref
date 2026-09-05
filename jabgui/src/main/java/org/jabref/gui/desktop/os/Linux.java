@@ -73,6 +73,11 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder("xdg-open", url).start();
+    }
+
+    @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
         // Use the given app if specified, and the universal "xdg-open" otherwise:
         String[] openWith;

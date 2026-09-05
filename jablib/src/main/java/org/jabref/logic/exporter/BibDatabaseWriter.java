@@ -113,7 +113,7 @@ public class BibDatabaseWriter {
         saveActions.ifPresent(actions -> {
             // save actions defined -> apply for every entry
             for (BibEntry entry : toChange) {
-                changes.addAll(actions.applySaveActions(entry));
+                changes.addAll(actions.applySaveActions(entry, metaData.getKeywordSeparator().orElse(null)));
             }
         });
 
