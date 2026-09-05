@@ -1,18 +1,19 @@
-# Renders a gource video of the JabCon period every three hours for the JabCon board
+# Renders a gource video of the JabCon period every 15 minutes for the JabCon board
 # (https://github.com/JabRef/jabcon-board). Remove or switch to workflow_dispatch only after JabCon.
 name: Gource (JabCon)
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# a render can take longer than the interval as the video grows; let runs queue rather than cancel each other
 concurrency:
   group: gource-jabcon
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   gource:
@@ -47,6 +48,7 @@ jobs:
           gource_seconds_per_day: ${{ matrix.seconds_per_day }}
           # skip only long idle stretches (nights); the default 3 s would compress the whole day into jumps
           gource_auto_skip_seconds: '30'
+          gource_fps: '30'
           gource_file_filter: 'buildres/csl|\.csl'
 
       - name: Store video
