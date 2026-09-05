@@ -1,3 +1,6 @@
+import org.gradlex.javamodule.packaging.tasks.Jpackage
+import org.jabref.gradle.jdkVendor
+
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
@@ -69,6 +72,43 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
+    }
+}
+
+// AOT cache (JEP 514): after jpackage has assembled the app image, do a training run of the packaged
+// launcher (-XX:AOTCacheOutput records and assembles the cache in one go) and ship the cache inside
+// the image. -XX:AOTCache and -XX:AOTCacheOutput are mutually exclusive, so the -XX:AOTCache line is
+// appended to the launcher .cfg only after training. An unusable cache is non-fatal at runtime
+// (default -XX:AOTMode=auto) and its diagnostics are silenced by -Xlog:disable above.
+// OpenJ9 does not implement the HotSpot AOT cache (it has -Xshareclasses instead), so skip it there.
+// -PskipAotTraining=true skips it for builds whose packaged launcher cannot run on the build host
+// (e.g. Dockerfile.jabkit packages in a plain-Alpine stage without glibc).
+// Requirement: req~jabkit.cli.aot-cache~1 (docs/requirements/cli.md)
+val skipAotTraining = providers.gradleProperty("skipAotTraining").map(String::toBoolean).getOrElse(false)
+if (jdkVendor != JvmVendorSpec.IBM && !skipAotTraining) {
+    tasks.withType<Jpackage>().configureEach {
+        val os = operatingSystem
+        val dest = destination
+        doLast {
+            val image = dest.get().asFile.listFiles()!!.single { it.isDirectory }
+            val (launcher, appDir) = when {
+                os.get().contains("macos") -> image.resolve("Contents/MacOS/jabkit") to image.resolve("Contents/app")
+                os.get().contains("windows") -> image.resolve("jabkit.exe") to image.resolve("app")
+                else -> image.resolve("bin/jabkit") to image.resolve("lib/app")
+            }
+            val cache = appDir.resolve("jabkit.aot")
+            // JAVA_TOOL_OPTIONS is whitespace-tokenized; the working-directory-relative cache name
+            // keeps the option a single token even when the checkout path contains spaces.
+            val process = ProcessBuilder(launcher.absolutePath, "--version")
+                .directory(appDir)
+                .redirectErrorStream(true)
+                .apply { environment()["JAVA_TOOL_OPTIONS"] = "-XX:AOTCacheOutput=${cache.name}" }
+                .start()
+            val output = process.inputStream.bufferedReader().readText()
+            check(process.waitFor() == 0 && cache.isFile) { "AOT cache training run failed:\n$output" }
+            // ponytail: --version only trains startup classes; record a real workload if profiling data should matter
+            appDir.resolve("jabkit.cfg").appendText("java-options=-XX:AOTCache=\$APPDIR/jabkit.aot\n")
+        }
     }
 }
 

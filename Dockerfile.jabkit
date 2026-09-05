@@ -48,7 +48,8 @@ RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
 
-RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
+# skipAotTraining: the AOT training run executes the packaged launcher, which needs glibc (see below)
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" -PskipAotTraining=true :jabkit:jpackage
 
 RUN mkdir /dist
 
@@ -65,6 +66,15 @@ LABEL org.opencontainers.image.source="https://github.com/JabRef/jabref"
 WORKDIR /work
 
 COPY --from=build /dist /jabref
+
+# Bake a JEP 514 AOT cache into the image so containers start faster. Creating the cache requires
+# executing the packaged launcher once ("training"), which is impossible in the musl-based build
+# stage (jpackage output is glibc-linked, hence -PskipAotTraining=true above) — this stage is the
+# first with glibc. The RUN happens at image-build time; containers only load the resulting
+# jabkit.aot. Mirrors the jpackage doLast in jabkit/build.gradle.kts.
+RUN cd /jabref/jabkit/lib/app \
+ && JAVA_TOOL_OPTIONS="-XX:AOTCacheOutput=jabkit.aot" /jabref/jabkit/bin/jabkit --version \
+ && echo 'java-options=-XX:AOTCache=$APPDIR/jabkit.aot' >> jabkit.cfg
 
 EXPOSE 6050
 
