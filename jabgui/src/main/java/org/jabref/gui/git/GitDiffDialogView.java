@@ -57,14 +57,36 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     private final List<DatabaseChange> changes;
     private final BibDatabaseContext headDatabase;
     private final BibDatabaseContext workingTreeDatabase;
+    private final String oldVersionLabel;
+    private final String newVersionLabel;
     private final Map<DatabaseChange, Node> detailsViewCache = new HashMap<>();
 
+    /// Diff dialog labeled for the Git commit use case: committed version (left) vs. saved file (right).
+    ///
+    /// @param changes             the changes to list, as computed by `DatabaseChangeList.compareAndGetChanges`
+    /// @param headDatabase        the committed version (left side)
+    /// @param workingTreeDatabase the saved file (right side)
     public GitDiffDialogView(List<DatabaseChange> changes,
                              BibDatabaseContext headDatabase,
                              BibDatabaseContext workingTreeDatabase) {
+        this(changes, headDatabase, workingTreeDatabase, Localization.lang("Committed version"), Localization.lang("Saved file"));
+    }
+
+    /// @param changes             the changes to list, as computed by `DatabaseChangeList.compareAndGetChanges`
+    /// @param headDatabase        the older version (left side)
+    /// @param workingTreeDatabase the newer version (right side)
+    /// @param oldVersionLabel     heading shown above the older version
+    /// @param newVersionLabel     heading shown above the newer version
+    public GitDiffDialogView(List<DatabaseChange> changes,
+                             BibDatabaseContext headDatabase,
+                             BibDatabaseContext workingTreeDatabase,
+                             String oldVersionLabel,
+                             String newVersionLabel) {
         this.changes = changes;
         this.headDatabase = headDatabase;
         this.workingTreeDatabase = workingTreeDatabase;
+        this.oldVersionLabel = oldVersionLabel;
+        this.newVersionLabel = newVersionLabel;
 
         setTitle(Localization.lang("Diff view"));
         ViewLoader.view(this)
@@ -103,7 +125,9 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             headDatabase,
                             workingTreeDatabase,
                             preferences,
-                            entryTypesManager
+                            entryTypesManager,
+                            oldVersionLabel,
+                            newVersionLabel
                     );
             case org.jabref.gui.collab.entryadd.EntryAdd entryAdd ->
                     new EntryWithPreviewAndSourceDetailsView(
@@ -125,8 +149,8 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                     new MetadataChangeDetailsView(
                             metadataChange,
                             preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
-                            Localization.lang("Committed version"),
-                            Localization.lang("Saved file")
+                            oldVersionLabel,
+                            newVersionLabel
                     );
             case GroupChange groupChange ->
                     new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');

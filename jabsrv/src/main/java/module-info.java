@@ -1,3 +1,9 @@
+/// HTTP server exposing libraries via a REST API, used by the browser extension and for
+/// collaborative editing. Built on Jersey/Grizzly.
+///
+/// Entry points: [org.jabref.http.server.Server], [org.jabref.http.manager.HttpServerManager].
+///
+/// @see <a href="https://devdocs.jabref.org/code-howtos/http-server.html">HTTP server code howto</a>
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
     exports org.jabref.http.manager;
@@ -43,8 +49,6 @@ module org.jabref.jabsrv {
 
     requires static jakarta.annotation;
     requires transitive jakarta.inject;
-
-    requires static io.github.eadr;
 
     // Injection framework
     requires transitive org.glassfish.hk2.api;
