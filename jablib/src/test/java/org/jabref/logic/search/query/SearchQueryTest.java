@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SearchQueryTest {
     @ParameterizedTest
     @ValueSource(strings = {
+            "",
             "term",
             "term1 term2",
             "term1 term2 term3",

@@ -137,6 +137,9 @@ public class SearchQuery {
 
         @Override
         public Boolean visitStart(SearchParser.StartContext ctx) {
+            if (ctx.andExpression() == null) {
+                return true;
+            }
             return visit(ctx.andExpression());
         }
 
