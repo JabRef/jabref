@@ -32,7 +32,6 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      String newVersionLabel,
                                      DiffHighlighter.BasicDiffMethod diffMethod) {
         Label committedVersion = new Label(oldVersionLabel);
-
         committedVersion.getStyleClass().add("lib-change-header");
         Label savedFile = new Label(newVersionLabel);
         savedFile.getStyleClass().add("lib-change-header");
