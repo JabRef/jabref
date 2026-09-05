@@ -228,7 +228,9 @@ We need that information for our package maintainers (e.g., those of the [debian
 In case you add a library or do major code rewrites, we ask you to document your decision. Recommended reading: [https://adr.github.io/](https://adr.github.io).
 
 We simply ask to create a new markdown file in `docs/adr` following the template presented at [https://adr.github.io/madr/](https://adr.github.io/madr/).
-You can link that ADR using `@ADR({num})` as annotation.
+You can link code to that ADR with OpenFastTrace: put the identifier `adr~{short-title}~1` directly below the ADR's title, add `Needs: impl`,
+and mark the implementation with `// [impl->adr~{short-title}~1]`.
+See [the requirements documentation](docs/requirements/index.md) for details.
 
 #### When adding a new `Localization.lang` entry
 

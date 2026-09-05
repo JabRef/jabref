@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.4")
+    api("com.dlsc.gemsfx:gemsfx:4.4.5")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -87,7 +87,6 @@ dependencies.constraints {
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
-    api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:4.8.194")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
@@ -101,7 +100,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.12")
+    api("net.bytebuddy:byte-buddy:1.18.13")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
