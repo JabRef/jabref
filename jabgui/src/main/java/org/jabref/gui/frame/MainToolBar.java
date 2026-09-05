@@ -26,7 +26,6 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
@@ -54,7 +53,6 @@ public class MainToolBar extends ToolBar {
     private final ClipBoardManager clipBoardManager;
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
-    private final GuiUndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
@@ -72,7 +70,6 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       GuiUndoManager undoManager,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -85,7 +82,6 @@ public class MainToolBar extends ToolBar {
         this.taskExecutor = taskExecutor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
-        this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createToolBar();
@@ -106,7 +102,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
 
                 leftSpacer,
@@ -118,7 +114,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         factory.createIconButton(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager))),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -129,18 +125,18 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
                         pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository))),
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, journalAbbreviationRepository))),
 
                 new Separator(Orientation.VERTICAL),
 

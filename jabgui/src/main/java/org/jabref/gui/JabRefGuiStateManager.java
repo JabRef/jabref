@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javafx.beans.Observable;
@@ -26,11 +27,14 @@ import javafx.util.Pair;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.AbstractSrvStateManager;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -61,6 +65,12 @@ import org.slf4j.LoggerFactory;
 public class JabRefGuiStateManager extends AbstractSrvStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
+
+    /// Keyed by [BibDatabaseContext#getUid], as `selectedGroups` is: a context's `hashCode`
+    /// changes whenever an entry is added, so a map keyed by the context itself loses its entries.
+    /// Concurrent because changes are recorded from background tasks as well as from the JavaFX
+    /// thread.
+    private final Map<String, JabRefGuiUndoManager> undoManagers = new ConcurrentHashMap<>();
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -109,6 +119,22 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     @Override
     public OptionalObjectProperty<LibraryTab> activeTabProperty() {
         return activeTab;
+    }
+
+    @Override
+    public UndoManager getUndoManager(BibDatabaseContext context) {
+        return getGuiUndoManager(context);
+    }
+
+    // [impl->req~logic.undo.journal-per-library~1]
+    @Override
+    public GuiUndoManager getGuiUndoManager(BibDatabaseContext context) {
+        return undoManagers.computeIfAbsent(context.getUid(), _ -> new JabRefGuiUndoManager());
+    }
+
+    @Override
+    public void removeUndoManager(BibDatabaseContext context) {
+        undoManagers.remove(context.getUid());
     }
 
     @Override

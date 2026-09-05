@@ -30,7 +30,6 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -51,7 +50,6 @@ public class RightClickMenu {
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      GuiPreferences preferences,
-                                     GuiUndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
@@ -66,24 +64,24 @@ public class RightClickMenu {
         MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
 
                 createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor),
 
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> libraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> libraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, () -> libraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferences, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferences, stateManager),
 
                 new SeparatorMenuItem(),
 
@@ -101,9 +99,9 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor))
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), entryTypesManager).asSubMenu(),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
+                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor))
         );
 
         EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -> {

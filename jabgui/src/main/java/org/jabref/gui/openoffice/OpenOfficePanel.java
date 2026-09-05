@@ -34,7 +34,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -101,7 +100,6 @@ public class OpenOfficePanel {
 
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private final GuiUndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
@@ -124,14 +122,12 @@ public class OpenOfficePanel {
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
-                           ClipBoardManager clipBoardManager,
-                           GuiUndoManager undoManager) {
+                           ClipBoardManager clipBoardManager) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.aiService = aiService;
@@ -357,7 +353,6 @@ public class OpenOfficePanel {
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
-                    undoManager,
                     clipBoardManager,
                     taskExecutor);
             tabContainer.addTab(libraryTab, true);
@@ -630,7 +625,7 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            undoManager.addEdit(Localization.lang("Cite"), edit -> {
+            stateManager.getUndoManager(databaseContext.get()).addEdit(Localization.lang("Cite"), edit -> {
                 for (BibEntry entry : entries) {
                     if (entry.getCitationKey().isEmpty()) {
                         // Generate key

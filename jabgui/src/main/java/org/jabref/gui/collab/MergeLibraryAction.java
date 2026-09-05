@@ -15,7 +15,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -31,20 +30,17 @@ public class MergeLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     public MergeLibraryAction(DialogService dialogService,
                               StateManager stateManager,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              UndoManager undoManager,
                               LibraryTabContainer libraryTabContainer) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.libraryTabContainer = libraryTabContainer;
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -94,7 +90,7 @@ public class MergeLibraryAction extends SimpleCommand {
         if (areAllChangesResolved.orElse(false)) {
             List<DatabaseChange> resolvedChanges = databaseChangesResolverDialog.getResolvedChanges();
 
-            boolean anyChange = undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+            boolean anyChange = stateManager.getUndoManager(activeDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                     resolvedChanges.stream()
                                    .filter(DatabaseChange::isAccepted)
                                    .forEach(change -> change.applyChange(edit)));

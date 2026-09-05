@@ -83,7 +83,7 @@ public class FieldEditors {
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.GROUPS) {
-            return new GroupsEditor(field, suggestionProvider, fieldCheckers, preferences.getBibEntryPreferences(), databaseContext);
+            return new GroupsEditor(field, suggestionProvider, fieldCheckers, preferences.getBibEntryPreferences(), databaseContext, undoManager);
         } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
@@ -110,7 +110,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, databaseContext);
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, databaseContext, undoManager);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {

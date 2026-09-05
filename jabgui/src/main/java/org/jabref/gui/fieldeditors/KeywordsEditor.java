@@ -15,8 +15,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 
-import com.airhacks.afterburner.injection.Injector;
-
 public class KeywordsEditor extends TagsEditor {
 
     private final CliPreferences preferences;
@@ -27,9 +25,10 @@ public class KeywordsEditor extends TagsEditor {
                           SuggestionProvider<?> suggestionProvider,
                           FieldCheckers fieldCheckers,
                           CliPreferences preferences,
-                          BibDatabaseContext databaseContext) {
+                          BibDatabaseContext databaseContext,
+                          UndoManager undoManager) {
 
-        super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.preferences = preferences;
 
         this.viewModel = new KeywordsEditorViewModel(

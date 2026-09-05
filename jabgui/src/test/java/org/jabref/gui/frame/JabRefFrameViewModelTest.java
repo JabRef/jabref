@@ -64,9 +64,9 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(UndoManager.class, undoManager);
 
         when(stateManager.getOpenDatabases()).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.getUndoManager(any())).thenReturn(undoManager);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
 
         viewModel = new JabRefFrameViewModel(
@@ -78,7 +78,6 @@ class JabRefFrameViewModelTest extends ApplicationTest {
                 openDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor
         );

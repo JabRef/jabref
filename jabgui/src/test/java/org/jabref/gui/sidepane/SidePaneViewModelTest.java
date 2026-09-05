@@ -13,7 +13,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -45,7 +44,6 @@ class SidePaneViewModelTest {
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
-    GuiUndoManager undoManager = mock(GuiUndoManager.class);
 
     SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0);
     ObservableList<SidePaneType> sidePaneComponents = FXCollections.observableArrayList();
@@ -73,8 +71,7 @@ class SidePaneViewModelTest {
                 aiService,
                 fileUpdateMonitor,
                 entryTypesManager,
-                clipBoardManager,
-                undoManager);
+                clipBoardManager);
     }
 
     @Test

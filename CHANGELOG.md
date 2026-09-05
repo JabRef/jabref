@@ -200,6 +200,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
 - We fixed an issue where deleting an entry removed the group filter and defaulted to the home view. [#16036](https://github.com/JabRef/jabref/issues/16036)
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
+- We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
+- We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 
 ### Removed
 

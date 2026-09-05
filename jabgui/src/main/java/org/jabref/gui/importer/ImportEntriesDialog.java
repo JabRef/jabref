@@ -46,7 +46,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -100,7 +99,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -153,7 +151,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, stateManager.getUndoManager(database), preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
