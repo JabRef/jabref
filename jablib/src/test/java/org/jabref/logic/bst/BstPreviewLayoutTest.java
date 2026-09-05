@@ -78,14 +78,22 @@ class BstPreviewLayoutTest {
 
     private static Stream<Arguments> generatePreviewHandlesInlineFormatting() {
         return Stream.of(
+
+                // Small-caps forms that should be preserved in the preview output
                 Arguments.of("\\textsc{L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
                 Arguments.of("{\\sc L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
                 Arguments.of("\\textsc{Outer \\textsc{inner} text}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>"),
+
+                // Parser edge cases that should still keep the surrounding small-caps span intact
                 Arguments.of("\\textsc {L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
                 Arguments.of("\\textsc{A\\{B\\}C}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
                 Arguments.of("{\\scshape Lopez}", "O.\u00a0Kopp. Lopez."),
+
+                // Malformed input should fall back to the existing preview pipeline without failing
                 Arguments.of("\\textsc{L{\\'o}pez", "O.\u00a0Kopp. López."),
                 Arguments.of("{\\sc L{\\'o}pez", "O.\u00a0Kopp. lópez."),
+
+                // Existing superscript and subscript rendering should remain unchanged
                 Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium."),
                 Arguments.of("{H\\textsubscript{2}O}", "O.\u00a0Kopp. H₂O.")
         );
