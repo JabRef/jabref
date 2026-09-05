@@ -8,9 +8,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.collab.DatabaseChange;
@@ -30,6 +32,7 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
@@ -48,6 +51,10 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     @FXML private TableView<DatabaseChange> changesTableView;
     @FXML private TableColumn<DatabaseChange, String> changeName;
     @FXML private BorderPane changeInfoPane;
+
+    @FXML private RadioButton highlightWordsRadioButton;
+    @FXML private RadioButton highlightCharactersRadioButton;
+    @FXML private ToggleGroup diffHighlightingMethodToggleGroup;
 
     @Inject private org.jabref.gui.DialogService dialogService;
     @Inject private GuiPreferences preferences;
@@ -114,6 +121,14 @@ public class GitDiffDialogView extends BaseDialog<Void> {
         if (!changes.isEmpty()) {
             changesTableView.getSelectionModel().selectFirst();
         }
+
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            detailsViewCache.clear();
+            DatabaseChange selectedChange = changesTableView.getSelectionModel().getSelectedItem();
+            if (selectedChange != null) {
+                changeInfoPane.setCenter(createDetailsNode(selectedChange, previewViewer));
+            }
+        });
     }
 
     private Node createDetailsNode(DatabaseChange change, PreviewViewer previewViewer) {
@@ -127,7 +142,8 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             preferences,
                             entryTypesManager,
                             oldVersionLabel,
-                            newVersionLabel
+                            newVersionLabel,
+                            getDiffMethod()
                     );
             case org.jabref.gui.collab.entryadd.EntryAdd entryAdd ->
                     new EntryWithPreviewAndSourceDetailsView(
@@ -150,7 +166,8 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             metadataChange,
                             preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                             oldVersionLabel,
-                            newVersionLabel
+                            newVersionLabel,
+                            getDiffMethod()
                     );
             case GroupChange groupChange ->
                     new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');
@@ -170,5 +187,11 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                 yield label;
             }
         };
+    }
+
+    private DiffHighlighter.BasicDiffMethod getDiffMethod() {
+        return highlightWordsRadioButton.isSelected()
+               ? DiffHighlighter.BasicDiffMethod.WORDS
+               : DiffHighlighter.BasicDiffMethod.CHARS;
     }
 }

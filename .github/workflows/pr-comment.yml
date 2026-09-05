@@ -295,23 +295,25 @@ jobs:
 
           if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 ]]; then
             echo "Bot comments - adding label changes-required"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments,status: stale" --add-label "status: changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
             # A PR without bot comments is ready for review unless it is a draft, a human requested changes,
-            # or it already progressed further in the review process.
+            # or it already progressed further in the review process. Drafts and pending human re-reviews
+            # end up without any status label ("nothing for the bots, a human decides what is next");
+            # progressed PRs keep their awaiting-second-review / to-be-merged label.
             PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision,labels \
               --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
                        or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
                     then "not-ready" else "ready" end')
             if [ "$PR_STATE" = "ready" ]; then
               echo "No bot comments and PR is ready for review - adding label ready-for-review"
-              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: no-bot-comments" --add-label "status: ready-for-review"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: ready-for-review"
               echo "No bot comments - removed label changes-required and added ready-for-review" >> $GITHUB_STEP_SUMMARY
             else
-              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - adding label no-bot-comments"
-              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review" --add-label "status: no-bot-comments"
-              echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
+              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - removing changes-required, stale and ready-for-review"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review"
+              echo "No bot comments, but not ready for review - removed changes-required, stale and ready-for-review" >> $GITHUB_STEP_SUMMARY
             fi
           fi
         env:

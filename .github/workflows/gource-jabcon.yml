@@ -25,7 +25,7 @@ jobs:
       matrix:
         include:
           - title: 'JabCon 2026'
-            start: '2026-09-03'
+            start: '2026-09-04 09:00:00'
             end: ''
             file: 'jabcon-2026.mp4'
             seconds_per_day: '100'
@@ -39,6 +39,10 @@ jobs:
 
       - name: Generate Gource video
         uses: nbprojekt/gource-action@d2fdf85904db416b69445dae5551282528e052ae # v1
+        env:
+          # Berlin time for the clock in the video and the start date. POSIX rule string because the action's
+          # Alpine image has no tzdata, so a zone name would silently fall back to UTC.
+          TZ: 'CET-1CEST,M3.5.0,M10.5.0/3'
         with:
           gource_title: ${{ matrix.title }}
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
+
 <DialogPane prefHeight="460.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.git.GitDiffDialogView">
     <content>
         <AnchorPane>
@@ -19,7 +24,20 @@
                     </TableView>
                 </masterNode>
                 <detailNode>
-                    <BorderPane fx:id="changeInfoPane" prefHeight="100.0" />
+                    <BorderPane fx:id="changeInfoPane" prefHeight="100.0">
+                        <top>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </padding>
+                                <fx:define>
+                                    <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
+                                </fx:define>
+                                <RadioButton fx:id="highlightWordsRadioButton" mnemonicParsing="false" text="%Highlight words" toggleGroup="$diffHighlightingMethodToggleGroup" />
+                                <RadioButton fx:id="highlightCharactersRadioButton" mnemonicParsing="false" selected="true" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
+                            </HBox>
+                        </top>
+                    </BorderPane>
                 </detailNode>
             </MasterDetailPane>
         </AnchorPane>

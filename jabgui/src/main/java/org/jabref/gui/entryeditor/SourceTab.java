@@ -66,7 +66,7 @@ public class SourceTab extends EntryEditorTab {
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
     private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
-    private final Subscription activeTabSubscription;
+    private final Subscription activeDatabaseSubscription;
     private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
@@ -100,17 +100,14 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        activeTabSubscription = EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
-            if (library.isEmpty()) {
-                this.setText(Localization.lang("Source"));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
-            } else {
-                BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                                   .orElse(BibDatabaseMode.BIBLATEX);
-                this.setText(Localization.lang("%0 source", mode.getFormattedName()));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
-            }
-        });
+        activeDatabaseSubscription = EasyBind.subscribe(stateManager.activeDatabaseProperty(), database -> database.ifPresentOrElse(context -> {
+            BibDatabaseMode mode = context.getMode();
+            this.setText(Localization.lang("%0 source", mode.getFormattedName()));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+        }, () -> {
+            this.setText(Localization.lang("Source"));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
+        }));
         searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
@@ -226,7 +223,7 @@ public class SourceTab extends EntryEditorTab {
             removeEntryListeners(previousEntry);
             previousEntry = null;
         }
-        activeTabSubscription.unsubscribe();
+        activeDatabaseSubscription.unsubscribe();
         searchQuerySubscription.unsubscribe();
     }
 
