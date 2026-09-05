@@ -13,10 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.DosFileAttributes;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
 /// 2. Create a backup (with .sav suffix) of the original file (if it exists) in the same directory.
 /// 3. Atomically move the temporary file to the correct place, overwriting any file that already exists at that
 /// location. On Linux and macOS, files with hard links are overwritten in place to preserve their inode. An in-place
-/// overwrite is also used when the file system does not support atomic moves. Before the move, the group, DOS
-/// attributes, ACL and user-defined extended attributes of the original file are copied to the temporary file on a
-/// best-effort basis (the owner cannot be restored without elevated privileges).
+/// overwrite is also used when the file system does not support atomic moves. Afterwards, the group, DOS attributes,
+/// ACL and user-defined extended attributes of the original file are applied to the new file on a best-effort basis
+/// (the owner cannot be restored without elevated privileges).
 /// 4. Delete the backup file (if configured to do so).
 ///
 /// If all goes well, no temporary or backup files will remain on disk after closing the stream.
@@ -323,12 +323,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
-            if (Files.exists(targetFile)) {
-                // An in-place overwrite keeps the attributes anyway; copying them nonetheless is harmless and covers
-                // the fallback to a move when no backup could be created. Done before the final change check, because
-                // ACL and extended-attribute I/O take time on network shares.
-                copyAttributes(targetFile, temporaryFile);
-            }
+            // Read before the final change check, because ACL and extended-attribute I/O take time on network shares.
+            // Applied to the target only after the commit: the temporary file must stay readable by this process for
+            // the in-place fallbacks, which a restrictive ACL of the target could prevent.
+            Map<String, Object> preservedAttributes = Files.exists(targetFile) ? readPreservableAttributes(targetFile) : Map.of();
 
             // Re-check right before the commit: creating the backup of a large file can take a while, so the first
             // check may be long in the past by now
@@ -364,6 +362,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // own is as small as possible
             committedTargetFileState = FileSnapshot.read(targetFile);
 
+            // Before the permission restore: a read-only target refuses attribute writes on some platforms
+            applyAttributes(targetFile, preservedAttributes);
+
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
                 try {
@@ -383,56 +384,71 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 
-    /// Copies everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes) from
-    /// `source` to `target`, which must be on the same file system. Each part is independent and best-effort: a
-    /// mounted file system may lack support the default file system advertises, and setting a group the user is not
-    /// a member of is refused by the OS. POSIX permissions are restored separately after the move, so that they also
-    /// apply to a freshly created target.
+    /// Reads everything a move cannot preserve (group, DOS attributes, ACL, user-defined extended attributes), keyed
+    /// by attribute name for [Files#setAttribute]. Each part is independent and best-effort: a mounted file system
+    /// may lack support the default file system advertises. Ownership is not included, because restoring it needs
+    /// elevated privileges. POSIX permissions are restored separately, so that they also apply to a freshly created
+    /// target.
     ///
     /// The string-based attribute API is used instead of the typed views: it never yields `null` and transfers each
     /// extended attribute completely or throws, so a partial transfer cannot go unnoticed.
     // [impl->req~logic.exporter.preserve-file-attributes~1]
-    private static void copyAttributes(Path source, Path target) {
-        Set<String> views = source.getFileSystem().supportedFileAttributeViews();
+    private static Map<String, Object> readPreservableAttributes(Path file) {
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        Set<String> views = file.getFileSystem().supportedFileAttributeViews();
 
         if (views.contains("posix")) {
             try {
-                Files.setAttribute(target, "posix:group", Files.readAttributes(source, PosixFileAttributes.class).group());
+                attributes.put("posix:group", Files.getAttribute(file, "posix:group"));
             } catch (IOException | UnsupportedOperationException exception) {
-                LOGGER.debug("Could not copy group of {} to {}", source, target, exception);
-            }
-        }
-
-        if (views.contains("dos")) {
-            try {
-                DosFileAttributes attributes = Files.readAttributes(source, DosFileAttributes.class);
-                Files.setAttribute(target, "dos:hidden", attributes.isHidden());
-                Files.setAttribute(target, "dos:system", attributes.isSystem());
-                Files.setAttribute(target, "dos:archive", attributes.isArchive());
-                // Last: a read-only file refuses further attribute changes on some platforms
-                Files.setAttribute(target, "dos:readonly", attributes.isReadOnly());
-            } catch (IOException | UnsupportedOperationException exception) {
-                LOGGER.debug("Could not copy DOS attributes of {} to {}", source, target, exception);
+                LOGGER.debug("Could not read group of {}", file, exception);
             }
         }
 
         if (views.contains("acl")) {
             try {
-                Files.setAttribute(target, "acl:acl", Files.getAttribute(source, "acl:acl"));
+                attributes.put("acl:acl", Files.getAttribute(file, "acl:acl"));
             } catch (IOException | UnsupportedOperationException exception) {
-                LOGGER.debug("Could not copy ACL of {} to {}", source, target, exception);
+                LOGGER.debug("Could not read ACL of {}", file, exception);
             }
         }
 
         if (views.contains("user")) {
             try {
-                for (Map.Entry<String, Object> attribute : Files.readAttributes(source, "user:*").entrySet()) {
-                    Files.setAttribute(target, "user:" + attribute.getKey(), attribute.getValue());
-                }
+                Files.readAttributes(file, "user:*").forEach((name, value) -> attributes.put("user:" + name, value));
             } catch (IOException | UnsupportedOperationException exception) {
-                LOGGER.debug("Could not copy extended attributes of {} to {}", source, target, exception);
+                LOGGER.debug("Could not read extended attributes of {}", file, exception);
             }
         }
+
+        if (views.contains("dos")) {
+            try {
+                Map<String, Object> dosAttributes = Files.readAttributes(file, "dos:hidden,system,archive,readonly");
+                // Only set flags: a new file has none, and writing "false" on Linux would add a DOSATTRIB xattr to
+                // every saved file. Read-only is last of all, because it blocks further attribute writes on Windows.
+                for (String flag : List.of("hidden", "system", "archive", "readonly")) {
+                    if (Boolean.TRUE.equals(dosAttributes.get(flag))) {
+                        attributes.put("dos:" + flag, true);
+                    }
+                }
+            } catch (IOException | UnsupportedOperationException exception) {
+                LOGGER.debug("Could not read DOS attributes of {}", file, exception);
+            }
+        }
+
+        return attributes;
+    }
+
+    /// Applies the attributes read by [#readPreservableAttributes(Path)] in their order, skipping (and logging) each
+    /// one the OS refuses, e.g. a group the user is not a member of.
+    private static void applyAttributes(Path file, Map<String, Object> attributes) {
+        attributes.forEach((name, value) -> {
+            try {
+                Files.setAttribute(file, name, value);
+            } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+                LOGGER.debug("Could not set attribute {} on {}", name, file, exception);
+            }
+        });
     }
 
     private boolean createBackup() {
