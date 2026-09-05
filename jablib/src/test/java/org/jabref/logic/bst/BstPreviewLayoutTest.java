@@ -90,6 +90,51 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void smallCapsFormattingAllowsWhitespaceAfterCommand() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc {L{\\'o}pez}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
+    }
+
+    @Test
+    void smallCapsFormattingHandlesEscapedBracesWithoutBreakingTheSpan() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc{A\\{B\\}C}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>", preview);
+    }
+
+    @Test
+    void legacySmallCapsDoesNotMatchLongerCommands() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{\\scshape Lopez}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. Lopez.", preview);
+    }
+
+    @Test
+    void unterminatedSmallCapsCommandIsIgnoredGracefully() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc{L{\\'o}pez");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. López.", preview);
+    }
+
+    @Test
+    void unterminatedLegacySmallCapsCommandIsIgnoredGracefully() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{\\sc L{\\'o}pez");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. lópez.", preview);
+    }
+
+    @Test
     void superscriptFormattingIsRendered() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
