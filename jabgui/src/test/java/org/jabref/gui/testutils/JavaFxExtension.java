@@ -15,6 +15,7 @@ import javafx.stage.Window;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -28,6 +29,12 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
     private static final ConcurrentLinkedQueue<Throwable> ASYNCHRONOUS_FAILURES = new ConcurrentLinkedQueue<>();
     private static boolean toolkitInitialized;
     private static Thread.@Nullable UncaughtExceptionHandler previousFxUncaughtExceptionHandler;
+
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("glass.platform", "Headless");
+        System.setProperty("prism.order", "sw");
+    }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
