@@ -1,11 +1,13 @@
 package org.jabref.model.groups;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
 
@@ -47,11 +49,13 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     /// Lazily computed value, therefore, nullable.
     private @Nullable Set<String> keysUsedInAux;
 
-    /// Lazily computed value, therefore, nullable. Dropped when the library path changes.
+    /// Lazily computed value, therefore, nullable. Dropped when the library path changes or when a
+    /// watched aux file is created or updated.
     private @Nullable Path resolvedPath;
 
-    /// The path currently registered at the file monitor, or null if nothing is registered.
-    private @Nullable Path monitoredPath;
+    /// Relative aux paths can appear later in any configured directory. We therefore watch every
+    /// absolute candidate path so a newly created higher-priority aux file can take over.
+    private final SequencedSet<Path> monitoredPaths = new LinkedHashSet<>();
 
     /// Whether this group was created with a real file monitor.
     private boolean monitorWanted;
@@ -109,6 +113,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     ///    It comes first, because paths written by earlier JabRef versions are relative to it.
     /// 2. The directory of the `.bib` file. This makes the path work on every computer that
     ///    syncs the library, without any per-host setting.
+    // [impl->req~ux.groups.cited-entries.aux-path-resolution~1]
     public static List<Path> auxFileDirectories(MetaData metaData, String userAndHost) {
         SequencedSet<Path> directories = new LinkedHashSet<>();
         metaData.getLatexFileDirectory(userAndHost).ifPresent(directories::add);
@@ -116,6 +121,37 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
                 .flatMap(path -> java.util.Optional.ofNullable(path.getParent()))
                 .ifPresent(directories::add);
         return new ArrayList<>(directories);
+    }
+
+    /// Converts an absolute aux path to a portable stored path when doing so keeps the same file
+    /// selected after applying the LaTeX-directory lookup order.
+    public static Path toStoredPath(Path auxFile, MetaData metaData, String userAndHost) {
+        return toStoredPath(auxFile, auxFileDirectories(metaData, userAndHost));
+    }
+
+    private static Path toStoredPath(Path auxFile, List<Path> directories) {
+        if (!auxFile.isAbsolute()) {
+            return auxFile;
+        }
+
+        Path relativePath = FileUtil.relativize(auxFile, directories);
+        if (relativePath.isAbsolute()) {
+            return relativePath;
+        }
+
+        return FileUtil.find(relativePath.toString(), directories)
+                       .filter(resolvedPath -> refersToSameFile(resolvedPath, auxFile))
+                       .map(_ -> relativePath)
+                       .orElse(auxFile);
+    }
+
+    private static boolean refersToSameFile(Path first, Path second) {
+        try {
+            return Files.isSameFile(first, second);
+        } catch (IOException exception) {
+            LOGGER.debug("Could not compare aux file targets {} and {}", first, second, exception);
+            return first.toAbsolutePath().normalize().equals(second.toAbsolutePath().normalize());
+        }
     }
 
     /// Rebinds this group to the metadata instance that currently owns its group tree.
@@ -131,7 +167,8 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         pathDependenciesChanged();
     }
 
-    /// The absolute path of the aux file, if it can be found. Otherwise, the stored path.
+    /// The path currently used for parsing: the first matching aux file, or the highest-priority
+    /// absolute candidate while the file is still missing.
     public Path getFilePathResolved() {
         Path currentPath = resolvedPath;
         if (currentPath == null) {
@@ -140,10 +177,14 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         return currentPath;
     }
 
-    /// The path to write to the `.bib` file. It is relative if the aux file is below one of the
-    /// directories returned by `auxFileDirectories(MetaData, String)`.
+    /// The path to write to the `.bib` file. It is kept relative if that still resolves to the
+    /// same aux file with the library's directory precedence.
     public Path getFilePath() {
-        return FileUtil.relativize(getFilePathResolved(), auxFileDirectories(metaData, user));
+        if (!storedPath.isAbsolute()) {
+            return storedPath;
+        }
+
+        return toStoredPath(getFilePathResolved(), metaData, user);
     }
 
     @Override
@@ -199,7 +240,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public void fileUpdated() {
-        // Reset previous parse result
+        resolvedPath = null;
         keysUsedInAux = null;
         metaData.groupsBinding().invalidate();
     }
@@ -215,9 +256,9 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     private Path refreshResolvedPath() {
-        Path currentPath = FileUtil.find(storedPath.toString(), auxFileDirectories(metaData, user)).orElse(storedPath);
+        Path currentPath = resolveExistingPath().orElseGet(this::firstCandidatePath);
         resolvedPath = currentPath;
-        updateFileMonitor(currentPath);
+        updateFileMonitor(candidateMonitorPaths());
         return currentPath;
     }
 
@@ -225,39 +266,63 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private void pathDependenciesChanged() {
         resolvedPath = null;
         keysUsedInAux = null;
-        updateFileMonitor(null);
+        updateFileMonitor(List.of());
         if (monitorWanted) {
             refreshResolvedPath();
         }
         metaData.groupsBinding().invalidate();
     }
 
-    /// Moves the file monitor to the given path.
-    private void updateFileMonitor(@Nullable Path newPath) {
+    private Optional<Path> resolveExistingPath() {
+        return FileUtil.find(storedPath.toString(), auxFileDirectories(metaData, user));
+    }
+
+    private Path firstCandidatePath() {
+        return candidateMonitorPaths().stream().findFirst().orElse(storedPath);
+    }
+
+    private List<Path> candidateMonitorPaths() {
+        if (storedPath.isAbsolute()) {
+            return List.of(storedPath);
+        }
+
+        return auxFileDirectories(metaData, user).stream()
+                                                 .map(directory -> directory.resolve(storedPath))
+                                                 .filter(Path::isAbsolute)
+                                                 .distinct()
+                                                 .toList();
+    }
+
+    private void updateFileMonitor(List<Path> newPaths) {
         if (!monitorWanted) {
             return;
         }
 
-        if ((newPath != null) && !newPath.isAbsolute()) {
-            newPath = null;
+        SequencedSet<Path> targetPaths = new LinkedHashSet<>(newPaths);
+        if (monitoredPaths.equals(targetPaths)) {
+            return;
         }
 
-        if (Objects.equals(monitoredPath, newPath)) {
-            return;
+        List<Path> pathsToRemove = monitoredPaths.stream()
+                                                 .filter(path -> !targetPaths.contains(path))
+                                                 .toList();
+        for (Path path : pathsToRemove) {
+            fileMonitor.removeListener(path, this);
+            monitoredPaths.remove(path);
         }
-        if (monitoredPath != null) {
-            fileMonitor.removeListener(monitoredPath, this);
-            monitoredPath = null;
-        }
-        if (newPath == null) {
-            return;
-        }
-        try {
-            fileMonitor.addListenerForFile(newPath, this);
-            monitoredPath = newPath;
-        } catch (IOException ex) {
-            LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.",
-                    newPath, name.getValue(), ex);
+
+        for (Path path : targetPaths) {
+            if (monitoredPaths.contains(path)) {
+                continue;
+            }
+
+            try {
+                fileMonitor.addListenerForFile(path, this);
+                monitoredPaths.add(path);
+            } catch (IOException exception) {
+                LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.",
+                        path, name.getValue(), exception);
+            }
         }
     }
 }

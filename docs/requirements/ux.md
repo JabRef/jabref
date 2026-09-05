@@ -76,6 +76,14 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Cited-entry groups resolve relative aux paths predictably
+`req~ux.groups.cited-entries.aux-path-resolution~1`
+
+When a group based on cited entries stores a relative aux path, JabRef must resolve it first against the configured LaTeX file directory and then against the library file directory.
+When converting an absolute aux path back to a stored path, JabRef must keep it absolute unless the relative path would still resolve to the same aux file.
+
+Needs: impl
+
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 

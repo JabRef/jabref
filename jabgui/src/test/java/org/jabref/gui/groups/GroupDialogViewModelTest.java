@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
@@ -29,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -117,6 +119,22 @@ class GroupDialogViewModelTest {
 
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
         assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void texGroupBrowseKeepsAbsolutePathWhenRelativePathWouldRetarget() throws IOException {
+        Path libraryDirectory = Files.createDirectory(temporaryFolder.resolve("library"));
+        Path latexDirectory = Files.createDirectory(temporaryFolder.resolve("latex"));
+        Path libraryAuxFile = Files.createFile(libraryDirectory.resolve("paper.aux"));
+        Files.createFile(latexDirectory.resolve("paper.aux"));
+
+        metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
+        bibDatabaseContext.setDatabasePath(libraryDirectory.resolve("library.bib"));
+        when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(libraryAuxFile));
+
+        viewModel.texGroupBrowse();
+
+        assertEquals(libraryAuxFile.toString(), viewModel.texGroupFilePathProperty().get());
     }
 
     @Test

@@ -535,7 +535,11 @@ public class GroupDialogViewModel {
                                                                  .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
-                             FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
+                             TexGroup.toStoredPath(
+                                             file.toAbsolutePath(),
+                                             currentDatabase.getMetaData(),
+                                             preferences.getFilePreferences().getUserAndHost())
+                                     .toString()
                      ));
     }
 
