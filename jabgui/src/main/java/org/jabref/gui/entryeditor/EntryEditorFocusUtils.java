@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -13,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -68,13 +70,32 @@ class EntryEditorFocusUtils {
     // region — jump to field
 
     void setFocusToField(Field field) {
+        focusField(field, () -> {
+        });
+    }
+
+    void focusOrAddField(Field field) {
+        focusField(field, () -> addFieldViaAllFieldsTab(field));
+    }
+
+    private void focusField(Field field, Runnable onNotFound) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            onNotFound
+                    );
                 }
         ));
+    }
+
+    private Field canonicalFieldForActiveMode(Field field, BibDatabaseMode mode) {
+        Map<Field, Field> aliasesToCanonical = mode == BibDatabaseMode.BIBTEX
+                                               ? EntryConverter.FIELD_ALIASES_BIBLATEX_TO_BIBTEX
+                                               : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
+        return aliasesToCanonical.getOrDefault(field, field);
     }
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {
@@ -83,6 +104,22 @@ class EntryEditorFocusUtils {
                       .map(FieldsEditorTab.class::cast)
                       .filter(tab -> tab.getShownFields().contains(field))
                       .findFirst();
+    }
+
+    private void addFieldViaAllFieldsTab(Field field) {
+        tabPane.getTabs().stream()
+               .filter(AllFieldsTab.class::isInstance)
+               .map(AllFieldsTab.class::cast)
+               .findFirst()
+               .ifPresent(allFieldsTab -> {
+                   BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                   Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                   if (!FieldFactory.getAllFieldsWithOutInternal().contains(canonicalField)) {
+                       return;
+                   }
+                   tabPane.getSelectionModel().select(allFieldsTab);
+                   allFieldsTab.addFieldAndFocus(canonicalField);
+               });
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {

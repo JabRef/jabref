@@ -27,7 +27,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -51,6 +50,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.NodeTraversalUtils;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
@@ -120,6 +120,11 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// entry (cleared on entry switch). Without an override, a section is expanded iff it
     /// contains at least one shown field.
     private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
+            new EnumMap<>(FieldListSections.SectionType.class);
+
+    /// Tracks the [TitledPane] created for each section type, so we can expand a collapsed
+    /// section on demand (e.g. when jump-to-field targets a field inside it).
+    private final Map<FieldListSections.SectionType, TitledPane> sectionPanes =
             new EnumMap<>(FieldListSections.SectionType.class);
 
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
@@ -303,6 +308,14 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
     }
 
+    @Override
+    public void requestFocus(Field fieldName) {
+        Optional.ofNullable(sectionPanes.get(FieldListSections.sectionOf(fieldName)))
+                .filter(pane -> !pane.isExpanded())
+                .ifPresent(pane -> pane.setExpanded(true));
+        super.requestFocus(fieldName);
+    }
+
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
     /// then the always-present collapsible sections (identifiers / files & links /
     /// bibliometrics / comments / meta, collapsed when empty) each with its own add-chips,
@@ -310,6 +323,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
+        sectionPanes.clear();
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
         int labelIndex = 0;
@@ -411,7 +425,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// preserving its HBox grow priority) and overlays `button` on it. Returns the new overlay
     /// pane, or empty if the editor exposes no plain text input to overlay onto.
     private static Optional<StackPane> overlayInsideTextInput(Node editorNode, Button button) {
-        return findPrimaryTextInput(editorNode).flatMap(input -> {
+        return NodeTraversalUtils.findFirstTextInput(editorNode).flatMap(input -> {
             if (!(input.getParent() instanceof Pane parent)) {
                 return Optional.empty();
             }
@@ -429,23 +443,6 @@ public class AllFieldsTab extends FieldsEditorTab {
             overlay.getChildren().addAll(input, button);
             return Optional.of(overlay);
         });
-    }
-
-    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
-    /// or empty for composite editors that have none.
-    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
-        if (node instanceof TextInputControl textInput) {
-            return Optional.of(textInput);
-        }
-        if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                Optional<TextInputControl> found = findPrimaryTextInput(child);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     /// Hides a still-empty, user-added field row again (reachable only for non-required,
@@ -494,6 +491,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (pane.isExpanded()) {
             populateContent.run();
         }
+        sectionPanes.put(type, pane);
         return pane;
     }
 
@@ -618,22 +616,33 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// field if necessary) and focuses it.
     // [impl->req~entry-editor.main-tab.add-chips~1]
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        showFieldEditor(bibDatabaseContext, entry, field, true);
+    }
+
+    private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field, boolean openAddFileDialogForFile) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
+        // The outer runLater lets one pulse pass so the editors rebuilt become focusable
+        // before the inner runLater requests focus on them.
         Platform.runLater(() -> {
-            // The tab may have been rebound to a different entry before this deferred block runs;
-            // the editors map would then belong to that other entry, so focusing/adding here would
-            // act on the wrong entry. Bail out unless we are still showing the entry we started with.
-            if (getCurrentEntry() != entry) {
-                return;
-            }
-            requestFocus(field);
-            // Adding the File field via its "+" chip should immediately open the add-file dialog,
-            // since an empty File editor has no other purpose than to receive a file.
-            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                linkedFilesEditor.addNewFile();
-            }
+            Platform.runLater(() -> {
+                if (getCurrentEntry() != entry) {
+                    return;
+                }
+                requestFocus(field);
+                // Adding the File field via its "+" chip should immediately open the add-file dialog,
+                // since an empty File editor has no other purpose than to receive a file.
+                // navigation must not pop up a modal dialog as a side effect.
+                if (openAddFileDialogForFile && (StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                    linkedFilesEditor.addNewFile();
+                }
+            });
         });
+    }
+
+    public void addFieldAndFocus(Field field) {
+        Optional.ofNullable(getCurrentEntry())
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field, false));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -642,7 +651,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     // endregion
 
-    private BibDatabaseMode getDatabaseMode() {
+    BibDatabaseMode getDatabaseMode() {
         return stateManager.getActiveDatabase()
                            .map(BibDatabaseContext::getMode)
                            .orElse(BibDatabaseMode.BIBLATEX);

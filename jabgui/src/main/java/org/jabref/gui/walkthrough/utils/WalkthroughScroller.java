@@ -11,6 +11,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeView;
 
+import org.jabref.gui.util.ScrollUtils;
+
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
@@ -74,7 +76,7 @@ public class WalkthroughScroller {
             switch (scrollableParent) {
                 case ScrollPane scrollPane -> {
                     Bounds targetBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
-                    scrollIntoScrollPane(scrollPane, targetBounds);
+                    ScrollUtils.scrollIntoScrollPane(scrollPane, targetBounds);
                 }
                 case ListView<?> listView ->
                         scrollIntoListView(targetNode, listView);
@@ -88,27 +90,6 @@ public class WalkthroughScroller {
         } catch (RuntimeException e) {
             LOGGER.warn("Failed to scroll node into view for parent {}", scrollableParent.getClass().getSimpleName(), e);
         }
-    }
-
-    private void scrollIntoScrollPane(@NonNull ScrollPane scrollPane, @NonNull Bounds targetBounds) {
-        Node content = scrollPane.getContent();
-        if (content == null) {
-            return;
-        }
-
-        Bounds contentBounds = content.getBoundsInLocal();
-        double viewportHeight = scrollPane.getViewportBounds().getHeight();
-        if (contentBounds.getHeight() <= viewportHeight) {
-            return;
-        }
-
-        Bounds targetInContent = content.sceneToLocal(targetBounds);
-        double targetCenterY = targetInContent.getCenterY();
-        double maxScrollY = contentBounds.getHeight() - viewportHeight;
-        double desiredScrollY = targetCenterY - (viewportHeight / 2);
-
-        double vValue = Math.max(0, Math.min(1, desiredScrollY / maxScrollY));
-        scrollPane.setVvalue(vValue);
     }
 
     private void scrollIntoListView(@NonNull Node targetNode, @NonNull ListView<?> listView) {
