@@ -127,6 +127,23 @@ class TexGroupTest {
         assertEquals(libraryAuxFile, group.getFilePath());
     }
 
+    @Test
+    void missingAbsolutePathFallsBackToCurrentLatexDirectory(@TempDir Path tempDir) throws Exception {
+        Path libraryDirectory = Files.createDirectory(tempDir.resolve("library"));
+        Path latexDirectory = Files.createDirectory(tempDir.resolve("latex"));
+        Path currentAuxFile = copyPaperAux(latexDirectory);
+        Path missingAbsolutePath = tempDir.resolve("computer-a").resolve("paper.aux").toAbsolutePath();
+        BibEntry inAux = new BibEntry().withCitationKey("Darwin1888");
+
+        metaData.setLibraryPath(libraryDirectory.resolve("library.bib"));
+        metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, missingAbsolutePath, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, USER_AND_HOST);
+
+        assertEquals(currentAuxFile, group.getFilePathResolved());
+        assertTrue(group.contains(inAux));
+        assertEquals("paper.aux", group.getFilePath().toString());
+    }
+
     /// "Save as" moves the library. The aux file then resolves to another directory.
     @Test
     void resolvedPathFollowsTheLibrary(@TempDir Path tempDir) throws Exception {
@@ -184,6 +201,21 @@ class TexGroupTest {
         metaData.setLibraryPath(libraryDirectory.resolve("library.bib"));
         metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
         TexGroup group = TexGroup.create("paper", GroupHierarchyType.INDEPENDENT, Path.of("paper.aux"), new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData, USER_AND_HOST);
+
+        verify(fileMonitor).addListenerForFile(latexDirectory.resolve("paper.aux"), group);
+        verify(fileMonitor).addListenerForFile(libraryDirectory.resolve("paper.aux"), group);
+    }
+
+    @Test
+    void fileMonitorFallsBackToCurrentDirectoriesForMissingAbsolutePath(@TempDir Path tempDir) throws Exception {
+        Path libraryDirectory = Files.createDirectory(tempDir.resolve("library"));
+        Path latexDirectory = Files.createDirectory(tempDir.resolve("latex"));
+        Path missingAbsolutePath = tempDir.resolve("computer-a").resolve("paper.aux").toAbsolutePath();
+        FileUpdateMonitor fileMonitor = mock(FileUpdateMonitor.class);
+
+        metaData.setLibraryPath(libraryDirectory.resolve("library.bib"));
+        metaData.setLatexFileDirectory(USER_AND_HOST, latexDirectory.toString());
+        TexGroup group = TexGroup.create("paper", GroupHierarchyType.INDEPENDENT, missingAbsolutePath, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData, USER_AND_HOST);
 
         verify(fileMonitor).addListenerForFile(latexDirectory.resolve("paper.aux"), group);
         verify(fileMonitor).addListenerForFile(libraryDirectory.resolve("paper.aux"), group);

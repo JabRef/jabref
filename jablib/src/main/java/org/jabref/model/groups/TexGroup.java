@@ -274,6 +274,16 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     private Optional<Path> resolveExistingPath() {
+        if (storedPath.isAbsolute()) {
+            if (Files.exists(storedPath)) {
+                return Optional.of(storedPath);
+            }
+
+            return absolutePathFallbackCandidates().stream()
+                                                   .filter(Files::exists)
+                                                   .findFirst();
+        }
+
         return FileUtil.find(storedPath.toString(), auxFileDirectories(metaData, user));
     }
 
@@ -283,14 +293,39 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private List<Path> candidateMonitorPaths() {
         if (storedPath.isAbsolute()) {
-            return List.of(storedPath);
+            return absolutePathFallbackCandidates();
         }
 
         return auxFileDirectories(metaData, user).stream()
                                                  .map(directory -> directory.resolve(storedPath))
-                                                 .filter(Path::isAbsolute)
+                                                 .filter(this::canWatch)
                                                  .distinct()
                                                  .toList();
+    }
+
+    /// Absolute aux paths from another computer are not portable. If the stored absolute path is
+    /// missing, retry the current LaTeX and library directories with the same file name so the
+    /// group can recover after sync or when a different mount point is used.
+    private List<Path> absolutePathFallbackCandidates() {
+        SequencedSet<Path> candidates = new LinkedHashSet<>();
+        if (canWatch(storedPath)) {
+            candidates.add(storedPath);
+        }
+
+        Optional.of(storedPath)
+                .filter(path -> !Files.exists(path))
+                .map(Path::getFileName)
+                .stream()
+                .flatMap(fileName -> auxFileDirectories(metaData, user).stream()
+                                                                       .map(directory -> directory.resolve(fileName)))
+                .filter(this::canWatch)
+                .forEach(candidates::add);
+
+        return new ArrayList<>(candidates);
+    }
+
+    private boolean canWatch(Path path) {
+        return Optional.ofNullable(path.getParent()).map(Files::exists).orElse(false);
     }
 
     private void updateFileMonitor(List<Path> newPaths) {
