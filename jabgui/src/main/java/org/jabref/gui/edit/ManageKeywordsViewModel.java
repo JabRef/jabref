@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
@@ -20,13 +19,13 @@ public class ManageKeywordsViewModel {
 
     private final List<BibEntry> entries;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
-    private final BibEntryPreferences bibEntryPreferences;
+    private final Character keywordSeparator;
     private final UndoManager undoManager;
     private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries, UndoManager undoManager) {
-        this.bibEntryPreferences = bibEntryPreferences;
+    public ManageKeywordsViewModel(Character keywordSeparator, List<BibEntry> entries, UndoManager undoManager) {
+        this.keywordSeparator = keywordSeparator;
         this.entries = entries;
         this.undoManager = undoManager;
         this.keywords = FXCollections.observableArrayList();
@@ -45,7 +44,6 @@ public class ManageKeywordsViewModel {
     private void fillKeywordsList(ManageKeywordsDisplayType type) {
         keywords.clear();
         sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
-        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
         if (type == ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES) {
             for (BibEntry entry : entries) {
@@ -104,7 +102,6 @@ public class ManageKeywordsViewModel {
         }
 
         undoManager.addEdit(StandardActions.MANAGE_KEYWORDS.getText(), edit -> {
-            Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
             for (BibEntry entry : entries) {
                 KeywordList entryKeywords = entry.getKeywords(keywordSeparator);

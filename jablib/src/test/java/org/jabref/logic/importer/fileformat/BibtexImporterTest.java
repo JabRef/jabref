@@ -130,18 +130,36 @@ class BibtexImporterTest {
     }
 
     @Test
-    void importSemicolonSeparatedKeywordsUsesConfiguredSeparator() throws IOException {
+    void importSemicolonSeparatedKeywordsKeepsLibrarySeparator() throws IOException {
         // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
-        List<BibEntry> importedEntries = importer.importDatabase(new BufferedReader(Reader.of("""
+        ParserResult result = importer.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
-                  keywords = {keywordOne; keywordTwo; keywordThree},
+                  keywords = {keywordOne;keywordTwo;keywordThree},
                 }
-                """))).getDatabase().getEntries();
+                """)));
+        List<BibEntry> importedEntries = result.getDatabase().getEntries();
 
         assertEquals(1, importedEntries.size());
         BibEntry importedEntry = importedEntries.getFirst();
-        assertEquals(Optional.of("keywordOne, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
-        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
+        assertEquals(Optional.of("keywordOne;keywordTwo;keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of(';'), result.getMetaData().getKeywordSeparator());
+    }
+
+    @Test
+    void importNormalizesKeywordsToSeparatorDeclaredInLibrary() throws IOException {
+        // [utest->req~import.bibtex.keywords.normalize-delimiters~1]
+        ParserResult result = importer.importDatabase(new BufferedReader(Reader.of("""
+                @Article{,
+                  keywords = {keywordOne, keywordTwo, keywordThree},
+                }
+                @Comment{jabref-meta: keywordSeparator:\\;;}
+                """)));
+        List<BibEntry> importedEntries = result.getDatabase().getEntries();
+
+        assertEquals(1, importedEntries.size());
+        BibEntry importedEntry = importedEntries.getFirst();
+        assertEquals(Optional.of("keywordOne; keywordTwo; keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"), importedEntry.getKeywords(';'));
     }
 
     @Test
@@ -171,8 +189,9 @@ class BibtexImporterTest {
 
         assertEquals(1, importedEntries.size());
         BibEntry importedEntry = importedEntries.getFirst();
-        assertEquals(Optional.of("keywordOne\\, keywordTwo, keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
-        assertEquals(new KeywordList("keywordOne, keywordTwo", "keywordThree"), importedEntry.getKeywords(','));
+        // only ';' is an accepted delimiter, so the library is guessed to use ';' and the field stays as is
+        assertEquals(Optional.of("keywordOne, keywordTwo; keywordThree"), importedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(new KeywordList("keywordOne, keywordTwo", "keywordThree"), importedEntry.getKeywords(';'));
     }
 
     @Test
@@ -214,12 +233,12 @@ class BibtexImporterTest {
         BibtexImporter importerWithoutKeywordSeparator = createImporter(bibEntryPreferences);
         List<BibEntry> importedEntries = importerWithoutKeywordSeparator.importDatabase(new BufferedReader(Reader.of("""
                 @Article{,
-                  keywords = {keywordOne; keywordTwo},
+                  keywords = {keywordOne; keywordTwo, keywordThree},
                 }
                 """))).getDatabase().getEntries();
 
         assertEquals(1, importedEntries.size());
-        assertEquals(Optional.of("keywordOne, keywordTwo"), importedEntries.getFirst().getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("keywordOne, keywordTwo, keywordThree"), importedEntries.getFirst().getField(StandardField.KEYWORDS));
     }
 
     @Test

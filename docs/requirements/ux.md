@@ -98,6 +98,13 @@ When a dialog with text input as a main component is opened, the text field shou
 
 Needs: impl
 
+## Show unsaved changes before closing a library
+`req~ux.close.show-diff~1`
+
+When closing a modified library, the "Save before closing" dialog should offer to show the unsaved changes compared to the file on disk, so the user can decide between saving and discarding on an informed basis.
+
+Needs: impl
+
 ## Automatically paste clipboard content when useful
 `req~ux.textdialogs.autopaste~1`
 
