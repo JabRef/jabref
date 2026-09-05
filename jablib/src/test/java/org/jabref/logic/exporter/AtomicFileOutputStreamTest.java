@@ -160,7 +160,6 @@ class AtomicFileOutputStreamTest {
         Path out = tempDir.resolve("acl.txt");
         Files.writeString(out, FIFTY_CHARS);
         byte[] tag = "tagged".getBytes(StandardCharsets.UTF_8);
-        Files.setAttribute(out, "user:jabref.test", tag);
         // The owner is the only principal available without a localized name; denying WRITE_OWNER neither blocks
         // reading, writing, nor deleting the file
         UserPrincipal owner = Files.getOwner(out);
@@ -169,10 +168,15 @@ class AtomicFileOutputStreamTest {
                                  .setPrincipal(owner)
                                  .setPermissions(AclEntryPermission.WRITE_OWNER)
                                  .build();
-        @SuppressWarnings("unchecked")
-        List<AclEntry> acl = new ArrayList<>((List<AclEntry>) Files.getAttribute(out, "acl:acl"));
-        acl.addFirst(entry);
-        Files.setAttribute(out, "acl:acl", acl);
+        try {
+            Files.setAttribute(out, "user:jabref.test", tag);
+            @SuppressWarnings("unchecked")
+            List<AclEntry> acl = new ArrayList<>((List<AclEntry>) Files.getAttribute(out, "acl:acl"));
+            acl.addFirst(entry);
+            Files.setAttribute(out, "acl:acl", acl);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support user-defined attributes or ACLs: " + exception);
+        }
 
         try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
             atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
@@ -192,7 +196,11 @@ class AtomicFileOutputStreamTest {
     void clearedArchiveFlagIsPreserved(@TempDir Path tempDir) throws IOException {
         Path out = tempDir.resolve("archive.txt");
         Files.writeString(out, FIFTY_CHARS);
-        Files.setAttribute(out, "dos:archive", false);
+        try {
+            Files.setAttribute(out, "dos:archive", false);
+        } catch (IOException | UnsupportedOperationException | IllegalArgumentException exception) {
+            assumeTrue(false, "file system does not support DOS attributes: " + exception);
+        }
 
         try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
             atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());
