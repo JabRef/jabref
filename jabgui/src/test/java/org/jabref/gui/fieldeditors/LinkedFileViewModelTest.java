@@ -24,6 +24,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -43,7 +44,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,7 +59,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class LinkedFileViewModelTest {
 
     private Path tempFile;

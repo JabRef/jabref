@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import java.util.Calendar
 
@@ -47,9 +46,6 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.hamcrest")
     requires("org.mockito")
-
-    // Required for LocalizationConsistencyTest
-    requires("org.testfx.junit5")
 
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
@@ -312,6 +308,9 @@ tasks.javadoc {
 }
 
 tasks.test {
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+
     useJUnitPlatform {
         excludeTags("DatabaseTest", "ExternalServicesTest")
     }
@@ -321,9 +320,6 @@ tasks.test {
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
-    testLogging {
-        showStandardStreams = false
-    }
 }
 
 jmh {
@@ -351,11 +347,6 @@ tasks.register<Test>("databaseTest") {
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
-    }
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
 }

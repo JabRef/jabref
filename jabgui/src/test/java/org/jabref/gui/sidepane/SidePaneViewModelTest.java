@@ -13,6 +13,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
@@ -25,14 +26,13 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
