@@ -48,4 +48,8 @@ Needs: impl
 
 For entries that contain a ScholarAPI identifier and have a PDF available, JabRef discovers the ScholarAPI PDF endpoint and uses the configured ScholarAPI API key to download the full text.
 
+## Fetch entry by Software Heritage identifier (SWHID)
+`req~fetchers.swhid~1`
+
+The user can look up and import bibliography entries by providing a Software Heritage identifier (SWHID).
 <!-- markdownlint-disable-file MD022 -->

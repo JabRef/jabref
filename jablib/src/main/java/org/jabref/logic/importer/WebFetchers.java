@@ -49,6 +49,7 @@ import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.SsrnFetcher;
+import org.jabref.logic.importer.fetcher.SwhidFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.fetcher.WileyFetcher;
@@ -66,6 +67,7 @@ import org.jabref.model.entry.identifier.IacrEprint;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
+import org.jabref.model.entry.identifier.SWHID;
 
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
@@ -122,6 +124,8 @@ public class WebFetchers {
                             new RfcFetcher(importFormatPreferences);
                     case SSRN _ ->
                             new SsrnFetcher(importFormatPreferences);
+                    case SWHID _ ->
+                            new SwhidFetcher(importFormatPreferences);
                     // No fetcher for ARK and MathSciNet
                     default ->
                             null;
@@ -213,6 +217,7 @@ public class WebFetchers {
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
+        set.add(new SwhidFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
