@@ -36,7 +36,6 @@ import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Answers;
@@ -51,7 +50,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
-@ResourceLock("Localization.lang")
 class SourceTabTest {
 
     private Stage stage;
@@ -63,15 +61,15 @@ class SourceTabTest {
     private BibEntryTypesManager entryTypesManager;
     private KeyBindingRepository keyBindingRepository;
     private OptionalObjectProperty<BibDatabaseContext> activeDatabase;
+    private StateManager stateManager;
 
     @Start
     public void onStart(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        StateManager stateManager = mock(StateManager.class);
+        stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.searchQueryProperty()).thenReturn(mock(StringProperty.class));
-        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         activeDatabase = OptionalObjectProperty.empty();
         when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
         keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
@@ -137,6 +135,7 @@ class SourceTabTest {
 
     @Test
     void switchingFromSourceTabDoesNotThrowException(FxRobot robot) {
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         BibEntry entry = new BibEntry();
         entry.setField(new UnknownField("test"), "testvalue");
 
@@ -161,6 +160,7 @@ class SourceTabTest {
 
     @Test
     void replacingLongSourceWithShortSourceDoesNotThrowException(FxRobot robot) {
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         BibEntry longEntry = new BibEntry()
                 .withField(new UnknownField("author"), "Author")
                 .withField(new UnknownField("title"), "Title")
@@ -190,6 +190,7 @@ class SourceTabTest {
 
     @Test
     void updatingPreviouslyBoundEntryDoesNotResetCurrentSource(FxRobot robot) {
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         BibEntry firstEntry = new BibEntry().withField(new UnknownField("title"), "First entry");
         BibEntry secondEntry = new BibEntry().withField(new UnknownField("title"), "Second entry");
 
@@ -212,6 +213,7 @@ class SourceTabTest {
 
     @Test
     void saveKeybindingWritesBackToRenderedEntryInsteadOfCurrentSelection(FxRobot robot) {
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "First entry");
         BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Second entry");
 
@@ -239,6 +241,7 @@ class SourceTabTest {
 
     @Test
     void switchingToEqualContentEntryRebindsByIdentity(FxRobot robot) {
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "Same title");
         BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Same title");
 
