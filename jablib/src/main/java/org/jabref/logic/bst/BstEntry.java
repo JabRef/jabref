@@ -22,7 +22,7 @@ public class BstEntry {
     // ENTRY: Third sub list
     public final Map<String, @Nullable String> localStrings = new HashMap<>();
 
-    public BstEntry(BibEntry e) {
-        this.entry = e;
+    public BstEntry(BibEntry bibEntry) {
+        this.entry = bibEntry;
     }
 }
