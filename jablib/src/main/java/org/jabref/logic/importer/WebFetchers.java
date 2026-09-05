@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BaseSearchFetcher;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
@@ -170,6 +171,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new OpenAlex(importerPreferences));
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
+        searchBasedFetchers.add(new BaseSearchFetcher(importerPreferences));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         searchBasedFetchers.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
@@ -296,6 +298,7 @@ public class WebFetchers {
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         Set<CustomizableKeyFetcher> fetchers = Set.of(
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
+                new BaseSearchFetcher(importerPreferences),
                 new BiodiversityLibrary(importerPreferences),
                 new CrossRef(importerPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
