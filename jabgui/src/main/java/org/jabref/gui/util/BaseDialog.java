@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.Optional;
 
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -30,6 +31,13 @@ public class BaseDialog<T> extends Dialog<T> {
             }
         });
         setupKeyBindings(getDialogPane());
+
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupButtonFix(newPane);
+            }
+        });
+        setupButtonFix(getDialogPane());
 
         this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
 
@@ -74,13 +82,13 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogWindow.getIcons().add(image);
     }
 
+    private void setupButtonFix(DialogPane dialogPane) {
+        applyButtonFix(dialogPane);
+        dialogPane.getButtonTypes().addListener((ListChangeListener<ButtonType>) _ -> applyButtonFix(dialogPane));
+    }
+
     /// Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
     public static void applyButtonFix(DialogPane pane) {
-        // Force the window to fit the new font content bounds
-        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
-            pane.getScene().getWindow().sizeToScene();
-        }
-
         for (ButtonType type : pane.getButtonTypes()) {
             Node node = pane.lookupButton(type);
             if (node instanceof Button button) {
@@ -94,6 +102,11 @@ public class BaseDialog<T> extends Dialog<T> {
                 // Re-trigger CSS to ensure prefWidth is calculated using the new font metrics
                 button.applyCss();
             }
+        }
+
+        // Force the window to fit the new font content bounds
+        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
+            pane.getScene().getWindow().sizeToScene();
         }
     }
 

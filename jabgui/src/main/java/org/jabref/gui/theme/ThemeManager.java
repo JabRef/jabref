@@ -13,10 +13,12 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.DialogPane;
 import javafx.stage.Window;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -115,6 +117,10 @@ public class ThemeManager {
             int mainFontSize = WorkspacePreferences.getDefault().getMainFontSize();
             LOGGER.debug("Using default font size of {}pt", mainFontSize);
             scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
+        }
+
+        if (scene.getRoot() instanceof DialogPane dialogPane) {
+            BaseDialog.applyButtonFix(dialogPane);
         }
     }
 
