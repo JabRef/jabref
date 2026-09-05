@@ -2035,6 +2035,49 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseIgnoresAtSignInsidePercentComment() throws IOException {
+        String bibtex = """
+                % Type of BibLaTeX entries    : @online
+                @online{test,
+                  author = {Foo Bar}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+
+        BibEntry entry = result.getDatabase().getEntries().getFirst();
+
+        assertEquals(Optional.of("test"), entry.getCitationKey());
+        assertEquals(Optional.of("Foo Bar"), entry.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void parseIgnoresAtSignInsidePercentCommentBetweenEntries() throws IOException {
+        String bibtex = """
+                @article{first,
+                  author = {First Author}
+                }
+                % Type of BibLaTeX entries    : @online
+                @article{second,
+                  author = {Second Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(2, result.getDatabase().getEntries().size());
+
+        assertEquals(Optional.of("first"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+        assertEquals(Optional.of("second"),
+                result.getDatabase().getEntries().get(1).getCitationKey());
+    }
+
+    @Test
     void preserveEncodingPrefixInsideEntry() throws ParseException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")

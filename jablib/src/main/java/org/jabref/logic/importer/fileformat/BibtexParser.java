@@ -214,6 +214,8 @@ public class BibtexParser implements Parser {
     }
 
     private void parseDatabaseID() throws IOException {
+        boolean escaped = false;
+
         while (!eof) {
             skipWhitespace();
             char c = (char) read();
@@ -225,10 +227,33 @@ public class BibtexParser implements Parser {
                 if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
+                } else if (!SaveConfiguration.ENCODING_PREFIX.trim().equals(label) && !escaped) {
+                    skipUntilEndOfLine();
                 }
             } else if (c == '@') {
                 unread(c);
                 break;
+            }
+
+            if (c == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
+        }
+    }
+
+    private void skipUntilEndOfLine() throws IOException {
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if ((character == '\n') || (character == '\r')) {
+                return;
             }
         }
     }
@@ -1178,19 +1203,34 @@ public class BibtexParser implements Parser {
     }
 
     private boolean consumeUncritically(char expected) throws IOException {
-        int character;
-        // @formatter:off
-        do {
-            // @formatter:on
-            character = read();
-        } while ((character != expected) && (character != -1) && (character != 65535));
+        boolean escaped = false;
 
-        if (isEOFCharacter(character)) {
-            eof = true;
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return false;
+            }
+
+            if (character == expected) {
+                return true;
+            }
+
+            if ((character == '%') && !escaped) {
+                skipUntilEndOfLine();
+                escaped = false;
+                continue;
+            }
+
+            if (character == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
         }
 
-        // Return true if we actually found the character we were looking for:
-        return character == expected;
+        return false;
     }
 
     private void consume(char firstOption, char secondOption) throws IOException {
