@@ -82,6 +82,7 @@ public class BibDatabaseContext {
         this.database = database;
         this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
+        this.metaData.setLibraryPath(null);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, @Nullable Path path) {
@@ -90,7 +91,7 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, @Nullable Path path, DatabaseLocation location) {
         this(database, metaData);
-        this.path = path;
+        setDatabasePath(path);
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -107,6 +108,8 @@ public class BibDatabaseContext {
 
     public void setDatabasePath(@Nullable Path file) {
         this.path = file;
+        // Groups can store paths relative to the library, so they must learn about the new location.
+        this.metaData.setLibraryPath(file);
     }
 
     /// Get the path where this database was last saved to or loaded from, if any.
@@ -117,7 +120,7 @@ public class BibDatabaseContext {
     }
 
     public void clearDatabasePath() {
-        this.path = null;
+        setDatabasePath(null);
     }
 
     public BibDatabase getDatabase() {
@@ -135,6 +138,7 @@ public class BibDatabaseContext {
 
     public void setMetaData(MetaData metaData) {
         this.metaData = metaData;
+        this.metaData.setLibraryPath(this.path);
     }
 
     public boolean isBiblatexMode() {

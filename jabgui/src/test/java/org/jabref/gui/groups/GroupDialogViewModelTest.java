@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
@@ -30,16 +29,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GroupDialogViewModelTest {
 
+    private static final String USER_AND_HOST = "MockedUser-mockedhost";
+
     private GroupDialogViewModel viewModel;
     private Path temporaryFolder;
     private BibDatabaseContext bibDatabaseContext;
-    private final MetaData metaData = mock(MetaData.class);
+    private MetaData metaData;
     private final StateManager stateManager = mock(StateManager.class);
     private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
@@ -49,6 +49,7 @@ class GroupDialogViewModelTest {
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
+        this.metaData = new MetaData();
         bibDatabaseContext = new BibDatabaseContext();
 
         when(group.getName()).thenReturn("Group");
@@ -56,7 +57,7 @@ class GroupDialogViewModelTest {
         when(preferences.getBibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
-        when(preferences.getFilePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
+        when(preferences.getFilePreferences().getUserAndHost()).thenReturn(USER_AND_HOST);
         when(preferences.getGroupsPreferences()).thenReturn(groupsPreferences);
         when(groupsPreferences.getDefaultHierarchicalContext()).thenReturn(GroupHierarchyType.INDEPENDENT);
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
@@ -71,7 +72,6 @@ class GroupDialogViewModelTest {
         Path anAuxFile = temporaryFolder.resolve("auxfile.aux").toAbsolutePath();
 
         Files.createFile(anAuxFile);
-        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
 
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
         assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
@@ -88,9 +88,19 @@ class GroupDialogViewModelTest {
     void validateExistingRelativePath() throws IOException {
         Path anAuxFile = Path.of("auxfile.aux");
 
-        // The file needs to exist
         Files.createFile(temporaryFolder.resolve(anAuxFile));
-        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+        metaData.setLatexFileDirectory(USER_AND_HOST, temporaryFolder.toString());
+
+        viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
+        assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateExistingRelativePathRelativeToLibrary() throws IOException {
+        Path anAuxFile = Path.of("auxfile.aux");
+
+        Files.createFile(temporaryFolder.resolve(anAuxFile));
+        bibDatabaseContext.setDatabasePath(temporaryFolder.resolve("library.bib"));
 
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
         assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());

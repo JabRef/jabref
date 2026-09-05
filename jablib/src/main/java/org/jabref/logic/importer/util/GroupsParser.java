@@ -154,17 +154,11 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(token.nextToken()));
         try {
             Path path = Path.of(token.nextToken());
-            try {
-                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData, userAndHost);
-                addGroupDetails(token, newGroup);
-                return newGroup;
-            } catch (IOException ex) {
-                LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.", path, name, ex);
-
-                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), metaData, userAndHost);
-                addGroupDetails(token, newGroup);
-                return newGroup;
-            }
+            // The aux file often cannot be resolved yet, because the location of the `.bib` file is
+            // not known during parsing. TexGroup registers the file monitor as soon as it can.
+            TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData, userAndHost);
+            addGroupDetails(token, newGroup);
+            return newGroup;
         } catch (InvalidPathException | IOException ex) {
             throw new ParseException(ex);
         }

@@ -1,5 +1,6 @@
 package org.jabref.model.metadata;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,14 @@ class MetaDataTest {
     @Test
     void getLatexFileDirectoryReturnsEmptyWhenNotSet() {
         assertEquals(Optional.empty(), metaData.getLatexFileDirectory("user-host"));
+    }
+
+    @Test
+    void storesLibraryPath() {
+        Path libraryPath = Path.of("library.bib");
+        metaData.setLibraryPath(libraryPath);
+
+        assertEquals(Optional.of(libraryPath), metaData.getLibraryPath());
     }
 
     @Test

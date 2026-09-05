@@ -3,7 +3,6 @@ package org.jabref.gui.groups;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +55,6 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -283,13 +281,12 @@ public class GroupDialogViewModel {
                 sameNameValidator);
     }
 
-    /// Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+    /// Resolves a user supplied aux file path against the directories of the library.
     ///
     /// @param input the user input path
-    /// @return an absolute path if LatexFileDirectory exists; otherwise, returns input
+    /// @return an absolute path if the file was found; otherwise, the input as given
     private Path getAbsoluteTexGroupPath(String input) {
-        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
+        return FileUtil.find(input, getFileDirectoriesAsPaths()).orElse(Path.of(input));
     }
 
     public void validationHandler(Event event) {
@@ -533,9 +530,9 @@ public class GroupDialogViewModel {
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
-                                      currentDatabase.getMetaData()
-                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
+                                      getFileDirectoriesAsPaths().stream()
+                                                                 .findFirst()
+                                                                 .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
@@ -543,11 +540,7 @@ public class GroupDialogViewModel {
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        List<Path> fileDirs = new ArrayList<>();
-        MetaData metaData = currentDatabase.getMetaData();
-        metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).ifPresent(fileDirs::add);
-
-        return fileDirs;
+        return TexGroup.auxFileDirectories(currentDatabase.getMetaData(), preferences.getFilePreferences().getUserAndHost());
     }
 
     public ValidationStatus validationStatus() {

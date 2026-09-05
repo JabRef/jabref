@@ -10,7 +10,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
@@ -26,6 +28,7 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
@@ -70,6 +73,18 @@ public class MetaData {
     private final Map<String, String> latexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
+
+    /// The location of the `.bib` file this metadata belongs to.
+    ///
+    /// It is mirrored from [org.jabref.model.database.BibDatabaseContext] and is never written to the
+    /// `.bib` file. It is observable, because it is unknown while the library is parsed and it changes
+    /// on "Save as". Groups that store a path relative to the library need to know about that change.
+    private final ObjectProperty<@Nullable Path> libraryPath = new SimpleObjectProperty<>(null);
+
+    /// Incremented whenever the LaTeX file directory changes.
+    /// Tex groups resolve paths against this directory and therefore need to refresh when it changes.
+    private final IntegerProperty latexFileDirectoryVersion = new SimpleIntegerProperty(0);
+
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
@@ -118,6 +133,12 @@ public class MetaData {
 
     /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
     public void setGroups(@NonNull GroupTreeNode root) {
+        root.iterateOverTree()
+            .map(GroupTreeNode::getGroup)
+            .filter(TexGroup.class::isInstance)
+            .map(TexGroup.class::cast)
+            .forEach(group -> group.setMetaData(this));
+
         groupsRoot.setValue(root);
         root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
         root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
@@ -322,17 +343,39 @@ public class MetaData {
         postChange();
     }
 
+    /// The location of the `.bib` file this metadata belongs to, if it was already saved or loaded.
+    public Optional<Path> getLibraryPath() {
+        return Optional.ofNullable(libraryPath.get());
+    }
+
+    /// Only [org.jabref.model.database.BibDatabaseContext] is expected to call this.
+    /// The value is not part of the metadata written to the `.bib` file, so it does not mark the
+    /// library as changed.
+    public void setLibraryPath(@Nullable Path path) {
+        libraryPath.set(path);
+    }
+
+    public ObjectProperty<@Nullable Path> libraryPathProperty() {
+        return libraryPath;
+    }
+
+    public IntegerProperty latexFileDirectoryVersionProperty() {
+        return latexFileDirectoryVersion;
+    }
+
     public Optional<Path> getLatexFileDirectory(String userHostString) {
         return Optional.ofNullable(latexFileDirectory.get(userHostString)).map(Path::of);
     }
 
     public void setLatexFileDirectory(@NonNull String userHostString, @NonNull String path) {
         latexFileDirectory.put(userHostString, path);
+        latexFileDirectoryVersion.set(latexFileDirectoryVersion.get() + 1);
         postChange();
     }
 
     public void clearLatexFileDirectory(String userHostString) {
         latexFileDirectory.remove(userHostString);
+        latexFileDirectoryVersion.set(latexFileDirectoryVersion.get() + 1);
         postChange();
     }
 
