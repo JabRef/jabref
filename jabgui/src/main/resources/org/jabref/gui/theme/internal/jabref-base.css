@@ -2449,3 +2449,7 @@ journalInfo .grid-cell-b {
     -fx-fill: -color-warning-subtle !important;
     -fx-stroke: transparent !important;
 }
+
+.flashing-danger {
+    -fx-background-color: -color-danger;
+}

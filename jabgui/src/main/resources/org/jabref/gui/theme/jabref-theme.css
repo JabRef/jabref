@@ -948,10 +948,3 @@ TextFlow > .tooltip-text-monospaced {
 .web-view {
     -fx-page-fill: -color-fg-emphasis;
 }
-.flashing-color{
-    -fx-control-inner-background: transparent;
-
-}
-.flashing-color:flash{
-    -fx-control-inner-background: #ff0000;
-}

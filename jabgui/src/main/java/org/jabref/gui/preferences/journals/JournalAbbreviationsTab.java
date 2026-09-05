@@ -5,8 +5,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.collections.transformation.FilteredList;
-import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -191,14 +189,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setAnimations() {
-        PseudoClass flash = PseudoClass.getPseudoClass("flash");
-
         invalidateSearch = new Timeline(
-                new KeyFrame(Duration.seconds(0), event -> searchBox.pseudoClassStateChanged(flash, false)),
-                new KeyFrame(Duration.seconds(0.25), event -> searchBox.pseudoClassStateChanged(flash, true)),
+                new KeyFrame(Duration.seconds(0), _ -> searchBox.getStyleClass().add("flashing-danger")),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent _) -> addAbbreviationActions()),
-                new KeyFrame(Duration.seconds(0.5), event -> searchBox.pseudoClassStateChanged(flash, false))
+                new KeyFrame(Duration.seconds(0.25), _ -> addAbbreviationActions()),
+                new KeyFrame(Duration.seconds(0.5), _ -> searchBox.getStyleClass().remove("flashing-danger"))
         );
     }
 
