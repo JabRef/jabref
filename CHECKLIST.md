@@ -58,11 +58,12 @@ Run in this order — cheapest first. Each must pass.
 - [ ] `./gradlew --no-configuration-cache :rewriteDryRun` reports no changes (run `./gradlew rewriteRun` to fix).
 - [ ] `./gradlew javadoc`.
 - [ ] `npx markdownlint-cli2 "docs/**/*.md" "*.md"` (only if Markdown changed).
+- [ ] `npm ci && npm run textlint` reports no misspellings (only if Markdown changed).
 - [ ] Only if formatting is still off after `rewriteRun`: `docker run -v $(pwd):/github/workspace ghcr.io/leventebajczi/intellij-format:master "*.java" "" ".idea/codeStyles/Project.xml"`.
 
 ## 3. Documentation
 
-- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Link the issue if one exists; link the PR only when no issue exists. Use `TODO` as the placeholder when neither is known yet — never a fake number. No entry for fixes to changes that were themselves introduced after the last release (feature only in `## [Unreleased]`) — update the existing unreleased entry instead if needed.
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines, sorted in next to existing entries about the same component/feature). Link the issue if one exists; link the PR only when no issue exists. Use `TODO` as the placeholder when neither is known yet — never a fake number. No entry for fixes to changes that were themselves introduced after the last release (feature only in `## [Unreleased]`) — update the existing unreleased entry instead if needed.
 - [ ] Searched [jabref/issues](https://github.com/JabRef/jabref/issues) and [jabref-koppor/issues](https://github.com/JabRef/jabref-koppor/issues) for a related issue; linked only on a confident match, otherwise kept `TODO` (no `closes`/`fixes` for merely-similar issues).
 - [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.

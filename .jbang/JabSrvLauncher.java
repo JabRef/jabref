@@ -11,8 +11,6 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
-//DEPS io.github.adr:e-adr:2.0.0
 
 // Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
 // Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with

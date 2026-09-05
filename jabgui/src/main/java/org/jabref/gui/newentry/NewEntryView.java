@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -21,10 +22,10 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -124,6 +125,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
+    @FXML private HBox idSearchingBox;
 
     @FXML private TextField urlText;
     @FXML private Label urlErrorInvalidText;
@@ -155,12 +157,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton.getStyleClass().add("customGenerateButton");
-
-        final Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        stage.setHeight(650);
-        stage.setWidth(931);
-        stage.setMinHeight(300);
-        stage.setMinWidth(400);
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        double width = Math.clamp(bounds.getWidth() * 0.60, 400, 1100);
+        double height = Math.clamp(bounds.getHeight() * 0.85, 300, 650);
+        getDialogPane().setPrefSize(width, height);
+        getDialogPane().setMinSize(400, 300);
 
         ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
         setOnCloseRequest(_ -> cancel());
@@ -180,8 +182,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     if (idText != null) {
+                        // [impl->req~ux.textdialogs.autopaste~1]
                         idText.setText(clipboardText);
                         idText.selectAll();
+                        // [impl->req~ux.textdialogs.focus~1]
                         Platform.runLater(() -> idText.requestFocus());
                     }
                 } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
@@ -347,6 +351,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         Optional<Identifier> identifier = Identifier.from(clipboard);
 
         if (identifier.isPresent()) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             idText.setText(clipboard);
             idText.selectAll();
 
@@ -370,8 +375,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
-        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(idErrorInvalidText.visibleProperty());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idSearchingBox.visibleProperty().bind(viewModel.executingProperty());
+        idSearchingBox.managedProperty().bind(idSearchingBox.visibleProperty());
 
         idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
 
@@ -386,9 +394,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         // Only prefill clipboard content that actually is a URL -- prefilling arbitrary text would open the tab
         // with junk in the field and the "invalid URL" hint showing (same guard idea as the Enter Identifier tab).
-        // [impl->req~textinput.clipboard.autofocus~1]
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (URLUtil.isURL(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             urlText.setText(clipboardText);
             urlText.selectAll();
         }
@@ -398,10 +406,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
-        // [impl->req~textinput.clipboard.autofocus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
+            // [impl->req~ux.textdialogs.autopaste~1]
             interpretText.setText(clipboardText);
             interpretText.selectAll();
         }
@@ -423,6 +431,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (!StringUtil.isBlank(clipboardText)) {
             // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
             // supported Bib(La)TeX source format.
+            // [impl->req~ux.textdialogs.autopaste~1]
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
@@ -454,6 +463,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
 
         if (idText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> idText.requestFocus());
         }
 
@@ -475,6 +485,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (urlText != null) {
             Platform.runLater(() -> {
                 if (tabEnterUrl.isSelected()) {
+                    // [impl->req~ux.textdialogs.focus~1]
                     urlText.requestFocus();
                 }
             });
@@ -495,8 +506,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
-        // [impl->req~textinput.clipboard.autofocus~1]
         if (interpretText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> interpretText.requestFocus());
         }
 
@@ -516,6 +527,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
+            // [impl->req~ux.textdialogs.focus~1]
             Platform.runLater(() -> bibtexText.requestFocus());
         }
 

@@ -49,8 +49,8 @@ public abstract class AbstractCitationKeyPatterns {
 
     /// Gets an object for a desired key from this CitationKeyPattern or one of it's parents (in the case of
     /// DatabaseCitationKeyPattern). This method first tries to obtain the object from this CitationKeyPattern via the
-    /// `get` method of `Hashtable`. If this fails, we try the default.<br /> If that fails, we try
-    /// the parent.<br /> If that fails, we return the DEFAULT_LABELPATTERN<br />
+    /// `get` method of `Hashtable`. If this fails, we try the default. If that fails, we try
+    /// the parent. If that fails, we return the DEFAULT_LABELPATTERN
     ///
     /// @param entryType a `String`
     /// @return the list of Strings for the given key. First entry: the complete key

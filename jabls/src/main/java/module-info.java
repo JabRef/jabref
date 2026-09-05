@@ -1,3 +1,10 @@
+/// Language Server Protocol implementation for `.bib` files (diagnostics from the
+/// integrity checker, based on lsp4j). Started by the `jabls-cli` module or embedded in the GUI.
+///
+/// Entry points: [org.jabref.languageserver.LspLauncher],
+/// [org.jabref.languageserver.BibtexTextDocumentService].
+///
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
 module org.jabref.jabls {
     exports org.jabref.languageserver;
     opens org.jabref.languageserver to org.eclipse.lsp4j, org.eclipse.lsp4j.jsonrpc, com.google.gson;
