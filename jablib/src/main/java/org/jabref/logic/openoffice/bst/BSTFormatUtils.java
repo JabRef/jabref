@@ -77,17 +77,17 @@ public final class BSTFormatUtils {
     }
 
     private static String replaceLegacySwitch(String input, String legacy, String modern) {
-        String needle = "{\\" + legacy; // e.g., "{\\sc"
+        String legacyCommandPrefix = "{\\" + legacy; // e.g., "{\\sc"
         StringBuilder out = new StringBuilder(input.length());
         int i = 0;
         while (i < input.length()) {
-            int j = input.indexOf(needle, i);
+            int j = input.indexOf(legacyCommandPrefix, i);
             if (j < 0) {
                 out.append(input, i, input.length());
                 break;
             }
             out.append(input, i, j);
-            int k = j + needle.length();
+            int k = j + legacyCommandPrefix.length();
             // Skip whitespace after the legacy command
             int whitespacePos = k;
             while (whitespacePos < input.length() && Character.isWhitespace(input.charAt(whitespacePos))) {
