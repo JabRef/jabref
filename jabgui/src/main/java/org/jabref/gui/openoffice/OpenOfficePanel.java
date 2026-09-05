@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -666,19 +665,6 @@ public class OpenOfficePanel {
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
         alwaysAddCitedOnPagesText.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof JStyle)));
 
-        CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
-        zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
-        zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
-        zoteroCompatibilityMode.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof CitationStyle)));
-
-        CheckMenuItem inferCslStyleFromDocument = new CheckMenuItem(Localization.lang("Infer CSL style from document"));
-        inferCslStyleFromDocument.selectedProperty().set(openOfficePreferences.shouldInferCslStyleFromDocument());
-        inferCslStyleFromDocument.setOnAction(_ -> openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.isSelected()));
-        inferCslStyleFromDocument.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> !zoteroCompatibilityMode.isSelected() || !(currentStyleProperty.get() instanceof CitationStyle),
-                zoteroCompatibilityMode.selectedProperty(),
-                currentStyleProperty));
-
         CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the currently selected library only"));
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
 
@@ -696,33 +682,22 @@ public class OpenOfficePanel {
                 alwaysAddCitedOnPagesText,
                 addSpaceBefore,
                 addSpaceAfter,
-                zoteroCompatibilityMode,
-                inferCslStyleFromDocument,
                 new SeparatorMenuItem(),
                 onlyUseActiveTab,
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
         EasyBind.subscribe(currentStyleProperty, newValue -> {
-            updatePreferences(newValue, zoteroCompatibilityMode, inferCslStyleFromDocument);
-        });
-
-        EasyBind.subscribe(zoteroCompatibilityMode.selectedProperty(), isSelected -> {
-            if (!isSelected) {
-                inferCslStyleFromDocument.setSelected(false);
-                openOfficePreferences.setInferCslStyleFromDocument(false);
-            }
+            updatePreferences(newValue);
         });
 
         return contextMenu;
     }
 
-    private void updatePreferences(OOStyle currentStyle, CheckMenuItem zoteroCompatibilityMode, CheckMenuItem inferCslStyleFromDocument) {
-        boolean shouldSwitchOffZoteroMode = !(currentStyle instanceof CitationStyle);
-
-        if (shouldSwitchOffZoteroMode) {
-            zoteroCompatibilityMode.setSelected(false);
+    private void updatePreferences(OOStyle currentStyle) {
+        if (!(currentStyle instanceof CitationStyle)) {
             openOfficePreferences.setZoteroCompatibilityMode(false);
+            openOfficePreferences.setInferCslStyleFromDocument(false);
         }
     }
 }
