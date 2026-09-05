@@ -63,6 +63,42 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void smallCapsFormattingIsRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "\\textsc{L{\\'o}pez}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
+    }
+
+    @Test
+    void legacySmallCapsFormattingIsRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{\\sc L{\\'o}pez}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>", preview);
+    }
+
+    @Test
+    void superscriptFormattingIsRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "Proceedings of the 9\\textsuperscript{th} symposium");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium.", preview);
+    }
+
+    @Test
+    void subscriptFormattingIsRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "{H\\textsubscript{2}O}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.\u00a0Kopp. H₂O.", preview);
+    }
+
+    @Test
     void unresolvableBracedMathIsKept() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
