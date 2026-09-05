@@ -299,8 +299,9 @@ jobs:
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
             # A PR without bot comments is ready for review unless it is a draft, a human requested changes,
-            # or it already progressed further in the review process. In those cases no status label is
-            # set at all: "no status label" means "nothing for the bots, a human decides what is next".
+            # or it already progressed further in the review process. Drafts and pending human re-reviews
+            # end up without any status label ("nothing for the bots, a human decides what is next");
+            # progressed PRs keep their awaiting-second-review / to-be-merged label.
             PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision,labels \
               --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
                        or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
@@ -310,9 +311,9 @@ jobs:
               gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: ready-for-review"
               echo "No bot comments - removed label changes-required and added ready-for-review" >> $GITHUB_STEP_SUMMARY
             else
-              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - removing status labels"
+              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - removing changes-required, stale and ready-for-review"
               gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review"
-              echo "No bot comments - removed label changes-required" >> $GITHUB_STEP_SUMMARY
+              echo "No bot comments, but not ready for review - removed changes-required, stale and ready-for-review" >> $GITHUB_STEP_SUMMARY
             fi
           fi
         env:
