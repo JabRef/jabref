@@ -1,7 +1,6 @@
 ---
 parent: AI
 grand_parent: Requirements
-nav_order: 3
 ---
 
 # Different response engines for AI chat

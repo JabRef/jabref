@@ -1,6 +1,5 @@
 ---
 parent: Requirements
-has_children: true
 ---
 
 # AI

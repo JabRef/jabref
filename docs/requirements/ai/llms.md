@@ -1,7 +1,6 @@
 ---
 parent: AI
 grand_parent: Requirements
-nav_order: 8
 ---
 
 # LLMs in AI features
