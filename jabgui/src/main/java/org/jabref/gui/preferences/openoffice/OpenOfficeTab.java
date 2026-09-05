@@ -47,9 +47,11 @@ public class OpenOfficeTab extends AbstractPreferenceTabView<OpenOfficeTabViewMo
                 .section(Localization.lang("Pandoc"), pandoc -> pandoc
                         .custom(buildPandocPathRow()))
                 .section(Localization.lang("Zotero"), zotero -> zotero
-                        .checkbox(Localization.lang("Zotero compatibility mode"), viewModel.zoteroCompatibilityModeProperty())
+                        .checkbox(Localization.lang("Zotero compatibility mode"), viewModel.zoteroCompatibilityModeProperty(), mode -> mode
+                                .disableWhen(viewModel.zoteroCompatibilityModeDisabledProperty()))
                         .checkbox(Localization.lang("Infer CSL style from document"), viewModel.inferCslStyleFromDocumentProperty(), inference -> inference
-                                .disableWhen(viewModel.zoteroCompatibilityModeProperty().not())))
+                                .disableWhen(viewModel.zoteroCompatibilityModeDisabledProperty()
+                                        .or(viewModel.zoteroCompatibilityModeProperty().not()))))
                 .build());
     }
 
