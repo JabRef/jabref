@@ -25,6 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -108,7 +109,7 @@ public class SourceTab extends EntryEditorTab {
             this.setText(Localization.lang("Source"));
             this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
         }));
-        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
