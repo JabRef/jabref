@@ -48,7 +48,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        final List<BibEntry> entries = stateManager.getSelectedEntries();
+        // Copied because the state manager replaces its selection when the user switches
+        // libraries, and this task runs on past that.
+        final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,

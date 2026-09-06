@@ -1,5 +1,6 @@
 package org.jabref.gui.citationkeypattern;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -51,7 +52,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        entries = stateManager.getSelectedEntries();
+        // A copy, not the state manager's list itself: it is replaced when the user switches
+        // libraries, and checkOverwriteKeysChosen prunes what it is given — which until now pruned
+        // the user's selection.
+        entries = new ArrayList<>(stateManager.getSelectedEntries());
 
         // Read here, on the JavaFX thread: the keys are generated for, and recorded against, the
         // library the user started on, which they may have switched away from by the time the task

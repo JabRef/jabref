@@ -51,16 +51,19 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     @Override
     public void execute() {
-        // Read here rather than when the lookup finishes: the entries are recorded against the
-        // library the user started on, not the one in front at the end.
         Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
         if (activeDatabase.isEmpty()) {
             return;
         }
 
+        // Both the library and the entries are read here rather than when the lookup runs: the
+        // work belongs to the library the user started on, and the state manager replaces its
+        // selection when they switch away from it.
+        BibDatabaseContext databaseContext = activeDatabase.get();
+        List<BibEntry> selectedEntries = List.copyOf(stateManager.getSelectedEntries());
+
         try {
-            BibDatabaseContext databaseContext = activeDatabase.get();
-            BackgroundTask.wrap(() -> lookupIdentifiers(databaseContext, stateManager.getSelectedEntries()))
+            BackgroundTask.wrap(() -> lookupIdentifiers(databaseContext, selectedEntries))
                           .onSuccess(dialogService::notify)
                           .executeWith(taskExecutor);
         } catch (Exception e) {
