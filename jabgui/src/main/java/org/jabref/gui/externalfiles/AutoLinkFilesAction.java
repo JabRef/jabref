@@ -17,6 +17,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.WriteReservation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -58,6 +59,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         final CompoundEdit compound = new CompoundEdit(StandardActions.AUTO_LINK_FILES.getText());
+        // The file fields are written round by round in the task and handed over only in
+        // succeeded(), so the library is held against undo across both.
+        final WriteReservation reserved = undoManager.reserveWrites(StandardActions.AUTO_LINK_FILES.getText());
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -79,8 +83,26 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
             @Override
             protected void succeeded() {
-                AutoSetFileLinksUtil.LinkFilesResult result = getValue();
+                try {
+                    report(getValue());
+                } finally {
+                    reserved.close();
+                }
+            }
 
+            @Override
+            protected void failed() {
+                reserved.close();
+            }
+
+            @Override
+            protected void cancelled() {
+                reserved.close();
+            }
+
+            /// Every path out of this method returns without pushing except the last, which is why
+            /// the caller closes the reservation rather than each branch.
+            private void report(AutoSetFileLinksUtil.LinkFilesResult result) {
                 if (!result.getFileExceptions().isEmpty()) {
                     dialogService.showWarningDialogAndWait(
                             Localization.lang("Automatically set file links"),

@@ -13,6 +13,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.WriteReservation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -78,39 +79,44 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private String lookupIdentifiers(UndoManager undoManager, List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
-        CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
+        String name = Localization.lang("Look up %0", fetcher.getIdentifierName());
+        CompoundEdit compoundEdit = new CompoundEdit(name);
         int count = 0;
         int foundCount = 0;
-        for (BibEntry bibEntry : bibEntries) {
-            count++;
-            final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                    fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-            UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
-            Optional<T> identifier = Optional.empty();
-            try {
-                identifier = fetcher.findIdentifier(bibEntry);
-            } catch (FetcherException e) {
-                LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
-            }
-            if (identifier.isPresent()) {
-                T foundIdentifier = identifier.get();
-                // BibEntry uses an ObservableMap which notifies JavaFX listeners.
-                Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
-                    if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
-                        return Optional.empty();
+        // The fields are written as the lookup goes and handed over only at the end, so the
+        // library holds unrecorded writes for the whole loop: hold it against undo until then.
+        try (WriteReservation reserved = undoManager.reserveWrites(name)) {
+            for (BibEntry bibEntry : bibEntries) {
+                count++;
+                final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                        fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+                UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
+                Optional<T> identifier = Optional.empty();
+                try {
+                    identifier = fetcher.findIdentifier(bibEntry);
+                } catch (FetcherException e) {
+                    LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
+                }
+                if (identifier.isPresent()) {
+                    T foundIdentifier = identifier.get();
+                    // BibEntry uses an ObservableMap which notifies JavaFX listeners.
+                    Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
+                        if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
+                            return Optional.empty();
+                        }
+                        return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
+                    });
+                    if (fieldChange != null && fieldChange.isPresent()) {
+                        compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+                        foundCount++;
+                        final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                                fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+                        UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
                     }
-                    return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
-                });
-                if (fieldChange != null && fieldChange.isPresent()) {
-                    compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
-                    foundCount++;
-                    final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                            fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                    UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
                 }
             }
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
-        undoManager.addEdit(compoundEdit.toChangeSet());
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }
 }

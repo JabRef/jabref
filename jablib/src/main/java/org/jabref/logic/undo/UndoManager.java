@@ -34,4 +34,24 @@ public interface UndoManager {
     ///
     /// @return what was applied, and what was not — see [BibChange#apply]
     ApplyResult applyEdit(BibChange change);
+
+    /// Reserves the library against undo and redo while the caller applies changes it has not yet
+    /// handed over.
+    ///
+    /// A command that mutates on a background thread writes to the library long before anything
+    /// reaches the stack, and an undo arriving in that window takes back a change *underneath*
+    /// those writes: the library then holds a state no step on the stack describes, and the push
+    /// that follows discards the undone change with the redo stack. Reserving is how a caller says
+    /// that window is open.
+    ///
+    /// Nothing waits: undo and redo decline while a reservation is open rather than blocking on
+    /// it, so a long import can never freeze the JavaFX thread on Ctrl+Z.
+    ///
+    /// [#addEdit(String,Consumer)] reserves for the duration of the block, so only the commands
+    /// that collect by hand need this. Close it **after** the push, or the window reopens between
+    /// the last write and the record.
+    ///
+    /// @param name the command holding the library, as the user would recognise it — shown when
+    ///             undo declines
+    WriteReservation reserveWrites(String name);
 }

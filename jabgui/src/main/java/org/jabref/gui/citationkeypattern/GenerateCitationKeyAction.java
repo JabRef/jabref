@@ -16,6 +16,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.WriteReservation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -115,6 +116,9 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         // task finishes.
         LibraryTab libraryTab = tabSupplier.get();
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
+        // The keys are written entry by entry in call() and handed over in the success handler, so
+        // the library is held against undo across both. Closed on every path out of the task.
+        WriteReservation reserved = undoManager.reserveWrites(StandardActions.GENERATE_CITE_KEYS.getText());
 
         BackgroundTask<Void> backgroundTask = new BackgroundTask<>() {
             @Override
@@ -148,15 +152,21 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             }
         };
 
-        return backgroundTask.onSuccess(_ -> {
-            // register the undo event only if new citation keys were generated
-            if (compound.hasEdits()) {
-                undoManager.addEdit(compound.toChangeSet());
-            }
+        return backgroundTask
+                .onSuccess(_ -> {
+                    try {
+                        // register the undo event only if new citation keys were generated
+                        if (compound.hasEdits()) {
+                            undoManager.addEdit(compound.toChangeSet());
+                        }
 
-            libraryTab.markBaseChanged();
-            dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
-        });
+                        libraryTab.markBaseChanged();
+                        dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
+                    } finally {
+                        reserved.close();
+                    }
+                })
+                .onFailure(_ -> reserved.close());
     }
 
     private String formatOutputMessage(String start, int count) {

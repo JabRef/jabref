@@ -37,6 +37,12 @@ public interface GuiUndoManager extends UndoManager {
 
     boolean canUndo();
 
+    /// The command currently applying changes to this library that are not yet on the stack, if
+    /// one is — see [org.jabref.logic.undo.UndoManager#reserveWrites]. While it is present, undo
+    /// and redo decline, and `canUndo`/`canRedo` are false for that reason rather than for an
+    /// empty stack.
+    Optional<String> writeInProgress();
+
     boolean canRedo();
 
     /// Whether the library differs from the last saved position.

@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.undo.JabRefUndoManager;
+import org.jabref.logic.undo.WriteReservation;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -479,6 +480,133 @@ class JabRefUndoManagerTest {
 
         assertTrue(undoRedoManager.canUndo());
         assertEquals(1, reached.get());
+    }
+
+    /// The defect this reserves against: a background command applies its changes long before it
+    /// pushes them, and an undo arriving in that window takes back a change *underneath* those
+    /// writes - after which the command's push discards the undone change with the redo stack.
+    @Test
+    @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    void anUndoCannotLandBetweenACommandsWritesAndItsPush() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        CountDownLatch blockStarted = new CountDownLatch(1);
+        CountDownLatch undoAttempted = new CountDownLatch(1);
+
+        try (ExecutorService background = Executors.newSingleThreadExecutor()) {
+            Future<?> block = background.submit(() -> undoRedoManager.addEdit("Import entries", edit -> {
+                edit.addEdit(setAuthor("Planck"));
+                blockStarted.countDown();
+                await(undoAttempted, "the recording block was never released");
+            }));
+
+            await(blockStarted, "the recording block never started");
+            assertEquals(Optional.empty(), undoRedoManager.undo(), "undo ran while the library was being written");
+            assertEquals(Optional.of("Planck"), entry.getField(StandardField.AUTHOR),
+                    "the undo reverted a change underneath the command's writes");
+
+            undoAttempted.countDown();
+            assertTrue(completes(block), "the recording block never finished");
+        }
+
+        // Both steps survived: the command's, and the one it would have discarded.
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void aReservationMakesUndoAndRedoDecline() {
+        // One step on each stack, so neither answer can be right for the wrong reason.
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Planck"));
+        undoRedoManager.undo();
+        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
+
+        try (WriteReservation reserved = undoRedoManager.reserveWrites("Import entries")) {
+            assertFalse(undoRedoManager.canUndo());
+            assertFalse(undoRedoManager.canRedo());
+            assertEquals(Optional.empty(), undoRedoManager.redo());
+            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress());
+        }
+
+        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
+        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+    }
+
+    /// Enablement has to fall when a command takes the library and rise when it gives it back, so
+    /// both ends are stack changes as far as an observer is concerned.
+    @Test
+    void takingAndReleasingAReservationNotifiesListeners() {
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        WriteReservation reserved = undoRedoManager.reserveWrites("Import entries");
+        assertEquals(1, notifications.get());
+
+        reserved.close();
+        assertEquals(2, notifications.get());
+
+        // Idempotent, so a task closing on more than one of its outcomes says nothing twice.
+        reserved.close();
+        assertEquals(2, notifications.get());
+        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+    }
+
+    @Test
+    void twoCommandsHoldTheLibraryUntilBothHaveHandedOver() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        WriteReservation first = undoRedoManager.reserveWrites("Import entries");
+        WriteReservation second = undoRedoManager.reserveWrites("Look up DOI");
+        first.close();
+
+        assertFalse(undoRedoManager.canUndo(), "undo returned while a command was still writing");
+        assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress(),
+                "the name of the command the user has been waiting on");
+
+        second.close();
+        assertTrue(undoRedoManager.canUndo());
+    }
+
+    @Test
+    void aBlockHoldsTheLibraryForItsWholeDurationAndReleasesItAfterThePush() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        undoRedoManager.addEdit("Import entries", edit -> {
+            assertFalse(undoRedoManager.canUndo(), "the block did not hold the library");
+            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress());
+            edit.addEdit(setAuthor("Planck"));
+        });
+
+        assertTrue(undoRedoManager.canUndo());
+        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+    }
+
+    /// A nested block is inside its caller's window already; releasing at its end would reopen the
+    /// window while the outer block is still writing.
+    @Test
+    void aNestedBlockDoesNotReleaseTheLibraryWhenItEnds() {
+        undoRedoManager.addEdit("Import entries", edit -> {
+            undoRedoManager.addEdit("Merge entries", nested -> nested.addEdit(setAuthor("Planck")));
+            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress(),
+                    "the nested block released the library its caller was holding");
+        });
+
+        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+    }
+
+    @Test
+    void aBlockThatFailsDoesNotKeepHoldingTheLibrary() {
+        assertThrows(IllegalStateException.class, () -> undoRedoManager.addEdit("Import entries", edit -> {
+            edit.addEdit(setAuthor("Planck"));
+            throw new IllegalStateException("import failed");
+        }));
+
+        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertTrue(undoRedoManager.canUndo(), "what the failed block managed to change stayed undoable");
     }
 
     /// A listener that waits for another thread to read the manager. Were listeners still run

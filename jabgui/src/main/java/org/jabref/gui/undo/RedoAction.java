@@ -1,5 +1,7 @@
 package org.jabref.gui.undo;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -35,6 +37,13 @@ public class RedoAction extends SimpleCommand {
 
         LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
+
+        Optional<String> writing = undoManager.writeInProgress();
+        if (writing.isPresent()) {
+            // See UndoAction: a reservation makes canRedo() false without the stack being empty.
+            dialogService.notify(Localization.lang("Cannot redo while %0 is running", writing.get()));
+            return;
+        }
 
         if (undoManager.canRedo()) {
             undoManager.redo().ifPresent(outcome -> dialogService.notify(message(outcome)));

@@ -106,6 +106,15 @@ public class JabRefUndoManager implements UndoManager {
     /// [#hasChanged].
     private long savedId = ORIGIN;
 
+    /// How many commands are currently applying changes they have not yet handed over, and the
+    /// name of the first of them. Guarded by this object's monitor.
+    ///
+    /// A count rather than a flag: two background commands can write to one library at the same
+    /// time, and undo may only return once both have handed over. The name is the first
+    /// reserver's, because that is the one the user has been waiting on.
+    private int openWriters;
+    private @Nullable String openWriterName;
+
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
     /// a shared field would fold edits the user makes meanwhile into the background command's
@@ -224,6 +233,12 @@ public class JabRefUndoManager implements UndoManager {
         CompoundEdit enclosing = active.get();
         CompoundEdit compoundEdit = new CompoundEdit(name);
 
+        // The block applies as it goes and pushes only at the end, so the library holds writes
+        // this journal does not know about for as long as the body runs. Only the outermost block
+        // reserves: a nested one is inside its caller's window already, and releasing at its end
+        // would reopen the window while the outer block is still writing.
+        WriteReservation reservation = enclosing == null ? reserveWrites(name) : null;
+
         active.set(compoundEdit);
         try {
             mutations.accept(compoundEdit);
@@ -234,38 +249,95 @@ public class JabRefUndoManager implements UndoManager {
                 active.set(enclosing);
             }
 
-            // Handing over from the finally block rather than after a catch: whatever ended the
-            // block — a return, a RuntimeException, an Error — the library already holds what
-            // was recorded so far, and the failure travels on afterwards untouched.
-            // `active` is restored first, so this lands in the enclosing block if there is one.
-            ChangeSet changeSet = compoundEdit.toChangeSet();
-            if (!changeSet.isEmpty()) {
-                addEdit(changeSet);
+            try {
+                // Handing over from the finally block rather than after a catch: whatever ended
+                // the block — a return, a RuntimeException, an Error — the library already holds
+                // what was recorded so far, and the failure travels on afterwards untouched.
+                // `active` is restored first, so this lands in the enclosing block if there is one.
+                ChangeSet changeSet = compoundEdit.toChangeSet();
+                if (!changeSet.isEmpty()) {
+                    addEdit(changeSet);
+                }
+            } finally {
+                // After the push, so the window does not reopen between the last write and the
+                // record; and in a finally, so a block that failed does not hold the library.
+                if (reservation != null) {
+                    reservation.close();
+                }
             }
         }
         return compoundEdit.hasEdits();
     }
 
+    /// Reserves this library against undo and redo until the returned reservation is closed.
+    ///
+    /// Taking and releasing are both stack changes as far as observers are concerned — enablement
+    /// has to fall while a command holds the library and rise again afterwards — so both notify,
+    /// and both do so after the monitor is released.
+    @Override
+    public WriteReservation reserveWrites(String name) {
+        synchronized (this) {
+            openWriters++;
+            if (openWriters == 1) {
+                openWriterName = name;
+            }
+        }
+        notifyListeners();
+
+        return new WriteReservation() {
+            private boolean closed;
+
+            @Override
+            public void close() {
+                synchronized (JabRefUndoManager.this) {
+                    // Idempotent: a task can finish through success, failure or cancellation, and
+                    // closing on each of them is easier to get right than closing on exactly one.
+                    if (closed) {
+                        return;
+                    }
+                    closed = true;
+                    openWriters--;
+                    if (openWriters == 0) {
+                        openWriterName = null;
+                    }
+                }
+                notifyListeners();
+            }
+        };
+    }
+
+    /// The command currently holding this library, if one is.
+    ///
+    /// For the Undo and Redo actions, which have to tell "nothing to undo" from "not while this is
+    /// running" — both of which make [#canUndo] false.
+    public synchronized Optional<String> writeInProgress() {
+        return Optional.ofNullable(openWriterName);
+    }
+
+    /// Whether there is a step to take back *and* the library is free to take it back — see
+    /// [#reserveWrites].
     public synchronized boolean canUndo() {
-        return !undoStack.isEmpty();
+        return (openWriters == 0) && !undoStack.isEmpty();
     }
 
     public synchronized boolean canRedo() {
-        return !redoStack.isEmpty();
+        return (openWriters == 0) && !redoStack.isEmpty();
     }
 
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
     ///
     /// @return what was undone — its name for the user, and what of it could not be applied —
-    ///         or empty if there was nothing to undo. The name is taken inside the monitor: read
+    ///         or empty if there was nothing to undo, or a command is holding the library (see
+    ///         [#reserveWrites] — [#writeInProgress] tells the two apart). The name is taken
+    ///         inside the monitor: read
     ///         afterwards, it would describe whichever step another thread has since pushed.
     ///         Only a name leaves the journal, so nothing outside it starts reading the contents
     ///         of the stacks.
     public Optional<ChangeOutcome> undo() {
         ChangeOutcome outcome;
         synchronized (this) {
-            if (undoStack.isEmpty()) {
+            if ((openWriters > 0) || undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
@@ -282,11 +354,11 @@ public class JabRefUndoManager implements UndoManager {
     }
 
     /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
-    ///         to redo
+    ///         to redo or a command is holding the library
     public Optional<ChangeOutcome> redo() {
         ChangeOutcome outcome;
         synchronized (this) {
-            if (redoStack.isEmpty()) {
+            if ((openWriters > 0) || redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();

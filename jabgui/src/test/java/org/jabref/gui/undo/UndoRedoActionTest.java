@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.WriteReservation;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -167,6 +168,36 @@ class UndoRedoActionTest {
         undoAction.execute();
 
         verify(dialogService).notify("Undone: Remove string (some changes could not be applied)");
+    }
+
+    /// "Nothing to undo" would be untrue while a command holds the library: there is something to
+    /// undo, and the reason it cannot happen yet is worth naming.
+    @Test
+    void theNotificationNamesTheCommandHoldingTheLibrary() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+
+        try (WriteReservation reserved = journalOfA.reserveWrites("Import entries")) {
+            undoAction.execute();
+            redoAction.execute();
+        }
+
+        verify(dialogService).notify("Cannot undo while Import entries is running");
+        verify(dialogService).notify("Cannot redo while Import entries is running");
+        assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "the undo ran anyway");
+    }
+
+    @Test
+    void enablementIsOffWhileACommandHoldsTheActiveLibrary() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+        assertTrue(undoAction.executableProperty().get());
+
+        try (WriteReservation reserved = journalOfA.reserveWrites("Import entries")) {
+            assertFalse(undoAction.executableProperty().get(), "enabled while the library was being written");
+        }
+
+        assertTrue(undoAction.executableProperty().get());
     }
 
     @Test

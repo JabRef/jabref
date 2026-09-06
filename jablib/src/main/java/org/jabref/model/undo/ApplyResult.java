@@ -16,7 +16,6 @@ import org.jspecify.annotations.NullMarked;
 /// @param failures the changes that could not be applied, in the order they were attempted
 @NullMarked
 public record ApplyResult(List<Failure> failures) {
-
     /// Everything asked for was applied.
     public static final ApplyResult SUCCESS = new ApplyResult(List.of());
 
