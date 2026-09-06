@@ -150,10 +150,14 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
         return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
     }
 
-    /// The list itself, not a copy, and [#setSelectedEntries] replaces its contents, which
-    /// happens whenever the user selects elsewhere or switches to another library. A caller that
-    /// hands the selection to something outliving the current event, such as a background task,
-    /// has to copy it first, or it will act on a selection made since.
+    /// The live selection, not a snapshot of it.
+    ///
+    /// [#setSelectedEntries] replaces the contents of this very list, which happens every time the
+    /// user selects different entries or switches to another library.
+    ///
+    /// Copy it before handing it to anything that reads it later, such as a background task.
+    /// A task holding this list sees the selection as it is when it looks, not as it was when the
+    /// task started.
     @Override
     public ObservableList<BibEntry> getSelectedEntries() {
         return selectedEntries;
