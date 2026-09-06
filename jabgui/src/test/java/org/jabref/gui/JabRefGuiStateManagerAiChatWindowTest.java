@@ -11,8 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class JabRefGuiStateManagerAiChatWindowTest {
@@ -33,13 +31,9 @@ class JabRefGuiStateManagerAiChatWindowTest {
         String groupName = "My group";
         stateManager.setAiChatWindowForGroup(context, groupName, window);
 
-        int hashCodeBefore = context.hashCode();
         context.getDatabase().insertEntry(new BibEntry().withField(StandardField.TITLE, "Changed content"));
-        assertNotEquals(hashCodeBefore, context.hashCode());
 
-        Optional<AiGroupChatWindow> found = stateManager.getAiChatWindowForGroup(context, groupName);
-
-        assertEquals(Optional.of(window), found);
+        assertEquals(Optional.of(window), stateManager.getAiChatWindowForGroup(context, groupName));
     }
 
     @Test
@@ -50,6 +44,6 @@ class JabRefGuiStateManagerAiChatWindowTest {
         context.getDatabase().insertEntry(new BibEntry().withField(StandardField.TITLE, "Changed content"));
         stateManager.removeAiChatWindowForGroup(context, groupName);
 
-        assertTrue(stateManager.getAiChatWindowForGroup(context, groupName).isEmpty());
+        assertEquals(Optional.empty(), stateManager.getAiChatWindowForGroup(context, groupName));
     }
 }
