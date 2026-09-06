@@ -321,20 +321,17 @@ class GitMergeDriver implements Callable<Integer> {
         return conflicts;
     }
 
-    /// The properties the planner does not compare: everything but the fields.
     private static boolean differsBeyondFields(BibEntry one, BibEntry other) {
         return !one.getType().equals(other.getType())
                 || !one.getUserComments().equals(other.getUserComments());
     }
 
-    /// Both sides changed the value, and to something different.
     private static <T> boolean diverged(BibEntry base, BibEntry current, BibEntry other, Function<BibEntry, T> value) {
         return !value.apply(base).equals(value.apply(current))
                 && !value.apply(base).equals(value.apply(other))
                 && !value.apply(current).equals(value.apply(other));
     }
 
-    /// Applies a value changed in OTHER alone, that is: as long as CURRENT still holds BASE's value.
     private static <T> void takeFromOther(BibEntry base, BibEntry current, BibEntry other, Function<BibEntry, T> value, BiConsumer<BibEntry, T> setter) {
         if (value.apply(base).equals(value.apply(current)) && !value.apply(base).equals(value.apply(other))) {
             setter.accept(current, value.apply(other));

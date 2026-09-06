@@ -17,7 +17,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitMergeDriverTest extends AbstractJabKitTest {
 
@@ -82,7 +81,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: changed on both sides with different content
+                """, commandLine.getErrorOutput());
         BibEntry smith = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Smith2020")
                 .withField(StandardField.AUTHOR, "Smith, John")
@@ -131,7 +133,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: changed on both sides with different content
+                """, commandLine.getErrorOutput());
         BibEntry smith = new BibEntry(StandardEntryType.Report)
                 .withCitationKey("Smith2020")
                 .withField(StandardField.AUTHOR, "Smith, John")
@@ -149,7 +154,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: changed in CURRENT, deleted in OTHER
+                """, commandLine.getErrorOutput());
         BibEntry smith = new BibEntry(StandardEntryType.Report)
                 .withCitationKey("Smith2020")
                 .withField(StandardField.AUTHOR, "Smith, John")
@@ -230,7 +238,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: changed on both sides with different content
+                """, commandLine.getErrorOutput());
         assertEquals(parse(getClassResourceAsPath("merge-comment-current.bib")).getFirst().getUserComments(),
                 parse(current).getFirst().getUserComments());
     }
@@ -270,7 +281,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: deleted in CURRENT, changed in OTHER
+                """, commandLine.getErrorOutput());
         assertEquals(List.of(DOE), parse(current));
     }
 
@@ -283,7 +297,10 @@ class GitMergeDriverTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
 
         assertEquals(1, exitCode);
-        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals("""
+                1 entries could not be merged automatically:
+                  Smith2020: changed in CURRENT, deleted in OTHER
+                """, commandLine.getErrorOutput());
         assertEquals(parse(getClassResourceAsPath("merge-comment-current.bib")), parse(current));
     }
 
