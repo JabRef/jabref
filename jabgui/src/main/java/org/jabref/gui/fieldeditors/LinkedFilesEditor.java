@@ -85,6 +85,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final FieldCheckers fieldCheckers;
+    private final UndoManager undoManager;
 
     @Inject
     private DialogService dialogService;
@@ -96,8 +97,6 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private JournalAbbreviationRepository abbreviationRepository;
     @Inject
     private TaskExecutor taskExecutor;
-    @Inject
-    private UndoManager undoManager;
     @Inject
     private FileUpdateMonitor fileUpdateMonitor;
     @Inject
@@ -113,11 +112,13 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
                              SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers) {
+                             FieldCheckers fieldCheckers,
+                             UndoManager undoManager) {
         this.field = field;
         this.databaseContext = databaseContext;
         this.suggestionProvider = suggestionProvider;
         this.fieldCheckers = fieldCheckers;
+        this.undoManager = undoManager;
 
         ViewLoader.view(this)
                   .root(this)

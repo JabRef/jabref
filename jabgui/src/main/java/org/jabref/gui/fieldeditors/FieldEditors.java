@@ -85,7 +85,7 @@ public class FieldEditors {
         } else if (field == StandardField.GROUPS) {
             return new GroupsEditor(field, suggestionProvider, fieldCheckers, preferences.getBibEntryPreferences(), databaseContext, undoManager);
         } else if (field == StandardField.FILE) {
-            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
+            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers, undoManager);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
