@@ -195,7 +195,8 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void lookUpDoi(BibEntry entry) {
-        lookUpDoi(entry, () -> { });
+        lookUpDoi(entry, () -> {
+        });
     }
 
     public void lookUpDoi(BibEntry entry, Runnable onDoiFound) {
