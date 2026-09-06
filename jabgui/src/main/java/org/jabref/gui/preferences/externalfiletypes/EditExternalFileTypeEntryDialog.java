@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,10 +14,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
@@ -40,8 +38,6 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private EditExternalFileTypeViewModel viewModel;
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-
     public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
         this.item = item;
         this.fileTypes = fileTypes;
@@ -54,7 +50,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
+        confirmDialogButton.disableProperty().bind(viewModel.validProperty().not());
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
@@ -65,8 +61,6 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        visualizer.setDecoration(new IconValidationDecorator());
-
         viewModel = new EditExternalFileTypeViewModel(item, fileTypes);
 
         icon.setGraphic(viewModel.getIcon());
@@ -80,11 +74,9 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());
 
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.extensionValidation(), extension, true);
-            visualizer.initVisualization(viewModel.nameValidation(), name, true);
-            visualizer.initVisualization(viewModel.mimeTypeValidation(), mimeType, true);
-        });
+        new ValidationVisualizer().initVisualization(viewModel.extensionProperty(), extension);
+        new ValidationVisualizer().initVisualization(viewModel.nameProperty(), name);
+        new ValidationVisualizer().initVisualization(viewModel.mimeTypeProperty(), mimeType);
     }
 
     @FXML

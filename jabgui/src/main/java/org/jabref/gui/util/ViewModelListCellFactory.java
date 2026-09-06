@@ -21,10 +21,12 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.Subscription;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
 
 /// Constructs a [ListCell] based on the view model of the row and a bunch of specified converter methods.
 ///
@@ -46,7 +48,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
     private BiConsumer<T, ? super DragEvent> toOnDragDone;
     private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
-    private Callback<T, ValidationStatus> validationStatusProperty;
+    private Callback<T, ReadOnlyConstrainedProperty<?, ValidationMessage>> validationProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -140,8 +142,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withValidation(Callback<T, ValidationStatus> validationStatusProperty) {
-        this.validationStatusProperty = validationStatusProperty;
+    public ViewModelListCellFactory<T> withValidation(Callback<T, ReadOnlyConstrainedProperty<?, ValidationMessage>> validationProperty) {
+        this.validationProperty = validationProperty;
         return this;
     }
 
@@ -238,15 +240,15 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                                 pseudoClassWithCondition.getKey(),
                                 condition));
                     }
-                    if (validationStatusProperty != null) {
-                        validationStatusProperty.call(viewModel)
-                                                .getHighestMessage()
-                                                .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+                    if (validationProperty != null) {
+                        ReadOnlyConstrainedProperty<?, ValidationMessage> validation = validationProperty.call(viewModel);
+                        ValidationVisualizer.highestMessage(validation)
+                                            .ifPresent(message -> setTooltip(new Tooltip(message.message())));
 
                         subscriptions.add(BindingsHelper.includePseudoClassWhen(
                                 this,
                                 INVALID_PSEUDO_CLASS,
-                                validationStatusProperty.call(viewModel).validProperty().not()));
+                                validation.validProperty().not()));
                     }
                 }
             }

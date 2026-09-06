@@ -40,7 +40,8 @@ open module org.jabref {
     requires com.dlsc.unitfx;
 
     requires de.saxsys.mvvmfx;
-    requires de.saxsys.mvvmfx.validation;
+
+    requires jfxcore.validation;
 
     requires org.controlsfx.controls;
     requires org.fxmisc.flowless;

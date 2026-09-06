@@ -16,18 +16,21 @@ import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
+
 import com.tobiasdiez.easybind.Subscription;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
 
 public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
-    private Function<S, ValidationStatus> validationStatusProperty;
+    private Function<S, ReadOnlyConstrainedProperty<?, ValidationMessage>> validationProperty;
     private StringConverter<T> stringConverter;
 
-    public ViewModelTextFieldTableCellVisualizationFactory<S, T> withValidation(Function<S, ValidationStatus> validationStatusProperty) {
-        this.validationStatusProperty = validationStatusProperty;
+    public ViewModelTextFieldTableCellVisualizationFactory<S, T> withValidation(Function<S, ReadOnlyConstrainedProperty<?, ValidationMessage>> validationProperty) {
+        this.validationProperty = validationProperty;
         return this;
     }
 
@@ -85,15 +88,14 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
                     pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
                     S viewModel = getTableRow().getItem();
-                    if (validationStatusProperty != null) {
-                        validationStatusProperty.apply(viewModel)
-                                                .getHighestMessage()
-                                                .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+                    if (validationProperty != null) {
+                        ValidationVisualizer.highestMessage(validationProperty.apply(viewModel))
+                                            .ifPresent(message -> setTooltip(new Tooltip(message.message())));
 
                         subscriptions.add(BindingsHelper.includePseudoClassWhen(
                                 this,
                                 INVALID_PSEUDO_CLASS,
-                                validationStatusProperty.apply(viewModel).validProperty().not()));
+                                validationProperty.apply(viewModel).validProperty().not()));
                     }
                 }
             }

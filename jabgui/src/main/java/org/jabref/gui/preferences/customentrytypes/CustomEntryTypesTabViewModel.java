@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -37,17 +37,23 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
-    private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
-    private final StringProperty newFieldToAdd = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> entryTypeToAdd = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> StringUtil.isNotBlank(input) && !input.contains(" "),
+                    ValidationMessage.error(Localization.lang("Entry type cannot be empty and must not contain spaces."))));
+    private final ConstrainedStringProperty<ValidationMessage> newFieldToAdd = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> StringUtil.isNotBlank(input) && !input.contains(" "),
+                    ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces."))));
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
@@ -56,8 +62,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final BibDatabaseMode bibDatabaseMode;
 
-    private final Validator entryTypeValidator;
-    private final Validator fieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
     Predicate<Field> isMultiline = field -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
@@ -72,16 +76,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         this.bibDatabaseMode = mode;
 
         this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());
-
-        entryTypeValidator = new FunctionBasedValidator<>(
-                entryTypeToAdd,
-                input -> StringUtil.isNotBlank(input) && !input.contains(" "),
-                ValidationMessage.error(Localization.lang("Entry type cannot be empty and must not contain spaces.")));
-        fieldValidator = new FunctionBasedValidator<>(
-                newFieldToAdd,
-                input -> StringUtil.isNotBlank(input) && !input.contains(" "),
-                ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces."))
-        );
     }
 
     @Override
@@ -228,11 +222,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         return this.selectedEntryType;
     }
 
-    public StringProperty entryTypeToAddProperty() {
+    public ConstrainedStringProperty<ValidationMessage> entryTypeToAddProperty() {
         return this.entryTypeToAdd;
     }
 
-    public StringProperty newFieldToAddProperty() {
+    public ConstrainedStringProperty<ValidationMessage> newFieldToAddProperty() {
         return this.newFieldToAdd;
     }
 
@@ -242,14 +236,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public ObservableList<Field> fieldsForAdding() {
         return this.fieldsForAdding;
-    }
-
-    public ValidationStatus entryTypeValidationStatus() {
-        return entryTypeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus fieldValidationStatus() {
-        return fieldValidator.getValidationStatus();
     }
 
     public void resetMultilineFieldsToDefault() {

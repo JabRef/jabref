@@ -13,14 +13,13 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class GitCommitDialogView extends BaseDialog<Void> {
@@ -37,8 +36,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @Inject private GitHandlerRegistry gitHandlerRegistry;
     @Inject private GuiPreferences preferences;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public GitCommitDialogView() {
         ViewLoader.view(this)
@@ -71,9 +68,9 @@ public class GitCommitDialogView extends BaseDialog<Void> {
             return null;
         });
 
+        new ValidationVisualizer().initVisualization(viewModel.commitMessageProperty(), commitMessage);
+
         Platform.runLater(() -> {
-            visualizer.setDecoration(new IconValidationDecorator());
-            visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
             // [impl->req~ux.textdialogs.focus~1]
             commitMessage.requestFocus();
         });

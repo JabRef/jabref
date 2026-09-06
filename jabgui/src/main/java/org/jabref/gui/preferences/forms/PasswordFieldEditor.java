@@ -2,7 +2,7 @@ package org.jabref.gui.preferences.forms;
 
 import java.util.function.Consumer;
 
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.Property;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
@@ -32,12 +32,12 @@ public final class PasswordFieldEditor {
     private final EnhancedPasswordField field = new EnhancedPasswordField();
     private final HBox buttons = new HBox();
 
-    private PasswordFieldEditor(StringProperty value) {
+    private PasswordFieldEditor(Property<String> value) {
         field.textProperty().bindBidirectional(value);
         field.setRight(buttons);
     }
 
-    public static PasswordFieldEditor create(StringProperty value) {
+    public static PasswordFieldEditor create(Property<String> value) {
         return new PasswordFieldEditor(value);
     }
 

@@ -64,12 +64,12 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         viewModel.themesListProperty(),
                                         viewModel.selectedThemeProperty(),
                                         ThemePreset::getLocalizedName,
-                                        theme -> theme.validate(viewModel.themeValidationStatus()))
+                                        theme -> theme.validate(viewModel.selectedThemeProperty()))
                                 .combo(Localization.lang("Color scheme"),
                                         viewModel.colorSchemeListProperty(),
                                         viewModel.selectedThemeColorSchemeProperty(),
                                         ThemeColorScheme::getLocalizedName,
-                                        colorScheme -> colorScheme.validate(viewModel.themeColorSchemeValidationStatus()))
+                                        colorScheme -> colorScheme.validate(viewModel.selectedThemeColorSchemeProperty()))
                                 .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
                                         path -> path
                                                 .browse(viewModel::importCSSFile)
@@ -78,7 +78,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                 .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
                                 .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
                                 .field(Localization.lang("Size"), buildFontSizeSpinner(),
-                                        size -> size.validate(viewModel.fontSizeValidationStatus())),
+                                        size -> size.validate(viewModel.fontSizeProperty())),
                         appearance -> appearance.help(URLs.CUSTOM_THEME_DOC))
 
                 .section(Localization.lang("User interface"), userInterface -> userInterface
@@ -93,19 +93,19 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 .section(Localization.lang("Single instance"), singleInstance -> singleInstance
                         .checkWithField(Localization.lang("Enforce single JabRef instance (and allow remote operations) using port"),
                                 viewModel.remoteServerProperty(), viewModel.remotePortProperty(),
-                                port -> port.validate(viewModel.remotePortValidationStatus())
+                                port -> port.validate(viewModel.remotePortProperty())
                                             .help(HelpFile.REMOTE)))
 
                 .section(Localization.lang("HTTP Server"), httpServer -> httpServer
                         .checkWithField(Localization.lang("Enable HTTP Server (e.g., for JabMap) on port"),
                                 viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
-                                port -> port.validate(viewModel.httpPortValidationStatus()))
+                                port -> port.validate(viewModel.httpPortProperty()))
                         .checkbox(Localization.lang("Skip import dialog for entries received from browser extensions"), viewModel.directHttpImportProperty()))
 
                 .section(Localization.lang("LSP Server"), lspServer -> lspServer
                         .checkWithField(Localization.lang("Enable LSP Server on port"),
                                 viewModel.enableLanguageServerProperty(), viewModel.languageServerPortProperty(),
-                                port -> port.validate(viewModel.languageServerPortValidationStatus())))
+                                port -> port.validate(viewModel.languageServerPortProperty())))
 
                 .section(Localization.lang("Libraries"), libraries -> libraries
                         .combo(Localization.lang("Default library mode"),

@@ -8,8 +8,6 @@ import java.util.function.Consumer;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -17,7 +15,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -49,17 +46,17 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.SearchableElement;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.dlsc.gemsfx.TagsField;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -85,7 +82,7 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 ///                 .checkWithField("Enable HTTP Server on port",
 ///                         viewModel.enableHttpServerProperty(),
 ///                         viewModel.httpPortProperty(),
-///                         port -> port.validate(viewModel.httpPortValidationStatus())
+///                         port -> port.validate(viewModel.httpPortProperty())
 ///                                     .help(HelpFile.REMOTE))
 ///
 ///                 // A group of related elements, can be disabled as one.
@@ -115,7 +112,7 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 /// anything outside it.
 ///
 /// Consecutive labelled fields share an aligned two-column [GridPane]. Validation decoration is
-/// applied per control once that control reaches a scene, which is when ControlsFX can position it.
+/// applied per control once that control reaches a showing window, which is when it can be positioned.
 @NullMarked
 public class PreferencesFormBuilder {
 
@@ -125,7 +122,7 @@ public class PreferencesFormBuilder {
     private final VBox root = new VBox(GAP);
     private final Deque<Pane> containers = new ArrayDeque<>();
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer visualizer = new ValidationVisualizer();
 
     /// Every visible text handed to the builder, paired with the node it captions. The
     /// preferences search matches against these and highlights the node without reflection.
@@ -149,7 +146,6 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.visualizer.setDecoration(new IconValidationDecorator());
         this.containers.push(root);
     }
 
@@ -202,13 +198,13 @@ public class PreferencesFormBuilder {
     /// A checkbox with an inline value field that is enabled only while the box is ticked (the
     /// recurring "Enable ... on port [....]" pattern). The configured element is the **value field**;
     /// its disable binding to the checkbox is preserved even if you add one of your own.
-    public PreferencesFormBuilder checkWithField(String text, Property<Boolean> enabled, StringProperty fieldValue) {
+    public PreferencesFormBuilder checkWithField(String text, Property<Boolean> enabled, Property<String> fieldValue) {
         return checkWithField(text, enabled, fieldValue, noConfig());
     }
 
     public PreferencesFormBuilder checkWithField(String text,
                                                  Property<Boolean> enabled,
-                                                 StringProperty fieldValue,
+                                                 Property<String> fieldValue,
                                                  Consumer<InputElement<TextField>> config) {
         return checkbox(text, enabled, box -> box.attachField(fieldValue, field -> {
             field.node().setMaxWidth(FormMetrics.SHORT_FIELD_WIDTH);
@@ -216,11 +212,11 @@ public class PreferencesFormBuilder {
         }));
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value) {
+    public PreferencesFormBuilder stringField(@Nullable String label, Property<String> value) {
         return stringField(label, value, noConfig());
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value, Consumer<InputElement<TextField>> config) {
+    public PreferencesFormBuilder stringField(@Nullable String label, Property<String> value, Consumer<InputElement<TextField>> config) {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
@@ -558,22 +554,11 @@ public class PreferencesFormBuilder {
         }
     }
 
-    /// Applies a validation decoration once `control` actually sits in a scene — ControlsFX
-    /// positions the decoration against the parent, so doing this earlier is a no-op at best.
-    private void decorate(ValidationStatus status, Control control) {
-        if (control.getScene() != null) {
-            visualizer.initVisualization(status, control);
-            return;
-        }
-        control.sceneProperty().addListener(new ChangeListener<>() {
-            @Override
-            public void changed(ObservableValue<? extends Scene> scene, Scene oldScene, @Nullable Scene newScene) {
-                if (newScene != null) {
-                    control.sceneProperty().removeListener(this);
-                    visualizer.initVisualization(status, control);
-                }
-            }
-        });
+    /// Applies a validation decoration to `control`. The control need not be in a scene yet —
+    /// [ValidationVisualizer] tracks the control's scene and window itself and only shows the
+    /// decoration once it can be positioned.
+    private void decorate(ReadOnlyConstrainedProperty<?, ValidationMessage> validation, Control control) {
+        visualizer.initVisualization(validation, control);
     }
 
     private <E> PreferencesFormBuilder configured(E element, Consumer<E> config) {
@@ -919,10 +904,10 @@ public class PreferencesFormBuilder {
         }
 
         /// Decorates a control the builder did not create — one the [#custom] node brought
-        /// with it — so that a tab needs no [ControlsFxVisualizer] of its own. The control is
+        /// with it — so that a tab needs no [ValidationVisualizer] of its own. The control is
         /// named explicitly because this handle addresses the custom node, not its insides.
-        public NodeElement<N> validate(ValidationStatus status, Control control) {
-            form.decorate(status, control);
+        public NodeElement<N> validate(ReadOnlyConstrainedProperty<?, ValidationMessage> validation, Control control) {
+            form.decorate(validation, control);
             return this;
         }
     }
@@ -942,9 +927,9 @@ public class PreferencesFormBuilder {
             return this;
         }
 
-        /// Decorates the control with `status`, applied once the control reaches a scene.
-        public InputElement<N> validate(ValidationStatus status) {
-            form.decorate(status, node);
+        /// Decorates the control with `validation`, applied once the control reaches a scene.
+        public InputElement<N> validate(ReadOnlyConstrainedProperty<?, ValidationMessage> validation) {
+            form.decorate(validation, node);
             return this;
         }
 
@@ -977,11 +962,11 @@ public class PreferencesFormBuilder {
         /// disabled state; on a checkbox or radio it is additionally disabled while the toggle is
         /// unselected (the recurring "option with inline value" pattern). The config lambda
         /// addresses the new field.
-        public InputElement<N> attachField(StringProperty value) {
+        public InputElement<N> attachField(Property<String> value) {
             return attachField(value, noConfig());
         }
 
-        public InputElement<N> attachField(StringProperty value, Consumer<InputElement<TextField>> config) {
+        public InputElement<N> attachField(Property<String> value, Consumer<InputElement<TextField>> config) {
             TextField field = new TextField();
             field.setMaxWidth(Double.MAX_VALUE);
             field.textProperty().bindBidirectional(value);

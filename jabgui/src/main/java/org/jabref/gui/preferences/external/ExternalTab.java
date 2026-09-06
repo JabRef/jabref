@@ -55,12 +55,12 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
                 .section(Localization.lang("Push applications"), push -> push
                         .custom(buildPushGrid(), grid -> grid
-                                .validate(viewModel.citeCommandValidationStatus(), citeCommand)))
+                                .validate(viewModel.citeCommandProperty(), citeCommand)))
 
                 .section(Localization.lang("Custom applications"), applications -> applications
                         .custom(buildCustomApplicationsGrid(), grid -> grid
-                                .validate(viewModel.terminalCommandValidationStatus(), customTerminalCommand)
-                                .validate(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand)))
+                                .validate(viewModel.customTerminalCommandProperty(), customTerminalCommand)
+                                .validate(viewModel.customFileBrowserCommandProperty(), customFileBrowserCommand)))
 
                 .build());
     }
@@ -137,7 +137,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         return grid;
     }
 
-    private TextField commandField(String tooltip, javafx.beans.property.StringProperty value, CheckBox enabler) {
+    private TextField commandField(String tooltip, javafx.beans.property.Property<String> value, CheckBox enabler) {
         TextField field = new TextField();
         field.textProperty().bindBidirectional(value);
         field.setTooltip(new Tooltip(tooltip));

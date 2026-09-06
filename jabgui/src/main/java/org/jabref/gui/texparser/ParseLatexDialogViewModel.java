@@ -15,8 +15,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -25,6 +23,8 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.texparser.DefaultLatexParser;
@@ -35,10 +35,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +49,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
     private final FileUpdateMonitor fileMonitor;
-    private final StringProperty latexFileDirectory;
-    private final Validator latexDirectoryValidator;
+    private final ConstrainedStringProperty<ValidationMessage> latexFileDirectory;
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final BooleanProperty noFilesFound;
@@ -69,25 +66,21 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.fileMonitor = fileMonitor;
-        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()))
-                                                                          .toAbsolutePath().toString());
+        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
+        this.latexFileDirectory = new SimpleConstrainedStringProperty<>(
+                databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                               .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()))
+                               .toAbsolutePath().toString(),
+                ValidationConstraints.predicate(isDirectory, ValidationMessage.error(Localization.lang("Please enter a valid file path."))));
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
         this.noFilesFound = new SimpleBooleanProperty(true);
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
-
-        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
-        latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
-    public StringProperty latexFileDirectoryProperty() {
+    public ConstrainedStringProperty<ValidationMessage> latexFileDirectoryProperty() {
         return latexFileDirectory;
-    }
-
-    public ValidationStatus latexDirectoryValidation() {
-        return latexDirectoryValidator.getValidationStatus();
     }
 
     public ObjectProperty<FileNodeViewModel> rootProperty() {

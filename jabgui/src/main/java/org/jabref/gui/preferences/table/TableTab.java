@@ -47,7 +47,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
                 .section(Localization.lang("Columns"), columns -> columns
                         .custom(buildColumnsRegion(), region -> region
-                                .validate(viewModel.columnsListValidationStatus(), columnsList))
+                                .validate(viewModel.columnsListProperty(), columnsList))
                         .checkbox(Localization.lang("Enable special fields"), viewModel.specialFieldsEnabledProperty(),
                                 specialFields -> specialFields.help(StandardActions.HELP_SPECIAL_FIELDS, HelpFile.SPECIAL_FIELDS))
                         .checkbox(Localization.lang("Show extra columns"), viewModel.extraFileColumnsEnabledProperty())
