@@ -108,7 +108,7 @@ Needs: impl
 `req~ux.text-filtering.case-insensitive-separators~1`
 
 When users filter textual lists, matching must ignore case and treat punctuation or whitespace separators as equivalent.
-For example, a search for `Springer lecture` should match `Springer - Lecture Notes in Computer Science`.
+For example, a search for `Springer lecture` or `SPRINGER LECTURE` or `springer lecture` should match `Springer - Lecture Notes in Computer Science`.
 
 Needs: impl
 
