@@ -94,7 +94,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved switching between large libraries so entry previews remain responsive while automatic groups and their counts are refreshed. [#16289](https://github.com/JabRef/jabref/pull/16289)
 - We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types. [#16055](https://github.com/JabRef/jabref/issues/16055)
 - AI summaries now render with regular JavaFX components instead of an embedded browser, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
-- We separated AI features behind a service provider interface to allow running JabRef without AI dependencies. [TODO](https://github.com/JabRef/jabref/issues/TODO)
+- We separated AI features behind a service provider interface to allow running JabRef without AI dependencies. [#16884](https://github.com/JabRef/jabref/pull/16884)
 - We replaced the [scala-based LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine](https://github.com/tomtung/latex2unicode) with the new [SnuggleTeX](https://github.com/davemckain/snuggletex)-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The "Unicode to LaTeX" cleanup emits accent commands with a single brace group (`{\aa}` instead of `{{\aa}}`). [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
