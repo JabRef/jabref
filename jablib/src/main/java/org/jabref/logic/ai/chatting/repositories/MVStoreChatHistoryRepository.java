@@ -5,9 +5,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.io.MVStoreBase;
 import org.jabref.model.ai.chatting.ChatIdentifier;
 import org.jabref.model.ai.chatting.ChatMessage;
 

@@ -6,12 +6,12 @@ import java.util.Objects;
 
 import javafx.beans.property.ObjectProperty;
 
-import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.io.MVStoreBase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 

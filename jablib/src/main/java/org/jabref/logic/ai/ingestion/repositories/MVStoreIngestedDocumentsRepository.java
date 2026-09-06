@@ -3,9 +3,9 @@ package org.jabref.logic.ai.ingestion.repositories;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.io.MVStoreBase;
 
 /// This class is responsible for recording the information about which documents (or documents) have been fully ingested.
 ///
