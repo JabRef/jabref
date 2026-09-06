@@ -35,6 +35,7 @@ Needs: impl
 `req~git.commit.preview-current-library~1`
 
 Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
+Selecting a groups tree change must display the old and new trees with highlighted differences and respect the selected word or character highlighting mode.
 
 Needs: impl
 
