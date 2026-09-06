@@ -7,15 +7,14 @@ on:
 jobs:
   # A draft is not reviewable; the label is re-added by "Comment on PR" once the PR is ready again
   # (the label workflows only listen to "labeled", so removing it here triggers nothing further).
-  # Race with "Comment on PR": it re-reads isDraft immediately before writing the label, so the
-  # remaining window is one API round-trip. A shared per-PR concurrency group cannot close it -
-  # that job runs on workflow_run, where the PR number is only known after a step has run.
+  # Shares a concurrency group with the label evaluation in "Comment on PR", keyed by head
+  # repository and branch because that job runs on workflow_run, where the PR number is only known
+  # after a step has run.
   remove-label-on-draft:
     runs-on: ubuntu-slim
     if: github.event.action == 'converted_to_draft'
-    # Same group as the label evaluation in "Comment on PR": the removal must not interleave with it.
     concurrency:
-      group: pr-status-${{ github.event.pull_request.number }}
+      group: pr-status-${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.ref }}
       cancel-in-progress: false
     permissions:
       pull-requests: write
