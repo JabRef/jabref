@@ -27,6 +27,12 @@ jobs:
       ${{ github.repository == 'JabRef/jabref'
           && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]')
           && (github.event_name != 'pull_request_review_comment' || github.event.comment.user.login == github.event.pull_request.user.login) }}
+    # A burst of review activity on one PR only needs the last event to reach "Comment on PR";
+    # collapsing the bursts here keeps the downstream runs it would otherwise have to cancel
+    # from being started at all.
+    concurrency:
+      group: pr-review-activity-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-slim
     permissions:
       contents: read

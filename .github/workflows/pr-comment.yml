@@ -29,6 +29,15 @@ on:
 jobs:
   comment:
     if: ${{ github.repository == 'JabRef/jabref' }}
+    # The label decision reads live review-thread state and writes it back minutes later, so two
+    # runs for the same PR would race and the slower one would restore the state it started from.
+    # The PR number is only known after the artifact is read, too late for a group expression -
+    # head repository plus head branch identifies the same pull request just as well.
+    concurrency:
+      group: pr-comment-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
+      # The newest run has the freshest view; an interrupted run's work is redone by the one
+      # that replaced it.
+      cancel-in-progress: true
     runs-on: ubuntu-slim
     permissions:
       actions: read
