@@ -239,6 +239,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public static boolean matchStyleSearch(String styleName, String searchTerm) {
+        // [impl->req~ux.text-filtering.case-insensitive-separators~1]
         List<String> searchTerms = STYLE_SEARCH_SEPARATORS.splitAsStream(searchTerm.toLowerCase(Locale.ROOT))
                                                           .filter(term -> !term.isBlank())
                                                           .toList();
