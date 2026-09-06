@@ -80,6 +80,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
+    /// Keyed by [BibDatabaseContext#getUid()] instead of [BibDatabaseContext], because [BibDatabaseContext#equals(Object)] (and the matching [BibDatabaseContext#hashCode()]) change with the library content and cannot be used as [HashMap] keys.
     private final Map<String, Map<String, AiGroupChatWindow>> groupAiChatWindows = new HashMap<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
