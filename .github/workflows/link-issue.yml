@@ -118,12 +118,12 @@ jobs:
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-slim
-    # Serialized repository-wide, not per pull request: the STRANGE_USERS secret is one ledger that can only be
-    # overwritten as a whole, so two runs recording an incident at the same time would lose one of the records.
-    # ponytail: a queued third run is dropped by GitHub; acceptable because both comments and the strike are keyed
-    # by pull request number and are re-applied on the next event of that pull request.
+    # The job posts comments and updates the STRANGE_USERS ledger with separate API calls; two runs of the same pull
+    # request must not interleave. Grouping per pull request keeps a busy repository from dropping other pull requests'
+    # runs - GitHub keeps only one pending run per group. A ledger update lost to a run of another pull request is
+    # re-applied on the next event of this pull request, because every effect below is keyed by pull request number.
     concurrency:
-      group: link-issue-ensure-assignment
+      group: link-issue-ensure-assignment-${{ github.event.pull_request.number }}
       cancel-in-progress: false
     permissions:
       issues: write
@@ -142,52 +142,45 @@ jobs:
         with:
           packages: jq
           version: 1.0
-      - name: Count previous strikes of the PR author
-        id: strikes
-        env:
-          STRANGE_USERS: ${{ secrets.STRANGE_USERS }}
-        run: |
-          set -euo pipefail
-          STRANGE_USERS="${STRANGE_USERS:-}"
-          [ -n "$STRANGE_USERS" ] || STRANGE_USERS='{}'
-          COUNT=$(jq --arg u "$PR_AUTHOR" '(.[$u] // []) | length' <<< "$STRANGE_USERS")
-          echo "Author '$PR_AUTHOR' has $COUNT strike(s)."
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          # Three strikes: the PR is closed and nothing else (labels, assignment) happens.
-          if [ "$COUNT" -ge 3 ]; then
-            echo "blocked=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "blocked=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Close PR of a repeatedly conspicuous author
-        if: steps.strikes.outputs.blocked == 'true'
-        run: |
-          set -euo pipefail
-          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
-          gh pr close "$PR_NUMBER" --repo "$REPO"
-      - name: Check whether the PR author is assigned to the issue
+      - name: Pin the issue, or warn about a pull request on somebody else's issue
         id: assignment
-        if: steps.strikes.outputs.blocked != 'true'
         run: |
           set -euo pipefail
-          ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]')
+
+          echo "warned=false" >> "$GITHUB_OUTPUT"
+
+          # Read and act in one step: assignees can change at any moment, and a decision made in an earlier step
+          # would pin or warn based on an assignment that no longer holds.
+          ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]' | jq -c '.')
           echo "Assignees of issue #$ISSUE_NUMBER: $ASSIGNEES"
-          if [ "$(jq 'length' <<< "$ASSIGNEES")" -eq 0 ] || jq -e --arg u "$PR_AUTHOR" 'index($u)' <<< "$ASSIGNEES" > /dev/null; then
-            echo "author_assigned=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "author_assigned=false" >> "$GITHUB_OUTPUT"
+
+          if [ "$(jq 'length' <<< "$ASSIGNEES")" -ne 0 ] && ! jq -e --arg u "$PR_AUTHOR" 'index($u)' <<< "$ASSIGNEES" > /dev/null; then
+            MENTIONS=$(jq -r 'map("@" + .) | join(", ")' <<< "$ASSIGNEES")
+
+            # The workflow also runs on "edited"/"synchronize", so each comment is posted only once. Both markers are
+            # checked separately: a run that failed after the first comment has to be able to catch up on the second one.
+            # Only comments written by this workflow itself count - anybody can post the marker text and would otherwise
+            # silence their own strike. The comments are collected before searching them, because "grep -q" closes the
+            # pipe on the first match, which would fail the paginating "gh api" under "pipefail".
+            PR_MARKER="<!-- pr-on-foreign-issue -->"
+            PR_COMMENTS=$(gh api "/repos/$REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+            if ! grep -qF "$PR_MARKER" <<< "$PR_COMMENTS"; then
+              gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$PR_MARKER
+          Hi @$PR_AUTHOR, issue #$ISSUE_NUMBER is assigned to $MENTIONS, not to you. Please only work on issues assigned to you - see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md). The issue stays with its assignee and this pull request may be closed without review."
+            fi
+
+            ISSUE_MARKER="<!-- pr-on-foreign-issue:$PR_NUMBER -->"
+            ISSUE_COMMENTS=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+            if ! grep -qF "$ISSUE_MARKER" <<< "$ISSUE_COMMENTS"; then
+              gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$ISSUE_MARKER
+          @$PR_AUTHOR opened #$PR_NUMBER for this issue without being assigned. $MENTIONS: this does not affect your assignment."
+            fi
+
+            echo "warned=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-          echo "assignees=$ASSIGNEES" >> "$GITHUB_OUTPUT"
-      - name: Add label "📌 Pinned"
-        if: steps.assignment.outputs.author_assigned == 'true'
-        run: gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "📌 Pinned"
-      - name: Assign PR creator to issue
-        if: steps.assignment.outputs.author_assigned == 'true'
-        run: |
-          set -e
 
-          echo "Updating issue '$ISSUE_NUMBER'"
-
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "📌 Pinned"
 
           # Copy over labels from issue to PR if they match good first/second/third/forth issue or component:* labels
 
@@ -217,57 +210,17 @@ jobs:
             SILENT=true
           fi
 
-
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
-          # The "assignees" endpoint adds and is idempotent; PATCHing the full list would drop an assignee added since the check above.
+          # The "assignees" endpoint adds and is idempotent; PATCHing the full list would drop an assignee added since the read above.
+          echo "Assigning '$PR_AUTHOR' to issue #$ISSUE_NUMBER"
           if [ "$SILENT" = true ]; then
             gh api -X POST "/repos/$REPO/issues/$ISSUE_NUMBER/assignees" -f "assignees[]=$PR_AUTHOR" || true
           else
             gh api -X POST "/repos/$REPO/issues/$ISSUE_NUMBER/assignees" -f "assignees[]=$PR_AUTHOR"
           fi
-      - name: Warn about PR on an issue assigned to somebody else
-        id: warn
-        if: steps.assignment.outputs.author_assigned == 'false'
-        env:
-          ASSIGNEES: ${{ steps.assignment.outputs.assignees }}
-        run: |
-          set -euo pipefail
-
-          echo "warned=false" >> "$GITHUB_OUTPUT"
-
-          # The assignment may have changed while the previous steps ran - never warn somebody who meanwhile owns the issue.
-          ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]')
-          if [ "$(jq 'length' <<< "$ASSIGNEES")" -eq 0 ] || jq -e --arg u "$PR_AUTHOR" 'index($u)' <<< "$ASSIGNEES" > /dev/null; then
-            echo "Author '$PR_AUTHOR' is assigned by now - nothing to warn about."
-            exit 0
-          fi
-
-          MENTIONS=$(jq -r 'map("@" + .) | join(", ")' <<< "$ASSIGNEES")
-
-          # The workflow also runs on "edited"/"synchronize", so each comment is posted only once. Both markers are
-          # checked separately: a run that failed after the first comment has to be able to catch up on the second one.
-          # Only comments written by this workflow itself count - anybody can post the marker text and would otherwise silence their own strike.
-          bot_comments() {
-            gh api "/repos/$REPO/issues/$1/comments" --paginate \
-              --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body'
-          }
-
-          PR_MARKER="<!-- pr-on-foreign-issue -->"
-          if ! bot_comments "$PR_NUMBER" | grep -qF "$PR_MARKER"; then
-            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$PR_MARKER
-          Hi @$PR_AUTHOR, issue #$ISSUE_NUMBER is assigned to $MENTIONS, not to you. Please only work on issues assigned to you - see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md). The issue stays with its assignee and this pull request may be closed without review."
-          fi
-
-          ISSUE_MARKER="<!-- pr-on-foreign-issue:$PR_NUMBER -->"
-          if ! bot_comments "$ISSUE_NUMBER" | grep -qF "$ISSUE_MARKER"; then
-            gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$ISSUE_MARKER
-          @$PR_AUTHOR opened #$PR_NUMBER for this issue without being assigned. $MENTIONS: this does not affect your assignment."
-          fi
-
-          echo "warned=true" >> "$GITHUB_OUTPUT"
-      - name: Record strike in STRANGE_USERS
+      - name: Record incident in STRANGE_USERS
         id: record
-        if: steps.warn.outputs.warned == 'true'
+        if: steps.assignment.outputs.warned == 'true'
         env:
           STRANGE_USERS: ${{ secrets.STRANGE_USERS }}
           GH_TOKEN_STRANGE_USERS: ${{ secrets.GH_TOKEN_STRANGE_USERS }}
@@ -275,23 +228,26 @@ jobs:
           set -euo pipefail
           STRANGE_USERS="${STRANGE_USERS:-}"
           [ -n "$STRANGE_USERS" ] || STRANGE_USERS='{}'
-          # One strike per pull request: a rerun after a partial failure records the incident, a rerun after success does not duplicate it.
+
+          # One incident per pull request: a rerun after a partial failure records it, a rerun after success does not duplicate it.
           if [ "$(jq --arg u "$PR_AUTHOR" --arg pr "$PR_NUMBER" 'any((.[$u] // [])[]; .pr == $pr)' <<< "$STRANGE_USERS")" = 'true' ]; then
-            echo "Strike for '$PR_AUTHOR' on #$PR_NUMBER is already recorded."
-            jq --arg u "$PR_AUTHOR" '"count=" + (.[$u] | length | tostring)' -r <<< "$STRANGE_USERS" >> "$GITHUB_OUTPUT"
+            echo "Incident of '$PR_AUTHOR' on #$PR_NUMBER is already recorded."
+            jq -r --arg u "$PR_AUTHOR" '"count=" + (.[$u] | length | tostring)' <<< "$STRANGE_USERS" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          # No "count" output unless the ledger was written: an incident that cannot be persisted must not close a pull request.
+          if [ -z "${GH_TOKEN_STRANGE_USERS:-}" ]; then
+            echo "::warning::Secret GH_TOKEN_STRANGE_USERS is not set - incident of '$PR_AUTHOR' not persisted."
+            exit 0
+          fi
+
           UPDATED=$(jq -c --arg u "$PR_AUTHOR" --arg d "$(date -u +%F)" --arg pr "$PR_NUMBER" --arg issue "$ISSUE_NUMBER" \
             '.[$u] = ((.[$u] // []) + [{date: $d, pr: $pr, reason: ("PR on issue #" + $issue + " assigned to somebody else")}])' \
             <<< "$STRANGE_USERS")
-          COUNT=$(jq --arg u "$PR_AUTHOR" '.[$u] | length' <<< "$UPDATED")
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          if [ -z "${GH_TOKEN_STRANGE_USERS:-}" ]; then
-            echo "::warning::Secret GH_TOKEN_STRANGE_USERS is not set - strike for '$PR_AUTHOR' not persisted."
-            exit 0
-          fi
           GH_TOKEN="$GH_TOKEN_STRANGE_USERS" gh secret set STRANGE_USERS --repo "$REPO" --body "$UPDATED"
-      - name: Close PR after the third strike
+          jq -r --arg u "$PR_AUTHOR" '"count=" + (.[$u] | length | tostring)' <<< "$UPDATED" >> "$GITHUB_OUTPUT"
+      - name: Close the pull request causing the third incident
         if: steps.record.outputs.count >= 3
         run: |
           set -euo pipefail
