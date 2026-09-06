@@ -36,4 +36,10 @@
 ///   methods or dedicated hooks such as `tagsField`. The password editor deliberately has no
 ///   builder method: its variants differ per call site, and `field(label, editor)` places it just
 ///   as well.
+///
+/// The tabs using this DSL live in the sibling packages of `org.jabref.gui.preferences`.
+///
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html#preferences">Preferences component</a>
+/// @see <a href="https://devdocs.jabref.org/code-howtos/ui-recommendations.html#form-validation">Form validation</a>
+/// @see <a href="https://devdocs.jabref.org/decisions/0069-preferences-search-registration-vs-scene-graph-scan.html">ADR 0069: preferences search registration</a>
 package org.jabref.gui.preferences.forms;

@@ -50,7 +50,7 @@ public class AiChatView extends StackPane {
     @FXML private SimpleListView<String> followUpQuestionsSimpleListView;
 
     @FXML private Button infoButton;
-    // [impl->req~ai.chat.smart-prompt-field~1]
+    // [impl->feat~ai.chat.smart-prompt-field~1]
     @FXML private HistoryTextArea userMessageTextArea;
     @FXML private Button sendButton;
     @FXML private Button retryButton;
@@ -94,7 +94,7 @@ public class AiChatView extends StackPane {
         chatHistoryScrollPane.setRenderer(this::renderChatMessage);
         chatHistoryScrollPane.setAutoScrollToBottom(true);
 
-        // [pp->req~ai.ingestion.trigger-on-demand~1]
+        // [pp->feat~ai.ingestion.trigger-on-demand~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         restartNeededPane.managedProperty().bind(restartNeededPane.visibleProperty());
         noFilesErrorPane.managedProperty().bind(noFilesErrorPane.visibleProperty());
@@ -184,14 +184,14 @@ public class AiChatView extends StackPane {
         userMessageTextArea.clear();
     }
 
-    // [impl->req~ai.chat.retry-error~1]
+    // [impl->feat~ai.chat.retry-error~1]
     @FXML
     private void retry() {
         viewModel.regenerate();
     }
 
-    // [impl->req~ai.chat.cancel-generation~1]
-    // [impl->req~ai.chat.cancel-error-state~1]
+    // [impl->feat~ai.chat.cancel-generation~1]
+    // [impl->feat~ai.chat.cancel-error-state~1]
     @FXML
     private void cancel() {
         viewModel.cancel();

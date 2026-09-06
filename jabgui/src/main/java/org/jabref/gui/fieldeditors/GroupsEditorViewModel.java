@@ -11,7 +11,6 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
@@ -31,13 +30,13 @@ public class GroupsEditorViewModel extends AbstractEditorViewModel {
     public GroupsEditorViewModel(Field field,
                                  SuggestionProvider<?> suggestionProvider,
                                  FieldCheckers fieldCheckers,
-                                 CliPreferences preferences,
+                                 Character groupSeparator,
                                  UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         groupListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.groupSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
+        this.groupSeparator = groupSeparator;
         this.suggestionProvider = suggestionProvider;
 
         BindingsHelper.bindContentBidirectional(

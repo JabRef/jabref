@@ -57,7 +57,7 @@ public class GitRevisionLocator {
             RevCommit remote = walk.parseCommit(remoteId);
             RevCommit base = findMergeBase(repo, local, remote);
 
-            // [impl->req~ux.git-pull.unrelated-histories~1]
+            // [impl->req~git.pull.unrelated-histories~1]
             return new RevisionTriple(Optional.ofNullable(base), local, remote);
         }
     }
