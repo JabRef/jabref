@@ -297,11 +297,21 @@
           - 'jabgui/src/**/org/jabref/gui/preferences/xmp/**'
 
 # Everything that drives CI/CD: workflow definitions, the composite actions they
-# call, and the top-level configuration files read by those workflows.
+# call, and the files those workflows read directly. Listed one by one instead of
+# a '.github/*' wildcard, which would also catch FUNDING.yml and the issue and
+# pull request templates.
 "dev: ci-cd":
   - changed-files:
       - any-glob-to-any-file:
           - '.github/workflows/**'
           - '.github/actions/**'
-          - '.github/*.yml'
-          - '.github/*.sh'
+          - '.github/dependabot.yml'
+          - '.github/ghprcomment.yml'
+          - '.github/labeler.yml'
+          - '.github/format-diff-annotations.sh'
+          - '.idea/codeStyles/**'
+          - 'scripts/after-failure.sh'
+          - 'scripts/junit-xml-format-errors.xsl'
+          - 'Dockerfile.*'
+          - '.dockerignore'
+          - 'jablib/src/test/latex/Texlivefile'
