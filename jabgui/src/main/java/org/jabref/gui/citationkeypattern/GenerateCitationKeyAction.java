@@ -3,7 +3,6 @@ package org.jabref.gui.citationkeypattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -111,10 +110,13 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         // Taken here, while the library is certainly open: asking for a journal once it has closed
         // would create one nothing can reach.
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
+        // Taken here for the same reason: the keys are generated for, and recorded against, the library
+        // the action started on, so that is the tab to mark changed - not whichever is in front when the
+        // task finishes.
+        LibraryTab libraryTab = tabSupplier.get();
+        CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
 
-        return new BackgroundTask<>() {
-            private final CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
-
+        BackgroundTask<Void> backgroundTask = new BackgroundTask<>() {
             @Override
             public Void call() {
                 if (isCanceled) {
@@ -144,19 +146,17 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 }
                 return null;
             }
-
-            @Override
-            public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
-                // register the undo event only if new citation keys were generated
-                if (compound.hasEdits()) {
-                    undoManager.addEdit(compound.toChangeSet());
-                }
-
-                tabSupplier.get().markBaseChanged();
-                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
-                return super.onSuccess(onSuccess);
-            }
         };
+
+        return backgroundTask.onSuccess(_ -> {
+            // register the undo event only if new citation keys were generated
+            if (compound.hasEdits()) {
+                undoManager.addEdit(compound.toChangeSet());
+            }
+
+            libraryTab.markBaseChanged();
+            dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
+        });
     }
 
     private String formatOutputMessage(String start, int count) {
