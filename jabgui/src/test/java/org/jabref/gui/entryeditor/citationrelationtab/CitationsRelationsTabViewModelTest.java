@@ -180,26 +180,26 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void bindToEntryWithoutDoiSetsDoiMissingStatus() {
+    void updateForEntryWithoutDoiSetsDoiMissingStatus() {
         BibEntry entryWithoutDoi = new BibEntry(StandardEntryType.Article);
-        viewModel.bindToEntry(entryWithoutDoi);
+        viewModel.updateForEntry(entryWithoutDoi);
         assertEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
     }
 
     @Test
-    void bindToNullEntrySetsErrorStatus() {
-        viewModel.bindToEntry(null);
+    void updateForNullEntrySetsErrorStatus() {
+        viewModel.updateForEntry(null);
         assertEquals(CitationsRelationsTabViewModel.SciteStatus.ERROR, viewModel.statusProperty().get());
     }
 
     @Test
-    void bindToEntryTransitionFromNoDoiToDoiResetsStatus() {
+    void updateForEntryTransitionFromNoDoiToDoiResetsStatus() {
         BibEntry entryWithoutDoi = new BibEntry(StandardEntryType.Article);
-        viewModel.bindToEntry(entryWithoutDoi);
+        viewModel.updateForEntry(entryWithoutDoi);
         assertEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
 
         BibEntry entryWithDoi = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, "10.1000/182");
-        viewModel.bindToEntry(entryWithDoi);
+        viewModel.updateForEntry(entryWithDoi);
         assertNotEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
     }
 }

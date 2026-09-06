@@ -143,7 +143,7 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
-    public void bindToEntry(@Nullable BibEntry entry) {
+    public void updateForEntry(@Nullable BibEntry entry) {
         // If a search or lookup is already running, cancel it
         cancelSearch();
         cancelDoiLookup();
@@ -194,11 +194,6 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
-    public void lookUpDoi(BibEntry entry) {
-        lookUpDoi(entry, () -> {
-        });
-    }
-
     public void lookUpDoi(BibEntry entry, Runnable onDoiFound) {
         cancelDoiLookup();
 
@@ -213,7 +208,6 @@ public class CitationsRelationsTabViewModel {
                                           identifier.ifPresentOrElse(
                                                   doi -> {
                                                       entry.setField(StandardField.DOI, doi.asString());
-                                                      bindToEntry(entry);
                                                       onDoiFound.run();
                                                   },
                                                   () -> {

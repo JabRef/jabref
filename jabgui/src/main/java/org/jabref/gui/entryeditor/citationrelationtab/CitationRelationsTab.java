@@ -802,7 +802,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        citationsRelationsTabViewModel.bindToEntry(entry);
+        citationsRelationsTabViewModel.updateForEntry(entry);
 
         // TODO: All this should go to ViewModel
         if (citingTask != null && !citingTask.isCancelled()) {
