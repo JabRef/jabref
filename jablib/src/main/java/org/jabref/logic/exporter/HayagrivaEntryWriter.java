@@ -313,9 +313,12 @@ public class HayagrivaEntryWriter {
 
     private String booktitleParentType(EntryType entryType) {
         return switch (entryType) {
-            case StandardEntryType.InProceedings -> "proceedings";
-            case StandardEntryType.InBook -> "book";
-            default -> "anthology";
+            case StandardEntryType.InProceedings ->
+                    "proceedings";
+            case StandardEntryType.InBook ->
+                    "book";
+            default ->
+                    "anthology";
         };
     }
 
