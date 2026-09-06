@@ -13,6 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -30,6 +31,7 @@ public class SidePaneContentFactory {
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final GuiUndoManager undoManager;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
@@ -41,7 +43,8 @@ public class SidePaneContentFactory {
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
                                   ClipBoardManager clipBoardManager,
-                                  GuiUndoManager undoManager) {
+                                  GuiUndoManager undoManager,
+                                  GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
@@ -53,6 +56,7 @@ public class SidePaneContentFactory {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
     public Node create(SidePaneType sidePaneType) {
@@ -79,7 +83,8 @@ public class SidePaneContentFactory {
                             fileUpdateMonitor,
                             entryTypesManager,
                             clipBoardManager,
-                            undoManager).getContent();
+                            undoManager,
+                            gitHandlerRegistry).getContent();
             case WEB_SEARCH ->
                     new WebSearchPaneView(
                             preferences,

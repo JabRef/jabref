@@ -20,6 +20,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
@@ -47,9 +48,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private CheckBox autosave;
     @FXML private ButtonType connectButton;
     @FXML private CheckBox useSSL;
-    @FXML private TextField fileKeystore;
-    @FXML private PasswordField passwordKeystore;
-    @FXML private Button browseKeystore;
     @FXML private TextField serverTimezone;
     @FXML private TextField jdbcUrl;
     @FXML private CheckBox expertMode;
@@ -64,6 +62,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private GitHandlerRegistry gitHandlerRegistry;
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -108,7 +107,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 undoManager,
                 clipBoardManager,
                 taskExecutor,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                gitHandlerRegistry);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
@@ -127,16 +127,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
-        fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
-
         expertMode.selectedProperty().bindBidirectional(viewModel.expertModeProperty());
         jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());
         jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
 
-        fileKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
-        browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
-        passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
-        passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
         rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
 
         // Must be executed after the initialization of the view, otherwise it doesn't work
@@ -148,19 +142,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
             EasyBind.subscribe(autosave.selectedProperty(), selected ->
                     visualizer.initVisualization(viewModel.folderValidation(), folder, true));
-
-            EasyBind.subscribe(useSSL.selectedProperty(), selected ->
-                    visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true));
         });
     }
 
     @FXML
     private void showSaveDbToFileDialog(ActionEvent event) {
         viewModel.showSaveDbToFileDialog();
-    }
-
-    @FXML
-    private void showOpenKeystoreFileDialog(ActionEvent event) {
-        viewModel.showOpenKeystoreFileDialog();
     }
 }

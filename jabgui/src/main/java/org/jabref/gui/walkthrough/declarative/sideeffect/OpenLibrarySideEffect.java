@@ -13,6 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -81,7 +82,8 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     Injector.instantiateModelOrService(GuiUndoManager.class),
                     Injector.instantiateModelOrService(ClipBoardManager.class),
-                    Injector.instantiateModelOrService(TaskExecutor.class)
+                    Injector.instantiateModelOrService(TaskExecutor.class),
+                    Injector.instantiateModelOrService(GitHandlerRegistry.class)
             );
 
             libraryTab.setText(WALKTHROUGH_LIBRARY_TEMPLATE.formatted(libraryName));

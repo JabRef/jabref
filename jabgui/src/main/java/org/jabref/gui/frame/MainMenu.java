@@ -70,7 +70,6 @@ import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
-import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.slr.EditExistingStudyAction;
@@ -203,8 +202,7 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
-                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
+                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService))),
                 // endregion
 
                 new SeparatorMenuItem(),

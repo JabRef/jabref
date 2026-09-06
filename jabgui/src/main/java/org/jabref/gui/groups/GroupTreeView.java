@@ -114,8 +114,6 @@ public class GroupTreeView extends BorderPane {
     private CustomLocalDragboard localDragboard;
     private DragExpansionHandler dragExpansionHandler;
     private Timer scrollTimer;
-    private ImportHandler importHandler;
-    private BibDatabaseContext database;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;
     private double upperBorder;
@@ -470,8 +468,8 @@ public class GroupTreeView extends BorderPane {
         }
 
         if (dragboard.hasFiles()) {
-            this.database = stateManager.getActiveDatabase().orElse(null);
-            this.importHandler = new ImportHandler(
+            BibDatabaseContext database = stateManager.getActiveDatabase().orElse(null);
+            ImportHandler importHandler = new ImportHandler(
                     database,
                     preferences,
                     fileUpdateMonitor,
