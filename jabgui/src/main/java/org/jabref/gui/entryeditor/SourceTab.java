@@ -35,7 +35,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -63,7 +62,6 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final FieldPreferences fieldPreferences;
-    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
     private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
@@ -81,19 +79,18 @@ public class SourceTab extends EntryEditorTab {
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
-    public SourceTab(UndoManager undoManager,
-                     FieldPreferences fieldPreferences,
-                     ImportFormatPreferences importFormatPreferences,
-                     FileUpdateMonitor fileMonitor,
-                     DialogService dialogService,
-                     BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager,
-                     BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+    public SourceTab(
+            FieldPreferences fieldPreferences,
+            ImportFormatPreferences importFormatPreferences,
+            FileUpdateMonitor fileMonitor,
+            DialogService dialogService,
+            BibEntryTypesManager entryTypesManager,
+            KeyBindingRepository keyBindingRepository,
+            StateManager stateManager,
+            BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.stateManager = stateManager;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
-        this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
@@ -330,7 +327,8 @@ public class SourceTab extends EntryEditorTab {
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
             compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
-        undoManager.addEdit(compound.toChangeSet());
+        stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet()));
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {

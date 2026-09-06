@@ -22,7 +22,6 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -81,7 +80,6 @@ class SourceTabTest {
         entryTypesManager = mock(BibEntryTypesManager.class);
 
         sourceTab = new SourceTab(
-                new JabRefUndoManager(),
                 fieldPreferences,
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),

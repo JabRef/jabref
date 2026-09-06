@@ -82,7 +82,6 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -121,7 +120,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
 
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
@@ -132,7 +130,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private boolean shouldClearSelectionOnDrop = false;
 
     public CitationRelationsTab(DialogService dialogService,
-                                UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
@@ -142,7 +139,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -154,7 +150,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
                 preferences,
-                undoManager,
                 stateManager,
                 dialogService,
                 fileUpdateMonitor,
@@ -1054,7 +1049,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
+            libraryTab.get().getUndoManager().addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
                 edit.applyEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
                 libraryTab.get().getMainTable().setCitationMergeMode(true);
                 edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));

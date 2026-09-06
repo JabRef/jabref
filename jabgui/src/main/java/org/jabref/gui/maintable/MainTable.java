@@ -55,7 +55,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.theme.StyleClasses;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
@@ -95,7 +94,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
-    private final GuiUndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
@@ -126,7 +124,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.dialogService = dialogService;
         this.model = model;
         this.taskExecutor = taskExecutor;
-        this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
@@ -144,7 +141,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 database,
                 preferences,
                 preferences.getMainTableColumnPreferences(),
-                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor);
@@ -163,7 +159,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         dialogService,
                         stateManager,
                         preferences,
-                        undoManager,
                         clipBoardManager,
                         taskExecutor,
                         journalAbbreviationRepository,
@@ -357,8 +352,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entries
             List<Integer> indices = bibEntries.stream()
-                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .flatMap(bibEntry -> findEntry(bibEntry).stream())
                                               .map(entry -> getItems().indexOf(entry))
                                               .filter(index -> index >= 0)
                                               .toList();
@@ -418,14 +412,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
-        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
-        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -641,10 +635,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(@NonNull BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
-    }
-
-    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
-        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

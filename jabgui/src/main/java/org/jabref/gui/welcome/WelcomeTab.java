@@ -36,13 +36,13 @@ import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.StyleClasses;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
 import org.jabref.gui.welcome.components.QuickSettings;
 import org.jabref.gui.welcome.components.Walkthroughs;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -68,9 +68,9 @@ public class WelcomeTab extends Tab {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private final FileHistoryMenu fileHistoryMenu;
     private final BuildInfo buildInfo;
     private final Stage stage;
@@ -89,9 +89,9 @@ public class WelcomeTab extends Tab {
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
-                      GuiUndoManager undoManager,
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
+                      GitHandlerRegistry gitHandlerRegistry,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo,
                       WorkspacePreferences workspacePreferences) {
@@ -104,9 +104,9 @@ public class WelcomeTab extends Tab {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.fileHistoryMenu = fileHistoryMenu;
         this.buildInfo = buildInfo;
         this.stage = stage;
@@ -243,8 +243,8 @@ public class WelcomeTab extends Tab {
 
         Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
-                        stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
-                        taskExecutor).execute());
+                        stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager,
+                        taskExecutor, gitHandlerRegistry).execute());
 
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
@@ -291,7 +291,8 @@ public class WelcomeTab extends Tab {
             ParserResult result = bibtexParser.parse(reader);
             BibDatabaseContext databaseContext = result.getDatabaseContext();
             LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,
-                    preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
+                    preferences, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor,
+                    gitHandlerRegistry);
             tabContainer.addTab(libraryTab, true);
         } catch (IOException e) {
             LOGGER.error("Failed to load example library", e);
