@@ -860,6 +860,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setPlaceholder(lookingUpDoiLabel);
     }
 
+    private static void setLoadingPlaceholder(CheckListView<CitationRelationItem> listView) {
+        setLabelOn(listView, Localization.lang("Loading..."));
+    }
+
     /// Snapshots the active library on the JavaFX Application Thread, so the background matching task never
     /// iterates the live entry list, which the user can modify while the search runs.
     ///
@@ -881,7 +885,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         LibrarySnapshot librarySnapshot = snapshotActiveLibrary();
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
         citationComponents.listView().setItems(observableList);
-        citationComponents.listView().setPlaceholder(null);
+        setLoadingPlaceholder(citationComponents.listView());
 
         BackgroundTask<List<CitationRelationItem>> task = this.createCitationSearchTask(
                 citationComponents.entry(),
