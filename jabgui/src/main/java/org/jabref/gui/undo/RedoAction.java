@@ -26,7 +26,13 @@ public class RedoAction extends SimpleCommand {
         this.executable.bind(needsRedo(stateManager));
     }
 
-    private void redoIn(LibraryTab libraryTab) {
+    @Override
+    public void execute() {
+        if (stateManager.activeTabProperty().get().isEmpty()) {
+            return;
+        }
+
+        LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
         if (undoManager.canRedo()) {
@@ -36,10 +42,5 @@ public class RedoAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
-    }
-
-    @Override
-    public void execute() {
-        stateManager.activeTabProperty().get().ifPresent(this::redoIn);
     }
 }

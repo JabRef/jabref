@@ -27,20 +27,22 @@ public class UndoAction extends SimpleCommand {
         this.executable.bind(needsUndo(stateManager));
     }
 
-    private void undoIn(LibraryTab libraryTab) {
-        GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
-
-        if (undoManager.canUndo()) {
-            undoManager.undo();
-            dialogService.notify(Localization.lang("Undo"));
-        } else {
-            dialogService.notify(Localization.lang("Nothing to undo") + '.');
-        }
-        libraryTab.markChangedOrUnChanged();
-    }
-
     @Override
     public void execute() {
-        stateManager.activeTabProperty().get().ifPresent(this::undoIn);
+        if (stateManager.activeTabProperty().get().isEmpty()) {
+            return;
+        }
+
+        LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
+        GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
+
+        if (!undoManager.canUndo()) {
+            dialogService.notify(Localization.lang("Nothing to undo") + '.');
+            return;
+        }
+
+        undoManager.undo();
+        dialogService.notify(Localization.lang("Undo"));
+        libraryTab.markChangedOrUnChanged();
     }
 }
