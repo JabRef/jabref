@@ -140,7 +140,7 @@ public class WelcomeTab extends Tab {
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
         VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("spacing-10", "align-top-left", "padding-bottom-20");
+        topTitles.getStyleClass().addAll("spacing-12", "align-top-left", "padding-bottom-24");
         return topTitles;
     }
 
@@ -369,7 +369,7 @@ public class WelcomeTab extends Tab {
 
     private Hyperlink createFooterLink(String text, StandardActions action, IconTheme.JabRefIcons icon) {
         Hyperlink link = new Hyperlink(text);
-        link.getStyleClass().add("welcome-community-link");
+        link.getStyleClass().addAll("welcome-community-link", "text-accent");
         String url = switch (action) {
             case HELP ->
                     URLs.HELP_URL;

@@ -29,7 +29,7 @@
             <RowConstraints />
         </rowConstraints>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r">
-            <Label styleClass="info-label,h4" text="%h-index">
+            <Label styleClass="h4,text-accent" text="%h-index">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -40,7 +40,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.columnIndex="1">
-            <Label styleClass="info-label,h4" text="%Publisher">
+            <Label styleClass="h4,text-accent" text="%Publisher">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -51,7 +51,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2">
-            <Label styleClass="info-label,h4" text="%ISSN">
+            <Label styleClass="h4,text-accent" text="%ISSN">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>

@@ -24,7 +24,7 @@
             <AnchorPane>
                 <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="padding-bottom-16"
                       AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
-                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading,font-size-250" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
+                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading,font-size-250,text-accent" text="${controller.viewModel.heading}" wrapText="true">
                         <cursor>
                             <Cursor fx:constant="HAND"/>
                         </cursor>

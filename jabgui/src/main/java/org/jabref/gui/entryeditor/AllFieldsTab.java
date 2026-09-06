@@ -157,7 +157,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-10-16", "spacing-8");
+        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-12-16", "spacing-8");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));

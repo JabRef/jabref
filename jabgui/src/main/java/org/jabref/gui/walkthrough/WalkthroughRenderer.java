@@ -112,7 +112,7 @@ public class WalkthroughRenderer {
 
     private Node render(InfoBlock infoBlock) {
         HBox infoContainer = new HBox();
-        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-10", "spacing-6", "align-top-left");
+        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "spacing-6", "align-top-left");
 
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
 

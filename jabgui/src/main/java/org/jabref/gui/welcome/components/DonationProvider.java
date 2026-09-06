@@ -102,7 +102,7 @@ public class DonationProvider {
         HBox.setHgrow(textSpacer, Priority.ALWAYS);
 
         donationToast = new HBox(leftContent, textSpacer, rightButtons);
-        donationToast.getStyleClass().addAll("donation-toast", "padding-10-12", "spacing-12", "align-center-left");
+        donationToast.getStyleClass().addAll("donation-toast", "padding-12", "spacing-12", "align-center-left");
         donationToast.setMaxWidth(Region.USE_PREF_SIZE);
         donationToast.setMinWidth(Region.USE_PREF_SIZE);
         donationToast.setTranslateY(-40);
