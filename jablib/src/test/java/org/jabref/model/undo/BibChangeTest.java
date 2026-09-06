@@ -1,6 +1,7 @@
 package org.jabref.model.undo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
@@ -80,6 +81,19 @@ class BibChangeTest {
 
         change.apply();
         assertEquals(BibDatabaseMode.BIBLATEX, databaseContext.getMetaData().getMode().orElseThrow());
+
+        change.inverted().apply();
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getMode());
+    }
+
+    @Test
+    void applyingAMetaDataChangeKeepsTheMetaDataInstance() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        MetaData before = databaseContext.getMetaData();
+        UndoableMetaDataChange change = new UndoableMetaDataChange(databaseContext, before, metaDataWithMode());
+
+        change.apply();
+        assertSame(before, databaseContext.getMetaData());
 
         change.inverted().apply();
         assertSame(before, databaseContext.getMetaData());

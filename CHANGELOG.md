@@ -131,6 +131,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
 - We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
+- We fixed an issue where accepting an external change to a library's settings stopped later settings changes from marking the library as modified, and from reaching autosave and backup. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where generated citation keys could not be undone, the "Generated citation key for" notification never appeared, and the wrong library was marked as modified when the active tab changed during generation. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)

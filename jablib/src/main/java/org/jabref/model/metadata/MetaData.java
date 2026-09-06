@@ -386,6 +386,51 @@ public class MetaData {
         postChange();
     }
 
+    /// Takes over the entire contents of `other`, leaving this instance's identity intact — and with it
+    /// everything registered on its [EventBus]. Installing `other` in the library instead would orphan
+    /// every listener of the instance it replaced.
+    ///
+    /// Event propagation is not taken over: whether this instance posts is a property of the live
+    /// instance and its listeners, not of the contents. One [MetaDataChangedEvent] is posted at the end.
+    public void setContentsFrom(@NonNull MetaData other) {
+        citeKeyPatterns.clear();
+        citeKeyPatterns.putAll(other.citeKeyPatterns);
+        userFileDirectory.clear();
+        userFileDirectory.putAll(other.userFileDirectory);
+        latexFileDirectory.clear();
+        latexFileDirectory.putAll(other.latexFileDirectory);
+        blgFilePathMap.clear();
+        blgFilePathMap.putAll(other.blgFilePathMap);
+        unknownMetaData.clear();
+        unknownMetaData.putAll(other.unknownMetaData);
+
+        contentSelectors.getContentSelectors().clear();
+        other.contentSelectors.getContentSelectors().forEach(contentSelectors::addContentSelector);
+
+        groupSearchSyntaxVersion = other.groupSearchSyntaxVersion;
+        encoding = other.encoding;
+        encodingExplicitlySupplied = other.encodingExplicitlySupplied;
+        saveOrder = other.saveOrder;
+        defaultCiteKeyPattern = other.defaultCiteKeyPattern;
+        saveActions = other.saveActions;
+        mode = other.mode;
+        libraryAbbreviationType = other.libraryAbbreviationType;
+        keywordSeparator = other.keywordSeparator;
+        isProtected = other.isProtected;
+        librarySpecificFileDirectory = other.librarySpecificFileDirectory;
+        versionDBStructure = other.versionDBStructure;
+        aiLibraryId = other.aiLibraryId;
+        containsSearchGroups = other.containsSearchGroups;
+        gitAutoPull = other.gitAutoPull;
+        gitAutoCommit = other.gitAutoCommit;
+        gitAutoPush = other.gitAutoPush;
+
+        // Last, since setGroups wires up the subscriptions this instance's listeners depend on
+        other.getGroups().ifPresentOrElse(this::setGroups, () -> groupsRoot.setValue(null));
+
+        postChange();
+    }
+
     /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
         if (isEventPropagationEnabled) {
