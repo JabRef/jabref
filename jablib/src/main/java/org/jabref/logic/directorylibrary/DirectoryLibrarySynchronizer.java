@@ -227,7 +227,8 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     /// Waits until every event queued so far has been handled (tests).
     void awaitPendingEvents() throws InterruptedException, ExecutionException {
-        syncExecutor.submit(() -> { }).get();
+        syncExecutor.submit(() -> {
+        }).get();
     }
 
     /// Stops watching and writes what is still pending. Events already queued (the last
