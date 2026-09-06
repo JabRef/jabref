@@ -34,7 +34,6 @@ import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.AbstractSrvStateManager;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -121,18 +120,13 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
         return activeTab;
     }
 
-    @Override
-    public UndoManager getUndoManager(BibDatabaseContext context) {
-        return getGuiUndoManager(context);
-    }
-
     /// Creates the journal on first use, which for a library is while its tab is being built. A
     /// caller that names a library after it closed therefore gets a fresh journal rather than the
     /// one that was discarded; [org.jabref.gui.LibraryTab#getUndoManager] answers with the journal
     /// the library had instead, so that path cannot put a new one back into this map.
     // [impl->req~logic.undo.journal-per-library~1]
     @Override
-    public GuiUndoManager getGuiUndoManager(BibDatabaseContext context) {
+    public GuiUndoManager getUndoManager(BibDatabaseContext context) {
         return undoManagers.computeIfAbsent(context.getUid(), _ -> new JabRefGuiUndoManager());
     }
 

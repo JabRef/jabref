@@ -60,8 +60,8 @@ class UndoRedoActionTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeTabProperty()).thenReturn(activeTab);
         when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
-        when(stateManager.getGuiUndoManager(libraryA)).thenReturn(journalOfA);
-        when(stateManager.getGuiUndoManager(libraryB)).thenReturn(journalOfB);
+        when(stateManager.getUndoManager(libraryA)).thenReturn(journalOfA);
+        when(stateManager.getUndoManager(libraryB)).thenReturn(journalOfB);
 
         undoAction = new UndoAction(mock(DialogService.class), stateManager);
         redoAction = new RedoAction(mock(DialogService.class), stateManager);

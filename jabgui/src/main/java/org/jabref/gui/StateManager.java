@@ -19,7 +19,6 @@ import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.search.SearchContext;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -49,20 +48,17 @@ public interface StateManager extends SrvStateManager {
 
     OptionalObjectProperty<LibraryTab> activeTabProperty();
 
-    /// The undo journal to record a change to `context` on.
+    /// The undo journal of `context`.
     ///
     /// Each library has its own, so a caller names the library it is recording against instead of
     /// holding a journal handed to it when it was built. Which library that is has to be decided
     /// where the change is made, not where the change lands: a task that finishes after the user
     /// switched libraries still belongs to the one it ran on.
     ///
-    /// Recording is all most callers do, which is why this hands out the narrow type; the classes
-    /// that drive the stacks ask for [#getGuiUndoManager].
-    UndoManager getUndoManager(BibDatabaseContext context);
-
-    /// The same journal as [#getUndoManager], for the few classes that undo, redo, track the saved
-    /// position, or bind menu enablement to the stacks.
-    GuiUndoManager getGuiUndoManager(BibDatabaseContext context);
+    /// This is where a library's journal lives, so it hands out the whole of it. A caller that only
+    /// records says so by what it declares — the parameter it passes the journal to, or
+    /// [org.jabref.gui.LibraryTab#getUndoManager], which hands its collaborators the recording half.
+    GuiUndoManager getUndoManager(BibDatabaseContext context);
 
     /// Discards the journal of a library that is closing, with the changes it holds and the entries
     /// those changes keep alive.

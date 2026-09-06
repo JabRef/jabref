@@ -60,7 +60,7 @@ public class ActionHelper {
                                                   Function<GuiUndoManager, ReadOnlyBooleanProperty> state) {
         return BooleanExpression.booleanExpression(
                 stateManager.activeDatabaseProperty().flatMap(
-                        database -> database.map(context -> state.apply(stateManager.getGuiUndoManager(context)))
+                        database -> database.map(context -> state.apply(stateManager.getUndoManager(context)))
                                             .orElse(new SimpleBooleanProperty(false))));
     }
 

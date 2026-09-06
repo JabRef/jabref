@@ -27,7 +27,7 @@ public class RedoAction extends SimpleCommand {
     }
 
     private void redoIn(LibraryTab libraryTab) {
-        GuiUndoManager undoManager = stateManager.getGuiUndoManager(libraryTab.getBibDatabaseContext());
+        GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
         if (undoManager.canRedo()) {
             undoManager.redo();

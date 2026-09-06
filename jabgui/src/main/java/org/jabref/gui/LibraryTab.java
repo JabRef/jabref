@@ -781,7 +781,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
-        journalAfterClose = stateManager.getGuiUndoManager(bibDatabaseContext);
+        journalAfterClose = stateManager.getUndoManager(bibDatabaseContext);
         stateManager.removeUndoManager(bibDatabaseContext);
 
         try {
@@ -852,7 +852,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.warn("The undo journal of {} was requested after the library was closed", bibDatabaseContext.getDatabasePath());
             return journalAfterClose;
         }
-        return stateManager.getGuiUndoManager(bibDatabaseContext);
+        return stateManager.getUndoManager(bibDatabaseContext);
     }
 
     public MainTable getMainTable() {
