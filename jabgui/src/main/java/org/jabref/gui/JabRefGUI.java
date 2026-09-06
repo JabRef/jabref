@@ -42,6 +42,8 @@ import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.AiServiceFactory;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -264,12 +266,15 @@ public class JabRefGUI extends Application {
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
-        JabRefGUI.aiService = new AiService(
+        JabRefGUI.aiService = AiServiceFactory.createService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
+        if (aiService instanceof DefaultAiService defaultAiService) {
+            Injector.setModelOrService(DefaultAiService.class, defaultAiService);
+        }
 
         JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
                 preferences.getImporterPreferences(),
@@ -279,8 +284,7 @@ public class JabRefGUI extends Application {
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
-                preferences.getAiPreferences(),
-                aiService.getCurrentChatModel(),
+                aiService,
                 entryTypesManager,
                 dialogService
         );

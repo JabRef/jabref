@@ -135,7 +135,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 journalAbbreviationRepository,
                 keyBindingRepository,
                 searchCitationsRelationsService,
-                bibTeXSyntaxHighlighter
+                bibTeXSyntaxHighlighter,
+                aiService
         );
 
         this.viewModel = new EntryEditorViewModel(

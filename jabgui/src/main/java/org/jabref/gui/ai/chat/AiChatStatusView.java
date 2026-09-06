@@ -20,6 +20,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.rag.logic.ResponseEngine;
@@ -87,19 +88,21 @@ public class AiChatStatusView extends VBox {
 
     @FXML
     private void initialize() {
-        viewModel = new AiChatStatusViewModel(
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                preferences.getFieldPreferences(),
-                entryTypesManager,
-                dialogService,
-                aiService.getEmbeddingModelCache(),
-                aiService.getEmbeddingsStore()
-        );
+        if (aiService instanceof DefaultAiService defaultAiService) {
+            viewModel = new AiChatStatusViewModel(
+                    preferences.getAiPreferences(),
+                    preferences.getFilePreferences(),
+                    preferences.getFieldPreferences(),
+                    entryTypesManager,
+                    dialogService,
+                    defaultAiService.getEmbeddingModelCache(),
+                    defaultAiService.getEmbeddingsStore()
+            );
 
-        setupEntriesTable();
-        setupIngestionTable();
-        setupRest();
+            setupEntriesTable();
+            setupIngestionTable();
+            setupRest();
+        }
     }
 
     private void setupEntriesTable() {

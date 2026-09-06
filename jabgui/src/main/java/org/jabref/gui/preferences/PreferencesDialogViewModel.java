@@ -42,6 +42,7 @@ import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -76,8 +77,15 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(workingAiPreferences),
-                new AiTab(workingAiPreferences),
+                new WebSearchTab(workingAiPreferences)
+        );
+
+        AiService aiService = Injector.instantiateModelOrService(AiService.class);
+        if (aiService.isAvailable()) {
+            preferenceTabs.add(new AiTab(workingAiPreferences));
+        }
+
+        preferenceTabs.addAll(
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

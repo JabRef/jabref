@@ -12,6 +12,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ExceptionsUtil;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.summarization.logic.summarizationalgorithms.Summarizator;
 import org.jabref.logic.l10n.Localization;
@@ -49,16 +50,18 @@ public class AiSummaryView extends StackPane {
 
     @FXML
     private void initialize() {
-        viewModel = new AiSummaryViewModel(
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                aiService.getSummariesRepository(),
-                aiService.getSummaryCache(),
-                aiService.getSummarizationTaskAggregator(),
-                dialogService
-        );
+        if (aiService instanceof DefaultAiService defaultAiService) {
+            viewModel = new AiSummaryViewModel(
+                    preferences.getAiPreferences(),
+                    preferences.getFilePreferences(),
+                    defaultAiService.getSummariesRepository(),
+                    defaultAiService.getSummaryCache(),
+                    defaultAiService.getSummarizationTaskAggregator(),
+                    dialogService
+            );
 
-        setupBindings();
+            setupBindings();
+        }
     }
 
     private void setupBindings() {

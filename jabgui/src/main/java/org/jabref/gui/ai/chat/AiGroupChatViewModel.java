@@ -14,12 +14,15 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.groups.GroupNodeViewModel;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.logic.ai.chatting.InMemoryChatHistoryCache;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
+import org.jspecify.annotations.Nullable;
 
 public class AiGroupChatViewModel extends AbstractViewModel {
     private final BooleanProperty enabled = new SimpleBooleanProperty();
@@ -31,11 +34,13 @@ public class AiGroupChatViewModel extends AbstractViewModel {
     private final ListProperty<ChatMessage> chatHistory = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final AiPreferences aiPreferences;
-    private final InMemoryChatHistoryCache chatHistoryCache;
+    private final @Nullable InMemoryChatHistoryCache chatHistoryCache;
 
     public AiGroupChatViewModel(AiPreferences aiPreferences, AiService aiService) {
         this.aiPreferences = aiPreferences;
-        this.chatHistoryCache = aiService.getChatHistoryCache();
+        this.chatHistoryCache = aiService instanceof DefaultAiService defaultAiService
+                ? defaultAiService.getChatHistoryCache()
+                : null;
 
         enabled.bind(aiPreferences.aiFeaturesEnabledCurrentlyProperty());
 
@@ -43,7 +48,7 @@ public class AiGroupChatViewModel extends AbstractViewModel {
     }
 
     private void loadGroupChat() {
-        if (groupNode.get() == null || databaseContext.get() == null || !enabled.get()) {
+        if (chatHistoryCache == null || groupNode.get() == null || databaseContext.get() == null || !enabled.get()) {
             return;
         }
 

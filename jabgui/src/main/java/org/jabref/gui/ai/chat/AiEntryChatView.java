@@ -7,6 +7,7 @@ import javafx.scene.layout.StackPane;
 import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -30,12 +31,14 @@ public class AiEntryChatView extends StackPane {
 
     @FXML
     private void initialize() {
-        viewModel = new AiEntryChatViewModel(
-                preferences.getAiPreferences(),
-                aiService.getChatHistoryCache()
-        );
+        if (aiService instanceof DefaultAiService defaultAiService) {
+            viewModel = new AiEntryChatViewModel(
+                    preferences.getAiPreferences(),
+                    defaultAiService.getChatHistoryCache()
+            );
 
-        setupBindings();
+            setupBindings();
+        }
     }
 
     private void setupBindings() {

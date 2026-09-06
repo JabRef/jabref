@@ -14,6 +14,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.DirectoryMonitor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.undo.UndoManager;
@@ -47,6 +48,7 @@ public class EntryEditorTabFactory {
     private final KeyBindingRepository keyBindingRepository;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
+    private final AiService aiService;
 
     public EntryEditorTabFactory(PreviewPanel previewPanel,
                                  UndoAction undoAction,
@@ -63,7 +65,8 @@ public class EntryEditorTabFactory {
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
                                  SearchCitationsRelationsService searchCitationsRelationsService,
-                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter,
+                                 AiService aiService) {
         this.previewPanel = previewPanel;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -80,6 +83,7 @@ public class EntryEditorTabFactory {
         this.keyBindingRepository = keyBindingRepository;
         this.searchCitationsRelationsService = searchCitationsRelationsService;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
+        this.aiService = aiService;
     }
 
     /// Creates all tabs that can possibly be shown from [EntryEditorTabModel], in display order.
@@ -87,6 +91,11 @@ public class EntryEditorTabFactory {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         for (EntryEditorTabModel model : preferences.getEntryEditorPreferences().getTabModels()) {
+            if (!aiService.isAvailable() && model instanceof EntryEditorTabModel.BuiltInTab builtInTab) {
+                if (builtInTab.type() == EntryEditorTabModel.BuiltIn.AI_SUMMARY || builtInTab.type() == EntryEditorTabModel.BuiltIn.AI_CHAT) {
+                    continue;
+                }
+            }
             tabs.add(createTab(model));
         }
 

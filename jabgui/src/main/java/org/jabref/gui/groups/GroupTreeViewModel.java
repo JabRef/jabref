@@ -29,14 +29,11 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
-import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -431,6 +428,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void chatWithGroup(GroupNodeViewModel group) {
+        if (!aiService.isAvailable()) {
+            return;
+        }
+
         assert currentDatabase.isPresent();
 
         BibDatabaseContext context = currentDatabase.get();
@@ -459,7 +460,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void generateEmbeddings(GroupNodeViewModel groupNode) {
-        if (!preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
+        if (!aiService.isAvailable() || !preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
             return;
         }
 
@@ -476,24 +477,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .flatMap(entry -> entry.getFiles().stream())
                 .toList();
 
-        aiService.getIngestionTaskAggregator()
-                 .start(new GenerateEmbeddingsForSeveralTaskRequest(
-                         preferences.getFilePreferences(),
-                         aiService.getIngestedDocumentsRepository(),
-                         aiService.getEmbeddingsStore(),
-                         aiService.getCurrentEmbeddingModel(),
-                         aiService.getCurrentDocumentSplitter(),
-                         currentDatabase.get(),
-                         group.nameProperty(),
-                         linkedFiles,
-                         taskExecutor
-                 ));
+        aiService.generateEmbeddingsForGroup(currentDatabase.get(), group, linkedFiles, preferences.getFilePreferences());
 
         dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
     }
 
     public void generateSummaries(GroupNodeViewModel groupNode) {
-        if (!preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
+        if (!aiService.isAvailable() || !preferences.getAiPreferences().getAiFeaturesEnabled() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
             return;
         }
 
@@ -509,17 +499,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .filter(group::isMatch)
                 .toList();
 
-        entries.forEach(entry ->
-                aiService.getSummarizationTaskAggregator().start(
-                        new GenerateSummaryTaskRequest(
-                                preferences.getFilePreferences(),
-                                aiService.getCurrentChatModel(),
-                                aiService.getCurrentSummarizator(),
-                                new FullBibEntry(currentDatabase.get(), entry),
-                                false
-                        )
-                )
-        );
+        aiService.generateSummariesForEntries(currentDatabase.get(), entries, preferences.getFilePreferences());
 
         dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
     }

@@ -24,6 +24,8 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
+import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -44,10 +46,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private TabPane templatesTabPane;
 
     public AiTab(AiPreferences workingAiPreferences) {
+        AiService aiService = Injector.instantiateModelOrService(AiService.class);
+        AiModelService modelService = aiService instanceof DefaultAiService defaultAiService
+                ? defaultAiService.getModelService()
+                : new AiModelService();
         this.viewModel = new AiTabViewModel(
                 preferences.getAiPreferences(),
                 workingAiPreferences,
-                Injector.instantiateModelOrService(AiService.class).getModelService(),
+                modelService,
                 taskExecutor);
         this.aiDisabled = viewModel.enableAi().not();
 

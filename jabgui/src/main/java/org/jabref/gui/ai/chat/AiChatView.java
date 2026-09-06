@@ -21,6 +21,7 @@ import org.jabref.gui.util.component.ListScrollPane;
 import org.jabref.gui.util.component.SimpleListView;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.DefaultAiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -73,20 +74,22 @@ public class AiChatView extends StackPane {
 
     @FXML
     private void initialize() {
-        viewModel = new AiChatViewModel(
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                dialogService,
-                aiService.getIngestionTaskAggregator(),
-                aiService.getIngestedDocumentsRepository(),
-                aiService.getEmbeddingsStore(),
-                aiService.getEmbeddingModelCache(),
-                taskExecutor
-        );
+        if (aiService instanceof DefaultAiService defaultAiService) {
+            viewModel = new AiChatViewModel(
+                    preferences.getAiPreferences(),
+                    preferences.getFilePreferences(),
+                    dialogService,
+                    defaultAiService.getIngestionTaskAggregator(),
+                    defaultAiService.getIngestedDocumentsRepository(),
+                    defaultAiService.getEmbeddingsStore(),
+                    defaultAiService.getEmbeddingModelCache(),
+                    taskExecutor
+            );
 
-        setupBindings();
-        setupValues();
-        setupFollowUpQuestions();
+            setupBindings();
+            setupValues();
+            setupFollowUpQuestions();
+        }
     }
 
     private void setupBindings() {

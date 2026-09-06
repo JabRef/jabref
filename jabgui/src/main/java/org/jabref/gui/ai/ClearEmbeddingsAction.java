@@ -38,7 +38,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        if (!aiService.isAvailable() || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 
@@ -62,9 +62,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
                 .toList();
 
         BackgroundTask.wrap(() ->
-                              aiService
-                                      .getEmbeddingsCleaner()
-                                      .clearEmbeddingsFor(linkedFiles, bibDatabaseContext, filePreferences))
+                              aiService.clearEmbeddingsFor(linkedFiles, bibDatabaseContext, filePreferences))
                       .executeWith(taskExecutor);
     }
 }

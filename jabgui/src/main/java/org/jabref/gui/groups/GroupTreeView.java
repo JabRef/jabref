@@ -663,15 +663,23 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
-        if (preferences.getAiPreferences().getAiFeaturesEnabled() && preferences.getGroupsPreferences().showAiChatButton()) {
+        if (aiService.isAvailable() && preferences.getAiPreferences().getAiFeaturesEnabled() && preferences.getGroupsPreferences().showAiChatButton()) {
             contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
         }
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
-                factory.createMenuItem(StandardActions.GROUP_RENAME, new ContextAction(StandardActions.GROUP_RENAME, group)),
-                factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
-                factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
+                factory.createMenuItem(StandardActions.GROUP_RENAME, new ContextAction(StandardActions.GROUP_RENAME, group))
+        );
+
+        if (aiService.isAvailable()) {
+            contextMenu.getItems().addAll(
+                    factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
+                    factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group))
+            );
+        }
+
+        contextMenu.getItems().addAll(
                 removeGroup,
                 new SeparatorMenuItem()
         );
