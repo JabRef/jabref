@@ -40,6 +40,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -109,6 +110,7 @@ public class OpenOfficePanel {
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private OOBibBase ooBase;
     private OOStyle currentStyle;
 
@@ -123,10 +125,12 @@ public class OpenOfficePanel {
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
-                           ClipBoardManager clipBoardManager) {
+                           ClipBoardManager clipBoardManager,
+                           GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -354,7 +358,8 @@ public class OpenOfficePanel {
                     fileUpdateMonitor,
                     entryTypesManager,
                     clipBoardManager,
-                    taskExecutor);
+                    taskExecutor,
+                    gitHandlerRegistry);
             tabContainer.addTab(libraryTab, true);
         }
     }

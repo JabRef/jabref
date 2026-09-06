@@ -45,6 +45,7 @@ import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
+import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -58,6 +59,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.git.diff.GitDiffChecker;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -169,6 +171,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final AiService aiService;
 
@@ -192,6 +195,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.tabContainer = tabContainer;
@@ -203,6 +207,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
 
         this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
@@ -406,6 +411,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
+
+        GitPullScheduler.start(bibDatabaseContext,
+                dialogService,
+                preferences,
+                stateManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                this::isModified);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -795,6 +808,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
+        try {
+            GitPullScheduler.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down Git pull scheduler", e);
+        }
+
         if (tableModel != null) {
             tableModel.unbind();
         }
@@ -1160,7 +1179,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
@@ -1175,6 +1195,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 entryTypesManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
@@ -1194,7 +1215,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         return new LibraryTab(
                 databaseContext,
                 tabContainer,
@@ -1206,6 +1228,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 entryTypesManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 false);
     }
 

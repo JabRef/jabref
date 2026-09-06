@@ -23,6 +23,7 @@ import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -69,6 +70,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               GuiPreferences preferences,
@@ -78,7 +80,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
                               ClipBoardManager clipBoardManager,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -88,6 +91,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.entryTypesManager = entryTypesManager;
         this.clipboardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
@@ -244,7 +248,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipboardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         tabContainer.addTab(newTab, true);
     }
 
@@ -294,7 +299,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     entryTypesManager,
                     fileUpdateMonitor,
                     clipboardManager,
-                    taskExecutor);
+                    taskExecutor,
+                    gitHandlerRegistry);
         }
         return parserResult;
     }
@@ -308,7 +314,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
                                           ClipBoardManager clipBoardManager,
-                                          TaskExecutor taskExecutor)
+                                          TaskExecutor taskExecutor,
+                                          GitHandlerRegistry gitHandlerRegistry)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
@@ -320,7 +327,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     entryTypesManager,
                     fileUpdateMonitor,
                     clipBoardManager,
-                    taskExecutor)
+                    taskExecutor,
+                    gitHandlerRegistry)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                  NotASharedDatabaseException e) {

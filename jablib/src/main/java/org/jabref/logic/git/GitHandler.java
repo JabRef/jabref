@@ -133,8 +133,8 @@ public class GitHandler {
         Path gitignore = repositoryRoot.resolve(".gitignore");
         // NOFOLLOW_LINKS: a dangling .gitignore symlink is still a pre-existing user-owned entry that rollback must not delete
         boolean gitignoreExisted = Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS);
-        // The Git index always uses forward slashes, independent of the platform
-        String pathInRepository = repositoryRoot.relativize(fileInRepository).toString().replace('\\', '/');
+
+        String pathInRepository = relativizeToRepository(fileToCommit);
         try (Git git = Git.init()
                           .setDirectory(repositoryPathAsFile)
                           .setInitialBranch("main")
@@ -289,6 +289,27 @@ public class GitHandler {
             }
         }
         return commitCreated;
+    }
+
+    /// Commits `fileToCommit` on the current branch, staging nothing else.
+    ///
+    /// Unlike [#createCommitOnCurrentBranch(String,boolean)], which stages the whole working tree.
+    ///
+    /// @return true if a commit was created, false if the file was unchanged
+    public boolean createCommitForFileOnCurrentBranch(Path fileToCommit, String commitMessage) throws IOException, GitAPIException {
+        String pathInRepository = relativizeToRepository(fileToCommit);
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            if (git.status().addPath(pathInRepository).call().isClean()) {
+                return false;
+            }
+            git.add().addFilepattern(pathInRepository).call();
+            git.commit()
+               .setOnly(pathInRepository)
+               .setAllowEmpty(false)
+               .setMessage(commitMessage)
+               .call();
+            return true;
+        }
     }
 
     /// Merges the source branch into the target branch
@@ -504,5 +525,12 @@ public class GitHandler {
             return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), remoteMessage);
         }
         return Localization.lang("Push to %0 was rejected (%1).", update.getRemoteName(), update.getStatus());
+    }
+
+    /// The Git index always uses forward slashes, independent of the platform.
+    private String relativizeToRepository(Path file) {
+        return repositoryPath.toAbsolutePath().normalize()
+                             .relativize(file.toAbsolutePath().normalize())
+                             .toString().replace('\\', '/');
     }
 }

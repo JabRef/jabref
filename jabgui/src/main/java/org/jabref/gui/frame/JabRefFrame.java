@@ -184,7 +184,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                clipBoardManager);
+                clipBoardManager,
+                gitHandlerRegistry);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -226,7 +227,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                gitHandlerRegistry);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -551,6 +553,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 fileHistory,
                 Injector.instantiateModelOrService(BuildInfo.class),
                 preferences.getWorkspacePreferences());
@@ -572,7 +575,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         addTab(libraryTab, raisePanel);
     }
 
@@ -675,7 +679,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
     }
 
     /// Refreshes the ui after preferences changes

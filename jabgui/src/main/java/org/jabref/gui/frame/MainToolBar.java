@@ -29,6 +29,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,6 +55,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -70,7 +72,8 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       JournalAbbreviationRepository journalAbbreviationRepository) {
+                       JournalAbbreviationRepository journalAbbreviationRepository,
+                       GitHandlerRegistry gitHandlerRegistry) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -83,6 +86,7 @@ public class MainToolBar extends ToolBar {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         createToolBar();
     }
@@ -102,7 +106,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor, gitHandlerRegistry)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
 
                 leftSpacer,
