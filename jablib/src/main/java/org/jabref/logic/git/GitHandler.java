@@ -74,6 +74,7 @@ public class GitHandler {
             return;
         }
         try {
+            // Git.init().call() returns a handle that must be closed before the repository is reopened below.
             Git.init()
                .setDirectory(repositoryPathAsFile)
                .setInitialBranch("main")
