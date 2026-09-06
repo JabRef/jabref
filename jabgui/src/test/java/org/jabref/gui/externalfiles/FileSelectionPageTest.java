@@ -46,7 +46,7 @@ class FileSelectionPageTest {
         when(viewModel.taskActiveProperty()).thenReturn(new SimpleBooleanProperty());
         SimpleObjectProperty<Optional<FileNodeViewModel>> treeRoot = new SimpleObjectProperty<>(Optional.empty());
         when(viewModel.treeRootProperty()).thenReturn(treeRoot);
-        when(viewModel.checkedFileListProperty()).thenReturn(new SimpleListProperty<>(FXCollections.<TreeItem<FileNodeViewModel>>observableArrayList()));
+        when(viewModel.checkedFileListProperty()).thenReturn(new SimpleListProperty<>(FXCollections.observableArrayList()));
 
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
         when(taskExecutor.createThrottler(300)).thenReturn(mock(DelayTaskThrottler.class));
