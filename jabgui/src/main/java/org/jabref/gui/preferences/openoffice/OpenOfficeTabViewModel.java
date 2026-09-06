@@ -3,6 +3,10 @@ package org.jabref.gui.preferences.openoffice;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -10,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.bst.PandocLatexConverter;
@@ -26,11 +31,14 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeTabViewModel.class);
 
     private final StringProperty pandocPath = new SimpleStringProperty();
+    private final BooleanProperty zoteroCompatibilityMode = new SimpleBooleanProperty();
+    private final BooleanProperty inferCslStyleFromDocument = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
     private final TaskExecutor taskExecutor;
+    private final BooleanBinding zoteroCompatibilityModeDisabled;
 
     public OpenOfficeTabViewModel(DialogService dialogService,
                                   FilePreferences filePreferences,
@@ -40,20 +48,56 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = filePreferences;
         this.openOfficePreferences = openOfficePreferences;
         this.taskExecutor = taskExecutor;
+        zoteroCompatibilityModeDisabled = Bindings.createBooleanBinding(
+                () -> !(openOfficePreferences.getCurrentStyle() instanceof CitationStyle),
+                openOfficePreferences.currentStyleProperty());
+        zoteroCompatibilityMode.addListener((_, _, enabled) -> {
+            if (!enabled) {
+                inferCslStyleFromDocument.set(false);
+            }
+        });
+        zoteroCompatibilityModeDisabled.addListener((_, _, disabled) -> {
+            if (disabled) {
+                zoteroCompatibilityMode.set(false);
+                inferCslStyleFromDocument.set(false);
+            }
+        });
     }
 
     @Override
     public void setValues() {
         pandocPath.set(openOfficePreferences.getPandocPath());
+        boolean compatibilityMode = openOfficePreferences.getZoteroCompatibilityMode()
+                && !zoteroCompatibilityModeDisabled.get();
+        zoteroCompatibilityMode.set(compatibilityMode);
+        inferCslStyleFromDocument.set(openOfficePreferences.shouldInferCslStyleFromDocument()
+                && compatibilityMode);
     }
 
     @Override
     public void storeSettings() {
         openOfficePreferences.setPandocPath(pandocPath.get());
+        boolean compatibilityMode = zoteroCompatibilityMode.get()
+                && !zoteroCompatibilityModeDisabled.get();
+        openOfficePreferences.setZoteroCompatibilityMode(compatibilityMode);
+        openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.get()
+                && compatibilityMode);
     }
 
     public StringProperty pandocPathProperty() {
         return pandocPath;
+    }
+
+    public BooleanProperty zoteroCompatibilityModeProperty() {
+        return zoteroCompatibilityMode;
+    }
+
+    public BooleanProperty inferCslStyleFromDocumentProperty() {
+        return inferCslStyleFromDocument;
+    }
+
+    public BooleanBinding zoteroCompatibilityModeDisabledProperty() {
+        return zoteroCompatibilityModeDisabled;
     }
 
     public void browsePandocPath() {
