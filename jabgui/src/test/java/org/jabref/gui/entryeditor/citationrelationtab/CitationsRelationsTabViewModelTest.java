@@ -21,6 +21,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,8 +38,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -201,5 +204,32 @@ class CitationsRelationsTabViewModelTest {
         BibEntry entryWithDoi = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, "10.1000/182");
         viewModel.updateForEntry(entryWithDoi);
         assertNotEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
+    }
+
+    @Test
+    void trackCitationSearchCancelsPreviousTaskOfSameType() {
+        BackgroundTask<List<CitationRelationItem>> firstTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+        BackgroundTask<List<CitationRelationItem>> secondTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, firstTask);
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, secondTask);
+
+        assertTrue(firstTask.isCancelled());
+        assertTrue(viewModel.isTrackedCitationSearch(CitationFetcher.SearchType.CITES, secondTask));
+        assertFalse(viewModel.isTrackedCitationSearch(CitationFetcher.SearchType.CITES, firstTask));
+    }
+
+    @Test
+    void cancelCitationSearchesCancelsTrackedTasks() {
+        BackgroundTask<List<CitationRelationItem>> citesTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+        BackgroundTask<List<CitationRelationItem>> citedByTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, citesTask);
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITED_BY, citedByTask);
+
+        viewModel.cancelCitationSearches();
+
+        assertTrue(citesTask.isCancelled());
+        assertTrue(citedByTask.isCancelled());
     }
 }

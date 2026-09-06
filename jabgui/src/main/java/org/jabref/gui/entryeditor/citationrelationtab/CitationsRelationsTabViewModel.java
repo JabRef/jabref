@@ -218,6 +218,30 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
+    public boolean isTrackedCitationSearch(CitationFetcher.SearchType searchType, BackgroundTask<List<CitationRelationItem>> task) {
+        return switch (searchType) {
+            case CITES ->
+                    citingTask == task;
+            case CITED_BY ->
+                    citedByTask == task;
+        };
+    }
+
+    public void clearTrackedCitationSearch(CitationFetcher.SearchType searchType, BackgroundTask<List<CitationRelationItem>> task) {
+        switch (searchType) {
+            case CITES -> {
+                if (citingTask == task) {
+                    citingTask = null;
+                }
+            }
+            case CITED_BY -> {
+                if (citedByTask == task) {
+                    citedByTask = null;
+                }
+            }
+        }
+    }
+
     private void cancelTrackedCitationSearch(@Nullable BackgroundTask<List<CitationRelationItem>> task) {
         if (task != null && !task.isCancelled()) {
             task.cancel(false);

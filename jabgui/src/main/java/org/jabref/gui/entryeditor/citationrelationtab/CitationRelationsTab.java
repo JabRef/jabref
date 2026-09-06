@@ -901,12 +901,20 @@ public class CitationRelationsTab extends EntryEditorTab {
             dialogService.notify(Localization.lang("Search aborted."));
         });
 
-        task.onSuccess(citationRelationItems -> onSearchForRelationsSucceed(
-                    citationComponents,
-                    citationRelationItems,
-                    observableList
-            ))
+        task.onSuccess(citationRelationItems -> {
+                if (!citationsRelationsTabViewModel.isTrackedCitationSearch(citationComponents.searchType(), task)) {
+                    return;
+                }
+                onSearchForRelationsSucceed(
+                        citationComponents,
+                        citationRelationItems,
+                        observableList
+                );
+            })
             .onFailure(exception -> {
+                if (!citationsRelationsTabViewModel.isTrackedCitationSearch(citationComponents.searchType(), task)) {
+                    return;
+                }
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
                 hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
                 boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
@@ -922,6 +930,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                      ? Localization.lang("Error while fetching cited entries.")
                                      : Localization.lang("Error while fetching citing entries."));
             })
+            .onFinished(() -> citationsRelationsTabViewModel.clearTrackedCitationSearch(citationComponents.searchType(), task))
             .executeWith(taskExecutor);
     }
 
