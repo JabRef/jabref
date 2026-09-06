@@ -1,18 +1,19 @@
-# Renders a gource video of the JabCon period every three hours for the JabCon board
+# Renders a gource video of the JabCon period every 15 minutes for the JabCon board
 # (https://github.com/JabRef/jabcon-board). Remove or switch to workflow_dispatch only after JabCon.
 name: Gource (JabCon)
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# a render can take longer than the interval as the video grows; let runs queue rather than cancel each other
 concurrency:
   group: gource-jabcon
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   gource:
@@ -24,7 +25,7 @@ jobs:
       matrix:
         include:
           - title: 'JabCon 2026'
-            start: '2026-09-03'
+            start: '2026-09-04 09:00:00'
             end: ''
             file: 'jabcon-2026.mp4'
             seconds_per_day: '100'
@@ -38,6 +39,10 @@ jobs:
 
       - name: Generate Gource video
         uses: nbprojekt/gource-action@d2fdf85904db416b69445dae5551282528e052ae # v1
+        env:
+          # Berlin time for the clock in the video and the start date. POSIX rule string because the action's
+          # Alpine image has no tzdata, so a zone name would silently fall back to UTC.
+          TZ: 'CET-1CEST,M3.5.0,M10.5.0/3'
         with:
           gource_title: ${{ matrix.title }}
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
@@ -47,6 +52,7 @@ jobs:
           gource_seconds_per_day: ${{ matrix.seconds_per_day }}
           # skip only long idle stretches (nights); the default 3 s would compress the whole day into jumps
           gource_auto_skip_seconds: '30'
+          gource_fps: '30'
           gource_file_filter: 'buildres/csl|\.csl'
 
       - name: Store video
