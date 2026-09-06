@@ -376,6 +376,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
+        // The context being replaced is the placeholder this tab showed while the file loaded. Its
+        // journal describes a library that is about to stop existing, and nothing else can reach it
+        // once the tab moves on, so it goes with the context rather than staying for the session.
+        stateManager.removeUndoManager(previousDatabaseContext);
+
         this.bibDatabaseContext = bibDatabaseContext;
 
         initializeComponentsAndListeners(false);
