@@ -14,4 +14,13 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
+## Ignore entry markers in percent comments
+`req~import.bibtex.percent-comments~1`
+
+When importing BibTeX or BibLaTeX, JabRef ignores entry markers inside unescaped `%` comments, including comments containing recognized metadata.
+
+Immediately adjacent entry markers after legacy encoding declarations remain supported for backwards compatibility.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

@@ -213,11 +213,15 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
+    // [impl->req~import.bibtex.percent-comments~1]
     private void parseDatabaseID() throws IOException {
         boolean escaped = false;
 
         while (!eof) {
-            skipWhitespace();
+            if (!escaped) {
+                skipWhitespace();
+            }
+
             char c = (char) read();
 
             if (c == '%') {
@@ -227,7 +231,15 @@ public class BibtexParser implements Parser {
                 if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
-                } else if (!SaveConfiguration.ENCODING_PREFIX.trim().equals(label) && !escaped) {
+                    skipUntilEndOfLine();
+                } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
+                    skipWhitespace();
+                    parseTextToken();
+
+                    if (peek() != '@') {
+                        skipUntilEndOfLine();
+                    }
+                } else if (!escaped) {
                     skipUntilEndOfLine();
                 }
             } else if (c == '@') {
@@ -1202,6 +1214,7 @@ public class BibtexParser implements Parser {
         }
     }
 
+    // [impl->req~import.bibtex.percent-comments~1]
     private boolean consumeUncritically(char expected) throws IOException {
         boolean escaped = false;
 

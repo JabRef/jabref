@@ -2034,6 +2034,7 @@ class BibtexParserTest {
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 
+    // [utest->req~import.bibtex.percent-comments~1]
     @Test
     void parseIgnoresAtSignInsidePercentComment() throws IOException {
         String bibtex = """
@@ -2054,6 +2055,7 @@ class BibtexParserTest {
         assertEquals(Optional.of("Foo Bar"), entry.getField(StandardField.AUTHOR));
     }
 
+    // [utest->req~import.bibtex.percent-comments~1]
     @Test
     void parseIgnoresAtSignInsidePercentCommentBetweenEntries() throws IOException {
         String bibtex = """
@@ -2075,6 +2077,58 @@ class BibtexParserTest {
                 result.getDatabase().getEntries().getFirst().getCitationKey());
         assertEquals(Optional.of("second"),
                 result.getDatabase().getEntries().get(1).getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignAfterEncodingMetadataComment() throws IOException {
+        String bibtex = """
+                % Encoding: UTF-8 @article{fake}
+                @article{real,
+                  author = {Real Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignAfterDatabaseIdMetadataComment() throws IOException {
+        String bibtex = """
+                % DBID: database @article{fake}
+                @article{real,
+                  author = {Real Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseDoesNotPreserveEscapeStateAcrossWhitespace() throws IOException {
+        String bibtex = "\\\n"
+                + "% First comment @article{fakeOne}\n"
+                + "\\   % Second comment @article{fakeTwo}\n"
+                + "@article{real, author = {Real Author}}";
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
     }
 
     @Test
