@@ -38,7 +38,7 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
                 Optional.ofNullable(groupChange.getGroupDiff().getOriginalGroupRoot()),
                 Optional.ofNullable(groupChange.getGroupDiff().getNewGroupRoot()),
                 leftLabelText, rightLabelText, diffMethod);
-        VBox container = new VBox(15, label, diffPane);
+        VBox container = new VBox(12, label, diffPane);
         VBox.setVgrow(diffPane, Priority.ALWAYS);
         setAllAnchorsAndAttachChild(container);
     }
@@ -71,8 +71,8 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         Label onDisk = new Label(rightLabelText);
         onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
-        VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
-        VBox rightContainer = new VBox(5, onDisk, rightScrollPane);
+        VBox leftContainer = new VBox(4, inJabRef, leftScrollPane);
+        VBox rightContainer = new VBox(4, onDisk, rightScrollPane);
         VBox.setVgrow(leftScrollPane, Priority.ALWAYS);
         VBox.setVgrow(rightScrollPane, Priority.ALWAYS);
 

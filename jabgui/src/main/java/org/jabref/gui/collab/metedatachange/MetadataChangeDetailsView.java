@@ -69,7 +69,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /// @param diff The difference to display
     /// @return Configured ScrollPane showing the difference
     private ScrollPane createDefaultDiffScrollPane(MetaDataDiff.Difference diff) {
-        VBox diffContainer = new VBox(15);
+        VBox diffContainer = new VBox(12);
 
         // Show both original and new values
         diffContainer.getChildren().add(new Label(diff.originalObject().toString()));
