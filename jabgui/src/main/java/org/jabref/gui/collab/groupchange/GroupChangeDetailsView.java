@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -66,9 +67,9 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         ScrollPane rightScrollPane = createScrollPane(diskTextArea);
 
         Label inJabRef = new Label(leftLabelText);
-        inJabRef.getStyleClass().add("lib-change-header");
+        inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
         Label onDisk = new Label(rightLabelText);
-        onDisk.getStyleClass().add("lib-change-header");
+        onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
         VBox rightContainer = new VBox(5, onDisk, rightScrollPane);
@@ -80,7 +81,7 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         splitPane.setDividerPositions(0.5);
 
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
-        legendLabel.getStyleClass().add("lib-change-legend");
+        legendLabel.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_LEGEND);
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
         resultContainer.setSpacing(5);
@@ -111,7 +112,7 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         textArea.setEditable(false);
         textArea.setWrapText(false);
         textArea.setAutoHeight(true);
-        textArea.getStyleClass().add("lib-change-text-area");
+        textArea.getStyleClass().addAll("lib-change-text-area");
         return textArea;
     }
 

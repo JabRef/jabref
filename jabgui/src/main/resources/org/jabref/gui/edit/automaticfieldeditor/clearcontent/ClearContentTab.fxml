@@ -14,7 +14,7 @@
         prefHeight="400.0"
         prefWidth="600.0"
         type="VBox"
-        styleClass="edit-field-content-pane"
+        styleClass="edit-field-content-pane,padding-0-12,spacing-12"
         xmlns="http://javafx.com/javafx/17"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.edit.automaticfieldeditor.clearcontent.ClearContentTabView">
@@ -58,7 +58,7 @@
               GridPane.hgrow="ALWAYS"
               GridPane.rowSpan="2"
               GridPane.vgrow="ALWAYS">
-            <Label styleClass="sectionHeader"
+            <Label styleClass="h4,padding-top-12"
                    text="%Clear field content for selected entries">
                 <HBox.margin>
                     <Insets bottom="10.0"/>

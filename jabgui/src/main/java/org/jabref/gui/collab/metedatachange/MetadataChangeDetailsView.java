@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
@@ -25,7 +26,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         container.getChildren().add(header);
 
         // Add views for each detected difference
