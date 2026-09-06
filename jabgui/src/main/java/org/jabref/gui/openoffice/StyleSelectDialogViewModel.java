@@ -238,8 +238,8 @@ public class StyleSelectDialogViewModel {
         filteredAvailableCslLayouts.setPredicate(layout -> matchStyleSearch(layout.getDisplayName(), searchTerm));
     }
 
-    private static boolean matchStyleSearch(String styleName, String searchTerm) {
-        List<String> searchTerms = STYLE_SEARCH_SEPARATORS.splitAsStream(searchTerm)
+    public static boolean matchStyleSearch(String styleName, String searchTerm) {
+        List<String> searchTerms = STYLE_SEARCH_SEPARATORS.splitAsStream(searchTerm.toLowerCase(Locale.ROOT))
                                                           .filter(term -> !term.isBlank())
                                                           .toList();
 
