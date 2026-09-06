@@ -17,8 +17,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -76,7 +74,6 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
@@ -101,6 +98,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +125,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final EntryEditorPreferences entryEditorPreferences;
     private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
+    private @Nullable CitationComponents currentCitingComponents;
+    private @Nullable CitationComponents currentCitedByComponents;
 
     private boolean shouldClearSelectionOnDrop = false;
 
@@ -212,7 +212,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private void onDoiLookUpError() {
         onDoiMissing();
-        dialogService.notify(Localization.lang("No DOI found."));
     }
 
     private void onSciteLookUp() {
@@ -252,11 +251,12 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onDoiMissing() {
+        resetEmptyPanels();
         sciteResultsPane.getChildren().clear();
 
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
-        link.setOnAction(doiLookUp());
+        link.setOnAction(_ -> triggerDoiLookup());
 
         HBox hBox = new HBox();
         hBox.getChildren().add(label);
@@ -273,25 +273,31 @@ public class CitationRelationsTab extends EntryEditorTab {
         GridPane.setVgrow(hBox, Priority.ALWAYS);
     }
 
-    private EventHandler<ActionEvent> doiLookUp() {
-        return _ -> {
-            CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
+    private void triggerDoiLookup() {
+        BibEntry entry = getCurrentEntry();
+        if (entry == null) {
+            return;
+        }
 
-            BackgroundTask.wrap(() -> doiFetcher.findIdentifier(getCurrentEntry()))
-                          .onRunning(() -> citationsRelationsTabViewModel.statusProperty().set(CitationsRelationsTabViewModel.SciteStatus.DOI_LOOK_UP))
-                          .onSuccess(identifier -> {
-                              if (identifier.isPresent()) {
-                                  getCurrentEntry().setField(StandardField.DOI, identifier.get().asString());
-                                  bindToEntry(getCurrentEntry());
-                              } else {
-                                  citationsRelationsTabViewModel.statusProperty().set(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING);
-                                  dialogService.notify(Localization.lang("No DOI found."));
-                              }
-                          }).onFailure(ex -> {
-                              LOGGER.error("Error while looking up DOI", ex);
-                              citationsRelationsTabViewModel.statusProperty().set(CitationsRelationsTabViewModel.SciteStatus.DOI_LOOK_UP_ERROR);
-                          }).executeWith(taskExecutor);
-        };
+        if (currentCitingComponents != null && currentCitedByComponents != null) {
+            showNodes(currentCitingComponents.progress(), currentCitedByComponents.progress());
+            setLabelOn(currentCitingComponents.listView(), Localization.lang("Looking up DOI..."));
+            setLabelOn(currentCitedByComponents.listView(), Localization.lang("Looking up DOI..."));
+        }
+
+        citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
+            if (getCurrentEntry() == entry) {
+                bindToEntry(entry);
+            }
+        });
+    }
+
+    private void resetEmptyPanels() {
+        if (currentCitingComponents != null && currentCitedByComponents != null && currentCitingComponents.entry().getDOI().isEmpty()) {
+            hideNodes(currentCitingComponents.progress(), currentCitedByComponents.progress());
+            setUpEmptyPanel(currentCitingComponents, currentCitedByComponents);
+            setUpEmptyPanel(currentCitedByComponents, currentCitingComponents);
+        }
     }
 
     private VBox getErrorPane() {
@@ -492,19 +498,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                 importCitedByButton,
                 citedByProgress);
 
+        this.currentCitingComponents = citingComponents;
+        this.currentCitedByComponents = citedByComponents;
+
         // click refresh button will trigger refresh from the remote
         refreshCitingButton.setOnMouseClicked(_ -> handleRefresh(citingComponents, citedByComponents));
         refreshCitedByButton.setOnMouseClicked(_ -> handleRefresh(citedByComponents, citingComponents));
-
-        fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
-            if (citingComponents.entry().getDOI().isEmpty()) {
-                return;
-            }
-
-            // switch the fetcher will not trigger refresh from the remote, therefore we trigger it explicitly.
-            searchForRelations(citingComponents, citedByComponents, false);
-            searchForRelations(citedByComponents, citingComponents, false);
-        });
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
@@ -528,6 +527,14 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .withText(CitationFetcherType::getName)
                 .install(fetcherCombo);
         fetcherCombo.valueProperty().bindBidirectional(entryEditorPreferences.citationFetcherTypeProperty());
+
+        fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, _) -> {
+            if (currentCitingComponents != null && currentCitedByComponents != null && currentCitingComponents.entry().getDOI().isPresent()) {
+                // switch the fetcher will not trigger refresh from the remote, therefore we trigger it explicitly.
+                searchForRelations(currentCitingComponents, currentCitedByComponents, false);
+                searchForRelations(currentCitedByComponents, currentCitingComponents, false);
+            }
+        });
     }
 
     private HBox getTopBar() {
@@ -839,35 +846,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
-        link.setOnAction(_ -> {
-            CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
-
-            BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
-                          .onRunning(() -> {
-                              showNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), Localization.lang("Looking up DOI..."));
-                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Looking up DOI..."));
-                          })
-                          .onSuccess(identifier -> {
-                              if (identifier.isPresent()) {
-                                  citationComponents.entry().setField(StandardField.DOI, identifier.get().asString());
-                                  // Update scite metrics in bottom pane
-                                  citationsRelationsTabViewModel.bindToEntry(citationComponents.entry());
-                                  // if the DOI is successfully looked up (requested by the user), trigger refresh from the remote
-                                  executeSearch(citationComponents, true);
-                                  executeSearch(otherCitationComponents, true);
-                              } else {
-                                  dialogService.notify(Localization.lang("No DOI found."));
-                                  setUpEmptyPanel(citationComponents, otherCitationComponents);
-                                  setUpEmptyPanel(otherCitationComponents, citationComponents);
-                              }
-                          }).onFailure(ex -> {
-                              LOGGER.error("Error while looking up DOI", ex);
-                              hideNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), Localization.lang("Error while looking up DOI: %0", ex.getLocalizedMessage()));
-                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Error while looking up DOI: %0", ex.getLocalizedMessage()));
-                          }).executeWith(taskExecutor);
-        });
+        link.setOnAction(_ -> triggerDoiLookup());
 
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
