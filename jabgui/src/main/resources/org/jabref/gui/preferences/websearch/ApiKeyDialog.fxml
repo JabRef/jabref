@@ -13,14 +13,14 @@
 <DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.preferences.websearch.ApiKeyDialog" prefWidth="500">
     <content>
-        <VBox spacing="10" styleClass="api-key-dialog-content">
+        <VBox spacing="10" styleClass="padding-12">
             <padding>
                 <Insets top="10"/>
             </padding>
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label text="%API Key"/>
                 <TextField fx:id="apiKeyField" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="testButton" onAction="#testApiKey" text="%Test connection"/>
+                <Button fx:id="testButton" onAction="#testApiKey" styleClass="padding-4-6" text="%Test connection"/>
             </HBox>
             <CheckBox fx:id="persistApiKeysCheckBox" text="%Save API key to use in future?">
                 <tooltip>

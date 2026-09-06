@@ -22,7 +22,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
       # A human push invalidates the bot's earlier approval; "automerge" must be granted again explicitly.
@@ -106,7 +106,7 @@ jobs:
         id: checkout_pr
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && (steps.pr_info.outputs.head_repo == 'JabRef/jabref' || steps.pr_info.outputs.maintainer_can_modify == 'true')
         continue-on-error: true
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: ${{ steps.pr_info.outputs.head_repo }}
           ref: ${{ steps.pr_info.outputs.head_ref }}
@@ -176,7 +176,7 @@ jobs:
 
           echo "❌ Merge conflicts"
           echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
-          gh issue edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
+          gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
           # "workflow dispatch" does not trigger subsequent "on completion" runs.
           # Therefore, we emulate ghprcomment here

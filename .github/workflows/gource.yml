@@ -51,13 +51,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           show-progress: 'false'
 
       - name: Generate Gource video
-        uses: nbprojekt/gource-action@v1
+        uses: nbprojekt/gource-action@d2fdf85904db416b69445dae5551282528e052ae # v1
         with:
           gource_title: ${{ matrix.title }}
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
@@ -73,14 +73,14 @@ jobs:
           mv ./gource/gource.mp4 ${{ matrix.file }}
 
       - name: Upload gource video
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: Gource-${{ matrix.file }}
           path: ${{ matrix.file }}
           retention-days: 80
 
       - name: Upload to files.jabref.org
-        uses: Pendect/action-rsyncer@v2.0.0
+        uses: Pendect/action-rsyncer@8e05ffa5c93e5d9c9b167796b26044d2c616b2b9 # v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
         with:

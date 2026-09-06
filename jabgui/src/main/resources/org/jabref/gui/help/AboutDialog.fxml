@@ -22,9 +22,9 @@
     <content>
         <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <AnchorPane>
-                <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top"
+                <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="padding-bottom-16"
                       AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
-                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
+                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading,font-size-250" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
                         <cursor>
                             <Cursor fx:constant="HAND"/>
                         </cursor>
@@ -32,21 +32,21 @@
                             <Tooltip text="%Copy Version"/>
                         </tooltip>
                     </Label>
-                    <Label managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading"
+                    <Label managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading,h3"
                            text="${controller.viewModel.developmentVersion}"
                            visible="${controller.viewModel.isDevelopmentVersion}"/>
-                    <Hyperlink onAction="#openChangeLog" styleClass="top-padding" text="%What's new in this version?"/>
+                    <Hyperlink onAction="#openChangeLog" styleClass="padding-top-6" text="%What's new in this version?"/>
                     <Label styleClass="filler"/>
                     <HBox alignment="CENTER_LEFT">
-                        <Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true"/>
+                        <Label styleClass="padding-right-6" text="${controller.viewModel.license}" wrapText="true"/>
                         <Hyperlink onAction="#openLicense" text="MIT"/>
                     </HBox>
                     <Hyperlink onAction="#openPrivacyPolicy" text="Privacy Policy"/>
                     <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries"/>
                     <HBox alignment="CENTER_LEFT">
-                        <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>
+                        <Label styleClass="padding-right-6" text="%Want to help?" wrapText="true"/>
                         <Hyperlink onAction="#openDonation" text="%Make a donation"/>
-                        <Label styleClass="space" text="%or" wrapText="true"/>
+                        <Label styleClass="padding-0-6" text="%or" wrapText="true"/>
                         <Hyperlink onAction="#openGithub" text="%get involved"/>
                         <Label text="."/>
                     </HBox>
@@ -83,13 +83,13 @@
                     </effect>
                 </StackPane>
             </AnchorPane>
-            <Label styleClass="sub-heading" text="%Maintainers"/>
-            <Label alignment="CENTER" styleClass="info-sections" prefHeight="100.0" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
-            <Label styleClass="sub-heading" text="%Contributors"/>
+            <Label styleClass="h3,padding-4" text="%Maintainers"/>
+            <Label alignment="CENTER" styleClass="padding-4" prefHeight="100.0" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
+            <Label styleClass="h3,padding-4" text="%Contributors"/>
             <HBox alignment="CENTER_LEFT">
-                <Hyperlink styleClass="contrib-section" onAction="#openContributors" text="%JabRef would not have been possible without the help of our contributors." wrapText="true"/>
+                <Hyperlink styleClass="padding-6" onAction="#openContributors" text="%JabRef would not have been possible without the help of our contributors." wrapText="true"/>
             </HBox>
-            <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="info-sections"/>
+            <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="padding-4"/>
         </VBox>
     </content>
     <ButtonType fx:id="copyVersionButton" text="Copy Version" buttonData="LEFT"/>

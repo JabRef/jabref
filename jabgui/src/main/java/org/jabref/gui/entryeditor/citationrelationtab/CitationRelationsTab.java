@@ -174,6 +174,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
         this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        // Close the preview automatically when the user clicks somewhere outside of it.
+        this.previewTooltip.setAutoHide(true);
     }
 
     private void setSciteResultsPane() {
@@ -279,9 +281,10 @@ public class CitationRelationsTab extends EntryEditorTab {
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.setId("scite-error-label");
+        titleLabel.getStyleClass().addAll("h3", "bold");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("scite-error-box");
+        errorMessageBox.getStyleClass().add("padding-32");
         return errorMessageBox;
     }
 
@@ -291,7 +294,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         tallies.setAlignment(Pos.CENTER_LEFT);
 
         Text metrics = new Text(Localization.lang("Metrics:"));
-        metrics.getStyleClass().add("markdown-bold");
+        metrics.getStyleClass().add("bold");
         Text totalCitations = new Text(Localization.lang("Total Citations: %0", tallModel.total()));
         Text supporting = new Text(Localization.lang("Supporting: %0", tallModel.supporting()));
         Text contradicting = new Text(Localization.lang("Contradicting: %0", tallModel.contradicting()));
@@ -529,7 +532,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = ControlHelper.iconButton(IconTheme.JabRefIcons.LINK);
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
-                        jumpTo.getStyleClass().add("addEntryButton");
+                        jumpTo.getStyleClass().add("h1");
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
                         vContainer.getChildren().add(jumpTo);
 
@@ -547,7 +550,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         });
-                        addToggle.getStyleClass().add("addEntryButton");
+                        addToggle.getStyleClass().addAll("addEntryButton", "h1");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
                         vContainer.getChildren().add(addToggle);
                     }
@@ -570,6 +573,21 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
+                    Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
+                    showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
+                    // [impl->req~entry-editor.citations.click-preview~1]
+                    showPreview.setOnMouseClicked(event -> {
+                        if (previewTooltip.isShowing()) {
+                            previewTooltip.hide();
+                            return;
+                        }
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                            previewTooltip.show(showPreview, event.getScreenX(), event.getScreenY());
+                        });
+                    });
+                    vContainer.getChildren().addLast(showPreview);
+
                     Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
@@ -577,15 +595,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     vContainer.getChildren().addLast(showEntrySource);
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("entry-container");
-
-                    // [impl->req~entry-editor.citations.hover-preview~1]
-                    hContainer.setOnMouseEntered(_ -> {
-                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
-                        });
-                    });
-                    Tooltip.install(hContainer, previewTooltip);
+                    hContainer.getStyleClass().add("padding-6-0");
 
                     return hContainer;
                 })
@@ -703,7 +713,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.getStyleClass().add("padding-5px");
+        label.getStyleClass().add("padding-6");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +15,17 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
@@ -36,6 +42,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
@@ -550,6 +557,66 @@ class BibtexParserTest {
                 .parse(Reader.of("@article{test,author={author missing bracket}"));
         assertTrue(result.hasWarnings());
         assertEquals(List.of(), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseContinuesAfterEntryWithUnmatchedOpenBracket() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                @article{valid,
+                  title = {Valid entry}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseContinuesAfterUnmatchedOpenBracketWithIndentedEntryAndSeparateDelimiter() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                    @article
+                    {valid,
+                      title = {Valid entry}
+                    }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseRetainsLineLeadingBibtexLikeTextInBracedField() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{test,
+                  title = {prefix
+                @foo{bar}
+                suffix}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, """
+                        prefix
+                        @foo{bar}
+                        suffix""");
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -1522,6 +1589,68 @@ class BibtexParserTest {
         assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
     }
 
+    @Test
+    void bibDeskStaticGroupsUseTheEffectiveKeywordSeparator() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{test,
+                    keywords = {first; second},
+                    groups = {existing}}
+
+                @comment{BibDesk Static Groups{
+                <plist><array><dict>
+                    <key>group name</key><string>static</string>
+                    <key>keys</key><string>test</string>
+                </dict></array></plist>
+                }}
+                """));
+
+        BibEntry entry = result.getDatabase().getEntryByCitationKey("test").orElseThrow();
+        GroupTreeNode root = result.getMetaData().getGroups().orElseThrow();
+
+        assertEquals(Optional.of(';'), result.getMetaData().getKeywordSeparator());
+        assertEquals("existing;static", entry.getField(StandardField.GROUPS).orElseThrow());
+        assertEquals(new ExplicitGroup("static", GroupHierarchyType.INDEPENDENT, ';'), root.getFirstChild().orElseThrow().getFirstChild().orElseThrow().getGroup());
+    }
+
+    @Test
+    void bibDeskStaticGroupsDoNotDuplicateWhenReopeningSavedLibrary() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{test,
+                    keywords = {first; second},
+                    groups = {existing}}
+
+                @comment{BibDesk Static Groups{
+                <plist><array><dict>
+                    <key>group name</key><string>static</string>
+                    <key>keys</key><string>test</string>
+                </dict></array></plist>
+                }}
+                """));
+        StringWriter stringWriter = new StringWriter();
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
+                new BibWriter(stringWriter, "\n"),
+                new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false),
+                new FieldPreferences(true, List.of(), List.of()),
+                mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new BibEntryTypesManager());
+
+        databaseWriter.writeDatabase(result.getDatabaseContext());
+
+        String savedContent = stringWriter.toString();
+        ParserResult reopened = new BibtexParser(importFormatPreferences).parse(Reader.of(savedContent));
+        BibEntry reopenedEntry = reopened.getDatabase().getEntryByCitationKey("test").orElseThrow();
+        GroupTreeNode reopenedRoot = reopened.getMetaData().getGroups().orElseThrow();
+
+        assertTrue(savedContent.contains("@comment{BibDesk Static Groups"));
+        assertEquals(Optional.of(';'), reopened.getMetaData().getKeywordSeparator());
+        assertEquals("existing;static", reopenedEntry.getField(StandardField.GROUPS).orElseThrow());
+        assertEquals(List.of(new ExplicitGroup("static", GroupHierarchyType.INDEPENDENT, ';')),
+                reopenedRoot.findChildrenSatisfying(groupTreeNode -> "static".equals(groupTreeNode.getGroup().getName()))
+                            .stream()
+                            .map(GroupTreeNode::getGroup)
+                            .toList());
+    }
+
     /// Checks that BibDesk Smart Groups are available after parsing the library
     @Test
     @Disabled("Not yet supported")
@@ -1782,6 +1911,30 @@ class BibtexParserTest {
                 .parse(Reader.of("@comment{jabref-meta: protectedFlag:true;}"));
 
         assertTrue(result.getMetaData().isProtected());
+    }
+
+    @Test
+    void integrationTestGitAutoPull() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPull());
+    }
+
+    @Test
+    void integrationTestGitAutoCommit() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoCommit:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoCommit());
+    }
+
+    @Test
+    void integrationTestGitAutoPush() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPush:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPush());
     }
 
     @Test
