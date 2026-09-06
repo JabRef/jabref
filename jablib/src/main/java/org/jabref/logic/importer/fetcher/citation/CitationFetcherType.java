@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher.citation;
 
-import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.preferences.AiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -11,6 +10,9 @@ import org.jabref.logic.importer.fetcher.citation.opencitations.OpenCitationsFet
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum CitationFetcherType {
     ALL(AllCitationFetcher.FETCHER_NAME),
     CROSSREF(CrossRefCitationFetcher.FETCHER_NAME),
@@ -49,8 +51,7 @@ public enum CitationFetcherType {
             ImportFormatPreferences importFormatPreferences,
             CitationKeyPatternPreferences citationKeyPatternPreferences,
             GrobidPreferences grobidPreferences,
-            AiPreferences aiPreferences,
-            ChatModel chatModel) {
+            AiService aiService) {
 
         return switch (citationFetcherName) {
             case ALL ->
@@ -59,16 +60,14 @@ public enum CitationFetcherType {
                             importFormatPreferences,
                             citationKeyPatternPreferences,
                             grobidPreferences,
-                            aiPreferences,
-                            chatModel);
+                            aiService);
             case CROSSREF ->
                     new CrossRefCitationFetcher(
                             importerPreferences,
                             importFormatPreferences,
                             citationKeyPatternPreferences,
                             grobidPreferences,
-                            aiPreferences,
-                            chatModel);
+                            aiService);
             case OPEN_ALEX ->
                     new OpenAlex(importerPreferences);
             case OPEN_CITATIONS ->
