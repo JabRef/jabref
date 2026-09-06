@@ -10,14 +10,14 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container">
+        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
             <HBox alignment="CENTER_LEFT" spacing="4">
                 <Label text="%Select features to disable. Disabling these features can significantly improve performance when working with large libraries."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>
 
-            <VBox styleClass="optimization-checkboxes">
+            <VBox styleClass="padding-left-12,spacing-16">
                 <CheckBox fx:id="disableFulltextIndexing" text="%Fulltext indexing"
                           selected="true"/>
                 <CheckBox fx:id="disableCreationDate" text="%Creation date timestamps"

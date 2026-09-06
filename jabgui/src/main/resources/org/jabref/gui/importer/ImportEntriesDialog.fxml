@@ -40,7 +40,7 @@
                     <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
                         <Label fx:id="bibTeXDataLabel"/>
                         <CodeArea fx:id="bibTeXData"
-                                styleClass="bibtex-code-area"
+                                styleClass="bibtex-code-area,font-size-090"
                                 editable="false"
                                 minHeight="30.0"
                                 prefHeight="200.0"

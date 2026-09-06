@@ -174,6 +174,11 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
+
+    // JabRef only reads the top-level styles (CitationStyleCatalogGenerator scans with depth 1),
+    // but these ~8000 unused files dominate the cost of processResources on Windows.
+    exclude("csl-styles/dependent/**")
+    exclude("csl-styles/spec/**")
 }
 
 // region processResources
