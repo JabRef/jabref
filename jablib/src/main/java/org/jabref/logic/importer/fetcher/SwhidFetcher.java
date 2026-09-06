@@ -38,7 +38,6 @@ public class SwhidFetcher implements IdBasedFetcher {
     private static final String USER_AGENT = "JabRef";
 
     // Software Heritage allows 120 requests per hour for anonymous users
-    // [impl->req~fetchers.rate-limiting~1]
     static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval(FETCHER_NAME, 120, Duration.ofHours(1));
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -65,7 +64,6 @@ public class SwhidFetcher implements IdBasedFetcher {
     }
 
     @Override
-    // [impl->req~fetchers.identifier-rate-limit-retries~1]
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<SWHID> parsedSwhid = SWHID.parse(identifier);
         if (parsedSwhid.isEmpty()) {
@@ -73,6 +71,7 @@ public class SwhidFetcher implements IdBasedFetcher {
         }
 
         String canonicalSwhid = parsedSwhid.get().asString();
+        // [impl->req~fetchers.rate-limiting~1]
         RATE_LIMITER.acquire(canonicalSwhid);
 
         URL url;
@@ -82,6 +81,7 @@ public class SwhidFetcher implements IdBasedFetcher {
             throw new FetcherException("Invalid URL constructed for SWHID: " + canonicalSwhid, e);
         }
 
+        // [impl->req~fetchers.identifier-rate-limit-retries~1]
         return FetcherRetry.executeWithRateLimitRetry(() -> {
             try {
                 URLDownload urlDownload = new URLDownload(url);
