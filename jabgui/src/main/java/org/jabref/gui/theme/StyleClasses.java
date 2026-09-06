@@ -11,7 +11,7 @@ public final class StyleClasses {
     public static final List<String> CHANGE_VIEW_HEADER = List.of("h4", "padding-4");
 
     /// Explanatory legend below a change/diff view.
-    public static final List<String> CHANGE_VIEW_LEGEND = List.of("font-size-090", "text-subtle", "padding-4");
+    public static final List<String> CHANGE_VIEW_LEGEND = List.of("text-subtle", "padding-4");
 
     /// Header introducing a section within a tab or form.
     public static final List<String> SECTION_HEADER = List.of("h4", "padding-top-12");

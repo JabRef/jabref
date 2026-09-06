@@ -403,7 +403,7 @@ public class WelcomeTab extends Tab {
         HBox container = new HBox();
         container.getStyleClass().addAll("align-center-left", "padding-top-4");
         Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
-        versionLabel.getStyleClass().addAll("font-size-090", "text-subtle");
+        versionLabel.getStyleClass().addAll("text-subtle");
         container.getChildren().add(versionLabel);
         return container;
     }

@@ -68,7 +68,6 @@
 .h6 { -fx-font-size: 1em; }
 
 /* Off-scale sizes: below h6 and above h1 */
-.font-size-090 { -fx-font-size: 0.9em; }
 .font-size-250 { -fx-font-size: 2.5em; }
 
 /* Font style */

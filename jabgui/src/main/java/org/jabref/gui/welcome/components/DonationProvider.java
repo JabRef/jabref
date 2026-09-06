@@ -68,7 +68,6 @@ public class DonationProvider {
         Label title = new Label(Localization.lang("Support JabRef"));
         title.getStyleClass().add("bold");
         Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
-        subtitle.getStyleClass().add("font-size-090");
         VBox textBox = new VBox(title, subtitle);
         textBox.getStyleClass().add("spacing-4");
 
