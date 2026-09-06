@@ -115,11 +115,11 @@ public class WelcomeTab extends Tab {
         this.buildInfo = buildInfo;
         this.stage = stage;
         this.workspacePreferences = workspacePreferences;
-        this.recentLibrariesBox = new VBox();
+        this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "spacing-24", "align-center", "padding-24");
+        main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
+        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-24");
         initializeColumns();
 
         VBox container = new VBox(main);
@@ -136,7 +136,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
-        welcomeLabel.getStyleClass().addAll("font-size-250", "text-accent");
+        welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
         VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
@@ -146,7 +146,7 @@ public class WelcomeTab extends Tab {
 
     private void initializeColumns() {
         GridPane grid = new GridPane();
-        grid.getStyleClass().addAll("gap-24", "align-top-center");
+        grid.getStyleClass().addAll("gap-16", "align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -175,19 +175,19 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(
+        VBox leftColumn = new VBox(24,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
-        leftColumn.getStyleClass().addAll("spacing-24", "align-top-left");
+        leftColumn.getStyleClass().addAll("align-top-left");
         return leftColumn;
     }
 
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(quickSettings, walkthroughs);
-        rightColumn.getStyleClass().addAll("spacing-24", "align-top-left");
+        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
+        rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
 
@@ -256,8 +256,8 @@ public class WelcomeTab extends Tab {
                 this::importIntoNewLibrary
         );
 
-        VBox container = new VBox();
-        container.getStyleClass().addAll("spacing-8", "align-top-left");
+        VBox container = new VBox(8);
+        container.getStyleClass().addAll("align-top-left");
         container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
@@ -309,7 +309,7 @@ public class WelcomeTab extends Tab {
             return;
         }
         recentLibrariesBox.getChildren().clear();
-        recentLibrariesBox.getStyleClass().addAll("spacing-8", "align-top-left");
+        recentLibrariesBox.getStyleClass().addAll("align-top-left");
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
@@ -357,8 +357,8 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox();
-        container.getStyleClass().addAll("spacing-16", "align-center-left");
+        HBox container = new HBox(16);
+        container.getStyleClass().addAll("align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
         Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);

@@ -128,7 +128,7 @@ public class QuickSettings extends VBox {
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().addAll("quick-settings-button", "padding-12-16", "align-center-left");
+        button.getStyleClass().addAll("quick-settings-button", "padding-12", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(event -> action.run());
         return button;

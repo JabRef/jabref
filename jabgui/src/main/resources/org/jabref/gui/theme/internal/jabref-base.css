@@ -67,9 +67,6 @@
 .h5 { -fx-font-size: 1.1em; }
 .h6 { -fx-font-size: 1em; }
 
-/* Off-scale sizes: below h6 and above h1 */
-.font-size-250 { -fx-font-size: 2.5em; }
-
 /* Font style */
 .bold { -fx-font-weight: bold; }
 .italic { -fx-font-style: italic; }
@@ -99,9 +96,6 @@
 .padding-4-0 { -fx-padding: 0.333em 0; }
 .padding-4-8 { -fx-padding: 0.333em 0.667em; }
 .padding-4-12 { -fx-padding: 0.333em 1em; }
-.padding-4-24 { -fx-padding: 0.333em 2em; }
-.padding-8-12 { -fx-padding: 0.667em 1em; }
-.padding-12-16 { -fx-padding: 1em 1.333em; }
 
 /* Padding: single side. Added on demand -- only the steps in use exist. */
 .padding-top-4 { -fx-padding: 0.333em 0 0 0; }
@@ -118,19 +112,16 @@
 .padding-left-24 { -fx-padding: 0 0 0 2em; }
 
 /* Spacing between the children of an HBox / VBox */
-.spacing-0 { -fx-spacing: 0; }
 .spacing-4 { -fx-spacing: 0.333em; }
 .spacing-8 { -fx-spacing: 0.667em; }
 .spacing-12 { -fx-spacing: 1em; }
 .spacing-16 { -fx-spacing: 1.333em; }
-.spacing-24 { -fx-spacing: 2em; }
 
 /* Gap between the cells of a GridPane / FlowPane / TilePane */
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
 .gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
 .gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
 .gap-16 { -fx-hgap: 1.333em; -fx-vgap: 1.333em; }
-.gap-24 { -fx-hgap: 2em; -fx-vgap: 2em; }
 
 /* Alignment */
 .align-center { -fx-alignment: center; }

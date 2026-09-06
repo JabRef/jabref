@@ -29,8 +29,8 @@ public class WalkthroughRenderer {
     /// @param beforeNavigate Runnable to execute before any navigation action
     /// @return The rendered tooltip content node
     public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox tooltip = new VBox();
-        tooltip.getStyleClass().addAll("root", "padding-12", "spacing-12");
+        VBox tooltip = new VBox(12);
+        tooltip.getStyleClass().addAll("root", "padding-12");
 
         StackPane titleContainer = new StackPane();
         titleContainer.getStyleClass().add("walkthrough-title-container");
@@ -40,11 +40,9 @@ public class WalkthroughRenderer {
         titleContainer.getChildren().add(titleFlow);
 
         VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
-        contentContainer.getStyleClass().add("spacing-16");
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
         HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);
-        actionsContainer.getStyleClass().add("spacing-0");
 
         step.maxHeight().ifPresent(tooltip::setMaxHeight);
         step.maxWidth().ifPresent(tooltip::setMaxWidth);
@@ -134,9 +132,8 @@ public class WalkthroughRenderer {
     }
 
     private HBox createActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
-        HBox actions = new HBox();
+        HBox actions = new HBox(0);
         actions.setAlignment(Pos.CENTER_LEFT);
-        actions.getStyleClass().add("spacing-0");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -163,8 +160,7 @@ public class WalkthroughRenderer {
     }
 
     private VBox createContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox contentBox = new VBox();
-        contentBox.getStyleClass().add("spacing-16");
+        VBox contentBox = new VBox(16);
         contentBox.getChildren().addAll(component.content().stream().map(block ->
                 switch (block) {
                     case TextBlock textBlock ->

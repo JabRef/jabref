@@ -103,7 +103,7 @@ public class Walkthroughs extends VBox {
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().addAll("quick-settings-button", "padding-12-16", "align-center-left");
+        button.getStyleClass().addAll("quick-settings-button", "padding-12", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, preferences, walkthroughId).execute());
         return button;

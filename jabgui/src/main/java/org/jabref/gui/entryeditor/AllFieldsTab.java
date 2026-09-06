@@ -131,7 +131,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     private Optional<BibEntry> subscribedEntry = Optional.empty();
 
     /// Scroll content: main grid + chip bar + section panes + free-form add row.
-    private final VBox listContainer = new VBox();
+    private final VBox listContainer = new VBox(8);
 
     public AllFieldsTab(UndoManager undoManager,
                         UndoAction undoAction,
@@ -157,7 +157,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-12-16", "spacing-8");
+        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-12");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
@@ -470,8 +470,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                                          Map<Field, Label> labelForField,
                                          BibDatabaseContext bibDatabaseContext,
                                          BibEntry entry) {
-        VBox content = new VBox();
-        content.getStyleClass().add("spacing-8");
+        VBox content = new VBox(8);
 
         Runnable populateContent = () -> populateSectionContent(
                 content,
