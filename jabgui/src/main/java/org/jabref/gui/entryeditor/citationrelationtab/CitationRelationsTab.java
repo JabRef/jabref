@@ -169,6 +169,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
         this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        // Close the preview automatically when the user clicks somewhere outside of it.
+        this.previewTooltip.setAutoHide(true);
     }
 
     private void setSciteResultsPane() {
@@ -565,6 +567,21 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
+                    Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
+                    showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
+                    // [impl->req~entry-editor.citations.click-preview~1]
+                    showPreview.setOnMouseClicked(event -> {
+                        if (previewTooltip.isShowing()) {
+                            previewTooltip.hide();
+                            return;
+                        }
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                            previewTooltip.show(showPreview, event.getScreenX(), event.getScreenY());
+                        });
+                    });
+                    vContainer.getChildren().addLast(showPreview);
+
                     Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
@@ -573,14 +590,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
-
-                    // [impl->req~entry-editor.citations.hover-preview~1]
-                    hContainer.setOnMouseEntered(_ -> {
-                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
-                        });
-                    });
-                    Tooltip.install(hContainer, previewTooltip);
 
                     return hContainer;
                 })
