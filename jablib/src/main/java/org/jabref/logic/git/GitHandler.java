@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
@@ -73,12 +74,12 @@ public class GitHandler {
             return;
         }
         try {
-            try (Git git = Git.init()
-                              .setDirectory(repositoryPathAsFile)
-                              .setInitialBranch("main")
-                              .call()) {
-                // "git" object is not used later, but we need to close it after initialization
-            }
+            // Git.init().call() returns a handle that must be closed before the repository is reopened below.
+            Git.init()
+               .setDirectory(repositoryPathAsFile)
+               .setInitialBranch("main")
+               .call()
+               .close();
             setupGitIgnore();
             String initialCommit = "Initial commit";
             if (!createCommitOnCurrentBranch(initialCommit, false)) {
@@ -154,7 +155,7 @@ public class GitHandler {
             git.commit()
                .setMessage("Initial commit")
                .call();
-        } catch (IOException | GitAPIException | JabRefException e) {
+        } catch (IOException | GitAPIException | JGitInternalException | JabRefException e) {
             LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
             try {
                 FileUtils.delete(repositoryRoot.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);

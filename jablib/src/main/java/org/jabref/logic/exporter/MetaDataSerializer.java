@@ -27,7 +27,7 @@ public class MetaDataSerializer {
     private MetaDataSerializer() {
     }
 
-    /// Writes all data in the format &lt;key, serialized data>.
+    /// Writes all data in the format `<key, serialized data>`.
     /// Also serializes user-defined .blg file paths (if present).
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
                                                              GlobalCitationKeyPatterns globalCiteKeyPatterns) {

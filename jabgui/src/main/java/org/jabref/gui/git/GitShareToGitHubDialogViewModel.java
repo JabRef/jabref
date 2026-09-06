@@ -19,6 +19,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
+import org.jabref.logic.git.util.GitExceptionUtil;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.GitInitService;
 import org.jabref.logic.l10n.Localization;
@@ -97,11 +98,18 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                     close.run();
                 })
                 .onFailure(e -> {
-                    LOGGER.warn("Git share failed", e);
+                    LOGGER.warn("GitHub share failed", e);
+                    String message;
+                    if (e instanceof JabRefException jabRefException) {
+                        message = jabRefException.getLocalizedMessage();
+                    } else if (GitExceptionUtil.isLockFailure(e)) {
+                        message = Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.");
+                    } else {
+                        message = Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
+                    }
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("GitHub share failed"),
-                            e.getMessage(),
-                            e
+                            message
                     );
                 })
                 .executeWith(taskExecutor);
@@ -129,9 +137,12 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
         String url = gitPreferences.getRepositoryUrl();
 
-        Path bibPath = bibFilePathOpt.get();
+        Path bibPath = GitHandler.resolveToRealPath(bibFilePathOpt.get());
         GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);
-        GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());
+        GitHandler handler = gitHandlerRegistry.fromAnyPath(bibPath)
+                                               .orElseThrow(() -> new JabRefException(
+                                                       "Could not resolve the Git repository for the current library",
+                                                       Localization.lang("Could not set up the Git repository for this library. Please check the repository location and try again.")));
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
         if (status.syncStatus() == SyncStatus.BEHIND) {
             throw new JabRefException(Localization.lang("Remote repository is not empty. Please pull changes before pushing."));

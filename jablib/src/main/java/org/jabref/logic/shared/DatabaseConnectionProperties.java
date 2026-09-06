@@ -16,8 +16,6 @@ public interface DatabaseConnectionProperties {
 
     boolean isValid();
 
-    String getKeyStore();
-
     boolean isUseSSL();
 
     boolean isAllowPublicKeyRetrieval();

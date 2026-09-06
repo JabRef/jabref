@@ -16,9 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -102,8 +100,20 @@ class GitShareToGitHubDialogViewModelTest {
         });
 
         verify(dialogService).showErrorDialogAndWait(
-                eq(Localization.lang("GitHub share failed")),
-                eq(Localization.lang("No GitHub credentials. Please configure them in Preferences > Git.")),
-                any(Exception.class));
+                Localization.lang("GitHub share failed"),
+                Localization.lang("No GitHub credentials. Please configure them in Preferences > Git."));
+    }
+
+    @Test
+    void shareToGitHubShowsErrorWithoutExceptionDetails() {
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
+
+        GitShareToGitHubDialogViewModel viewModel = viewModel(gitPreferences("JabRef", "token"));
+        viewModel.shareToGitHub(() -> {
+        });
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("GitHub share failed"),
+                Localization.lang("No library open"));
     }
 }

@@ -216,6 +216,29 @@ class GitCommitActionTest {
         }
     }
 
+    @Test
+    void brokenRepositoryStatusShowsAnErrorDialog() throws Exception {
+        Path libraryFile = libraryDirectory.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        try (Git git = Git.init().setInitialBranch("main").setDirectory(libraryDirectory.toFile()).call()) {
+            git.add().addFilepattern("library.bib").call();
+            git.commit().setMessage("Initial commit").call();
+        }
+        Files.writeString(libraryDirectory.resolve(".git").resolve("refs").resolve("heads").resolve("main"), "0000000000000000000000000000000000000000");
+
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        when(databaseContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(libraryFile));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        when(libraryTab.isModified()).thenReturn(false);
+
+        gitCommitAction.execute();
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Git commit failed"),
+                Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."));
+    }
+
     private void executeCommitAction(Path libraryFile, boolean confirmInitialization) {
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
