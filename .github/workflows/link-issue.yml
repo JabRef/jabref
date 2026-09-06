@@ -241,8 +241,10 @@ jobs:
           set -euo pipefail
 
           # The workflow also runs on "edited"/"synchronize"; the marker keeps the warning (and the strike) a one-time event per PR.
+          # Only comments written by this workflow itself count - anybody can post the marker text and would otherwise silence their own strike.
           MARKER='<!-- pr-on-foreign-issue -->'
-          if gh pr view "$PR_NUMBER" --repo "$REPO" --json comments --jq '.comments[].body' | grep -qF "$MARKER"; then
+          if gh api "/repos/$REPO/issues/$PR_NUMBER/comments" --paginate \
+               --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body' | grep -qF "$MARKER"; then
             echo "Already warned."
             echo "warned=false" >> "$GITHUB_OUTPUT"
             exit 0
