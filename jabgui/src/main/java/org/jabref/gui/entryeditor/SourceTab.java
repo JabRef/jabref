@@ -80,14 +80,14 @@ public class SourceTab extends EntryEditorTab {
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public SourceTab(
-                     FieldPreferences fieldPreferences,
-                     ImportFormatPreferences importFormatPreferences,
-                     FileUpdateMonitor fileMonitor,
-                     DialogService dialogService,
-                     BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager,
-                     BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+            FieldPreferences fieldPreferences,
+            ImportFormatPreferences importFormatPreferences,
+            FileUpdateMonitor fileMonitor,
+            DialogService dialogService,
+            BibEntryTypesManager entryTypesManager,
+            KeyBindingRepository keyBindingRepository,
+            StateManager stateManager,
+            BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.stateManager = stateManager;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
