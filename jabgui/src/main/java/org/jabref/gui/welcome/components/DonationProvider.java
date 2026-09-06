@@ -68,8 +68,7 @@ public class DonationProvider {
         Label title = new Label(Localization.lang("Support JabRef"));
         title.getStyleClass().add("bold");
         Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
-        VBox textBox = new VBox(title, subtitle);
-        textBox.getStyleClass().add("spacing-4");
+        VBox textBox = new VBox(4, title, subtitle);
 
         Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();
         HBox leftContent = new HBox(10, iconNode, textBox);
@@ -100,8 +99,8 @@ public class DonationProvider {
         Region textSpacer = new Region();
         HBox.setHgrow(textSpacer, Priority.ALWAYS);
 
-        donationToast = new HBox(leftContent, textSpacer, rightButtons);
-        donationToast.getStyleClass().addAll("donation-toast", "padding-12", "spacing-12", "align-center-left");
+        donationToast = new HBox(12, leftContent, textSpacer, rightButtons);
+        donationToast.getStyleClass().addAll("donation-toast", "padding-12", "align-center-left");
         donationToast.setMaxWidth(Region.USE_PREF_SIZE);
         donationToast.setMinWidth(Region.USE_PREF_SIZE);
         donationToast.setTranslateY(-40);

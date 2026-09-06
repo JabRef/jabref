@@ -179,8 +179,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {
-        HBox container = new HBox();
-        container.getStyleClass().addAll("fetcher-list-cell", "padding-4-8", "align-center-left", "spacing-4");
+        HBox container = new HBox(4);
+        container.getStyleClass().addAll("fetcher-list-cell", "padding-4-8", "align-center-left");
         container.setAlignment(Pos.CENTER_LEFT);
 
         CheckBox enabledCheckBox = new CheckBox();

@@ -594,8 +594,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         Runnable addAction = () -> addFreeFormField(bibDatabaseContext, entry, fieldNameBox.getEditor().getText());
         addButton.setOnAction(_ -> addAction.run());
         fieldNameBox.getEditor().setOnAction(_ -> addAction.run());
-        HBox freeFormRow = new HBox(fieldNameBox, addButton);
-        freeFormRow.getStyleClass().addAll("spacing-4", "padding-top-4");
+        HBox freeFormRow = new HBox(4, fieldNameBox, addButton);
+        freeFormRow.getStyleClass().add("padding-top-4");
         freeFormRow.setAlignment(Pos.CENTER_LEFT);
         return freeFormRow;
     }

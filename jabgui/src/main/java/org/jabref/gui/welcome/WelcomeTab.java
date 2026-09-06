@@ -139,8 +139,8 @@ public class WelcomeTab extends Tab {
         welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("spacing-12", "align-top-left", "padding-bottom-24");
+        VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
+        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-24");
         return topTitles;
     }
 
@@ -335,8 +335,8 @@ public class WelcomeTab extends Tab {
         FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
         HBox versionContainer = createVersionContainer();
-        VBox container = new VBox();
-        container.getStyleClass().addAll("spacing-12", "align-top-left");
+        VBox container = new VBox(12);
+        container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
         return createVBoxContainer(header, container);
     }
@@ -409,8 +409,8 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createVBoxContainer(Node... nodes) {
-        VBox box = new VBox();
-        box.getStyleClass().addAll("spacing-12", "align-top-left");
+        VBox box = new VBox(12);
+        box.getStyleClass().add("align-top-left");
         box.getChildren().addAll(nodes);
         return box;
     }

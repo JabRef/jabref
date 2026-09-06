@@ -35,7 +35,8 @@ public class QuickSettings extends VBox {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        getStyleClass().addAll("spacing-12", "align-top-left");
+        setSpacing(12);
+        getStyleClass().add("align-top-left");
 
         header = new Label(Localization.lang("Quick settings"));
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
@@ -101,7 +102,7 @@ public class QuickSettings extends VBox {
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog);
 
-        VBox newContent = new VBox(
+        VBox newContent = new VBox(4,
                 httpServerToggle,
                 coverImagesDownloadToggle,
                 mainFileDirButton,
@@ -110,7 +111,7 @@ public class QuickSettings extends VBox {
                 entryTableButton,
                 pushApplicationButton,
                 onlineServicesButton);
-        newContent.getStyleClass().addAll("spacing-4", "align-top-left");
+        newContent.getStyleClass().add("align-top-left");
         return newContent;
     }
 

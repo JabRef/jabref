@@ -45,7 +45,7 @@
 /* ==========================================================================
  * Generic utility classes
  * --------------------------------------------------------------------------
- * These are the only style classes that are allowed to declare spacing and
+ * These are the only style classes that are allowed to declare padding and
  * typography. Every other style class in this file describes what a component
  * *looks* like (fills, borders, radii, effects) and leaves how much room it
  * takes up to the utilities below, applied from FXML or Java.
@@ -110,12 +110,6 @@
 
 .padding-left-12 { -fx-padding: 0 0 0 1em; }
 .padding-left-24 { -fx-padding: 0 0 0 2em; }
-
-/* Spacing between the children of an HBox / VBox */
-.spacing-4 { -fx-spacing: 0.333em; }
-.spacing-8 { -fx-spacing: 0.667em; }
-.spacing-12 { -fx-spacing: 1em; }
-.spacing-16 { -fx-spacing: 1.333em; }
 
 /* Gap between the cells of a GridPane / FlowPane / TilePane */
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
@@ -1471,7 +1465,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-dialog-container > HBox {
     -fx-alignment: center-left;
-    -fx-spacing: 0.667em;
 }
 
 .quick-settings-dialog-container > ScrollPane {

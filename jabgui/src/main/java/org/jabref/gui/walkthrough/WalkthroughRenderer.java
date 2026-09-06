@@ -80,12 +80,12 @@ public class WalkthroughRenderer {
         boolean isVertical = step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT;
 
         if (isVertical) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-24", "spacing-12");
+            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-24");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
             step.maxWidth().ifPresent(panel::setMaxWidth);
         } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-24", "spacing-12");
+            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-24");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
             step.maxHeight().ifPresent(panel::setMaxHeight);
@@ -109,8 +109,8 @@ public class WalkthroughRenderer {
     }
 
     private Node render(InfoBlock infoBlock) {
-        HBox infoContainer = new HBox();
-        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "spacing-4", "align-top-left");
+        HBox infoContainer = new HBox(4);
+        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "align-top-left");
 
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
@@ -126,7 +126,7 @@ public class WalkthroughRenderer {
     }
 
     private VBox makePanel() {
-        VBox container = new VBox();
+        VBox container = new VBox(12);
         container.getStyleClass().add("walkthrough-panel");
         return container;
     }
@@ -143,9 +143,8 @@ public class WalkthroughRenderer {
                          actions.getChildren()
                                 .add(makeButton(text, "walkthrough-back-button", beforeNavigate, walkthrough::previousStep)));
 
-        HBox rightActions = new HBox();
+        HBox rightActions = new HBox(4);
         rightActions.setAlignment(Pos.CENTER_RIGHT);
-        rightActions.getStyleClass().add("spacing-4");
 
         component.skipButtonText()
                  .ifPresent(text ->
