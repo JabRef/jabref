@@ -1,4 +1,4 @@
-# Applies "component: *" labels to pull requests based on the changed files,
+# Applies "component: *" and "dev: *" labels to pull requests based on the changed files,
 # as configured in .github/labeler.yml.
 #
 # pull_request_target is required so the workflow has label-write permission

@@ -1,4 +1,4 @@
-# Maps changed files to "component: *" labels on pull requests.
+# Maps changed files to "component: *" and "dev: *" labels on pull requests.
 # Used by .github/workflows/pr-labeler.yml (actions/labeler).
 #
 # Only components with a clear home in the source tree are listed here.
@@ -8,6 +8,24 @@
 # Glob syntax: https://github.com/actions/labeler
 # The component labels themselves are documented at
 # https://devdocs.jabref.org/architecture-and-components.html
+
+"dev: ci-cd":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/actions/**'
+          - '.github/labeler.yml'
+          - '.github/dependabot.yml'
+
+"dev: build-system":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.gradle.kts'
+          - 'gradle/**'
+          - 'gradle.properties'
+          - 'gradlew*'
+          - 'build-logic/**'
+          - 'versions/**'
 
 "component: ai":
   - changed-files:
