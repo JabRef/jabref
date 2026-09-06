@@ -362,6 +362,7 @@ public class BibtexParser implements Parser {
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            dumpTextReadSoFarToString();
         }
     }
 
@@ -370,7 +371,7 @@ public class BibtexParser implements Parser {
         int startLine = line;
         int startColumn = column;
         try {
-            buffer = parseBracketedFieldContent();
+            buffer = parseBracketedFieldContent(false);
         } catch (IOException e) {
             // if we get an IO Exception here, then we have an unbracketed comment,
             // which means that we should just return and the comment will be picked up as arbitrary text
@@ -833,7 +834,7 @@ public class BibtexParser implements Parser {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
-                StringBuilder text = parseBracketedFieldContent();
+                StringBuilder text = parseBracketedFieldContent(true);
                 value.append(text.toString());
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
@@ -1073,7 +1074,7 @@ public class BibtexParser implements Parser {
 
     /// This is called if a field in the form of `field = {content}` is parsed.
     /// The global variable `character` contains `{`.
-    private StringBuilder parseBracketedFieldContent() throws IOException {
+    private StringBuilder parseBracketedFieldContent(boolean recoverAtEntryStart) throws IOException {
         StringBuilder value = new StringBuilder();
 
         consume('{');
@@ -1081,9 +1082,16 @@ public class BibtexParser implements Parser {
         int brackets = 0;
         char character;
         char lastCharacter = '\0';
+        boolean potentialEntryEnd = false;
+        boolean lineContainsOnlyWhitespace = false;
 
         while (true) {
             character = (char) read();
+
+            if (recoverAtEntryStart && potentialEntryEnd && lineContainsOnlyWhitespace && (character == '@') && isEntryStart()) {
+                unread(character);
+                throw new IOException("Error in line " + line + ": Unmatched opening bracket in field content");
+            }
 
             boolean isClosingBracket = false;
             if (character == '}') {
@@ -1119,12 +1127,38 @@ public class BibtexParser implements Parser {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
+                potentialEntryEnd = (brackets == 0) && lineContainsOnlyWhitespace;
+            } else if (!Character.isWhitespace(character)) {
+                potentialEntryEnd = false;
             }
 
             value.append(character);
 
+            if ((character == '\r') || (character == '\n')) {
+                lineContainsOnlyWhitespace = true;
+            } else if (!Character.isWhitespace(character)) {
+                lineContainsOnlyWhitespace = false;
+            }
             lastCharacter = character;
         }
+    }
+
+    private boolean isEntryStart() throws IOException {
+        StringBuilder entryStart = new StringBuilder(parseTextToken());
+        int character;
+        // @formatter:off
+        do {
+            character = read();
+            if (isEOFCharacter(character)) {
+                unreadBuffer(entryStart);
+                return false;
+            }
+            entryStart.append((char) character);
+        } while (Character.isWhitespace((char) character));
+        // @formatter:on
+        boolean isEntryStart = (entryStart.length() > 1) && ((character == '{') || (character == '('));
+        unreadBuffer(entryStart);
+        return isEntryStart;
     }
 
     private boolean isEscapeSymbol(char character) {

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -43,6 +45,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class StyleSelectDialogViewModel {
+
+    private static final Pattern STYLE_SEARCH_SEPARATORS = Pattern.compile("[\\p{P}\\s]+");
 
     private final DialogService dialogService;
 
@@ -231,8 +235,23 @@ public class StyleSelectDialogViewModel {
     }
 
     public void setAvailableCslLayoutsFilter(String searchTerm) {
-        filteredAvailableCslLayouts.setPredicate(layout ->
-                searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
+        filteredAvailableCslLayouts.setPredicate(layout -> matchStyleSearch(layout.getDisplayName(), searchTerm));
+    }
+
+    public static boolean matchStyleSearch(String styleName, String searchTerm) {
+        // [impl->req~ux.text-filtering.case-insensitive-separators~1]
+        List<String> searchTerms = STYLE_SEARCH_SEPARATORS.splitAsStream(searchTerm.toLowerCase(Locale.ROOT))
+                                                          .filter(term -> !term.isBlank())
+                                                          .toList();
+
+        if (searchTerms.isEmpty()) {
+            return true;
+        }
+
+        String searchableStyleName = STYLE_SEARCH_SEPARATORS.matcher(styleName.toLowerCase(Locale.ROOT))
+                                                            .replaceAll(" ")
+                                                            .trim();
+        return searchTerms.stream().allMatch(searchableStyleName::contains);
     }
 
     /// Handles importing a custom CSL style file

@@ -75,7 +75,7 @@
                 </HBox>
             </VBox>
             <VBox>
-                <Label fx:id="tabTitle" styleClass="titleHeader">
+                <Label fx:id="tabTitle" styleClass="h3,padding-bottom-6">
                     <padding>
                         <Insets bottom="4.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>

@@ -20,6 +20,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
@@ -64,6 +65,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private GitHandlerRegistry gitHandlerRegistry;
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -108,7 +110,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 undoManager,
                 clipBoardManager,
                 taskExecutor,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                gitHandlerRegistry);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 

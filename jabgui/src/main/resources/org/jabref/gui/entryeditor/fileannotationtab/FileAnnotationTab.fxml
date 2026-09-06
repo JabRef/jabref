@@ -15,7 +15,7 @@
 <?import org.controlsfx.control.MasterDetailPane?>
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
             xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView" styleClass="editorPane">
+            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView" styleClass="editorPane,gap-8,padding-4">
     <MasterDetailPane dividerPosition="0.6">
         <masterNode>
             <BorderPane>

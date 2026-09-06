@@ -30,6 +30,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -110,7 +111,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
         Button addTabButton = new Button();
         addTabButton.setPrefSize(20.0, 20.0);
-        addTabButton.getStyleClass().addAll("icon-button", "narrow");
+        addTabButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         addTabButton.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
         addTabButton.setTooltip(new Tooltip(Localization.lang("Add new tab")));
         addTabButton.setOnAction(_ -> addTab());

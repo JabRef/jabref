@@ -25,6 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -66,7 +67,7 @@ public class SourceTab extends EntryEditorTab {
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
     private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
-    private final Subscription activeTabSubscription;
+    private final Subscription activeDatabaseSubscription;
     private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
@@ -100,18 +101,15 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        activeTabSubscription = EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
-            if (library.isEmpty()) {
-                this.setText(Localization.lang("Source"));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
-            } else {
-                BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                                   .orElse(BibDatabaseMode.BIBLATEX);
-                this.setText(Localization.lang("%0 source", mode.getFormattedName()));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
-            }
-        });
-        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        activeDatabaseSubscription = EasyBind.subscribe(stateManager.activeDatabaseProperty(), database -> database.ifPresentOrElse(context -> {
+            BibDatabaseMode mode = context.getMode();
+            this.setText(Localization.lang("%0 source", mode.getFormattedName()));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+        }, () -> {
+            this.setText(Localization.lang("Source"));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
+        }));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
@@ -145,7 +143,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.getStyleClass().add("bibtex-code-area");
+        codeArea.getStyleClass().addAll("bibtex-code-area", "font-size-090");
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
@@ -226,7 +224,7 @@ public class SourceTab extends EntryEditorTab {
             removeEntryListeners(previousEntry);
             previousEntry = null;
         }
-        activeTabSubscription.unsubscribe();
+        activeDatabaseSubscription.unsubscribe();
         searchQuerySubscription.unsubscribe();
     }
 

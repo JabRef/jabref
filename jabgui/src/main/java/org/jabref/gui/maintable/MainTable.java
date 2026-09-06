@@ -54,6 +54,7 @@ import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -198,18 +199,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         Button addExampleButton = new Button(Localization.lang("Add example entry"));
-        addExampleButton.getStyleClass().add("text-button-blue");
+        addExampleButton.getStyleClass().addAll("text-button-blue", "h4");
         addExampleButton.setOnAction(_ -> {
             BibEntry entry = addExampleEntry();
             libraryTab.showAndEdit(entry);
         });
 
         Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
-        importPdfsButton.getStyleClass().add("text-button-blue");
+        importPdfsButton.getStyleClass().addAll("text-button-blue", "h4");
         importPdfsButton.setOnAction(_ -> importPdfs());
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
-        noContentLabel.getStyleClass().add("welcome-header-label");
+        noContentLabel.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -356,8 +357,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entries
             List<Integer> indices = bibEntries.stream()
-                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .flatMap(bibEntry -> findEntry(bibEntry).stream())
                                               .map(entry -> getItems().indexOf(entry))
                                               .filter(index -> index >= 0)
                                               .toList();
@@ -640,10 +640,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(@NonNull BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
-    }
-
-    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
-        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

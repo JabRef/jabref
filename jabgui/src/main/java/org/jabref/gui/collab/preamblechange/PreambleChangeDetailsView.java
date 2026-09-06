@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -15,7 +16,7 @@ public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
 
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Changed preamble"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         container.getChildren().add(header);
 
         if (StringUtil.isNotBlank(preambleDiff.getOriginalPreamble())) {
