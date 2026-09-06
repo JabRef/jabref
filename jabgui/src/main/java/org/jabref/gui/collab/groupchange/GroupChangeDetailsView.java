@@ -25,10 +25,6 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         this(groupChange, Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName()));
     }
 
-    public GroupChangeDetailsView(GroupChange groupChange, String labelValue) {
-        this(groupChange, labelValue, Localization.lang("In JabRef"), Localization.lang("On disk"), DiffHighlighter.BasicDiffMethod.CHARS);
-    }
-
     public GroupChangeDetailsView(GroupChange groupChange, String labelValue, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
         Label label = new Label(labelValue);
         label.setWrapText(true);
