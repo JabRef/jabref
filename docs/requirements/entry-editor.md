@@ -19,10 +19,10 @@ ControlsFX validation decoration is initialized during GUI startup, so opening t
 
 Needs: impl
 
-## Citations tab should show citation preview on hover
-`req~entry-editor.citations.hover-preview~1`
+## Citations tab should show citation preview on click
+`req~entry-editor.citations.click-preview~1`
 
-When the user hovers over a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the current selected style should be displayed.
+When the user clicks the preview icon on a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the currently selected style should be displayed. The preview is not shown automatically on hover, because a large floating card popping up on every hover is too intrusive.
 
 Needs: impl
 
@@ -74,6 +74,13 @@ Needs: impl
 A field's row shows a small gray "remove field" icon button pinned to its top-right corner while the field's editor is focused and the field is currently blank. Clicking it hides the row again. The citation key and the entry type's required fields never show this button, so they cannot be removed this way.
 
 Needs: impl
+
+## Files found in the file directory are suggested even when no file is linked
+`req~entry-editor.main-tab.autolink-suggestions~1`
+
+When "Automatically search and show unlinked files in the entry editor" is enabled and files in the file directory match the entry but are not linked in it, the file editor is shown in the files and links section even if the entry has no file field, listing those files as suggestions with a gray background and an accept button. This matches the file editor's behavior for entries that already have linked files.
+
+Needs: impl, utest
 
 ## Custom tabs show a user-defined list of field patterns
 `req~entry-editor.custom-tabs~1`

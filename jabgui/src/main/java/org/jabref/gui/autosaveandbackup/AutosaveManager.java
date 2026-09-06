@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,19 +32,26 @@ public class AutosaveManager {
     private final EventBus eventBus;
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter coarseChangeFilter;
-    private boolean needsSave = false;
+    private final AtomicBoolean needsSave = new AtomicBoolean(false);
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
+        this(bibDatabaseContext, coarseChangeFilter, new ScheduledThreadPoolExecutor(2));
+    }
+
+    AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, ScheduledThreadPoolExecutor executor) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.coarseChangeFilter = coarseChangeFilter;
         this.eventBus = new EventBus();
 
-        this.executor = new ScheduledThreadPoolExecutor(2);
+        this.executor = executor;
         this.executor.scheduleAtFixedRate(
                 () -> {
-                    if (needsSave) {
-                        eventBus.post(new AutosaveEvent());
-                        needsSave = false;
+                    synchronized (this) {
+                        // Serialize posting with shutdown so a callback cannot post after disposal.
+                        // Clear before posting, so a change arriving while the save runs is not lost
+                        if (!executor.isShutdown() && needsSave.getAndSet(false)) {
+                            eventBus.post(new AutosaveEvent());
+                        }
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
@@ -51,14 +59,21 @@ public class AutosaveManager {
                 TimeUnit.SECONDS);
     }
 
+    /// Every change counts, including the keystrokes the filter marks as minor: the filter exists to spare listeners
+    /// expensive work per keystroke, but a flag is cheap and the timer throttles the saves anyway. Ignoring minor
+    /// changes would leave a field the user only types in unsaved until the user moves to another field.
     @Subscribe
     public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFiltered()) {
-            this.needsSave = true;
-        }
+        needsSave.set(true);
     }
 
-    private void shutdown() {
+    boolean isSavePending() {
+        return needsSave.get();
+    }
+
+    synchronized void shutdown() {
+        executor.shutdownNow();
+        needsSave.set(false);
         try {
             coarseChangeFilter.unregisterListener(this);
         } catch (IllegalArgumentException e) {
@@ -68,10 +83,12 @@ public class AutosaveManager {
     }
 
     /// Starts the Autosaver which is associated with the given [BibDatabaseContext].
+    /// [impl->req~jabgui.autosaveandbackup.autosave-listens~1]
     ///
     /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
         AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext, coarseChangeFilter);
+        coarseChangeFilter.registerListener(autosaveManager);
         runningInstances.add(autosaveManager);
         return autosaveManager;
     }

@@ -11,7 +11,6 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.exception.ImportServiceException;
 
-import io.github.adr.linked.ADR;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -53,7 +52,7 @@ class InputOption {
     /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
     /// @throws ImportServiceException if a URL was supplied and could not be downloaded
     // [impl->req~jabkit.cli.input-url~2]
-    @ADR(65)
+    // [impl->adr~download-url-input-files~1]
     static Path resolveInput(String input) throws ImportServiceException {
         if (URLUtil.isURL(input)) {
             try {
@@ -79,13 +78,15 @@ class InputOption {
         }
     }
 
+    /// `--input` is a backward-compatible alias here; the positional form and the alias both come from
+    /// ADR 57, which superseded the `--input`-only ADR 45.
+    // [impl->adr~allow-positional-input-file-argument~1]
     private static class InputSource {
         // [impl->req~jabkit.cli.input-flag~2]
         @Parameters(index = "0", paramLabel = "FILE",
                 description = "Input file, or an http(s)/ftp URL. Alternatively, pass it via --input.")
         private String positionalInput;
 
-        @ADR(45)
         @Option(names = {"--input"},
                 description = "Input file, or an http(s)/ftp URL (alias for the positional FILE argument).")
         private String optionInput;
