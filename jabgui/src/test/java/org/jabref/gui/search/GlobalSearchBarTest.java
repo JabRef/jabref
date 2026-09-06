@@ -2,6 +2,9 @@ package org.jabref.gui.search;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,10 +22,10 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +70,6 @@ public class GlobalSearchBarTest {
                 mock(LibraryTabContainer.class),
                 stateManager,
                 preferences,
-                mock(UndoManager.class),
                 mock(DialogService.class),
                 SearchType.NORMAL_SEARCH
         );
@@ -115,5 +117,36 @@ public class GlobalSearchBarTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of(), lastSearchHistory);
+    }
+
+    @Test
+    void blankQueryClearsActiveSearch(FxRobot robot) throws InterruptedException {
+        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+
+        FxRobotInterface searchFieldRobot = robot.clickOn(searchField);
+        searchFieldRobot.write("abc");
+        awaitActiveSearchQuery(Optional.of(new SearchQuery("abc")));
+        assertEquals(Optional.of(new SearchQuery("abc")), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+
+        searchFieldRobot.eraseText(3);
+        searchFieldRobot.write("   ");
+        awaitActiveSearchQuery(Optional.empty());
+
+        assertEquals(Optional.empty(), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+    }
+
+    private void awaitActiveSearchQuery(Optional<SearchQuery> expected) throws InterruptedException {
+        if (expected.equals(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get())) {
+            return;
+        }
+
+        CountDownLatch updated = new CountDownLatch(1);
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, current) -> {
+            if (expected.equals(current)) {
+                updated.countDown();
+            }
+        });
+
+        assertTrue(updated.await(5, TimeUnit.SECONDS), "Active search query was not updated in time");
     }
 }

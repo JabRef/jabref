@@ -18,7 +18,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -32,7 +31,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @FXML private ToggleButton keepOnTop;
     @FXML private HBox searchBarContainer;
 
-    private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
@@ -43,8 +41,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
 
-    public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
-        this.undoManager = undoManager;
+    public GlobalSearchResultDialog(LibraryTabContainer libraryTabContainer) {
         this.libraryTabContainer = libraryTabContainer;
 
         setTitle(Localization.lang("Search results from open libraries"));
@@ -58,16 +55,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferences.getSearchPreferences());
 
-        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferences, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferences, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferences, stateManager, taskExecutor);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, undoManager, dialogService, stateManager, taskExecutor);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 

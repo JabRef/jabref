@@ -11,7 +11,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -30,7 +29,6 @@ public class SpecialFieldAction extends SimpleCommand {
     private final String undoText;
     private final DialogService dialogService;
     private final CliPreferences preferences;
-    private final UndoManager undoManager;
     private final StateManager stateManager;
 
     /// @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
@@ -41,7 +39,6 @@ public class SpecialFieldAction extends SimpleCommand {
                               String undoText,
                               DialogService dialogService,
                               CliPreferences preferences,
-                              UndoManager undoManager,
                               StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.specialField = specialField;
@@ -50,7 +47,6 @@ public class SpecialFieldAction extends SimpleCommand {
         this.undoText = undoText;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.undoManager = undoManager;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -64,7 +60,7 @@ public class SpecialFieldAction extends SimpleCommand {
                 return;
             }
             List<BibEntry> besCopy = new ArrayList<>(bes);
-            boolean anyChange = undoManager.addEdit(undoText, edit -> {
+            boolean anyChange = tabSupplier.get().getUndoManager().addEdit(undoText, edit -> {
                 for (BibEntry bibEntry : besCopy) {
                     // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                     edit.addEdit(UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame));
@@ -92,17 +88,15 @@ public class SpecialFieldAction extends SimpleCommand {
     private String getTextDone(SpecialField field, String @NonNull... params) {
     // @formatter:on
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferences, undoManager);
-
         if (field.isSingleValueField() && (params.length == 1)) {
             // Single value fields can be toggled only
-            return Localization.lang("Toggled '%0' for %1 entries", viewModel.getLocalization(), params[0]);
+            return Localization.lang("Toggled '%0' for %1 entries", SpecialFieldViewModel.getAction(field).getText(), params[0]);
         } else if (!field.isSingleValueField() && (params.length == 2)) {
             // setting a multi value special field - the set value is displayed, too
-            return Localization.lang("Set '%0' to '%1' for %2 entries", viewModel.getLocalization(), params[0], params[1]);
+            return Localization.lang("Set '%0' to '%1' for %2 entries", SpecialFieldViewModel.getAction(field).getText(), params[0], params[1]);
         } else if (!field.isSingleValueField() && (params.length == 1)) {
             // clearing a multi value specialfield
-            return Localization.lang("Cleared '%0' for %1 entries", viewModel.getLocalization(), params[0]);
+            return Localization.lang("Cleared '%0' for %1 entries", SpecialFieldViewModel.getAction(field).getText(), params[0]);
         } else {
             // invalid usage
             LOGGER.info("Creation of special field status change message failed: illegal argument combination.");

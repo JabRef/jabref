@@ -19,7 +19,6 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.SciteAiFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -43,7 +42,6 @@ public class CitationsRelationsTabViewModel {
     }
 
     private final GuiPreferences preferences;
-    private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -57,9 +55,8 @@ public class CitationsRelationsTabViewModel {
     private Optional<TalliesResponse> currentResult = Optional.empty();
     private Future<?> searchTask;
 
-    public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(GuiPreferences preferences, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.preferences = preferences;
-        this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -93,7 +90,7 @@ public class CitationsRelationsTabViewModel {
                 databaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 stateManager,
                 dialogService,
                 taskExecutor);
