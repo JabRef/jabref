@@ -26,6 +26,8 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit "$PR_NUMBER" --remove-label "status: ready-for-review"
 
+  # Turns a fork PR back into a draft when it is marked ready while CI still runs or changes are
+  # required, and tells the author why. Same-repo PRs are maintainers' own and are trusted.
   # Only on the draft -> ready transition: on converted_to_draft the gate would post its
   # "do not mark ready" messages to a PR that was just made a draft, and re-drafting is a no-op.
   guard-review:
