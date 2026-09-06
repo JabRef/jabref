@@ -40,10 +40,14 @@ public final class EntryChange extends DatabaseChange {
 
     /// Changes the entry in place rather than replacing it, so it keeps its identity: table position, selection, and
     /// an open entry editor stay as they are.
+    ///
+    /// The changes are collected in a nested step named after this change, so a failure while applying them names
+    /// the entry it belongs to instead of only the enclosing merge.
     @Override
     public void applyChange(CompoundEdit undoEdit) {
+        CompoundEdit entryEdit = new CompoundEdit(getName());
         if (!oldEntry.getType().equals(newEntry.getType())) {
-            undoEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
+            entryEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
         }
         Set<Field> fields = new LinkedHashSet<>(oldEntry.getFields());
         fields.addAll(newEntry.getFields());
@@ -51,8 +55,9 @@ public final class EntryChange extends DatabaseChange {
             String before = oldEntry.getField(field).orElse(null);
             String after = newEntry.getField(field).orElse(null);
             if (!Objects.equals(before, after)) {
-                undoEdit.applyEdit(new UndoableFieldChange(oldEntry, field, before, after));
+                entryEdit.applyEdit(new UndoableFieldChange(oldEntry, field, before, after));
             }
         }
+        undoEdit.addEdit(entryEdit);
     }
 }

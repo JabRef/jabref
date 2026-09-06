@@ -60,7 +60,6 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
-import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -744,7 +743,7 @@ public class BibtexParser implements Parser {
         return result;
     }
 
-    @ADR(49)
+    // [impl->adr~hardcode-fieldnames~1]
     private void parseField(BibEntry entry) throws IOException {
         int startLine = line;
         int startColumn = column;

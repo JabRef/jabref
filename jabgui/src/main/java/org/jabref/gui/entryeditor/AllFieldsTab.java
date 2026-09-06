@@ -41,6 +41,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
@@ -53,6 +54,8 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -66,9 +69,12 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
@@ -81,6 +87,8 @@ import org.jspecify.annotations.Nullable;
 /// field-name box at the bottom adds arbitrary fields.
 @NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
     /// (instead of the JavaFX TextArea default of 10).
@@ -209,6 +217,44 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+        showFileFieldIfAutoLinkFindsFiles(entry);
+    }
+
+    /// Only set fields get an editor, so an entry without a file field has no
+    /// [LinkedFilesEditor] — whose view model is what searches the file directories and
+    /// shows not-yet-linked files as auto-found suggestions
+    /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
+    /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
+    /// the search and renders the suggestion rows.
+    // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
+    private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
+        if (editors.containsKey(StandardField.FILE)
+                || !guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabaseContext();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                guiPreferences.getExternalApplicationsPreferences(),
+                guiPreferences.getFilePreferences(),
+                guiPreferences.getAutoLinkPreferences());
+        Optional<String> keyAtProbeStart = entry.getCitationKey();
+        BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
+                      .onSuccess(foundFiles -> {
+                          // subscribedEntry is cleared on dispose() and replaced on entry switch,
+                          // so this also invalidates callbacks that outlive the tab. The citation
+                          // key comparison drops results of probes started for a stale key.
+                          if (!foundFiles.isEmpty()
+                                  && guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()
+                                  && subscribedEntry.filter(current -> current == entry).isPresent()
+                                  && entry.getCitationKey().equals(keyAtProbeStart)
+                                  && !editors.containsKey(StandardField.FILE)) {
+                              userAddedFields.add(StandardField.FILE);
+                              rebuildPanel(databaseContext, entry);
+                          }
+                      })
+                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(entry.getAuthorTitleYear()), exception))
+                      .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 
     @Override
@@ -249,6 +295,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         boolean entryTypeChanged = InternalField.TYPE_HEADER == event.getField();
         if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
+        }
+        // A changed citation key can make files in the file directory match this entry,
+        // so the suggestions must be re-discovered without switching entries.
+        if (InternalField.KEY_FIELD == event.getField()) {
+            showFileFieldIfAutoLinkFindsFiles(entry);
         }
     }
 
