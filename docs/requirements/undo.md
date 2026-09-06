@@ -17,11 +17,8 @@ Needs: impl, utest
 ## Every library has its own undo history
 `req~logic.undo.journal-per-library~1`
 
-Each open library keeps its own undo history, and undo and redo act on the library the user is working in.
-A change recorded against one library is never undone by undoing in another, and reaching the end of one library's history does not start undoing another's.
-Saving a library sets its own saved position only, so a second library holding unsaved changes still reports itself modified and still offers to save when it is closed.
-Closing a library discards its history, together with the entries the recorded changes refer to; reopening the library starts with an empty history.
-The history is identified by the library, not by which library is in front, so a change made by a task that finishes after the user has switched libraries is still recorded against the library it was made in.
+Each open library keeps its own undo history, and undo, redo and the saved position act on that library alone.
+A change belongs to the library it was made in, whichever library is in front when it is recorded, and closing a library discards its history.
 
 Needs: impl, utest
 
