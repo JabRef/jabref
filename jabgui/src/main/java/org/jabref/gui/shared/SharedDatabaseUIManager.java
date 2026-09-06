@@ -19,6 +19,7 @@ import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -54,6 +55,7 @@ public class SharedDatabaseUIManager {
     private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
@@ -64,7 +66,8 @@ public class SharedDatabaseUIManager {
                                    FileUpdateMonitor fileUpdateMonitor,
                                    GuiUndoManager undoManager,
                                    ClipBoardManager clipBoardManager,
-                                   TaskExecutor taskExecutor) {
+                                   TaskExecutor taskExecutor,
+                                   GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -75,6 +78,7 @@ public class SharedDatabaseUIManager {
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
     @Subscribe
@@ -178,7 +182,8 @@ public class SharedDatabaseUIManager {
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         tabContainer.addTab(libraryTab, true);
         return libraryTab;
     }
