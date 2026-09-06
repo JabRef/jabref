@@ -140,8 +140,9 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             return;
         }
 
-        areAllChangesResolved.set(visibleChanges.isEmpty());
         areAllChangesAccepted.set(changes.stream().allMatch(DatabaseChange::isAccepted));
         areAllChangesDenied.set(changes.stream().noneMatch(DatabaseChange::isAccepted));
+        // Last: listeners of this property (the dialog closing itself) read the two above, and would see stale values otherwise
+        areAllChangesResolved.set(visibleChanges.isEmpty());
     }
 }

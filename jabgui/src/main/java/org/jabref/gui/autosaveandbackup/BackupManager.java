@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.scene.control.TableColumn;
 
@@ -81,7 +82,7 @@ public class BackupManager {
     // Contains a list of all backup paths
     // During writing, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
-    private boolean needsBackup = false;
+    private final AtomicBoolean needsBackup = new AtomicBoolean(false);
 
     BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -222,7 +223,8 @@ public class BackupManager {
     ///
     /// @param backupPath the full path to the file where the library should be backed up to
     void performBackup(Path backupPath) {
-        if (!needsBackup) {
+        // Clear before cloning, so a change arriving while the backup is written is not lost
+        if (!needsBackup.getAndSet(false)) {
             return;
         }
 
@@ -288,10 +290,6 @@ public class BackupManager {
                         // we save the clone to prevent the original database (and thus the UI) from being changed
                         .writeDatabase(bibDatabaseContextClone);
                 backupFilesQueue.add(backupPath);
-
-                // We wrote the file successfully
-                // Thus, we currently do not need any new backup
-                this.needsBackup = false;
                 // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
             } catch (IOException e) {
                 writer.abort();
@@ -299,6 +297,7 @@ public class BackupManager {
             }
         } catch (IOException e) {
             LOGGER.error("Error while saving to file {}", backupPath, e);
+            needsBackup.set(true);
         }
     }
 
@@ -319,11 +318,12 @@ public class BackupManager {
         }
     }
 
+    /// Every change counts, including the keystrokes the filter marks as minor: the filter exists to spare listeners
+    /// expensive work per keystroke, but a flag is cheap and the timer throttles the backups anyway. Ignoring minor
+    /// changes would leave a field the user only types in without backup until the user moves to another field.
     @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFiltered()) {
-            this.needsBackup = true;
-        }
+    public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+        needsBackup.set(true);
     }
 
     private void startBackupTask(Path backupDir) {
