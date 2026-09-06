@@ -93,7 +93,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             if (content instanceof Region region) {
                 region.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
             }
-            content.getStyleClass().add("preferencesTab");
+            content.getStyleClass().add("padding-6");
         });
 
         if (this.preferencesTabToSelectClass != null) {

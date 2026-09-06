@@ -2,12 +2,38 @@ name: Auto-remove ready-for-review
 
 on:
   pull_request_target:
-    types: [ready_for_review]
+    types: [ready_for_review, converted_to_draft]
 
 jobs:
+  # A draft is not reviewable; the label is re-added by "Comment on PR" once the PR is ready again
+  # (the label workflows only listen to "labeled", so removing it here triggers nothing further).
+  # Race with "Comment on PR": it re-reads isDraft immediately before writing the label, so the
+  # remaining window is one API round-trip. A shared per-PR concurrency group cannot close it -
+  # that job runs on workflow_run, where the PR number is only known after a step has run.
+  remove-label-on-draft:
+    runs-on: ubuntu-slim
+    if: github.event.action == 'converted_to_draft'
+    # Same group as the label evaluation in "Comment on PR": the removal must not interleave with it.
+    concurrency:
+      group: pr-status-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      pull-requests: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr edit "$PR_NUMBER" --remove-label "status: ready-for-review"
+
+  # Turns a fork PR back into a draft when it is marked ready while CI still runs or changes are
+  # required, and tells the author why. Same-repo PRs are maintainers' own and are trusted.
+  # Only on the draft -> ready transition: on converted_to_draft the gate would post its
+  # "do not mark ready" messages to a PR that was just made a draft, and re-drafting is a no-op.
   guard-review:
     runs-on: ubuntu-slim
-    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: github.event.action == 'ready_for_review' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     permissions:
       pull-requests: write
       checks: read

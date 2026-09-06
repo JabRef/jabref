@@ -16,7 +16,6 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -32,7 +31,6 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private ToggleGroup displayType;
     @Inject private CliPreferences preferences;
     @Inject private StateManager stateManager;
-    @Inject private UndoManager undoManager;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -56,7 +54,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
         Character keywordSeparator = stateManager.getActiveDatabase()
                                                  .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
                                                  .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
-        viewModel = new ManageKeywordsViewModel(keywordSeparator, entries, undoManager);
+        viewModel = new ManageKeywordsViewModel(keywordSeparator, entries, stateManager.getActiveDatabase().map(stateManager::getUndoManager).orElseThrow());
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {

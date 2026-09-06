@@ -49,6 +49,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.SearchableElement;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
@@ -469,7 +470,7 @@ public class PreferencesFormBuilder {
                                           Consumer<SectionRegion> config) {
         Label header = new Label(title);
         searchable(title, header);
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
         HBox headerRow = row(header);
@@ -1002,7 +1003,7 @@ public class PreferencesFormBuilder {
         public InputElement<N> browse(Runnable onBrowse) {
             Button browseButton = new Button();
             browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-            browseButton.getStyleClass().addAll("icon-button", "narrow");
+            browseButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
             browseButton.setPrefSize(FormMetrics.ICON_BUTTON_SIZE, FormMetrics.ICON_BUTTON_SIZE);
             browseButton.setTooltip(new Tooltip(Localization.lang("Browse")));
             browseButton.setOnAction(_ -> onBrowse.run());
