@@ -16,6 +16,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -48,8 +49,10 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        // Copied because the state manager replaces its selection when the user switches
-        // libraries, and this task runs on past that.
+        // The journal and the entries are taken here, while the library is certainly open: the
+        // state manager replaces its selection when the user switches libraries, and asking it for
+        // a journal once the library has closed would create one nothing can reach.
+        final UndoManager undoManager = stateManager.getUndoManager(database);
         final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
@@ -97,7 +100,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 }
 
                 if (compound.hasEdits()) {
-                    stateManager.getUndoManager(database).addEdit(compound.toChangeSet());
+                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(
