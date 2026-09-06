@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 
 import org.jabref.gui.DialogService;
@@ -23,6 +24,7 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -85,12 +87,12 @@ class GitCommitActionTest {
         when(libraryTab.isModified()).thenReturn(true);
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
-                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.SUCCESS))) {
+                (mockedSave, _) -> when(mockedSave.saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.SUCCESS))) {
             gitCommitAction.execute();
 
             SaveDatabaseAction save = saveDatabaseAction.constructed().getFirst();
             InOrder inOrder = inOrder(save, stateManager);
-            inOrder.verify(save).save(SaveDatabaseMode.NORMAL);
+            inOrder.verify(save).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
             inOrder.verify(stateManager).getActiveDatabase();
         }
     }
@@ -107,16 +109,64 @@ class GitCommitActionTest {
         }
     }
 
+    // [utest->req~git.commit.unsaved-changes~1]
     @Test
-    void modifiedLibraryWithoutAutosaveIsNotSavedAndAbortsCommit() {
+    void cancellingLeavesTheLibraryUnsavedAndAbortsCommit() {
         when(libraryTab.isModified()).thenReturn(true);
         when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class)) {
             gitCommitAction.execute();
 
             assertEquals(List.of(), saveDatabaseAction.constructed());
-            verify(dialogService).showWarningDialogAndWait(any(), any());
+            verify(stateManager, never()).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void committingWithoutSavingLeavesTheLibraryUnsaved() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Commit without saving"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class)) {
+            gitCommitAction.execute();
+
+            assertEquals(List.of(), saveDatabaseAction.constructed());
+            verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void savingAndCommittingWritesTheLibraryFirst() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Save and commit"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
+                (mockedSave, _) -> when(mockedSave.saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.SUCCESS))) {
+            gitCommitAction.execute();
+
+            verify(saveDatabaseAction.constructed().getFirst()).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
+            verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    // [utest->req~git.commit.unsaved-changes~1]
+    @Test
+    void unsuccessfulSaveAfterChoosingToSaveAbortsCommit() {
+        when(libraryTab.isModified()).thenReturn(true);
+        when(libraryPreferences.shouldAutoSave()).thenReturn(false);
+        clickButton(Localization.lang("Save and commit"));
+
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
+                (mockedSave, _) -> when(mockedSave.saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.FAILURE))) {
+            gitCommitAction.execute();
+
             verify(stateManager, never()).getActiveDatabase();
         }
     }
@@ -127,10 +177,10 @@ class GitCommitActionTest {
         when(libraryTab.isModified()).thenReturn(true);
 
         try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
-                (mockedSave, _) -> when(mockedSave.save(SaveDatabaseMode.NORMAL)).thenReturn(saveResult))) {
+                (mockedSave, _) -> when(mockedSave.saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL)).thenReturn(saveResult))) {
             gitCommitAction.execute();
 
-            verify(saveDatabaseAction.constructed().getFirst()).save(SaveDatabaseMode.NORMAL);
+            verify(saveDatabaseAction.constructed().getFirst()).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
             verify(stateManager, never()).getActiveDatabase();
             verify(dialogService, never()).showCustomDialogAndWait(any(Dialog.class));
         }
@@ -186,5 +236,14 @@ class GitCommitActionTest {
                 mock(JournalAbbreviationRepository.class),
                 new CurrentThreadTaskExecutor(),
                 new GitHandlerRegistry(mock(GitPreferences.class))).execute();
+    }
+
+    private void clickButton(String label) {
+        when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
+                .thenAnswer(invocation -> Stream.of(invocation.getArguments())
+                                                .filter(ButtonType.class::isInstance)
+                                                .map(ButtonType.class::cast)
+                                                .filter(button -> label.equals(button.getText()))
+                                                .findFirst());
     }
 }

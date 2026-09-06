@@ -41,6 +41,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -59,6 +60,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -90,6 +92,7 @@ public class OpenOfficePanel {
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
     private final Button modifyBibliographyProperties = new Button(Localization.lang("Bibliography properties"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
+    private final Button inferStyle = new Button(Localization.lang("Infer style"));
     private final Button help;
     private final VBox vbox = new VBox();
 
@@ -109,6 +112,7 @@ public class OpenOfficePanel {
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private OOBibBase ooBase;
     private OOStyle currentStyle;
 
@@ -124,10 +128,12 @@ public class OpenOfficePanel {
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
                            ClipBoardManager clipBoardManager,
-                           GuiUndoManager undoManager) {
+                           GuiUndoManager undoManager,
+                           GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
@@ -191,10 +197,6 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (ooBase != null && ooBase.testDialog(title, ooBase.readStyleInPreference())) {
-            return FAIL;
-        }
-
         currentStyle = openOfficePreferences.getCurrentStyle();
         currentStyleProperty.set(currentStyle);
         updateButtonAvailability();
@@ -252,7 +254,7 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
-                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
+                                 OOVoidResult<OOError> result = ooBase.writeDocumentCslStyle(cslStyle);
                                  if (ooBase.testDialog(Localization.lang("Problem modifying citation"), result)) {
                                      return;
                                  }
@@ -277,6 +279,9 @@ public class OpenOfficePanel {
         citeSpecial.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
         citeSpecial.setOnAction(_ -> cite(CitationType.AUTHORYEAR_INTEXT, true));
         citeSpecial.setMaxWidth(Double.MAX_VALUE);
+        inferStyle.setTooltip(new Tooltip(Localization.lang("Infer CSL style from document")));
+        inferStyle.setOnAction(_ -> inferStyleFromDocument());
+        inferStyle.setMaxWidth(Double.MAX_VALUE);
 
         updateBibliography.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
@@ -328,7 +333,7 @@ public class OpenOfficePanel {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
-        flow.getChildren().addAll(setStyleFile, cite, citeInText);
+        flow.getChildren().addAll(setStyleFile, cite, citeInText, inferStyle);
         flow.getChildren().addAll(citeSpecial, citeEmpty, merge, unmerge);
         flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
 
@@ -358,7 +363,8 @@ public class OpenOfficePanel {
                     entryTypesManager,
                     undoManager,
                     clipBoardManager,
-                    taskExecutor);
+                    taskExecutor,
+                    gitHandlerRegistry);
             tabContainer.addTab(libraryTab, true);
         }
     }
@@ -456,6 +462,7 @@ public class OpenOfficePanel {
         citeInText.setDisable(!canCite);
         citeEmpty.setDisable(!canCite || !emptyCitationSupported);
         citeSpecial.setDisable(!canCite || !specialCitationSupported);
+        inferStyle.setDisable(!isConnectedToDocument || !cslStyleSelected);
 
         updateBibliography.setDisable(!canGenerateBibliography);
         merge.setDisable(!isConnectedToDocument || !jstyleSelected);
@@ -604,6 +611,21 @@ public class OpenOfficePanel {
                 citationType,
                 pageInfo,
                 syncOptions);
+    }
+
+    private void inferStyleFromDocument() {
+        final String errorDialogTitle = Localization.lang("Could not infer CSL style from document");
+        OOResult<Optional<CitationStyle>, OOError> result = ooBase.inferCslStyleFromDocument();
+        if (result.ifError(error -> ooBase.showDialog(error.setTitle(errorDialogTitle))).isError()) {
+            return;
+        }
+
+        result.get().ifPresentOrElse(style -> {
+            currentStyle = style;
+            currentStyleProperty.set(style);
+            updateButtonAvailability();
+            dialogService.notify(Localization.lang("Inferred CSL style: '%0'", style.getName()));
+        }, () -> dialogService.notify(Localization.lang("No CSL style could be inferred from the document.")));
     }
 
     /// Check that all entries in the list have citation keys, if not ask if they should be generated

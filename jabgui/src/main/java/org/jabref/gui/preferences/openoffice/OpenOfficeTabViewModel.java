@@ -32,7 +32,6 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty pandocPath = new SimpleStringProperty();
     private final BooleanProperty zoteroCompatibilityMode = new SimpleBooleanProperty();
-    private final BooleanProperty inferCslStyleFromDocument = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -51,15 +50,9 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         zoteroCompatibilityModeDisabled = Bindings.createBooleanBinding(
                 () -> !(openOfficePreferences.getCurrentStyle() instanceof CitationStyle),
                 openOfficePreferences.currentStyleProperty());
-        zoteroCompatibilityMode.addListener((_, _, enabled) -> {
-            if (!enabled) {
-                inferCslStyleFromDocument.set(false);
-            }
-        });
         zoteroCompatibilityModeDisabled.addListener((_, _, disabled) -> {
             if (disabled) {
                 zoteroCompatibilityMode.set(false);
-                inferCslStyleFromDocument.set(false);
             }
         });
     }
@@ -70,8 +63,6 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         boolean compatibilityMode = openOfficePreferences.getZoteroCompatibilityMode()
                 && !zoteroCompatibilityModeDisabled.get();
         zoteroCompatibilityMode.set(compatibilityMode);
-        inferCslStyleFromDocument.set(openOfficePreferences.shouldInferCslStyleFromDocument()
-                && compatibilityMode);
     }
 
     @Override
@@ -80,8 +71,6 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         boolean compatibilityMode = zoteroCompatibilityMode.get()
                 && !zoteroCompatibilityModeDisabled.get();
         openOfficePreferences.setZoteroCompatibilityMode(compatibilityMode);
-        openOfficePreferences.setInferCslStyleFromDocument(inferCslStyleFromDocument.get()
-                && compatibilityMode);
     }
 
     public StringProperty pandocPathProperty() {
@@ -90,10 +79,6 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty zoteroCompatibilityModeProperty() {
         return zoteroCompatibilityMode;
-    }
-
-    public BooleanProperty inferCslStyleFromDocumentProperty() {
-        return inferCslStyleFromDocument;
     }
 
     public BooleanBinding zoteroCompatibilityModeDisabledProperty() {

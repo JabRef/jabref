@@ -357,8 +357,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entries
             List<Integer> indices = bibEntries.stream()
-                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .flatMap(bibEntry -> findEntry(bibEntry).stream())
                                               .map(entry -> getItems().indexOf(entry))
                                               .filter(index -> index >= 0)
                                               .toList();
@@ -641,10 +640,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(@NonNull BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
-    }
-
-    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
-        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

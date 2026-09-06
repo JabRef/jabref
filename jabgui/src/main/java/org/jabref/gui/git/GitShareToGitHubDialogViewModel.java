@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -38,36 +36,22 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// "Preferences" dialog for sharing library to GitHub.
-/// We do not put it into the JabRef preferences dialog because we want these settings to be close to the user.
+/// Shares the active library to a GitHub repository.
+/// The credentials are taken from the Git preferences.
 public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitShareToGitHubDialogViewModel.class);
 
     private final StateManager stateManager;
-
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final GitHubRepositoryAccessChecker gitHubRepositoryAccessChecker;
 
-    // The preferences stored in JabRef
     private final GitPreferences gitPreferences;
 
-    // The preferences of this dialog
-    private final StringProperty usernameProperty = new SimpleStringProperty("");
-    private final StringProperty patProperty = new SimpleStringProperty("");
-
-    // TODO: This should be a library preference -> the library is connected to repository; not all JabRef libraries to the same one
-    //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as another repository
-    //               Both share the same secrets, but are different URLs.
-    //       Also think of having two .bib files in the same folder - they will have the same repository URL -- should make no issues, but let's see...
     private final StringProperty repositoryUrlProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty rememberPatProperty = new SimpleBooleanProperty();
-
     private final Validator repositoryUrlValidator;
-    private final Validator githubUsernameValidator;
-    private final Validator githubPatValidator;
 
     public GitShareToGitHubDialogViewModel(
             GitPreferences gitPreferences,
@@ -97,22 +81,11 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                 githubHttpsUrlValidator(),
                 ValidationMessage.error(Localization.lang("Please enter a valid HTTPS GitHub repository URL"))
         );
-        githubUsernameValidator = new FunctionBasedValidator<>(
-                usernameProperty,
-                notEmptyValidator(),
-                ValidationMessage.error(Localization.lang("GitHub username is required"))
-        );
-        githubPatValidator = new FunctionBasedValidator<>(
-                patProperty,
-                notEmptyValidator(),
-                ValidationMessage.error(Localization.lang("Personal Access Token is required"))
-        );
     }
 
     /// @implNote `close` Is a runnable to make testing easier
     public void shareToGitHub(Runnable close) {
         // We store the settings because "Share" implies that the settings should be used as typed
-        // We also have the option to not store the settings permanently: This is implemented in JabRefCliPreferences at the listeners.
         this.storeSettings();
         BackgroundTask
                 .wrap(() -> {
@@ -123,13 +96,14 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                     dialogService.notify(Localization.lang("Successfully pushed to GitHub."));
                     close.run();
                 })
-                .onFailure(e ->
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("GitHub share failed"),
-                                e.getMessage(),
-                                e
-                        )
-                )
+                .onFailure(e -> {
+                    LOGGER.warn("Git share failed", e);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("GitHub share failed"),
+                            e.getMessage(),
+                            e
+                    );
+                })
                 .executeWith(taskExecutor);
     }
 
@@ -144,6 +118,10 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         Optional<Path> bibFilePathOpt = activeDatabase.getDatabasePath();
         if (bibFilePathOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
+        }
+
+        if (StringUtil.isBlank(gitPreferences.getUsername()) || StringUtil.isBlank(gitPreferences.getPat())) {
+            throw new JabRefException(Localization.lang("No GitHub credentials. Please configure them in Preferences > Git."));
         }
 
         // We don't get a new preference object (and re-use the existing one instead), because of ADR-0016
@@ -168,22 +146,16 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
     public void setValues() {
         repositoryUrlProperty.set(gitPreferences.getRepositoryUrl());
-        usernameProperty.set(gitPreferences.getUsername());
-        patProperty.set(gitPreferences.getPat());
-        rememberPatProperty.set(gitPreferences.getPersistPat());
     }
 
     public void storeSettings() {
         gitPreferences.setRepositoryUrl(repositoryUrlProperty.get().trim());
-        gitPreferences.setUsername(usernameProperty.get().trim());
-        gitPreferences.setPersistPat(rememberPatProperty.get());
-        gitPreferences.setPat(patProperty.get().trim());
     }
 
     public void checkGitHubAccess() {
         // [impl->req~git.share.personal-access-token-verification~1]
         BackgroundTask
-                .wrap(() -> gitHubRepositoryAccessChecker.check(repositoryUrlProperty.get().trim(), usernameProperty.get().trim(), patProperty.get().trim()))
+                .wrap(() -> gitHubRepositoryAccessChecker.check(repositoryUrlProperty.get().trim(), gitPreferences.getUsername(), gitPreferences.getPat()))
                 .onSuccess(this::showGitHubAccessResult)
                 .onFailure(e -> {
                     LOGGER.debug("Could not check GitHub repository access", e);
@@ -220,35 +192,11 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         return repositoryUrlValidator.getValidationStatus();
     }
 
-    public ValidationStatus githubUsernameValidation() {
-        return githubUsernameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus githubPatValidation() {
-        return githubPatValidator.getValidationStatus();
-    }
-
-    private Predicate<String> notEmptyValidator() {
-        return StringUtil::isNotBlank;
-    }
-
     private Predicate<String> githubHttpsUrlValidator() {
         return input -> StringUtil.isNotBlank(input) && URLUtil.isURL(input.trim());
     }
 
-    public StringProperty usernameProperty() {
-        return usernameProperty;
-    }
-
-    public StringProperty patProperty() {
-        return patProperty;
-    }
-
     public StringProperty repositoryUrlProperty() {
         return repositoryUrlProperty;
-    }
-
-    public BooleanProperty rememberPatProperty() {
-        return rememberPatProperty;
     }
 }
