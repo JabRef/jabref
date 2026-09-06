@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /// Pins that the two actions act on the journal of the library the user is looking at, and read
@@ -40,6 +42,7 @@ class UndoRedoActionTest {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
 
+    private DialogService dialogService;
     private BibEntry entryInA;
     private BibEntry entryInB;
     private LibraryTab tabA;
@@ -63,8 +66,9 @@ class UndoRedoActionTest {
         when(stateManager.getUndoManager(libraryA)).thenReturn(journalOfA);
         when(stateManager.getUndoManager(libraryB)).thenReturn(journalOfB);
 
-        undoAction = new UndoAction(mock(DialogService.class), stateManager);
-        redoAction = new RedoAction(mock(DialogService.class), stateManager);
+        dialogService = mock(DialogService.class);
+        undoAction = new UndoAction(dialogService, stateManager);
+        redoAction = new RedoAction(dialogService, stateManager);
     }
 
     @Test
@@ -118,6 +122,31 @@ class UndoRedoActionTest {
 
         assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "redone again in the library switched away from");
         assertEquals(Optional.of("Meitner"), entryInB.getField(StandardField.AUTHOR));
+    }
+
+    /// The message names the step, so that an undo of something that finished while the user was
+    /// elsewhere - an import, a cleanup - says what was taken back.
+    @Test
+    void theNotificationSaysWhatWasUndoneAndRedone() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+        verify(dialogService).notify("Undone: Change field Author");
+
+        redoAction.execute();
+        verify(dialogService).notify("Redone: Change field Author");
+    }
+
+    /// A step recorded as a set is named by the control the user activated.
+    @Test
+    void theNotificationNamesTheCommandWhenTheStepIsASet() {
+        journalOfA.addEdit(Localization.lang("Replace string"), edit -> edit.addEdit(setAuthor(entryInA, "Bohr")));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+
+        verify(dialogService).notify("Undone: Replace string");
     }
 
     @Test

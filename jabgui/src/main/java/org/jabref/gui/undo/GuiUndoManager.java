@@ -1,5 +1,7 @@
 package org.jabref.gui.undo;
 
+import java.util.Optional;
+
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.logic.undo.UndoManager;
@@ -21,10 +23,14 @@ import org.jspecify.annotations.NullMarked;
 public interface GuiUndoManager extends UndoManager {
 
     /// Reverses the change on top of the undo stack.
-    void undo();
+    ///
+    /// @return what was undone, named for the user, or empty if there was nothing to undo
+    Optional<String> undo();
 
     /// Re-applies the change last undone.
-    void redo();
+    ///
+    /// @return what was redone, named for the user, or empty if there was nothing to redo
+    Optional<String> redo();
 
     boolean canUndo();
 

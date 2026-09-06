@@ -3,6 +3,7 @@ package org.jabref.logic.undo;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -251,12 +252,19 @@ public class JabRefUndoManager implements UndoManager {
 
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
-    public void undo() {
+    ///
+    /// @return what was undone, named for the user, or empty if there was nothing to undo. The
+    ///         name is taken inside the monitor: read afterwards, it would describe whichever
+    ///         step another thread has since pushed. Only a name leaves the journal, so nothing
+    ///         outside it starts reading the contents of the stacks.
+    public Optional<String> undo() {
+        String description;
         synchronized (this) {
             if (undoStack.isEmpty()) {
-                return;
+                return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
+            description = BibChangeDescriber.describe(journalEntry.change());
             journalEntry.change().inverted().apply();
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
@@ -264,19 +272,24 @@ public class JabRefUndoManager implements UndoManager {
             redoStack.push(journalEntry);
         }
         notifyListeners();
+        return Optional.of(description);
     }
 
-    public void redo() {
+    /// @return what was redone, named for the user, or empty if there was nothing to redo
+    public Optional<String> redo() {
+        String description;
         synchronized (this) {
             if (redoStack.isEmpty()) {
-                return;
+                return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
+            description = BibChangeDescriber.describe(journalEntry.change());
             journalEntry.change().apply();
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
+        return Optional.of(description);
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

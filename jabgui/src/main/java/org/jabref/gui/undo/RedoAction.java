@@ -36,8 +36,7 @@ public class RedoAction extends SimpleCommand {
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
         if (undoManager.canRedo()) {
-            undoManager.redo();
-            dialogService.notify(Localization.lang("Redo"));
+            undoManager.redo().ifPresent(description -> dialogService.notify(Localization.lang("Redone: %0", description)));
         } else {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }

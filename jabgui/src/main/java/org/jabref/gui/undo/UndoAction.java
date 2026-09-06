@@ -41,8 +41,7 @@ public class UndoAction extends SimpleCommand {
             return;
         }
 
-        undoManager.undo();
-        dialogService.notify(Localization.lang("Undo"));
+        undoManager.undo().ifPresent(description -> dialogService.notify(Localization.lang("Undone: %0", description)));
         libraryTab.markChangedOrUnChanged();
     }
 }
