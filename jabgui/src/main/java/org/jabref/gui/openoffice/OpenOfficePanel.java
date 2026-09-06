@@ -250,7 +250,7 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
-                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
+                                 OOVoidResult<OOError> result = ooBase.writeDocumentCslStyle(cslStyle);
                                  if (ooBase.testDialog(Localization.lang("Problem modifying citation"), result)) {
                                      return;
                                  }

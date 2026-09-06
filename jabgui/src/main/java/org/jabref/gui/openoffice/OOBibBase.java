@@ -186,7 +186,7 @@ public class OOBibBase {
         }
     }
 
-    OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {
+    OOVoidResult<OOError> writeDocumentCslStyle(CitationStyle citationStyle) {
         if (!isConnectedToDocument()) {
             return OOVoidResult.ok();
         }
@@ -196,14 +196,10 @@ public class OOBibBase {
             return document.asVoidResult();
         }
 
-        return writeZoteroDocumentStyle(document.get(), citationStyle);
+        return writeDocumentCslStyle(document.get(), citationStyle);
     }
 
-    private OOVoidResult<OOError> writeZoteroDocumentStyle(XTextDocument doc, CitationStyle citationStyle) {
-        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
-            return OOVoidResult.ok();
-        }
-
+    static OOVoidResult<OOError> writeDocumentCslStyle(XTextDocument doc, CitationStyle citationStyle) {
         try {
             boolean result = ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
             if (!result) {
@@ -213,7 +209,7 @@ public class OOBibBase {
             }
             return OOVoidResult.ok();
         } catch (IllegalTypeException | NotRemoveableException | PropertyVetoException | WrappedTargetException e) {
-            LOGGER.warn("Could not update Zotero document preferences", e);
+            LOGGER.warn("Could not update document CSL preferences", e);
             return OOVoidResult.error(OOError.fromMisc(e));
         }
     }
@@ -692,7 +688,7 @@ public class OOBibBase {
             return OOVoidResult.error(OOError.fromMisc(e));
         }
 
-        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        OOVoidResult<OOError> documentPreferencesResult = writeDocumentCslStyle(doc, citationStyle);
         if (documentPreferencesResult.isError()) {
             return documentPreferencesResult;
         }
@@ -1181,7 +1177,7 @@ public class OOBibBase {
     /// @param errorTitle    Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
-        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        OOVoidResult<OOError> documentPreferencesResult = writeDocumentCslStyle(doc, citationStyle);
         if (documentPreferencesResult.isError()) {
             return documentPreferencesResult;
         }
