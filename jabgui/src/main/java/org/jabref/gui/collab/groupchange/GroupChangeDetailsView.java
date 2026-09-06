@@ -22,7 +22,11 @@ import org.jspecify.annotations.NullMarked;
 public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
     public GroupChangeDetailsView(GroupChange groupChange) {
-        this(groupChange, Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName()));
+        this(groupChange,
+                Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName()),
+                Localization.lang("In JabRef"),
+                Localization.lang("On disk"),
+                DiffHighlighter.BasicDiffMethod.CHARS);
     }
 
     public GroupChangeDetailsView(GroupChange groupChange, String labelValue, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
