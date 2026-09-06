@@ -1,4 +1,4 @@
-# Maps changed files to "component: *" labels on pull requests.
+# Maps changed files to "component: *" and "dev: *" labels on pull requests.
 # Used by .github/workflows/pr-labeler.yml (actions/labeler).
 #
 # Only components with a clear home in the source tree are listed here.
@@ -295,3 +295,13 @@
           - 'jablib/src/**/org/jabref/logic/xmp/**'
           - 'jablib/src/**/*Xmp*.java'
           - 'jabgui/src/**/org/jabref/gui/preferences/xmp/**'
+
+# Everything that drives CI/CD: workflow definitions, the composite actions they
+# call, and the top-level configuration files read by those workflows.
+"dev: ci-cd":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/actions/**'
+          - '.github/*.yml'
+          - '.github/*.sh'
