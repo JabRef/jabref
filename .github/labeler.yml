@@ -314,12 +314,7 @@
 "dev: ci-cd":
   - changed-files:
       - any-glob-to-any-file:
-          - '.github/workflows/**'
-          - '.github/actions/**'
-          - '.github/dependabot.yml'
-          - '.github/ghprcomment.yml'
-          - '.github/labeler.yml'
-          - '.github/format-diff-annotations.sh'
+          - '.github/**'
           - '.idea/codeStyles/**'
           - 'scripts/after-failure.sh'
           - 'scripts/junit-xml-format-errors.xsl'
