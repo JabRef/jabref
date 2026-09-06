@@ -42,7 +42,7 @@ public class EntryImportHandlerTracker {
         this.stateManager = stateManager;
         this.targetDatabaseContext = targetDatabaseContext;
         this.totalEntries = totalEntries;
-        importedEntries = new ArrayList<>(Math.max(totalEntries, 0));
+        importedEntries = new ArrayList<>(Math.max(totalEntries, 4));
     }
 
     public synchronized void setOnFinish(@Nullable Runnable onFinish) {
