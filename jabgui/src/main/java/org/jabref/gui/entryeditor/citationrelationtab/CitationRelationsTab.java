@@ -932,9 +932,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         });
 
         task.onSuccess(citationRelationItems -> onSearchForRelationsSucceed(
-                citationComponents,
-                citationRelationItems,
-                observableList
+                    citationComponents,
+                    citationRelationItems,
+                    observableList
             ))
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
