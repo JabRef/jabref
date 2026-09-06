@@ -58,6 +58,7 @@ public class Pseudonymization {
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        bibDatabaseContext.getMetaData().getKeywordSeparator().ifPresent(result.getMetaData()::setKeywordSeparator);
 
         pseudonymizedGroups.ifPresent(newGroups -> result.getMetaData().setGroups(newGroups));
 

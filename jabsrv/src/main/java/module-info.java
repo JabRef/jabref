@@ -50,8 +50,6 @@ module org.jabref.jabsrv {
     requires static jakarta.annotation;
     requires transitive jakarta.inject;
 
-    requires static io.github.eadr;
-
     // Injection framework
     requires transitive org.glassfish.hk2.api;
     requires /*runtime*/ org.glassfish.jersey.inject.hk2;

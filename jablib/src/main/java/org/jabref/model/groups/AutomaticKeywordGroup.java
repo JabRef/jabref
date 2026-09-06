@@ -42,6 +42,10 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
         return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
     }
 
+    public AutomaticKeywordGroup withKeywordSeparator(Character newKeywordSeparator) {
+        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, newKeywordSeparator, keywordHierarchicalDelimiter);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

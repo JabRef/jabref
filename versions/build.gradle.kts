@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.4")
+    api("com.dlsc.gemsfx:gemsfx:4.4.5")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -87,7 +87,6 @@ dependencies.constraints {
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
-    api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:4.8.194")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
@@ -125,7 +124,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.85.2")
-    api("org.controlsfx:controlsfx:11.2.4")
+    api("org.controlsfx:controlsfx:11.2.5")
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.7.1.202607240634-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.7.1.202607240634-r")

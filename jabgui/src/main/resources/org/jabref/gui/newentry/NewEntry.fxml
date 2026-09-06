@@ -6,6 +6,7 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -167,6 +168,15 @@
                                       size="13.0"/>
                             </font>
                         </Label>
+                        <HBox fx:id="idSearchingBox"
+                              alignment="CENTER_LEFT"
+                              spacing="8.0"
+                              visible="false"
+                              managed="false">
+                            <ProgressIndicator maxHeight="16.0"
+                                               maxWidth="16.0"/>
+                            <Label text="%Searching..."/>
+                        </HBox>
                     </VBox>
                 </VBox>
             </Tab>
