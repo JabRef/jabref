@@ -126,11 +126,14 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                 })
                 .onFailure(e -> {
                     LOGGER.warn("GitHub share failed", e);
-                    String message = e instanceof JabRefException jabRefException
-                                     ? jabRefException.getLocalizedMessage()
-                                     : GitExceptionUtil.isLockFailure(e)
-                                       ? Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.")
-                                       : Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
+                    String message;
+                    if (e instanceof JabRefException jabRefException) {
+                        message = jabRefException.getLocalizedMessage();
+                    } else if (GitExceptionUtil.isLockFailure(e)) {
+                        message = Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.");
+                    } else {
+                        message = Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
+                    }
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("GitHub share failed"),
                             message
