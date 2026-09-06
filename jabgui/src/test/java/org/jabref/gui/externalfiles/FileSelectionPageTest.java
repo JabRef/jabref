@@ -73,9 +73,9 @@ class FileSelectionPageTest {
 
         assertEquals(0, previewPanes(robot));
         Button showButton = robot.lookup(".button")
-                               .match(Button.class::isInstance)
-                               .match(node -> ((Button) node).getText().equals(Localization.lang("Show PDF preview")))
-                               .queryButton();
+                                 .match(Button.class::isInstance)
+                                 .match(node -> ((Button) node).getText().equals(Localization.lang("Show PDF preview")))
+                                 .queryButton();
         assertTrue(showButton.isVisible());
 
         robot.interact(showButton::fire);
@@ -94,9 +94,9 @@ class FileSelectionPageTest {
 
     private long previewPanes(FxRobot robot) {
         return robot.lookup(".titled-pane")
-                   .match(TitledPane.class::isInstance)
-                   .match(node -> ((TitledPane) node).getText().equals(Localization.lang("PDF preview")))
-                   .queryAll().stream()
-                   .count();
+                    .match(TitledPane.class::isInstance)
+                    .match(node -> ((TitledPane) node).getText().equals(Localization.lang("PDF preview")))
+                    .queryAll().stream()
+                    .count();
     }
 }
