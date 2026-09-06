@@ -13,6 +13,10 @@ jobs:
   remove-label-on-draft:
     runs-on: ubuntu-slim
     if: github.event.action == 'converted_to_draft'
+    # Same group as the label evaluation in "Comment on PR": the removal must not interleave with it.
+    concurrency:
+      group: pr-status-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     permissions:
       pull-requests: write
     steps:
