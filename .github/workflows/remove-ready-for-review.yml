@@ -24,7 +24,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr edit "$PR_NUMBER" --remove-label "status: ready-for-review"
+        run: |
+          gh pr edit "$PR_NUMBER" --remove-label "status: ready-for-review"
 
   # Turns a fork PR back into a draft when it is marked ready while CI still runs or changes are
   # required, and tells the author why. Same-repo PRs are maintainers' own and are trusted.
