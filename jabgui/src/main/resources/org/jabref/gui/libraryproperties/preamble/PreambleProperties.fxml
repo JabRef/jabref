@@ -6,6 +6,6 @@
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.preamble.PreamblePropertiesView">
-    <Label styleClass="sectionHeader" text="%Preamble"/>
+    <Label styleClass="h4,padding-top-12" text="%Preamble"/>
     <TextArea fx:id="preamble" minHeight="100" prefHeight="180" VBox.vgrow="ALWAYS"/>
 </fx:root>

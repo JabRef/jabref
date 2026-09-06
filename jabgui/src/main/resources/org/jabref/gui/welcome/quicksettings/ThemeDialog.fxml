@@ -17,7 +17,7 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container">
+        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
             <Label text="%Choose between different themes, the color scheme or use a custom theme."
                    wrapText="true" HBox.hgrow="ALWAYS"/>
             <GridPane hgap="10.0" vgap="4.0">
