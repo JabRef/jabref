@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
+- We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
 - We added a per-library keyword separator to the library properties, so opening a library no longer rewrites keyword fields. [#16835](https://github.com/JabRef/jabref/pull/16835)
 - We added a "Normalize keyword delimiters" cleanup and save action that rewrites keyword fields to the keyword separator of the library. [#16835](https://github.com/JabRef/jabref/pull/16835)
 - We added a "Commit and push" button which allows to commit and then push in one go for Git operations. [#16339](https://github.com/JabRef/jabref/issues/16339)
@@ -70,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 - We added an offer to initialize a Git repository when committing a library that is not yet version controlled. [#16722](https://github.com/JabRef/jabref/pull/16722)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
+- We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
 
 ### Changed
 
@@ -77,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the default size of the "New Entry" dialog to improve visibility. [#11589](https://github.com/JabRef/jabref/issues/11589)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
+- We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - A custom theme (CSS file) is now applied on top of the selected theme instead of replacing it entirely. [#15625](https://github.com/JabRef/jabref/issues/15625)
@@ -107,6 +111,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
+- We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
+- "Get fulltext", groups "Attach file", "Attach file from URL", "Open folder(s)" and "Open file" commands in right click menu have been moved into a "More file operations..." submenu. [#16829](https://github.com/JabRef/jabref/pull/16829)
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
 
 ### Fixed
@@ -115,12 +122,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
-- "Git commit" now saves a modified library first (if autosave is enabled) or asks to save it, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
+- "Git commit" now saves a modified library first if autosave is enabled, and otherwise lets you choose between saving first and committing only the state on disk, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
+- We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
 - We fixed freezing while scrolling results in the Search for unlinked local files dialog. [#16696](https://github.com/JabRef/jabref/pull/16696)
 - We fixed an issue where "File > Git > Commit" refused to commit when the repository had no remote or the remote could not be reached. [#16720](https://github.com/JabRef/jabref/pull/16720)
+- We fixed Git commit, push, and GitHub share errors for broken local repositories. [#16704](https://github.com/JabRef/jabref/issues/16704)
+- We fixed Git diffs so group tree changes are highlighted. [#16729](https://github.com/JabRef/jabref/issues/16729)
 - We fixed the unreadable hit count on group badges that turn green because they contain selected entries. [#16700](https://github.com/JabRef/jabref/pull/16700)
 - We fixed an issue where resolving external library conflicts through the merge dialog could discard the merged result. [#16537](https://github.com/JabRef/jabref/issues/16537)
 - We fixed an issue where switching entries in the source tab could throw an exception or overwrite another entry. [#16534](https://github.com/JabRef/jabref/issues/16534)
@@ -162,8 +172,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
+- We fixed an issue where BST entry previews did not render small caps formatting. [#16330](https://github.com/JabRef/jabref/issues/16330)
 - We fixed rendering of LaTeX math symbols in the entry preview when `.bst` styles were used. [#11338](https://github.com/JabRef/jabref/issues/11338)
 - We fixed importing UTF-16 BibTeX files without a byte-order mark. [#9496](https://github.com/JabRef/jabref/issues/9496)
+- We fixed BibTeX imports skipping entries after an unmatched curly brace. [#9833](https://github.com/JabRef/jabref/issues/9833)
 - We fixed an issue where `jabkit convert` without `--output` printed an internal object reference (e.g. `org.jabref.model.database.BibDatabase@17932d9b`) instead of the converted library. It now writes the library to standard output in the format selected by `--output-format`, with progress messages going to standard error. [#16292](https://github.com/JabRef/jabref/pull/16292)
 - We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
 - We fixed an issue where a critical error occurring during application startup (e.g. while constructing the main window) was only written to the log, leaving the user with no visible feedback and an apparently silent crash. [#14967](https://github.com/JabRef/jabref/issues/14967)
@@ -206,6 +218,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
 - We fixed an issue where the main table showed a tooltip with the entry's full title even when the title was already fully visible; the tooltip now appears only when the title is truncated. [#16607](https://github.com/JabRef/jabref/issues/16607)
 - We fixed the `Journal Abbreviation` search box invisible text with `JabRef - Light theme`. [#15721](https://github.com/JabRef/jabref/issues/15721).
+- We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
+- We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
+- We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
 
 ### Removed
 

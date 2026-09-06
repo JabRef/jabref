@@ -13,7 +13,7 @@
             fx:controller="org.jabref.gui.documentviewer.DocumentViewerView"
             id="documentViewerDialog">
     <content>
-        <BorderPane fx:id="mainPane">
+        <BorderPane fx:id="mainPane" styleClass="padding-0">
             <fx:define>
                 <ToggleGroup fx:id="toggleGroupMode"/>
             </fx:define>

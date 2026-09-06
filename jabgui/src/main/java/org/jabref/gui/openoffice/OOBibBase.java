@@ -96,7 +96,6 @@ public class OOBibBase {
     /// Adapter lifecycle is tied to the currently selected document. Keep creation here so cite/export/
     /// bibliography actions only ever use adapters that were initialized as part of document selection.
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-        readStyleInPreference(doc);
         // Plain reassignment would be enough for most helpers, but CSLCitationOOAdapter registers a listener on
         // openOfficePreferences. Clear document-bound helpers first so the old CSL adapter can dispose that listener
         // before we replace the adapters for the newly selected document.
@@ -163,41 +162,31 @@ public class OOBibBase {
         return this.connection.getCurrentDocumentTitle();
     }
 
-    OOVoidResult<OOError> readStyleInPreference() {
+    OOResult<Optional<CitationStyle>, OOError> inferCslStyleFromDocument() {
         if (!isConnectedToDocument()) {
-            return OOVoidResult.ok();
+            return OOResult.ok(Optional.empty());
         }
 
         OOResult<XTextDocument, OOError> document = getXTextDocument();
         if (document.isError()) {
-            return document.asVoidResult();
+            return OOResult.error(document.getError());
         }
 
-        return readStyleInPreference(document.get());
+        return inferCslStyleFromDocument(document.get());
     }
 
-    private OOVoidResult<OOError> readStyleInPreference(XTextDocument doc) {
-        if (!shouldReadStyleInPreference(openOfficePreferences)) {
-            return OOVoidResult.ok();
-        }
-
+    private OOResult<Optional<CitationStyle>, OOError> inferCslStyleFromDocument(XTextDocument doc) {
         try {
-            ZoteroDocumentPreferences.findCitationStyle(doc, CSLStyleLoader.getStyles())
-                                     .ifPresent(openOfficePreferences::setCurrentStyle);
-            return OOVoidResult.ok();
+            Optional<CitationStyle> citationStyle = ZoteroDocumentPreferences.findCitationStyle(doc, CSLStyleLoader.getStyles());
+            citationStyle.ifPresent(openOfficePreferences::setCurrentStyle);
+            return OOResult.ok(citationStyle);
         } catch (WrappedTargetException e) {
             LOGGER.warn("Could not read Zotero document preferences", e);
-            return OOVoidResult.error(OOError.fromMisc(e));
+            return OOResult.error(OOError.fromMisc(e));
         }
     }
 
-    static boolean shouldReadStyleInPreference(OpenOfficePreferences openOfficePreferences) {
-        return openOfficePreferences.getCurrentStyle() instanceof CitationStyle
-                && openOfficePreferences.getZoteroCompatibilityMode()
-                && openOfficePreferences.shouldInferCslStyleFromDocument();
-    }
-
-    OOVoidResult<OOError> writeZoteroDocumentStyle(CitationStyle citationStyle) {
+    OOVoidResult<OOError> writeDocumentCslStyle(CitationStyle citationStyle) {
         if (!isConnectedToDocument()) {
             return OOVoidResult.ok();
         }
@@ -207,14 +196,10 @@ public class OOBibBase {
             return document.asVoidResult();
         }
 
-        return writeZoteroDocumentStyle(document.get(), citationStyle);
+        return writeDocumentCslStyle(document.get(), citationStyle);
     }
 
-    private OOVoidResult<OOError> writeZoteroDocumentStyle(XTextDocument doc, CitationStyle citationStyle) {
-        if (!openOfficePreferences.getZoteroCompatibilityMode()) {
-            return OOVoidResult.ok();
-        }
-
+    static OOVoidResult<OOError> writeDocumentCslStyle(XTextDocument doc, CitationStyle citationStyle) {
         try {
             boolean result = ZoteroDocumentPreferences.writeCitationStyle(doc, citationStyle);
             if (!result) {
@@ -224,7 +209,7 @@ public class OOBibBase {
             }
             return OOVoidResult.ok();
         } catch (IllegalTypeException | NotRemoveableException | PropertyVetoException | WrappedTargetException e) {
-            LOGGER.warn("Could not update Zotero document preferences", e);
+            LOGGER.warn("Could not update document CSL preferences", e);
             return OOVoidResult.error(OOError.fromMisc(e));
         }
     }
@@ -703,7 +688,7 @@ public class OOBibBase {
             return OOVoidResult.error(OOError.fromMisc(e));
         }
 
-        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        OOVoidResult<OOError> documentPreferencesResult = writeDocumentCslStyle(doc, citationStyle);
         if (documentPreferencesResult.isError()) {
             return documentPreferencesResult;
         }
@@ -1192,7 +1177,7 @@ public class OOBibBase {
     /// @param errorTitle    Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
-        OOVoidResult<OOError> documentPreferencesResult = writeZoteroDocumentStyle(doc, citationStyle);
+        OOVoidResult<OOError> documentPreferencesResult = writeDocumentCslStyle(doc, citationStyle);
         if (documentPreferencesResult.isError()) {
             return documentPreferencesResult;
         }

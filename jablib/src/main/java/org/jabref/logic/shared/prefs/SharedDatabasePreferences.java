@@ -29,7 +29,6 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_AUTOSAVE = "sharedDatabaseAutosave";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
-    private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
     private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
     private static final String SHARED_DATABASE_EXPERT_MODE = "sharedDatabaseExpertMode";
     private static final String SHARED_DATABASE_JDBC_URL = "sharedDatabaseJdbcUrl";
@@ -67,10 +66,6 @@ public class SharedDatabasePreferences {
 
     public Optional<String> getPassword() {
         return getOptionalValue(SHARED_DATABASE_PASSWORD);
-    }
-
-    public Optional<String> getKeyStoreFile() {
-        return getOptionalValue(SHARED_DATABASE_KEYSTORE_FILE);
     }
 
     public Optional<String> getServerTimezone() {
@@ -133,10 +128,6 @@ public class SharedDatabasePreferences {
         internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
     }
 
-    public void setKeystoreFile(String keystoreFile) {
-        internalPrefs.put(SHARED_DATABASE_KEYSTORE_FILE, keystoreFile);
-    }
-
     public void setServerTimezone(String serverTimezone) {
         internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);
     }
@@ -182,7 +173,6 @@ public class SharedDatabasePreferences {
         setName(properties.getDatabase());
         setUser(properties.getUser());
         setUseSSL(properties.isUseSSL());
-        setKeystoreFile(properties.getKeyStore());
         setServerTimezone(properties.getServerTimezone());
         setExpertMode(properties.isUseExpertMode());
         setJdbcUrl(properties.getJdbcUrl());

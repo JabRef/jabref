@@ -78,7 +78,6 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -115,7 +114,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
 
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
@@ -128,7 +126,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private boolean shouldClearSelectionOnDrop = false;
 
     public CitationRelationsTab(DialogService dialogService,
-                                UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
@@ -138,7 +135,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -150,7 +146,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
                 preferences,
-                undoManager,
                 stateManager,
                 dialogService,
                 fileUpdateMonitor,
@@ -314,9 +309,10 @@ public class CitationRelationsTab extends EntryEditorTab {
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.setId("scite-error-label");
+        titleLabel.getStyleClass().addAll("h3", "bold");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("scite-error-box");
+        errorMessageBox.getStyleClass().add("padding-32");
         return errorMessageBox;
     }
 
@@ -326,7 +322,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         tallies.setAlignment(Pos.CENTER_LEFT);
 
         Text metrics = new Text(Localization.lang("Metrics:"));
-        metrics.getStyleClass().add("markdown-bold");
+        metrics.getStyleClass().add("bold");
         Text totalCitations = new Text(Localization.lang("Total Citations: %0", tallModel.total()));
         Text supporting = new Text(Localization.lang("Supporting: %0", tallModel.supporting()));
         Text contradicting = new Text(Localization.lang("Contradicting: %0", tallModel.contradicting()));
@@ -578,7 +574,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = ControlHelper.iconButton(IconTheme.JabRefIcons.LINK);
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
-                        jumpTo.getStyleClass().add("addEntryButton");
+                        jumpTo.getStyleClass().add("h1");
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
                         vContainer.getChildren().add(jumpTo);
 
@@ -596,7 +592,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         });
-                        addToggle.getStyleClass().add("addEntryButton");
+                        addToggle.getStyleClass().addAll("addEntryButton", "h1");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
                         vContainer.getChildren().add(addToggle);
                     }
@@ -641,7 +637,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     vContainer.getChildren().addLast(showEntrySource);
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("entry-container");
+                    hContainer.getStyleClass().add("padding-6-0");
 
                     return hContainer;
                 })
@@ -754,7 +750,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.getStyleClass().add("padding-5px");
+        label.getStyleClass().add("padding-6");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
@@ -1055,7 +1051,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             BibDatabase database = libraryTab.get().getDatabase();
-            undoManager.addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
+            libraryTab.get().getUndoManager().addEdit(StandardActions.MERGE_ENTRIES.getText(), edit -> {
                 edit.applyEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
                 libraryTab.get().getMainTable().setCitationMergeMode(true);
                 edit.applyEdit(new UndoableInsertEntries(database, mergedEntry));
