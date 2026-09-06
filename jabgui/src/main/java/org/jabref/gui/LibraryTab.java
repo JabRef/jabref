@@ -135,7 +135,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
-    private @Nullable GuiUndoManager journalAfterClose;
 
     // All subscribers needing "coarse" change events should use this filter
     // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
@@ -781,7 +780,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
-        journalAfterClose = stateManager.getUndoManager(bibDatabaseContext);
         stateManager.removeUndoManager(bibDatabaseContext);
 
         try {
@@ -841,17 +839,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return journal();
     }
 
-    /// Resolved on each call rather than held: the context a tab shows is replaced once loading
-    /// finishes (see [#setDatabaseContext]), and the journal follows the library the tab holds now.
-    ///
-    /// Once the library is closed its journal is no longer the state manager's to hand out — asking
-    /// for it there would put a fresh one back in a map nothing will clear again — so what is
-    /// returned from then on is the journal this library had, which goes when this tab does.
     private GuiUndoManager journal() {
-        if (journalAfterClose != null) {
-            LOGGER.warn("The undo journal of {} was requested after the library was closed", bibDatabaseContext.getDatabasePath());
-            return journalAfterClose;
-        }
         return stateManager.getUndoManager(bibDatabaseContext);
     }
 
