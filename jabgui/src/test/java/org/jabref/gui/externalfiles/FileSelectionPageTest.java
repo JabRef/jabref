@@ -38,8 +38,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(ApplicationExtension.class)
 class FileSelectionPageTest {
 
-    private FileSelectionPage page;
-
     @Start
     void onStart(Stage stage) {
         UnlinkedFilesDialogViewModel viewModel = mock(UnlinkedFilesDialogViewModel.class);
@@ -53,7 +51,7 @@ class FileSelectionPageTest {
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
         when(taskExecutor.createThrottler(300)).thenReturn(mock(DelayTaskThrottler.class));
 
-        page = new FileSelectionPage(
+        FileSelectionPage page = new FileSelectionPage(
                 mock(StateManager.class),
                 viewModel,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
@@ -69,37 +67,36 @@ class FileSelectionPageTest {
     /// [utest->req~jabgui.externalfiles.unlinked-files.preview.close~1]
     @Test
     void previewPaneCanBeClosedAndShownAgain(FxRobot robot) {
-        Button closeButton = findButtonWithTooltip(Localization.lang("Close PDF preview"));
+        Button closeButton = findButtonWithTooltip(robot, Localization.lang("Close PDF preview"));
 
         robot.interact(closeButton::fire);
 
-        assertEquals(0, previewPanes());
-        Button showButton = page.lookupAll(".button").stream()
-                                .map(Button.class::cast)
-                                .filter(button -> button.getText().equals(Localization.lang("Show PDF preview")))
-                                .findFirst()
-                                .orElseThrow();
+        assertEquals(0, previewPanes(robot));
+        Button showButton = robot.lookup(".button")
+                               .match(Button.class::isInstance)
+                               .match(node -> ((Button) node).getText().equals(Localization.lang("Show PDF preview")))
+                               .queryButton();
         assertTrue(showButton.isVisible());
 
         robot.interact(showButton::fire);
 
-        assertEquals(1, previewPanes());
+        assertEquals(1, previewPanes(robot));
         assertFalse(showButton.isVisible());
     }
 
-    private Button findButtonWithTooltip(String tooltipText) {
-        return page.lookupAll(".button").stream()
-                   .map(Button.class::cast)
-                   .filter(button -> button.getTooltip() != null)
-                   .filter(button -> button.getTooltip().getText().equals(tooltipText))
-                   .findFirst()
-                   .orElseThrow();
+    private Button findButtonWithTooltip(FxRobot robot, String tooltipText) {
+        return robot.lookup(".button")
+                    .match(Button.class::isInstance)
+                    .match(node -> ((Button) node).getTooltip() != null)
+                    .match(node -> ((Button) node).getTooltip().getText().equals(tooltipText))
+                    .queryButton();
     }
 
-    private long previewPanes() {
-        return page.lookupAll(".titled-pane").stream()
-                   .map(TitledPane.class::cast)
-                   .filter(pane -> pane.getText().equals(Localization.lang("PDF preview")))
+    private long previewPanes(FxRobot robot) {
+        return robot.lookup(".titled-pane")
+                   .match(TitledPane.class::isInstance)
+                   .match(node -> ((TitledPane) node).getText().equals(Localization.lang("PDF preview")))
+                   .queryAll().stream()
                    .count();
     }
 }
