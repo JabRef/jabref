@@ -119,7 +119,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "spacing-24", "align-center", "padding-32-24");
+        main.getStyleClass().addAll("welcome-main-container", "spacing-24", "align-center", "padding-24");
         initializeColumns();
 
         VBox container = new VBox(main);

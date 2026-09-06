@@ -112,7 +112,7 @@ public class WalkthroughRenderer {
 
     private Node render(InfoBlock infoBlock) {
         HBox infoContainer = new HBox();
-        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "spacing-6", "align-top-left");
+        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "spacing-4", "align-top-left");
 
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
@@ -148,7 +148,7 @@ public class WalkthroughRenderer {
 
         HBox rightActions = new HBox();
         rightActions.setAlignment(Pos.CENTER_RIGHT);
-        rightActions.getStyleClass().add("spacing-6");
+        rightActions.getStyleClass().add("spacing-4");
 
         component.skipButtonText()
                  .ifPresent(text ->
@@ -181,7 +181,7 @@ public class WalkthroughRenderer {
     /// @param text the already localized button text
     private Button makeButton(String text, String styleClass, Runnable beforeNavigate, Runnable navigationAction) {
         Button button = new Button(text);
-        button.getStyleClass().addAll(styleClass, "h5", "padding-4-6");
+        button.getStyleClass().addAll(styleClass, "h5", "padding-4");
         button.setOnAction(_ -> {
             beforeNavigate.run();
             navigationAction.run();

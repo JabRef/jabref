@@ -133,7 +133,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         notFoundText.getStyleClass().add("italic");
 
         VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
-        notFoundBox.getStyleClass().add("padding-32");
+        notFoundBox.getStyleClass().add("padding-24");
         return notFoundBox;
     }
 
@@ -143,7 +143,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text errorMessageText = new Text();
         errorMessageText.textProperty().bind(viewModel.searchErrorProperty());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-32");
+        errorMessageBox.getStyleClass().add("padding-24");
         return errorMessageBox;
     }
 

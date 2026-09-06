@@ -70,25 +70,25 @@ public class DonationProvider {
         Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
         subtitle.getStyleClass().add("font-size-090");
         VBox textBox = new VBox(title, subtitle);
-        textBox.getStyleClass().add("spacing-2");
+        textBox.getStyleClass().add("spacing-4");
 
         Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();
         HBox leftContent = new HBox(10, iconNode, textBox);
         leftContent.setAlignment(Pos.CENTER_LEFT);
 
         Button neverButton = new Button(Localization.lang("Never show again"));
-        neverButton.getStyleClass().addAll("donation-btn-ghost", "padding-6-12");
+        neverButton.getStyleClass().addAll("donation-btn-ghost", "padding-4-12");
         neverButton.setOnAction(_ -> {
             preferences.getDonationPreferences().setNeverShowAgain(true);
             hideToast();
         });
 
         Button cancelButton = new Button(Localization.lang("Cancel"));
-        cancelButton.getStyleClass().addAll("donation-btn-secondary", "padding-6-12");
+        cancelButton.getStyleClass().addAll("donation-btn-secondary", "padding-4-12");
         cancelButton.setOnAction(_ -> hideToast());
 
         Button donateButton = new Button(Localization.lang("Donate"));
-        donateButton.getStyleClass().addAll("donation-btn-primary", "padding-6-12");
+        donateButton.getStyleClass().addAll("donation-btn-primary", "padding-4-12");
         donateButton.setDefaultButton(true);
         donateButton.setOnAction(_ -> {
             new OpenBrowserAction(DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();

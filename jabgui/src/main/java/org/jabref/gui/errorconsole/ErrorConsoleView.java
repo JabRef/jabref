@@ -93,7 +93,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                 message = new VBox();
                 message.setAlignment(Pos.CENTER_LEFT);
                 message.getChildren().setAll(heading, stacktrace);
-                message.getStyleClass().add("spacing-6");
+                message.getStyleClass().add("spacing-4");
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 getStyleClass().addAll("error-console-cell", "padding-8-12");
             }

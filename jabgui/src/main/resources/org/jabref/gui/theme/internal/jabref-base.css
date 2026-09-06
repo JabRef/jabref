@@ -54,10 +54,9 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          8 -> 0.667em    24 -> 2em
- *     2 -> 0.167em   12 -> 1em
- *     4 -> 0.333em   16 -> 1.333em
- *     6 -> 0.5em
+ *     0 -> 0          12 -> 1em
+ *     4 -> 0.333em    16 -> 1.333em
+ *     8 -> 0.667em    24 -> 2em
  * ========================================================================== */
 
 /* Type scale */
@@ -87,40 +86,32 @@
 .text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
-/* Padding: all sides. The full scale, so any step can be picked without editing this file. */
+/* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
-.padding-2 { -fx-padding: 0.167em; }
 .padding-4 { -fx-padding: 0.333em; }
-.padding-6 { -fx-padding: 0.5em; }
 .padding-8 { -fx-padding: 0.667em; }
 .padding-12 { -fx-padding: 1em; }
 .padding-16 { -fx-padding: 1.333em; }
 .padding-24 { -fx-padding: 2em; }
-.padding-32 { -fx-padding: 2.667em; }
 
 /* Padding: <vertical>-<horizontal>. Added on demand -- only the pairs in use exist. */
-.padding-0-6 { -fx-padding: 0 0.5em; }
+.padding-0-4 { -fx-padding: 0 0.333em; }
 .padding-0-12 { -fx-padding: 0 1em; }
-.padding-2-12 { -fx-padding: 0.167em 1em; }
-.padding-4-6 { -fx-padding: 0.333em 0.5em; }
+.padding-4-0 { -fx-padding: 0.333em 0; }
 .padding-4-8 { -fx-padding: 0.333em 0.667em; }
 .padding-4-12 { -fx-padding: 0.333em 1em; }
-.padding-6-0 { -fx-padding: 0.5em 0; }
-.padding-6-12 { -fx-padding: 0.5em 1em; }
-.padding-6-24 { -fx-padding: 0.5em 2em; }
+.padding-4-24 { -fx-padding: 0.333em 2em; }
 .padding-8-12 { -fx-padding: 0.667em 1em; }
 .padding-12-16 { -fx-padding: 1em 1.333em; }
-.padding-32-24 { -fx-padding: 2.667em 2em; }
 
 /* Padding: single side. Added on demand -- only the steps in use exist. */
 .padding-top-4 { -fx-padding: 0.333em 0 0 0; }
-.padding-top-6 { -fx-padding: 0.5em 0 0 0; }
 .padding-top-12 { -fx-padding: 1em 0 0 0; }
 
-.padding-right-6 { -fx-padding: 0 0.5em 0 0; }
+.padding-right-4 { -fx-padding: 0 0.333em 0 0; }
 .padding-right-16 { -fx-padding: 0 1.333em 0 0; }
 
-.padding-bottom-6 { -fx-padding: 0 0 0.5em 0; }
+.padding-bottom-4 { -fx-padding: 0 0 0.333em 0; }
 .padding-bottom-16 { -fx-padding: 0 0 1.333em 0; }
 .padding-bottom-24 { -fx-padding: 0 0 2em 0; }
 
@@ -129,18 +120,14 @@
 
 /* Spacing between the children of an HBox / VBox */
 .spacing-0 { -fx-spacing: 0; }
-.spacing-2 { -fx-spacing: 0.167em; }
 .spacing-4 { -fx-spacing: 0.333em; }
-.spacing-6 { -fx-spacing: 0.5em; }
 .spacing-8 { -fx-spacing: 0.667em; }
 .spacing-12 { -fx-spacing: 1em; }
 .spacing-16 { -fx-spacing: 1.333em; }
 .spacing-24 { -fx-spacing: 2em; }
-.spacing-32 { -fx-spacing: 2.667em; }
 
 /* Gap between the cells of a GridPane / FlowPane / TilePane */
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
-.gap-6 { -fx-hgap: 0.5em; -fx-vgap: 0.5em; }
 .gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
 .gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
 .gap-16 { -fx-hgap: 1.333em; -fx-vgap: 1.333em; }

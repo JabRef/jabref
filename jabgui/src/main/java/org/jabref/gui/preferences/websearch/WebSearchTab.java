@@ -180,7 +180,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {
         HBox container = new HBox();
-        container.getStyleClass().addAll("fetcher-list-cell", "padding-4-8", "align-center-left", "spacing-6");
+        container.getStyleClass().addAll("fetcher-list-cell", "padding-4-8", "align-center-left", "spacing-4");
         container.setAlignment(Pos.CENTER_LEFT);
 
         CheckBox enabledCheckBox = new CheckBox();
@@ -202,7 +202,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         }
 
         Button configureButton = new Button(Localization.lang("Configure API key"));
-        configureButton.getStyleClass().addAll("configure-button", "padding-4-6");
+        configureButton.getStyleClass().addAll("configure-button", "padding-4");
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
