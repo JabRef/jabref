@@ -78,7 +78,6 @@ class GitShareToGitHubDialogViewModelTest {
         verify(gitHubRepositoryAccessChecker).check("https://github.com/JabRef/jabref.git", "JabRef", "token");
     }
 
-    // [utest->req~git.repository-status.graceful-errors~1]
     @Test
     void shareToGitHubShowsErrorWithoutExceptionDetails() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());

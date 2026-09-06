@@ -167,7 +167,6 @@ class GitCommitActionTest {
         }
     }
 
-    // [utest->req~git.repository-status.graceful-errors~1]
     @Test
     void brokenRepositoryStatusShowsAnErrorDialog() throws Exception {
         Path libraryFile = libraryDirectory.resolve("library.bib");

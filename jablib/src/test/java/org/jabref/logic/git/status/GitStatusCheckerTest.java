@@ -263,7 +263,6 @@ class GitStatusCheckerTest {
         assertEquals(SyncStatus.DIVERGED, snapshot.syncStatus());
     }
 
-    // [utest->req~git.repository-status.graceful-errors~1]
     @Test
     void invalidHeadIsReportedAsJabRefException(@TempDir Path tempDir) throws Exception {
         Path repoDir = tempDir.resolve("broken");
