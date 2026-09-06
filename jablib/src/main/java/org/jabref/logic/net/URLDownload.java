@@ -314,7 +314,7 @@ public class URLDownload {
             try {
                 Files.deleteIfExists(file);
             } catch (IOException ioException) {
-                // Ignore failure to delete temporary file on cleanup
+                LOGGER.debug("Could not delete temporary file {}", file, ioException);
             }
             throw e;
         }
