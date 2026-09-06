@@ -35,6 +35,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
@@ -110,7 +111,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().add("welcome-main-container");
+        main.getStyleClass().addAll("welcome-main-container", "spacing-24", "align-center", "padding-32-24");
         initializeColumns();
 
         VBox container = new VBox(main);
@@ -127,17 +128,17 @@ public class WelcomeTab extends Tab {
 
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
-        welcomeLabel.getStyleClass().add("welcome-label");
+        welcomeLabel.getStyleClass().addAll("font-size-250", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
-        descriptionLabel.getStyleClass().add("welcome-description-label");
+        descriptionLabel.getStyleClass().add("h2");
         VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().add("welcome-top-titles");
+        topTitles.getStyleClass().addAll("spacing-10", "align-top-left", "padding-bottom-20");
         return topTitles;
     }
 
     private void initializeColumns() {
         GridPane grid = new GridPane();
-        grid.getStyleClass().add("welcome-columns-container");
+        grid.getStyleClass().addAll("gap-24", "align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -170,7 +171,7 @@ public class WelcomeTab extends Tab {
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
-        leftColumn.getStyleClass().add("welcome-content-column");
+        leftColumn.getStyleClass().addAll("spacing-24", "align-top-left");
         return leftColumn;
     }
 
@@ -178,7 +179,7 @@ public class WelcomeTab extends Tab {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
         VBox rightColumn = new VBox(quickSettings, walkthroughs);
-        rightColumn.getStyleClass().add("welcome-content-column");
+        rightColumn.getStyleClass().addAll("spacing-24", "align-top-left");
         return rightColumn;
     }
 
@@ -231,7 +232,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createWelcomeStartBox() {
         Label header = new Label(Localization.lang("Start"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         Hyperlink newLibraryLink = createActionLink(Localization.lang("New empty library"),
                 () -> new NewDatabaseAction(tabContainer, preferences).execute());
@@ -248,7 +249,7 @@ public class WelcomeTab extends Tab {
         );
 
         VBox container = new VBox();
-        container.getStyleClass().add("welcome-links-content");
+        container.getStyleClass().addAll("spacing-8", "align-top-left");
         container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
@@ -260,7 +261,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createWelcomeRecentBox() {
         Label header = new Label(Localization.lang("Recent"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
         updateWelcomeRecentLibraries();
         fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
@@ -270,7 +271,7 @@ public class WelcomeTab extends Tab {
 
     private Hyperlink createActionLink(String text, Runnable action) {
         Hyperlink link = new Hyperlink(text);
-        link.getStyleClass().add("welcome-hyperlink");
+        link.getStyleClass().addAll("welcome-hyperlink", "h4");
         link.setOnAction(_ -> action.run());
         return link;
     }
@@ -299,12 +300,12 @@ public class WelcomeTab extends Tab {
             return;
         }
         recentLibrariesBox.getChildren().clear();
-        recentLibrariesBox.getStyleClass().add("welcome-links-content");
+        recentLibrariesBox.getStyleClass().addAll("spacing-8", "align-top-left");
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-            recentLibraryLink.getStyleClass().add("welcome-hyperlink");
+            recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
@@ -313,7 +314,7 @@ public class WelcomeTab extends Tab {
     private void displayNoRecentLibrariesMessage() {
         recentLibrariesBox.getChildren().clear();
         Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
-        noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
+        noRecentLibrariesLabel.getStyleClass().addAll("h4", "text-accent");
         recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(true);
@@ -321,19 +322,19 @@ public class WelcomeTab extends Tab {
 
     private VBox createCommunityBox() {
         Label header = new Label(Localization.lang("Community"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
         HBox versionContainer = createVersionContainer();
         VBox container = new VBox();
-        container.getStyleClass().add("welcome-community-content");
+        container.getStyleClass().addAll("spacing-12", "align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
         return createVBoxContainer(header, container);
     }
 
     private FlowPane createIconLinksContainer() {
         FlowPane container = new FlowPane();
-        container.getStyleClass().add("welcome-community-icons");
+        container.getStyleClass().addAll("gap-12", "align-center-left");
 
         Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
         Hyperlink privacyPolicyLink = createFooterLink(Localization.lang("Privacy policy"), StandardActions.OPEN_PRIVACY_POLICY, IconTheme.JabRefIcons.BOOK);
@@ -348,7 +349,7 @@ public class WelcomeTab extends Tab {
 
     private HBox createTextLinksContainer() {
         HBox container = new HBox();
-        container.getStyleClass().add("welcome-community-links");
+        container.getStyleClass().addAll("spacing-16", "align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
         Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
@@ -391,16 +392,16 @@ public class WelcomeTab extends Tab {
 
     private HBox createVersionContainer() {
         HBox container = new HBox();
-        container.getStyleClass().add("welcome-community-version");
+        container.getStyleClass().addAll("align-center-left", "padding-top-4");
         Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
-        versionLabel.getStyleClass().add("welcome-community-version-text");
+        versionLabel.getStyleClass().addAll("font-size-090", "text-subtle");
         container.getChildren().add(versionLabel);
         return container;
     }
 
     private VBox createVBoxContainer(Node... nodes) {
         VBox box = new VBox();
-        box.getStyleClass().add("welcome-section");
+        box.getStyleClass().addAll("spacing-12", "align-top-left");
         box.getChildren().addAll(nodes);
         return box;
     }
