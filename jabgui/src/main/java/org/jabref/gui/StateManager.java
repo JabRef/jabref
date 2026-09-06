@@ -48,7 +48,7 @@ public interface StateManager extends SrvStateManager {
 
     OptionalObjectProperty<LibraryTab> activeTabProperty();
 
-    /// The undo journal of `context`.
+    /// The undo journal of the library `context` describes.
     ///
     /// Each library has its own, so a caller names the library it is recording against instead of
     /// holding a journal handed to it when it was built. Which library that is has to be decided

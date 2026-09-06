@@ -106,10 +106,14 @@ class UndoRedoActionTest {
 
         showLibrary(tabA, libraryA);
         undoAction.execute();
+
+        assertEquals(Optional.of("Einstein"), entryInA.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Meitner"), entryInB.getField(StandardField.AUTHOR), "undone in the library that was not in front");
+
         showLibrary(tabB, libraryB);
         undoAction.execute();
 
-        assertEquals(Optional.of("Einstein"), entryInA.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Einstein"), entryInA.getField(StandardField.AUTHOR), "undone again in the library switched away from");
         assertEquals(Optional.of("Curie"), entryInB.getField(StandardField.AUTHOR));
     }
 
@@ -119,12 +123,18 @@ class UndoRedoActionTest {
         journalOfB.addEdit(setAuthor(entryInB, "Meitner"));
         journalOfA.undo();
         journalOfB.undo();
-        showLibrary(tabA, libraryA);
 
+        showLibrary(tabA, libraryA);
         redoAction.execute();
 
         assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("Curie"), entryInB.getField(StandardField.AUTHOR), "the other library was redone as well");
+        assertEquals(Optional.of("Curie"), entryInB.getField(StandardField.AUTHOR), "redone in the library that was not in front");
+
+        showLibrary(tabB, libraryB);
+        redoAction.execute();
+
+        assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "redone again in the library switched away from");
+        assertEquals(Optional.of("Meitner"), entryInB.getField(StandardField.AUTHOR));
     }
 
     @Test
