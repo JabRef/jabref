@@ -65,7 +65,6 @@ public class SwhidFetcher implements IdBasedFetcher {
     }
 
     @Override
-    // [impl->req~fetchers.identifier-rate-limit-retries~1]
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<SWHID> parsedSwhid = SWHID.parse(identifier);
         if (parsedSwhid.isEmpty()) {
@@ -82,6 +81,7 @@ public class SwhidFetcher implements IdBasedFetcher {
             throw new FetcherException("Invalid URL constructed for SWHID: " + canonicalSwhid, e);
         }
 
+        // [impl->req~fetchers.identifier-rate-limit-retries~1]
         return FetcherRetry.executeWithRateLimitRetry(() -> {
             try {
                 URLDownload urlDownload = new URLDownload(url);
