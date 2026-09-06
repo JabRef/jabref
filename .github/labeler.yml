@@ -76,6 +76,17 @@
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/*.css'
 
+"component: diff-merge":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/externalfiles/PdfMergeDialog.java'
+          - 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+          - 'jablib/src/**/org/jabref/logic/bibtex/comparator/**'
+          - 'jablib/src/**/org/jabref/logic/git/conflicts/**'
+          - 'jablib/src/**/org/jabref/logic/git/diff/**'
+          - 'jablib/src/**/org/jabref/logic/git/merge/**'
+          - 'jablib/src/**/org/jabref/logic/importer/fetcher/MergingIdBasedFetcher.java'
+
 "component: duplicate-finder":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/duplicationFinder/**'
@@ -213,10 +224,6 @@
 "component: maintable":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
-
-"component: merge":
-  - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
 
 "component: microsoft-word-integration":
   - changed-files:

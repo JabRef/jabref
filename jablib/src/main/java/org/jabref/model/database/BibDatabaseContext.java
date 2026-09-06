@@ -124,6 +124,11 @@ public class BibDatabaseContext {
         return database;
     }
 
+    /// The keyword separator of this library, falling back to the given separator (typically the global preference) when the library does not declare one
+    public Character getKeywordSeparator(Character fallbackKeywordSeparator) {
+        return metaData.getKeywordSeparator().orElse(fallbackKeywordSeparator);
+    }
+
     public MetaData getMetaData() {
         return metaData;
     }
