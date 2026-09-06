@@ -5,6 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.ChangeOutcome;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -41,7 +42,16 @@ public class UndoAction extends SimpleCommand {
             return;
         }
 
-        undoManager.undo().ifPresent(description -> dialogService.notify(Localization.lang("Undone: %0", description)));
+        undoManager.undo().ifPresent(outcome -> dialogService.notify(message(outcome)));
         libraryTab.markChangedOrUnChanged();
+    }
+
+    /// A set applies best-effort, so an undo can take back less than it names. Saying only what
+    /// was undone would then be a message the library does not match.
+    private static String message(ChangeOutcome outcome) {
+        if (outcome.result().isComplete()) {
+            return Localization.lang("Undone: %0", outcome.description());
+        }
+        return Localization.lang("Undone: %0 (some changes could not be applied)", outcome.description());
     }
 }

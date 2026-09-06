@@ -17,8 +17,9 @@ public record UndoablePreambleChange(BibDatabase database, @Nullable String befo
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         database.setPreamble(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

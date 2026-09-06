@@ -2,6 +2,7 @@ package org.jabref.logic.undo;
 
 import java.util.function.Consumer;
 
+import org.jabref.model.undo.ApplyResult;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.CompoundEdit;
 
@@ -30,5 +31,7 @@ public interface UndoManager {
     boolean addEdit(String name, Consumer<CompoundEdit> mutations);
 
     /// Performs `change` and records it in one go.
-    void applyEdit(BibChange change);
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
+    ApplyResult applyEdit(BibChange change);
 }

@@ -5,6 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.ChangeOutcome;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -36,10 +37,18 @@ public class RedoAction extends SimpleCommand {
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
         if (undoManager.canRedo()) {
-            undoManager.redo().ifPresent(description -> dialogService.notify(Localization.lang("Redone: %0", description)));
+            undoManager.redo().ifPresent(outcome -> dialogService.notify(message(outcome)));
         } else {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
+    }
+
+    /// See [UndoAction#message].
+    private static String message(ChangeOutcome outcome) {
+        if (outcome.result().isComplete()) {
+            return Localization.lang("Redone: %0", outcome.description());
+        }
+        return Localization.lang("Redone: %0 (some changes could not be applied)", outcome.description());
     }
 }

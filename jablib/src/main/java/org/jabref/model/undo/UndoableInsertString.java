@@ -17,8 +17,9 @@ public record UndoableInsertString(BibDatabase database, BibtexString string) im
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         database.addString(string);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

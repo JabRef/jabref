@@ -1,5 +1,6 @@
 package org.jabref.model.undo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
@@ -37,21 +38,28 @@ public record ChangeSet(String name, List<BibChange> changes) implements BibChan
         return new ChangeSet(name, changes.reversed().stream().map(BibChange::inverted).toList());
     }
 
-    /// Applies every change, continuing past a failing one.
+    /// Applies every change, continuing past a failing one, and reports what did not make it.
     ///
     /// Aborting midway would leave the library in a state that is neither the old nor the new
     /// one and that no subsequent undo could describe, so a partially applied set is preferred
-    /// over a partially reverted one. Failures are logged rather than propagated because
-    /// callers have no meaningful recovery.
+    /// over a partially reverted one. Failures are not propagated, because a caller half-way
+    /// through a set has no meaningful recovery; they are returned, because a caller that
+    /// believes the whole set was applied has been told something untrue.
+    ///
+    /// Failures of nested sets travel up as they are, so what comes back names the changes that
+    /// failed rather than the sets that contained them.
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        List<ApplyResult.Failure> failures = new ArrayList<>();
         for (BibChange change : changes) {
             try {
-                change.apply();
+                failures.addAll(change.apply().failures());
             } catch (RuntimeException e) {
                 LOGGER.warn("Could not apply {} as part of '{}'", change, name, e);
+                failures.add(new ApplyResult.Failure(change, e));
             }
         }
+        return failures.isEmpty() ? ApplyResult.SUCCESS : new ApplyResult(failures);
     }
 
     public boolean isEmpty() {

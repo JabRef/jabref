@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import org.jabref.model.undo.ApplyResult;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
@@ -154,22 +155,25 @@ public class JabRefUndoManager implements UndoManager {
     /// therefore still races a concurrent undo, which is a defect this class cannot fix alone:
     /// only the command knows when its block ends, so reserving a command's writes against undo
     /// and redo has to happen above this class, not inside it.
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
-    public void applyEdit(BibChange change) {
+    public ApplyResult applyEdit(BibChange change) {
         CompoundEdit compound = active.get();
         if (compound != null) {
-            compound.applyEdit(change);
-            return;
+            return compound.applyEdit(change);
         }
         if (isEmptyStep(change)) {
-            return;
+            return ApplyResult.SUCCESS;
         }
+        ApplyResult result;
         synchronized (this) {
-            change.apply();
+            result = change.apply();
             push(change);
         }
         notifyListeners();
+        return result;
     }
 
     /// Whether `change` would be an undo step that does nothing.
@@ -253,43 +257,47 @@ public class JabRefUndoManager implements UndoManager {
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
     ///
-    /// @return what was undone, named for the user, or empty if there was nothing to undo. The
-    ///         name is taken inside the monitor: read afterwards, it would describe whichever
-    ///         step another thread has since pushed. Only a name leaves the journal, so nothing
-    ///         outside it starts reading the contents of the stacks.
-    public Optional<String> undo() {
-        String description;
+    /// @return what was undone — its name for the user, and what of it could not be applied —
+    ///         or empty if there was nothing to undo. The name is taken inside the monitor: read
+    ///         afterwards, it would describe whichever step another thread has since pushed.
+    ///         Only a name leaves the journal, so nothing outside it starts reading the contents
+    ///         of the stacks.
+    public Optional<ChangeOutcome> undo() {
+        ChangeOutcome outcome;
         synchronized (this) {
             if (undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            description = BibChangeDescriber.describe(journalEntry.change());
-            journalEntry.change().inverted().apply();
+            outcome = new ChangeOutcome(
+                    BibChangeDescriber.describe(journalEntry.change()),
+                    journalEntry.change().inverted().apply());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
             redoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(description);
+        return Optional.of(outcome);
     }
 
-    /// @return what was redone, named for the user, or empty if there was nothing to redo
-    public Optional<String> redo() {
-        String description;
+    /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
+    ///         to redo
+    public Optional<ChangeOutcome> redo() {
+        ChangeOutcome outcome;
         synchronized (this) {
             if (redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            description = BibChangeDescriber.describe(journalEntry.change());
-            journalEntry.change().apply();
+            outcome = new ChangeOutcome(
+                    BibChangeDescriber.describe(journalEntry.change()),
+                    journalEntry.change().apply());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(description);
+        return Optional.of(outcome);
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

@@ -16,7 +16,8 @@ public record UndoableKeywordSeparatorChange(MetaData metaData, Optional<Charact
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         after.ifPresentOrElse(metaData::setKeywordSeparator, metaData::clearKeywordSeparator);
+        return ApplyResult.SUCCESS;
     }
 }

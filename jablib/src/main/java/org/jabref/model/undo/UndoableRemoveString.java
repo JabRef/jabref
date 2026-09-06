@@ -17,8 +17,9 @@ public record UndoableRemoveString(BibDatabase database, BibtexString string) im
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         database.removeString(string.getId());
+        return ApplyResult.SUCCESS;
     }
 
     @Override

@@ -23,12 +23,13 @@ public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String 
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         if (after == null) {
             entry.clearField(field);
         } else {
             entry.setField(field, after);
         }
+        return ApplyResult.SUCCESS;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.jabref.gui.undo;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -10,9 +11,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableFieldChange;
+import org.jabref.model.undo.UndoableRemoveString;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -147,6 +151,22 @@ class UndoRedoActionTest {
         undoAction.execute();
 
         verify(dialogService).notify("Undone: Replace string");
+    }
+
+    /// A set applies best-effort, so an undo can take back less than its name promises. The
+    /// message has to say so, or it describes a library the user does not have.
+    @Test
+    void theNotificationSaysWhenPartOfTheStepCouldNotBeUndone() {
+        BibtexString string = new BibtexString("name", "content");
+        libraryA.getDatabase().addString(string);
+        // Recorded without being performed, so undoing it puts back a string the library still
+        // holds - the shape a change has when the library moved on underneath the journal.
+        journalOfA.addEdit(new ChangeSet("Remove string", List.of(new UndoableRemoveString(libraryA.getDatabase(), string))));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+
+        verify(dialogService).notify("Undone: Remove string (some changes could not be applied)");
     }
 
     @Test

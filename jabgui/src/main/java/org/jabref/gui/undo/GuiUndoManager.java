@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
+import org.jabref.logic.undo.ChangeOutcome;
 import org.jabref.logic.undo.UndoManager;
 
 import org.jspecify.annotations.NullMarked;
@@ -24,13 +25,15 @@ public interface GuiUndoManager extends UndoManager {
 
     /// Reverses the change on top of the undo stack.
     ///
-    /// @return what was undone, named for the user, or empty if there was nothing to undo
-    Optional<String> undo();
+    /// @return what was undone, and what of it could not be applied, or empty if there was
+    ///         nothing to undo
+    Optional<ChangeOutcome> undo();
 
     /// Re-applies the change last undone.
     ///
-    /// @return what was redone, named for the user, or empty if there was nothing to redo
-    Optional<String> redo();
+    /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
+    ///         to redo
+    Optional<ChangeOutcome> redo();
 
     boolean canUndo();
 

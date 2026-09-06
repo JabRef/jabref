@@ -34,15 +34,16 @@ public record UndoableModifySubtree(GroupTreeNode root, List<Integer> path, Grou
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         GroupTreeNode target = root.getDescendant(path).orElse(null);
         if (target == null) {
-            return;
+            return ApplyResult.SUCCESS;
         }
         target.removeAllChildren();
         for (GroupTreeNode child : after.getChildren()) {
             child.copySubtree().moveTo(target);
         }
+        return ApplyResult.SUCCESS;
     }
 
     @Override

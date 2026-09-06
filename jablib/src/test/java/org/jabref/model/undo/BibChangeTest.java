@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BibChangeTest {
 
@@ -122,6 +123,49 @@ class BibChangeTest {
 
         change.inverted().apply();
         assertEquals(List.of(), database.getEntries());
+    }
+
+    /// A set applies best-effort, and best-effort is only honest if the caller is told what did
+    /// not make it - otherwise one implementation of the sealed interface reports a success its
+    /// siblings would have thrown on.
+    @Test
+    void aSetReportsTheChangesItCouldNotApplyAndKeepsGoing() {
+        BibEntry entry = entry();
+        BibDatabase database = new BibDatabase();
+        BibtexString string = new BibtexString("name", "content");
+        database.addString(string);
+        UndoableInsertString collides = new UndoableInsertString(database, new BibtexString("name", "other"));
+        ChangeSet changeSet = new ChangeSet("edit", List.of(
+                collides,
+                new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr")));
+
+        ApplyResult result = changeSet.apply();
+
+        assertEquals(List.of(collides), result.failures().stream().map(ApplyResult.Failure::change).toList());
+        assertEquals("Bohr", entry.getField(StandardField.AUTHOR).orElseThrow(), "stopped at the failing change");
+    }
+
+    @Test
+    void aSetThatAppliedEverythingReportsSuccess() {
+        BibEntry entry = entry();
+        ChangeSet changeSet = new ChangeSet("edit", List.of(
+                new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr")));
+
+        assertTrue(changeSet.apply().isComplete());
+    }
+
+    /// The failures of a nested set name the changes that failed, not the sets holding them.
+    @Test
+    void aNestedSetsFailuresTravelUp() {
+        BibDatabase database = new BibDatabase();
+        BibtexString string = new BibtexString("name", "content");
+        database.addString(string);
+        UndoableInsertString collides = new UndoableInsertString(database, new BibtexString("name", "other"));
+        ChangeSet changeSet = new ChangeSet("outer", List.of(new ChangeSet("inner", List.of(collides))));
+
+        ApplyResult result = changeSet.apply();
+
+        assertEquals(List.of(collides), result.failures().stream().map(ApplyResult.Failure::change).toList());
     }
 
     @Test

@@ -40,5 +40,11 @@ public sealed interface BibChange permits
     /// The change is applied unconditionally rather than checking whether the library still
     /// holds the expected prior state; the undo stack is discarded whenever the library is
     /// reloaded, so that state is an invariant rather than something to verify.
-    void apply();
+    ///
+    /// A change describing one modification performs it or throws, and so always returns
+    /// [ApplyResult#SUCCESS]. Only [ChangeSet] can apply part of what it describes, and the
+    /// return value is how it says so instead of reporting a success it did not deliver.
+    ///
+    /// @return what was applied, and what was not
+    ApplyResult apply();
 }

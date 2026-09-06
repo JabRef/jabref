@@ -18,13 +18,14 @@ public record UndoableStringChange(BibtexString string, Part part, String before
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         switch (part) {
             case NAME ->
                     string.setName(after);
             case CONTENT ->
                     string.setContent(after);
         }
+        return ApplyResult.SUCCESS;
     }
 
     @Override

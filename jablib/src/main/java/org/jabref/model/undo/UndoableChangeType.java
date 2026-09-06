@@ -20,8 +20,9 @@ public record UndoableChangeType(BibEntry entry, EntryType before, EntryType aft
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         entry.setType(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

@@ -29,8 +29,9 @@ public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaDat
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         databaseContext.getMetaData().setContentsFrom(after);
+        return ApplyResult.SUCCESS;
     }
 
     private static MetaData copyOf(MetaData metaData) {

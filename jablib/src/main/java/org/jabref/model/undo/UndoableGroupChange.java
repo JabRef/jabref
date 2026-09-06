@@ -17,8 +17,9 @@ public record UndoableGroupChange(GroupTreeNode node, AbstractGroup before, Abst
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         node.setGroup(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override
