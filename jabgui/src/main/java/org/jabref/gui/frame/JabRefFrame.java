@@ -708,7 +708,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
             DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId));
             try {
-                SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, undoManager, clipBoardManager, taskExecutor);
+                SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
                 LibraryTab libraryTab = manager.openTab(manager.connect(connectionProperties));
                 libraryTab.getDatabase().setSharedDatabaseID(sharedDatabaseId);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
