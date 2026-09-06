@@ -9,24 +9,6 @@
 # The component labels themselves are documented at
 # https://devdocs.jabref.org/architecture-and-components.html
 
-"dev: ci-cd":
-  - changed-files:
-      - any-glob-to-any-file:
-          - '.github/workflows/**'
-          - '.github/actions/**'
-          - '.github/labeler.yml'
-          - '.github/dependabot.yml'
-
-"dev: build-system":
-  - changed-files:
-      - any-glob-to-any-file:
-          - '**/*.gradle.kts'
-          - 'gradle/**'
-          - 'gradle.properties'
-          - 'gradlew*'
-          - 'build-logic/**'
-          - 'versions/**'
-
 "component: ai":
   - changed-files:
       - any-glob-to-any-file:
@@ -322,8 +304,9 @@
           - '**/*.gradle.kts'
           - 'build-logic/**'
           - 'gradle/**'
-          - 'gradlew'
-          - 'gradlew.bat'
+          - 'gradle.properties'
+          - 'gradlew*'
+          - 'versions/**'
 
 # Everything that drives CI/CD: workflow definitions, the composite actions they
 # call, and the files those workflows read directly. Listed one by one instead of
