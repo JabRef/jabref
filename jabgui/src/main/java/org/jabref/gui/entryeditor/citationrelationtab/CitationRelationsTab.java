@@ -322,7 +322,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private BorderPane getTalliesPane(TalliesResponse tallModel) {
         HBox tallies = new HBox();
-        tallies.setPadding(new Insets(0, 0, 10, 0));
+        tallies.setPadding(new Insets(0, 0, 10, 10));
         tallies.setAlignment(Pos.CENTER_LEFT);
 
         Text metrics = new Text(Localization.lang("Metrics:"));
