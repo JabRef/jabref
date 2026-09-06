@@ -89,7 +89,7 @@ runs:
       if: ${{ steps.perm.outputs.skip-check != 'true'
               && steps.eval.outputs.ci_running == 'true'
               && inputs.ci-running-message != '' }}
-      uses: thollander/actions-comment-pull-request@v3
+      uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
       with:
         github-token: ${{ inputs.github-token }}
         message: ${{ inputs.ci-running-message }}
@@ -100,7 +100,7 @@ runs:
       if: ${{ steps.perm.outputs.skip-check != 'true'
               && steps.eval.outputs.changes_required == 'true'
               && inputs.changes-required-message != '' }}
-      uses: thollander/actions-comment-pull-request@v3
+      uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
       with:
         github-token: ${{ inputs.github-token }}
         message: ${{ inputs.changes-required-message }}

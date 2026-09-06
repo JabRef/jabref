@@ -76,6 +76,12 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Pressing Escape when a combo box popup is open closes only the combo box
+`req~ux.combobox.escape-closes-popup-only~1`
+
+When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
+The enclosing dialog must remain open.
+
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 
@@ -95,6 +101,13 @@ Needs: impl
 `req~ux.textdialogs.focus~1`
 
 When a dialog with text input as a main component is opened, the text field should be focused.
+
+Needs: impl
+
+## Show unsaved changes before closing a library
+`req~ux.close.show-diff~1`
+
+When closing a modified library, the "Save before closing" dialog should offer to show the unsaved changes compared to the file on disk, so the user can decide between saving and discarding on an informed basis.
 
 Needs: impl
 

@@ -114,7 +114,7 @@ This component manages the generation of citation keys based on customizable pat
 
 ### Citation Relations
 
-- Open issues: [component: citation relations](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+citation+relations%22)
+- Open issues: [component: citation-relations](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+citation-relations%22)
 - Docs: TBD
 
 This component focuses on features that analyze and visualize relationships between cited and citing works, helping users understand bibliographic networks and dependencies.
@@ -156,7 +156,7 @@ This component controls the preview pane that renders formatted citations or abs
 
 ### Event Bus
 
-- Open issues: [component: event bus](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+event+bus%22)
+- Open issues: [component: event-bus](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+event-bus%22)
 - Docs: <../code-howtos/eventbus.md>
 
 This component manages JabRef’s internal event bus system, which enables communication between decoupled components through event publishing and subscription.
@@ -191,7 +191,7 @@ This component handles the retrieval of bibliographic data from online sources s
 
 ## GitHub Action
 
-- Open issues: [component: github-action](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+github-action%22)
+- Open issues: [dev: ci-cd](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22dev%3A+ci-cd%22)
 - Docs: TBD
 
 This component refers to the GitHub Action offered by JabRef.
@@ -226,14 +226,14 @@ This component validates entries against predefined rules to detect inconsistenc
 
 ### JabKit [CLI]
 
-- Open issues: [component: JabKit [cli]](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+JabKit+%5Bcli%5D%22)
+- Open issues: [component: jabkit](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+jabkit%22)
 - Docs: TBD
 
 This component covers the command-line interface for JabRef, known as JabKit, enabling batch operations such as conversion, validation, or citation key generation without the GUI.
 
 ### Journal Abbreviations
 
-- Open issues: [component: journal abbreviations](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+journal+abbreviations%22)
+- Open issues: [component: journal-abbreviations](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+journal-abbreviations%22)
 - Docs: <https://docs.jabref.org/advanced/journalabbreviations>
 
 This component deals with the management and application of journal abbreviation lists, supporting consistent formatting for citations in different publication styles.
@@ -252,12 +252,12 @@ This component manages keyboard shortcuts within JabRef, allowing users to confi
 
 This component handles the management of keywords in bibliographic entries, including editing, merging, filtering, and automatic keyword generation or cleaning.
 
-### LaTeX Citations
+### LaTeX File Support
 
-- Open issues: [component: latex-citations](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+latex-citations%22)
+- Open issues: [component: latex-file-support](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+latex-file-support%22)
 - Docs: <https://docs.jabref.org/advanced/entryeditor/latex-citations>
 
-This component manages support for LaTeX citation formats, including parsing and interpreting `\cite` commands in `.tex` files and linking them to corresponding BibTeX entries.
+This component manages the LaTeX files JabRef reads or writes alongside a document: `\cite` commands in `.tex` files linked to their BibTeX entries, `.aux` imports, `.blg` log warnings, and `.bst` styles.
 
 ### Logging
 
@@ -280,7 +280,7 @@ This component refers to the central entry table in JabRef, including its layout
 
 ### PDF Viewer
 
-- Open issues: [component: pdf viewer](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+pdf+viewer%22)
+- Open issues: [component: pdf-viewer](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+pdf-viewer%22)
 - Docs: TBD
 
 This component relates to the built-in PDF viewer functionality in JabRef, including rendering PDFs and annotations.
@@ -329,7 +329,7 @@ This component ensures correct handling, display, and conversion of Unicode char
 
 ### Welcome Tab
 
-- Open issues: [component: welcome tab](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+welcome+tab%22)
+- Open issues: [component: welcome-tab](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+welcome-tab%22)
 - Docs: TBD
 
 This component covers the welcome/startup screen shown when JabRef launches, providing quick access to recent libraries, documentation, and getting-started resources.
