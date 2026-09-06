@@ -21,6 +21,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
+import org.jabref.logic.git.util.GitExceptionUtil;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.GitInitService;
 import org.jabref.logic.l10n.Localization;
@@ -127,7 +128,9 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                     LOGGER.warn("GitHub share failed", e);
                     String message = e instanceof JabRefException jabRefException
                                      ? jabRefException.getLocalizedMessage()
-                                     : Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
+                                     : GitExceptionUtil.isLockFailure(e)
+                                       ? Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.")
+                                       : Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("GitHub share failed"),
                             message

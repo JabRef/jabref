@@ -27,11 +27,15 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved;
 
 public class GitPullAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitPullAction.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -167,6 +171,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     private void showPullError(Throwable exception) {
+        LOGGER.warn("Git pull failed", exception);
         if (exception instanceof JabRefException e) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Pull Failed"),

@@ -8,6 +8,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitExceptionUtil;
 import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.Git;
@@ -15,8 +16,6 @@ import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
-import org.eclipse.jgit.errors.LockFailedException;
-import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -158,13 +157,13 @@ public class GitStatusChecker {
 
     private static JabRefException translateStatusFailure(Exception exception) {
         LOGGER.warn("Failed to check Git status", exception);
-        if (containsCause(exception, LockFailedException.class)) {
+        if (GitExceptionUtil.isLockFailure(exception)) {
             return new JabRefException(
                     "Failed to check Git status because the repository is locked",
                     Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."),
                     exception);
         }
-        if (containsCause(exception, MissingObjectException.class)) {
+        if (GitExceptionUtil.isMissingObjectFailure(exception)) {
             return new JabRefException(
                     "Failed to check Git status because the repository is incomplete or corrupted",
                     Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."),
@@ -174,16 +173,5 @@ public class GitStatusChecker {
                 "Failed to check Git status",
                 Localization.lang("Could not read the Git repository status. Please check the repository and try again."),
                 exception);
-    }
-
-    private static boolean containsCause(Throwable throwable, Class<? extends Throwable> causeType) {
-        Throwable current = throwable;
-        while (current != null) {
-            if (causeType.isInstance(current)) {
-                return true;
-            }
-            current = current.getCause();
-        }
-        return false;
     }
 }

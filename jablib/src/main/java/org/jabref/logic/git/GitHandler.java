@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
@@ -154,7 +155,7 @@ public class GitHandler {
             git.commit()
                .setMessage("Initial commit")
                .call();
-        } catch (IOException | GitAPIException | JabRefException e) {
+        } catch (IOException | GitAPIException | JGitInternalException | JabRefException e) {
             LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
             try {
                 FileUtils.delete(repositoryRoot.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);

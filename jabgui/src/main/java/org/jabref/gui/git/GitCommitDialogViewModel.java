@@ -19,6 +19,7 @@ import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
+import org.jabref.logic.git.util.GitExceptionUtil;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -34,9 +35,13 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class GitCommitDialogViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitCommitDialogViewModel.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -86,9 +91,8 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     onSuccess.run();
                 })
                 .onFailure(ex -> {
-                    String message = ex instanceof JabRefException jabRefException
-                                     ? jabRefException.getLocalizedMessage()
-                                     : ex.getMessage();
+                    LOGGER.warn("Git commit failed", ex);
+                    String message = localizedFailureMessage(ex);
                     dialogService.showErrorDialogAndWait(
                             ex instanceof PushFailedException
                             ? Localization.lang("Git push failed")
@@ -186,6 +190,16 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private boolean commitCurrent(ResolvedRepository repository) throws GitAPIException, IOException {
         return repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
+    }
+
+    private String localizedFailureMessage(Throwable throwable) {
+        if (throwable instanceof JabRefException jabRefException) {
+            return jabRefException.getLocalizedMessage();
+        }
+        if (GitExceptionUtil.isLockFailure(throwable)) {
+            return Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.");
+        }
+        return Localization.lang("Could not create the Git commit. Please check the repository and try again.");
     }
 
     private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
