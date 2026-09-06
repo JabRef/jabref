@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 class JabRefGuiStateManagerTest {
 
-    /// Each library gets a journal of its own, so that undo does not cross libraries and saving
-    /// one does not stamp another's saved position.
     @Test
     void eachLibraryGetsItsOwnJournal() {
         // [utest->req~logic.undo.journal-per-library~1]
@@ -28,9 +26,6 @@ class JabRefGuiStateManagerTest {
         assertNotSame(stateManager.getUndoManager(one), stateManager.getUndoManager(another));
     }
 
-    /// The same library has to resolve to the same journal every time, including after an entry is
-    /// added: a context's hashCode changes when its database does, which is why the journals are
-    /// keyed by its uid.
     @Test
     void aLibraryKeepsItsJournalAfterItsContentChanges() {
         JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
@@ -42,7 +37,6 @@ class JabRefGuiStateManagerTest {
         assertSame(journal, stateManager.getUndoManager(context));
     }
 
-    /// Closing a library discards its history, and the entries the recorded changes keep alive.
     @Test
     void closingALibraryDiscardsItsJournal() {
         // [utest->req~logic.undo.journal-per-library~1]

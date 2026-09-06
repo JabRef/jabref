@@ -49,9 +49,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        // The journal and the entries are taken here, while the library is certainly open: the
-        // state manager replaces its selection when the user switches libraries, and asking it for
-        // a journal once the library has closed would create one nothing can reach.
         final UndoManager undoManager = stateManager.getUndoManager(database);
         final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 

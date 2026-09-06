@@ -53,14 +53,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        // A copy, not the state manager's list itself: it is replaced when the user switches
-        // libraries, and checkOverwriteKeysChosen prunes what it is given — which until now pruned
-        // the user's selection.
         entries = new ArrayList<>(stateManager.getSelectedEntries());
-
-        // The library is read here, on the JavaFX thread: the keys are generated for, and recorded
-        // against, the one the user started on, which they may have switched away from by the time
-        // the task runs.
         stateManager.getActiveDatabase().ifPresent(this::generateKeysIn);
     }
 
