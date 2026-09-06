@@ -20,7 +20,6 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -93,7 +92,6 @@ class CitationsRelationsTabViewModelTest {
 
         viewModel = new CitationsRelationsTabViewModel(
                 preferences,
-                mock(UndoManager.class),
                 stateManager,
                 mock(DialogService.class),
                 new DummyFileUpdateMonitor(),

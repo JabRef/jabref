@@ -25,11 +25,11 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private UndoManager undoManager;
 
     public OwnerEditor(Field field,
                        SuggestionProvider<?> suggestionProvider,
                        FieldCheckers fieldCheckers,
+                       UndoManager undoManager,
                        UndoAction undoAction,
                        RedoAction redoAction) {
         ViewLoader.view(this)

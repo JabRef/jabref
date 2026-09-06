@@ -8,11 +8,14 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NullMarked;
+
 import static org.jabref.gui.actions.ActionHelper.needsRedo;
 
 /// Re-applies the last change undone in the library the user is looking at.
 ///
 /// Reads the library when it runs, for the same reason as [UndoAction].
+@NullMarked
 public class RedoAction extends SimpleCommand {
 
     private final DialogService dialogService;

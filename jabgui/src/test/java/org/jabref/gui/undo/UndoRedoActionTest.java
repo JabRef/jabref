@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.undo.UndoableFieldChange;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 /// it when they run rather than when they were built. One instance of each serves every library
 /// the session opens, so holding a journal would tie the menu to whichever library happened to
 /// exist first.
+@NullMarked
 class UndoRedoActionTest {
 
     private final HeadlessGuiUndoManager journalOfA = new HeadlessGuiUndoManager();

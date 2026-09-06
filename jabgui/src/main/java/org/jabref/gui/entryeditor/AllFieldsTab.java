@@ -53,7 +53,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -132,8 +131,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// Scroll content: main grid + chip bar + section panes + free-form add row.
     private final VBox listContainer = new VBox();
 
-    public AllFieldsTab(UndoManager undoManager,
-                        UndoAction undoAction,
+    public AllFieldsTab(UndoAction undoAction,
                         RedoAction redoAction,
                         GuiPreferences preferences,
                         BibEntryTypesManager entryTypesManager,
@@ -142,7 +140,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                         PreviewPanel previewPanel) {
         super(
                 false,
-                undoManager,
                 undoAction,
                 redoAction,
                 preferences,

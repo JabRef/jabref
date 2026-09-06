@@ -127,7 +127,6 @@ class AllFieldsTabTest {
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
         tab = new AllFieldsTab(
-                new JabRefUndoManager(),
                 mock(UndoAction.class),
                 mock(RedoAction.class),
                 preferences,
