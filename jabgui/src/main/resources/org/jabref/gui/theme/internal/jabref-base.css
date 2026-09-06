@@ -213,20 +213,20 @@
     -fx-text-fill: -fx-text-background-color;
 }
 
-.table-row-cell:dragOver-bottom,
-#groupTree .tree-table-row-cell:dragOver-bottom {
+.table-row-cell:drag-over-bottom,
+#groupTree .tree-table-row-cell:drag-over-bottom {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 0 0 2 0;
     -fx-padding: 0 0 -2 0;
 }
 
-.table-row-cell:dragOver-center,
-.table-row-cell:dragOver-center > .table-cell {
+.table-row-cell:drag-over-center,
+.table-row-cell:drag-over-center > .table-cell {
     -fx-background-color: -color-drag-target-hover;
 }
 
-.table-row-cell:dragOver-top,
-#groupTree .tree-table-row-cell:dragOver-top {
+.table-row-cell:drag-over-top,
+#groupTree .tree-table-row-cell:drag-over-top {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 2 0 0 0;
     -fx-padding: -2 0 0 0;
@@ -690,8 +690,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-fg-subtle;
 }
 
-.main-table .table-row-cell:dragOver-center,
-#groupTree .tree-table-row-cell:dragOver-center {
+.main-table .table-row-cell:drag-over-center,
+#groupTree .tree-table-row-cell:drag-over-center {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 1 1 1 1;
     -fx-padding: -1 -1 -1 -1;
