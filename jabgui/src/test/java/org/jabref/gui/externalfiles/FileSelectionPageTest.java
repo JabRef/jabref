@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
@@ -96,7 +95,6 @@ class FileSelectionPageTest {
         return robot.lookup(".titled-pane")
                     .match(TitledPane.class::isInstance)
                     .match(node -> ((TitledPane) node).getText().equals(Localization.lang("PDF preview")))
-                    .queryAll().stream()
-                    .count();
+                    .queryAll().size();
     }
 }
