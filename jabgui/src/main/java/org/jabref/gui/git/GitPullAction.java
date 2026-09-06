@@ -170,26 +170,22 @@ public class GitPullAction extends SimpleCommand {
         if (exception instanceof JabRefException e) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Pull Failed"),
-                    e.getLocalizedMessage(),
-                    e
+                    e.getLocalizedMessage()
             );
         } else if (exception instanceof GitAPIException e) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Pull Failed"),
-                    Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage()),
-                    e
+                    Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage())
             );
         } else if (exception instanceof IOException e) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Pull Failed"),
-                    Localization.lang("I/O error: %0", e.getLocalizedMessage()),
-                    e
+                    Localization.lang("I/O error: %0", e.getLocalizedMessage())
             );
         } else {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Git Pull Failed"),
-                    Localization.lang("Unexpected error: %0", exception.getLocalizedMessage()),
-                    exception
+                    Localization.lang("Unexpected error: %0", exception.getLocalizedMessage())
             );
         }
     }

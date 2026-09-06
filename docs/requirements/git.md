@@ -54,4 +54,11 @@ Declining the offer must leave the directory unchanged, because the user may wan
 
 Needs: impl, utest
 
+## Git operations report repository-state failures gracefully
+`req~git.repository-status.graceful-errors~1`
+
+When Git commit, push, pull, or GitHub share encounter a broken or locked local Git repository, JabRef must show a concise user-facing error message instead of raw JGit exception details.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

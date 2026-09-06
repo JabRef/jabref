@@ -1,5 +1,7 @@
 package org.jabref.gui.git;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.git.GitHubRepositoryAccess;
@@ -20,16 +22,18 @@ import static org.mockito.Mockito.when;
 class GitShareToGitHubDialogViewModelTest {
 
     private DialogService dialogService;
+    private StateManager stateManager;
     private GitHubRepositoryAccessChecker gitHubRepositoryAccessChecker;
     private GitShareToGitHubDialogViewModel viewModel;
 
     @BeforeEach
     void setUp() {
         dialogService = mock(DialogService.class);
+        stateManager = mock(StateManager.class);
         gitHubRepositoryAccessChecker = mock(GitHubRepositoryAccessChecker.class);
         viewModel = new GitShareToGitHubDialogViewModel(
                 GitPreferences.getDefault(),
-                mock(StateManager.class),
+                stateManager,
                 dialogService,
                 new CurrentThreadTaskExecutor(),
                 mock(GitHandlerRegistry.class),
@@ -72,5 +76,18 @@ class GitShareToGitHubDialogViewModelTest {
         viewModel.checkGitHubAccess();
 
         verify(gitHubRepositoryAccessChecker).check("https://github.com/JabRef/jabref.git", "JabRef", "token");
+    }
+
+    // [utest->req~git.repository-status.graceful-errors~1]
+    @Test
+    void shareToGitHubShowsErrorWithoutExceptionDetails() {
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
+
+        viewModel.shareToGitHub(() -> {
+        });
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("GitHub share failed"),
+                Localization.lang("No library open"));
     }
 }

@@ -123,13 +123,16 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                     dialogService.notify(Localization.lang("Successfully pushed to GitHub."));
                     close.run();
                 })
-                .onFailure(e ->
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("GitHub share failed"),
-                                e.getMessage(),
-                                e
-                        )
-                )
+                .onFailure(e -> {
+                    LOGGER.warn("GitHub share failed", e);
+                    String message = e instanceof JabRefException jabRefException
+                                     ? jabRefException.getLocalizedMessage()
+                                     : Localization.lang("Could not share this library to GitHub. Please check the repository and try again.");
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("GitHub share failed"),
+                            message
+                    );
+                })
                 .executeWith(taskExecutor);
     }
 
@@ -151,9 +154,12 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
         String url = gitPreferences.getRepositoryUrl();
 
-        Path bibPath = bibFilePathOpt.get();
+        Path bibPath = GitHandler.resolveToRealPath(bibFilePathOpt.get());
         GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);
-        GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());
+        GitHandler handler = gitHandlerRegistry.fromAnyPath(bibPath)
+                                               .orElseThrow(() -> new JabRefException(
+                                                       "Could not resolve the Git repository for the current library",
+                                                       Localization.lang("Could not set up the Git repository for this library. Please check the repository location and try again.")));
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
         if (status.syncStatus() == SyncStatus.BEHIND) {
             throw new JabRefException(Localization.lang("Remote repository is not empty. Please pull changes before pushing."));

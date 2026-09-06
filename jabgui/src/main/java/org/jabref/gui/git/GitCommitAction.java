@@ -1,6 +1,7 @@
 package org.jabref.gui.git;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -12,6 +13,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -84,8 +86,16 @@ public class GitCommitAction extends SimpleCommand {
             return;
         }
 
-        if (hasNothingToCommit(libraryFile)) {
-            dialogService.notify(Localization.lang("Nothing to commit."));
+        try {
+            if (hasNothingToCommit(libraryFile)) {
+                dialogService.notify(Localization.lang("Nothing to commit."));
+                return;
+            }
+        } catch (JabRefException e) {
+            LOGGER.warn("Could not determine whether the repository has changes", e);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Git commit failed"),
+                    e.getLocalizedMessage());
             return;
         }
 
@@ -156,10 +166,11 @@ public class GitCommitAction extends SimpleCommand {
         return false;
     }
 
-    private boolean hasNothingToCommit(Path bibFilePath) {
-        return gitHandlerRegistry.fromAnyPath(bibFilePath)
-                                 .map(GitStatusChecker::checkStatus)
-                                 .map(status -> !status.uncommittedChanges())
-                                 .orElse(true);
+    private boolean hasNothingToCommit(Path bibFilePath) throws JabRefException {
+        Optional<GitHandler> gitHandler = gitHandlerRegistry.fromAnyPath(bibFilePath);
+        if (gitHandler.isEmpty()) {
+            return true;
+        }
+        return !GitStatusChecker.checkStatusOrThrow(gitHandler.get()).uncommittedChanges();
     }
 }

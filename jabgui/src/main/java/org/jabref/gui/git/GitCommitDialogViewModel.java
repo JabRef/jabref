@@ -85,15 +85,17 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                     dialogService.notify(messageFor(outcome));
                     onSuccess.run();
                 })
-                .onFailure(ex ->
-                        dialogService.showErrorDialogAndWait(
-                                ex instanceof PushFailedException
-                                ? Localization.lang("Git push failed")
-                                : Localization.lang("Git commit failed"),
-                                ex.getMessage(),
-                                ex
-                        )
-                )
+                .onFailure(ex -> {
+                    String message = ex instanceof JabRefException jabRefException
+                                     ? jabRefException.getLocalizedMessage()
+                                     : ex.getMessage();
+                    dialogService.showErrorDialogAndWait(
+                            ex instanceof PushFailedException
+                            ? Localization.lang("Git push failed")
+                            : Localization.lang("Git commit failed"),
+                            message
+                    );
+                })
                 .executeWith(taskExecutor);
     }
 
@@ -161,7 +163,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         TrackedFile trackedFile = getTrackedBibFile();
         GitHandler gitHandler = trackedFile.gitHandler();
 
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
+        GitStatusSnapshot status = GitStatusChecker.checkStatusOrThrow(gitHandler);
         if (!status.tracking()) {
             throw new JabRefException(Localization.lang("Commit aborted: The file is not under Git version control."));
         }
