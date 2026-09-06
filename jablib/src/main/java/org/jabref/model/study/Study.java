@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
 ///
-/// The file is parsed using by {@link org.jabref.logic.crawler.StudyYamlParser}
+/// The file is parsed using by [org.jabref.logic.crawler.StudyYamlParser]
 @JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogs", "max-results-per-catalog"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -202,7 +202,7 @@ public class BibDatabase {
     }
 
     /// Removes the given entries.
-    /// The entries removed based on the id {@link BibEntry#getId()}
+    /// The entries removed based on the id [BibEntry#getId()]
     ///
     /// @param toBeDeleted Entries to delete
     public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
@@ -210,7 +210,7 @@ public class BibDatabase {
     }
 
     /// Removes the given entries.
-    /// The entries are removed based on the id {@link BibEntry#getId()}
+    /// The entries are removed based on the id [BibEntry#getId()]
     ///
     /// @param toBeDeleted Entry to delete
     /// @param eventSource Source the event is sent from
@@ -535,9 +535,9 @@ public class BibDatabase {
     /// Registers a listener object (subscriber) to the internal event bus.
     /// The following events are posted:
     ///
-    /// - {@link EntriesAddedEvent}
-    /// - {@link org.jabref.model.entry.event.EntryChangedEvent}
-    /// - {@link EntriesRemovedEvent}
+    /// - [EntriesAddedEvent]
+    /// - [org.jabref.model.entry.event.EntryChangedEvent]
+    /// - [EntriesRemovedEvent]
     ///
     /// @param listener listener (subscriber) to add
     public void registerListener(Object listener) {
@@ -660,9 +660,9 @@ public class BibDatabase {
 
     /// @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
     /// @implNote New entries are always added to the end of the list and always get a higher ID.
-    /// See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-    /// {@link org.jabref.model.entry.IdGenerator IdGenerator},
-    /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+    /// See [BibEntry][org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)],
+    /// [IdGenerator][org.jabref.model.entry.IdGenerator],
+    /// [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)].
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(@NonNull BibEntry bibEntry) {

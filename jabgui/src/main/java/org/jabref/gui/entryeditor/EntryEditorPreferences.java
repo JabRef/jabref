@@ -50,7 +50,7 @@ public class EntryEditorPreferences {
     private final DoubleProperty previewWidthDividerPosition;
 
     /// Field-level toggle: whether the user-specific comments field is shown inside the Comments tab.
-    /// Distinct from the Comments tab's own visibility ({@link EntryEditorTabModel.BuiltIn#COMMENTS}).
+    /// Distinct from the Comments tab's own visibility ([EntryEditorTabModel.BuiltIn#COMMENTS]).
     private final BooleanProperty showUserCommentsFields;
 
     private EntryEditorPreferences() {

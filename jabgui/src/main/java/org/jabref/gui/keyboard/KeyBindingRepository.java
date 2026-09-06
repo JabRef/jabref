@@ -18,7 +18,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 /// Handles keyboard shortcuts. Including checking whether a keybinding matches.
-/// See {@link #matches}.
+/// See [#matches].
 public class KeyBindingRepository {
 
     /// sorted by localization
@@ -109,7 +109,7 @@ public class KeyBindingRepository {
 
     /// Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
     ///
-    /// If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
+    /// If you need all matching key bindings, use [#mapToKeyBindings(KeyEvent)] instead.
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
             if (checkKeyCombinationEquality(binding, keyEvent)) {

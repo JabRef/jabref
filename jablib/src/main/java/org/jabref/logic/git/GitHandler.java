@@ -473,7 +473,7 @@ public class GitHandler {
     }
 
     private static void verifyPushResults(Iterable<PushResult> pushResults) throws JabRefException {
-        // [impl->req~ux.git-push.rejected-update-reporting~1]
+        // [impl->req~git.push.rejected-update-reporting~1]
         for (PushResult pushResult : pushResults) {
             String remoteMessage = pushResult.getMessages();
             if (StringUtil.isNotBlank(remoteMessage)) {

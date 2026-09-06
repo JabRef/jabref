@@ -48,7 +48,7 @@ public record CSLStyleLoader(
         return result;
     }
 
-    /// Returns the default citation style which is currently set to {@link CSLStyleLoader#DEFAULT_STYLE}.
+    /// Returns the default citation style which is currently set to [CSLStyleLoader#DEFAULT_STYLE].
     public static CitationStyle getDefaultStyle() {
         return INTERNAL_STYLES.stream()
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))

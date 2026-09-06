@@ -102,12 +102,12 @@ public class BackupManager {
         return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
     }
 
-    /// Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
-    /// file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
+    /// Starts the BackupManager which is associated with the given [BibDatabaseContext]. As long as no database
+    /// file is present in [BibDatabaseContext], the [BackupManager] will do nothing.
     ///
     /// This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
@@ -116,16 +116,16 @@ public class BackupManager {
         return backupManager;
     }
 
-    /// Marks the backup as discarded at the library which is associated with the given {@link BibDatabaseContext}.
+    /// Marks the backup as discarded at the library which is associated with the given [BibDatabaseContext].
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
-    /// Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
+    /// Shuts down the BackupManager which is associated with the given [BibDatabaseContext].
     ///
-    /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
+    /// @param bibDatabaseContext Associated [BibDatabaseContext]
     /// @param backupDir          The path to the backup directory
     /// @param createBackup       True, if a backup should be created
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
@@ -136,7 +136,7 @@ public class BackupManager {
     /// Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
     /// newer and different from the original.
     ///
-    /// In case a discarded file is present, the method also returns `false`, See also {@link #discardBackup(Path)}.
+    /// In case a discarded file is present, the method also returns `false`, See also [#discardBackup(Path)].
     ///
     /// @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
@@ -342,7 +342,7 @@ public class BackupManager {
                 backupFilesQueue.addAll(BackupFileUtil.getExistingBackupFiles(databasePath, backupDir)));
     }
 
-    /// Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
+    /// Unregisters the BackupManager from the eventBus of [BibDatabaseContext].
     /// This method should only be used when closing a database/JabRef in a normal way.
     ///
     /// @param backupDir    The backup directory

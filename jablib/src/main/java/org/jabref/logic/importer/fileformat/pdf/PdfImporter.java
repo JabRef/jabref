@@ -20,6 +20,7 @@ import org.jspecify.annotations.NullMarked;
 /// which allows user for more fine-grained control of how [org.jabref.model.entry.BibEntry] is extracted from a PDF file.
 ///
 /// [PdfImporter]s are used in two places in JabRef:
+///
 /// 1. [PdfMergeMetadataImporter]: uses several [PdfImporter] and automatically
 ///    merges them into 1 [org.jabref.model.entry.BibEntry].
 /// 2. `org.jabref.gui.externalfiles.PdfMergeDialog` also uses several [PdfImporter], but

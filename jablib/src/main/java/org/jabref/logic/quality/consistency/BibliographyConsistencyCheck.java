@@ -101,9 +101,9 @@ public class BibliographyConsistencyCheck {
     ///
     /// This class **does** check if required fields are set for an entry type but **does not** check if the fields are valid for the entry type.
     ///
-    /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
+    /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of [BibliographyConsistencyCheckResultCsvWriter#writeFindings]
     ///
-    /// @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
+    /// @implNote This class does not implement [org.jabref.logic.integrity.DatabaseChecker], because it returns a list of [org.jabref.logic.integrity.IntegrityMessage], which are too fine-grained.
     public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();

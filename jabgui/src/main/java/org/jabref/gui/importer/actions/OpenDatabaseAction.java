@@ -223,9 +223,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
-    /// This is the real file opening. Should be called via {@link #openFile(Path)}
+    /// This is the real file opening. Should be called via [#openFile(Path)]
     ///
-    /// Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
+    /// Similar method: [org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)].
     ///
     /// @param file the file, may be NOT null, but may not be existing
     private void openTheFile(@NonNull Path file) {

@@ -37,7 +37,7 @@ import org.jspecify.annotations.NonNull;
 /// - active number of search results
 /// - focus owner
 /// - dialog window sizes/positions
-/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+/// - opened AI chat window (controlled by [org.jabref.logic.ai.AiService])
 ///
 public interface StateManager extends SrvStateManager {
 

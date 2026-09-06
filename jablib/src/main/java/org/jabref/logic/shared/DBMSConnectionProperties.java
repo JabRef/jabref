@@ -12,7 +12,7 @@ import org.jabref.logic.shared.security.Password;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.
+/// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);
@@ -32,7 +32,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     // Not needed for connection, but stored for future login
     private String keyStore;
 
-    /// Gets all required data from {@link SharedDatabasePreferences} and sets them if present.
+    /// Gets all required data from [SharedDatabasePreferences] and sets them if present.
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
         if (prefs.getType().isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(prefs.getType().get());

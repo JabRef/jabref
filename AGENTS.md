@@ -133,7 +133,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax instead of JavaDoc inline tags or HTML formatting tags: `` `code` `` instead of `{@code code}` or `<code>code</code>`, `[ClassName]` instead of `{@link ClassName}`, and fenced code blocks (```` ``` ````) instead of `<pre><code>`.
 
 ### Comments
 
@@ -386,7 +386,7 @@ npx markdownlint-cli2 "*.md"
 Tests requiring external resources have dedicated tasks:
 
 - `./gradlew databaseTest` — requires PostgreSQL
-- `./gradlew fetcherTest` — hits live external APIs
+- `./gradlew externalServicesTest` — hits live external APIs
 
 Fetcher tests must always hit the live endpoints — do not mock or stub the remote API in fetcher tests.
 
@@ -443,6 +443,23 @@ When a significant design or implementation decision is made, create a new MADR 
 2. Fill in **Context and Problem Statement**, **Considered Options**, and **Decision Outcome**.
 3. Add an entry to `docs/decisions/index.md`.
 
+To link code to a decision, give the ADR an OpenFastTrace identifier directly below its title (no blank line in between)
+and declare what has to cover it:
+
+```markdown
+# Hardcode `StandardField` names
+`adr~hardcode-fieldnames~1`
+
+Needs: impl
+```
+
+```java
+// [impl->adr~hardcode-fieldnames~1]
+```
+
+The identifier's name part must not start with a digit, so drop the file's number prefix.
+Add `<!-- markdownlint-disable-file MD022 -->` at the end of the ADR.
+
 See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.md) for the rationale and [adr-template.md](docs/decisions/adr-template.md) for the full template.
 
 ---
@@ -492,12 +509,14 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 ## Documentation
 
 - Add a CHANGELOG.md entry only if the change is visible to the user.
+- Do not add an entry when fixing something that was itself introduced after the last release (e.g. a bug in a feature that only exists in `## [Unreleased]`) — users of the last release never saw the bug. Instead, update the existing unreleased entry if the fix changes what it should say.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
 - **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
 - Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
+- Within the section, sort the entry in next to existing entries about the same component or feature (e.g. a jabkit fix goes next to the other jabkit fixes) instead of appending it at the end.
 - Do not add extra blank lines in CHANGELOG.md
-- Do not reorder or reword existing entries, and do not create a new version heading.
+- Do not reorder or reword existing entries (except the unreleased entry your fix relates to, per the rule above), and do not create a new version heading.
 - CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
 - When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
@@ -531,6 +550,8 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/code-howtos/` — localization, testing, fetchers, tools
 - `docs/decisions/` — Architecture Decision Records
 - `docs/requirements/` — Requirements (OpenFastTrace)
+
+When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
 
 ---
 

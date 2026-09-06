@@ -8,7 +8,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 
 import org.jspecify.annotations.Nullable;
 
-/// {@link EntriesAddedEvent} is fired when at least {@link BibEntry} is being added to the {@link org.jabref.model.database.BibDatabase}.
+/// [EntriesAddedEvent] is fired when at least [BibEntry] is being added to the [org.jabref.model.database.BibDatabase].
 public class EntriesAddedEvent extends EntriesEvent {
 
     // firstEntry used by listeners that used to listen to AllInsertsFinishedEvent

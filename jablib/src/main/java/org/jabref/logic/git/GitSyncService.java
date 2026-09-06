@@ -127,11 +127,13 @@ public class GitSyncService {
     /// Phase-2: finalize after GUI saved the file with applied plan.
     ///
     /// Responsibilities:
+    ///
     /// - (Re)open repo, stage bib file
     /// - For BEHIND: fast-forward or create commit consistent with GUI-saved tree
     /// - For DIVERGED: merge commit with parents (localHead, remote)
     ///
     /// Preconditions:
+    ///
     /// - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
     /// - No uncommitted unrelated changes
     public BookkeepingResult finalizeMerge(Path bibFilePath,
@@ -150,7 +152,7 @@ public class GitSyncService {
         gitHandler.fetchOnCurrentBranch();
 
         if (GitStatusChecker.isRemoteEmpty(gitHandler)) {
-            // [impl->req~ux.git-push.empty-remote~1]
+            // [impl->req~git.push.empty-remote~1]
             gitHandler.pushCurrentBranchCreatingUpstream();
             return PushResult.pushed();
         }

@@ -22,7 +22,7 @@ public class SelfContainedSaveOrder extends SaveOrder {
 
     /// Converts a SaveOrder to a SelfContainedSaveOrder
     ///
-    /// @throws IllegalArgumentException if `saveOrder` has {@link OrderType#TABLE}
+    /// @throws IllegalArgumentException if `saveOrder` has [OrderType#TABLE]
     public static SelfContainedSaveOrder of(SaveOrder saveOrder) {
         if (saveOrder instanceof SelfContainedSaveOrder order) {
             return order;

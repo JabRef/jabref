@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// @FetcherTest("Downloads a PDF file")
+// @ExternalServicesTest("Downloads a PDF file")
 class LinkedFilesEditorViewModelTest {
     private LinkedFilesEditorViewModel viewModel;
     private final GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -34,7 +34,7 @@ class LinkedFilesEditorViewModelTest {
     private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
-    @Disabled("Runs in UI AND downloads data. This causes troubles. If @FetcherTest: UI framework cannot be started. If GuiTest: Too many connection errors")
+    @Disabled("Runs in UI AND downloads data. This causes troubles. If @ExternalServicesTest: UI framework cannot be started. If GuiTest: Too many connection errors")
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");

@@ -31,8 +31,8 @@ public class ListUtil {
         return true;
     }
 
-    /// Extract all {@link LinkedFile}s from a list of {@link BibEntry}s.
-    /// The result is a stream of distinct {@link LinkedFile}s.
+    /// Extract all [LinkedFile]s from a list of [BibEntry]s.
+    /// The result is a stream of distinct [LinkedFile]s.
     public static Stream<LinkedFile> getLinkedFiles(Iterable<BibEntry> entries) {
         return StreamSupport
                 .stream(entries.spliterator(), false)

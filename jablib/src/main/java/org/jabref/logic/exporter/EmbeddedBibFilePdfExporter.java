@@ -83,7 +83,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         embedBibTex(bibString, file);
     }
 
-    /// Similar method: {@link org.jabref.logic.xmp.XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
+    /// Similar method: [org.jabref.logic.xmp.XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)]
     private void embedBibTex(String bibTeX, Path path) throws IOException {
         if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;

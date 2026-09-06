@@ -25,10 +25,10 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A very simple implementation of the {@link TaskExecutor} interface.
+/// A very simple implementation of the [TaskExecutor] interface.
 /// Every submitted task is invoked in a separate thread.
 ///
-/// In case something does not interact well with JavaFX, you can use the {@link org.jabref.logic.util.HeadlessExecutorService}
+/// In case something does not interact well with JavaFX, you can use the [org.jabref.logic.util.HeadlessExecutorService]
 public class UiTaskExecutor implements TaskExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UiTaskExecutor.class);
@@ -59,9 +59,9 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
-    /// Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
+    /// Runs the specified [Runnable] on the JavaFX application thread and waits for completion.
     ///
-    /// @param action the {@link Runnable} to run
+    /// @param action the [Runnable] to run
     /// @throws NullPointerException if `action` is `null`
     public static void runAndWaitInJavaFXThread(@NonNull Runnable action) {
         // Run synchronously on JavaFX thread
@@ -105,7 +105,7 @@ public class UiTaskExecutor implements TaskExecutor {
         Platform.runLater(runnable);
     }
 
-    /// This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
+    /// This will convert the given [BackgroundTask] to a JavaFX [Task]
     /// The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
     ///
     /// @param task the BackgroundTask to run
@@ -128,8 +128,7 @@ public class UiTaskExecutor implements TaskExecutor {
         return execute(javafxTask);
     }
 
-    /// Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
-    /// #execute(BackgroundTask)}.
+    /// Runs the given task and returns a Future representing that task. Usually, you want to use the other method [#execute(BackgroundTask)].
     ///
     /// @param <V>  type of return value of the task
     /// @param task the task to run
@@ -162,7 +161,7 @@ public class UiTaskExecutor implements TaskExecutor {
         return throttler;
     }
 
-    /// Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
+    /// Generates a wrapper with a JavaFX [Task] for our BackgroundTask monitoring the progress based on the data given from the task.
     /// `call` is routed to the given task object.
     ///
     /// @param task the BackgroundTask to wrap

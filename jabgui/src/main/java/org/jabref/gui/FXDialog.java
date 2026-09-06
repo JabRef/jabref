@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -15,11 +16,11 @@ import com.airhacks.afterburner.injection.Injector;
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
 /// To create a custom JavaFX dialog one should create an instance of this class and set a dialog
-/// pane through the inherited {@link javafx.scene.control.Dialog#setDialogPane(Dialojavafx.scene.control.DialogPanegPane)} method.
-/// The dialog can be shown via {@link javafx.scene.control.Dialog#show()} or {@link javafx.scene.control.Dialog#showAndWait()}.
+/// pane through the inherited [javafx.scene.control.Dialog#setDialogPane(javafx.scene.control.DialogPane)] method.
+/// The dialog can be shown via [javafx.scene.control.Dialog#show()] or [javafx.scene.control.Dialog#showAndWait()].
 ///
 /// The layout of the pane should be defined in an external fxml file and loaded it via the
-/// {@link javafx.fxml.FXMLLoader}.
+/// [javafx.fxml.FXMLLoader].
 public class FXDialog extends Alert {
 
     public FXDialog(AlertType type, String title, Image image, boolean isModal) {
@@ -55,10 +56,11 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        dialogWindow.getScene().setOnKeyPressed(event -> {
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 dialogWindow.close();
+                event.consume();
             }
         });
         this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));

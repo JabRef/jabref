@@ -103,6 +103,14 @@ tasks.generateGrammarSource {
 evaluationDependsOn(":versions")
 val jbangVersion = project(":versions").extra["jbangVersion"] as String
 
+tasks.withType<JBangTask>().configureEach {
+    version = jbangVersion
+    // The plugin defaults installDir to <user.home>/.gradle/caches/jbang, ignoring GRADLE_USER_HOME.
+    // On the Windows CI runners GRADLE_USER_HOME is D:\a\.gradle, so JBang ended up outside the
+    // cached Gradle user home and was downloaded from github.com in every run.
+    installDir.set(gradle.gradleUserHomeDir.resolve("caches/jbang"))
+}
+
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
@@ -126,8 +134,6 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
-    version = jbangVersion
-
     val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java")
     script = '"' + generatorScript.asFile.absolutePath + '"'
 
@@ -142,8 +148,6 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     description = "Generates a catalog of all available citation styles"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
-    version = jbangVersion
-
     val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java")
     script = '"' + generatorScript.asFile.absolutePath + '"'
 
@@ -156,10 +160,9 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
+    dependsOn(tasks.named("generateGrammarSource"))
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
-    version = jbangVersion
-
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.file(layout.buildDirectory.file("../src/main/resources/ltwa/ltwa_20210702.csv"))
@@ -310,7 +313,7 @@ tasks.javadoc {
 
 tasks.test {
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "FetcherTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -332,12 +335,12 @@ jmh {
 
 val testSourceSet = sourceSets.test.get()
 
-tasks.register<Test>("fetcherTest") {
+tasks.register<Test>("externalServicesTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
-        includeTags("FetcherTest")
+        includeTags("ExternalServicesTest")
     }
     maxParallelForks = 1
 }
@@ -370,14 +373,14 @@ tasks.register('jacocoPrepare') {
 }
 test.mustRunAfter jacocoPrepare
 databaseTest.mustRunAfter jacocoPrepare
-fetcherTest.mustRunAfter jacocoPrepare
+externalServicesTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
-    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+    dependsOn jacocoPrepare, test, externalServicesTest, databaseTest
 
     executionData files(
             layout.buildDirectory.file('jacoco/test.exec').get().asFile,
-            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/externalServicesTest.exec').get().asFile,
             layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
 
     reports {

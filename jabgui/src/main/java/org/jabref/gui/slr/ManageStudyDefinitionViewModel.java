@@ -262,7 +262,7 @@ public class ManageStudyDefinitionViewModel {
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
 
-    /// Builds a {@link Study} from the current UI state without persisting it.
+    /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
         return new Study(
                 authors,

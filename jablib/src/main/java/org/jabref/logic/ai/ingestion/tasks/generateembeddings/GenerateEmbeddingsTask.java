@@ -8,7 +8,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This task generates embeddings for a {@link LinkedFile}.
+/// This task generates embeddings for a [LinkedFile].
 /// It will check if embeddings were already generated.
 /// And it also will store the embeddings.
 public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {

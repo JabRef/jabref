@@ -27,7 +27,7 @@ public enum CitationCountFetcherType {
         return name;
     }
 
-    /// Parses a constant by name, falling back to {@link #SEMANTIC_SCHOLAR} for unknown/corrupted values.
+    /// Parses a constant by name, falling back to [#SEMANTIC_SCHOLAR] for unknown/corrupted values.
     public static CitationCountFetcherType safeValueOf(String name) {
         try {
             return CitationCountFetcherType.valueOf(name);

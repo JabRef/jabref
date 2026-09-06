@@ -5,7 +5,7 @@ import org.jabref.logic.ai.ingestion.logic.documentsplitting.SlidingWindowDocume
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 
-/// Static factory for creating {@link DocumentSplitter} instances.
+/// Static factory for creating [DocumentSplitter] instances.
 public final class DocumentSplitterFactory {
     private DocumentSplitterFactory() {
         throw new UnsupportedOperationException("cannot instantiate a utility class");

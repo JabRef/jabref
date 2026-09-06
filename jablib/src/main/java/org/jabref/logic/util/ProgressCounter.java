@@ -20,7 +20,7 @@ import ai.djl.util.Progress;
 
 /// Convenient class for managing ETA for background tasks.
 ///
-/// Always call {@link ProgressCounter#stop()} when your task is done, because there is a background timer that
+/// Always call [ProgressCounter#stop()] when your task is done, because there is a background timer that
 /// periodically updates the ETA.
 public class ProgressCounter implements Progress {
 

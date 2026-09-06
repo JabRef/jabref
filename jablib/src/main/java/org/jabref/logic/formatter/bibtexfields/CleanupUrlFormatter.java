@@ -34,7 +34,7 @@ public class CleanupUrlFormatter extends Formatter {
     ///
     /// Method will also try to find a URL placed after "url=" or "to=".
     ///
-    /// The conversion process is the same as executed by {@link URLDecoder} to try to
+    /// The conversion process is the same as executed by [URLDecoder] to try to
     /// take guarantees against code injections.
     ///
     /// The plus sign is replaced by its correspondent code (%2b) to avoid the character

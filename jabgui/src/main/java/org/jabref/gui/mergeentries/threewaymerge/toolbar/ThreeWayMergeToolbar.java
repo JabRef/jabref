@@ -170,8 +170,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     /// Convenience method used to disable diff related views when diff is not selected.
     ///
     ///
-    /// This method is required because {@link EasyBinding} class doesn't have a method to invert a boolean property,
-    /// like {@link javafx.beans.binding.BooleanExpression#not()}
+    /// This method is required because [EasyBinding] class doesn't have a method to invert a boolean property,
+    /// like [javafx.beans.binding.BooleanExpression#not()]
     ///
     public EasyBinding<Boolean> notShowDiffProperty() {
         return showDiffProperty().map(showDiff -> !showDiff);

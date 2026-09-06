@@ -195,6 +195,7 @@ public class CAYWResource {
     }
 
     /// Filter strategy:
+    ///
     /// - Empty input → return everything.
     /// - Valid Search.g4 expression → grammar-based filter via [InMemoryLibrarySearcher].
     /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain
@@ -263,7 +264,15 @@ public class CAYWResource {
             return false;
         }
 
-        if (GraphicsEnvironment.isHeadless()) {
+        boolean headless;
+        try {
+            headless = GraphicsEnvironment.isHeadless();
+        } catch (LinkageError awtUnavailable) {
+            // Native image doesn't bundle AWT libs, so isHeadless() fails to link; treat that as headless.
+            LOGGER.debug("AWT unavailable (native image without bundled AWT libs); treating as headless.", awtUnavailable);
+            headless = true;
+        }
+        if (headless) {
             LOGGER.warn("Rejecting CAYW library path access in headless mode: {}", requestedLibraryPath);
             return false;
         }

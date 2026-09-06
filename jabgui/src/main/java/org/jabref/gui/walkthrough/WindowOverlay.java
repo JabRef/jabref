@@ -282,6 +282,7 @@ class WindowOverlay {
     /// walkthrough.
     ///
     /// This method is necessary because:
+    ///
     /// 1. PopOver is in a separate scene, so the [org.jabref.gui.JabRefGUI]'s
     /// keybindings registration on the main scene doesn't/cannot capture the key events
     /// on the PopOver scene. If a user, presumably, focus on the PopOver and press Esc,

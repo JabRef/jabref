@@ -91,7 +91,7 @@ class MVStoreBibEntryRelationRepositoryTest {
                 .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
-    /// Create a fake list of relations for a bibEntry based on the {@link org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails#toBibEntry()} logic
+    /// Create a fake list of relations for a bibEntry based on the [org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails#toBibEntry()] logic
     /// that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
     /// and mapped as BibEntry will be serializable by the MVStore.
     ///

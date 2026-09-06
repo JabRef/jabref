@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /// Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
 /// when closing a database or quitting the applications.
 ///
-/// The save operation is loaded off of the GUI thread using {@link org.jabref.logic.util.BackgroundTask}. Callers can query whether the
+/// The save operation is loaded off of the GUI thread using [org.jabref.logic.util.BackgroundTask]. Callers can query whether the
 /// operation was canceled, or whether it was successful.
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);

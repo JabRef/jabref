@@ -52,7 +52,7 @@ import picocli.CommandLine;
 /// See [Command Line Interface Guidelines](https://clig.dev/) for general guidelines how to design a good CLI interface.
 ///
 /// It does not open any GUI.
-/// For the GUI application see {@link org.jabref.Launcher}.
+/// For the GUI application see [org.jabref.Launcher].
 ///
 /// Does not do any preference migrations.
 public class JabKitLauncher {

@@ -1053,7 +1053,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    /// Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
@@ -1062,7 +1062,7 @@ public class MedlineImporter extends Importer implements Parser {
         handleText(reader, textList, startElement, result);
     }
 
-    /// Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities of abstracts that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)

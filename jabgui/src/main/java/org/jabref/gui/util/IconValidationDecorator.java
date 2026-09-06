@@ -17,7 +17,7 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 
-/// This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
+/// This class is similar to [GraphicValidationDecoration] but with a different style and font-based icon.
 public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;

@@ -78,7 +78,7 @@ public class GitCommitAction extends SimpleCommand {
         // the link path would misclassify it, and staging the link would commit only the symlink.
         Path libraryFile = GitHandler.resolveToRealPath(bibFilePath);
 
-        // [impl->req~ux.git-commit.initialize-repository~1]
+        // [impl->req~git.commit.initialize-repository~1]
         if (GitHandler.findRepositoryRoot(libraryFile).isEmpty()) {
             initRepository(libraryFile);
             return;

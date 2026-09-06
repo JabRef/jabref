@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jspecify.annotations.NullMarked;
 
-/// View representation of {@link org.jabref.model.study.StudyCatalog}
+/// View representation of [org.jabref.model.study.StudyCatalog]
 @NullMarked
 public class StudyCatalogItem {
     private final StringProperty name;

@@ -31,9 +31,9 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
     /// Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
     ///
     /// <h4>Example</h4>
-    /// <pre>{@code
+    /// ```text
     /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
-    /// }</pre>
+    /// ```
     @Override
     public String format(@NonNull String value) {
         if (value.isEmpty()) {

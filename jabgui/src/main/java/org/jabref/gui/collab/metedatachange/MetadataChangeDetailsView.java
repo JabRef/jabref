@@ -21,13 +21,14 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
     public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
-        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"));
+        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"), DiffHighlighter.BasicDiffMethod.CHARS);
     }
 
     public MetadataChangeDetailsView(MetadataChange metadataChange,
                                      GlobalCitationKeyPatterns globalCitationKeyPatterns,
                                      String leftLabelText,
-                                     String rightLabelText) {
+                                     String rightLabelText,
+                                     DiffHighlighter.BasicDiffMethod diffMethod) {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
@@ -36,7 +37,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
         // Add views for each detected difference
         for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {
-            addDifferenceView(container, diff, metadataChange, leftLabelText, rightLabelText);
+            addDifferenceView(container, diff, metadataChange, leftLabelText, rightLabelText, diffMethod);
         }
 
         this.setAllAnchorsAndAttachChild(container);
@@ -52,14 +53,15 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                                    MetaDataDiff.Difference diff,
                                    MetadataChange metadataChange,
                                    String leftLabelText,
-                                   String rightLabelText) {
+                                   String rightLabelText,
+                                   DiffHighlighter.BasicDiffMethod diffMethod) {
         Label typeLabel = new Label(getDifferenceString(diff.differenceType()));
         typeLabel.getStyleClass().add("diff-type-label");
         container.getChildren().add(typeLabel);
 
         // Show appropriate view based on difference type
         if (diff.differenceType() == MetaDataDiff.DifferenceType.GROUPS) {
-            container.getChildren().add(createGroupDiffSplitPane(metadataChange, leftLabelText, rightLabelText));
+            container.getChildren().add(createGroupDiffSplitPane(metadataChange, leftLabelText, rightLabelText, diffMethod));
         } else {
             container.getChildren().add(createDefaultDiffScrollPane(diff));
         }
@@ -85,7 +87,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     ///
     /// @param metadataChange The metadata change containing groups differences
     /// @return Configured SplitPane showing groups differences
-    private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange, String leftLabelText, String rightLabelText) {
+    private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
         StyleClassedTextArea jabrefTextArea = createConfiguredTextArea();
         StyleClassedTextArea diskTextArea = createConfiguredTextArea();
 
@@ -95,11 +97,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         jabrefTextArea.replaceText(jabRefContent);
         diskTextArea.replaceText(diskContent);
 
-        SplitDiffHighlighter highlighter = new SplitDiffHighlighter(
-                jabrefTextArea,
-                diskTextArea,
-                DiffHighlighter.BasicDiffMethod.CHARS
-        );
+        SplitDiffHighlighter highlighter = new SplitDiffHighlighter(jabrefTextArea, diskTextArea, diffMethod);
         highlighter.highlight();
 
         ScrollPane leftScrollPane = createScrollPane(jabrefTextArea);

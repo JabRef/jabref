@@ -29,7 +29,7 @@ public final class TokenEstimatorFactory {
         };
     }
 
-    /// Convenience overload that reads the kind from {@link AiPreferences}.
+    /// Convenience overload that reads the kind from [AiPreferences].
     public static TokenEstimator create(AiPreferences aiPreferences) {
         return create(aiPreferences.getTokenEstimatorKind());
     }

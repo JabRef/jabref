@@ -165,7 +165,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
 
     /// Resets the chat model and summarizator to the default values from AI preferences.
     /// Called before generating a summary to ensure default models are used
-    /// (as opposed to a custom summarizator set by {@link #regenerateCustom()}).
+    /// (as opposed to a custom summarizator set by [#regenerateCustom()]).
     private void setDefaultModels() {
         summarizator.unbind();
         setupSummarizatorBinding();

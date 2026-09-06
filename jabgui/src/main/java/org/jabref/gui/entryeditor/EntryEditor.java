@@ -67,7 +67,7 @@ import org.jspecify.annotations.Nullable;
 /// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
 /// the text fields to update themselves if the change is made from somewhere else.
 ///
-/// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
+/// The editors for fields are created via [org.jabref.gui.fieldeditors.FieldEditors].
 public class EntryEditor extends BorderPane implements PreviewControls {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
