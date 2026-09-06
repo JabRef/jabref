@@ -152,6 +152,7 @@ public class CitationsRelationsTabViewModel {
             return;
         }
 
+        status.set(SciteStatus.IN_PROGRESS);
         searchTask = BackgroundTask.wrap(() -> sciteAiFetcher.fetchTallies(entry.getDOI().get()))
                                    .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
                                    .onSuccess(result -> {
@@ -166,11 +167,13 @@ public class CitationsRelationsTabViewModel {
     }
 
     private void cancelSearch() {
+        currentResult = Optional.empty();
+        status.set(SciteStatus.IN_PROGRESS);
+
         if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
             return;
         }
 
-        status.set(SciteStatus.IN_PROGRESS);
         searchTask.cancel(false);
     }
 

@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -176,5 +177,29 @@ class CitationsRelationsTabViewModelTest {
                 new CitationRelationItem(firstEntryToImport, false));
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
         assertEquals(citationItems.getFirst().entry(), viewModel.lastImportedEntryProperty().get());
+    }
+
+    @Test
+    void bindToEntryWithoutDoiSetsDoiMissingStatus() {
+        BibEntry entryWithoutDoi = new BibEntry(StandardEntryType.Article);
+        viewModel.bindToEntry(entryWithoutDoi);
+        assertEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
+    }
+
+    @Test
+    void bindToNullEntrySetsErrorStatus() {
+        viewModel.bindToEntry(null);
+        assertEquals(CitationsRelationsTabViewModel.SciteStatus.ERROR, viewModel.statusProperty().get());
+    }
+
+    @Test
+    void bindToEntryTransitionFromNoDoiToDoiResetsStatus() {
+        BibEntry entryWithoutDoi = new BibEntry(StandardEntryType.Article);
+        viewModel.bindToEntry(entryWithoutDoi);
+        assertEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
+
+        BibEntry entryWithDoi = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, "10.1000/182");
+        viewModel.bindToEntry(entryWithDoi);
+        assertNotEquals(CitationsRelationsTabViewModel.SciteStatus.DOI_MISSING, viewModel.statusProperty().get());
     }
 }
