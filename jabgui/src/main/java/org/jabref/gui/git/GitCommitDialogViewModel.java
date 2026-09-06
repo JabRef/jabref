@@ -199,7 +199,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         if (GitExceptionUtil.isLockFailure(throwable)) {
             return Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again.");
         }
-        return Localization.lang("Could not create the Git commit. Please check the repository and try again.");
+        return Localization.lang("Could not commit the changes. Please check the repository and try again.");
     }
 
     private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
