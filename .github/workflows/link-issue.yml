@@ -121,28 +121,72 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
-      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: jq
           version: 1.0
-      - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
+      - name: Count previous strikes of the PR author
+        id: strikes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STRANGE_USERS: ${{ secrets.STRANGE_USERS }}
+        run: |
+          set -euo pipefail
+          STRANGE_USERS="${STRANGE_USERS:-}"
+          [ -n "$STRANGE_USERS" ] || STRANGE_USERS='{}'
+          COUNT=$(jq --arg u "$PR_AUTHOR" '(.[$u] // []) | length' <<< "$STRANGE_USERS")
+          echo "Author '$PR_AUTHOR' has $COUNT strike(s)."
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          # Three strikes: the PR is closed and nothing else (labels, assignment) happens.
+          if [ "$COUNT" -ge 3 ]; then
+            echo "blocked=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "blocked=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Close PR of a repeatedly conspicuous author
+        if: steps.strikes.outputs.blocked == 'true'
+        run: |
+          set -euo pipefail
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
+          gh pr close "$PR_NUMBER" --repo "$REPO"
+      - name: Check whether the PR author is assigned to the issue
+        id: assignment
+        if: steps.strikes.outputs.blocked != 'true'
+        run: |
+          set -euo pipefail
+          ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]')
+          echo "Assignees of issue #$ISSUE_NUMBER: $ASSIGNEES"
+          if [ "$(jq 'length' <<< "$ASSIGNEES")" -eq 0 ] || jq -e --arg u "$PR_AUTHOR" 'index($u)' <<< "$ASSIGNEES" > /dev/null; then
+            echo "author_assigned=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "author_assigned=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "assignees=$ASSIGNEES" >> "$GITHUB_OUTPUT"
+      - name: Add label "📌 Pinned"
+        if: steps.assignment.outputs.author_assigned == 'true'
+        run: gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "📌 Pinned"
       - name: Assign PR creator to issue
+        if: steps.assignment.outputs.author_assigned == 'true'
+        env:
+          ASSIGNEES: ${{ steps.assignment.outputs.assignees }}
         run: |
           set -e
 
-          echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
+          echo "Updating issue '$ISSUE_NUMBER'"
 
 
           # Copy over labels from issue to PR if they match good first/second/third/forth issue or component:* labels
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABELS=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/labels" --jq '.[].name')
 
           # Check for good first/second/.. issue label
           LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
@@ -154,13 +198,13 @@ jobs:
             SILENT=false
             if [ -n "$LABEL" ]; then
               echo "✅ Found label: $LABEL"
-              gh pr edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+              gh pr edit "$PR_NUMBER" --add-label "$LABEL"
             fi
             if [ -n "$COMPONENT_LABELS" ]; then
               echo "✅ Found component labels:"
               while IFS= read -r COMPONENT_LABEL; do
                 echo "   - $COMPONENT_LABEL"
-                gh pr edit "${{ github.event.pull_request.number }}" --add-label "$COMPONENT_LABEL"
+                gh pr edit "$PR_NUMBER" --add-label "$COMPONENT_LABEL"
               done <<< "$COMPONENT_LABELS"
             fi
           else
@@ -171,24 +215,70 @@ jobs:
 
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
-          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
-
           # Check if the user is already assigned
-          if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
-            echo "User '${{ github.event.pull_request.user.login }}' is already an assignee. No update needed."
+          if echo "$ASSIGNEES" | jq -e --arg u "$PR_AUTHOR" 'index($u)' >/dev/null; then
+            echo "User '$PR_AUTHOR' is already an assignee. No update needed."
             echo "Debug: $ASSIGNEES"
             exit 0
           fi
 
           # Append the new assignee
-          UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
+          UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "$PR_AUTHOR" '. + [$new]')
 
           # Update issue with the new assignee list
-          echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
+          echo "Updating issue #$ISSUE_NUMBER updated with assignees: $UPDATED_ASSIGNEES..."
           if [ "$SILENT" = true ]; then
-            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
+            gh api -X PATCH "/repos/$REPO/issues/$ISSUE_NUMBER" --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
           else
-            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+            gh api -X PATCH "/repos/$REPO/issues/$ISSUE_NUMBER" --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
           fi
+      - name: Warn about PR on an issue assigned to somebody else
+        id: warn
+        if: steps.assignment.outputs.author_assigned == 'false'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSIGNEES: ${{ steps.assignment.outputs.assignees }}
+        run: |
+          set -euo pipefail
+
+          # The workflow also runs on "edited"/"synchronize"; the marker keeps the warning (and the strike) a one-time event per PR.
+          MARKER='<!-- pr-on-foreign-issue -->'
+          if gh pr view "$PR_NUMBER" --repo "$REPO" --json comments --jq '.comments[].body' | grep -qF "$MARKER"; then
+            echo "Already warned."
+            echo "warned=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          MENTIONS=$(jq -r 'map("@" + .) | join(", ")' <<< "$ASSIGNEES")
+
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$MARKER
+          Hi @$PR_AUTHOR, issue #$ISSUE_NUMBER is assigned to $MENTIONS, not to you. Please only work on issues assigned to you - see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md). The issue stays with its assignee and this pull request may be closed without review."
+
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "@$PR_AUTHOR opened #$PR_NUMBER for this issue without being assigned. $MENTIONS: this does not affect your assignment."
+
+          echo "warned=true" >> "$GITHUB_OUTPUT"
+      - name: Record strike in STRANGE_USERS
+        id: record
+        if: steps.warn.outputs.warned == 'true'
+        env:
+          STRANGE_USERS: ${{ secrets.STRANGE_USERS }}
+          GH_TOKEN_STRANGE_USERS: ${{ secrets.GH_TOKEN_STRANGE_USERS }}
+        run: |
+          set -euo pipefail
+          STRANGE_USERS="${STRANGE_USERS:-}"
+          [ -n "$STRANGE_USERS" ] || STRANGE_USERS='{}'
+          UPDATED=$(jq -c --arg u "$PR_AUTHOR" --arg d "$(date -u +%F)" --arg pr "$PR_NUMBER" --arg issue "$ISSUE_NUMBER" \
+            '.[$u] = ((.[$u] // []) + [{date: $d, pr: $pr, reason: ("PR on issue #" + $issue + " assigned to somebody else")}])' \
+            <<< "$STRANGE_USERS")
+          COUNT=$(jq --arg u "$PR_AUTHOR" '.[$u] | length' <<< "$UPDATED")
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ -z "${GH_TOKEN_STRANGE_USERS:-}" ]; then
+            echo "::warning::Secret GH_TOKEN_STRANGE_USERS is not set - strike for '$PR_AUTHOR' not persisted."
+            exit 0
+          fi
+          GH_TOKEN="$GH_TOKEN_STRANGE_USERS" gh secret set STRANGE_USERS --repo "$REPO" --body "$UPDATED"
+      - name: Close PR after the third strike
+        if: steps.record.outputs.count >= 3
+        run: |
+          set -euo pipefail
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
+          gh pr close "$PR_NUMBER" --repo "$REPO"
