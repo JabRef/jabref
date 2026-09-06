@@ -67,23 +67,6 @@ class UndoRedoActionTest {
         redoAction = new RedoAction(mock(DialogService.class), stateManager);
     }
 
-    private static BibDatabaseContext libraryAt(String fileName) {
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(Path.of(fileName));
-        return context;
-    }
-
-    private void showLibrary(LibraryTab tab, BibDatabaseContext context) {
-        activeTab.set(Optional.of(tab));
-        activeDatabase.set(Optional.of(context));
-    }
-
-    private UndoableFieldChange setAuthor(BibEntry entry, String value) {
-        String before = entry.getField(StandardField.AUTHOR).orElse(null);
-        entry.setField(StandardField.AUTHOR, value);
-        return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
-    }
-
     @Test
     void undoReversesTheChangeInTheActiveLibraryOnly() {
         // [utest->req~logic.undo.journal-per-library~1]
@@ -162,5 +145,22 @@ class UndoRedoActionTest {
     void executingWithNoLibraryOpenDoesNothing() {
         assertDoesNotThrow(() -> undoAction.execute());
         assertDoesNotThrow(() -> redoAction.execute());
+    }
+
+    private static BibDatabaseContext libraryAt(String fileName) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(Path.of(fileName));
+        return context;
+    }
+
+    private void showLibrary(LibraryTab tab, BibDatabaseContext context) {
+        activeTab.set(Optional.of(tab));
+        activeDatabase.set(Optional.of(context));
+    }
+
+    private UndoableFieldChange setAuthor(BibEntry entry, String value) {
+        String before = entry.getField(StandardField.AUTHOR).orElse(null);
+        entry.setField(StandardField.AUTHOR, value);
+        return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
     }
 }
