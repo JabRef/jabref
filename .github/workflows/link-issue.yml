@@ -251,5 +251,16 @@ jobs:
         if: steps.record.outputs.count >= 3
         run: |
           set -euo pipefail
-          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
-          gh pr close "$PR_NUMBER" --repo "$REPO"
+
+          # The count is the ledger total, so it stays at three on later events of the same pull request. The
+          # notice is therefore posted at most once, while a reopened pull request is closed again.
+          CLOSE_MARKER="<!-- pr-closed-after-third-incident -->"
+          PR_COMMENTS=$(gh api "/repos/$REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+          if ! grep -qF "$CLOSE_MARKER" <<< "$PR_COMMENTS"; then
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$CLOSE_MARKER
+          Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
+          fi
+
+          if [ "$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')" = 'OPEN' ]; then
+            gh pr close "$PR_NUMBER" --repo "$REPO"
+          fi
