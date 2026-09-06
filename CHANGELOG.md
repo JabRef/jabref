@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
 - We added a per-library keyword separator to the library properties, so opening a library no longer rewrites keyword fields. [#16835](https://github.com/JabRef/jabref/pull/16835)
 - We added a "Normalize keyword delimiters" cleanup and save action that rewrites keyword fields to the keyword separator of the library. [#16835](https://github.com/JabRef/jabref/pull/16835)
 - We added a "Commit and push" button which allows to commit and then push in one go for Git operations. [#16339](https://github.com/JabRef/jabref/issues/16339)
@@ -219,7 +220,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
 - Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
 - We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
