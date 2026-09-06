@@ -51,7 +51,6 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
@@ -103,7 +102,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -131,7 +129,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        GuiPreferences preferences,
                        AiService aiService,
                        StateManager stateManager,
-                       GuiUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
@@ -143,7 +140,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -162,7 +158,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, this);
@@ -177,14 +172,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this,
                 stateManager,
                 this.preferences,
-                undoManager,
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+                new UndoAction(dialogService, stateManager),
+                new RedoAction(dialogService, stateManager));
         Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.sidePane = new SidePane(
@@ -198,7 +192,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                gitHandlerRegistry);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -240,8 +234,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                gitHandlerRegistry);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -255,7 +249,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 journalAbbreviationRepository,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 this::getOpenDatabaseAction,
                 aiService,
@@ -565,9 +558,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 fileHistory,
                 Injector.instantiateModelOrService(BuildInfo.class),
                 preferences.getWorkspacePreferences());
@@ -588,9 +581,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         addTab(libraryTab, raisePanel);
     }
 
@@ -692,9 +685,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
     }
 
     /// Refreshes the ui after preferences changes

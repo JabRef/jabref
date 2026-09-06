@@ -24,9 +24,9 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -83,10 +83,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -103,10 +103,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
-                                              JournalAbbreviationRepository journalAbbreviationRepository) {
+                                              JournalAbbreviationRepository journalAbbreviationRepository,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -114,10 +114,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         // In expert mode the JDBC URL replaces host, port, and database; re-run their validators on toggling
         EasyBind.subscribe(expertMode, _ -> {
@@ -228,9 +228,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
 
         loading.set(true);
         BackgroundTask.wrap(() -> manager.connect(connectionProperties))

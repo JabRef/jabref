@@ -4,7 +4,8 @@
 * - Always loaded by JabRef, on top of the active theme
 * - Contains UI specific styles independent from any theme
 * - Contains styling for custom JavaFX components
-* - Contains generic style classes ready to be used
+* - Contains generic style classes ready to be used (see below). They and the
+*   component styles never declare the same property, so their order is free.
 * ==========
 * This file declares NO colors. Every color it uses comes from a `-color-*` token that the
 * active theme declares per color scheme (see jabref-theme.css for the full token contract).
@@ -40,6 +41,177 @@
     -color-ai-message-error: -color-danger;
     -color-ai-message-error-border: derive(-color-danger, -40%);
 }
+
+/* ==========================================================================
+ * Generic utility classes
+ * --------------------------------------------------------------------------
+ * These are the only style classes that are allowed to declare spacing and
+ * typography. Every other style class in this file describes what a component
+ * *looks* like (fills, borders, radii, effects) and leaves how much room it
+ * takes up to the utilities below, applied from FXML or Java.
+ *
+ * Spacing scale: the number in a class name is the size in pixels at the
+ * default root font (9pt = 12px, see ThemeManager). The value itself is
+ * written in `em`, so all spacing scales with the user's font size setting:
+ *
+ *     0 -> 0          8 -> 0.667em    20 -> 1.667em
+ *     2 -> 0.167em   10 -> 0.833em    24 -> 2em
+ *     4 -> 0.333em   12 -> 1em        32 -> 2.667em
+ *     6 -> 0.5em     16 -> 1.333em
+ *
+ * Font sizes are ALWAYS relative (em) -- never px and never %. The one place
+ * where `-fx-font-size` survives outside this block is on `.glyph-icon` /
+ * `.ikonli-font-icon` selectors: for those the font size *is* the icon size.
+ * ========================================================================== */
+
+/* Type scale */
+.h1 { -fx-font-size: 2em; }
+.h2 { -fx-font-size: 1.75em; }
+.h3 { -fx-font-size: 1.5em; }
+.h4 { -fx-font-size: 1.25em; }
+.h5 { -fx-font-size: 1.1em; }
+.h6 { -fx-font-size: 1em; }
+
+/* Off-scale sizes: below h6 and above h1 */
+.font-size-075 { -fx-font-size: 0.75em; }
+.font-size-090 { -fx-font-size: 0.9em; }
+.font-size-250 { -fx-font-size: 2.5em; }
+
+/* Font style */
+.bold { -fx-font-weight: bold; }
+.normal-weight { -fx-font-weight: normal; }
+.italic { -fx-font-style: italic; }
+.font-monospace { -fx-font-family: monospace; }
+
+/* Text color. Both properties are set so the same class works on a Label
+   (-fx-text-fill), on a Text node inside a TextFlow and on an icon (-fx-fill). */
+.text-accent { -fx-text-fill: -color-accent; -fx-fill: -color-accent; }
+.text-muted { -fx-text-fill: -color-fg-muted; -fx-fill: -color-fg-muted; }
+.text-subtle { -fx-text-fill: -color-fg-subtle; -fx-fill: -color-fg-subtle; }
+.text-emphasis { -fx-text-fill: -color-fg-emphasis; -fx-fill: -color-fg-emphasis; }
+.text-danger { -fx-text-fill: -color-danger; -fx-fill: -color-danger; }
+.text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
+.text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
+
+/* Padding: all sides */
+.padding-0 { -fx-padding: 0; }
+.padding-2 { -fx-padding: 0.167em; }
+.padding-4 { -fx-padding: 0.333em; }
+.padding-6 { -fx-padding: 0.5em; }
+.padding-8 { -fx-padding: 0.667em; }
+.padding-10 { -fx-padding: 0.833em; }
+.padding-12 { -fx-padding: 1em; }
+.padding-16 { -fx-padding: 1.333em; }
+.padding-20 { -fx-padding: 1.667em; }
+.padding-24 { -fx-padding: 2em; }
+.padding-32 { -fx-padding: 2.667em; }
+
+/* Padding: <vertical>-<horizontal> */
+.padding-0-6 { -fx-padding: 0 0.5em; }
+.padding-0-12 { -fx-padding: 0 1em; }
+.padding-2-10 { -fx-padding: 0.167em 0.833em; }
+.padding-2-12 { -fx-padding: 0.167em 1em; }
+.padding-4-0 { -fx-padding: 0.333em 0; }
+.padding-4-6 { -fx-padding: 0.333em 0.5em; }
+.padding-4-8 { -fx-padding: 0.333em 0.667em; }
+.padding-4-10 { -fx-padding: 0.333em 0.833em; }
+.padding-4-12 { -fx-padding: 0.333em 1em; }
+.padding-6-0 { -fx-padding: 0.5em 0; }
+.padding-6-10 { -fx-padding: 0.5em 0.833em; }
+.padding-6-12 { -fx-padding: 0.5em 1em; }
+.padding-6-24 { -fx-padding: 0.5em 2em; }
+.padding-8-0 { -fx-padding: 0.667em 0; }
+.padding-8-10 { -fx-padding: 0.667em 0.833em; }
+.padding-8-12 { -fx-padding: 0.667em 1em; }
+.padding-8-16 { -fx-padding: 0.667em 1.333em; }
+.padding-10-12 { -fx-padding: 0.833em 1em; }
+.padding-10-16 { -fx-padding: 0.833em 1.333em; }
+.padding-12-16 { -fx-padding: 1em 1.333em; }
+.padding-16-24 { -fx-padding: 1.333em 2em; }
+.padding-20-24 { -fx-padding: 1.667em 2em; }
+.padding-32-24 { -fx-padding: 2.667em 2em; }
+
+/* Padding: single side */
+.padding-top-2 { -fx-padding: 0.167em 0 0 0; }
+.padding-top-4 { -fx-padding: 0.333em 0 0 0; }
+.padding-top-6 { -fx-padding: 0.5em 0 0 0; }
+.padding-top-8 { -fx-padding: 0.667em 0 0 0; }
+.padding-top-10 { -fx-padding: 0.833em 0 0 0; }
+.padding-top-12 { -fx-padding: 1em 0 0 0; }
+.padding-top-16 { -fx-padding: 1.333em 0 0 0; }
+.padding-top-20 { -fx-padding: 1.667em 0 0 0; }
+.padding-top-24 { -fx-padding: 2em 0 0 0; }
+.padding-top-32 { -fx-padding: 2.667em 0 0 0; }
+
+.padding-right-2 { -fx-padding: 0 0.167em 0 0; }
+.padding-right-4 { -fx-padding: 0 0.333em 0 0; }
+.padding-right-6 { -fx-padding: 0 0.5em 0 0; }
+.padding-right-8 { -fx-padding: 0 0.667em 0 0; }
+.padding-right-10 { -fx-padding: 0 0.833em 0 0; }
+.padding-right-12 { -fx-padding: 0 1em 0 0; }
+.padding-right-16 { -fx-padding: 0 1.333em 0 0; }
+.padding-right-20 { -fx-padding: 0 1.667em 0 0; }
+.padding-right-24 { -fx-padding: 0 2em 0 0; }
+.padding-right-32 { -fx-padding: 0 2.667em 0 0; }
+
+.padding-bottom-2 { -fx-padding: 0 0 0.167em 0; }
+.padding-bottom-4 { -fx-padding: 0 0 0.333em 0; }
+.padding-bottom-6 { -fx-padding: 0 0 0.5em 0; }
+.padding-bottom-8 { -fx-padding: 0 0 0.667em 0; }
+.padding-bottom-10 { -fx-padding: 0 0 0.833em 0; }
+.padding-bottom-12 { -fx-padding: 0 0 1em 0; }
+.padding-bottom-16 { -fx-padding: 0 0 1.333em 0; }
+.padding-bottom-20 { -fx-padding: 0 0 1.667em 0; }
+.padding-bottom-24 { -fx-padding: 0 0 2em 0; }
+.padding-bottom-32 { -fx-padding: 0 0 2.667em 0; }
+
+.padding-left-2 { -fx-padding: 0 0 0 0.167em; }
+.padding-left-4 { -fx-padding: 0 0 0 0.333em; }
+.padding-left-6 { -fx-padding: 0 0 0 0.5em; }
+.padding-left-8 { -fx-padding: 0 0 0 0.667em; }
+.padding-left-10 { -fx-padding: 0 0 0 0.833em; }
+.padding-left-12 { -fx-padding: 0 0 0 1em; }
+.padding-left-16 { -fx-padding: 0 0 0 1.333em; }
+.padding-left-20 { -fx-padding: 0 0 0 1.667em; }
+.padding-left-24 { -fx-padding: 0 0 0 2em; }
+.padding-left-32 { -fx-padding: 0 0 0 2.667em; }
+
+/* Spacing between the children of an HBox / VBox */
+.spacing-0 { -fx-spacing: 0; }
+.spacing-2 { -fx-spacing: 0.167em; }
+.spacing-4 { -fx-spacing: 0.333em; }
+.spacing-6 { -fx-spacing: 0.5em; }
+.spacing-8 { -fx-spacing: 0.667em; }
+.spacing-10 { -fx-spacing: 0.833em; }
+.spacing-12 { -fx-spacing: 1em; }
+.spacing-16 { -fx-spacing: 1.333em; }
+.spacing-20 { -fx-spacing: 1.667em; }
+.spacing-24 { -fx-spacing: 2em; }
+.spacing-32 { -fx-spacing: 2.667em; }
+
+/* Gap between the cells of a GridPane / FlowPane / TilePane */
+.gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
+.gap-6 { -fx-hgap: 0.5em; -fx-vgap: 0.5em; }
+.gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
+.gap-10 { -fx-hgap: 0.833em; -fx-vgap: 0.833em; }
+.gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
+.gap-16 { -fx-hgap: 1.333em; -fx-vgap: 1.333em; }
+.gap-20 { -fx-hgap: 1.667em; -fx-vgap: 1.667em; }
+.gap-24 { -fx-hgap: 2em; -fx-vgap: 2em; }
+
+/* Alignment */
+.align-center { -fx-alignment: center; }
+.align-center-left { -fx-alignment: center-left; }
+.align-center-right { -fx-alignment: center-right; }
+.align-top-left { -fx-alignment: top-left; }
+.align-top-center { -fx-alignment: top-center; }
+.align-top-right { -fx-alignment: top-right; }
+.align-baseline-left { -fx-alignment: baseline-left; }
+.align-baseline-center { -fx-alignment: baseline-center; }
+
+/* Surface */
+.bg-transparent { -fx-background-color: transparent; }
+.bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
 
 /* JavaFX with custom components */
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon,
@@ -132,10 +304,6 @@
 
 /* Custom styles */
 
-.font-size-075 {
-    -fx-font-size: 0.75em;
-}
-
 .unchanged,
 .text-unchanged {
     -fx-fill: -color-fg-emphasis;
@@ -149,36 +317,15 @@
     -rtfx-background-color: -color-danger;
 }
 
-.bold {
-    -fx-font-weight: bold;
-}
-
-.italic {
-    -fx-font-style: italic;
-}
-
-.bordered {
-    -fx-border-width: 1;
-    -fx-border-color: -color-border-default;
-}
-
-.bg-transparent {
-    -fx-background-color: transparent;
-}
-
-.padding-right-15 {
-    -fx-padding: 0 15 0 0;
-}
-
 .merge-header-cell {
     -fx-border-color: -color-border-default;
+    -fx-border-width: 0 0 1 0;
     -fx-background-color: -color-bg-alt;
 }
 
 .merge-header {
-    -fx-background-color: -color-bg-alt;
+    -fx-background-color: -color-bg-secondary;
 }
-
 
 .global-search-bar .toggle-button .glyph-icon {
     -fx-icon-color: derive(-fx-text-base-color, 80%);
@@ -196,10 +343,7 @@
     -fx-fill: -fx-text-base-color;
 }
 
-.walkthrough-spotlight {
-    -fx-fill: -color-scrim;
-}
-
+.walkthrough-spotlight,
 .walkthrough-darken {
     -fx-fill: -color-scrim;
 }
@@ -239,8 +383,6 @@
     -fx-border-color: -color-accent-subtle;
 }
 
-.icon-buttonNoSpaceBottom,
-.icon-buttonNoSpaceTop,
 .icon-button {
     -fx-border-width: 0;
     -fx-background: transparent;
@@ -248,15 +390,11 @@
     -fx-padding: 0.5em;
 }
 
-.icon-buttonNoSpaceBottom:hover,
-.icon-buttonNoSpaceTop:hover,
 .icon-button:hover {
     -fx-background: -color-overlay-hover;
     -fx-background-color: -color-overlay-hover;
 }
 
-.icon-buttonNoSpaceBottom:armed,
-.icon-buttonNoSpaceTop:armed,
 .icon-button:armed {
     -fx-background: -color-overlay-armed;
     -fx-background-color: -color-overlay-armed;
@@ -273,13 +411,18 @@
     -fx-opacity: 0.4;
 }
 
-.icon-buttonNoSpaceBottom {
-    -fx-border-width: 0;
+/* Selected state is signalled by the icon color alone (set in code), not by a background. */
+.addEntryButton:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -color-selection;
+}
+
+
+.icon-button.no-space-bottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
 }
 
-.icon-buttonNoSpaceTop {
-    -fx-border-width: 0;
+.icon-button.no-space-top {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }
 
@@ -294,25 +437,6 @@
 
 .merge-field-value:disabled .action-icon {
     -fx-opacity: 0%;
-}
-
-.merge-header-cell {
-    -fx-border-width: 0 0 1 0;
-}
-
-.merge-header {
-    -fx-background-color: -color-bg-secondary;
-}
-
-.lib-change-header {
-    -fx-font-size: 130%;
-    -fx-padding: 0.2em 0em 0.2em 0.2em;
-}
-
-.lib-change-legend {
-    -fx-font-size: 11px;
-    -fx-text-fill: -color-fg-subtle;
-    -fx-padding: 4 0 0 5;
 }
 
 .lib-change-text-area {
@@ -340,6 +464,25 @@
     -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
+/* File found in the file directory but not (yet) linked in the entry.
+   Deliberately not -color-warning-subtle: orange signals "linked but not found".
+   -color-selection-inactive is a neutral gray that stays readable in dark themes,
+   where a translucent black fill would sink into the panel background. */
+.linked-files-list .list-cell:auto-found {
+    -fx-background-color: -color-selection-inactive;
+    -fx-background-radius: 4px;
+}
+
+/* The suggestion background must not mask the list's interaction affordances
+   (same colors the themes use for cell hover and selection). */
+.linked-files-list .list-cell:auto-found:filled:hover {
+    -fx-background-color: -color-border-default;
+}
+
+.linked-files-list .list-cell:auto-found:filled:selected {
+    -fx-background-color: -color-selection;
+}
+
 /* Sidepane */
 
 .sidePaneComponent {
@@ -347,7 +490,6 @@
 }
 
 .sidePaneComponentHeader {
-    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: 3em;
 }
 
@@ -365,14 +507,6 @@
     -fx-icon-color: -color-accent;
 }
 
-.progress-indicatorToolbar {
-    -fx-padding: 0.5em;
-}
-
-.progress-indicatorToolbar .percentage {
-    -fx-fill: null;
-}
-
 .mainMenu {
     -fx-background-color: -color-bg-tertiary;
     -fx-background-insets: 0;
@@ -386,10 +520,6 @@
     -fx-background-color: -color-bg-tertiary;
     -fx-border-color: derive(-color-bg-tertiary, 50%);
     -fx-border-width: 0;
-}
-
-.mainToolbar .icon-button {
-    -fx-padding: 0.5em;
 }
 
 /*
@@ -457,7 +587,6 @@
 }
 
 .mode-indicator {
-    -fx-font-size: 0.85em;
     -fx-text-fill: -color-fg-muted;
 }
 
@@ -482,76 +611,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-overlay-hover;
 }
 
-.bibEntry .type {
-    -fx-font-size: 110%;
-}
-
-.bibEntry .title {
-    -fx-font-size: 110%;
-    -fx-font-weight: bold;
-}
-
-.bibEntry .year {
-    -fx-font-size: 101%;
-    -fx-font-weight: bold;
-}
-
-.bibEntry .journal {
-    -fx-font-size: 101%;
-}
-
-.bibEntry .authors {
-    -fx-font-size: 101%;
-}
-
-.bibEntry .summary {
-    -fx-padding: 1ex 0ex 0ex 0ex;
-}
-
-.warning-icon {
-    -fx-fill: -color-warning;
-}
-
-.warning-message {
-    -fx-fill: -color-warning;
-    -fx-text-fill: -color-warning;
-}
-
-.error-message {
-    -fx-fill: -color-danger;
-    -fx-text-fill: -color-danger;
-}
-
-.error-icon {
-    -fx-text-fill: -color-danger;
-    -fx-fill: -color-danger;
-}
-
 .tooltip-warning {
     -fx-background-color: -color-warning;
 }
 
 .tooltip-error {
     -fx-background-color: -color-danger;
-}
-
-.titleHeader {
-    -fx-font-size: 150%;
-    -fx-padding: 0em 0em 0.5em 0em;
-}
-
-.sectionHeader {
-    -fx-font-size: 130%;
-    -fx-padding: 1em 0em 0.2em 0em;
-}
-
-.innerGridPane {
-    -fx-hgap: 1em;
-    -fx-vgap: 1em;
-}
-
-.prefIndent {
-    -fx-padding: 0 0 0 1.667em;
 }
 
 .code-area .text {
@@ -563,7 +628,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #bibtexcodearea {
-    -fx-padding: 4 4 4 4;
     -fx-background-color: -color-bg-secondary;
 }
 
@@ -588,7 +652,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
-    -fx-padding: 12;
 }
 
 .citationsList .contextBox * {
@@ -598,7 +661,7 @@ We want to have a look that matches our icons in the tool-bar */
 .citationsList .label {
     -fx-font-family: monospace;
     -fx-font-weight: bold;
-    -fx-label-padding: 5 0 10 10;
+    -fx-label-padding: 0.5em 0 0.833em 0.833em;
 }
 
 .tags-field {
@@ -641,10 +704,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-warning-subtle;
 }
 
-.mainTable-header {
-    -fx-fill: -color-fg-muted;
-}
-
 .rating {
     -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
     -fx-padding: 0.5em 0.0em 0.0em 0.0em;
@@ -655,7 +714,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .customGenerateButton {
-    -fx-padding: 0.5em 2em;
     -fx-min-width: 10em;
 }
 
@@ -663,7 +721,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-border-width: 1;
-    -fx-padding: 10;
+    -fx-padding: 0.833em;
     -fx-max-width: 600;
 }
 
@@ -695,14 +753,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0;
 }
 
-.padding-0 {
-    -fx-padding: 0;
-}
-
-.align-center-right {
-    -fx-alignment: CENTER-RIGHT;
-}
-
 .main-table .column-header.column-icon > .label {
     -fx-padding: 0;
     -fx-alignment: baseline-center;
@@ -718,23 +768,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-fg-subtle;
 }
 
-.main-table .table-row-cell:dragOver-bottom {
-    -fx-border-color: -color-drag-target;
-    -fx-border-width: 0 0 2 0;
-    -fx-padding: 0 0 -2 0;
-}
-
 .main-table .table-row-cell:dragOver-center {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 1 1 1 1;
     -fx-padding: -1 -1 -1 -1;
     -fx-background-color: -color-drag-target-hover;
-}
-
-.main-table .table-row-cell:dragOver-top {
-    -fx-border-color: -color-drag-target;
-    -fx-border-width: 2 0 0 0;
-    -fx-padding: -2 0 0 0;
 }
 
 /* matching-search-and-groups */
@@ -889,104 +927,26 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-effect: dropshadow(three-pass-box, -color-shadow, 8, 0.0, 0, 0);
 }
 
-.welcome-label {
-    -fx-font-size: 2.75em;
-    -fx-text-fill: -color-accent;
-    -fx-font-family: "Arial";
-}
-
-.welcome-description-label {
-    -fx-font-size: 1.75em;
-    -fx-font-family: "Arial";
-}
-
 .welcome-header-label {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-    -fx-font-family: "Arial";
     -fx-text-fill: -fx-text-inner-color;
 }
 
-.welcome-no-recent-label {
-    -fx-font-size: 1.25em;
-    -fx-text-fill: -color-accent;
-    -fx-font-family: "Arial";
-}
-
-.welcome-hyperlink {
-    -fx-font-size: 1.25em;
-    -fx-text-fill: -color-accent;
-}
-
+.welcome-hyperlink,
 .welcome-hyperlink:visited {
     -fx-text-fill: -color-accent;
 }
 
-
 /* Welcome Tab Layout Styles */
+/* The font family is declared once here and inherited by everything inside. */
 .welcome-main-container {
+    -fx-font-family: "Arial";
     -fx-max-width: 64em;
-    -fx-spacing: 2.333em;
-    -fx-alignment: center;
-    -fx-padding: 2.667em 2em;
-}
-
-.welcome-top-titles {
-    -fx-spacing: 0.833em;
-    -fx-alignment: top-left;
-    -fx-padding: 0 0 1.667em 0;
-}
-
-.welcome-columns-container {
-    -fx-hgap: 2.083em;
-    -fx-vgap: 2.083em;
-    -fx-alignment: top-center;
-}
-
-.welcome-left-column,
-.welcome-right-column {
-    -fx-min-width: 0;
-    -fx-pref-width: 50%;
-    -fx-max-width: 50em;
-}
-
-.welcome-content-column {
-    -fx-spacing: 2.083em;
-    -fx-alignment: top-left;
-}
-
-.welcome-section {
-    -fx-spacing: 1em;
-    -fx-alignment: top-left;
-}
-
-.welcome-links-content {
-    -fx-spacing: 0.667em;
-    -fx-alignment: top-left;
 }
 
 
 /* Welcome Community  */
-.welcome-community-content {
-    -fx-spacing: 1em;
-    -fx-alignment: top-left;
-}
-
-.welcome-community-icons {
-    -fx-hgap: 1em;
-    -fx-vgap: 0.667em;
-    -fx-alignment: center-left;
-}
-
-.welcome-community-links {
-    -fx-spacing: 1.25em;
-    -fx-alignment: center-left;
-}
-
 .welcome-community-link {
-    -fx-font-size: 1.0em;
     -fx-text-fill: -color-accent;
-    -fx-font-family: "Arial";
 }
 
 .welcome-community-link:hover {
@@ -994,50 +954,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-accent, -20%);
 }
 
-.welcome-community-version {
-    -fx-alignment: center-left;
-    -fx-padding: 0.417em 0 0 0;
-}
-
-.welcome-community-version-text {
-    -fx-font-size: 0.9em;
-    -fx-text-fill: -color-fg-subtle;
-    -fx-font-family: "Arial";
-}
-
 /* donation toast */
 .donation-toast {
     -fx-background-radius: 0.8333333333em;
-    -fx-padding: 0.8333em 1em;
     -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 20, 0.25, 0, 6);
-    -fx-alignment: center-left;
     -fx-border-color: derive(-color-bg-tertiary, -10%);
     -fx-border-radius: 0.8333333333em;
     -fx-max-height: 4em;
-    -fx-spacing: 1.16667em;
 }
 
 .donation-toast .label {
     -fx-text-fill: -fx-text-base-color;
 }
 
-.donation-toast-title {
-    -fx-font-size: 1.0em;
-    -fx-font-weight: bold;
-}
-
-.donation-toast-desc {
-    -fx-font-size: 0.92em;
-}
-
-.donation-toast-text {
-    -fx-spacing: 2;
-}
-
 .donation-btn-primary,
 .donation-btn-secondary,
 .donation-btn-ghost {
-    -fx-padding: 0.5em 1em;
     -fx-background-radius: 0.5em;
     -fx-border-radius: 0.5em;
 }
@@ -1064,7 +996,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 2.40em;
     -fx-text-fill: -color-accent;
 }
 
@@ -1072,38 +1003,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-selection;
 }
 
-#aboutDialog .top-padding {
-    -fx-padding: 5 0 0 0;
-}
-
+/* Pulls the developer list up against its heading -- the spacing scale has no negative steps. */
 #aboutDialog .dev-heading {
-    -fx-font-size: 1.44em;
-    -fx-padding: -10 0 0 0;
-}
-
-#aboutDialog .sub-heading {
-    -fx-font-size: 1.44em;
-    -fx-padding: 0.312em;
-}
-
-#aboutDialog .about-top {
-    -fx-padding: 0 5 15 5;
-}
-
-#aboutDialog .space {
-    -fx-padding: 0 5 0 5;
-}
-
-#aboutDialog .space-after {
-    -fx-padding: 0 5 0 0;
-}
-
-#aboutDialog .info-sections {
-    -fx-padding: 0.312em;
-}
-
-#aboutDialog .contrib-section {
-    -fx-padding: 5 5 10 5;
+    -fx-padding: -0.833em 0 0 0;
 }
 
 #aboutDialog .logo-pane {
@@ -1115,10 +1017,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* DocumentViewer */
-#documentViewerDialog #mainPane {
-    -fx-padding: 0;
-}
-
 #documentViewerDialog .document-viewer .page {
     -fx-padding: 0em 0em 1em 0em;
     -fx-background-insets: 0;
@@ -1132,22 +1030,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-secondary;
 }
 
-#entryEditor .editorPane {
-    -fx-hgap: 8;
-    -fx-vgap: 8;
-    -fx-padding: 4;
-}
-
 /* Single scroll-list field tab "Main" (issue #12711) */
 #entryEditor .all-fields-container {
-    -fx-padding: 10 15 10 15;
-    -fx-spacing: 8;
     -fx-background-color: -color-bg-secondary;
-}
-
-#entryEditor .editorPane.all-fields-list {
-    -fx-vgap: 8;
-    -fx-padding: 0;
 }
 
 /* Collapsible sections: flat look instead of the default TitledPane box */
@@ -1158,34 +1043,19 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor .all-fields-section-pane > .title {
     -fx-background-color: transparent;
     -fx-font-weight: bold;
-    -fx-padding: 6 0 4 0;
+    -fx-padding: 0.5em 0 0.333em 0;
     -fx-border-color: transparent transparent -color-border-default transparent;
 }
 
 #entryEditor .all-fields-section-pane > *.content {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-padding: 6 0 4 16;
-}
-
-#entryEditor .all-fields-section-content {
-    -fx-spacing: 8;
-}
-
-#entryEditor .all-fields-add-chips {
-    -fx-hgap: 6;
-    -fx-vgap: 6;
+    -fx-padding: 0.5em 0 0.333em 1.333em;
 }
 
 #entryEditor .all-fields-add-chip {
     -fx-background-radius: 3;
     -fx-border-radius: 3;
-    -fx-padding: 3 12 3 12;
-}
-
-#entryEditor .all-fields-add-free-form {
-    -fx-spacing: 6;
-    -fx-padding: 4 0 0 0;
 }
 
 #entryEditor Text {
@@ -1198,21 +1068,16 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor #typeLabel {
-    -fx-padding: 0.1em;
-    -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
     -fx-text-fill: -color-accent;
 }
 
 #entryEditor #typeLabel:hover {
-    -fx-padding: 0.1em;
-    -fx-font-size: 1.166667em;
-    -fx-font-weight: bold;
     -fx-background-color: -color-overlay-hover;
 }
 
 #entryEditor #typeLabel .context-menu {
-    -fx-font-size: 0.92em;
+    -fx-font-size: 0.9em;
     -fx-font-weight: normal;
 }
 
@@ -1222,17 +1087,14 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .icon-button.narrow {
-    -fx-border-width: 0;
     -fx-padding: 0.1em;
 }
 
-#entryEditor .icon-buttonNoSpaceBottom.narrow {
-    -fx-border-width: 0;
+#entryEditor .icon-button.no-space-bottom.narrow {
     -fx-padding: 0.1em 0.1em -0.2em 0.1em;
 }
 
-#entryEditor .icon-buttonNoSpaceTop.narrow {
-    -fx-border-width: 0;
+#entryEditor .icon-button.no-space-top.narrow {
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
@@ -1242,11 +1104,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .icon-button .glyph-icon,
-#entryEditor .icon-button .ikonli-font-icon,
-#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
-#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
-#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
-#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
+#entryEditor .icon-button .ikonli-font-icon {
     -glyph-size: 1.0em;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
@@ -1262,34 +1120,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-subtle;
 }
 
-#entryEditor .warning-icon {
-    -fx-fill: -color-warning;
-}
-
-#entryEditor .error-icon {
-    -fx-text-fill: -color-danger;
-    -fx-fill: -color-danger;
-}
-
-#entryEditor .tooltip-warning {
-    -fx-background-color: -color-warning;
-}
-
-#entryEditor .tooltip-error {
-    -fx-background-color: -color-danger;
-}
-
 #entryEditor .code-area .context-menu {
     -fx-font-family: sans-serif;
 }
 
-#entryEditor #related-articles-tab {
-    -fx-padding: 20 20 20 20;
-    -fx-background-color: -color-bg-secondary;
-}
-
+#entryEditor #related-articles-tab,
 #entryEditor .ai-tab {
-    -fx-padding: 20 20 20 20;
     -fx-background-color: -color-bg-secondary;
 }
 
@@ -1298,16 +1134,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
-    -fx-padding: 12;
-    -fx-font-size: 1.3em;
-}
-
-#entryEditor .recommendation-item {
-    -fx-padding: 0 0 0 20;
 }
 
 #entryEditor #citationsPane {
-    -fx-padding: 0;
     -fx-background-color: -color-bg-secondary;
 }
 
@@ -1317,76 +1146,19 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-background-color;
 }
 
-#entryEditor .heading {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-}
-
-#entryEditor .description {
-    -fx-font-style: italic;
-}
-
-#entryEditor .scite-tallies-label {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-}
-
-#entryEditor .scite-error-box {
-    -fx-padding: 30 0 0 30;
-}
-
-#entryEditor .scite-message-box {
-    -fx-padding: 30 0 0 30;
-}
-
 #entryEditor #scite-error-label {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
     -fx-text-fill: -color-danger;
 }
 
-#entryEditor .latex-citations-directory-path {
-    -fx-font-family: monospace;
-    -fx-font-weight: bold;
-}
-
-#entryEditor .latex-citations-message-box {
-    -fx-padding: 30 0 0 30;
-}
-
-#entryEditor .latex-citations-error-label {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-accent-subtle;
-}
-
 /* ErrorConsole */
-#errorConsole .list-content {
-    -fx-padding: 0em;
-}
-
-#errorConsole .info-section {
-    -fx-graphic-text-gap: 0.8em;
-    -fx-font-size: 1.1em;
-    -fx-line-spacing: 0.2em;
-    -fx-padding: 0.6em 1em;
-    -fx-background-color: -color-info-subtle;
-}
-
 #errorConsole .button-bar {
     -fx-padding: 1em 0em 0em 0em;
 }
 
-#errorConsole .error-console-cell {
-    -fx-padding: 0.6em 1em;
-}
-
-#errorConsole .error-console-cell HBox {
-    -fx-spacing: 0.8em;
-}
-
-#errorConsole .message-box {
-    -fx-spacing: 0.5em;
+#errorConsole .info-section {
+    -fx-graphic-text-gap: 0.8em;
+    -fx-line-spacing: 0.2em;
+    -fx-background-color: -color-info-subtle;
 }
 
 #errorConsole .info-section .glyph-icon,
@@ -1429,25 +1201,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ImportEntriesDialog */
 
-#importEntriesDialog .addEntryButton {
-    -fx-font-size: 2em;
-}
-
-#importEntriesDialog .addEntryButton:selected {
-    -fx-background-color: transparent;
-    -fx-fill: -color-selection;
-}
-
-#importEntriesDialog .entry-container {
-    -fx-padding: 0.5em 0em 0.5em 0em;
-}
-
-/* ManageStudyDefinition */
-
-.slr-tab {
-    -fx-padding: 1em;
-}
-
 /* MultiMergeEntries */
 
 #multiMergeEntries .text-changed {
@@ -1466,21 +1219,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-danger-emphasis;
 }
 
-#multiMergeEntries .grid-pane {
-    -fx-hgap: 10;
-    -fx-vgap: 10;
-}
-
 #multiMergeEntries .toggle-button {
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-padding: 0.5em;
     -fx-background-radius: 0;
-}
-
-#multiMergeEntries .box {
-    -fx-spacing: 10;
 }
 
 /* ParseLatexResult */
@@ -1624,10 +1367,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 2em;
 }
 
-#groupTree .numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-color-success, 70%);
-}
-
 #groupTree .numberColumn > .hits:all-selected {
     -fx-background-color: -color-success;
 }
@@ -1648,7 +1387,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #preferencesTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 8;
+    -fx-padding: 0.667em;
     -fx-background: transparent;
     -fx-text-fill: -color-fg-default;
 }
@@ -1663,16 +1402,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
 }
 
-#preferencesDialog .preferencesTab {
-    -fx-padding: 0.5em;
-}
-
 #preferencesDialog *:search-highlight {
     -fx-background-color: -color-danger;
 }
 
 #preferencesDialog .code-area {
-    -fx-padding: 0;
     -fx-border-width: 1;
     -fx-background-color: transparent;
 }
@@ -1715,39 +1449,17 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #preferencesDialog .code-area .context-menu .menu-item .label {
-    -fx-padding: 2;
-}
-
-/* EntryEditorTab — tab list rows, matching the row density of the Entry table */
-.entry-editor-tab-cell {
-    -fx-padding: 0.3em 0.6em;
-    -fx-alignment: center-left;
-    -fx-spacing: 0.5em;
+    -fx-padding: 0.167em;
 }
 
 /* WebSearchTab */
-.fetcher-list-cell {
-    -fx-padding: 0.3em 0.6em;
-    -fx-alignment: center-left;
-    -fx-spacing: 0.5em;
-}
-
 .fetcher-list-cell:nth-child(odd) {
     -fx-background-color: -color-bg-alt;
 }
 
-.fetcher-list-cell .label {
-    -fx-font-size: 100%;
-}
-
 .fetcher-list-cell .configure-button {
-    -fx-padding: 0.25em 0.5em;
     -fx-background-color: -color-bg-secondary;
     -fx-text-fill: -color-fg-muted;
-}
-
-#testButton {
-    -fx-padding: 0.25em 0.5em;
 }
 
 #testButton.success {
@@ -1766,60 +1478,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-icon-color: -color-danger;
 }
 
-.api-key-dialog-content {
-    -fx-padding: 1em;
-}
-
 /* CitationRelationsTab */
 
-.padding-5px {
-    -fx-padding: 5px;
-}
-
-.align-center {
-    -fx-alignment: center;
-}
-
-#citationRelationsTab .addEntryButton {
-    -fx-font-size: 2em;
-}
-
-#citationRelationsTab .addEntryButton:selected {
-    -fx-background-color: transparent;
-    -fx-fill: -color-selection;
-}
-
-#citationRelationsTab .entry-container {
-    -fx-padding: 0.5em 0em 0.5em 0em;
-}
-
-.journalInfo .info-heading {
-    -fx-font-size: 2.5em;
-    -fx-text-fill: -color-accent;
-}
-
 .journalInfo .info-label {
-    -fx-font-size: 1.25em;
     -fx-text-fill: -color-accent;
-}
-
-.journalInfo .hIndex {
-    -fx-font-size: 2em;
-}
-
-.journalInfo .grid-cell {
-    -fx-border-color: transparent -color-border-default -color-border-default transparent;
-    -fx-border-width: 0 0.062em 0.062em 0;
 }
 
 .journalInfo .grid-cell-r {
     -fx-border-color: transparent -color-border-default transparent transparent;
     -fx-border-width: 0 0.062em 0 0;
-}
-
-journalInfo .grid-cell-b {
-    -fx-border-color: transparent transparent -color-border-default transparent;
-    -fx-border-width: 0 0 0.062em 0;
 }
 
 /* KeyBindingsTab */
@@ -1837,11 +1504,6 @@ journalInfo .grid-cell-b {
 .keybinding-table .tree-table-row-cell:selected > .tree-table-cell > .icon,
 .keybinding-table .tree-table-row-cell:pressed > .tree-table-cell > .icon {
     -fx-fill: -color-fg-emphasis;
-}
-
-.keybinding-table-icon-cell {
-    -fx-alignment: CENTER-RIGHT;
-    -fx-padding: 0 5 0 0;
 }
 
 /* ThreeWayMergeView */
@@ -1883,17 +1545,13 @@ journalInfo .grid-cell-b {
     -fx-background-color: -color-bg-secondary;
 }
 
-.three-way-merge .field-cell {
-    -fx-padding: 8;
-}
-
 .three-way-merge .merge-toolbox {
     -fx-background-color: -color-bg-tertiary;
 }
 
 .three-way-merge .merge-header-cell .label {
     -fx-font-weight: bold;
-    -fx-padding: 1, 0, 1, 0;
+    -fx-padding: 0.167em 0 0.167em 0;
 }
 
 .three-way-merge .field-name .glyph-icon,
@@ -1908,19 +1566,12 @@ journalInfo .grid-cell-b {
     -fx-border-color: -color-border-default;
 }
 
-#styleSelectDialog .currentStyleLabel {
-    -fx-font-size: 1em;
-}
-
 #styleSelectDialog .currentStyleNameLabel {
-    -fx-font-size: 1em;
-    -fx-font-weight: bold;
     -fx-text-fill: -color-accent;
 }
 
 .exampleQuestionStyle {
     -fx-background-color: transparent;
-    -fx-padding: 2px 10px;
     -fx-background-radius: 20px;
     -fx-border-radius: 20px;
     -fx-border-width: 0.062em;
@@ -1941,7 +1592,6 @@ journalInfo .grid-cell-b {
 .text-button-blue {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
-    -fx-font-size: 1.25em;
     -fx-border-color: transparent;
 }
 
@@ -1951,22 +1601,13 @@ journalInfo .grid-cell-b {
 }
 
 /* Quick Settings */
-.quick-settings-container,
-.walkthroughs-container {
-    -fx-spacing: 0.3333em;
-    -fx-alignment: top-left;
-}
-
 .quick-settings-button {
     -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.333em;
     -fx-background-radius: 0.333em;
-    -fx-padding: 0.833em 1.167em;
-    -fx-alignment: center-left;
     -fx-graphic-text-gap: 0.667em;
-    -fx-font-size: 1.0em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;
 }
@@ -1983,10 +1624,7 @@ journalInfo .grid-cell-b {
 }
 
 .quick-settings-dialog-container {
-    -fx-padding: 1.333em;
-    -fx-spacing: 1.333em;
     -fx-pref-width: 42.667em;
-    -fx-font-size: 1em;
 }
 
 .quick-settings-dialog-container > HBox {
@@ -2000,25 +1638,6 @@ journalInfo .grid-cell-b {
     -fx-border-radius: 0.333em;
 }
 
-/* Quick Settings: Theme Selection */
-.theme-option {
-    -fx-padding: 0.667em;
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
-    -fx-spacing: 1em;
-    -fx-alignment: center-left;
-}
-
-.theme-option:hover {
-    -fx-background-color: -color-overlay-hover;
-}
-
-/* Quick Settings: Optimization Checkboxes */
-.optimization-checkboxes {
-    -fx-padding: 0 0 0 1em;
-    -fx-spacing: 1.333em;
-}
-
 /* Quick Settings: Push Application Configuration */
 .applications-list {
     -fx-pref-height: 16.667em;
@@ -2026,7 +1645,6 @@ journalInfo .grid-cell-b {
 }
 
 .application-item {
-    -fx-padding: 0.667em;
     -fx-border-radius: 0.333em;
     -fx-background-color: transparent;
 }
@@ -2047,22 +1665,7 @@ journalInfo .grid-cell-b {
     -fx-fill: -color-accent;
 }
 
-/* Quick Settings: Online Fetchers */
-.fetchers-container {
-    -fx-padding: 1em;
-    -fx-spacing: 1em;
-}
-
 /* Walkthrough Styles */
-.walkthrough-overlay {
-    -fx-background-color: transparent;
-}
-
-.walkthrough-tooltip-content-container {
-    -fx-spacing: 1em;
-    -fx-padding: 1em;
-}
-
 .walkthrough-title-container {
     -fx-max-width: infinity;
 }
@@ -2074,12 +1677,6 @@ journalInfo .grid-cell-b {
     -fx-font-weight: bold;
     -fx-font-size: 1.75em;
     -fx-line-spacing: -0.25em;
-}
-
-.walkthrough-side-panel-vertical,
-.walkthrough-side-panel-horizontal {
-    -fx-spacing: 1em;
-    -fx-padding: 2em;
 }
 
 .walkthrough-side-panel-vertical {
@@ -2094,10 +1691,6 @@ journalInfo .grid-cell-b {
     -fx-min-height: 18em;
 }
 
-.walkthrough-content {
-    -fx-spacing: 1.5em;
-}
-
 /* Text content containers and flows */
 .walkthrough-text-container {
     -fx-max-width: infinity;
@@ -2105,7 +1698,6 @@ journalInfo .grid-cell-b {
 
 .walkthrough-text-content {
     -fx-text-fill: -fx-text-base-color;
-    -fx-font-size: 1.2em;
     -fx-line-spacing: 0.5em;
 }
 
@@ -2113,9 +1705,6 @@ journalInfo .grid-cell-b {
 .walkthrough-info-container {
     -fx-border-color: -color-accent;
     -fx-border-width: 0 0 0 0.15em;
-    -fx-padding: 0 0 0 0.75em;
-    -fx-spacing: 0.5em;
-    -fx-alignment: top-left;
 }
 
 .walkthrough-info-container .ikonli-font-icon {
@@ -2128,53 +1717,37 @@ journalInfo .grid-cell-b {
 
 .walkthrough-info-text {
     -fx-text-fill: -color-accent;
-    -fx-font-size: 1.2em;
     -fx-line-spacing: 0.5em;
 }
 
 /* Action buttons */
-.walkthrough-actions {
-    -fx-spacing: 0;
-}
-
-.walkthrough-right-actions {
-    -fx-spacing: 0.5em;
-}
-
 .walkthrough-continue-button {
     -fx-background-color: -color-accent;
     -fx-text-fill: -color-fg-emphasis;
-    -fx-font-size: 1.1em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-padding: 0.25em 0.5em;
 }
 
 .walkthrough-skip-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
-    -fx-font-size: 1.1em;
     -fx-border-color: -color-accent;
     -fx-border-width: 0.08em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-padding: 0.25em 0.5em;
 }
 
 .walkthrough-back-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
-    -fx-font-size: 1.1em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-padding: 0.25em 0.5em;
 }
 
 .walkthrough-quit-button {
     -fx-background-color: -color-bg-tertiary;
     -fx-border-color: transparent;
     /* For easy clipping */
-    -fx-padding: 0.5em;
     -fx-min-width: 2em;
     -fx-min-height: 2em;
     -fx-pref-width: 2em;
@@ -2199,20 +1772,6 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1.2em;
 }
 
-.walkthrough-fullscreen-content {
-    -fx-padding: 0.1875em;
-    -fx-spacing: 1em;
-    -fx-max-width: 48em;
-    -fx-fill-width: true;
-}
-
-/* FileSelectionPage */
-
-.file-selection-progress-pane {
-    -fx-alignment: center;
-    -fx-padding: 20;
-}
-
 /* TextFlowLimited */
 
 .text-flow-more-link {
@@ -2228,52 +1787,12 @@ journalInfo .grid-cell-b {
     -fx-fill: -fx-text-base-color;
 }
 
-.markdown-h1 {
-    -fx-font-size: 2em;
-    -fx-font-weight: bold;
-}
-
-.markdown-h2 {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-}
-
-.markdown-h3 {
-    -fx-font-size: 1.25em;
-    -fx-font-weight: bold;
-}
-
-.markdown-h4 {
-    -fx-font-size: 1.1em;
-    -fx-font-weight: bold;
-}
-
-.markdown-h5 {
-    -fx-font-size: 1em;
-    -fx-font-weight: bold;
-}
-
-.markdown-h6 {
-    -fx-font-size: 0.875em;
-    -fx-font-weight: bold;
-}
-
-.markdown-bold {
-    -fx-font-weight: bold;
-}
-
-.markdown-italic {
-    -fx-font-style: italic;
-}
-
 .markdown-code {
-    -fx-font-family: monospace;
     -fx-fill: -color-accent;
     -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 1, 0, 0, 1);
 }
 
 .markdown-code-block {
-    -fx-font-family: monospace;
     -fx-fill: -fx-text-base-color;
 }
 
@@ -2311,29 +1830,9 @@ journalInfo .grid-cell-b {
     -fx-border-width: 1px;
 }
 
-.checkbox-flowpane {
-    -fx-hgap: 1.5em;
-    -fx-vgap: 0.8em;
-}
-
 /* Automatic Field Editor */
-.edit-field-content-pane {
-    -fx-padding: 0em 1em;
-    -fx-spacing: 1em;
-}
-
 .edit-field-content-pane .text-field {
     -fx-padding: 0.5625em 0.75em;
-}
-
-.edit-field-content-pane .actions {
-    -fx-spacing: 0.75em;
-    -fx-alignment: BASELINE_LEFT;
-}
-
-.edit-field-content-pane .grid-pane {
-    -fx-hgap: 0.75em;
-    -fx-vgap: 0.75em;
 }
 
 .edit-field-content-pane .grid-pane .label {
@@ -2355,10 +1854,6 @@ journalInfo .grid-cell-b {
     -fx-background-color: -color-button-default;
 }
 
-.linked-files-info {
-    -fx-padding: 0.5em 0 0.5em 0;
-}
-
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
    LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
 .linked-files-list {
@@ -2372,7 +1867,6 @@ journalInfo .grid-cell-b {
 }
 
 .delete-files-dialog {
-    -fx-padding: 10px;
     -fx-background-color: -color-bg-primary;
 }
 
@@ -2411,7 +1905,6 @@ journalInfo .grid-cell-b {
 
 .bibtex-code-area {
     -fx-font-family: 'JetBrains Mono';
-    -fx-font-size: 0.9em;
 }
 
 .bibtex-code-area .bibtex-keyword {
@@ -2429,4 +1922,8 @@ journalInfo .grid-cell-b {
 .bibtex-code-area .search-highlight {
     -fx-fill: -color-warning-subtle !important;
     -fx-stroke: transparent !important;
+}
+
+.flashing-danger {
+    -fx-background-color: -color-danger;
 }

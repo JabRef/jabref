@@ -41,18 +41,21 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -66,9 +69,12 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
@@ -81,6 +87,8 @@ import org.jspecify.annotations.Nullable;
 /// field-name box at the bottom adds arbitrary fields.
 @NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
     /// (instead of the JavaFX TextArea default of 10).
@@ -124,8 +132,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// Scroll content: main grid + chip bar + section panes + free-form add row.
     private final VBox listContainer = new VBox();
 
-    public AllFieldsTab(UndoManager undoManager,
-                        UndoAction undoAction,
+    public AllFieldsTab(UndoAction undoAction,
                         RedoAction redoAction,
                         GuiPreferences preferences,
                         BibEntryTypesManager entryTypesManager,
@@ -134,7 +141,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                         PreviewPanel previewPanel) {
         super(
                 false,
-                undoManager,
                 undoAction,
                 redoAction,
                 preferences,
@@ -148,7 +154,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-        this.listContainer.getStyleClass().add("all-fields-container");
+        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-10-16", "spacing-8");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
@@ -209,6 +215,44 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+        showFileFieldIfAutoLinkFindsFiles(entry);
+    }
+
+    /// Only set fields get an editor, so an entry without a file field has no
+    /// [LinkedFilesEditor] — whose view model is what searches the file directories and
+    /// shows not-yet-linked files as auto-found suggestions
+    /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
+    /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
+    /// the search and renders the suggestion rows.
+    // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
+    private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
+        if (editors.containsKey(StandardField.FILE)
+                || !guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabaseContext();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                guiPreferences.getExternalApplicationsPreferences(),
+                guiPreferences.getFilePreferences(),
+                guiPreferences.getAutoLinkPreferences());
+        Optional<String> keyAtProbeStart = entry.getCitationKey();
+        BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
+                      .onSuccess(foundFiles -> {
+                          // subscribedEntry is cleared on dispose() and replaced on entry switch,
+                          // so this also invalidates callbacks that outlive the tab. The citation
+                          // key comparison drops results of probes started for a stale key.
+                          if (!foundFiles.isEmpty()
+                                  && guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()
+                                  && subscribedEntry.filter(current -> current == entry).isPresent()
+                                  && entry.getCitationKey().equals(keyAtProbeStart)
+                                  && !editors.containsKey(StandardField.FILE)) {
+                              userAddedFields.add(StandardField.FILE);
+                              rebuildPanel(databaseContext, entry);
+                          }
+                      })
+                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(entry.getAuthorTitleYear()), exception))
+                      .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 
     @Override
@@ -250,6 +294,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
         }
+        // A changed citation key can make files in the file directory match this entry,
+        // so the suggestions must be re-discovered without switching entries.
+        if (InternalField.KEY_FIELD == event.getField()) {
+            showFileFieldIfAutoLinkFindsFiles(entry);
+        }
     }
 
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
@@ -274,10 +323,9 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
 
-        // Main section rows go into the (already cleared) inherited gridPane
-        if (!gridPane.getStyleClass().contains("all-fields-list")) {
-            gridPane.getStyleClass().add("all-fields-list");
-        }
+        // Main section rows go into the (already cleared) inherited gridPane.
+        // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
+        gridPane.getStyleClass().remove("padding-4");
         addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
@@ -331,7 +379,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         ObservableValue<Optional<String>> fieldValue = entry.getFieldBinding(field);
         Button removeButton = new Button();
         removeButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
-        removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
+        removeButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
+        removeButton.getStyleClass().add("field-remove-button");
         removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
         removeButton.setFocusTraversable(false);
         removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
@@ -419,7 +468,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                                          BibDatabaseContext bibDatabaseContext,
                                          BibEntry entry) {
         VBox content = new VBox();
-        content.getStyleClass().add("all-fields-section-content");
+        content.getStyleClass().add("spacing-8");
 
         Runnable populateContent = () -> populateSectionContent(
                 content,
@@ -463,7 +512,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
-            chips.getStyleClass().add("all-fields-add-chips");
+            chips.getStyleClass().add("gap-6");
             chipFields.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
             content.getChildren().add(chips);
         }
@@ -495,7 +544,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         BibDatabaseMode mode = getDatabaseMode();
 
         FlowPane chips = new FlowPane();
-        chips.getStyleClass().add("all-fields-add-chips");
+        chips.getStyleClass().add("gap-6");
 
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
             List<Field> shown = List.copyOf(editors.keySet());
@@ -544,14 +593,14 @@ public class AllFieldsTab extends FieldsEditorTab {
         addButton.setOnAction(_ -> addAction.run());
         fieldNameBox.getEditor().setOnAction(_ -> addAction.run());
         HBox freeFormRow = new HBox(fieldNameBox, addButton);
-        freeFormRow.getStyleClass().add("all-fields-add-free-form");
+        freeFormRow.getStyleClass().addAll("spacing-6", "padding-top-4");
         freeFormRow.setAlignment(Pos.CENTER_LEFT);
         return freeFormRow;
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
-        chip.getStyleClass().add("all-fields-add-chip");
+        chip.getStyleClass().addAll("all-fields-add-chip", "padding-2-12");
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
     }

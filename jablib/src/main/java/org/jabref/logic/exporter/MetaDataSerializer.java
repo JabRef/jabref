@@ -45,11 +45,22 @@ public class MetaDataSerializer {
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
         }
+        if (metaData.isGitAutoPull()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_PULL, List.of("true"));
+        }
+        if (metaData.isGitAutoCommit()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_COMMIT, List.of("true"));
+        }
+        if (metaData.isGitAutoPush()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_PUSH, List.of("true"));
+        }
         stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, List.of(mode.getAsString())));
         metaData.getLibraryAbbreviationType().ifPresent(
                 abbreviationType -> stringyMetaData.put(MetaData.LIBRARY_ABBREVIATION_TYPE, List.of(abbreviationType.name())));
+        metaData.getKeywordSeparator().ifPresent(
+                separator -> stringyMetaData.put(MetaData.KEYWORD_SEPARATOR, List.of(separator.toString())));
         metaData.getLibrarySpecificFileDirectory().ifPresent(
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, List.of(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
