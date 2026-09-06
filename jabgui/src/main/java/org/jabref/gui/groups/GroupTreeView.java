@@ -66,7 +66,6 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -99,7 +98,6 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
-    private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
     private final BibEntryTypesManager entryTypesManager;
@@ -126,7 +124,6 @@ public class GroupTreeView extends BorderPane {
                          GuiPreferences preferences,
                          DialogService dialogService,
                          AiService aiService,
-                         UndoManager undoManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
@@ -134,7 +131,6 @@ public class GroupTreeView extends BorderPane {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
@@ -473,7 +469,7 @@ public class GroupTreeView extends BorderPane {
                     database,
                     preferences,
                     fileUpdateMonitor,
-                    undoManager,
+                    stateManager.getUndoManager(database),
                     stateManager,
                     dialogService,
                     taskExecutor);

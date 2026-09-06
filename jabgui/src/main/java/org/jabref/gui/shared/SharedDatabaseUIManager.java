@@ -15,9 +15,9 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -52,9 +52,9 @@ public class SharedDatabaseUIManager {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
@@ -63,9 +63,9 @@ public class SharedDatabaseUIManager {
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
-                                   GuiUndoManager undoManager,
                                    ClipBoardManager clipBoardManager,
-                                   TaskExecutor taskExecutor) {
+                                   TaskExecutor taskExecutor,
+                                   GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -73,9 +73,9 @@ public class SharedDatabaseUIManager {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
     /// The synchronizer keeps the changes locally and reconnects by itself (see [DBMSSynchronizer]),
@@ -143,7 +143,9 @@ public class SharedDatabaseUIManager {
     /// is reported without interrupting the user; the undo edit keeps the entries' last local
     /// state (including unsynchronized edits) recoverable.
     private void handleSharedEntriesNotPresent(SharedEntriesNotPresentEvent event) {
-        undoManager.addEdit(new UndoableRemoveEntries(event.bibDatabaseContext().getDatabase(), event.bibEntries()));
+        BibDatabaseContext databaseContext = event.bibDatabaseContext();
+        stateManager.getUndoManager(databaseContext)
+                    .addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), event.bibEntries()));
         dialogService.notify(Localization.lang("%0 entries were deleted on the shared side. Use \"Undo\" to restore them.",
                 String.valueOf(event.bibEntries().size())));
     }
@@ -176,9 +178,9 @@ public class SharedDatabaseUIManager {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         tabContainer.addTab(libraryTab, true);
         return libraryTab;
     }

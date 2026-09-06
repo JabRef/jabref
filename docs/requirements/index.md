@@ -58,6 +58,7 @@ In case of a tracing error, one can inspect `build/tracing.txt` to see which req
 
 - `pp`: means that this requirement should be guarded with a privacy policy banner. The feature should not do anything if the user does not accept the privacy policy. The specific privacy policy depends on the feature.
 - `guard`: means that this action might be dangerous and should be guarded with a confirmation dialog.
+- `adr`: an architectural decision record in `docs/decisions/` that code carries out. The identifier follows the ADR's title (`adr~hardcode-fieldnames~1`, without the file's number prefix, because an identifier must not start with a digit), and implementations link to it with `// [impl->adr~hardcode-fieldnames~1]`.
 - `model`: means that this feature requires a model.
 
 While not a custom artifact, but we interpret these OpenFastTrace artifact types as follows:

@@ -1,0 +1,46 @@
+# Description: Bridges pull request review activity into "Comment on PR".
+# On a fork PR, pull_request_review* runs get a read-only token and no secrets
+# ("Secret source: None"), so the status labels cannot be written there. This workflow
+# does nothing but record the PR number; "Comment on PR" picks it up via workflow_run,
+# which runs privileged in the context of the base repository.
+
+name: PR Review Activity
+
+on:
+  # Qodo is not a workflow, so its completion cannot be awaited via workflow_run.
+  # It submits a review when done - that is the signal to re-evaluate the status labels.
+  pull_request_review:
+    types: [ submitted ]
+  # The PR author replying in a Qodo thread changes the label outcome but completes no
+  # workflow - listen to this event directly. Deleting the author's last reply flips a
+  # thread back to unaddressed, so deletions count as well. (Thread resolve/unresolve has
+  # no workflow trigger event; those are only picked up on the next triggering event.)
+  pull_request_review_comment:
+    types: [ created, deleted ]
+
+jobs:
+  upload-pr-number:
+    # pull_request_review_comment: only a PR-author reply can un-count (or, when deleted,
+    # re-count) a Qodo thread, so other commenters' replies (including Qodo posting its own
+    # review comments) need no run. The deleted comment's author is in the same payload field.
+    if: >-
+      ${{ github.repository == 'JabRef/jabref'
+          && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]')
+          && (github.event_name != 'pull_request_review_comment' || github.event.comment.user.login == github.event.pull_request.user.login) }}
+    # A burst of review activity on one PR only needs the last event to reach "Comment on PR";
+    # collapsing the bursts here keeps the downstream runs it would otherwise have to cancel
+    # from being started at all.
+    concurrency:
+      group: pr-review-activity-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pr_number
+          path: pr_number.txt

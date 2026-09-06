@@ -53,8 +53,11 @@ public class ThreeWayMergeView extends VBox {
                 safeClone(rightEntry, leftEntry),
                 leftHeader,
                 rightHeader);
-        this.fieldMergerFactory = new FieldMergerFactory(preferences.getBibEntryPreferences());
-        this.keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator().toString();
+        Character separator = stateManager.getActiveDatabase()
+                                          .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
+                                          .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        this.fieldMergerFactory = new FieldMergerFactory(separator);
+        this.keywordSeparator = separator.toString();
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();

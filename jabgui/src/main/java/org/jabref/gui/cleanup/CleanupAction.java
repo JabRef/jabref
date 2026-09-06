@@ -9,7 +9,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 
 public class CleanupAction extends SimpleCommand {
@@ -19,7 +18,6 @@ public class CleanupAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
@@ -27,14 +25,12 @@ public class CleanupAction extends SimpleCommand {
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
-                         UndoManager undoManager,
                          JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -42,21 +38,15 @@ public class CleanupAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
-
-        CleanupDialog cleanupDialog = new CleanupDialog(
-                stateManager.getActiveDatabase().get(),
-                preferences,
-                dialogService,
-                stateManager,
-                undoManager,
-                tabSupplier,
-                taskExecutor,
-                journalAbbreviationRepository
-        );
-
-        dialogService.showCustomDialogAndWait(cleanupDialog);
+        stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                dialogService.showCustomDialogAndWait(new CleanupDialog(
+                        databaseContext,
+                        preferences,
+                        dialogService,
+                        stateManager,
+                        stateManager.getUndoManager(databaseContext),
+                        tabSupplier,
+                        taskExecutor,
+                        journalAbbreviationRepository)));
     }
 }
