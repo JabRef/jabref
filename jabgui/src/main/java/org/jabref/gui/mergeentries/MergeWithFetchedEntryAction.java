@@ -35,10 +35,10 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::mergeSelectedEntryIn);
+    }
 
+    private void mergeSelectedEntryIn(BibDatabaseContext databaseContext) {
         if (stateManager.getSelectedEntries().size() != 1) {
             dialogService.showInformationDialogAndWait(
                     Localization.lang("Merge entry with %0 information", FieldTextMapper.getDisplayName(new OrFields(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT))),
@@ -46,7 +46,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, stateManager.getUndoManager(databaseContext), stateManager).fetchAndMerge(originalEntry);
     }
 }

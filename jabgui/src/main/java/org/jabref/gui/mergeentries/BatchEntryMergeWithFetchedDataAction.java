@@ -1,7 +1,6 @@
 package org.jabref.gui.mergeentries;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -39,16 +38,12 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        if (databaseContext.isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::mergeEntriesOf);
+    }
 
-        List<BibEntry> entries = databaseContext.map(BibDatabaseContext::getEntries)
-                                                .orElse(List.of());
-        Character keywordSeparator = stateManager.getActiveDatabase()
-                                                 .map(database -> database.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
-                                                 .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+    private void mergeEntriesOf(BibDatabaseContext databaseContext) {
+        List<BibEntry> entries = databaseContext.getEntries();
+        Character keywordSeparator = databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
 
         if (entries.isEmpty()) {
             notificationService.notify(Localization.lang("No entries available for merging"));
@@ -59,7 +54,7 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
         BatchEntryMergeTask mergeTask = new BatchEntryMergeTask(
                 entries,
                 fetcher,
-                stateManager.getUndoManager(databaseContext.get()),
+                stateManager.getUndoManager(databaseContext),
                 notificationService,
                 keywordSeparator);
 

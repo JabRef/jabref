@@ -51,15 +51,13 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
-        if (activeDatabase.isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::lookUpIn);
+    }
 
-        // Both the library and the entries are read here rather than when the lookup runs: the
-        // work belongs to the library the user started on, and the state manager replaces its
-        // selection when they switch away from it.
-        BibDatabaseContext databaseContext = activeDatabase.get();
+    /// The library and the entries are read here rather than when the lookup runs: the work belongs
+    /// to the library the user started on, and the state manager replaces its selection when they
+    /// switch away from it.
+    private void lookUpIn(BibDatabaseContext databaseContext) {
         List<BibEntry> selectedEntries = List.copyOf(stateManager.getSelectedEntries());
 
         try {

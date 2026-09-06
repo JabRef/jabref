@@ -51,9 +51,10 @@ public interface StateManager extends SrvStateManager {
 
     /// The undo journal to record a change to `context` on.
     ///
-    /// One journal serves every open library, so the same journal comes back for every context.
-    /// The parameter is what a caller uses to name the library it is recording against, instead of
-    /// holding a journal handed to it when it was built.
+    /// Each library has its own, so a caller names the library it is recording against instead of
+    /// holding a journal handed to it when it was built. Which library that is has to be decided
+    /// where the change is made, not where the change lands: a task that finishes after the user
+    /// switched libraries still belongs to the one it ran on.
     ///
     /// Recording is all most callers do, which is why this hands out the narrow type; the classes
     /// that drive the stacks ask for [#getGuiUndoManager].

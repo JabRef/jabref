@@ -38,9 +38,10 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
 
     @Override
     public void execute() {
-        assert stateManager.getActiveDatabase().isPresent();
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
+        stateManager.getActiveDatabase().ifPresent(this::updateSelectedEntryIn);
+    }
 
+    private void updateSelectedEntryIn(BibDatabaseContext databaseContext) {
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);

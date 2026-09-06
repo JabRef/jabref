@@ -1,7 +1,5 @@
 package org.jabref.gui.undo;
 
-import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -28,13 +26,7 @@ public class RedoAction extends SimpleCommand {
         this.executable.bind(needsRedo(stateManager));
     }
 
-    @Override
-    public void execute() {
-        Optional<LibraryTab> activeTab = stateManager.activeTabProperty().get();
-        if (activeTab.isEmpty()) {
-            return;
-        }
-        LibraryTab libraryTab = activeTab.get();
+    private void redoIn(LibraryTab libraryTab) {
         GuiUndoManager undoManager = stateManager.getGuiUndoManager(libraryTab.getBibDatabaseContext());
 
         if (undoManager.canRedo()) {
@@ -44,5 +36,10 @@ public class RedoAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
+    }
+
+    @Override
+    public void execute() {
+        stateManager.activeTabProperty().get().ifPresent(this::redoIn);
     }
 }

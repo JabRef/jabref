@@ -30,11 +30,10 @@ public class MergeEntriesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        if (databaseContext.isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::mergeSelectedEntries);
+    }
 
+    private void mergeSelectedEntries(BibDatabaseContext databaseContext) {
         // Check if there are two entries selected
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries.size() != 2) {
@@ -66,7 +65,7 @@ public class MergeEntriesAction extends SimpleCommand {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, stateManager, stateManager.getUndoManager(databaseContext.get())).execute();
+            new MergeTwoEntriesAction(entriesMergeResult, stateManager, stateManager.getUndoManager(databaseContext)).execute();
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

@@ -622,24 +622,26 @@ public class OpenOfficePanel {
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
 
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        if (citePressed && databaseContext.isPresent()) {
+        if (!citePressed) {
+            // The user canceled
+            return false;
+        }
+
+        return stateManager.getActiveDatabase().map(databaseContext -> {
             // Generate keys
-            stateManager.getUndoManager(databaseContext.get()).addEdit(Localization.lang("Cite"), edit -> {
+            stateManager.getUndoManager(databaseContext).addEdit(Localization.lang("Cite"), edit -> {
                 for (BibEntry entry : entries) {
                     if (entry.getCitationKey().isEmpty()) {
                         // Generate key
-                        edit.addEdit(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
+                        edit.addEdit(new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences)
                                 .generateAndSetKey(entry));
                     }
                 }
             });
             // Now every entry has a key
             return true;
-        } else {
-            // No, we canceled (or there is no panel to get the database from, highly unlikely)
-            return false;
-        }
+            // There is no panel to get the database from, highly unlikely
+        }).orElse(false);
     }
 
     private ContextMenu createSettingsPopup() {

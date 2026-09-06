@@ -1,6 +1,5 @@
 package org.jabref.gui.cleanup;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -11,7 +10,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 
 public class CleanupAction extends SimpleCommand {
 
@@ -40,22 +38,15 @@ public class CleanupAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        if (databaseContext.isEmpty()) {
-            return;
-        }
-
-        CleanupDialog cleanupDialog = new CleanupDialog(
-                databaseContext.get(),
-                preferences,
-                dialogService,
-                stateManager,
-                stateManager.getUndoManager(databaseContext.get()),
-                tabSupplier,
-                taskExecutor,
-                journalAbbreviationRepository
-        );
-
-        dialogService.showCustomDialogAndWait(cleanupDialog);
+        stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                dialogService.showCustomDialogAndWait(new CleanupDialog(
+                        databaseContext,
+                        preferences,
+                        dialogService,
+                        stateManager,
+                        stateManager.getUndoManager(databaseContext),
+                        tabSupplier,
+                        taskExecutor,
+                        journalAbbreviationRepository)));
     }
 }

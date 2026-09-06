@@ -57,14 +57,13 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         // the user's selection.
         entries = new ArrayList<>(stateManager.getSelectedEntries());
 
-        // Read here, on the JavaFX thread: the keys are generated for, and recorded against, the
-        // library the user started on, which they may have switched away from by the time the task
-        // runs.
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
-        if (activeDatabase.isEmpty()) {
-            return;
-        }
+        // The library is read here, on the JavaFX thread: the keys are generated for, and recorded
+        // against, the one the user started on, which they may have switched away from by the time
+        // the task runs.
+        stateManager.getActiveDatabase().ifPresent(this::generateKeysIn);
+    }
 
+    private void generateKeysIn(BibDatabaseContext databaseContext) {
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate citation keys"),
                     Localization.lang("First select the entries you want keys to be generated for."));
@@ -75,7 +74,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         checkOverwriteKeysChosen();
 
         if (!this.isCanceled) {
-            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(activeDatabase.get());
+            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(databaseContext);
             backgroundTask.showToUser(true);
             backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
             backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
