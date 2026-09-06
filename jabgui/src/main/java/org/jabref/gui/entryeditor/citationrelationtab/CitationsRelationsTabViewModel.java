@@ -62,6 +62,8 @@ public class CitationsRelationsTabViewModel {
     private Optional<TalliesResponse> currentResult = Optional.empty();
     private @Nullable Future<?> searchTask;
     private @Nullable Future<?> doiLookupTask;
+    private @Nullable BackgroundTask<List<CitationRelationItem>> citingTask;
+    private @Nullable BackgroundTask<List<CitationRelationItem>> citedByTask;
     private @Nullable BibEntry currentEntry;
 
     public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
@@ -145,6 +147,7 @@ public class CitationsRelationsTabViewModel {
 
     public void updateForEntry(@Nullable BibEntry entry) {
         // If a search or lookup is already running, cancel it
+        cancelCitationSearches();
         cancelSearch();
         cancelDoiLookup();
 
@@ -185,6 +188,40 @@ public class CitationsRelationsTabViewModel {
         }
 
         searchTask.cancel(false);
+    }
+
+    public void cancelCitationSearches() {
+        cancelCitationSearch(CitationFetcher.SearchType.CITES);
+        cancelCitationSearch(CitationFetcher.SearchType.CITED_BY);
+    }
+
+    public void cancelCitationSearch(CitationFetcher.SearchType searchType) {
+        switch (searchType) {
+            case CITES -> {
+                cancelTrackedCitationSearch(citingTask);
+                citingTask = null;
+            }
+            case CITED_BY -> {
+                cancelTrackedCitationSearch(citedByTask);
+                citedByTask = null;
+            }
+        }
+    }
+
+    public void trackCitationSearch(CitationFetcher.SearchType searchType, BackgroundTask<List<CitationRelationItem>> task) {
+        cancelCitationSearch(searchType);
+        switch (searchType) {
+            case CITES ->
+                    citingTask = task;
+            case CITED_BY ->
+                    citedByTask = task;
+        }
+    }
+
+    private void cancelTrackedCitationSearch(@Nullable BackgroundTask<List<CitationRelationItem>> task) {
+        if (task != null && !task.isCancelled()) {
+            task.cancel(false);
+        }
     }
 
     public void cancelDoiLookup() {

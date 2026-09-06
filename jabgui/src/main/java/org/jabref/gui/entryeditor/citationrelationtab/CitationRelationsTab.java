@@ -107,9 +107,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
-    // Tasks used to implement asynchronous fetching of related articles
-    private static BackgroundTask<List<CitationRelationItem>> citingTask;
-    private static BackgroundTask<List<CitationRelationItem>> citedByTask;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
@@ -287,9 +284,23 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
             if (getCurrentEntry() == entry) {
-                bindToEntry(entry);
+                refreshCurrentEntryAfterDoiLookup(entry);
             }
         });
+    }
+
+    private void refreshCurrentEntryAfterDoiLookup(BibEntry entry) {
+        if (currentCitingComponents == null
+                || currentCitedByComponents == null
+                || currentCitingComponents.entry() != entry
+                || currentCitedByComponents.entry() != entry) {
+            bindToEntry(entry);
+            return;
+        }
+
+        citationsRelationsTabViewModel.updateForEntry(entry);
+        searchForRelations(currentCitingComponents, currentCitedByComponents, true);
+        searchForRelations(currentCitedByComponents, currentCitingComponents, true);
     }
 
     private void resetEmptyPanels() {
@@ -697,12 +708,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void jumpToEntry(CitationRelationItem entry) {
-        if (citingTask != null) {
-            citingTask.cancel(false);
-        }
-        if (citedByTask != null) {
-            citedByTask.cancel(false);
-        }
+        citationsRelationsTabViewModel.cancelCitationSearches();
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
@@ -804,16 +810,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.updateForEntry(entry);
 
-        // TODO: All this should go to ViewModel
-        if (citingTask != null && !citingTask.isCancelled()) {
-            citingTask.cancel(false);
-            citingTask = null;
-        }
-        if (citedByTask != null && !citedByTask.isCancelled()) {
-            citedByTask.cancel(false);
-            citedByTask = null;
-        }
-
         SplitPane splitPane = getPaneAndStartSearch(entry);
         splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         splitPane.setMinSize(0, 0);
@@ -887,18 +883,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationComponents.listView().setItems(observableList);
         citationComponents.listView().setPlaceholder(null);
 
-        if (citationComponents.searchType() == CitationFetcher.SearchType.CITES && citingTask != null && !citingTask.isCancelled()) {
-            citingTask.cancel(false);
-        } else if (citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY && citedByTask != null && !citedByTask.isCancelled()) {
-            citedByTask.cancel(false);
-        }
-
-        BackgroundTask<List<CitationRelationItem>> task = this.createBackgroundTask(
+        BackgroundTask<List<CitationRelationItem>> task = this.createCitationSearchTask(
                 citationComponents.entry(),
                 citationComponents.searchType(),
                 bypassCache,
                 librarySnapshot.entries(),
                 librarySnapshot.mode());
+        citationsRelationsTabViewModel.trackCitationSearch(citationComponents.searchType(), task);
 
         showNodes(citationComponents.abortButton(), citationComponents.progress());
         hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
@@ -934,31 +925,26 @@ public class CitationRelationsTab extends EntryEditorTab {
             .executeWith(taskExecutor);
     }
 
-    /// TODO: Make the method return a callable and let the calling method create the background task.
-    private BackgroundTask<List<CitationRelationItem>> createBackgroundTask(
+    private BackgroundTask<List<CitationRelationItem>> createCitationSearchTask(
             BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache,
             List<BibEntry> libraryEntries, BibDatabaseMode databaseMode
     ) {
         return switch (searchType) {
-            case CitationFetcher.SearchType.CITES -> {
-                citingTask = createSearchTask(
-                        isCancelled -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, isCancelled),
-                        libraryEntries, databaseMode);
-                yield citingTask;
-            }
-            case CitationFetcher.SearchType.CITED_BY -> {
-                citedByTask = createSearchTask(
-                        isCancelled -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, isCancelled),
-                        libraryEntries, databaseMode);
-                yield citedByTask;
-            }
+            case CitationFetcher.SearchType.CITES ->
+                    createSearchTask(
+                            isCancelled -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, isCancelled),
+                            libraryEntries, databaseMode);
+            case CitationFetcher.SearchType.CITED_BY ->
+                    createSearchTask(
+                            isCancelled -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, isCancelled),
+                            libraryEntries, databaseMode);
         };
     }
 
     /// Wraps fetching and duplicate matching into a task whose cancellation checks are bound to *that very task*.
-    /// They must not read [#citingTask]/[#citedByTask] instead: those fields are reassigned - or set to `null` -
-    /// on the JavaFX Application Thread as soon as another entry is selected, so a check evaluated after the fetch
-    /// returned would either hit `null` or observe an unrelated, newer task.
+    /// They must not read the mutable per-direction task references instead: those references are reassigned - or
+    /// set to `null` - on the JavaFX Application Thread as soon as another entry is selected, so a check evaluated
+    /// after the fetch returned would either hit `null` or observe an unrelated, newer task.
     private BackgroundTask<List<CitationRelationItem>> createSearchTask(CitationFetch fetch,
                                                                         List<BibEntry> libraryEntries,
                                                                         BibDatabaseMode databaseMode) {
@@ -1021,12 +1007,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     ///
     /// @param entriesToImport entries to import
     private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-        if (citingTask != null) {
-            citingTask.cancel(false);
-        }
-        if (citedByTask != null) {
-            citedByTask.cancel(false);
-        }
+        citationsRelationsTabViewModel.cancelCitationSearches();
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
         dialogService.notify(Localization.lang("%0 entry(s) imported", entriesToImport.size()));
     }
