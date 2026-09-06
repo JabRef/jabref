@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -110,19 +111,19 @@ public class SaveOrderConfigPanel extends VBox {
 
     private List<Node> createRowButtons(SortCriterionViewModel criterionViewModel) {
         Button remove = new Button("", new JabRefIconView(IconTheme.JabRefIcons.REMOVE_NOBOX));
-        remove.getStyleClass().addAll("icon-button", "narrow");
+        remove.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         remove.setPrefHeight(20.0);
         remove.setPrefWidth(20.0);
         remove.setOnAction(_ -> removeCriterion(criterionViewModel));
 
         Button moveUp = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_UP));
-        moveUp.getStyleClass().addAll("icon-button", "narrow");
+        moveUp.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         moveUp.setPrefHeight(20.0);
         moveUp.setPrefWidth(20.0);
         moveUp.setOnAction(_ -> moveCriterionUp(criterionViewModel));
 
         Button moveDown = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_DOWN));
-        moveDown.getStyleClass().addAll("icon-button", "narrow");
+        moveDown.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         moveDown.setPrefHeight(20.0);
         moveDown.setPrefWidth(20.0);
         moveDown.setOnAction(_ -> moveCriterionDown(criterionViewModel));

@@ -204,14 +204,14 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                         }
                     });
-                    addToggle.getStyleClass().add("addEntryButton");
+                    addToggle.getStyleClass().addAll("addEntryButton", "h1");
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = BibEntryView.getEntryNode(entry);
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox container = new HBox(entryNode, separator, addToggle);
-                    container.getStyleClass().add("entry-container");
+                    container.getStyleClass().add("padding-6-0");
                     container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
 
                     BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {

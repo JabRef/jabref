@@ -65,7 +65,7 @@ public class SidePaneComponent extends BorderPane {
         BorderPane headerView = new BorderPane();
         headerView.setLeft(label);
         headerView.setRight(buttonContainer);
-        headerView.getStyleClass().add("sidePaneComponentHeader");
+        headerView.getStyleClass().addAll("sidePaneComponentHeader", "padding-4-10");
 
         return headerView;
     }
