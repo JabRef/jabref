@@ -15,6 +15,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -258,6 +259,58 @@ class GitMergeDriverTest extends AbstractJabKitTest {
 
         assertEquals(1, exitCode);
         assertEquals(Files.readString(source), Files.readString(current));
+    }
+
+    @Test
+    void reportsConflictOnEntryCommentChangedInOtherAndDeletedInCurrent(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-comment-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-comment-deleted.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-comment-other.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals(List.of(DOE), parse(current));
+    }
+
+    @Test
+    void reportsConflictOnEntryCommentChangedInCurrentAndDeletedInOther(@TempDir Path tempDir) throws IOException {
+        Path base = copyToMergeFile(getClassResourceAsPath("merge-comment-base.bib"), tempDir, "base");
+        Path current = copyToMergeFile(getClassResourceAsPath("merge-comment-current.bib"), tempDir, "current");
+        Path other = copyToMergeFile(getClassResourceAsPath("merge-comment-deleted.bib"), tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Smith2020"), commandLine.getErrorOutput());
+        assertEquals(parse(getClassResourceAsPath("merge-comment-current.bib")), parse(current));
+    }
+
+    @Test
+    void reportsConflictOnCommentInFrontOfLowercaseCommentBlock(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-lowercase-comment-block.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(source, tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(source), Files.readString(current));
+    }
+
+    @Test
+    void reportsConflictOnCommentInFrontOfCommentBlockOfNonUtf8File(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-latin1-comment-block.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(source, tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertArrayEquals(Files.readAllBytes(source), Files.readAllBytes(current));
     }
 
     @Test

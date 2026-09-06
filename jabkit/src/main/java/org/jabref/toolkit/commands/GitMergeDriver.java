@@ -2,6 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -86,7 +87,7 @@ class GitMergeDriver implements Callable<Integer> {
     /// Exit code telling Git that the file could not be merged cleanly.
     private static final int CONFLICT = 1;
 
-    private static final Pattern COMMENT_BEFORE_COMMENT_BLOCK = Pattern.compile("^%.*(\\R\\s*)*\\R\\s*@Comment\\s*[{(]", Pattern.MULTILINE);
+    private static final Pattern COMMENT_BEFORE_COMMENT_BLOCK = Pattern.compile("^\\h*%.*(\\R\\s*)*\\R\\s*@comment\\s*[{(]", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     @ParentCommand
     private Git git;
@@ -182,18 +183,18 @@ class GitMergeDriver implements Callable<Integer> {
     private List<String> checkMergeable(ParserResult base, ParserResult current, ParserResult other) {
         List<String> reasons = new ArrayList<>();
 
-        List<Path> duplicates = filesWhere(base, current, other, result -> hasDuplicateCitationKeys(result.getDatabaseContext()));
+        List<Path> duplicates = filesWhere(base, current, other, (_, result) -> hasDuplicateCitationKeys(result.getDatabaseContext()));
         if (!duplicates.isEmpty()) {
             reasons.add(Localization.lang("Cannot merge %0: citation keys must be unique.", join(duplicates)));
         }
 
         // A warning means that the parser could not read everything - writing the file back would drop it
-        List<Path> withWarnings = filesWhere(base, current, other, ParserResult::hasWarnings);
+        List<Path> withWarnings = filesWhere(base, current, other, (_, result) -> result.hasWarnings());
         if (!withWarnings.isEmpty()) {
             reasons.add(Localization.lang("Cannot merge %0: the file was not parsed without warnings.", join(withWarnings)));
         }
 
-        List<Path> withDroppedComments = Stream.of(baseFile, currentFile, otherFile).filter(GitMergeDriver::hasCommentBeforeCommentBlock).toList();
+        List<Path> withDroppedComments = filesWhere(base, current, other, GitMergeDriver::hasCommentBeforeCommentBlock);
         if (!withDroppedComments.isEmpty()) {
             reasons.add(Localization.lang("Cannot merge %0: a comment in front of an @Comment block is not preserved.", join(withDroppedComments)));
         }
@@ -205,9 +206,9 @@ class GitMergeDriver implements Callable<Integer> {
         return reasons;
     }
 
-    private List<Path> filesWhere(ParserResult base, ParserResult current, ParserResult other, Predicate<ParserResult> predicate) {
+    private List<Path> filesWhere(ParserResult base, ParserResult current, ParserResult other, BiPredicate<Path, ParserResult> predicate) {
         return Stream.of(Map.entry(baseFile, base), Map.entry(currentFile, current), Map.entry(otherFile, other))
-                     .filter(entry -> predicate.test(entry.getValue()))
+                     .filter(entry -> predicate.test(entry.getKey(), entry.getValue()))
                      .map(Map.Entry::getKey)
                      .toList();
     }
@@ -218,12 +219,16 @@ class GitMergeDriver implements Callable<Integer> {
 
     /// The parser attaches a comment to the entry or `@String` following it, but drops it in front
     /// of an `@Comment` block (metadata, custom entry types) - as does every other JabRef save.
-    private static boolean hasCommentBeforeCommentBlock(Path file) {
+    private static boolean hasCommentBeforeCommentBlock(Path file, ParserResult result) {
+        Charset encoding = result.getDatabaseContext().getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         try {
-            return COMMENT_BEFORE_COMMENT_BLOCK.matcher(Files.readString(file)).find();
+            // decoding through the constructor rather than Files#readString: unmappable bytes are
+            // replaced instead of ending the check with an exception
+            return COMMENT_BEFORE_COMMENT_BLOCK.matcher(new String(Files.readAllBytes(file), encoding)).find();
         } catch (IOException e) {
-            LOGGER.debug("Unable to read {} to look for dropped comments", file, e);
-            return false;
+            LOGGER.error("Unable to read {} to look for dropped comments", file, e);
+            // what cannot be read cannot be checked - and must not be rewritten either
+            return true;
         }
     }
 
@@ -287,22 +292,20 @@ class GitMergeDriver implements Callable<Integer> {
 
             if (baseEntry == null) {
                 // added on both sides - the planner unions the fields, but cannot union the rest
-                if ((currentEntry != null) && (otherEntry != null)
-                        && (!currentEntry.getType().equals(otherEntry.getType())
-                        || !currentEntry.getUserComments().equals(otherEntry.getUserComments()))) {
+                if ((currentEntry != null) && (otherEntry != null) && differsBeyondFields(currentEntry, otherEntry)) {
                     conflicts.add(new ThreeWayEntryConflict(null, currentEntry, otherEntry));
                 }
                 continue;
             }
             if (currentEntry == null) {
-                // deleted in CURRENT: accepting the deletion would drop a type change of OTHER
-                if ((otherEntry != null) && !baseEntry.getType().equals(otherEntry.getType())) {
+                // deleted in CURRENT: accepting the deletion would drop a change of OTHER
+                if ((otherEntry != null) && differsBeyondFields(baseEntry, otherEntry)) {
                     conflicts.add(new ThreeWayEntryConflict(baseEntry, null, otherEntry));
                 }
                 continue;
             }
             if (otherEntry == null) {
-                if (!baseEntry.getType().equals(currentEntry.getType())) {
+                if (differsBeyondFields(baseEntry, currentEntry)) {
                     conflicts.add(new ThreeWayEntryConflict(baseEntry, currentEntry, null));
                 }
                 continue;
@@ -316,6 +319,12 @@ class GitMergeDriver implements Callable<Integer> {
             takeFromOther(baseEntry, currentEntry, otherEntry, BibEntry::getUserComments, GitMergeDriver::setUserComments);
         }
         return conflicts;
+    }
+
+    /// The properties the planner does not compare: everything but the fields.
+    private static boolean differsBeyondFields(BibEntry one, BibEntry other) {
+        return !one.getType().equals(other.getType())
+                || !one.getUserComments().equals(other.getUserComments());
     }
 
     /// Both sides changed the value, and to something different.
