@@ -44,6 +44,9 @@ public class SharedDatabaseUIManager {
 
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
+
+    /// The library this manager opened, set together with the synchronizer it listens to.
+    private BibDatabaseContext sharedDatabaseContext;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
@@ -135,18 +138,17 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
-        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        // The event comes from this manager's own synchronizer, so the entries are the shared
+        // library's, whether or not that library is the one in front.
+        stateManager.getUndoManager(sharedDatabaseContext)
+                    .addEdit(new UndoableRemoveEntries(sharedDatabaseContext.getDatabase(), event.bibEntries()));
 
-        if (libraryTab != null) {
-            libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
+        dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
+                Localization.lang("The entry you currently work on has been deleted on the shared side.")
+                        + "\n"
+                        + Localization.lang("You can restore the entry using the \"Undo\" operation."));
 
-            dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                    Localization.lang("The entry you currently work on has been deleted on the shared side.")
-                            + "\n"
-                            + Localization.lang("You can restore the entry using the \"Undo\" operation."));
-
-            stateManager.setSelectedEntries(List.of());
-        }
+        stateManager.setSelectedEntries(List.of());
     }
 
     /// Opens a new shared database tab with the given [DBMSConnectionProperties].
@@ -158,6 +160,7 @@ public class SharedDatabaseUIManager {
 
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
 
+        sharedDatabaseContext = bibDatabaseContext;
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
@@ -196,6 +199,7 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
         bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
+        sharedDatabaseContext = bibDatabaseContext;
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
