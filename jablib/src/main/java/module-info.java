@@ -133,6 +133,7 @@ open module org.jabref.jablib {
 
     // region: AI
     exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.spi;
     exports org.jabref.logic.ai.chatting;
     exports org.jabref.logic.ai.util;
     exports org.jabref.logic.ai.summarization;
@@ -280,6 +281,9 @@ open module org.jabref.jablib {
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    uses org.jabref.logic.ai.spi.AiServiceProvider;
+    provides org.jabref.logic.ai.spi.AiServiceProvider
+            with org.jabref.logic.ai.DefaultAiServiceProvider;
     requires velocity.engine.core;
     // endregion
 
