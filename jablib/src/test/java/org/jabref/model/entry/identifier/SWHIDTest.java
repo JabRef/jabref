@@ -20,7 +20,7 @@ public class SWHIDTest {
     private static final String QUALIFIED_SWHID = "swh:1:dir:2dc0f462d191524530f5612d2935851505af41dd;origin=https://github.com/rdicosmo/parmap;visit=swh:1:snp:2128ed4f25f2d7ae7c8b7950a611d69cf4429063";
 
     @Test
-    void parse_validPlainSwhid_returnsSwhid() {
+    void parseCoreSwhid() {
         Optional<SWHID> swhid = SWHID.parse(DIRECTORY_SWHID);
         assertEquals(Optional.of(new SWHID(DIRECTORY_SWHID)), swhid);
         assertEquals(BiblatexSoftwareField.SWHID, swhid.map(SWHID::getDefaultField).orElse(null));
@@ -28,13 +28,13 @@ public class SWHIDTest {
     }
 
     @Test
-    void parse_qualifiedSwhid_returnsSwhid() {
+    void parseQualifiedSwhid() {
         Optional<SWHID> swhid = SWHID.parse(QUALIFIED_SWHID);
         assertEquals(Optional.of(new SWHID(QUALIFIED_SWHID)), swhid);
     }
 
     @Test
-    void parse_urlPrefixedSwhid_returnsStrippedSwhid() {
+    void parseUrlPrefixedSwhid() {
         Optional<SWHID> swhid = SWHID.parse("https://archive.softwareheritage.org/" + DIRECTORY_SWHID);
         assertEquals(Optional.of(new SWHID(DIRECTORY_SWHID)), swhid);
     }
@@ -47,7 +47,7 @@ public class SWHIDTest {
             "swh:2:dir2dc0f462d191524530f5612d2935851505af41dd",
             "swh:1:dir2dc0f462d191524530f5612d2935851505af41dd",
             "swh:1:dir:short"})
-    void parse_invalidInputs_returnsEmpty(String invalidInput) {
+    void parseInvalidInputsReturnsEmpty(String invalidInput) {
         assertEquals(Optional.empty(), SWHID.parse(invalidInput));
     }
 }

@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-final class FetcherRetry {
+public final class FetcherRetry {
 
-    static final int MAX_RATE_LIMIT_RETRIES = 2;
-    static final int HTTP_TOO_MANY_REQUESTS = 429;
+    public static final int MAX_RATE_LIMIT_RETRIES = 2;
+    public static final int HTTP_TOO_MANY_REQUESTS = 429;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherRetry.class);
     private static final Duration INITIAL_BACKOFF = Duration.ofSeconds(1);
@@ -19,11 +19,11 @@ final class FetcherRetry {
     }
 
     // [impl->req~fetchers.identifier-rate-limit-retries~1]
-    static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation) throws FetcherException {
+    public static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation) throws FetcherException {
         return executeWithRateLimitRetry(operation, Thread::sleep);
     }
 
-    static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation, Backoff backoff) throws FetcherException {
+    public static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation, Backoff backoff) throws FetcherException {
         for (int retryAttempt = 0; ; retryAttempt++) {
             try {
                 return operation.execute();
@@ -51,12 +51,12 @@ final class FetcherRetry {
     }
 
     @FunctionalInterface
-    interface FetcherOperation<T> {
+    public interface FetcherOperation<T> {
         T execute() throws FetcherException;
     }
 
     @FunctionalInterface
-    interface Backoff {
+    public interface Backoff {
         void waitFor(Duration delay) throws InterruptedException;
     }
 }

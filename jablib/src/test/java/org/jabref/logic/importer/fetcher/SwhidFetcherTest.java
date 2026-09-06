@@ -40,12 +40,12 @@ public class SwhidFetcherTest {
     }
 
     @Test
-    void getName_returnsCorrectName() {
+    void getNameReturnsCorrectName() {
         assertEquals("Software Heritage", fetcher.getName());
     }
 
     @Test
-    void performSearchById_validParampSwhid_returnsBibEntry() throws FetcherException {
+    void performSearchByIdReturnsBibEntryForValidParmapSwhid() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(PARMAP_SWHID);
 
         assertEquals(Optional.of("Parmap"), fetchedEntry.flatMap(entry -> entry.getField(StandardField.TITLE)));
@@ -55,14 +55,14 @@ public class SwhidFetcherTest {
     }
 
     @Test
-    void performSearchById_nonExistentSwhid_returnsEmpty() throws FetcherException {
+    void performSearchByIdReturnsEmptyForNonExistentSwhid() throws FetcherException {
         String nonExistent = "swh:1:dir:0000000000000000000000000000000000000000";
         Optional<BibEntry> result = fetcher.performSearchById(nonExistent);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void performSearchById_malformedIdentifier_throwsFetcherClientException() {
+    void performSearchByIdThrowsFetcherClientExceptionForMalformedIdentifier() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("invalid-id"));
     }
 }

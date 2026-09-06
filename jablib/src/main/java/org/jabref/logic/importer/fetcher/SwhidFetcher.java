@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherRetry;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -26,12 +27,15 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Fetches bibliographic citation entries from Software Heritage using SWHID identifiers.
+// [impl->feat~fetchers.swhid~1]
 @NullMarked
 public class SwhidFetcher implements IdBasedFetcher {
 
     public static final String FETCHER_NAME = "Software Heritage";
     private static final Logger LOGGER = LoggerFactory.getLogger(SwhidFetcher.class);
     private static final String API_URL = "https://archive.softwareheritage.org/api/1/raw-intrinsic-metadata/citation/swhid/";
+    private static final String USER_AGENT = "JabRef";
 
     // Software Heritage allows 120 requests per hour for anonymous users
     // [impl->req~fetchers.rate-limiting~1]
@@ -61,6 +65,7 @@ public class SwhidFetcher implements IdBasedFetcher {
     }
 
     @Override
+    // [impl->req~fetchers.identifier-rate-limit-retries~1]
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<SWHID> parsedSwhid = SWHID.parse(identifier);
         if (parsedSwhid.isEmpty()) {
@@ -77,44 +82,48 @@ public class SwhidFetcher implements IdBasedFetcher {
             throw new FetcherException("Invalid URL constructed for SWHID: " + canonicalSwhid, e);
         }
 
-        try {
-            URLDownload urlDownload = new URLDownload(url);
-            urlDownload.addHeader("User-Agent", "JabRef");
-            String response = urlDownload.asString();
+        return FetcherRetry.executeWithRateLimitRetry(() -> {
+            try {
+                URLDownload urlDownload = new URLDownload(url);
+                // Software Heritage uses anti-bot protection that blocks default browser user agents.
+                // Explicitly setting the user-Agent to JabRef identifies us as an API client and allows retrieving the JSON response.
+                urlDownload.addHeader("User-Agent", USER_AGENT);
+                String response = urlDownload.asString();
 
-            JSONObject jsonObject = new JSONObject(response);
-            String bibtexContext = jsonObject.optString("content", "");
+                JSONObject jsonObject = new JSONObject(response);
+                String bibtexContext = jsonObject.optString("content", "");
 
-            if (bibtexContext.isBlank()) {
-                return Optional.empty();
+                if (bibtexContext.isBlank()) {
+                    return Optional.empty();
+                }
+
+                BibtexParser parser = new BibtexParser(importFormatPreferences);
+                List<BibEntry> entries = parser.parseEntries(bibtexContext);
+
+                if (entries.isEmpty()) {
+                    return Optional.empty();
+                }
+
+                BibEntry entry = entries.getFirst();
+
+                if (!entry.hasField(BiblatexSoftwareField.SWHID)) {
+                    entry = entry.withField(BiblatexSoftwareField.SWHID, canonicalSwhid);
+                }
+
+                return Optional.of(entry);
+            } catch (FetcherClientException e) {
+                boolean isNotFound = e.getHttpResponse()
+                                      .map(response -> response.statusCode() == 404)
+                                      .orElse(false);
+                if (isNotFound) {
+                    LOGGER.debug("No citation metadata found for SWHID: {}", canonicalSwhid, e);
+                    return Optional.empty();
+                }
+                throw e;
+            } catch (JSONException | ParseException e) {
+                LOGGER.info("Error fetching or parsing SWHID response for {}", canonicalSwhid, e);
+                throw new FetcherException("Failed to retrieve or parse metadata from Software Heritage", e);
             }
-
-            BibtexParser parser = new BibtexParser(importFormatPreferences);
-            List<BibEntry> entries = parser.parseEntries(bibtexContext);
-
-            if (entries.isEmpty()) {
-                return Optional.empty();
-            }
-
-            BibEntry entry = entries.getFirst();
-
-            if (!entry.hasField(BiblatexSoftwareField.SWHID)) {
-                entry = entry.withField(BiblatexSoftwareField.SWHID, canonicalSwhid);
-            }
-
-            return Optional.of(entry);
-        } catch (FetcherClientException e) {
-            boolean isNotFound = e.getHttpResponse()
-                                  .map(response -> response.statusCode() == 404)
-                                  .orElse(false);
-            if (isNotFound) {
-                LOGGER.debug("No citation metadata found for SWHID: {}", canonicalSwhid, e);
-                return Optional.empty();
-            }
-            throw e;
-        } catch (JSONException | ParseException e) {
-            LOGGER.info("Error fetching or parsing SWHID response for {}", canonicalSwhid, e);
-            throw new FetcherException("Failed to retrieve or parse metadata from Software Heritage", e);
-        }
+        });
     }
 }
