@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -22,21 +21,24 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 class DownloadFullTextActionTest {
 
     private DialogService dialogService;
     private JabRefGuiStateManager stateManager;
     private GuiPreferences preferences;
-    private CapturingTaskExecutor taskExecutor;
+    private UiTaskExecutor taskExecutor;
     private BibDatabaseContext databaseContext;
     private BibEntry entry;
     private FetcherResult fetcherResult;
@@ -46,7 +48,8 @@ class DownloadFullTextActionTest {
         dialogService = mock(DialogService.class);
         stateManager = new JabRefGuiStateManager();
         preferences = mock(GuiPreferences.class);
-        taskExecutor = new CapturingTaskExecutor();
+        taskExecutor = mock(UiTaskExecutor.class);
+        when(taskExecutor.execute(any(BackgroundTask.class))).thenReturn(CompletableFuture.completedFuture(null));
 
         databaseContext = new BibDatabaseContext();
         stateManager.getOpenDatabases().add(databaseContext);
@@ -59,11 +62,6 @@ class DownloadFullTextActionTest {
         stateManager.setSelectedEntries(List.of(entry));
 
         fetcherResult = new FetcherResult(TrustLevel.PUBLISHER, URLUtil.create("https://example.org/test.pdf"), Map.of());
-    }
-
-    @AfterEach
-    void tearDown() {
-        taskExecutor.shutdown();
     }
 
     @Test
@@ -117,7 +115,10 @@ class DownloadFullTextActionTest {
 
     private BackgroundTask<?> captureTask(DownloadFullTextAction action) {
         action.execute();
-        return taskExecutor.getCapturedTask();
+
+        ArgumentCaptor<BackgroundTask> taskCaptor = ArgumentCaptor.forClass(BackgroundTask.class);
+        verify(taskExecutor).execute(taskCaptor.capture());
+        return taskCaptor.getValue();
     }
 
     private static void completeTask(BackgroundTask<?> task) throws Exception {
@@ -130,20 +131,6 @@ class DownloadFullTextActionTest {
         Consumer onSuccess = task.getOnSuccess();
         if (onSuccess != null) {
             onSuccess.accept(downloads);
-        }
-    }
-
-    private static class CapturingTaskExecutor extends UiTaskExecutor {
-        private BackgroundTask<?> capturedTask;
-
-        @Override
-        public <V> Future<V> execute(BackgroundTask<V> task) {
-            capturedTask = task;
-            return CompletableFuture.completedFuture(null);
-        }
-
-        BackgroundTask<?> getCapturedTask() {
-            return capturedTask;
         }
     }
 
