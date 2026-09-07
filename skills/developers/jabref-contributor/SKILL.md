@@ -42,6 +42,16 @@ Requires JDK 25+ for Gradle (the wrapper downloads a JDK itself):
 - **Architecture decisions:** documented as ADRs in `docs/decisions/`; add a new ADR when making an architecturally significant choice.
 - **Localization:** user-visible strings go through `Localization.lang(...)`; add keys to `jablib/src/main/resources/l10n/JabRef_en.properties` only — other languages are translated via Crowdin.
 
+## Stacked pull requests
+
+When a PR is based on another open PR's branch and that base PR is squash-merged, merging `main` back in produces spurious conflicts — Git no longer sees the branch's commits in `main`. Do **not** use GitHub's "Rebase" button for this; it rewrites the branch and usually multiplies the conflicts.
+
+Instead create a magic merge commit that links the branch to the squashed history, then merge `main` normally: <https://github.com/koppor/magic-merge-commit/blob/main/skills/magic-merge-commit/SKILL.md>
+
+```bash
+jbang do@koppor/magic-merge-commit <squash-merged-pr-number>
+```
+
 ## Before opening a PR
 
 Work through every point of `CHECKLIST.md` in the repository root — it is the mandatory quality gate. Also:

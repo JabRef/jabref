@@ -20,7 +20,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label text="%API Key"/>
                 <TextField fx:id="apiKeyField" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="testButton" onAction="#testApiKey" styleClass="padding-4-6" text="%Test connection"/>
+                <Button fx:id="testButton" onAction="#testApiKey" styleClass="padding-4" text="%Test connection"/>
             </HBox>
             <CheckBox fx:id="persistApiKeysCheckBox" text="%Save API key to use in future?">
                 <tooltip>

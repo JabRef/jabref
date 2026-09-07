@@ -72,7 +72,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
-        root.getStyleClass().add("padding-20");
+        root.getStyleClass().add("padding-24");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
@@ -127,7 +127,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         for (BibEntry entry : list) {
             HBox hBox = new HBox();
             hBox.setSpacing(5.0);
-            hBox.getStyleClass().add("padding-left-20");
+            hBox.getStyleClass().add("padding-left-24");
 
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");
@@ -181,7 +181,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");
-        root.getStyleClass().add("padding-20");
+        root.getStyleClass().add("padding-24");
         VBox vbox = new VBox();
         vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-12");
         vbox.setSpacing(20.0);

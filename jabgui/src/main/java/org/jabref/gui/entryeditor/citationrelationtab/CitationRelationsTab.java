@@ -308,11 +308,10 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.setId("scite-error-label");
-        titleLabel.getStyleClass().addAll("h3", "bold");
+        titleLabel.getStyleClass().addAll("h3", "bold", "text-danger");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
-        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-32");
+        VBox errorMessageBox = new VBox(24, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("padding-24");
         return errorMessageBox;
     }
 
@@ -637,7 +636,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     vContainer.getChildren().addLast(showEntrySource);
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("padding-6-0");
+                    hContainer.getStyleClass().add("padding-4-0");
 
                     return hContainer;
                 })
@@ -750,7 +749,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.getStyleClass().add("padding-6");
+        label.getStyleClass().add("padding-4");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
