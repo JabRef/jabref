@@ -16,7 +16,7 @@
             id="multiMergeEntries">
 
     <content>
-        <VBox styleClass="box">
+        <VBox styleClass="spacing-10">
             <SplitPane dividerPositions="0.1, 0.6, 0.3" VBox.vgrow="ALWAYS">
                 <VBox>
                     <Region prefHeight="${topScrollPane.height}" VBox.vgrow="NEVER">
@@ -24,15 +24,15 @@
                         <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
                    </Region>
                     <ScrollPane fx:id="leftScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-                        <VBox fx:id="fieldHeader" styleClass="box"/>
+                        <VBox fx:id="fieldHeader" styleClass="spacing-10"/>
                     </ScrollPane>
                 </VBox>
                 <VBox>
                     <ScrollPane fx:id="topScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" VBox.vgrow="NEVER">
-                        <HBox fx:id="supplierHeader" styleClass="box"/>
+                        <HBox fx:id="supplierHeader" styleClass="spacing-10"/>
                     </ScrollPane>
                     <ScrollPane fx:id="centerScrollPane" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-                        <GridPane fx:id="optionsGrid" styleClass="grid-pane"/>
+                        <GridPane fx:id="optionsGrid" styleClass="gap-10"/>
                     </ScrollPane>
                 </VBox>
                <VBox alignment="TOP_CENTER">
@@ -41,12 +41,12 @@
                         <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
                    </Label>
                     <ScrollPane fx:id="rightScrollPane" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" fitToWidth="true">
-                        <VBox fx:id="fieldEditor" styleClass="box"/>
+                        <VBox fx:id="fieldEditor" styleClass="spacing-10"/>
                     </ScrollPane>
                 </VBox>
             </SplitPane>
             <Label fx:id="failedSuppliers"/>
-            <HBox styleClass="box">
+            <HBox styleClass="spacing-10">
                 <Label text="%Show diff" prefHeight="${diffMode.height}"/>
                 <ComboBox fx:id="diffMode"/>
             </HBox>

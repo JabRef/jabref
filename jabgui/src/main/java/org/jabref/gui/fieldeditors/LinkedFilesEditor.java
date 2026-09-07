@@ -85,6 +85,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final FieldCheckers fieldCheckers;
+    private final UndoManager undoManager;
 
     @Inject
     private DialogService dialogService;
@@ -96,8 +97,6 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private JournalAbbreviationRepository abbreviationRepository;
     @Inject
     private TaskExecutor taskExecutor;
-    @Inject
-    private UndoManager undoManager;
     @Inject
     private FileUpdateMonitor fileUpdateMonitor;
     @Inject
@@ -113,11 +112,13 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
                              SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers) {
+                             FieldCheckers fieldCheckers,
+                             UndoManager undoManager) {
         this.field = field;
         this.databaseContext = databaseContext;
         this.suggestionProvider = suggestionProvider;
         this.fieldCheckers = fieldCheckers;
+        this.undoManager = undoManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -158,6 +159,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withPseudoClass(PseudoClass.getPseudoClass("auto-found"), LinkedFileViewModel::isAutomaticallyFoundProperty)
                 .withGraphic(this::createFileDisplay)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -274,7 +276,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.getStyleClass().add("linked-files-info"); // To align with buttons below which also have 0.5em padding
+        info.getStyleClass().add("padding-6-0"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);

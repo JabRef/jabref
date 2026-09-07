@@ -107,6 +107,14 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void parsesKeywordSeparator() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.KEYWORD_SEPARATOR, "\\;;"), ',', "userAndHost");
+
+        assertEquals(Optional.of(';'), parsed.getKeywordSeparator());
+    }
+
+    @Test
     void parsesUserSpecificBlgPathSuccessfully() throws ParseException {
         String user = "testUser";
         String rawKey = "blgFilePath-" + user;
