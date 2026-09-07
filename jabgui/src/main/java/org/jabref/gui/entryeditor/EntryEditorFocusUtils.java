@@ -14,10 +14,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import org.jspecify.annotations.Nullable;
 
@@ -29,12 +32,14 @@ class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
+    private final NotificationService notificationService;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource, NotificationService notificationService) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
+        this.notificationService = notificationService;
     }
 
     // region — field focus capture / restore
@@ -111,13 +116,17 @@ class EntryEditorFocusUtils {
                .filter(AllFieldsTab.class::isInstance)
                .map(AllFieldsTab.class::cast)
                .findFirst()
-               .ifPresent(allFieldsTab -> {
+               .ifPresentOrElse(allFieldsTab -> {
                    BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
                    // Custom field names are added as they are typed, like the tab's free-form add row does.
                    Field canonicalField = canonicalFieldForActiveMode(field, mode);
                    tabPane.getSelectionModel().select(allFieldsTab);
                    allFieldsTab.addFieldAndFocus(canonicalField);
-               });
+               },
+               // No other tab can show a field it was not configured for, so say why nothing happens
+               // instead of swallowing the jump.
+               () -> notificationService.notify(Localization.lang("Cannot show \"%0\" because the \"%1\" tab is hidden",
+                       FieldTextMapper.getDisplayName(field), EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName())));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
