@@ -9,6 +9,10 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -41,7 +45,8 @@ public class OfflineChanges {
     /// against: the optimistic lock needs it to notice that the shared entry moved on meanwhile.
     public record EntryState(int baseVersion, String entryType, Map<String, String> fields) {
         static EntryState of(BibEntry entry) {
-            Map<String, String> fields = new LinkedHashMap<>();
+            // Sorted, so that the file content is stable across sessions
+            Map<String, String> fields = new TreeMap<>();
             entry.getFieldMap().forEach((field, value) -> fields.put(field.getName(), value));
             return new EntryState(entry.getSharedBibEntryData().getVersion(), entry.getType().getName(), fields);
         }
@@ -65,17 +70,36 @@ public class OfflineChanges {
         }
     }
 
-    /// Everything recorded up to a [#take]. New entries are keyed by their local entry id, so
+    /// Everything recorded up to a [#peek]. New entries are keyed by their local entry id, so
     /// that a reconnect without restart finds them in the local library.
     ///
     /// @param removedEntries the shared version each removed entry had when it was removed: the
     ///                       optimistic lock needs it to notice that the shared entry moved on
+    /// @param metaDataBase   the shared metadata as last known before the recorded metadata was
+    ///                       changed - the merge base for [#mergeMetaDataInto]
     public record Recorded(Map<Integer, EntryState> changedEntries,
                            Map<String, EntryState> newEntries,
                            Map<Integer, Integer> removedEntries,
-                           @Nullable Map<String, String> metaData) {
+                           @Nullable Map<String, String> metaData,
+                           @Nullable Map<String, String> metaDataBase) {
         public boolean isEmpty() {
             return changedEntries.isEmpty() && newEntries.isEmpty() && removedEntries.isEmpty() && (metaData == null);
+        }
+
+        /// Metadata has no version to lock on, so the recorded metadata is merged key by key:
+        /// a key the user changed while offline wins (also over a concurrent change on the
+        /// shared side - the user was promised that these changes are kept), every other key
+        /// stays as the shared side has it now.
+        public Map<String, String> mergeMetaDataInto(Map<String, String> sharedMetaData) {
+            Map<String, String> recorded = requireNonNullElse(metaData, Map.of());
+            Map<String, String> base = requireNonNullElse(metaDataBase, Map.of());
+            Map<String, String> merged = new LinkedHashMap<>(sharedMetaData);
+            Stream.concat(base.keySet().stream(), recorded.keySet().stream())
+                  .distinct()
+                  .filter(key -> !Objects.equals(recorded.get(key), base.get(key)))
+                  .forEach(key -> Optional.ofNullable(recorded.get(key))
+                                          .ifPresentOrElse(value -> merged.put(key, value), () -> merged.remove(key)));
+            return merged;
         }
     }
 
@@ -84,6 +108,7 @@ public class OfflineChanges {
     private final Map<String, EntryState> newEntries = new LinkedHashMap<>();
     private final Map<Integer, Integer> removedEntries = new LinkedHashMap<>();
     private @Nullable Map<String, String> metaData;
+    private @Nullable Map<String, String> metaDataBase;
 
     private OfflineChanges(Path file) {
         this.file = file;
@@ -106,6 +131,7 @@ public class OfflineChanges {
         newEntries.clear();
         removedEntries.clear();
         metaData = null;
+        metaDataBase = null;
         if (!Files.exists(file)) {
             return;
         }
@@ -120,6 +146,7 @@ public class OfflineChanges {
             newEntries.putAll(requireNonNullElse(recorded.newEntries(), Map.of()));
             removedEntries.putAll(requireNonNullElse(recorded.removedEntries(), Map.of()));
             metaData = recorded.metaData();
+            metaDataBase = recorded.metaDataBase();
         } catch (IOException | JsonParseException e) {
             LOGGER.error("Could not read the changes recorded for the shared database from {}", file, e);
         }
@@ -135,7 +162,7 @@ public class OfflineChanges {
     }
 
     public synchronized boolean isEmpty() {
-        return changedEntries.isEmpty() && newEntries.isEmpty() && removedEntries.isEmpty() && (metaData == null);
+        return snapshot().isEmpty();
     }
 
     public synchronized void recordChange(BibEntry entry) {
@@ -177,36 +204,49 @@ public class OfflineChanges {
         save();
     }
 
-    public synchronized void recordMetaData(Map<String, String> serializedMetaData) {
+    /// @param base the shared metadata as last known - kept from the first record, the metadata
+    ///             cannot move on while offline
+    public synchronized void recordMetaData(Map<String, String> serializedMetaData, @Nullable Map<String, String> base) {
         reload();
+        if (metaData == null) {
+            metaDataBase = base;
+        }
         metaData = serializedMetaData;
         save();
     }
 
-    /// Drops the record of an entry that reached the shared database after all
-    public synchronized void forget(BibEntry entry) {
+    /// Turns the record of a change into the record of a new entry, because the shared entry it
+    /// was recorded against is gone and the entry is inserted afresh instead. One step, so that
+    /// no moment exists in which the entry is recorded as neither.
+    public synchronized void recordAsNew(int sharedId, BibEntry entry) {
         reload();
-        boolean removed = newEntries.remove(entry.getId()) != null;
-        removed |= changedEntries.remove(entry.getSharedBibEntryData().getSharedIdAsInt()) != null;
+        changedEntries.remove(sharedId);
+        newEntries.put(entry.getId(), EntryState.of(entry));
+        save();
+    }
+
+    /// Re-keys the records of new entries restored after a restart under fresh local ids, so
+    /// that a failed insert records them under the ids it knows instead of next to the old records
+    public synchronized void rekeyInserts(Map<String, BibEntry> restoredEntriesByRecordedId) {
+        reload();
+        restoredEntriesByRecordedId.forEach((recordedId, entry) -> {
+            EntryState state = newEntries.remove(recordedId);
+            if (state != null) {
+                newEntries.put(entry.getId(), state);
+            }
+        });
+        save();
+    }
+
+    /// Drops the records of entries that reached the shared database after all
+    public synchronized void forget(Collection<BibEntry> entries) {
+        reload();
+        boolean removed = false;
+        for (BibEntry entry : entries) {
+            removed |= newEntries.remove(entry.getId()) != null;
+            removed |= changedEntries.remove(entry.getSharedBibEntryData().getSharedIdAsInt()) != null;
+        }
         if (removed) {
-            save();
-        }
-    }
-
-    /// Drops the record of a change that is written as an insert instead, because the shared entry
-    /// it was recorded against is gone
-    public synchronized void forgetChange(int sharedId) {
-        reload();
-        if (changedEntries.remove(sharedId) != null) {
-            save();
-        }
-    }
-
-    /// Drops the records of new entries that reached the shared database. Keyed by the recorded
-    /// local id: after a restart the entry is restored under a fresh id, so [#forget] would miss it.
-    public synchronized void forgetInserts(Collection<String> localIds) {
-        reload();
-        if (newEntries.keySet().removeAll(localIds)) {
             save();
         }
     }
@@ -225,6 +265,7 @@ public class OfflineChanges {
         reload();
         if (metaData != null) {
             metaData = null;
+            metaDataBase = null;
             save();
         }
     }
@@ -233,18 +274,23 @@ public class OfflineChanges {
     /// (see the `forget` methods), so that nothing is lost when the replay fails or is interrupted.
     public synchronized Recorded peek() {
         reload();
-        return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData);
+        return snapshot();
+    }
+
+    private Recorded snapshot() {
+        return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData, metaDataBase);
     }
 
     private void save() {
         try {
-            if (isEmpty()) {
+            Recorded recorded = snapshot();
+            if (recorded.isEmpty()) {
                 Files.deleteIfExists(file);
                 return;
             }
             Files.createDirectories(file.getParent());
             Path temporaryFile = Files.createTempFile(file.getParent(), "shared-database", ".json.tmp");
-            Files.writeString(temporaryFile, GSON.toJson(new Recorded(changedEntries, newEntries, removedEntries, metaData)));
+            Files.writeString(temporaryFile, GSON.toJson(recorded));
             Files.move(temporaryFile, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             LOGGER.error("Could not save the changes made while the shared database was unavailable to {}", file, e);

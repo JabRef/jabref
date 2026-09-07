@@ -55,7 +55,7 @@ class OfflineChangesTest {
         newEntry.setId("local-id");
         changes.recordInsert(List.of(newEntry));
         changes.recordRemoval(List.of(sharedEntry(2, 5)));
-        changes.recordMetaData(Map.of("databaseType", "bibtex"));
+        changes.recordMetaData(Map.of("databaseType", "bibtex"), Map.of("databaseType", "biblatex"));
 
         String expected = """
                 {
@@ -64,8 +64,8 @@ class OfflineChangesTest {
                       "baseVersion": 3,
                       "entryType": "article",
                       "fields": {
-                        "year": "2026",
-                        "title": "Title 1"
+                        "title": "Title 1",
+                        "year": "2026"
                       }
                     }
                   },
@@ -83,6 +83,9 @@ class OfflineChangesTest {
                   },
                   "metaData": {
                     "databaseType": "bibtex"
+                  },
+                  "metaDataBase": {
+                    "databaseType": "biblatex"
                   }
                 }""";
         assertEquals(expected, Files.readString(directory.resolve(OfflineChanges.fileName(properties))));
@@ -98,7 +101,7 @@ class OfflineChangesTest {
         changes.recordChange(changed);
         changes.recordRemoval(List.of(removed));
         changes.recordInsert(List.of(added));
-        changes.recordMetaData(Map.of("databaseType", "bibtex;"));
+        changes.recordMetaData(Map.of("databaseType", "bibtex;"), Map.of());
 
         OfflineChanges.Recorded recorded = OfflineChanges.load(directory, properties).peek();
 
@@ -106,6 +109,7 @@ class OfflineChangesTest {
         assertEquals(Map.of(added.getId(), new OfflineChanges.EntryState(1, "book", Map.of("author", "Ada"))), recorded.newEntries());
         assertEquals(Map.of(2, 1), recorded.removedEntries());
         assertEquals(Map.of("databaseType", "bibtex;"), recorded.metaData());
+        assertEquals(Map.of(), recorded.metaDataBase());
     }
 
     @Test
@@ -114,14 +118,14 @@ class OfflineChangesTest {
         OfflineChanges changes = OfflineChanges.load(directory, properties);
         changes.recordChange(changed);
         changes.recordRemoval(List.of(sharedEntry(2, 1)));
-        changes.recordMetaData(Map.of("databaseType", "bibtex;"));
+        changes.recordMetaData(Map.of("databaseType", "bibtex;"), Map.of());
 
         changes.peek();
 
         assertFalse(changes.isEmpty());
         assertFalse(OfflineChanges.load(directory, properties).isEmpty());
 
-        changes.forget(changed);
+        changes.forget(List.of(changed));
         changes.forgetRemovals(Set.of(2));
         changes.forgetMetaData();
 
@@ -187,5 +191,57 @@ class OfflineChangesTest {
         OfflineChanges.load(directory, properties).recordChange(sharedEntry(1, 1));
 
         assertTrue(OfflineChanges.load(directory, other).isEmpty());
+    }
+
+    @Test
+    void metaDataBaseIsTheOneOfTheFirstRecord() {
+        OfflineChanges changes = OfflineChanges.load(directory, properties);
+        changes.recordMetaData(Map.of("protectedFlag", "true;"), Map.of("databaseType", "bibtex;"));
+
+        changes.recordMetaData(Map.of("protectedFlag", "false;"), Map.of("protectedFlag", "true;"));
+
+        OfflineChanges.Recorded recorded = changes.peek();
+        assertEquals(Map.of("protectedFlag", "false;"), recorded.metaData());
+        assertEquals(Map.of("databaseType", "bibtex;"), recorded.metaDataBase());
+    }
+
+    @Test
+    void recordedMetaDataMergesKeyByKeyIntoTheSharedOne() {
+        Map<String, String> base = Map.of("databaseType", "bibtex;", "protectedFlag", "false;", "saveOrderConfig", "specified;author;false;");
+        // Offline: the flag changed, the save order removed
+        Map<String, String> recorded = Map.of("databaseType", "bibtex;", "protectedFlag", "true;");
+        // Meanwhile on the shared side: a key pattern added, the flag changed as well
+        Map<String, String> shared = Map.of("databaseType", "bibtex;", "protectedFlag", "false;", "saveOrderConfig", "specified;author;false;", "keypatterndefault", "[auth];");
+
+        Map<String, String> merged = new OfflineChanges.Recorded(Map.of(), Map.of(), Map.of(), recorded, base).mergeMetaDataInto(shared);
+
+        assertEquals(Map.of("databaseType", "bibtex;", "protectedFlag", "true;", "keypatterndefault", "[auth];"), merged);
+    }
+
+    @Test
+    void restoredNewEntriesAreRecordedUnderTheirFreshIds() {
+        BibEntry recordedInEarlierSession = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "New");
+        OfflineChanges changes = OfflineChanges.load(directory, properties);
+        changes.recordInsert(List.of(recordedInEarlierSession));
+        BibEntry restored = changes.peek().newEntries().get(recordedInEarlierSession.getId()).toBibEntry();
+
+        changes.rekeyInserts(Map.of(recordedInEarlierSession.getId(), restored));
+
+        assertEquals(Set.of(restored.getId()), changes.peek().newEntries().keySet());
+        changes.forget(List.of(restored));
+        assertTrue(changes.isEmpty());
+    }
+
+    @Test
+    void changeOfEntryGoneOnTheSharedSideBecomesNewEntry() {
+        BibEntry entry = sharedEntry(1, 2);
+        OfflineChanges changes = OfflineChanges.load(directory, properties);
+        changes.recordChange(entry);
+
+        changes.recordAsNew(1, entry);
+
+        OfflineChanges.Recorded recorded = changes.peek();
+        assertEquals(Map.of(), recorded.changedEntries());
+        assertEquals(Set.of(entry.getId()), recorded.newEntries().keySet());
     }
 }

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -381,12 +383,19 @@ class DBMSSynchronizerTest {
             assertTrue(Files.exists(offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()))));
             assertEquals(Optional.of("The nano processor1"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
 
+            // Typing after the record: the GUI marks such micro-edits as filtered, they stay buffered
+            entry.setField(StandardField.TITLE, "Typed after the record", EntriesEventSource.SHARED);
+            FieldChangedEvent microEdit = new FieldChangedEvent(entry, StandardField.TITLE, "Edited while disconnected", "Typed after the record");
+            microEdit.setFiltered(true);
+            synchronizer.listen(microEdit);
+
             // The reconnect loop finds the database again and writes them; the records are dropped
             // one by one as they are written, so the file is gone only once everything arrived
             Path recordsFile = offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()));
             waitUntil(() -> !Files.exists(recordsFile));
             assertFalse(Files.exists(recordsFile));
-            assertEquals(Optional.of("Edited while disconnected"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
+            // The local entry (including what was typed since the record) is what reaches the database
+            assertEquals(Optional.of("Typed after the record"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
             assertEquals(2, dbmsProcessor.getSharedEntries().size());
         } finally {
             synchronizer.closeSharedDatabase();
@@ -442,6 +451,32 @@ class DBMSSynchronizerTest {
             assertEquals(Optional.of("Changed by another client"), events.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.TITLE));
             // The local entry keeps the offline edit for the merge
             assertEquals(Optional.of("Edited offline"), database.getEntries().getFirst().getField(StandardField.TITLE));
+        } finally {
+            synchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void recordedMetaDataIsMergedWithWhatOtherClientsChangedMeanwhile() throws Exception {
+        Map<String, String> base = Map.of("databaseType", "bibtex;");
+        dbmsProcessor.setSharedMetaData(base);
+        DBMSConnection connection = connectorTest.getTestDBMSConnection();
+        // An earlier session protected the library while offline ...
+        OfflineChanges.load(offlineChangesDirectory, connection.getProperties())
+                      .recordMetaData(Map.of("databaseType", "bibtex;", "protectedFlag", "true;"), base);
+        // ... while another client set a citation key pattern
+        dbmsProcessor.setSharedMetaData(Map.of("databaseType", "bibtex;", "keypatterndefault", "[auth];"));
+
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
+        DBMSSynchronizer synchronizer = newSynchronousSynchronizer(context);
+        synchronizer.openSharedDatabase(connection);
+        try {
+            Map<String, String> sharedMetaData = new HashMap<>(dbmsProcessor.getSharedMetaData());
+            sharedMetaData.remove("VersionDBStructure");
+            assertEquals(Map.of("databaseType", "bibtex;", "protectedFlag", "true;", "keypatterndefault", "[auth];"), sharedMetaData);
+            assertTrue(context.getMetaData().isProtected());
+            assertEquals(Optional.of("[auth]"), context.getMetaData().getDefaultCiteKeyPattern());
+            assertTrue(OfflineChanges.load(offlineChangesDirectory, connection.getProperties()).isEmpty());
         } finally {
             synchronizer.closeSharedDatabase();
         }

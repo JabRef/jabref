@@ -124,7 +124,9 @@ The first write that finds the connection dead takes the `DBMSSynchronizer` offl
 The recorded changes are mirrored to one JSON file per database under the `shared-database` application directory (`Directories#getSharedDatabaseDirectory`), so they survive closing JabRef.
 
 Once a connection is back - or on the next connect to the same database after a restart - the recorded changes are replayed: applied to the local library where a restart lost them, then written through the same optimistic lock as any live change.
+After a reconnect without restart the local entry is written as it is (it also holds micro-edits typed since the record); the recorded state is only restored when a remote state reached the entry meanwhile, so that the write is refused instead of the offline changes being replaced silently.
 An entry whose shared version moved on meanwhile is refused and merged by the user; an entry deleted on the shared side meanwhile is kept as a new entry.
+Metadata has no version: recorded metadata is merged key by key into the current shared metadata (a key changed offline wins, every other key stays as the shared side has it), so that a group another client added during the outage survives.
 The replay ends with a pull.
 Until written, replayed entries are protected from that pull like refused ones.
 
