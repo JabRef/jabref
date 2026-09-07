@@ -6,6 +6,7 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -19,8 +20,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600"
-        xmlns="http://javafx.com/javafx/8.0.171"
-        fx:controller="org.jabref.gui.newentry.NewEntryView">
+            xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="org.jabref.gui.newentry.NewEntryView">
     <content>
         <TabPane
                 fx:id="tabs">
@@ -115,7 +116,7 @@
                                     StackPane.alignment="CENTER_RIGHT"
                                     text="%Jump to entry"
                                     visible="false"
-                                    styleClass="padding-right-15"/>
+                                    styleClass="padding-right-16"/>
                         </StackPane>
                     </HBox>
                     <VBox spacing="5.0">
@@ -167,6 +168,15 @@
                                       size="13.0"/>
                             </font>
                         </Label>
+                        <HBox fx:id="idSearchingBox"
+                              alignment="CENTER_LEFT"
+                              spacing="8.0"
+                              visible="false"
+                              managed="false">
+                            <ProgressIndicator maxHeight="16.0"
+                                               maxWidth="16.0"/>
+                            <Label text="%Searching..."/>
+                        </HBox>
                     </VBox>
                 </VBox>
             </Tab>

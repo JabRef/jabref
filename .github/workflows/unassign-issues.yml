@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Unassign stale assignments
         id: unassign
-        uses: takanome-dev/assign-issue-action@edge
+        uses: takanome-dev/assign-issue-action@fad4b83750f7df31e03c2a42e8f1880b0b4b3573 # edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           reminder_text: |
@@ -70,7 +70,7 @@ jobs:
         issue_number: ${{ fromJson(needs.unassign_issues.outputs.unassigned_issues) }}
     steps:
       - name: Move issue to "Free to take" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -81,7 +81,7 @@ jobs:
           issue-number: ${{ matrix.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"

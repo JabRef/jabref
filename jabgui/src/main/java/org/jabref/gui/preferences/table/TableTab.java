@@ -63,7 +63,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                                                                 .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
                                                                 .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
                                                                 .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
-                                                indent -> indent.styleClass("prefIndent").spacing(4.0)))
+                                                indent -> indent.styleClass("padding-left-20").spacing(4.0)))
                                 .group(abbreviation -> abbreviation
                                         .label(Localization.lang("Abbreviations"))
                                         .group(choices -> choices
@@ -71,7 +71,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                                                                 .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
                                                                 .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
                                                                 .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
-                                                indent -> indent.styleClass("prefIndent")
+                                                indent -> indent.styleClass("padding-left-20")
                                                                 .spacing(4.0)
                                                                 // Natbib and "unchanged" render names verbatim,
                                                                 // so abbreviation does not apply.
