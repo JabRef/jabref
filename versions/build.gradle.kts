@@ -70,7 +70,7 @@ dependencies.constraints {
     api("com.konghq:unirest-modules-gson:4.10.1")
     api("com.squareup.okhttp3:mockwebserver3:5.5.0")
     api("com.squareup.okhttp3:okhttp:5.5.0")
-    api("com.squareup.okio:okio-jvm:3.18.1")
+    api("com.squareup.okio:okio-jvm:3.18.2")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.5.0")
     api("com.tngtech.archunit:archunit-junit5-api:1.5.0")
