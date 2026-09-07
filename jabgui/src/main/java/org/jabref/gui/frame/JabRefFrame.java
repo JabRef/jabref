@@ -421,6 +421,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
                 stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
+                // The editor keeps its last entry on an empty selection (req~entry-editor.keep-showing~1), which
+                // would leave another library's entry on screen here; the new library has nothing to edit yet.
+                if (libraryTab.getSelectedEntries().isEmpty()) {
+                    stateManager.getEditorShowing().set(false);
+                }
 
                 // Update active search query when switching between databases
                 if (preferences.getSearchPreferences().shouldKeepSearchString()) {
