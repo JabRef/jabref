@@ -47,7 +47,7 @@ public enum BiblatexSoftwareField implements Field {
     }
 
     public static <T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
-        if (!(type instanceof BiblatexSoftwareEntryType || StandardEntryType.Software.equals(type))) {
+        if (!(type instanceof BiblatexSoftwareEntryType || StandardEntryType.Software == type)) {
             return Optional.empty();
         }
         return Arrays.stream(BiblatexSoftwareField.values())
