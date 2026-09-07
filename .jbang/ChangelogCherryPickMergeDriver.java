@@ -15,9 +15,17 @@ import java.util.Optional;
 /// (see `.github/workflows/port-to-other-branch.yml` and ADR-0072).
 ///
 /// A line-based cherry-pick of a changelog entry always conflicts: the entry's neighbours in
-/// `## [Unreleased]` differ between the two branches. The union driver of `.gitattributes`
-/// would duplicate whole blocks, and a driver that merges both "Unreleased" sections
-/// (maven-flow/changelog-merge-driver) would copy every unreleased entry of the source branch.
+/// `## [Unreleased]` differ between the two branches. No existing tool covers this case:
+///
+/// - Git's own strategies (`merge=union` from `.gitattributes`, `-X ours`/`-X theirs`,
+///   `--ignore-space-change`) are line-based: union duplicates whole blocks of the conflicting
+///   hunk, the others drop one side's entries.
+/// - maven-flow/changelog-merge-driver (used when merging `main` into a PR branch) merges the
+///   two "Unreleased" sections as a union of entries; applied to a cherry-pick, it would copy
+///   every unreleased entry of the source branch, not only the one the commit added.
+/// - heylogs and clparse only read a changelog (lint, extract a version); neither merges.
+/// - Generators such as git-cliff or conventional-changelog derive entries from commit
+///   messages; JabRef writes its entries by hand in the PR, so there is nothing to generate from.
 ///
 /// This driver is a true three-way merge on entry level: it applies the entries that the
 /// cherry-picked commit added to or removed from `## [Unreleased]` (base → theirs) onto ours,
