@@ -77,7 +77,7 @@ public class SharedDatabasePreferences {
         } catch (PasswordAccessException e) {
             return migrateLegacyPassword();
         } catch (Exception e) {
-            LOGGER.warn("Could not open keyring for retrieving the shared database password", e);
+            LOGGER.warn("Could not access keyring for retrieving the shared database password", e);
             return Optional.empty();
         }
     }
@@ -135,8 +135,9 @@ public class SharedDatabasePreferences {
     }
 
     /// Stores the plain password in the system keyring; a blank password clears it.
-    public void setPassword(String password) {
-        internalPrefs.remove(SHARED_DATABASE_PASSWORD);
+    ///
+    /// @return whether the keyring operation succeeded
+    public boolean setPassword(String password) {
         try (Keyring keyring = Keyring.create()) {
             if (StringUtil.isBlank(password)) {
                 try {
@@ -147,8 +148,11 @@ public class SharedDatabasePreferences {
             } else {
                 keyring.setPassword(KEYRING_SERVICE, keyringAccount, password);
             }
+            internalPrefs.remove(SHARED_DATABASE_PASSWORD);
+            return true;
         } catch (Exception e) {
-            LOGGER.warn("Could not open keyring for storing the shared database password", e);
+            LOGGER.warn("Could not access keyring for storing the shared database password", e);
+            return false;
         }
     }
 

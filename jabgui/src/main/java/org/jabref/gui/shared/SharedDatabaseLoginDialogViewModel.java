@@ -41,7 +41,6 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -94,6 +93,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator userValidator;
     private final Validator folderValidator;
     private final Validator connectionUrlValidator;
+    private final Validator jdbcUrlValidator;
     private final CompositeValidator formValidator;
 
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
@@ -121,7 +121,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         // In expert mode the JDBC URL replaces host, port, and database; re-run their validators on toggling
         EasyBind.subscribe(expertMode, _ -> {
-            for (StringProperty property : List.of(host, port, database)) {
+            for (StringProperty property : List.of(host, port, database, jdbcUrl)) {
                 String current = property.getValue();
                 property.setValue(null);
                 property.setValue(current);
@@ -157,9 +157,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, folderRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
         connectionUrlValidator = new FunctionBasedValidator<>(connectionUrl, input -> !notEmpty.test(input) || DBMSConnectionUrl.parse(input).isPresent(), ValidationMessage.error(Localization.lang("Not a PostgreSQL connection URL.")));
+        jdbcUrlValidator = new FunctionBasedValidator<>(jdbcUrl, this::isValidJdbcUrl, ValidationMessage.error(Localization.lang("Not a PostgreSQL connection URL.")));
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, folderValidator);
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, folderValidator, connectionUrlValidator, jdbcUrlValidator);
 
         applyPreferences();
 
@@ -176,6 +177,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         // Parameters without a dedicated field (e.g. sslmode=verify-full) survive only in the custom JDBC URL
         expertMode.set(!url.query().isEmpty());
         jdbcUrl.set(url.toJdbcUrl());
+        if (url.password().isPresent()) {
+            connectionUrl.set("");
+        }
+    }
+
+    private boolean isValidJdbcUrl(String input) {
+        return !expertMode.get() || ((input != null)
+                && input.regionMatches(true, 0, "jdbc:postgresql://", 0, "jdbc:postgresql://".length())
+                && DBMSConnectionUrl.parse(input).isPresent());
     }
 
     /// Connects in the background; `onConnected` runs on the JavaFX thread once the dialog can be closed
@@ -183,7 +193,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
                 .setHost(host.getValue())
-                .setPort(expertMode.get() && StringUtil.isBlank(port.getValue()) ? DBMSType.POSTGRESQL.getDefaultPort() : Integer.parseInt(port.getValue()))
+                .setPort(expertMode.get() ? DBMSType.POSTGRESQL.getDefaultPort() : Integer.parseInt(port.getValue()))
                 .setDatabase(database.getValue())
                 .setUser(user.getValue())
                 .setPassword(password.getValue())
@@ -194,10 +204,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
-        openSharedDatabase(connectionProperties, onConnected);
+        openSharedDatabase(connectionProperties, rememberPassword.get(), autosave.get(), folder.getValue(), onConnected);
     }
 
-    private void openSharedDatabase(DBMSConnectionProperties connectionProperties, Runnable onConnected) {
+    private void openSharedDatabase(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
@@ -205,8 +215,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        if (autosave.get()) {
-            Path localFilePath = Path.of(folder.getValue());
+        if (shouldAutosave) {
+            Path localFilePath = Path.of(autosavePath);
 
             if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
                 boolean overwriteFilePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Existing file"),
@@ -237,8 +247,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                       .onSuccess(bibDatabaseContext -> {
                           loading.set(false);
                           LibraryTab libraryTab = manager.openTab(bibDatabaseContext);
-                          setPreferences();
-                          if (!folder.getValue().isEmpty() && autosave.get()) {
+                          setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
+                          if (!autosavePath.isEmpty() && shouldAutosave) {
                               try {
                                   new SaveDatabaseAction(
                                           libraryTab,
@@ -247,7 +257,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                           entryTypesManager,
                                           stateManager,
                                           journalAbbreviationRepository
-                                  ).saveAs(Path.of(folder.getValue()));
+                                  ).saveAs(Path.of(autosavePath));
                               } catch (Throwable e) {
                                   LOGGER.error("Error while saving the database", e);
                               }
@@ -256,14 +266,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                       })
                       .onFailure(exception -> {
                           loading.set(false);
-                          showConnectionFailure(exception, connectionProperties, onConnected);
+                          showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected);
                       })
                       .executeWith(taskExecutor);
     }
 
-    private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, Runnable onConnected) {
+    private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
         if (exception instanceof DatabaseNotSupportedException) {
-            ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
+            ButtonType openHelp = new ButtonType(Localization.lang("Open help"), ButtonData.OTHER);
 
             Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
                     Localization.lang("Migration help information"),
@@ -275,37 +285,46 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties, onConnected));
+            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
             return;
         }
         // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
         String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
         dialogService.showErrorDialogAndWait(
                 Localization.lang("Connection error"),
-                Localization.lang("Could not connect to %0", host.getValue() + ":" + port.getValue()) + "\n\n" + reason,
+                Localization.lang("Could not connect to %0.\n\n%1", connectionEndpoint(connectionProperties), reason),
                 exception);
     }
 
-    private void setPreferences() {
-        sharedDatabasePreferences.setType(DBMSType.POSTGRESQL.toString());
-        sharedDatabasePreferences.setHost(host.getValue());
-        sharedDatabasePreferences.setPort(port.getValue());
-        sharedDatabasePreferences.setName(database.getValue());
-        sharedDatabasePreferences.setUser(user.getValue());
-        sharedDatabasePreferences.setUseSSL(useSSL.getValue());
-        sharedDatabasePreferences.setExpertMode(expertMode.get());
-        sharedDatabasePreferences.setJdbcUrl(jdbcUrl.getValue());
+    private String connectionEndpoint(DBMSConnectionProperties connectionProperties) {
+        if (!connectionProperties.isUseExpertMode()) {
+            return connectionProperties.getHost() + ":" + connectionProperties.getPort();
+        }
+        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
+                                .map(url -> url.host() + ":" + url.port())
+                                .orElse(connectionProperties.getJdbcUrl());
+    }
 
-        if (rememberPassword.get()) {
-            sharedDatabasePreferences.setPassword(password.getValue());
+    private void setPreferences(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath) {
+        sharedDatabasePreferences.setType(DBMSType.POSTGRESQL.toString());
+        sharedDatabasePreferences.setHost(connectionProperties.getHost());
+        sharedDatabasePreferences.setPort(Integer.toString(connectionProperties.getPort()));
+        sharedDatabasePreferences.setName(connectionProperties.getDatabase());
+        sharedDatabasePreferences.setUser(connectionProperties.getUser());
+        sharedDatabasePreferences.setUseSSL(connectionProperties.isUseSSL());
+        sharedDatabasePreferences.setExpertMode(connectionProperties.isUseExpertMode());
+        sharedDatabasePreferences.setJdbcUrl(connectionProperties.getJdbcUrl());
+
+        if (shouldRememberPassword) {
+            sharedDatabasePreferences.setPassword(connectionProperties.getPassword());
         } else {
             sharedDatabasePreferences.clearPassword();
         }
 
-        sharedDatabasePreferences.setRememberPassword(rememberPassword.get());
+        sharedDatabasePreferences.setRememberPassword(shouldRememberPassword);
 
-        sharedDatabasePreferences.setFolder(folder.getValue());
-        sharedDatabasePreferences.setAutosave(autosave.get());
+        sharedDatabasePreferences.setFolder(autosavePath);
+        sharedDatabasePreferences.setAutosave(shouldAutosave);
     }
 
     /// Fetches possibly saved data and configures the control elements respectively.

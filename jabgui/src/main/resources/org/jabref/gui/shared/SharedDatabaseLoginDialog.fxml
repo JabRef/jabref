@@ -22,7 +22,7 @@
                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
                     <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0"/>
                 </columnConstraints>
-                <Label text="%Connection URL:"/>
+                <Label text="%Connection URL"/>
                 <TextField fx:id="connectionUrl" promptText="postgres://user:password@host:5432/database"
                            GridPane.columnIndex="1" GridPane.columnSpan="2"/>
                 <Label text="%Paste the connection URL of your database to fill in the fields below." wrapText="true"

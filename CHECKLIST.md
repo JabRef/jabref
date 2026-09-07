@@ -74,4 +74,4 @@ Run in this order — cheapest first. Each must pass.
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
 - [ ] All HTML comments removed from the PR body.
 - [ ] PR created with `gh pr create --body-file <file>` (not `--body`).
-- [ ] If `CHANGELOG.md` used a `TODO` placeholder (no issue confidently identified yet — an existing issue link always stays), it was replaced with the real PR-number link after PR creation, then committed and pushed. If an issue is identified or created later, the link is switched to the issue.
+- [ ] If `CHANGELOG.md` used a `TODO` placeholder (no issue confidently identified yet — an existing issue link always stays), the PR was opened as draft, the placeholder was replaced with the real PR-number link after PR creation, committed and pushed, and only then was the PR marked ready for review. If an issue is identified or created later, the link is switched to the issue.

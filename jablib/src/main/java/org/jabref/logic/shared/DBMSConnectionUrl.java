@@ -36,7 +36,6 @@ public record DBMSConnectionUrl(DBMSType type,
                                 String query) {
 
     private static final Set<String> SSL_MODES_REQUIRING_SSL = Set.of("require", "verify-ca", "verify-full");
-    private static final Set<String> SSL_MODES_VERIFYING_SERVER = Set.of("verify-ca", "verify-full");
     private static final Pattern URL_IN_TEXT = Pattern.compile("(?i)(?:jdbc:)?postgres(?:ql)?://[^\\s'\"]+");
 
     // [impl->req~shared-database.connection-url~1]
@@ -65,7 +64,7 @@ public record DBMSConnectionUrl(DBMSType type,
             return Optional.empty();
         }
 
-        String path = Optional.ofNullable(uri.getPath()).orElse("");
+        String path = Optional.ofNullable(uri.getRawPath()).orElse("");
         List<Map.Entry<String, String>> parameters = new ArrayList<>();
         String rawUserInfo = Optional.ofNullable(uri.getRawUserInfo()).orElse("");
         if (!rawUserInfo.isEmpty()) {
@@ -133,6 +132,9 @@ public record DBMSConnectionUrl(DBMSType type,
                 host = value.toString();
             } else if ("port".equals(key)) {
                 port = parsePort(value.toString());
+                if (port.isEmpty()) {
+                    return Optional.empty();
+                }
             } else if ("dbname".equals(key)) {
                 database = value.toString();
             } else {
@@ -170,8 +172,8 @@ public record DBMSConnectionUrl(DBMSType type,
             } else if ("sslmode".equals(key)) {
                 String mode = value.toLowerCase(Locale.ROOT);
                 useSSL = SSL_MODES_REQUIRING_SSL.contains(mode);
-                // JabRef's "Use SSL" is sslmode=require; stricter modes are only expressible in the JDBC URL
-                if (SSL_MODES_VERIFYING_SERVER.contains(mode)) {
+                // JabRef's "Use SSL" is sslmode=require; all other modes are only expressible in the JDBC URL
+                if (!"require".equals(mode)) {
                     remaining.add(encode(key) + "=" + encode(value));
                 }
             } else {
