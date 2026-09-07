@@ -119,7 +119,7 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private VBox getCitationsPane() {
-        VBox citationsBox = new VBox(30, citationsDisplay);
+        VBox citationsBox = new VBox(24, citationsDisplay);
         VBox.setVgrow(citationsDisplay, Priority.ALWAYS);
         citationsBox.getStyleClass().add("padding-0");
         return citationsBox;
@@ -132,8 +132,8 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
         notFoundText.getStyleClass().add("italic");
 
-        VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
-        notFoundBox.getStyleClass().add("padding-32");
+        VBox notFoundBox = new VBox(24, titleLabel, notFoundText);
+        notFoundBox.getStyleClass().add("padding-24");
         return notFoundBox;
     }
 
@@ -142,8 +142,8 @@ public class LatexCitationsTab extends EntryEditorTab {
         titleLabel.getStyleClass().addAll("text-danger", "h3", "bold");
         Text errorMessageText = new Text();
         errorMessageText.textProperty().bind(viewModel.searchErrorProperty());
-        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-32");
+        VBox errorMessageBox = new VBox(24, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("padding-24");
         return errorMessageBox;
     }
 

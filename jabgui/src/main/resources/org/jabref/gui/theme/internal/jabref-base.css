@@ -45,7 +45,7 @@
 /* ==========================================================================
  * Generic utility classes
  * --------------------------------------------------------------------------
- * These are the only style classes that are allowed to declare spacing and
+ * These are the only style classes that are allowed to declare padding and
  * typography. Every other style class in this file describes what a component
  * *looks* like (fills, borders, radii, effects) and leaves how much room it
  * takes up to the utilities below, applied from FXML or Java.
@@ -54,14 +54,9 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          8 -> 0.667em    20 -> 1.667em
- *     2 -> 0.167em   10 -> 0.833em    24 -> 2em
- *     4 -> 0.333em   12 -> 1em        32 -> 2.667em
- *     6 -> 0.5em     16 -> 1.333em
- *
- * Font sizes are ALWAYS relative (em) -- never px and never %. The one place
- * where `-fx-font-size` survives outside this block is on `.glyph-icon` /
- * `.ikonli-font-icon` selectors: for those the font size *is* the icon size.
+ *     0 -> 0          12 -> 1em
+ *     4 -> 0.333em    16 -> 1.333em
+ *     8 -> 0.667em    24 -> 2em
  * ========================================================================== */
 
 /* Type scale */
@@ -72,14 +67,8 @@
 .h5 { -fx-font-size: 1.1em; }
 .h6 { -fx-font-size: 1em; }
 
-/* Off-scale sizes: below h6 and above h1 */
-.font-size-075 { -fx-font-size: 0.75em; }
-.font-size-090 { -fx-font-size: 0.9em; }
-.font-size-250 { -fx-font-size: 2.5em; }
-
 /* Font style */
 .bold { -fx-font-weight: bold; }
-.normal-weight { -fx-font-weight: normal; }
 .italic { -fx-font-style: italic; }
 .font-monospace { -fx-font-family: monospace; }
 
@@ -95,109 +84,38 @@
 
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
-.padding-2 { -fx-padding: 0.167em; }
 .padding-4 { -fx-padding: 0.333em; }
-.padding-6 { -fx-padding: 0.5em; }
 .padding-8 { -fx-padding: 0.667em; }
-.padding-10 { -fx-padding: 0.833em; }
 .padding-12 { -fx-padding: 1em; }
 .padding-16 { -fx-padding: 1.333em; }
-.padding-20 { -fx-padding: 1.667em; }
 .padding-24 { -fx-padding: 2em; }
-.padding-32 { -fx-padding: 2.667em; }
 
-/* Padding: <vertical>-<horizontal> */
-.padding-0-6 { -fx-padding: 0 0.5em; }
+/* Padding: <vertical>-<horizontal>. Added on demand -- only the pairs in use exist. */
+.padding-0-4 { -fx-padding: 0 0.333em; }
 .padding-0-12 { -fx-padding: 0 1em; }
-.padding-2-10 { -fx-padding: 0.167em 0.833em; }
-.padding-2-12 { -fx-padding: 0.167em 1em; }
 .padding-4-0 { -fx-padding: 0.333em 0; }
-.padding-4-6 { -fx-padding: 0.333em 0.5em; }
 .padding-4-8 { -fx-padding: 0.333em 0.667em; }
-.padding-4-10 { -fx-padding: 0.333em 0.833em; }
 .padding-4-12 { -fx-padding: 0.333em 1em; }
-.padding-6-0 { -fx-padding: 0.5em 0; }
-.padding-6-10 { -fx-padding: 0.5em 0.833em; }
-.padding-6-12 { -fx-padding: 0.5em 1em; }
-.padding-6-24 { -fx-padding: 0.5em 2em; }
-.padding-8-0 { -fx-padding: 0.667em 0; }
-.padding-8-10 { -fx-padding: 0.667em 0.833em; }
-.padding-8-12 { -fx-padding: 0.667em 1em; }
-.padding-8-16 { -fx-padding: 0.667em 1.333em; }
-.padding-10-12 { -fx-padding: 0.833em 1em; }
-.padding-10-16 { -fx-padding: 0.833em 1.333em; }
-.padding-12-16 { -fx-padding: 1em 1.333em; }
-.padding-16-24 { -fx-padding: 1.333em 2em; }
-.padding-20-24 { -fx-padding: 1.667em 2em; }
-.padding-32-24 { -fx-padding: 2.667em 2em; }
 
-/* Padding: single side */
-.padding-top-2 { -fx-padding: 0.167em 0 0 0; }
+/* Padding: single side. Added on demand -- only the steps in use exist. */
 .padding-top-4 { -fx-padding: 0.333em 0 0 0; }
-.padding-top-6 { -fx-padding: 0.5em 0 0 0; }
-.padding-top-8 { -fx-padding: 0.667em 0 0 0; }
-.padding-top-10 { -fx-padding: 0.833em 0 0 0; }
 .padding-top-12 { -fx-padding: 1em 0 0 0; }
-.padding-top-16 { -fx-padding: 1.333em 0 0 0; }
-.padding-top-20 { -fx-padding: 1.667em 0 0 0; }
-.padding-top-24 { -fx-padding: 2em 0 0 0; }
-.padding-top-32 { -fx-padding: 2.667em 0 0 0; }
 
-.padding-right-2 { -fx-padding: 0 0.167em 0 0; }
 .padding-right-4 { -fx-padding: 0 0.333em 0 0; }
-.padding-right-6 { -fx-padding: 0 0.5em 0 0; }
-.padding-right-8 { -fx-padding: 0 0.667em 0 0; }
-.padding-right-10 { -fx-padding: 0 0.833em 0 0; }
-.padding-right-12 { -fx-padding: 0 1em 0 0; }
 .padding-right-16 { -fx-padding: 0 1.333em 0 0; }
-.padding-right-20 { -fx-padding: 0 1.667em 0 0; }
-.padding-right-24 { -fx-padding: 0 2em 0 0; }
-.padding-right-32 { -fx-padding: 0 2.667em 0 0; }
 
-.padding-bottom-2 { -fx-padding: 0 0 0.167em 0; }
 .padding-bottom-4 { -fx-padding: 0 0 0.333em 0; }
-.padding-bottom-6 { -fx-padding: 0 0 0.5em 0; }
-.padding-bottom-8 { -fx-padding: 0 0 0.667em 0; }
-.padding-bottom-10 { -fx-padding: 0 0 0.833em 0; }
-.padding-bottom-12 { -fx-padding: 0 0 1em 0; }
 .padding-bottom-16 { -fx-padding: 0 0 1.333em 0; }
-.padding-bottom-20 { -fx-padding: 0 0 1.667em 0; }
 .padding-bottom-24 { -fx-padding: 0 0 2em 0; }
-.padding-bottom-32 { -fx-padding: 0 0 2.667em 0; }
 
-.padding-left-2 { -fx-padding: 0 0 0 0.167em; }
-.padding-left-4 { -fx-padding: 0 0 0 0.333em; }
-.padding-left-6 { -fx-padding: 0 0 0 0.5em; }
-.padding-left-8 { -fx-padding: 0 0 0 0.667em; }
-.padding-left-10 { -fx-padding: 0 0 0 0.833em; }
 .padding-left-12 { -fx-padding: 0 0 0 1em; }
-.padding-left-16 { -fx-padding: 0 0 0 1.333em; }
-.padding-left-20 { -fx-padding: 0 0 0 1.667em; }
 .padding-left-24 { -fx-padding: 0 0 0 2em; }
-.padding-left-32 { -fx-padding: 0 0 0 2.667em; }
-
-/* Spacing between the children of an HBox / VBox */
-.spacing-0 { -fx-spacing: 0; }
-.spacing-2 { -fx-spacing: 0.167em; }
-.spacing-4 { -fx-spacing: 0.333em; }
-.spacing-6 { -fx-spacing: 0.5em; }
-.spacing-8 { -fx-spacing: 0.667em; }
-.spacing-10 { -fx-spacing: 0.833em; }
-.spacing-12 { -fx-spacing: 1em; }
-.spacing-16 { -fx-spacing: 1.333em; }
-.spacing-20 { -fx-spacing: 1.667em; }
-.spacing-24 { -fx-spacing: 2em; }
-.spacing-32 { -fx-spacing: 2.667em; }
 
 /* Gap between the cells of a GridPane / FlowPane / TilePane */
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
-.gap-6 { -fx-hgap: 0.5em; -fx-vgap: 0.5em; }
 .gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
-.gap-10 { -fx-hgap: 0.833em; -fx-vgap: 0.833em; }
 .gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
 .gap-16 { -fx-hgap: 1.333em; -fx-vgap: 1.333em; }
-.gap-20 { -fx-hgap: 1.667em; -fx-vgap: 1.667em; }
-.gap-24 { -fx-hgap: 2em; -fx-vgap: 2em; }
 
 /* Alignment */
 .align-center { -fx-alignment: center; }
@@ -205,9 +123,7 @@
 .align-center-right { -fx-alignment: center-right; }
 .align-top-left { -fx-alignment: top-left; }
 .align-top-center { -fx-alignment: top-center; }
-.align-top-right { -fx-alignment: top-right; }
 .align-baseline-left { -fx-alignment: baseline-left; }
-.align-baseline-center { -fx-alignment: baseline-center; }
 
 /* Surface */
 .bg-transparent { -fx-background-color: transparent; }
@@ -257,18 +173,14 @@
     -fx-background-color: -color-warning;
 }
 
-.text-field:invalid {
+.text-field:invalid,
+.searchBar:invalid {
     -fx-background-color: -color-danger-subtle;
 }
 
 .menu-item .glyph-icon {
     -fx-fill: -color-fg-default;
     -fx-text-fill: -color-fg-default;
-}
-
-.menu-item:focused .glyph-icon {
-    -fx-fill: -color-fg-menu-active;
-    -fx-text-fill: -color-fg-menu-active;
 }
 
 .column-header .glyph-icon {
@@ -285,18 +197,20 @@
     -fx-text-fill: -fx-text-background-color;
 }
 
-.table-row-cell:dragOver-bottom {
+.table-row-cell:drag-over-bottom,
+#groupTree .tree-table-row-cell:drag-over-bottom {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 0 0 2 0;
     -fx-padding: 0 0 -2 0;
 }
 
-.table-row-cell:dragOver-center,
-.table-row-cell:dragOver-center > .table-cell {
+.table-row-cell:drag-over-center,
+.table-row-cell:drag-over-center > .table-cell {
     -fx-background-color: -color-drag-target-hover;
 }
 
-.table-row-cell:dragOver-top {
+.table-row-cell:drag-over-top,
+#groupTree .tree-table-row-cell:drag-over-top {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 2 0 0 0;
     -fx-padding: -2 0 0 0;
@@ -586,10 +500,6 @@
     -fx-background-color: derive(-color-danger, 70%);
 }
 
-.mode-indicator {
-    -fx-text-fill: -color-fg-muted;
-}
-
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
@@ -606,8 +516,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .mainToolbar .context-menu .glyph-icon:hover {
-    -fx-fill: -color-fg-menu-active;
-    -fx-text-fill: -color-fg-menu-active;
+    -fx-fill: -color-fg-default;
+    -fx-text-fill: -color-fg-default;
     -fx-background-color: -color-overlay-hover;
 }
 
@@ -696,10 +606,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-highlight-fill: derive(-color-accent-subtle, 20%);
 }
 
-.searchBar:invalid {
-    -fx-background-color: -color-danger-subtle;
-}
-
 .searchBar:unsupported {
     -fx-background-color: -color-warning-subtle;
 }
@@ -768,7 +674,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-fg-subtle;
 }
 
-.main-table .table-row-cell:dragOver-center {
+.main-table .table-row-cell:drag-over-center,
+#groupTree .tree-table-row-cell:drag-over-center {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 1 1 1 1;
     -fx-padding: -1 -1 -1 -1;
@@ -782,10 +689,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 .main-table .table-row-cell:matching-search-and-groups:odd {
     -fx-background-color: -color-match-1-odd;
-}
-
-.main-table .table-row-cell:matching-search-and-groups:selected {
-    -fx-background-color: -color-selection;
 }
 
 .main-table .table-row-cell:matching-search-and-groups > .table-cell,
@@ -815,10 +718,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-match-2-odd;
 }
 
-.main-table .table-row-cell:matching-search-not-groups:selected {
-    -fx-background-color: -color-selection;
-}
-
 .main-table .table-row-cell:matching-search-not-groups > .table-cell,
 .main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -color-match-2-text-color;
@@ -844,10 +743,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .main-table .table-row-cell:matching-groups-not-search:odd {
     -fx-background-color: -color-match-3-odd;
-}
-
-.main-table .table-row-cell:matching-groups-not-search:selected {
-    -fx-background-color: -color-selection;
 }
 
 .main-table .table-row-cell:matching-groups-not-search > .table-cell,
@@ -877,10 +772,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-match-4-odd;
 }
 
-.main-table .table-row-cell:not-matching-search-and-groups:selected {
-    -fx-background-color: -color-selection;
-}
-
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell,
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -color-match-4-text-color;
@@ -896,6 +787,14 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
 .main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: derive(-color-match-4-text-color, 10%);
+}
+
+/* Selection and hover both win over every match state, so each is stated once for all four. */
+.main-table .table-row-cell:matching-search-and-groups:selected,
+.main-table .table-row-cell:matching-search-not-groups:selected,
+.main-table .table-row-cell:matching-groups-not-search:selected,
+.main-table .table-row-cell:not-matching-search-and-groups:selected {
+    -fx-background-color: -color-selection;
 }
 
 .main-table .table-row-cell:matching-search-and-groups:selected:hover,
@@ -931,7 +830,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-text-inner-color;
 }
 
-.welcome-hyperlink,
+/* Undo the theme's dimmed ':visited' hyperlink color; the resting color already comes from '.hyperlink'. */
 .welcome-hyperlink:visited {
     -fx-text-fill: -color-accent;
 }
@@ -945,10 +844,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 
 /* Welcome Community  */
-.welcome-community-link {
-    -fx-text-fill: -color-accent;
-}
-
 .welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-color-accent, -20%);
@@ -995,10 +890,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* AboutDialog */
-#aboutDialog .about-heading {
-    -fx-text-fill: -color-accent;
-}
-
 #aboutDialog .about-heading:pressed {
     -fx-text-fill: -color-selection;
 }
@@ -1120,10 +1011,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-subtle;
 }
 
-#entryEditor .code-area .context-menu {
-    -fx-font-family: sans-serif;
-}
-
 #entryEditor #related-articles-tab,
 #entryEditor .ai-tab {
     -fx-background-color: -color-bg-secondary;
@@ -1144,10 +1031,6 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor #scitePane Label,
 #entryEditor #scitePane Text {
     -fx-fill: -fx-text-background-color;
-}
-
-#entryEditor #scite-error-label {
-    -fx-text-fill: -color-danger;
 }
 
 /* ErrorConsole */
@@ -1228,7 +1111,8 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ParseLatexResult */
 
-#parseLatexResultDialog > .split-pane > .split-pane-divider {
+#parseLatexResultDialog > .split-pane > .split-pane-divider,
+#preferencesDialog > .split-pane > .split-pane-divider {
     -fx-padding: 0 4 0 4;
     -fx-background-color: transparent;
 }
@@ -1270,7 +1154,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #groupTree .numberColumn > .hits .text {
-    -fx-fill: -color-badge-fg;
+    -fx-fill: -color-fg-emphasis;
 }
 
 #groupTree .expansionNodeColumn {
@@ -1282,35 +1166,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-alignment: center;
 }
 
-#groupTree .tree-table-row-cell:dragOver-bottom {
-    -fx-border-color: -color-drag-target;
-    -fx-border-width: 0 0 2 0;
-    -fx-padding: 0 0 -2 0;
-}
-
-#groupTree .tree-table-row-cell:dragOver-center {
-    -fx-border-color: -color-drag-target;
-    -fx-border-width: 1 1 1 1;
-    -fx-padding: -1 -1 -1 -1;
-    -fx-background-color: -color-drag-target-hover;
-}
-
-#groupTree .tree-table-row-cell:dragOver-top {
-    -fx-border-color: -color-drag-target;
-    -fx-border-width: 2 0 0 0;
-    -fx-padding: -2 0 0 0;
-}
-
 #groupTree .tree-table-row-cell:sub > .tree-table-cell {
     -fx-padding: 0.20em 0em 0.20em 0em;
 }
 
 #groupTree .tree-table-row-cell:sub > .numberColumn {
     -fx-padding: 0.20em 0.2em 0.20em 0em;
-}
-
-#groupTree .tree-table-row-cell:sub > .addSubgroupColumn {
-    -fx-padding: 0;
 }
 
 #groupTree .tree-table-row-cell:root {
@@ -1328,10 +1189,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .tree-table-row-cell:root > .expansionNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
-}
-
-#groupTree .tree-table-row-cell:root > .addSubgroupColumn {
-    -fx-padding: 0;
 }
 
 #groupTree .tree-table-row-cell:empty {
@@ -1397,11 +1254,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -color-bg-primary;
 }
 
-#preferencesDialog > .split-pane > .split-pane-divider {
-    -fx-padding: 0 4 0 4;
-    -fx-background-color: transparent;
-}
-
 #preferencesDialog *:search-highlight {
     -fx-background-color: -color-danger;
 }
@@ -1462,27 +1314,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-muted;
 }
 
-#testButton.success {
-    -fx-text-fill: -color-success;
-}
-
-#testButton.success .glyph-icon {
+#testButton.text-success .glyph-icon {
     -fx-icon-color: -color-success;
 }
 
-#testButton.error {
-    -fx-text-fill: -color-danger;
-}
-
-#testButton.error .glyph-icon {
+#testButton.text-danger .glyph-icon {
     -fx-icon-color: -color-danger;
 }
 
 /* CitationRelationsTab */
-
-.journalInfo .info-label {
-    -fx-text-fill: -color-accent;
-}
 
 .journalInfo .grid-cell-r {
     -fx-border-color: transparent -color-border-default transparent transparent;
@@ -1566,10 +1406,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -color-border-default;
 }
 
-#styleSelectDialog .currentStyleNameLabel {
-    -fx-text-fill: -color-accent;
-}
-
 .exampleQuestionStyle {
     -fx-background-color: transparent;
     -fx-background-radius: 20px;
@@ -1629,7 +1465,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-dialog-container > HBox {
     -fx-alignment: center-left;
-    -fx-spacing: 0.667em;
 }
 
 .quick-settings-dialog-container > ScrollPane {
