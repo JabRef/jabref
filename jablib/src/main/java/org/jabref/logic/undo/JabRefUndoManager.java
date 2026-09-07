@@ -333,6 +333,10 @@ public class JabRefUndoManager implements UndoManager {
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
     ///
+    /// A change that *refuses* — because the library no longer holds what it recorded — does move
+    /// across: the step was consumed, retrying it would refuse again, and the caller is told
+    /// through the result that not all of it applied.
+    ///
     /// @return what was undone — its name for the user, and what of it could not be applied —
     ///         or empty if there was nothing to undo, or a command is holding the library (see
     ///         [#suspendUndo] — [#suspendedBy] tells the two apart). The name is taken

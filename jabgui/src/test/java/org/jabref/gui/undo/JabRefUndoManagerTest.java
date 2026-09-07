@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.undo.JabRefUndoManager;
+import org.jabref.logic.undo.UndoResult;
 import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -513,6 +514,21 @@ class JabRefUndoManagerTest {
         assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
         undoRedoManager.undo();
         assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
+    /// The library moved on under a recorded step - a background command wrote the same field - so
+    /// undoing it takes back what it can and says the rest did not apply.
+    @Test
+    void undoingAStepTheLibraryMovedOnFromReportsIt() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        entry.setField(StandardField.AUTHOR, "Planck");
+
+        UndoResult result = undoRedoManager.undo().orElseThrow();
+
+        assertFalse(result.complete(), "the undo claimed to have taken the step back");
+        assertEquals(Optional.of("Planck"), entry.getField(StandardField.AUTHOR), "undo wrote over the newer value");
+        assertFalse(undoRedoManager.canUndo(), "the step was not consumed");
+        assertTrue(undoRedoManager.canRedo());
     }
 
     @Test

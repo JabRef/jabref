@@ -24,6 +24,10 @@ public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String 
 
     @Override
     public ApplyResult apply() {
+        String current = entry.getField(field).orElse(null);
+        if (!Objects.equals(current, before)) {
+            return ApplyResult.of(this, "field %s holds '%s', not the recorded '%s'".formatted(field.getName(), current, before));
+        }
         if (after == null) {
             entry.clearField(field);
         } else {

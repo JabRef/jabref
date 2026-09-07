@@ -23,6 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -172,6 +173,59 @@ class BibChangeTest {
 
         change.inverted().apply();
         assertSame(before, databaseContext.getMetaData());
+    }
+
+    /// The case reservations cannot cover: a command writes on a background thread, the user edits
+    /// the same field meanwhile, and the step recorded for one of them no longer describes what the
+    /// library holds. Writing over it would produce a state no step on the stack describes.
+    @Test
+    void aChangeRefusesWhenTheLibraryMovedOnUnderIt() {
+        BibEntry entry = entry();
+        UndoableFieldChange change = new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr");
+        entry.setField(StandardField.AUTHOR, "Planck");
+
+        ApplyResult result = change.apply();
+
+        assertEquals(List.of(change), result.failures().stream().map(ApplyResult.Failure::change).toList());
+        assertEquals("Planck", entry.getField(StandardField.AUTHOR).orElseThrow(), "the change wrote over the newer value");
+    }
+
+    @Test
+    void aTypeChangeRefusesWhenTheEntryIsNoLongerWhatItRecorded() {
+        BibEntry entry = entry();
+        UndoableChangeType change = new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book);
+        entry.setType(StandardEntryType.Thesis);
+
+        assertFalse(change.apply().isComplete());
+        assertEquals(StandardEntryType.Thesis, entry.getType());
+    }
+
+    /// A set keeps going: one element being stale says nothing about the others.
+    @Test
+    void aSetAppliesWhatStillFitsAndReportsWhatDoesNot() {
+        BibEntry moved = entry();
+        BibEntry untouched = entry();
+        UndoableFieldChange stale = new UndoableFieldChange(moved, StandardField.AUTHOR, "Einstein", "Bohr");
+        ChangeSet changeSet = new ChangeSet("edit", List.of(
+                stale,
+                new UndoableFieldChange(untouched, StandardField.AUTHOR, "Einstein", "Curie")));
+        moved.setField(StandardField.AUTHOR, "Planck");
+
+        ApplyResult result = changeSet.apply();
+
+        assertEquals(List.of(stale), result.failures().stream().map(ApplyResult.Failure::change).toList());
+        assertEquals("Curie", untouched.getField(StandardField.AUTHOR).orElseThrow());
+    }
+
+    /// Undo and redo are the ordinary case, and must not be mistaken for staleness.
+    @Test
+    void aChangeAppliesInBothDirectionsWhenNothingMovedOn() {
+        BibEntry entry = entry();
+        UndoableFieldChange change = new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr");
+
+        assertTrue(change.apply().isComplete());
+        assertTrue(change.inverted().apply().isComplete());
+        assertTrue(change.apply().isComplete(), "redo refused although the library was where the change left it");
     }
 
     @Test

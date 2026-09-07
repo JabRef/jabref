@@ -38,9 +38,11 @@ public sealed interface BibChange permits
     /// Implementations hold whatever they need to act on — an entry, a string, the database —
     /// so that recording a change never requires plumbing a context to the call site.
     ///
-    /// The change is applied unconditionally rather than checking whether the library still
-    /// holds the expected prior state; the undo stack is discarded whenever the library is
-    /// reloaded, so that state is an invariant rather than something to verify.
+    /// A change that describes one value refuses when the library no longer holds the state it
+    /// recorded: a command writing on a background thread can have moved that value on since,
+    /// and writing over it would produce a library no step on the stack describes. Changes that
+    /// describe a collection or a whole subtree apply unconditionally, because comparing the
+    /// whole of it on every apply costs more than the case is worth.
     ///
     /// A change describing one modification performs it or throws, and so always returns
     /// [ApplyResult#SUCCESS]. Only [ChangeSet] can apply part of what it describes, and the

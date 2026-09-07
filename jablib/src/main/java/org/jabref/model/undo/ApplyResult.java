@@ -6,14 +6,16 @@ import org.jspecify.annotations.NullMarked;
 
 /// What applying a [BibChange] achieved.
 ///
-/// A change that describes one modification either performs it or throws, so it reports
-/// [#SUCCESS] and nothing else. A [ChangeSet] is the one implementation that can come back with
-/// less than it promised: it applies best-effort, because aborting midway would leave the
-/// library in a state that is neither the old nor the new one and that no later undo could
-/// describe. Saying so here is what keeps it a substitutable [BibChange] — it reports the
-/// success it delivered rather than the one its siblings guarantee.
+/// Two things stop a change from being applied. A [ChangeSet] applies best-effort, aborting
+/// midway would leave the library in a state that is neither the old nor the new one, and that no
+/// later undo could describe, so it reports the elements that threw. And a change that describes
+/// one modification refuses when the library no longer holds the state it recorded, rather than
+/// writing over whatever is there now.
 ///
-/// @param failures the changes that could not be applied, in the order they were attempted
+/// Reporting either is what keeps an implementation substitutable: it says what it delivered
+/// instead of the success its siblings guarantee.
+///
+/// @param failures the changes that were not applied, in the order they were attempted
 @NullMarked
 public record ApplyResult(List<Failure> failures) {
     /// Everything asked for was applied.
@@ -23,8 +25,14 @@ public record ApplyResult(List<Failure> failures) {
         failures = List.copyOf(failures);
     }
 
-    /// A change that could not be applied, and what stopped it.
-    public record Failure(BibChange change, RuntimeException cause) {
+    /// A change that was not applied, and why — the reason is for a log or a message, not for a
+    /// caller to branch on.
+    public record Failure(BibChange change, String reason) {
+    }
+
+    /// One change that was not applied.
+    public static ApplyResult of(BibChange change, String reason) {
+        return new ApplyResult(List.of(new Failure(change, reason)));
     }
 
     public boolean isComplete() {

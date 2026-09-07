@@ -128,6 +128,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where main table columns could not be resized while "Fit table horizontally on screen" was enabled. Resizing a column now adjusts only the columns to its right, and column widths keep their proportions when the window is resized. [#10516](https://github.com/JabRef/jabref/issues/10516)
 - We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
+- We fixed an issue where undoing could overwrite a newer value when a background operation had changed the same field. [TODO](TODO)
 - We fixed an issue where adding, removing, moving, sorting or editing groups could not be undone. [TODO](TODO)
 - We fixed an issue where Ctrl+Z and Ctrl+Y only worked while the entry editor had focus. [TODO](TODO)
 - We fixed an issue where the entry editor kept showing an entry of another library after switching libraries. [#16892](https://github.com/JabRef/jabref/pull/16892)
