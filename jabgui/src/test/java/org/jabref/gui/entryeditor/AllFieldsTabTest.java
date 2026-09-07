@@ -194,11 +194,12 @@ class AllFieldsTabTest {
     }
 
     @Test
-    void abstractEditorGrowsWithWrappedContent() throws InterruptedException {
+    void abstractEditorGrowsWithWrappedContentUpToFiveRowsUntilFocused() throws InterruptedException {
         double oneRow = abstractEditorHeight("");
-        double twoRows = abstractEditorHeight("one\ntwo");
+        double rowHeight = abstractEditorHeight("one\ntwo") - oneRow;
 
-        assertTrue(abstractEditorHeight("word ".repeat(300)) > oneRow + 3 * (twoRows - oneRow));
+        // Tolerance: the skin snaps each height to whole pixels.
+        assertEquals(oneRow + 4 * rowHeight, abstractEditorHeight("word ".repeat(300)), 1.0);
     }
 
     @Test

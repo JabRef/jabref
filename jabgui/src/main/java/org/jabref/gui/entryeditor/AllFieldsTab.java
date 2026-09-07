@@ -79,7 +79,8 @@ import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), every set field, and — always,
-/// as the last main row — the abstract. Replaces the classic category tabs (required /
+/// as the last main row — the abstract. Multiline editors grow with their text, capped at a
+/// few rows until focused. Replaces the classic category tabs (required /
 /// optional / other / …) and the former "Abstract" tab.
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
@@ -96,6 +97,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// is no optional field of any entry type, so it would otherwise only be reachable through the
     /// free-form field-name box.
     private static final Set<Field> ALWAYS_SHOWN_FIELDS = Set.of(StandardField.ABSTRACT);
+
+    /// Rows a multiline editor shows before it is focused for the first time (a long abstract
+    /// must not push the other fields out of view just by being selected).
+    private static final int COLLAPSED_MULTILINE_ROWS = 5;
 
     /// Pixels of preferred height granted per weight unit for editors with weight > 1
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
@@ -678,7 +683,7 @@ public class AllFieldsTab extends FieldsEditorTab {
             textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
             // Editors are rebuilt on every entry switch; the width the field had for the previous
             // entry lets the new area wrap correctly before its own first layout.
-            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0));
+            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
             textArea.widthProperty().addListener((_, _, width) -> {
                 if (width.doubleValue() > 0) {
                     textAreaWidths.put(field, width.doubleValue());

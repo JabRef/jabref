@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -27,6 +28,8 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean growWithContent;
     private double widthHint = -1;
+    private int collapsedRows = Integer.MAX_VALUE;
+    private boolean expanded;
     /// Variable that contains user-defined behavior for paste action.
     private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
@@ -52,13 +55,41 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     /// of the fixed preferred row count. Intended for natural-height lists that scroll as a whole.
     /// `widthHint` is the width to wrap at until the first layout has set the real width — pass
     /// the width the same field had before, so a rebuilt editor is right in its very first frame.
-    public void setGrowWithContent(double widthHint) {
+    /// Until the area is focused for the first time it shows at most `collapsedRows` rows (with
+    /// its own scrollbar); the first focus expands it to the full text and it stays expanded, so
+    /// moving the focus on never shrinks a row under the mouse.
+    public void setGrowWithContent(double widthHint, int collapsedRows) {
         this.growWithContent = true;
         this.widthHint = widthHint;
+        this.collapsedRows = collapsedRows;
         setPrefRowCount(1);
         // The real width only exists after the first layout; if it differs from the hint the
         // wrapped height changes, so ask for another pass.
         widthProperty().addListener(_ -> requestLayout());
+        // Setting the text leaves the caret at its end and the skin scrolls the caret into view
+        // during layout; a collapsed area must show the beginning instead. The text is usually
+        // bound before this call, so reset once now as well.
+        showBeginningWhileCollapsed();
+        textProperty().addListener(_ -> showBeginningWhileCollapsed());
+        focusedProperty().addListener((_, _, focused) -> {
+            if (focused && !expanded) {
+                expanded = true;
+                requestLayout();
+            }
+        });
+    }
+
+    private void showBeginningWhileCollapsed() {
+        if (expanded) {
+            return;
+        }
+        // After the pending layout, which is what scrolls the caret into view.
+        Platform.runLater(() -> {
+            if (!expanded) {
+                positionCaret(0);
+                setScrollTop(0);
+            }
+        });
     }
 
     /// Wraps at the last laid-out width (or the hint before the first layout) instead of
@@ -84,6 +115,9 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         singleRow.setFont(getFont());
         double rowHeight = singleRow.getLayoutBounds().getHeight();
         long rows = Math.max(1, Math.round(measure.getLayoutBounds().getHeight() / rowHeight));
+        if (!expanded) {
+            rows = Math.min(rows, collapsedRows);
+        }
         return oneRow + (rows - 1) * rowHeight;
     }
 

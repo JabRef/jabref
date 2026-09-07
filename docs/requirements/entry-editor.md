@@ -31,7 +31,7 @@ Needs: impl
 ## Main tab shows all fields in one scrollable list
 `req~entry-editor.main-tab.single-list~1`
 
-The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty, then the abstract, which is always shown (one row when empty, growing with its content) and cannot be removed.
+The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty, then the abstract, which is always shown and cannot be removed. Multiline fields are one row when empty and grow with their content, showing at most five rows (with a scrollbar) until they are focused for the first time; from then on they show the complete text until another entry is opened.
 
 Needs: impl
 
