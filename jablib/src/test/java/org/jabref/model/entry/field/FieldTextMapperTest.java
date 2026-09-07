@@ -14,8 +14,8 @@ class FieldTextMapperTest {
         return Stream.of(
                 Arguments.of("Author", StandardField.AUTHOR),
                 Arguments.of("DOI", StandardField.DOI),
-                Arguments.of("Citation key", InternalField.KEY_FIELD),
-                Arguments.of("Entry type", InternalField.TYPE_HEADER),
+                Arguments.of("Citation Key", InternalField.KEY_FIELD),
+                Arguments.of("Entry Type", InternalField.TYPE_HEADER),
                 Arguments.of("JabRef-internal-id", InternalField.INTERNAL_ID_FIELD),
                 Arguments.of("myField", new UnknownField("myField"))
         );
