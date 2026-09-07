@@ -118,6 +118,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where <kbd>Ctrl</kbd> + <kbd>W</kbd> did not close the welcome tab. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
 - We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
