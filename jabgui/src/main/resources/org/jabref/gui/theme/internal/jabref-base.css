@@ -72,6 +72,20 @@
 .italic { -fx-font-style: italic; }
 .font-monospace { -fx-font-family: monospace; }
 
+.font-size-8 > * { -fx-font-size: 8pt; }
+.font-size-9 > * { -fx-font-size: 9pt; }
+.font-size-10 > * { -fx-font-size: 10pt; }
+.font-size-11 > * { -fx-font-size: 11pt; }
+.font-size-12 > * { -fx-font-size: 12pt; }
+.font-size-13 > * { -fx-font-size: 13pt; }
+.font-size-14 > * { -fx-font-size: 14pt; }
+.font-size-15 > * { -fx-font-size: 15pt; }
+.font-size-16 > * { -fx-font-size: 16pt; }
+.font-size-17 > * { -fx-font-size: 17pt; }
+.font-size-18 > * { -fx-font-size: 18pt; }
+.font-size-19 > * { -fx-font-size: 19pt; }
+.font-size-20 > * { -fx-font-size: 20pt; }
+
 /* Text color. Both properties are set so the same class works on a Label
    (-fx-text-fill), on a Text node inside a TextFlow and on an icon (-fx-fill). */
 .text-accent { -fx-text-fill: -color-accent; -fx-fill: -color-accent; }
@@ -121,6 +135,11 @@
 /* Surface */
 .bg-transparent { -fx-background-color: transparent; }
 .bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+
+.root {
+    /* Default JabRef font size. */
+    -fx-font-size: 9pt;
+}
 
 /* JavaFX with custom components */
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon,
