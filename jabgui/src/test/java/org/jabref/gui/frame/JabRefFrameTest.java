@@ -3,6 +3,7 @@ package org.jabref.gui.frame;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javafx.event.Event;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -28,6 +29,18 @@ class JabRefFrameTest {
 
         assertEquals(List.of(), tabbedPane.getTabs());
         assertTrue(cleanedUp.get());
+    }
+
+    @Test
+    void keepsTabVetoingItsClose() {
+        Tab vetoingTab = new Tab("Vetoing");
+        vetoingTab.setOnCloseRequest(Event::consume);
+        TabPane tabbedPane = new TabPane(vetoingTab);
+        tabbedPane.getSelectionModel().select(vetoingTab);
+
+        JabRefFrame.closeSelectedNonLibraryTab(tabbedPane);
+
+        assertEquals(List.of(vetoingTab), tabbedPane.getTabs());
     }
 
     @Test

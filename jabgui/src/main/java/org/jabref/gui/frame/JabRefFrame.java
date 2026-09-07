@@ -520,13 +520,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     /// Closes the selected tab if it is no [LibraryTab] (the welcome tab): [CloseDatabaseAction] only knows library tabs, so the close shortcut would do nothing there.
+    ///
+    /// Mirrors what the tab's close button does in `TabPaneBehavior`: the tab close events are notifications, a [TabPane] never removes a tab in response to one, so the removal has to happen here.
     static void closeSelectedNonLibraryTab(TabPane tabbedPane) {
         Tab selectedTab = tabbedPane.getSelectionModel().getSelectedItem();
         if ((selectedTab == null) || (selectedTab instanceof LibraryTab) || !selectedTab.isClosable()) {
             return;
         }
+        Event closeRequest = new Event(selectedTab, selectedTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(selectedTab, closeRequest);
+        if (closeRequest.isConsumed()) {
+            return;
+        }
         tabbedPane.getTabs().remove(selectedTab);
-        // Removing a tab programmatically does not fire the closed event the tab uses to release its resources
         Event.fireEvent(selectedTab, new Event(selectedTab, selectedTab, Tab.CLOSED_EVENT));
     }
 
