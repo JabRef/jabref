@@ -8,6 +8,7 @@ import org.jabref.logic.sync.LibraryBaseline.Side;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -124,5 +125,43 @@ class LibraryBaselineTest {
 
         // Against the kept ancestor, the memory edit is still visible as such
         assertEquals(Side.MEMORY, updated.sideOfEntry(local, remote));
+    }
+
+    @Test
+    void commentChangedOnDiskOnly() {
+        remote.setCommentsBeforeEntry("% new comment");
+
+        assertEquals(Side.DISK, baseline.sideOfEntry(local, remote));
+    }
+
+    @Test
+    void commentChangedOnDiskIsMergedWithFieldChangedInMemory() {
+        local.setField(StandardField.TITLE, "Memory title");
+        remote.setCommentsBeforeEntry("% new comment");
+
+        Optional<BibEntry> merged = baseline.mergeEntry(local, remote);
+
+        assertEquals(Optional.of("% new comment"), merged.map(BibEntry::getUserComments));
+        assertEquals(Optional.of("Memory title"), merged.flatMap(entry -> entry.getField(StandardField.TITLE)));
+    }
+
+    @Test
+    void ambiguousDuplicatesAreNotAssociated() {
+        BibEntry duplicate = new BibEntry(local);
+        baseline = LibraryBaseline.of(new BibDatabaseContext(new BibDatabase(List.of(duplicate, local))), PATTERNS);
+        remote.setField(StandardField.TITLE, "Changed on disk");
+
+        assertEquals(Optional.empty(), baseline.lookup().baseIdOf(remote));
+    }
+
+    @Test
+    void stringDeletedInMemoryAndRenamedOnDiskIsAConflict() {
+        BibDatabase database = new BibDatabase(List.of(local));
+        database.addString(new BibtexString("jan", "January"));
+        baseline = LibraryBaseline.of(new BibDatabaseContext(database), PATTERNS);
+
+        // memory has no string anymore, disk has the same content under a new name
+        assertEquals(Side.BOTH, baseline.sideOfAddedString("january", "January", _ -> false));
+        assertEquals(Side.DISK, baseline.sideOfAddedString("feb", "February", _ -> false));
     }
 }

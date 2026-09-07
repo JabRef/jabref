@@ -35,6 +35,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
     private static final int STABLE_FILE_ATTEMPTS = 20;
     private static final long STABLE_FILE_INTERVAL_MILLIS = 250;
+    /// A writer pausing between two chunks must not pass as finished: the file has to look the same this many times in a row
+    private static final int STABLE_FILE_CONFIRMATIONS = 2;
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
@@ -253,13 +255,13 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
-            BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableFile))
+            BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                           .onSuccess(changes -> onScannedForSynchronization(generation, scanner, scannedBaseline, changes))
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
         }
-        BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableFile))
+        BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
                               listeners.forEach(listener -> listener.databaseChanged(changes));
@@ -272,37 +274,44 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
     /// between classification and application.
     private void onScannedForSynchronization(int generation, ChangeScanner scanner, LibraryBaseline scannedBaseline, List<DatabaseChange> changes) {
-        if (generation != scanGeneration) {
-            LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
-            return;
+        // The lock keeps a file event from starting a newer scan between the check and the application
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
+                return;
+            }
+            synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
         }
-        synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
     }
 
     /// Sync clients and editors may write the file in several steps. A file that is still growing must not be parsed:
     /// half of a library parses fine and would look like every later entry had been deleted. Waits (bounded) until
-    /// size and modification time stop changing; the last snapshot seen becomes the known disk state.
-    private void awaitStableFile() {
+    /// size and modification time have stopped changing for a while. The state seen becomes the known disk state, so
+    /// that the events of the write just waited for do not trigger another scan; only for the current scan, since a
+    /// scan already overtaken will not apply what it sees, and recording it would make the next event look handled.
+    private void awaitStableLibraryFile(int generation) {
         Path path = monitoredPath.orElse(null);
         if (path == null) {
             return;
         }
         FileSnapshot last = FileSnapshot.read(path);
-        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS; attempt++) {
+        int unchanged = 0;
+        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS && unchanged < STABLE_FILE_CONFIRMATIONS; attempt++) {
             try {
                 Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
             } catch (InterruptedException e) {
+                LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
                 Thread.currentThread().interrupt();
                 return;
             }
             FileSnapshot current = FileSnapshot.read(path);
-            if (Objects.equals(current, last)) {
-                break;
-            }
+            unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
             last = current;
         }
         synchronized (database) {
-            knownDiskState = last;
+            if (generation == scanGeneration) {
+                knownDiskState = last;
+            }
         }
     }
 

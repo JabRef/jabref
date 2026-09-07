@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.CompoundEdit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -154,6 +155,17 @@ class ChangeTriageTest {
         // The entry deleted in memory is still unchanged on disk, so nothing is reported; the duplicate must not be mistaken for it
         assertInstanceOf(EntryAdd.class, triage.memoryOnly().getFirst());
         assertEquals(List.of(), triage.bothSides());
+    }
+
+    @Test
+    void commentChangedOnDiskIsAcceptedAndApplied() {
+        disk.setCommentsBeforeEntry("% from disk");
+
+        ChangeTriage.Triage triage = triage();
+
+        EntryChange change = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
+        change.applyChange(new CompoundEdit("test"));
+        assertEquals("% from disk", local.getUserComments());
     }
 
     @Test
