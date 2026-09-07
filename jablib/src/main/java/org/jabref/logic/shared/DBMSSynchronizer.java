@@ -434,7 +434,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Database worker.
     ///
     /// @return whether the entry reached the shared database - a refused or failed (and thus
-    ///         rolled back) update must not be announced to other clients
+     ///         rolled back) update must not be announced to other clients
     private boolean writeSharedEntry(BibEntry bibEntry) {
         if (!connected.get()) {
             offlineChanges.recordChange(bibEntry);
@@ -767,6 +767,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 reviveEntriesDeletedMeanwhile(entriesToWrite, entriesToInsert);
                 if (!entriesToInsert.isEmpty() && insertSharedEntries(entriesToInsert)) {
                     entriesToInsert.forEach(offlineChanges::forget);
+                    offlineChanges.forgetInserts(recorded.newEntries().keySet());
                 }
                 boolean written = false;
                 for (BibEntry bibEntry : entriesToWrite) {

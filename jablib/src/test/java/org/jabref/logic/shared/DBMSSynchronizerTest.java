@@ -381,17 +381,13 @@ class DBMSSynchronizerTest {
             assertTrue(Files.exists(offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()))));
             assertEquals(Optional.of("The nano processor1"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
 
-            // The reconnect loop finds the database again and writes them
-            waitUntil(() -> {
-                try {
-                    return dbmsProcessor.getSharedEntries().size() == 2;
-                } catch (SQLException e) {
-                    return false;
-                }
-            });
+            // The reconnect loop finds the database again and writes them; the records are dropped
+            // one by one as they are written, so the file is gone only once everything arrived
+            Path recordsFile = offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()));
+            waitUntil(() -> !Files.exists(recordsFile));
+            assertFalse(Files.exists(recordsFile));
             assertEquals(Optional.of("Edited while disconnected"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
             assertEquals(2, dbmsProcessor.getSharedEntries().size());
-            assertFalse(Files.exists(offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()))));
         } finally {
             synchronizer.closeSharedDatabase();
         }
