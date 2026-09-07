@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
@@ -29,7 +30,9 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.undo.CompoundEdit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,7 @@ class GroupTreeViewModelTest {
     private TaskExecutor taskExecutor;
     private GuiPreferences preferences;
     private DialogService dialogService;
+    private HeadlessGuiUndoManager journal;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +72,8 @@ class GroupTreeViewModelTest {
                 NoOpSearchBackend::new));
         when(stateManager.getSelectedGroups(databaseContext)).thenReturn(FXCollections.emptyObservableList());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
+        journal = new HeadlessGuiUndoManager();
+        when(stateManager.getUndoManager(databaseContext)).thenReturn(journal);
 
         taskExecutor = new CurrentThreadTaskExecutor();
         preferences = mock(GuiPreferences.class);
@@ -99,6 +105,33 @@ class GroupTreeViewModelTest {
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
     }
 
+    /// Group operations reach the model by editing the tree in place and writing the root back, so
+    /// they are recorded as the tree they produced - one step, undone by installing the tree that
+    /// was there before.
+    @Test
+    void reorderingSubgroupsIsUndoable() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        // The view model reads the tree when it is told about the library, and refreshes on later
+        // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+        assertEquals(List.of("A", "B"), childNames());
+
+        assertTrue(journal.canUndo(), "the sort was not recorded");
+        journal.undo();
+        assertEquals(List.of("B", "A"), childNames());
+    }
+
+    private List<String> childNames() {
+        return databaseContext.getMetaData().getGroups().orElseThrow().getChildren().stream()
+                              .map(node -> node.getGroup().getName())
+                              .toList();
+    }
+
     @Test
     void explicitGroupsAreRemovedFromEntriesOnDelete() {
         ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
@@ -107,7 +140,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model, new CompoundEdit("test"));
 
         assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
     }
@@ -121,7 +154,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model, new CompoundEdit("test"));
 
         assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get());
     }

@@ -133,6 +133,14 @@ public class MetaData {
         postChange();
     }
 
+    /// Removes the group tree, so that the library has no groups at all — the state it is in before
+    /// the first group is created.
+    public void clearGroups() {
+        groupsRoot.setValue(null);
+        eventBus.post(new GroupUpdatedEvent(this));
+        postChange();
+    }
+
     public void setGroupSearchSyntaxVersion(Version version) {
         groupSearchSyntaxVersion = Optional.of(version);
         postChange();

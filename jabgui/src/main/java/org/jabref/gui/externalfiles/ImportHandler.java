@@ -51,7 +51,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -538,17 +537,17 @@ public class ImportHandler {
         }
     }
 
+    /// Recorded as its own step rather than as part of the import: the import path pushes its own
+    /// step before the entries reach the library on the JavaFX thread, so there is no open block
+    /// left to fold these into.
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
-        for (GroupTreeNode node : groups) {
-            if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
-                List<FieldChange> undo = entryChanger.add(entries);
-                // TODO: Add undo
-                // if (!undo.isEmpty()) {
-                //    compoundEdit.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
-                //            undo));
-                // }
+        undoManager.addEdit(Localization.lang("Assign entries to group"), edit -> {
+            for (GroupTreeNode node : groups) {
+                if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
+                    edit.addAll(entryChanger.add(entries));
+                }
             }
-        }
+        });
     }
 
     /// Generate keys for given entries if globally configured - or citation key is empty

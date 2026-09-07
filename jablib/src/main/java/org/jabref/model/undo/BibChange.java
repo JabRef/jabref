@@ -19,6 +19,7 @@ public sealed interface BibChange permits
         UndoableChangeType,
         UndoableFieldChange,
         UndoableGroupChange,
+        UndoableGroupTreeChange,
         UndoableKeywordSeparatorChange,
         UndoableMetaDataChange,
         UndoableModifySubtree,

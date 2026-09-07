@@ -30,6 +30,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
@@ -55,10 +56,12 @@ import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
+import org.jabref.model.undo.UndoableGroupTreeChange;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -458,18 +461,23 @@ public class GroupNodeViewModel {
     }
 
     public void moveTo(GroupNodeViewModel target) {
-        // TODO: Add undo and display message
-        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
-        //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
-
-        getGroupNode().moveTo(target.getGroupNode());
-        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange).toChangeSet());
-        // panel.markBaseChanged();
-        // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+        recordTreeChange(() -> getGroupNode().moveTo(target.getGroupNode()));
     }
 
     public void moveTo(GroupTreeNode target, int targetIndex) {
-        getGroupNode().moveTo(target, targetIndex);
+        recordTreeChange(() -> getGroupNode().moveTo(target, targetIndex));
+    }
+
+    /// Records a move as one undo step. The nodes moved here belong to the tree the library holds,
+    /// so the move is already in the model when `operation` returns and only has to be described —
+    /// as a whole tree, the same way [GroupTreeViewModel] records the operations it owns.
+    private void recordTreeChange(Runnable operation) {
+        MetaData metaData = databaseContext.getMetaData();
+        Optional<GroupTreeNode> before = metaData.getGroups().map(GroupTreeNode::copySubtree);
+        stateManager.getUndoManager(databaseContext).addEdit(Localization.lang("Move group"), edit -> {
+            operation.run();
+            edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+        });
     }
 
     public Optional<GroupTreeNode> getParent() {

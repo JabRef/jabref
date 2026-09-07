@@ -51,6 +51,7 @@ class BibChangeTest {
                 new UndoableRemoveString(database, string),
                 new UndoableStringChange(string, UndoableStringChange.Part.CONTENT, "content", "other"),
                 new UndoableMetaDataChange(new BibDatabaseContext(), new MetaData(), metaDataWithMode()),
+                new UndoableGroupTreeChange(new MetaData(), Optional.of(groupTree("Books")), Optional.of(groupTree("Articles"))),
                 new ChangeSet("group", List.of(
                         new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
                         new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book))));
@@ -66,6 +67,12 @@ class BibChangeTest {
     @MethodSource("changes")
     void invertingOnceIsNotIdentity(BibChange change) {
         assertNotEquals(change, change.inverted());
+    }
+
+    private static GroupTreeNode groupTree(String childName) {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup(childName, GroupHierarchyType.INDEPENDENT, ','));
+        return root;
     }
 
     private static MetaData metaDataWithMode() {
@@ -102,6 +109,56 @@ class BibChangeTest {
 
         assertEquals(List.of(), live.getGroups().orElseThrow().getChildren(),
                 "undo restored a group tree the recorded state never held");
+    }
+
+    @Test
+    void undoingAGroupTreeChangePutsTheEarlierTreeBack() {
+        MetaData metaData = new MetaData();
+        metaData.setGroups(groupTree("Books"));
+        UndoableGroupTreeChange change = new UndoableGroupTreeChange(
+                metaData, metaData.getGroups(), Optional.of(groupTree("Articles")));
+
+        change.apply();
+        assertEquals(List.of("Articles"), childNames(metaData));
+
+        change.inverted().apply();
+        assertEquals(List.of("Books"), childNames(metaData));
+    }
+
+    /// A library that had no groups has to end up with none again, not with an empty root that a
+    /// save would write out.
+    @Test
+    void undoingTheFirstGroupLeavesTheLibraryWithoutGroups() {
+        MetaData metaData = new MetaData();
+        UndoableGroupTreeChange change = new UndoableGroupTreeChange(
+                metaData, Optional.empty(), Optional.of(groupTree("Books")));
+
+        change.apply();
+        assertEquals(List.of("Books"), childNames(metaData));
+
+        change.inverted().apply();
+        assertEquals(Optional.empty(), metaData.getGroups());
+    }
+
+    /// The tree the library holds must not be the one the change kept, or the next edit would
+    /// rewrite what undoing it restores.
+    @Test
+    void applyingAGroupTreeChangeInstallsACopy() {
+        MetaData metaData = new MetaData();
+        UndoableGroupTreeChange change = new UndoableGroupTreeChange(
+                metaData, Optional.empty(), Optional.of(groupTree("Books")));
+
+        change.apply();
+        metaData.getGroups().orElseThrow().addSubgroup(new ExplicitGroup("Added later", GroupHierarchyType.INDEPENDENT, ','));
+        change.apply();
+
+        assertEquals(List.of("Books"), childNames(metaData));
+    }
+
+    private static List<String> childNames(MetaData metaData) {
+        return metaData.getGroups().orElseThrow().getChildren().stream()
+                       .map(node -> node.getGroup().getName())
+                       .toList();
     }
 
     @Test

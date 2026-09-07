@@ -7,6 +7,7 @@ import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableChangeType;
 import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.undo.UndoableGroupChange;
+import org.jabref.model.undo.UndoableGroupTreeChange;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableInsertString;
 import org.jabref.model.undo.UndoableKeywordSeparatorChange;
@@ -50,7 +51,7 @@ public class BibChangeDescriber {
                     remove.entries().size() == 1 ? Localization.lang("Remove entry") : Localization.lang("Remove entries");
             case UndoableGroupChange groupChange ->
                     Localization.lang("Edit group %0", groupChange.after().getName());
-            case UndoableModifySubtree _ ->
+            case UndoableModifySubtree _, UndoableGroupTreeChange _ ->
                     Localization.lang("Edit groups");
             case UndoableKeywordSeparatorChange _ ->
                     Localization.lang("Change keyword separator");
