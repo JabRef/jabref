@@ -537,9 +537,6 @@ public class ImportHandler {
         }
     }
 
-    /// Recorded as its own step rather than as part of the import: the import path pushes its own
-    /// step before the entries reach the library on the JavaFX thread, so there is no open block
-    /// left to fold these into.
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         undoManager.addEdit(Localization.lang("Assign entries to group"), edit -> {
             for (GroupTreeNode node : groups) {

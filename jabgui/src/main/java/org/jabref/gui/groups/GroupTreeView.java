@@ -459,7 +459,9 @@ public class GroupTreeView extends BorderPane {
 
         if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();
-            row.getItem().addEntriesToGroup(entries);
+            stateManager.getActiveDatabase().ifPresent(database ->
+                    stateManager.getUndoManager(database).addEdit(Localization.lang("Assign entries to group"),
+                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
             success = true;
         }
 

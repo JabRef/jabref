@@ -245,8 +245,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
                 selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
-                // TODO: Expand parent to make new group visible
-                // parent.expand();
+                // TODO: expand the parent so the new group is visible
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
             }));
         });
@@ -709,40 +708,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
+    /// TODO: warn before assigning to a group whose membership is written to a field other than
+    /// `keywords`, since that edits the entries in a way the user may not expect.
     public void addSelectedEntries(GroupNodeViewModel group) {
-        // TODO: Warn
-        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
-        //    return; // user aborted operation
-
         recordEntryAssignment(Localization.lang("Assign entries to group"),
                 edit -> edit.addAll(group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries())));
-
-        // TODO: Add undo
-        // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
-        // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
-        // panel.getUndoManager().addEdit(undoAll.toChangeSet());
-
-        // TODO Display massages
-        // if (undo == null) {
-        //    frame.output(Localization.lang("The group \"%0\" already contains the selection.",
-        //            node.getGroup().getName()));
-        //    return;
-        // }
-        // panel.getUndoManager().addEdit(undo.toChangeSet());
-        // final String groupName = node.getGroup().getName();
-        // if (assignedEntries == 1) {
-        //    frame.output(Localization.lang("Assigned 1 entry to group \"%0\".", groupName));
-        // } else {
-        //    frame.output(Localization.lang("Assigned %0 entries to group \"%1\".", String.valueOf(assignedEntries),
-        //            groupName));
-        // }
     }
 
+    /// See [#addSelectedEntries] for the warning this still owes the user.
     public void removeSelectedEntries(GroupNodeViewModel group) {
-        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
-        //    return; // user aborted operation
-
         recordEntryAssignment(Localization.lang("Remove entries from group"),
                 edit -> edit.addAll(group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries())));
     }

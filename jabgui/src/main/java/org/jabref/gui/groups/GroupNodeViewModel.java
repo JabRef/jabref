@@ -170,13 +170,13 @@ public class GroupNodeViewModel {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferences);
     }
 
+    /// @return what the assignment changed, for the caller to record — this does not touch the
+    ///         journal itself, because whether the assignment is a step of its own or part of a
+    ///         larger one is the caller's to know
+    ///
+    /// TODO: warn before assigning to a group whose membership is written to a field other than
+    /// `keywords`, since that edits the entries in a way the user may not expect.
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
-        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
-        // {
-        //    return; // user aborted operation
-        // }
-
         List<FieldChange> changes = groupNode.addEntriesToGroup(entries);
 
         // Update appearance of group
@@ -184,9 +184,6 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched.invalidate();
 
         return changes;
-        // TODO: Store undo
-        // if (!undo.isEmpty()) {
-        // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
     }
 
     public SimpleBooleanProperty expandedProperty() {
