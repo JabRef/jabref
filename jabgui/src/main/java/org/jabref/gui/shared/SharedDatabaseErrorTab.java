@@ -1,5 +1,7 @@
 package org.jabref.gui.shared;
 
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -65,7 +67,7 @@ public class SharedDatabaseErrorTab extends Tab {
     }
 
     public void showError(Exception exception) {
-        message.setText(exception.getMessage() == null ? exception.toString() : exception.getMessage());
+        message.setText(Optional.ofNullable(exception.getMessage()).orElseGet(exception::toString));
         retryButton.setDisable(false);
     }
 }
