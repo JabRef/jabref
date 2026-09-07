@@ -1,5 +1,6 @@
 package org.jabref.logic.preferences;
 
+import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 
 import org.junit.jupiter.api.AfterEach;
@@ -11,12 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PreferenceMigrationTest {
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
     private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
+    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
     private static final String UNUSED_DEFAULT_VALUE = "";
+    private static final int UNUSED_DEFAULT_INT_VALUE = 0;
 
     private boolean hasLegacyResponseEngineKindValue;
     private boolean hasResponseEngineKindValue;
     private String legacyResponseEngineKindValue;
     private String responseEngineKindValue;
+
+    private boolean hasDocumentSplitterChunkSizeValue;
+    private int documentSplitterChunkSizeValue;
 
     @BeforeEach
     void setUp() {
@@ -27,8 +33,12 @@ class PreferenceMigrationTest {
         legacyResponseEngineKindValue = preferences.get(AI_ANSWER_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
         responseEngineKindValue = preferences.get(AI_RESPONSE_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
 
+        hasDocumentSplitterChunkSizeValue = preferences.hasKey(AI_DOCUMENT_SPLITTER_CHUNK_SIZE);
+        documentSplitterChunkSizeValue = preferences.getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, UNUSED_DEFAULT_INT_VALUE);
+
         preferences.remove(AI_ANSWER_ENGINE_KIND);
         preferences.remove(AI_RESPONSE_ENGINE_KIND);
+        preferences.remove(AI_DOCUMENT_SPLITTER_CHUNK_SIZE);
     }
 
     @AfterEach
@@ -37,6 +47,7 @@ class PreferenceMigrationTest {
 
         restorePreference(preferences, AI_ANSWER_ENGINE_KIND, hasLegacyResponseEngineKindValue, legacyResponseEngineKindValue);
         restorePreference(preferences, AI_RESPONSE_ENGINE_KIND, hasResponseEngineKindValue, responseEngineKindValue);
+        restorePreference(preferences, AI_DOCUMENT_SPLITTER_CHUNK_SIZE, hasDocumentSplitterChunkSizeValue, documentSplitterChunkSizeValue);
     }
 
     @Test
@@ -62,6 +73,28 @@ class PreferenceMigrationTest {
         assertEquals(ResponseEngineKind.EMBEDDINGS_SEARCH.name(), preferences.get(AI_RESPONSE_ENGINE_KIND, UNUSED_DEFAULT_VALUE));
     }
 
+    @Test
+    void getAiPreferencesClampsDocumentSplitterChunkSizeWhenExceedsMaximum() {
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+        preferences.putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 600);
+
+        int chunkSize = preferences.getAiPreferences().getDocumentSplitterChunkSize();
+
+        assertEquals(AiDefaultExpertSettings.DOCUMENT_SPLITTER_MAX_CHUNK_SIZE, chunkSize);
+        assertEquals(AiDefaultExpertSettings.DOCUMENT_SPLITTER_MAX_CHUNK_SIZE, preferences.getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, UNUSED_DEFAULT_INT_VALUE));
+    }
+
+    @Test
+    void getAiPreferencesKeepsDocumentSplitterChunkSizeWhenWithinLimit() {
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+        preferences.putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 400);
+
+        int chunkSize = preferences.getAiPreferences().getDocumentSplitterChunkSize();
+
+        assertEquals(400, chunkSize);
+        assertEquals(400, preferences.getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, UNUSED_DEFAULT_INT_VALUE));
+    }
+
     private void restorePreference(JabRefCliPreferences preferences, String key, boolean hasValue, String value) {
         if (!hasValue) {
             preferences.remove(key);
@@ -69,5 +102,14 @@ class PreferenceMigrationTest {
         }
 
         preferences.put(key, value);
+    }
+
+    private void restorePreference(JabRefCliPreferences preferences, String key, boolean hasValue, int value) {
+        if (!hasValue) {
+            preferences.remove(key);
+            return;
+        }
+
+        preferences.putInt(key, value);
     }
 }

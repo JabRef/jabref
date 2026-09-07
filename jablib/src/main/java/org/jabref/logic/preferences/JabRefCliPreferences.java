@@ -47,6 +47,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -2077,6 +2078,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         AiPreferences defaultValues = AiPreferences.getDefault();
         migrateLegacyAiResponseEngineKind(defaultValues);
+        migrateDocumentSplitterChunkSize();
 
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED, defaultValues.getAiFeaturesEnabled()),
@@ -2164,6 +2166,13 @@ public class JabRefCliPreferences implements CliPreferences {
     private void migrateLegacyAiResponseEngineKind(AiPreferences defaultValues) {
         if (!hasKey(AI_RESPONSE_ENGINE_KIND) && hasKey(AI_ANSWER_ENGINE_KIND)) {
             put(AI_RESPONSE_ENGINE_KIND, get(AI_ANSWER_ENGINE_KIND, defaultValues.getResponseEngineKind().name()));
+        }
+    }
+
+    private void migrateDocumentSplitterChunkSize() {
+        if (hasKey(AI_DOCUMENT_SPLITTER_CHUNK_SIZE)
+                && getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 0) > AiDefaultExpertSettings.DOCUMENT_SPLITTER_MAX_CHUNK_SIZE) {
+            putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultExpertSettings.DOCUMENT_SPLITTER_MAX_CHUNK_SIZE);
         }
     }
     // endregion
