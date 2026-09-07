@@ -12,6 +12,34 @@ on:
         required: true
 
 jobs:
+  # "status: changes-required" describes the state before this push and is therefore stale:
+  # whether the new head still requires changes is only known once CI and Qodo have run on it.
+  # No label at all is the honest state for that window; "Comment on PR" sets the verdict.
+  # Own job, sharing the concurrency group of "Comment on PR": an evaluation still running for the
+  # previous head must finish before this removal, otherwise its stale verdict lands after it and
+  # the label survives the push. The group key mirrors the one there, which reads head repository
+  # and branch of the run that triggered it - the same PR head this event carries.
+  # Not in the job below: that one re-adds "automerge" after pushing a conflict resolution, which a
+  # removal queued behind an unrelated status evaluation could undo.
+  clear_changes_required:
+    if: github.repository == 'JabRef/jabref' && github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
+    name: 'Clear "status: changes-required"'
+    runs-on: ubuntu-slim
+    concurrency:
+      group: pr-status-${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.ref }}
+      cancel-in-progress: false
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Remove label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: >-
+          gh pr edit "$PR_NUMBER" --remove-label "status: changes-required"
+
   conflicts_with_target:
     if: github.repository == 'JabRef/jabref'
     name: Conflicts with target branch

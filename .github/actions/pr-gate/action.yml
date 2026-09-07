@@ -1,5 +1,5 @@
 name: PR gate (maintainer/CI/label)
-description: "Checks whether actor is maintainer and whether CI is running or \"status: changes-required\" label is set."
+description: "Checks whether actor is maintainer and whether CI or the automatic review is running or \"status: changes-required\" label is set."
 
 inputs:
   github-token:
@@ -7,7 +7,7 @@ inputs:
     required: true
   ci-running-message:
     required: true
-    description: "Message if CI is running"
+    description: "Message if CI or the automatic review is running"
   changes-required-message:
     required: true
     description: "Message if label \"status: changes-required\" exists"
@@ -17,7 +17,7 @@ outputs:
     description: "true if actor is admin/maintain/write"
     value: ${{ steps.perm.outputs.skip-check }}
   ci_running:
-    description: "true if relevant checks are QUEUED/IN_PROGRESS"
+    description: "true if relevant checks are QUEUED/IN_PROGRESS or Qodo is still reviewing"
     value: ${{ steps.eval.outputs.ci_running }}
   changes_required:
     description: "true if label \"status: changes-required\" exists"
@@ -79,7 +79,12 @@ runs:
         # running checks: Binaries / Source Code Tests
         running=$(gh pr checks "$PR" --json name,state -q \
           '[.[] | select((.name=="Binaries" or .name=="Source Code Tests") and (.state=="IN_PROGRESS" or .state=="QUEUED"))] | length')
-        if [ "$running" -gt 0 ]; then
+        # Qodo is not a check run; its "busy" comment is the only signal that it still has a
+        # verdict to deliver. It has to gate as CI does: since a push clears
+        # "status: changes-required", that label no longer covers the window until Qodo is done.
+        qodo=$(gh pr view "$PR" --json comments \
+          --jq '[.comments[] | select(.author.login == "qodo-free-for-open-source-projects" and (.body | contains("Qodo is busy working")))] | length')
+        if [ "$running" -gt 0 ] || [ "$qodo" -gt 0 ]; then
           echo "ci_running=true" >> "$GITHUB_OUTPUT"
         else
           echo "ci_running=false" >> "$GITHUB_OUTPUT"

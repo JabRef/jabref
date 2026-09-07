@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
 - We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
 - We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
 - We added a per-library keyword separator to the library properties, so opening a library no longer rewrites keyword fields. [#16835](https://github.com/JabRef/jabref/pull/16835)
@@ -72,15 +73,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an offer to initialize a Git repository when committing a library that is not yet version controlled. [#16722](https://github.com/JabRef/jabref/pull/16722)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added a fetcher for the Bielefeld Academic Search Engine (BASE). [#15016](https://github.com/JabRef/jabref/issues/15016)
 - We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
+- We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 
 ### Changed
 
+- We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
+- We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)
 - We changed the default size of the "New Entry" dialog to improve visibility. [#11589](https://github.com/JabRef/jabref/issues/11589)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
 - We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
+- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - A custom theme (CSS file) is now applied on top of the selected theme instead of replacing it entirely. [#15625](https://github.com/JabRef/jabref/issues/15625)
@@ -119,6 +125,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
+- We fixed an issue where the entry editor kept showing an entry of another library after switching libraries. [#16892](https://github.com/JabRef/jabref/pull/16892)
+- We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
 - We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
@@ -126,6 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first if autosave is enabled, and otherwise lets you choose between saving first and committing only the state on disk, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
+- We fixed the context menu of an automatically found file offering "Remove link" instead of linking the file. [#16898](https://github.com/JabRef/jabref/pull/16898)
 - We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
@@ -223,6 +233,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
+- We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
+- We fixed an issue where the "entrytype" column header was shown in lower case; it now reads "Entry Type". [#16894](https://github.com/JabRef/jabref/pull/16894)
 
 ### Removed
 
