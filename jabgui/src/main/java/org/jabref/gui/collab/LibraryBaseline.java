@@ -139,9 +139,9 @@ public final class LibraryBaseline {
         Optional<Map.Entry<String, EntrySnapshot>> find(BibEntry remote) {
             EntrySnapshot snapshot = EntrySnapshot.view(remote);
             Optional<Map.Entry<String, EntrySnapshot>> byKeyMatch = snapshot.citationKey()
-                    .map(key -> byKey.getOrDefault(key, List.of()))
-                    .flatMap(candidates -> candidates.stream().filter(entry -> entry.getValue().equals(snapshot)).findFirst()
-                                                     .or(() -> candidates.stream().findFirst()));
+                                                                            .map(key -> byKey.getOrDefault(key, List.of()))
+                                                                            .flatMap(candidates -> candidates.stream().filter(entry -> entry.getValue().equals(snapshot)).findFirst()
+                                                                                                             .or(() -> candidates.stream().findFirst()));
             return byKeyMatch.or(() -> Optional.ofNullable(byContentExceptKey.get(snapshot.withoutKey())));
         }
     }
@@ -164,7 +164,7 @@ public final class LibraryBaseline {
                 // No in-memory counterpart: either new on disk, or deleted in memory (and possibly modified on disk)
                 case EntryAdd entryAdd ->
                         index.find(entryAdd.getAddedEntry()).map(base -> base.getValue().equals(EntrySnapshot.view(entryAdd.getAddedEntry())) ? Side.MEMORY : Side.BOTH)
-                                                      .orElse(Side.DISK);
+                             .orElse(Side.DISK);
                 // No counterpart on disk: either deleted on disk, or added in memory (and possibly modified on disk)
                 case EntryDelete entryDelete -> {
                     EntrySnapshot base = entriesById.get(entryDelete.getDeletedEntry().getId());
