@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Text?>
 <fx:root
         type="ScrollPane"
-        styleClass="ai-tab,padding-20"
+        styleClass="ai-tab,padding-24"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.ai.AiPrivacyNoticeView">
