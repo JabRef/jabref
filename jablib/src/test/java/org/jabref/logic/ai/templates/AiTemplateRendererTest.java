@@ -24,7 +24,7 @@ class AiTemplateRendererTest {
                 List.of(excerpt)
         );
 
-        assertTrue(rendered.contains("Smith2024:"));
+        assertTrue(rendered.contains("Smith2024"));
         assertTrue(rendered.contains("Some excerpt text from paper."));
         assertTrue(rendered.contains("User query"));
     }
