@@ -7,6 +7,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
 import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.jspecify.annotations.NullMarked;
@@ -51,7 +53,10 @@ public class SwhidFetcherTest {
         assertEquals(Optional.of("Parmap"), fetchedEntry.flatMap(entry -> entry.getField(StandardField.TITLE)));
         assertEquals(Optional.of("2011"), fetchedEntry.flatMap(entry -> entry.getField(StandardField.YEAR)));
         assertEquals(Optional.of("Di Cosmo, Roberto and Danelutto, Marco"), fetchedEntry.flatMap(entry -> entry.getField(StandardField.AUTHOR)));
+        assertEquals(Optional.of(BiblatexSoftwareEntryType.SoftwareVersion), fetchedEntry.map(BibEntry::getType));
         assertEquals(Optional.of(PARMAP_SWHID), fetchedEntry.flatMap(entry -> entry.getField(BiblatexSoftwareField.SWHID)));
+        assertEquals(Optional.empty(), fetchedEntry.flatMap(entry -> entry.getField(new UnknownField("swhid"))));
+        assertEquals(1, fetchedEntry.get().getFields().stream().filter(f -> f.getName().equalsIgnoreCase("swhid")).count());
     }
 
     @Test

@@ -761,7 +761,7 @@ public class BibtexParser implements Parser {
     private void parseField(BibEntry entry) throws IOException {
         int startLine = line;
         int startColumn = column;
-        Field field = FieldFactory.parseField(parseTextToken());
+        Field field = FieldFactory.parseField(entry.getType(), parseTextToken());
 
         skipWhitespace();
         consume(field, '=');

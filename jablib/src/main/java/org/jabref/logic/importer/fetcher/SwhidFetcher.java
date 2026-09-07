@@ -18,6 +18,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.SWHID;
 
 import kong.unirest.core.json.JSONException;
@@ -106,6 +107,7 @@ public class SwhidFetcher implements IdBasedFetcher {
 
                 BibEntry entry = entries.getFirst();
 
+                entry.clearField(new UnknownField("swhid"));
                 if (!entry.hasField(BiblatexSoftwareField.SWHID)) {
                     entry = entry.withField(BiblatexSoftwareField.SWHID, canonicalSwhid);
                 }
