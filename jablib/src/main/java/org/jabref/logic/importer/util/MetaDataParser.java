@@ -166,6 +166,7 @@ public class MetaDataParser {
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
                 // groups are processed last (see above), so a keyword separator declared in the library is already known here
                 metaData.setGroups(GroupsParser.importGroups(values, metaData.getKeywordSeparator().orElse(keywordSeparator), fileMonitor, metaData, userAndHost));
+                metaData.setGroupsInLegacyFormat(MetaData.GROUPSTREE_LEGACY.equals(entry.getKey()));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);

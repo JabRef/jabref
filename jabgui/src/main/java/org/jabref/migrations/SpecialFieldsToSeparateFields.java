@@ -8,12 +8,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 
+/// Moves special field values (`prio1`, `rank3`, `printed`, ...) that JabRef 5.2 and older stored in the
+/// `keywords` field into the special fields themselves.
 public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     private final KeywordList possibleKeywordsToMigrate;
     private final Character keywordDelimiter;
@@ -30,8 +33,23 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     }
 
     @Override
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getDatabase().getEntries().stream().anyMatch(this::hasKeywordToMigrate);
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Special fields (ranking, priority, read status, ...) are stored in the field 'keywords' (JabRef 5.2 and older). Move them to their own fields.");
+    }
+
+    @Override
     public void performMigration(ParserResult parserResult) {
         parserResult.getDatabase().getEntries().forEach(this::migrateEntry);
+    }
+
+    private boolean hasKeywordToMigrate(BibEntry entry) {
+        KeywordList keywords = entry.getKeywords(keywordDelimiter);
+        return possibleKeywordsToMigrate.stream().anyMatch(keywords::contains);
     }
 
     private void migrateEntry(BibEntry entry) {

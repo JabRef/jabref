@@ -94,6 +94,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
+    private boolean groupsInLegacyFormat;
     @Nullable private String versionDBStructure;
     @Nullable private String aiLibraryId;
     private boolean containsSearchGroups;
@@ -136,6 +137,16 @@ public class MetaData {
     public void setGroupSearchSyntaxVersion(Version version) {
         groupSearchSyntaxVersion = Optional.of(version);
         postChange();
+    }
+
+    /// `true` if the groups were read from the `groupstree` key JabRef 3.x wrote. Not part of [#equals(Object)]:
+    /// it describes the file the data came from, not the data itself.
+    public boolean isGroupsInLegacyFormat() {
+        return groupsInLegacyFormat;
+    }
+
+    public void setGroupsInLegacyFormat(boolean groupsInLegacyFormat) {
+        this.groupsInLegacyFormat = groupsInLegacyFormat;
     }
 
     public Optional<Version> getGroupSearchSyntaxVersion() {

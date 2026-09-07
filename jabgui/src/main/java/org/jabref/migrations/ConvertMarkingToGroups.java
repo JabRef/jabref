@@ -22,11 +22,20 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import org.jspecify.annotations.NonNull;
 
-/// Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,
-/// where the entry stores a list of groups it belongs to.
+/// Converts the markings of JabRef 4 and older (field `__markedentry`) to groups.
 public class ConvertMarkingToGroups implements PostOpenMigration {
 
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
+
+    @Override
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getDatabase().getEntries().stream().anyMatch(entry -> entry.hasField(InternalField.MARKED_INTERNAL));
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Entries are marked using the field '__markedentry' (JabRef 4 and older). Convert the markings to groups.");
+    }
 
     @Override
     public void performMigration(@NonNull ParserResult parserResult) {

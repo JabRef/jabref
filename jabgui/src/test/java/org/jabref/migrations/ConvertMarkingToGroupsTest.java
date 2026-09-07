@@ -14,6 +14,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConvertMarkingToGroupsTest {
     @Test
@@ -22,7 +24,10 @@ class ConvertMarkingToGroupsTest {
                 .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         ParserResult parserResult = new ParserResult(Set.of(entry));
 
-        new ConvertMarkingToGroups().performMigration(parserResult);
+        ConvertMarkingToGroups migration = new ConvertMarkingToGroups();
+        assertTrue(migration.isMigrationNecessary(parserResult));
+
+        migration.performMigration(parserResult);
 
         GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
@@ -30,5 +35,6 @@ class ConvertMarkingToGroupsTest {
 
         assertEquals(Optional.empty(), entry.getField(InternalField.MARKED_INTERNAL));
         assertEquals(Optional.of(rootExpected), parserResult.getMetaData().getGroups());
+        assertFalse(migration.isMigrationNecessary(parserResult));
     }
 }
