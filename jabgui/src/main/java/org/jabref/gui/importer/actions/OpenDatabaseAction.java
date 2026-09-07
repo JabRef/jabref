@@ -263,15 +263,9 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
-            // Several files may be loading at once, with the last opened tab on top;
-            // raise this file's tab so the dialog visibly belongs to it.
-            UiTaskExecutor.runInJavaFXThread(() -> tabContainer.getLibraryTabs().stream()
-                                                               .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().map(Path::toAbsolutePath).map(fileToLoad::equals).orElse(false))
-                                                               .findFirst()
-                                                               .ifPresent(tabContainer::showLibraryTab));
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, fileToLoad, preferences, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 
