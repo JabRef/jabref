@@ -35,7 +35,7 @@ Chosen option: "A single `stable` branch, ports driven by a label and done by CI
 
 * `main` is the development branch. Every pull request targets `main` unless the change only makes sense for the released version.
 * `stable` is the last regular release plus the fixes ported to it. A regular release merges `main` into `stable` and tags on `stable`; a hotfix release tags `stable` as it is. In the terms of Martin Fowler's [branching patterns](https://martinfowler.com/articles/branching-patterns.html), `stable` is a [long-lived release branch](https://martinfowler.com/articles/branching-patterns.html#long-lived-release-branch), and a fix follows the [hotfix branch](https://martinfowler.com/articles/branching-patterns.html#hotfix-branch) recommendation: it is made on the [mainline](https://martinfowler.com/articles/branching-patterns.html#mainline) and cherry-picked to the release branch.
-* A pull request into `main` labeled `dev: into-stable` is ported to `stable` after the merge. A pull request into `stable` is always ported to `main` after the merge, so `main` never lacks a fix that users have.
+* A pull request into `main` labeled `dev: into-stable` is ported to `stable` after the merge. CI adds the label when the pull request links an issue of type "bug", but only when the link is new (pull request creation, or a description edit that adds it), so a maintainer's manual decision for or against the label is never reverted by a later push. A pull request into `stable` is always ported to `main` after the merge, so `main` never lacks a fix that users have.
 * Before the merge, the port is simulated as a required check ("Would merge into stable/main"), so a conflict is visible on the pull request itself. After the merge, CI cherry-picks the squash commit into a port pull request, which auto-merges when CI passes. If the cherry-pick conflicts, the port pull request is opened as a draft with the conflict committed, and the workflow run fails: a maintainer resolves the conflict in that pull request.
 * `CHANGELOG.md` keeps one `## [Unreleased]` section per branch. heylogs rejects a second unreleased section on `main` in every spelling (`unique-release` for a duplicate `[Unreleased]`, `date-displayed` for a variant such as `[Unreleased (stable)]`), and it would only mirror what `stable`'s own changelog already shows. A changelog entry is written once, in the branch the pull request targets; the port carries it over with a merge driver that applies the added and removed entries of `## [Unreleased]` on entry level (`.jbang/ChangelogCherryPickMergeDriver.java`). A plain cherry-pick would always conflict there, because the neighbouring entries differ between the branches.
 * When a hotfix release renames `## [Unreleased]` to a version on `stable`, the port of that commit conflicts on `main` by design and is resolved by hand: the version section is inserted below `main`'s `## [Unreleased]`, and the ported entries are removed from it.
@@ -43,7 +43,7 @@ Chosen option: "A single `stable` branch, ports driven by a label and done by CI
 ### Consequences
 
 * Good, because the released version can be fixed and re-released within hours, from a branch whose only changes since the release are the ported fixes.
-* Good, because a contributor does nothing new; maintainers add one label.
+* Good, because a contributor does nothing new; bug fixes get the label automatically, and maintainers correct it with one click.
 * Good, because the conflict check turns "will this fix still apply to the release?" into a question answered before the merge.
 * Bad, because a change that conflicts needs a maintainer to resolve the port pull request, and until then `stable` lacks the fix.
 * Bad, because `stable` only serves the latest regular release; older releases (JabRef 5 while 6 is current) get no fixes. This is the current situation, so nothing is lost.
@@ -51,7 +51,7 @@ Chosen option: "A single `stable` branch, ports driven by a label and done by CI
 
 ### Confirmation
 
-`.github/workflows/port-to-other-branch.yml` implements the check and the port; the merge driver ships a self-test that the `JBang check` job runs. Whether a fix reached both branches is visible on the original pull request (comment and port pull request link from the port job).
+`.github/workflows/on-pr-bug-linked.yml` adds the label for newly linked bugs; `.github/workflows/port-to-other-branch.yml` implements the check and the port; the merge driver ships a self-test that the `JBang check` job runs. Whether a fix reached both branches is visible on the original pull request (comment and port pull request link from the port job).
 
 ## Pros and Cons of the Options
 

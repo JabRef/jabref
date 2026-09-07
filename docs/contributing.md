@@ -14,7 +14,7 @@ JabRef has two long-lived branches (see [ADR-0072](decisions/0072-single-stable-
 
 ### Getting a fix into the released version
 
-Open the pull request against `main` as usual. A maintainer adds the label `dev: into-stable` when the fix should reach users before the next regular release.
+Open the pull request against `main` as usual. CI adds the label `dev: into-stable` when the pull request links an issue of type "bug": at creation, or when an edit of the description newly links one. Maintainers add or remove the label by hand when the fix should or should not reach users before the next regular release; CI never overrides that decision (a push does not re-add the label).
 The label triggers two things:
 
 1. The check "Would merge into stable" simulates the port. If it fails, the fix conflicts with `stable`; resolve that before or after the merge, as described below.
