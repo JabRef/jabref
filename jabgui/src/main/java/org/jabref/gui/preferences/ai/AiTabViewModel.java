@@ -345,27 +345,27 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
-                Bindings.createObjectBinding(
-                        () -> new ChunkSizeValidation(documentSplitterChunkSize.get(), selectedEmbeddingModelMaxChunkSize.get()),
+                Bindings.createBooleanBinding(
+                        () -> documentSplitterChunkSize.get() > 0 && documentSplitterChunkSize.get() <= selectedEmbeddingModelMaxChunkSize.get(),
                         documentSplitterChunkSize,
                         selectedEmbeddingModelMaxChunkSize),
-                validation -> {
-                    if (validation.chunkSize() <= 0) {
-                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
-                    }
-                    if (validation.chunkSize() > validation.maxChunkSize()) {
-                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", validation.maxChunkSize()));
+                valid -> {
+                    if (!valid) {
+                        if (documentSplitterChunkSize.get() <= 0) {
+                            return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
+                        }
+                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", selectedEmbeddingModelMaxChunkSize.get()));
                     }
                     return null;
                 });
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 Bindings.createObjectBinding(
-                        () -> new OverlapSizeValidation(documentSplitterOverlapSize.get(), documentSplitterChunkSize.get()),
+                        () -> documentSplitterOverlapSize.getValue(),
                         documentSplitterOverlapSize,
                         documentSplitterChunkSize),
-                validation -> {
-                    if (validation.overlapSize() <= 0 || validation.overlapSize() >= validation.chunkSize()) {
+                size -> {
+                    if (size == null || size.intValue() <= 0 || size.intValue() >= documentSplitterChunkSize.get()) {
                         return ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size"));
                     }
                     return null;
@@ -854,11 +854,5 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                           }
                       })
                       .executeWith(taskExecutor);
-    }
-
-    private record ChunkSizeValidation(int chunkSize, int maxChunkSize) {
-    }
-
-    private record OverlapSizeValidation(int overlapSize, int chunkSize) {
     }
 }
