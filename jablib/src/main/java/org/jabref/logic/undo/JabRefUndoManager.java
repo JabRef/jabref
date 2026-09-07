@@ -340,14 +340,14 @@ public class JabRefUndoManager implements UndoManager {
     ///         afterwards, it would describe whichever step another thread has since pushed.
     ///         Only a name leaves the journal, so nothing outside it starts reading the contents
     ///         of the stacks.
-    public Optional<StepOutcome> undo() {
-        StepOutcome outcome;
+    public Optional<UndoResult> undo() {
+        UndoResult result;
         synchronized (this) {
             if (!suspensions.isEmpty() || undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            outcome = new StepOutcome(
+            result = new UndoResult(
                     BibChangeDescriber.describe(journalEntry.change()),
                     journalEntry.change().inverted().apply().isComplete());
             undoStack.pop();
@@ -356,26 +356,26 @@ public class JabRefUndoManager implements UndoManager {
             redoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(outcome);
+        return Optional.of(result);
     }
 
     /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
     ///         to redo or a command is holding the library
-    public Optional<StepOutcome> redo() {
-        StepOutcome outcome;
+    public Optional<UndoResult> redo() {
+        UndoResult result;
         synchronized (this) {
             if (!suspensions.isEmpty() || redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            outcome = new StepOutcome(
+            result = new UndoResult(
                     BibChangeDescriber.describe(journalEntry.change()),
                     journalEntry.change().apply().isComplete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(outcome);
+        return Optional.of(result);
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

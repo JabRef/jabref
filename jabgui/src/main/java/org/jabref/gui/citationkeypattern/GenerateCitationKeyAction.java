@@ -111,7 +111,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
         LibraryTab libraryTab = tabSupplier.get();
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
-
         // The keys are written entry by entry in call() and handed over in the success handler, so
         // the library is held against undo across both. Closed on every path out of the task.
         UndoSuspension suspended = undoManager.suspendUndo(StandardActions.GENERATE_CITE_KEYS.getText());

@@ -386,21 +386,15 @@ public class MetaData {
         postChange();
     }
 
-    /// A new instance holding the contents of `other`, detached from it: editing either afterwards
-    /// leaves the other alone, and the copy carries no listeners.
+    /// A detached copy of `other` with new identity and without listeners.
     public static MetaData copyOf(@NonNull MetaData other) {
         MetaData copy = new MetaData();
         copy.overwriteWith(other);
         return copy;
     }
 
-    /// Overwrites this instance's contents with those of `other`. **This object survives**, and with
-    /// it everything registered on its [EventBus] — which is the point: installing `other` in the
-    /// library instead would orphan every listener of the instance it replaced.
-    ///
-    /// Event propagation is not overwritten: whether this instance posts is a property of the live
-    /// instance and its listeners, not of the contents. Posts a [MetaDataChangedEvent], and a
-    /// [GroupUpdatedEvent] as well when `other` has groups.
+    /// Overwrites this instance's contents with those of `other`. The identity survives
+    /// of the overwritten object survives and with everything registered on its [EventBus].
     public void overwriteWith(@NonNull MetaData other) {
         citeKeyPatterns.clear();
         citeKeyPatterns.putAll(other.citeKeyPatterns);
@@ -433,9 +427,6 @@ public class MetaData {
         gitAutoCommit = other.gitAutoCommit;
         gitAutoPush = other.gitAutoPush;
 
-        // The tree is copied, not shared: group operations mutate nodes in place, so a shared tree
-        // would let a later edit rewrite what a recorded change is supposed to restore.
-        // Last, since setGroups wires up the subscriptions this instance's listeners depend on.
         other.getGroups()
              .map(GroupTreeNode::copySubtree)
              .ifPresentOrElse(this::setGroups, () -> groupsRoot.setValue(null));
