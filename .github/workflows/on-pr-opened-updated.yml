@@ -27,13 +27,19 @@ jobs:
           show-progress: 'false'
       # A human push invalidates the bot's earlier approval; "automerge" must be granted again explicitly.
       # The merge commit pushed by this workflow (as jabref-machine) is exempt, as it does not change the PR's content.
-      - name: Remove automerge label on push
+      # "status: changes-required" describes the state before this push and is therefore stale:
+      # whether the new head still requires changes is only known once CI and Qodo have run on it.
+      # No label at all is the honest state for that window; "Comment on PR" sets the verdict.
+      # Removing it here (and not in the pending branch of "Comment on PR") keeps the write ordered
+      # before every evaluation run this push triggers, so it cannot overwrite their verdict.
+      - name: Remove automerge and changes-required labels on push
         if: github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr edit "$PR_NUMBER" --remove-label automerge
+        run: >-
+          gh pr edit "$PR_NUMBER" --remove-label "automerge,status: changes-required"
       - name: Get PR info
         id: pr_info
         env:
