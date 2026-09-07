@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.jabref.model.undo.ApplyResult;
 import org.jabref.model.undo.BibChange;
@@ -122,6 +123,10 @@ public class JabRefUndoManager implements UndoManager {
     /// longer in it to be named.
     private final Set<Suspension> suspensions = new LinkedHashSet<>();
 
+    /// Set while this journal is applying a change *on this thread*, in [#applyEdit], [#undo] or
+    /// [#redo]. See [#isApplying] for what it is for and why a thread-local is sound here.
+    private final ThreadLocal<Boolean> applying = ThreadLocal.withInitial(() -> false);
+
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
     /// a shared field would fold edits the user makes meanwhile into the background command's
@@ -185,7 +190,7 @@ public class JabRefUndoManager implements UndoManager {
         }
         ApplyResult result;
         synchronized (this) {
-            result = change.apply();
+            result = applying(change::apply);
             push(change);
         }
         notifyListeners();
@@ -359,7 +364,7 @@ public class JabRefUndoManager implements UndoManager {
             UndoJournalEntry journalEntry = undoStack.getFirst();
             step = new UndoStep(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().inverted().apply().complete());
+                    applying(() -> journalEntry.change().inverted().apply()).complete());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
@@ -380,7 +385,7 @@ public class JabRefUndoManager implements UndoManager {
             UndoJournalEntry journalEntry = redoStack.getFirst();
             step = new UndoStep(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().apply().complete());
+                    applying(journalEntry.change()::apply).complete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
@@ -403,6 +408,27 @@ public class JabRefUndoManager implements UndoManager {
             savedId = currentPosition();
         }
         notifyListeners();
+    }
+
+    /// Whether this journal is applying a change on this thread right now.
+    ///
+    /// For listeners that a model write reaches synchronously, on the applying thread, while
+    /// [#undo] or [#redo] is between reading the stack and moving the entry across: recording
+    /// anything from there clears the redo stack under the operation that is still using it.
+    /// A thread-local answers exactly that question — the event is posted inside `apply`, on this
+    /// thread, before it returns — and it is not a substitute for a change knowing where it came
+    /// from, which is what [org.jabref.model.entry.event.EntriesEventSource] is for.
+    public boolean isApplying() {
+        return applying.get();
+    }
+
+    private ApplyResult applying(Supplier<ApplyResult> apply) {
+        applying.set(true);
+        try {
+            return apply.get();
+        } finally {
+            applying.remove();
+        }
     }
 
     /// Marks the library as changed by something this journal cannot take back — a migration on

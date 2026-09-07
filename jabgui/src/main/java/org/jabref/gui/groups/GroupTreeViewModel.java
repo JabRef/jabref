@@ -289,7 +289,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     // library in a state nothing describes. The journal hands over a failed block's
                     // changes for the same reason.
                     writeGroupChangesToMetaData();
-                    edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+                    // Sorting an already sorted group, or dropping one where it already is, changes
+                    // nothing: recording that would enable Undo over a step that does nothing.
+                    if (!before.equals(metaData.getGroups())) {
+                        edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+                    }
                 }
             });
         });

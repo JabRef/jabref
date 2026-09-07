@@ -1257,6 +1257,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 return;
             }
 
+            // Nor when the journal is replaying an insertion: a redo reads its stack, applies, and
+            // then moves the entry across, so recording anything here would clear the stack it is
+            // still holding. The entries are back either way; assigning them again is not this
+            // listener's business.
+            if (getUndoManager() instanceof GuiUndoManager journal && journal.isApplying()) {
+                return;
+            }
+
             // Automatically add new entries to the selected group (or set of groups)
             if (preferences.getGroupsPreferences().shouldAutoAssignGroup()) {
                 // The entries arrived through an event, so whatever added them has pushed its own step already.

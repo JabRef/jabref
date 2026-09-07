@@ -3,7 +3,9 @@ package org.jabref.gui.libraryproperties.constants;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -94,9 +96,16 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
                                                         .map(this::fromBibtexStringViewModel)
                                                         .toList();
         List<BibtexString> before = List.copyOf(databaseContext.getDatabase().getStringValues());
-        if (!before.equals(strings)) {
+        // By name and content only: `BibtexString.equals` also compares the parsed serialization and
+        // the changed flag, and the library's own list comes out of a map in no particular order, so
+        // comparing the objects would report a change every time this dialog is accepted.
+        if (!contentsOf(before).equals(contentsOf(strings))) {
             undoManager.applyEdit(new UndoableReplaceStrings(databaseContext.getDatabase(), before, strings));
         }
+    }
+
+    private static Map<String, String> contentsOf(List<BibtexString> strings) {
+        return strings.stream().collect(Collectors.toMap(BibtexString::getName, BibtexString::getContent, (first, _) -> first));
     }
 
     private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {

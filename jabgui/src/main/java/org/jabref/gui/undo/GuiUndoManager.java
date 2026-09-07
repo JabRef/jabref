@@ -45,6 +45,9 @@ public interface GuiUndoManager extends UndoManager {
     /// Marks the library as changed by something the journal cannot take back.
     void markChanged();
 
+    /// Whether the journal is applying a change on this thread right now.
+    boolean isApplying();
+
     /// Discards both stacks and the saved position.
     ///
     /// Nothing calls this today, which is a defect rather than a spare method: closing a library

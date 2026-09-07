@@ -86,22 +86,33 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 try {
                     report(getValue());
                 } finally {
-                    suspended.close();
+                    handOver();
                 }
             }
 
             @Override
             protected void failed() {
-                suspended.close();
+                handOver();
             }
 
             @Override
             protected void cancelled() {
+                handOver();
+            }
+
+            /// Hands over what the worker changed and releases the library, on every way this task
+            /// can end. Failing and cancelling reach here too: the file fields they had already
+            /// rewritten are in the library whether the task finished or not, so they belong on the
+            /// stack, and holding the library against undo afterwards would disable it for good.
+            private void handOver() {
+                if (compound.hasEdits()) {
+                    undoManager.addEdit(compound.toChangeSet());
+                }
                 suspended.close();
             }
 
-            /// Every path out of this method returns without pushing except the last, which is why
-            /// the caller closes the reservation rather than each branch.
+            /// Only reports; handing the changes over is [#handOver]'s job, so an early return
+            /// here cannot lose them.
             private void report(AutoSetFileLinksUtil.LinkFilesResult result) {
                 if (!result.getFileExceptions().isEmpty()) {
                     dialogService.showWarningDialogAndWait(
@@ -116,10 +127,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                             Localization.lang("Finished automatically setting external links.") + "\n"
                                     + Localization.lang("No files found."));
                     return;
-                }
-
-                if (compound.hasEdits()) {
-                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

@@ -220,6 +220,21 @@ class BibChangeTest {
         assertFalse(change.apply().complete(), "removing a string that is not there reported success");
     }
 
+    /// Same name, different string: the one this change recorded is gone, and removing by its id
+    /// would quietly remove nothing while reporting success.
+    @Test
+    void removingAStringRefusesWhenAnotherStringTookItsName() {
+        BibDatabase database = new BibDatabase();
+        BibtexString recorded = new BibtexString("name", "content");
+        database.addString(recorded);
+        UndoableRemoveString change = new UndoableRemoveString(database, recorded);
+        change.apply();
+        database.addString(new BibtexString("name", "something else"));
+
+        assertFalse(change.apply().complete());
+        assertEquals(1, database.getStringCount(), "the other string was removed");
+    }
+
     /// A set keeps going: one element being stale says nothing about the others.
     @Test
     void aSetAppliesWhatStillFitsAndReportsWhatDoesNot() {

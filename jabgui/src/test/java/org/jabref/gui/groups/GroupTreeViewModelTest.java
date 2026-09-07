@@ -148,6 +148,21 @@ class GroupTreeViewModelTest {
         assertEquals(List.of(), childNames());
     }
 
+    /// Sorting a group that is already sorted changes nothing, and an undo step that does nothing
+    /// makes the next Ctrl+Z look broken.
+    @Test
+    void anOperationThatChangesNothingIsNotAnUndoStep() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+
+        assertFalse(journal.canUndo(), "sorting an already sorted group became an undo step");
+    }
+
     private List<String> childNames() {
         return databaseContext.getMetaData().getGroups().orElseThrow().getChildren().stream()
                               .map(node -> node.getGroup().getName())
