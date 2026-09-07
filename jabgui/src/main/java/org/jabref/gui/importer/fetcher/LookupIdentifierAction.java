@@ -13,7 +13,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -85,7 +85,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         int foundCount = 0;
         // The fields are written as the lookup goes and handed over only at the end, so the
         // library holds unrecorded writes for the whole loop: hold it against undo until then.
-        try (WriteReservation reserved = undoManager.reserveWrites(name)) {
+        try (UndoSuspension suspended = undoManager.suspendUndo(name)) {
             for (BibEntry bibEntry : bibEntries) {
                 count++;
                 final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",

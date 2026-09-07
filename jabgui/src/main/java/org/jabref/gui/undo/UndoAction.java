@@ -37,9 +37,9 @@ public class UndoAction extends SimpleCommand {
         LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
-        // A command holding the library is asked about before the stacks: a reservation makes
+        // A command holding the library is asked about before the stacks: a suspension makes
         // canUndo() false as well, and "nothing to undo" would then be untrue.
-        undoManager.writeInProgress().ifPresentOrElse(
+        undoManager.suspendedBy().ifPresentOrElse(
                 command -> dialogService.notify(Localization.lang("Cannot undo while %0 is running", command)),
                 () -> undo(libraryTab, undoManager));
     }

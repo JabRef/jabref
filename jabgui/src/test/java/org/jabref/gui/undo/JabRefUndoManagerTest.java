@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.undo.JabRefUndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -524,16 +524,16 @@ class JabRefUndoManagerTest {
         assertTrue(undoRedoManager.canUndo());
         assertTrue(undoRedoManager.canRedo());
 
-        try (WriteReservation reserved = undoRedoManager.reserveWrites("Import entries")) {
+        try (UndoSuspension suspended = undoRedoManager.suspendUndo("Import entries")) {
             assertFalse(undoRedoManager.canUndo());
             assertFalse(undoRedoManager.canRedo());
             assertEquals(Optional.empty(), undoRedoManager.redo());
-            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress());
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
         }
 
         assertTrue(undoRedoManager.canUndo());
         assertTrue(undoRedoManager.canRedo());
-        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 
     /// Enablement has to fall when a command takes the library and rise when it gives it back, so
@@ -543,32 +543,48 @@ class JabRefUndoManagerTest {
         AtomicInteger notifications = new AtomicInteger();
         undoRedoManager.addListener(notifications::incrementAndGet);
 
-        WriteReservation reserved = undoRedoManager.reserveWrites("Import entries");
+        UndoSuspension suspended = undoRedoManager.suspendUndo("Import entries");
         assertEquals(1, notifications.get());
 
-        reserved.close();
+        suspended.close();
         assertEquals(2, notifications.get());
 
         // Idempotent, so a task closing on more than one of its outcomes says nothing twice.
-        reserved.close();
+        suspended.close();
         assertEquals(2, notifications.get());
-        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 
     @Test
     void twoCommandsHoldTheLibraryUntilBothHaveHandedOver() {
         undoRedoManager.addEdit(setAuthor("Bohr"));
 
-        WriteReservation first = undoRedoManager.reserveWrites("Import entries");
-        WriteReservation second = undoRedoManager.reserveWrites("Look up DOI");
+        UndoSuspension first = undoRedoManager.suspendUndo("Import entries");
+        UndoSuspension second = undoRedoManager.suspendUndo("Look up DOI");
         first.close();
 
         assertFalse(undoRedoManager.canUndo(), "undo returned while a command was still writing");
-        assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress(),
-                "the name of the command the user has been waiting on");
+        assertEquals(Optional.of("Look up DOI"), undoRedoManager.suspendedBy(),
+                "named a command that had already finished");
 
         second.close();
         assertTrue(undoRedoManager.canUndo());
+    }
+
+    /// Of several commands writing at once, the message names the one still running that the user
+    /// has been waiting on longest.
+    @Test
+    void theCommandNamedIsTheOldestStillWriting() {
+        UndoSuspension first = undoRedoManager.suspendUndo("Import entries");
+        UndoSuspension second = undoRedoManager.suspendUndo("Look up DOI");
+
+        assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+
+        second.close();
+        assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+
+        first.close();
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 
     @Test
@@ -577,12 +593,12 @@ class JabRefUndoManagerTest {
 
         undoRedoManager.addEdit("Import entries", edit -> {
             assertFalse(undoRedoManager.canUndo(), "the block did not hold the library");
-            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress());
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
             edit.addEdit(setAuthor("Planck"));
         });
 
         assertTrue(undoRedoManager.canUndo());
-        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 
     /// A nested block is inside its caller's window already; releasing at its end would reopen the
@@ -591,11 +607,11 @@ class JabRefUndoManagerTest {
     void aNestedBlockDoesNotReleaseTheLibraryWhenItEnds() {
         undoRedoManager.addEdit("Import entries", edit -> {
             undoRedoManager.addEdit("Merge entries", nested -> nested.addEdit(setAuthor("Planck")));
-            assertEquals(Optional.of("Import entries"), undoRedoManager.writeInProgress(),
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy(),
                     "the nested block released the library its caller was holding");
         });
 
-        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 
     @Test
@@ -605,7 +621,7 @@ class JabRefUndoManagerTest {
             throw new IllegalStateException("import failed");
         }));
 
-        assertEquals(Optional.empty(), undoRedoManager.writeInProgress());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
         assertTrue(undoRedoManager.canUndo(), "what the failed block managed to change stayed undoable");
     }
 

@@ -44,7 +44,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -166,7 +166,7 @@ public class ImportHandler {
                 // Closed on the JavaFX thread once the entries are actually in the database, which
                 // happens after this method returns - not with a try-with-resources here, which
                 // would release while the insert is still queued.
-                WriteReservation reserved = undoManager.reserveWrites(name);
+                UndoSuspension suspended = undoManager.suspendUndo(name);
                 CompoundEdit compoundEdit = new CompoundEdit(name);
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
@@ -272,12 +272,12 @@ public class ImportHandler {
                         try {
                             importEntries(allEntriesToAdd);
                         } finally {
-                            reserved.close();
+                            suspended.close();
                         }
                     });
                 } catch (RuntimeException | Error e) {
                     // The queued insert never got dispatched, so nothing else will release it.
-                    reserved.close();
+                    suspended.close();
                     throw e;
                 }
                 return results;

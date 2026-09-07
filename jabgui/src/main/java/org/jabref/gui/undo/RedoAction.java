@@ -36,8 +36,8 @@ public class RedoAction extends SimpleCommand {
         LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
-        // See UndoAction: a reservation makes canRedo() false without the stack being empty.
-        undoManager.writeInProgress().ifPresentOrElse(
+        // See UndoAction: a suspension makes canRedo() false without the stack being empty.
+        undoManager.suspendedBy().ifPresentOrElse(
                 command -> dialogService.notify(Localization.lang("Cannot redo while %0 is running", command)),
                 () -> redo(libraryTab, undoManager));
     }

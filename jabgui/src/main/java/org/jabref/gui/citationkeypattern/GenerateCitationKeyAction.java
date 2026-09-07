@@ -16,7 +16,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -114,7 +114,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
         // The keys are written entry by entry in call() and handed over in the success handler, so
         // the library is held against undo across both. Closed on every path out of the task.
-        WriteReservation reserved = undoManager.reserveWrites(StandardActions.GENERATE_CITE_KEYS.getText());
+        UndoSuspension suspended = undoManager.suspendUndo(StandardActions.GENERATE_CITE_KEYS.getText());
 
         BackgroundTask<Void> backgroundTask = new BackgroundTask<>() {
             @Override
@@ -159,10 +159,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         libraryTab.markBaseChanged();
                         dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
                     } finally {
-                        reserved.close();
+                        suspended.close();
                     }
                 })
-                .onFailure(_ -> reserved.close());
+                .onFailure(_ -> suspended.close());
     }
 
     private String formatOutputMessage(String start, int count) {

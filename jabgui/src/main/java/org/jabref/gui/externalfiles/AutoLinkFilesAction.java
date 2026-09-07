@@ -17,7 +17,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -61,7 +61,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
         final CompoundEdit compound = new CompoundEdit(StandardActions.AUTO_LINK_FILES.getText());
         // The file fields are written round by round in the task and handed over only in
         // succeeded(), so the library is held against undo across both.
-        final WriteReservation reserved = undoManager.reserveWrites(StandardActions.AUTO_LINK_FILES.getText());
+        final UndoSuspension suspended = undoManager.suspendUndo(StandardActions.AUTO_LINK_FILES.getText());
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -86,18 +86,18 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 try {
                     report(getValue());
                 } finally {
-                    reserved.close();
+                    suspended.close();
                 }
             }
 
             @Override
             protected void failed() {
-                reserved.close();
+                suspended.close();
             }
 
             @Override
             protected void cancelled() {
-                reserved.close();
+                suspended.close();
             }
 
             /// Every path out of this method returns without pushing except the last, which is why

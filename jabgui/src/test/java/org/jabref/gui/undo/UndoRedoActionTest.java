@@ -8,7 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -170,7 +170,7 @@ class UndoRedoActionTest {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
         showLibrary(tabA, libraryA);
 
-        try (WriteReservation reserved = journalOfA.reserveWrites("Import entries")) {
+        try (UndoSuspension suspended = journalOfA.suspendUndo("Import entries")) {
             undoAction.execute();
             redoAction.execute();
         }
@@ -186,7 +186,7 @@ class UndoRedoActionTest {
         showLibrary(tabA, libraryA);
         assertTrue(undoAction.executableProperty().get());
 
-        try (WriteReservation reserved = journalOfA.reserveWrites("Import entries")) {
+        try (UndoSuspension suspended = journalOfA.suspendUndo("Import entries")) {
             assertFalse(undoAction.executableProperty().get(), "enabled while the library was being written");
         }
 

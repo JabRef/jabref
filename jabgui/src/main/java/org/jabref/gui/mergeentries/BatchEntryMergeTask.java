@@ -8,7 +8,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.WriteReservation;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
@@ -64,7 +64,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         // The merge writes into the entries as it goes and hands the step over at the end, on
         // both the cancelled and the completed path. Undo waits for neither, so the library is
         // held against it until whichever of the two has pushed.
-        try (WriteReservation reserved = undoManager.reserveWrites(StandardActions.MERGE_ENTRIES.getText())) {
+        try (UndoSuspension suspended = undoManager.suspendUndo(StandardActions.MERGE_ENTRIES.getText())) {
             List<String> updatedEntries = processMergeEntries();
 
             if (isCancelled()) {

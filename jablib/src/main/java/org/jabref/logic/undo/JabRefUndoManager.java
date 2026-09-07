@@ -2,8 +2,10 @@ package org.jabref.logic.undo;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -106,14 +108,14 @@ public class JabRefUndoManager implements UndoManager {
     /// [#hasChanged].
     private long savedId = ORIGIN;
 
-    /// How many commands are currently applying changes they have not yet handed over, and the
-    /// name of the first of them. Guarded by this object's monitor.
+    /// The commands currently applying changes they have not yet handed over, in the order they
+    /// started. Guarded by this object's monitor.
     ///
-    /// A count rather than a flag: two background commands can write to one library at the same
-    /// time, and undo may only return once both have handed over. The name is the first
-    /// reserver's, because that is the one the user has been waiting on.
-    private int openWriters;
-    private @Nullable String openWriterName;
+    /// A collection rather than a flag: two background commands can write to one library at the
+    /// same time, and undo may only return once both have handed over. Ordered, so the message
+    /// names the command the user has been waiting on longest — and one that has finished is no
+    /// longer in it to be named.
+    private final Set<Suspension> suspensions = new LinkedHashSet<>();
 
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
@@ -234,10 +236,8 @@ public class JabRefUndoManager implements UndoManager {
         CompoundEdit compoundEdit = new CompoundEdit(name);
 
         // The block applies as it goes and pushes only at the end, so the library holds writes
-        // this journal does not know about for as long as the body runs. A nested block is inside
-        // its caller's window already and takes a reservation that does nothing: releasing a real
-        // one at its end would reopen the window while the outer block is still writing.
-        WriteReservation reservation = enclosing == null ? reserveWrites(name) : () -> { };
+        // this journal does not know about for as long as the body runs.
+        UndoSuspension suspension = enclosing == null ? suspendUndo(name) : UndoSuspension.NONE;
 
         active.set(compoundEdit);
         try {
@@ -261,65 +261,73 @@ public class JabRefUndoManager implements UndoManager {
             } finally {
                 // After the push, so the window does not reopen between the last write and the
                 // record; and in a finally, so a block that failed does not hold the library.
-                reservation.close();
+                suspension.close();
             }
         }
         return compoundEdit.hasEdits();
     }
 
-    /// Reserves this library against undo and redo until the returned reservation is closed.
+    /// Suspends undo and redo for this library until the returned suspension is closed.
     ///
-    /// Taking and releasing are both stack changes as far as observers are concerned — enablement
+    /// Opening and closing are both stack changes as far as observers are concerned — enablement
     /// has to fall while a command holds the library and rise again afterwards — so both notify,
     /// and both do so after the monitor is released.
     @Override
-    public WriteReservation reserveWrites(String name) {
+    public UndoSuspension suspendUndo(String name) {
+        Suspension suspension = new Suspension(name);
         synchronized (this) {
-            openWriters++;
-            if (openWriters == 1) {
-                openWriterName = name;
-            }
+            suspensions.add(suspension);
         }
         notifyListeners();
-
-        return new WriteReservation() {
-            private boolean closed;
-
-            @Override
-            public void close() {
-                synchronized (JabRefUndoManager.this) {
-                    // Idempotent: a task can finish through success, failure or cancellation, and
-                    // closing on each of them is easier to get right than closing on exactly one.
-                    if (closed) {
-                        return;
-                    }
-                    closed = true;
-                    openWriters--;
-                    if (openWriters == 0) {
-                        openWriterName = null;
-                    }
-                }
-                notifyListeners();
-            }
-        };
+        return suspension;
     }
 
-    /// The command currently holding this library, if one is.
+    /// The command currently holding this library, if one is: of those still writing, the one that
+    /// started first.
     ///
     /// For the Undo and Redo actions, which have to tell "nothing to undo" from "not while this is
     /// running" — both of which make [#canUndo] false.
-    public synchronized Optional<String> writeInProgress() {
-        return Optional.ofNullable(openWriterName);
+    public synchronized Optional<String> suspendedBy() {
+        return suspensions.stream().findFirst().map(Suspension::name);
+    }
+
+    /// One command's claim on this library, ended by [#close].
+    private final class Suspension implements UndoSuspension {
+
+        private final String name;
+        private boolean closed;
+
+        private Suspension(String name) {
+            this.name = name;
+        }
+
+        private String name() {
+            return name;
+        }
+
+        @Override
+        public void close() {
+            synchronized (JabRefUndoManager.this) {
+                // Idempotent: a task can finish through success, failure or cancellation, and
+                // closing on each of them is easier to get right than closing on exactly one.
+                if (closed) {
+                    return;
+                }
+                closed = true;
+                suspensions.remove(this);
+            }
+            notifyListeners();
+        }
     }
 
     /// Whether there is a step to take back *and* the library is free to take it back — see
-    /// [#reserveWrites].
+    /// [#suspendUndo].
     public synchronized boolean canUndo() {
-        return (openWriters == 0) && !undoStack.isEmpty();
+        return suspensions.isEmpty() && !undoStack.isEmpty();
     }
 
     public synchronized boolean canRedo() {
-        return (openWriters == 0) && !redoStack.isEmpty();
+        return suspensions.isEmpty() && !redoStack.isEmpty();
     }
 
     /// Applies the inverse before moving the change across, so a change that throws stays
@@ -327,7 +335,7 @@ public class JabRefUndoManager implements UndoManager {
     ///
     /// @return what was undone — its name for the user, and what of it could not be applied —
     ///         or empty if there was nothing to undo, or a command is holding the library (see
-    ///         [#reserveWrites] — [#writeInProgress] tells the two apart). The name is taken
+    ///         [#suspendUndo] — [#suspendedBy] tells the two apart). The name is taken
     ///         inside the monitor: read
     ///         afterwards, it would describe whichever step another thread has since pushed.
     ///         Only a name leaves the journal, so nothing outside it starts reading the contents
@@ -335,7 +343,7 @@ public class JabRefUndoManager implements UndoManager {
     public Optional<StepOutcome> undo() {
         StepOutcome outcome;
         synchronized (this) {
-            if ((openWriters > 0) || undoStack.isEmpty()) {
+            if (!suspensions.isEmpty() || undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
@@ -356,7 +364,7 @@ public class JabRefUndoManager implements UndoManager {
     public Optional<StepOutcome> redo() {
         StepOutcome outcome;
         synchronized (this) {
-            if ((openWriters > 0) || redoStack.isEmpty()) {
+            if (!suspensions.isEmpty() || redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
