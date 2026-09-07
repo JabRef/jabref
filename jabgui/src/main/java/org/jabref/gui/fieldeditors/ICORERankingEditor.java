@@ -29,7 +29,6 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
     @FXML private Button visitICOREConferencePageButton;
 
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private ConferenceRepository conferenceRepository;
 
@@ -37,7 +36,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
 
     public ICORERankingEditor(Field field,
                               SuggestionProvider<?> suggestionProvider,
-                              FieldCheckers fieldCheckers) {
+                              FieldCheckers fieldCheckers,
+                              UndoManager undoManager) {
 
         Injector.registerExistingAndInject(this);
 

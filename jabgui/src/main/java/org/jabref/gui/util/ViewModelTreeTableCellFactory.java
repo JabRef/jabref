@@ -1,5 +1,8 @@
 package org.jabref.gui.util;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -20,15 +23,19 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
-    private Callback<S, String> toStyleClass;
+    private Supplier<List<String>> styleClassSupplier;
 
     public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
         this.toText = toText;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withStyleClass(Callback<S, String> toStyleClass) {
-        this.toStyleClass = toStyleClass;
+    /// Supplies styleClasses that are set on the cell right after creation, only once.
+    ///
+    /// @param styleClassSupplier the supplier that is called only once on the cell
+    /// @return the factory
+    public ViewModelTreeTableCellFactory<S> withStyleClasses(Supplier<List<String>> styleClassSupplier) {
+        this.styleClassSupplier = styleClassSupplier;
         return this;
     }
 
@@ -55,7 +62,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
 
     @Override
     public TreeTableCell<S, S> call(TreeTableColumn<S, S> param) {
-        return new TreeTableCell<>() {
+        TreeTableCell<S, S> treeTableCell = new TreeTableCell<>() {
             @Override
             protected void updateItem(S viewModel, boolean empty) {
                 super.updateItem(viewModel, empty);
@@ -80,12 +87,13 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
                     }
-                    if (toStyleClass != null) {
-                        getStyleClass().add(toStyleClass.call(viewModel));
-                    }
                 }
             }
         };
+        if (styleClassSupplier != null) {
+            treeTableCell.getStyleClass().addAll(styleClassSupplier.get());
+        }
+        return treeTableCell;
     }
 
     public void install(TreeTableColumn<S, S> column) {
