@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
@@ -73,12 +74,12 @@ public class GitHandler {
             return;
         }
         try {
-            try (Git git = Git.init()
-                              .setDirectory(repositoryPathAsFile)
-                              .setInitialBranch("main")
-                              .call()) {
-                // "git" object is not used later, but we need to close it after initialization
-            }
+            // Git.init().call() returns a handle that must be closed before the repository is reopened below.
+            Git.init()
+               .setDirectory(repositoryPathAsFile)
+               .setInitialBranch("main")
+               .call()
+               .close();
             setupGitIgnore();
             String initialCommit = "Initial commit";
             if (!createCommitOnCurrentBranch(initialCommit, false)) {
@@ -133,8 +134,8 @@ public class GitHandler {
         Path gitignore = repositoryRoot.resolve(".gitignore");
         // NOFOLLOW_LINKS: a dangling .gitignore symlink is still a pre-existing user-owned entry that rollback must not delete
         boolean gitignoreExisted = Files.exists(gitignore, LinkOption.NOFOLLOW_LINKS);
-        // The Git index always uses forward slashes, independent of the platform
-        String pathInRepository = repositoryRoot.relativize(fileInRepository).toString().replace('\\', '/');
+
+        String pathInRepository = relativizeToRepository(fileToCommit);
         try (Git git = Git.init()
                           .setDirectory(repositoryPathAsFile)
                           .setInitialBranch("main")
@@ -154,7 +155,7 @@ public class GitHandler {
             git.commit()
                .setMessage("Initial commit")
                .call();
-        } catch (IOException | GitAPIException | JabRefException e) {
+        } catch (IOException | GitAPIException | JGitInternalException | JabRefException e) {
             LOGGER.debug("Rolling back failed Git repository initialization at {}", repositoryPath, e);
             try {
                 FileUtils.delete(repositoryRoot.resolve(Constants.DOT_GIT).toFile(), FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
@@ -289,6 +290,27 @@ public class GitHandler {
             }
         }
         return commitCreated;
+    }
+
+    /// Commits `fileToCommit` on the current branch, staging nothing else.
+    ///
+    /// Unlike [#createCommitOnCurrentBranch(String,boolean)], which stages the whole working tree.
+    ///
+    /// @return true if a commit was created, false if the file was unchanged
+    public boolean createCommitForFileOnCurrentBranch(Path fileToCommit, String commitMessage) throws IOException, GitAPIException {
+        String pathInRepository = relativizeToRepository(fileToCommit);
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            if (git.status().addPath(pathInRepository).call().isClean()) {
+                return false;
+            }
+            git.add().addFilepattern(pathInRepository).call();
+            git.commit()
+               .setOnly(pathInRepository)
+               .setAllowEmpty(false)
+               .setMessage(commitMessage)
+               .call();
+            return true;
+        }
     }
 
     /// Merges the source branch into the target branch
@@ -504,5 +526,12 @@ public class GitHandler {
             return Localization.lang("Push to %0 was rejected (%1). %2", update.getRemoteName(), update.getStatus(), remoteMessage);
         }
         return Localization.lang("Push to %0 was rejected (%1).", update.getRemoteName(), update.getStatus());
+    }
+
+    /// The Git index always uses forward slashes, independent of the platform.
+    private String relativizeToRepository(Path file) {
+        return repositoryPath.toAbsolutePath().normalize()
+                             .relativize(file.toAbsolutePath().normalize())
+                             .toString().replace('\\', '/');
     }
 }

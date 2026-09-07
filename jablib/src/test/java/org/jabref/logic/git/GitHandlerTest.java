@@ -299,4 +299,27 @@ class GitHandlerTest {
         assertEquals(repositoryPath.toRealPath(), handlerOpt.get().repositoryPath.toRealPath(),
                 "Expected repositoryPath to match Git root");
     }
+
+    @Test
+    void commitForFileStagesOnlyThatFile() throws Exception {
+        Path libraryFile = repositoryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Files.writeString(repositoryPath.resolve("notes.txt"), "unrelated");
+
+        assertTrue(gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references"));
+
+        try (Git git = Git.open(repositoryPath.toFile())) {
+            assertTrue(committedPaths(git).contains("library.bib"));
+            assertEquals(Set.of("notes.txt"), git.status().call().getUntracked());
+        }
+    }
+
+    @Test
+    void commitForFileDoesNothingWhenUnchanged() throws Exception {
+        Path libraryFile = repositoryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references");
+
+        assertFalse(gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references"));
+    }
 }

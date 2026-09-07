@@ -1,4 +1,4 @@
-# Maps changed files to "component: *" labels on pull requests.
+# Maps changed files to "component: *" and "dev: *" labels on pull requests.
 # Used by .github/workflows/pr-labeler.yml (actions/labeler).
 #
 # Only components with a clear home in the source tree are listed here.
@@ -75,6 +75,17 @@
 "component: css":
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/*.css'
+
+"component: diff-merge":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/externalfiles/PdfMergeDialog.java'
+          - 'jabgui/src/**/org/jabref/gui/mergeentries/**'
+          - 'jablib/src/**/org/jabref/logic/bibtex/comparator/**'
+          - 'jablib/src/**/org/jabref/logic/git/conflicts/**'
+          - 'jablib/src/**/org/jabref/logic/git/diff/**'
+          - 'jablib/src/**/org/jabref/logic/git/merge/**'
+          - 'jablib/src/**/org/jabref/logic/importer/fetcher/MergingIdBasedFetcher.java'
 
 "component: duplicate-finder":
   - changed-files:
@@ -214,10 +225,6 @@
   - changed-files:
       - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
 
-"component: merge":
-  - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/mergeentries/**'
-
 "component: microsoft-word-integration":
   - changed-files:
       - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/msbib/**'
@@ -288,3 +295,42 @@
           - 'jablib/src/**/org/jabref/logic/xmp/**'
           - 'jablib/src/**/*Xmp*.java'
           - 'jabgui/src/**/org/jabref/gui/preferences/xmp/**'
+
+# The Gradle build itself: the module build scripts, the convention plugins in
+# build-logic, and the wrapper.
+"dev: build-system":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.gradle.kts'
+          - 'build-logic/**'
+          - 'gradle/**'
+          - 'gradle.properties'
+          - 'gradlew*'
+          - 'versions/**'
+
+# Everything that drives CI/CD: workflow definitions, the composite actions they
+# call, and the files those workflows read directly. Listed one by one instead of
+# a '.github/*' wildcard, which would also catch FUNDING.yml and the issue and
+# pull request templates.
+"dev: ci-cd":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - '.idea/codeStyles/**'
+          - 'scripts/after-failure.sh'
+          - 'scripts/junit-xml-format-errors.xsl'
+          - 'Dockerfile.*'
+          - '.dockerignore'
+          - 'jablib/src/test/latex/Texlivefile'
+          - 'AGENTS.md'
+          - 'CHECKLIST.md'
+
+# Packaging and delivery of the built application: the store/package manifests
+# and the per-OS resources jpackage bundles into the installers.
+"dev: distribution":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'flatpak/**'
+          - 'snap/**'
+          - 'jabgui/buildres/**'
+

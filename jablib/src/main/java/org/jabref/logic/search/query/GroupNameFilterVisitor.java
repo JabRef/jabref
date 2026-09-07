@@ -85,7 +85,7 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
             return groupName.contains(plain);
         }
 
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue()).toLowerCase(Locale.ROOT);
+        String term = SearchQuery.unescapeSearchValue(ctx.searchValue()).toLowerCase(Locale.ROOT);
         return groupName.contains(term);
     }
 

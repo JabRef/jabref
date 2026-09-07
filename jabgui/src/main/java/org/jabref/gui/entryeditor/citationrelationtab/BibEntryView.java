@@ -28,18 +28,18 @@ public class BibEntryView {
     /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
-        entryType.getStyleClass().add("type");
+        entryType.getStyleClass().add("h5");
         String authorsText = entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("");
         Node authors = createLabel(authorsText);
-        authors.getStyleClass().add("authors");
+        authors.getStyleClass().add("h6");
         String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("");
         Node title = createLabel(titleText);
-        title.getStyleClass().add("title");
+        title.getStyleClass().addAll("h5", "bold");
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
-        year.getStyleClass().add("year");
+        year.getStyleClass().addAll("h6", "bold");
         String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("");
         Node journal = createLabel(journalText);
-        journal.getStyleClass().add("journal");
+        journal.getStyleClass().add("h6");
 
         VBox entryContainer = new VBox(
                 new HBox(10, entryType, title),
@@ -49,7 +49,7 @@ public class BibEntryView {
 
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
             Node summary = createSummary(summaryText);
-            summary.getStyleClass().add("summary");
+            summary.getStyleClass().add("padding-top-6");
             entryContainer.getChildren().add(summary);
         });
 

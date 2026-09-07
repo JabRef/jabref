@@ -19,10 +19,10 @@ ControlsFX validation decoration is initialized during GUI startup, so opening t
 
 Needs: impl
 
-## Citations tab should show citation preview on hover
-`req~entry-editor.citations.hover-preview~1`
+## Citations tab should show citation preview on click
+`req~entry-editor.citations.click-preview~1`
 
-When the user hovers over a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the current selected style should be displayed.
+When the user clicks the preview icon on a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the currently selected style should be displayed. The preview is not shown automatically on hover, because a large floating card popping up on every hover is too intrusive.
 
 Needs: impl
 
