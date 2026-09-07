@@ -65,6 +65,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         Label embeddingModelSizeLabel = new Label();
         embeddingModelSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
 
+        Label embeddingModelMaxChunkSizeLabel = new Label();
+        embeddingModelMaxChunkSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty());
+
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
@@ -105,6 +108,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                         model -> model != null ? model : "",
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                                 .field(Localization.lang("Embedding model size"), embeddingModelSizeLabel)
+                                                .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeLabel)
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]
