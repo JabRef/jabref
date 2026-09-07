@@ -77,6 +77,7 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -398,7 +399,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         Optional.ofNullable(bibDatabaseContext.getDBMSSynchronizer())
-                .map(synchronizer -> synchronizer.getDBName())
+                .map(DatabaseSynchronizer::getDBName)
                 .ifPresent(text::append);
         text.append(" [");
         text.append(Localization.lang("shared"));
@@ -1335,7 +1336,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         BackgroundTask<BibDatabaseContext> dataLoadingTask = new SharedDatabaseLoadingTask(connectionTask, callbacks);
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onSuccess(callbacks::onDatabaseLoadingSucceed)
-                       .onFailure(callbacks::onDatabaseLoadingFailed)
+                       .onFailure(callbacks::onDatabaseLoadingFailed);
 
         return newTab;
     }
