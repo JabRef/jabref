@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -409,6 +410,15 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
     @FXML
     public void addNewFile() {
+        // A selected suggestion (file found in the file directory, not yet linked) is what the user wants to add,
+        // so "+" links it directly instead of asking for a new file link.
+        List<LinkedFileViewModel> selectedSuggestions = listView.getSelectionModel().getSelectedItems().stream()
+                                                                .filter(LinkedFileViewModel::isAutomaticallyFound)
+                                                                .toList();
+        if (!selectedSuggestions.isEmpty()) {
+            selectedSuggestions.forEach(LinkedFileViewModel::acceptAsLinked);
+            return;
+        }
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 
