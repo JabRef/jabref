@@ -60,7 +60,7 @@ public class ApiKeyDialog extends FXDialog {
             apiKeyValid.set(newValue.isEmpty());
             testButton.setGraphic(null);
             testButton.setText(Localization.lang("Test connection"));
-            testButton.getStyleClass().removeAll("success", "error");
+            testButton.getStyleClass().removeAll("text-success", "text-danger");
         });
 
         persistApiKeysCheckBox.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
@@ -87,8 +87,8 @@ public class ApiKeyDialog extends FXDialog {
             testButton.setDisable(false);
 
             testButton.setGraphic(success ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode() : IconTheme.JabRefIcons.ERROR.getGraphicNode());
-            testButton.getStyleClass().removeAll("success", "error");
-            testButton.getStyleClass().add(success ? "success" : "error");
+            testButton.getStyleClass().removeAll("text-success", "text-danger");
+            testButton.getStyleClass().add(success ? "text-success" : "text-danger");
             testButton.setText(success ? Localization.lang("API Key Valid") : Localization.lang("API Key Invalid"));
             apiKeyValid.set(success);
 

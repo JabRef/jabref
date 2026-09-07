@@ -133,9 +133,6 @@
         -color-bg-sidepane: -color-bg-inset;
         -color-bg-alt: -color-bg-subtle;
 
-        /* Foreground (-color-fg-default/-muted/-subtle/-emphasis come from Primer) */
-        -color-fg-menu-active: -color-fg-default;
-
         /* Accent */
         -color-accent: -color-accent-emphasis;
 
@@ -170,16 +167,13 @@
         -color-syntax-string: -color-chart-3;
         -color-syntax-comment: -color-chart-4;
         -color-syntax-punctuation: -color-fg-subtle;
-        -color-search-highlight-bg: -color-warning-subtle;
-        -color-search-highlight-fg: -color-fg-default;
 
         /* Scrollbars */
         -color-scrollbar-thumb: -color-base-6;
         -color-scrollbar-track: -color-bg-subtle;
 
-        /* Tooltips */
+        /* Tooltip background; the text uses -color-fg-default. */
         -color-tooltip-bg: -color-bg-overlay;
-        -color-tooltip-fg: -color-fg-default;
 
         /* Drag & drop targets */
         -color-drag-target: -color-accent-emphasis;
@@ -187,7 +181,6 @@
 
         /* Group hit-count badge */
         -color-badge-bg: -color-neutral-emphasis;
-        -color-badge-fg: -color-fg-emphasis;
         /* Text on the green badge of a group that contains selected entries */
         -color-badge-selected-fg: #FFFFFF;
 
@@ -323,9 +316,6 @@
         -color-bg-sidepane: -color-bg-inset;
         -color-bg-alt: -color-bg-subtle;
 
-        /* Foreground (-color-fg-default/-muted/-subtle/-emphasis come from Primer) */
-        -color-fg-menu-active: -color-fg-default;
-
         /* Accent */
         -color-accent: -color-accent-emphasis;
 
@@ -360,16 +350,13 @@
         -color-syntax-string: -color-chart-3;
         -color-syntax-comment: -color-chart-4;
         -color-syntax-punctuation: -color-fg-subtle;
-        -color-search-highlight-bg: -color-warning-subtle;
-        -color-search-highlight-fg: -color-fg-default;
 
         /* Scrollbars */
         -color-scrollbar-thumb: -color-base-6;
         -color-scrollbar-track: -color-bg-subtle;
 
-        /* Tooltips */
+        /* Tooltip background; the text uses -color-fg-default. */
         -color-tooltip-bg: -color-bg-overlay;
-        -color-tooltip-fg: -color-fg-default;
 
         /* Drag & drop targets */
         -color-drag-target: -color-accent-emphasis;
@@ -377,7 +364,6 @@
 
         /* Group hit-count badge */
         -color-badge-bg: -color-neutral-emphasis;
-        -color-badge-fg: -color-fg-emphasis;
         /* Text on the green badge of a group that contains selected entries */
         -color-badge-selected-fg: #000000;
 

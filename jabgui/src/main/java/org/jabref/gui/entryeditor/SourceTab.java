@@ -140,7 +140,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.getStyleClass().addAll("bibtex-code-area", "font-size-090");
+        codeArea.getStyleClass().addAll("bibtex-code-area");
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);

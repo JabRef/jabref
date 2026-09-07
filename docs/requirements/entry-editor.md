@@ -10,6 +10,8 @@ The Entry Editor should "always" show a valid entry.
 
 When users search or select a group not containing the entry shown in the Entry Editor, the Entry Editor should keep showing until user select a new entry explicitly.
 
+This holds within one library only: switching to a library tab without a selected entry closes the Entry Editor instead of showing an entry of another library.
+
 Needs: impl
 
 ## Validation decoration is initialized before opening the entry editor
