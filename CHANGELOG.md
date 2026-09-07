@@ -118,6 +118,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
 - We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
@@ -125,6 +126,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first if autosave is enabled, and otherwise lets you choose between saving first and committing only the state on disk, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
+- We fixed the context menu of an automatically found file offering "Remove link" instead of linking the file. [#16898](https://github.com/JabRef/jabref/pull/16898)
 - We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
