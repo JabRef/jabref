@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 
 /// This class provides methods to expand bracketed expressions, such as
 /// `[year]_[author]_[firstpage]`, using information from a provided BibEntry. The above-mentioned expression would yield
-/// `2017_Kitsune_123` when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
-/// pages={123-6}}</code>.
+/// `2017_Kitsune_123` when expanded using the BibTeX entry `@Article{ authors = {O. Kitsune}, year = {2017},
+/// pages={123-6}}`.
 ///
 /// The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
 ///

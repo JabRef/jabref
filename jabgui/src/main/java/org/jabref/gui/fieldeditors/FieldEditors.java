@@ -66,26 +66,26 @@ public class FieldEditors {
         boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.DATE)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new UrlEditor(field, suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new JournalEditor(field, suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
-            return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
+            return new IdentifierEditor(field, suggestionProvider, fieldCheckers, undoManager);
         } else if (field == StandardField.CITATIONCOUNT) {
-            return new CitationCountEditor(field, suggestionProvider, fieldCheckers);
+            return new CitationCountEditor(field, suggestionProvider, fieldCheckers, undoManager);
         } else if (field == StandardField.ISSN) {
-            return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (field == StandardField.OWNER) {
-            return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
+            return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoManager, undoAction, redoAction);
         } else if (field == StandardField.GROUPS) {
-            return new GroupsEditor(field, suggestionProvider, fieldCheckers);
+            return new GroupsEditor(field, suggestionProvider, fieldCheckers, preferences.getBibEntryPreferences(), databaseContext, undoManager);
         } else if (field == StandardField.FILE) {
-            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
+            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers, undoManager);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
@@ -106,17 +106,17 @@ public class FieldEditors {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             }
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
+            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers, undoManager);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, databaseContext, undoManager);
         } else if (field == InternalField.KEY_FIELD) {
-            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
+            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoManager, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction, databaseContext);
         } else if (field == StandardField.ICORERANKING) {
-            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
+            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers, undoManager);
         } else if (field instanceof SpecialField specialField) {
             return new SpecialFieldEditor(specialField, preferences, undoManager);
         } else {

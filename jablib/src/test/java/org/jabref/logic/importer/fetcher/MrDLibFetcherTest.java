@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@FetcherTest
+@ExternalServicesTest
 class MrDLibFetcherTest {
 
     private MrDLibFetcher fetcher;

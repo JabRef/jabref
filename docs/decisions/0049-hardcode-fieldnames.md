@@ -7,6 +7,9 @@ date: 2025-09-13
 ---
 <!-- markdownlint-disable-next-line MD025 -->
 # Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)
+`adr~hardcode-fieldnames~1`
+
+Needs: impl, utest
 
 ## Context and Problem Statement
 
@@ -89,3 +92,5 @@ This is option "Hardcode `StandardField` names and use exact or customized names
 * Good, because UI looks consistent and readable.
 * Bad, because ignores user intent for custom fields’ casing (less flexibility).
 * Bad, because preferences may mask underlying canonical keys, complicating tooling.
+
+<!-- markdownlint-disable-file MD022 -->

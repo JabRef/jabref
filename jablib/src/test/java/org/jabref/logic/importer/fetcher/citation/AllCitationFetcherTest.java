@@ -9,7 +9,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-@FetcherTest
+@ExternalServicesTest
 class AllCitationFetcherTest {
 
     private AllCitationFetcher fetcher;

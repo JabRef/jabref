@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<fx:root
+        spacing="10.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.libraryproperties.git.GitPropertiesView">
+    <Label styleClass="sectionHeader"
+           text="%Git"/>
+    <CheckBox
+            fx:id="autoCommit"
+            text="%Automatically commit when library is saved"/>
+    <CheckBox
+            fx:id="autoPush"
+            text="%Automatically push changes after committing"/>
+    <CheckBox
+            fx:id="autoPull"
+            text="%Regularly pull remote changes"/>
+</fx:root>
