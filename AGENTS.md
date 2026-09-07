@@ -481,7 +481,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Branches
 
-- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; maintainers label a PR `dev: into-stable` to have CI port it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See <https://devdocs.jabref.org/contributing.html#branching-strategy>.
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; maintainers label a PR `dev: into-stable` to have CI port it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 
