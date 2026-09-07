@@ -14,7 +14,7 @@
         prefHeight="400.0"
         prefWidth="600.0"
         type="VBox"
-        styleClass="edit-field-content-pane,padding-0-12,spacing-12"
+        spacing="12" styleClass="edit-field-content-pane,padding-0-12"
         xmlns="http://javafx.com/javafx/17"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.edit.automaticfieldeditor.clearcontent.ClearContentTabView">
