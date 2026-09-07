@@ -31,20 +31,14 @@ jobs:
     if: ${{ github.repository == 'JabRef/jabref' }}
     # The label decision reads live review-thread state and writes it back minutes later, so two
     # runs for the same PR would race and the slower one would restore the state it started from.
+    # Same group as "Auto-remove ready-for-review", so a draft conversion cannot interleave with the
+    # label evaluation below (which re-reads isDraft right before writing the label).
     # The PR number is only known after the artifact is read, too late for a group expression -
-    # head repository plus head branch identifies the same pull request just as well.
+    # head repository plus head branch identifies the same pull request just as well, for fork PRs too.
     concurrency:
-      group: pr-comment-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
-      # The newest run has the freshest view; an interrupted run's work is redone by the one
-      # that replaced it.
-      cancel-in-progress: true
-    runs-on: ubuntu-slim
-    # Serialized with "Auto-remove ready-for-review" per PR, so a draft conversion cannot interleave
-    # with the label evaluation below (which re-reads isDraft right before writing the label).
-    # workflow_run payloads carry no PR number for fork PRs; those fall back to an unshared group.
-    concurrency:
-      group: pr-status-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.event.workflow_run.pull_requests[0].number || github.run_id }}
+      group: pr-status-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
       cancel-in-progress: false
+    runs-on: ubuntu-slim
     permissions:
       actions: read
       contents: read

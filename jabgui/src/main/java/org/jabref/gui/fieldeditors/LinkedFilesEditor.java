@@ -276,7 +276,9 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.getStyleClass().add("padding-6-0"); // To align with buttons below which also have 0.5em padding
+        // Centered rather than padded to the buttons' own padding, so the row stays aligned
+        // whatever padding '.icon-button' carries.
+        info.getStyleClass().add("align-center-left");
         info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
@@ -309,7 +311,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
 
-        HBox container = new HBox(2);
+        HBox container = new HBox(4);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
@@ -454,4 +456,3 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         return 3;
     }
 }
-
