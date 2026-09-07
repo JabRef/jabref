@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
@@ -39,6 +40,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
@@ -71,14 +73,16 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
-/// the citation key, all required fields (even when unset), and every set field.
-/// Replaces the classic category tabs (required / optional / other / …).
+/// the citation key, all required fields (even when unset), every set field, and — always,
+/// as the last main row — the abstract. Replaces the classic category tabs (required /
+/// optional / other / …) and the former "Abstract" tab.
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
 /// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
@@ -90,9 +94,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
-    /// Preferred number of visible text rows for multiline editors in the scroll list
-    /// (instead of the JavaFX TextArea default of 10).
-    private static final int MULTILINE_ROWS = 4;
+    /// Fields shown even when unset for every entry type, without a remove button. The abstract
+    /// is no optional field of any entry type, so it would otherwise only be reachable through the
+    /// free-form field-name box.
+    private static final Set<Field> ALWAYS_SHOWN_FIELDS = Set.of(StandardField.ABSTRACT);
 
     /// Pixels of preferred height granted per weight unit for editors with weight > 1
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
@@ -163,7 +168,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
-    /// fields sorted by name, then still-empty user-added fields.
+    /// fields sorted by name, then still-empty user-added fields, then the always-shown fields.
     // [impl->req~entry-editor.main-tab.single-list~1]
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
@@ -194,6 +199,9 @@ public class AllFieldsTab extends FieldsEditorTab {
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
+        // Re-add so the always-shown fields end up last in the main section even when set.
+        fields.removeAll(ALWAYS_SHOWN_FIELDS);
+        fields.addAll(ALWAYS_SHOWN_FIELDS);
         return fields;
     }
 
@@ -372,7 +380,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field) || ALWAYS_SHOWN_FIELDS.contains(field)) {
             return editorNode;
         }
 
@@ -663,15 +671,42 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// The classic stretch layout lets text inputs fill their percent-height rows by setting
     /// an infinite pref height ([org.jabref.gui.fieldeditors.EditorTextField]); in the
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
-    /// their computed size and cap text areas at a few visible rows.
+    /// their computed size and let text areas grow with their content.
     private static void normalizeInputHeights(Node node) {
         if (node instanceof TextArea textArea) {
-            textArea.setPrefRowCount(MULTILINE_ROWS);
             textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            growWithContent(textArea);
         } else if (node instanceof TextField textField) {
             textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
         } else if (node instanceof Parent parent) {
             parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
         }
+    }
+
+    /// Sizes the text area to its wrapped text: one row when empty, growing as text is typed
+    /// (the scroll list scrolls, so the area never needs an inner scrollbar). The row count is
+    /// derived from the skin's internal [Text] node, the only place that knows the wrapped
+    /// line count; a [Text] of the same font gives the height of one row.
+    private static void growWithContent(TextArea textArea) {
+        textArea.setPrefRowCount(1);
+        // Subscribe (not listen): editors are reused across rebuilds, so the skin may already exist.
+        EasyBind.subscribe(textArea.skinProperty(), skin -> {
+            // The skin's scroll pane has no skin of its own yet, so its content is not reachable via
+            // lookup from the text area; go through the content node directly.
+            if (skin == null
+                    || !(textArea.lookup(".scroll-pane") instanceof ScrollPane scrollPane)
+                    || !(scrollPane.getContent().lookup(".text") instanceof Text text)) {
+                return;
+            }
+            Runnable resize = () -> {
+                Text oneRow = new Text("X");
+                oneRow.setFont(text.getFont());
+                double rowHeight = oneRow.getLayoutBounds().getHeight();
+                int rows = (int) Math.round(text.getLayoutBounds().getHeight() / rowHeight);
+                textArea.setPrefRowCount(Math.max(1, rows));
+            };
+            text.layoutBoundsProperty().addListener(_ -> resize.run());
+            resize.run();
+        });
     }
 }

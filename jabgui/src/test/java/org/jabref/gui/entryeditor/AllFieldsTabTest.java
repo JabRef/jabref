@@ -159,6 +159,15 @@ class AllFieldsTabTest {
     }
 
     @Test
+    void abstractEditorAlwaysShown() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+
+        assertTrue(tab.editors.containsKey(StandardField.ABSTRACT));
+    }
+
+    @Test
     void fileEditorStaysHiddenWithoutMatchingFile() throws InterruptedException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
