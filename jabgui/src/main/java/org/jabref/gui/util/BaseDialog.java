@@ -31,19 +31,33 @@ public class BaseDialog<T> extends Dialog<T> {
         });
         setupKeyBindings(getDialogPane());
 
-        this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
+        setOnShown(_ -> applyButtonFix(this.getDialogPane()));
 
         setDialogIcon(IconTheme.getJabRefIcon());
         setResizable(true);
     }
 
+    public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
+        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+            dialog.close();
+            event.consume();
+
+            return true;
+        }
+
+        return false;
+    }
+
     private void setupKeyBindings(DialogPane dialogPane) {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            boolean closed = closeOnKeyBindingMatch(event, this);
+            if (closed) {
+                return;
+            }
+
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                close();
-                event.consume();
-            } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
                 getDefaultButton().ifPresent(Button::fire);
                 event.consume();
             }
@@ -95,6 +109,8 @@ public class BaseDialog<T> extends Dialog<T> {
                 button.applyCss();
             }
         }
+
+        pane.requestLayout();
     }
 
     public static void bringToFront(Dialog<?> dialog) {
