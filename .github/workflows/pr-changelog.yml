@@ -28,7 +28,9 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
           echo "Body: $BODY"
 
-          if printf '%s\n' "$BODY" | grep -Eq '^- \[x\] I added \*\*one sentence.*CHANGELOG\.md'; then
+          # The AI walkthrough lives in a <details> block and ticks its own CHANGELOG.md items;
+          # only the template's own checklist item counts, so drop collapsed blocks before matching.
+          if printf '%s\n' "$BODY" | sed '/<details>/,/<\/details>/d' | grep -Eq '^- \[x\] .*CHANGELOG\.md'; then
             echo "found"
             echo "found=yes" >> $GITHUB_OUTPUT
           else
