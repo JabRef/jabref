@@ -14,9 +14,8 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrMyPdfEngine;
+import org.jabref.logic.ocr.OcrEngineFactory;
 import org.jabref.logic.ocr.OcrResult;
-import org.jabref.logic.ocr.docling.DoclingEngine;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -73,17 +72,9 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
-        OcrEngine ocrEngine;
-        switch (preferences.getOcrPreferences().getEngineSelection()) {
-            case OCRMYPDF ->
-                    ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
-            case DOCLING ->
-                    ocrEngine = new DoclingEngine(preferences.getOcrPreferences());
-            default -> {
-                LOGGER.error("switch doesn't cover all variants of EngineSelection");
-                return;
-            }
-        }
+        OcrEngine ocrEngine = OcrEngineFactory.create(preferences.getOcrPreferences(),
+                preferences.getOcrPreferences().getEngineSelection());
+
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
         ocrTask.titleProperty().set(Localization.lang("Performing OCR"));
@@ -98,7 +89,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = getFailureResult(failure, ocrEngine);
+                    String failureReason = failure.reason().getMessage(ocrEngine.getName(),
+                            preferences.getOcrPreferences().getOcrEnginePath());
                     dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
                 }
             }
@@ -108,21 +100,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
         });
         taskExecutor.execute(ocrTask);
-    }
-
-    String getFailureResult(OcrResult.Failure failure, OcrEngine ocrEngine) {
-        return switch (failure.reason()) {
-            case NOT_AVAILABLE ->
-                    Localization.lang("%0 is not available at: %1", ocrEngine.getName(), preferences.getOcrPreferences().getOcrEnginePath());
-            case TIMEOUT ->
-                    Localization.lang("OCR timed out");
-            case NON_ZERO_EXIT ->
-                    Localization.lang("OCR process failed");
-            case IO_ERROR ->
-                    Localization.lang("Could not start OCR process");
-            case INTERRUPTED ->
-                    Localization.lang("OCR was cancelled");
-        };
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {
