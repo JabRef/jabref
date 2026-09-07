@@ -108,7 +108,7 @@ class GitMergeDriver implements Callable<Integer> {
     private Path otherFile;
 
     @Override
-    // [impl->req~jabkit.git.merge-driver~1]
+    // [impl->feat~jabkit.git.merge-driver~1]
     public Integer call() throws ImportServiceException {
         boolean porcelain = sharedOptions.porcelain;
         ParserResult baseResult = ImportService.importBibTexFile(baseFile, git.jabKit.cliPreferences, porcelain);
