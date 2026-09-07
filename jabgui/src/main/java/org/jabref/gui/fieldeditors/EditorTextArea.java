@@ -57,15 +57,12 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     /// `widthHint` is the width to wrap at until the first layout has set the real width — pass
     /// the width the same field had before, so a rebuilt editor is right in its very first frame.
     /// Until the area is focused for the first time it shows at most `collapsedRows` rows (with
-    /// its own scrollbar); the first focus expands it to the full text and it stays expanded, so
-    /// moving the focus on never shrinks a row under the mouse. `initiallyExpanded` starts it expanded —
-    /// editors are rebuilt for the same entry (adding a field, "Show more"), and the caller
-    /// remembers which fields the user already expanded.
-    public void setGrowWithContent(double widthHint, int collapsedRows, boolean initiallyExpanded) {
+    /// its own scrollbar); the first focus expands it to the full text (see [#expand]) and it
+    /// stays expanded, so moving the focus on never shrinks a row under the mouse.
+    public void setGrowWithContent(double widthHint, int collapsedRows) {
         this.growWithContent = true;
         this.widthHint = widthHint;
         this.collapsedRows = collapsedRows;
-        this.expanded = initiallyExpanded;
         setPrefRowCount(1);
         // The real width only exists after the first layout; if it differs from the hint the
         // wrapped height changes, so ask for another pass.
@@ -76,11 +73,20 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         showBeginningWhileCollapsed();
         textProperty().addListener(_ -> showBeginningWhileCollapsed());
         focusedProperty().addListener((_, _, focused) -> {
-            if (focused && !expanded) {
-                expanded = true;
-                requestLayout();
+            if (focused) {
+                expand();
             }
         });
+    }
+
+    /// Shows the complete text instead of the collapsed `collapsedRows`, as the first focus does.
+    /// Callers use it to restore the expansion of a rebuilt editor (editors are rebuilt for the
+    /// same entry when a field is added or "Show more" is toggled).
+    public void expand() {
+        if (!expanded) {
+            expanded = true;
+            requestLayout();
+        }
     }
 
     private void showBeginningWhileCollapsed() {

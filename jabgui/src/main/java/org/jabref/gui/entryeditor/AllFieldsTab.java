@@ -689,7 +689,10 @@ public class AllFieldsTab extends FieldsEditorTab {
             textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
             // Editors are rebuilt on every entry switch; the width the field had for the previous
             // entry lets the new area wrap correctly before its own first layout.
-            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS, expandedFields.contains(field));
+            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
+            if (expandedFields.contains(field)) {
+                textArea.expand();
+            }
             textArea.focusedProperty().addListener((_, _, focused) -> {
                 if (focused) {
                     expandedFields.add(field);
