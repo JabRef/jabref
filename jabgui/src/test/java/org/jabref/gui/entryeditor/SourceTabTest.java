@@ -31,6 +31,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.support.DisabledOnCIServer;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
@@ -210,6 +211,7 @@ class SourceTabTest {
     }
 
     @Test
+    @DisabledOnCIServer("Depends on https://bugs.openjdk.org/browse/JDK-8391883 ")
     void saveKeybindingWritesBackToRenderedEntryInsteadOfCurrentSelection() {
         BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "First entry");
         BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Second entry");
