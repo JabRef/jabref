@@ -145,6 +145,13 @@ Example: new entry dialog by ID. It is expected that user would copy some paper 
 
 Needs: impl
 
+### Citation key is focused for a newly added entry
+`req~newentry.focus.citation-key~1`
+
+When a new entry is added and the entry editor opens for it, the citation key field receives keyboard focus, so the key can be typed without clicking into the field first.
+
+Needs: impl
+
 ### Automatic Identifier Detection and Focus in New Entry Dialog
 `req~newentry.clipboard.autofocus~1`
 
