@@ -114,4 +114,27 @@ class AiTabViewModelTest {
 
         assertFalse(viewModel.validateSettings());
     }
+
+    @Test
+    void documentSplitterChunkSizeValidationMessageUpdatesWhenChunkSizeChanges() {
+        when(embeddingModelMetadataService.getMetadata("small-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("small-model", OptionalLong.of(1024), OptionalInt.of(128)))
+        );
+
+        viewModel.selectedEmbeddingModelProperty().set("small-model");
+
+        viewModel.documentSplitterChunkSizeProperty().set(0);
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertEquals("Document splitter chunk size must be greater than 0",
+                viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().orElseThrow().getMessage());
+
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertEquals("Document splitter chunk size must not exceed 128",
+                viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().orElseThrow().getMessage());
+
+        viewModel.documentSplitterChunkSizeProperty().set(100);
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().isEmpty());
+    }
 }

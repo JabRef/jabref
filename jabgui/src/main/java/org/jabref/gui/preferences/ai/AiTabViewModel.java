@@ -41,6 +41,7 @@ import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
@@ -344,20 +345,21 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
 
-        this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
-                Bindings.createBooleanBinding(
-                        () -> documentSplitterChunkSize.get() > 0 && documentSplitterChunkSize.get() <= selectedEmbeddingModelMaxChunkSize.get(),
+        this.documentSplitterChunkSizeValidator = new ObservableRuleBasedValidator(
+                Bindings.createObjectBinding(
+                        () -> {
+                            int size = documentSplitterChunkSize.get();
+                            if (size <= 0) {
+                                return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
+                            }
+                            int maxChunkSize = selectedEmbeddingModelMaxChunkSize.get();
+                            if (size > maxChunkSize) {
+                                return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", maxChunkSize));
+                            }
+                            return null;
+                        },
                         documentSplitterChunkSize,
-                        selectedEmbeddingModelMaxChunkSize),
-                valid -> {
-                    if (!valid) {
-                        if (documentSplitterChunkSize.get() <= 0) {
-                            return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
-                        }
-                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", selectedEmbeddingModelMaxChunkSize.get()));
-                    }
-                    return null;
-                });
+                        selectedEmbeddingModelMaxChunkSize));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 Bindings.createObjectBinding(
