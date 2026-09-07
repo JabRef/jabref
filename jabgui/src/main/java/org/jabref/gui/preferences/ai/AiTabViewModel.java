@@ -50,6 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 512;
+
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AiTabViewModel.class);
@@ -89,8 +91,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedEmbeddingModel = new SimpleStringProperty();
     private final StringProperty selectedEmbeddingModelSize = new SimpleStringProperty("");
-    private final StringProperty selectedEmbeddingModelMaxChunkSize = new SimpleStringProperty("");
-    private final ObjectProperty<OptionalInt> selectedEmbeddingModelMaxSnippetTokens = new SimpleObjectProperty<>(OptionalInt.empty());
+    private final IntegerProperty selectedEmbeddingModelMaxChunkSize = new SimpleIntegerProperty(DEFAULT_MAX_CHUNK_SIZE);
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // HuggingFaceChatModel and GoogleAiGeminiChatModel don't support setting an API base URL
@@ -347,14 +348,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 Bindings.createObjectBinding(
                         () -> documentSplitterChunkSize.getValue(),
                         documentSplitterChunkSize,
-                        selectedEmbeddingModelMaxSnippetTokens),
+                        selectedEmbeddingModelMaxChunkSize),
                 size -> {
                     if (size == null || size.intValue() <= 0) {
                         return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
                     }
-                    OptionalInt maxTokens = selectedEmbeddingModelMaxSnippetTokens.get();
-                    if (maxTokens != null && maxTokens.isPresent() && size.intValue() > maxTokens.orElseThrow()) {
-                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", maxTokens.orElseThrow()));
+                    int maxChunkSize = selectedEmbeddingModelMaxChunkSize.get();
+                    if (size.intValue() > maxChunkSize) {
+                        return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", maxChunkSize));
                     }
                     return null;
                 });
@@ -815,20 +816,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return selectedEmbeddingModelSize;
     }
 
-    public StringProperty selectedEmbeddingModelMaxChunkSizeProperty() {
+    public IntegerProperty selectedEmbeddingModelMaxChunkSizeProperty() {
         return selectedEmbeddingModelMaxChunkSize;
     }
 
     private void updateSelectedEmbeddingModelMetadata(@Nullable String modelName) {
         if (StringUtil.isBlank(modelName)) {
             selectedEmbeddingModelSize.set("");
-            selectedEmbeddingModelMaxChunkSize.set("");
-            selectedEmbeddingModelMaxSnippetTokens.set(OptionalInt.empty());
+            selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
             return;
         }
 
         selectedEmbeddingModelSize.set(Localization.lang("Loading..."));
-        selectedEmbeddingModelMaxChunkSize.set(Localization.lang("Loading..."));
         BackgroundTask.wrap(() -> embeddingModelMetadataService.getMetadata(modelName))
                       .onSuccess(metadataOpt -> {
                           if (modelName.equals(selectedEmbeddingModel.get())) {
@@ -840,22 +839,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                                       .orElse(Localization.lang("Unknown"));
                               selectedEmbeddingModelSize.set(sizeText);
 
-                              OptionalInt maxTokens = metadataOpt
+                              int maxTokens = metadataOpt
                                       .map(EmbeddingModelMetadata::maxSnippetTokens)
-                                      .orElseGet(OptionalInt::empty);
-                              selectedEmbeddingModelMaxSnippetTokens.set(maxTokens);
-                              String maxChunkSizeText = maxTokens.isPresent()
-                                      ? String.valueOf(maxTokens.orElseThrow())
-                                      : Localization.lang("Unknown");
-                              selectedEmbeddingModelMaxChunkSize.set(maxChunkSizeText);
+                                      .filter(OptionalInt::isPresent)
+                                      .map(OptionalInt::orElseThrow)
+                                      .orElse(DEFAULT_MAX_CHUNK_SIZE);
+                              selectedEmbeddingModelMaxChunkSize.set(maxTokens);
                           }
                       })
                       .onFailure(e -> {
                           LOGGER.warn("Failed to fetch embedding model metadata for {}", modelName, e);
                           if (modelName.equals(selectedEmbeddingModel.get())) {
                               selectedEmbeddingModelSize.set(Localization.lang("Unknown"));
-                              selectedEmbeddingModelMaxChunkSize.set(Localization.lang("Unknown"));
-                              selectedEmbeddingModelMaxSnippetTokens.set(OptionalInt.empty());
+                              selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
                           }
                       })
                       .executeWith(taskExecutor);

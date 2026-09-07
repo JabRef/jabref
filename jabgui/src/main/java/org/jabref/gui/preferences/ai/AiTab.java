@@ -66,7 +66,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         embeddingModelSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
 
         Label embeddingModelMaxChunkSizeLabel = new Label();
-        embeddingModelMaxChunkSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty());
+        embeddingModelMaxChunkSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty().asString());
 
         setContent(form()
 

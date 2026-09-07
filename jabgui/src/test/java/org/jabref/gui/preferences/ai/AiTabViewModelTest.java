@@ -52,7 +52,18 @@ class AiTabViewModelTest {
     void maxChunkSizeLabelUpdatesWhenModelSelected() {
         viewModel.selectedEmbeddingModelProperty().set("test-model");
 
-        assertEquals("256", viewModel.selectedEmbeddingModelMaxChunkSizeProperty().get());
+        assertEquals(256, viewModel.selectedEmbeddingModelMaxChunkSizeProperty().get());
+    }
+
+    @Test
+    void maxChunkSizeFallsBackToDefaultWhenUnknown() {
+        when(embeddingModelMetadataService.getMetadata("unknown-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("unknown-model", OptionalLong.empty(), OptionalInt.empty()))
+        );
+
+        viewModel.selectedEmbeddingModelProperty().set("unknown-model");
+
+        assertEquals(512, viewModel.selectedEmbeddingModelMaxChunkSizeProperty().get());
     }
 
     @Test
