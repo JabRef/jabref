@@ -40,5 +40,13 @@ Add the changelog entry once, in the branch the pull request targets; do not add
 
 ### Releases (maintainers)
 
-- Regular release: prepare `CHANGELOG.md` on `main` as before (rename `## [Unreleased]` to the version and add a fresh `## [Unreleased]`), then merge `main` into `stable` (`git merge main`; on a conflict in `CHANGELOG.md`, take the version from `main`) and tag on `stable`.
+- Regular release: prepare `CHANGELOG.md` on `main` as before (rename `## [Unreleased]` to the version and add a fresh `## [Unreleased]`), then merge `main` into `stable` and tag on `stable`. Always take `main`'s `CHANGELOG.md` in that merge; the union merge attribute would otherwise combine both unreleased blocks silently instead of reporting a conflict:
+
+  ```bash
+  git switch stable
+  git merge --no-commit main
+  git checkout main -- CHANGELOG.md
+  git commit
+  ```
+
 - Hotfix release: on `stable`, rename `## [Unreleased]` to the version, tag, and re-add an empty `## [Unreleased]`. The port of that commit to `main` conflicts by design: insert the version section below `main`'s `## [Unreleased]` and remove the ported entries from it.

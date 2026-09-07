@@ -8,9 +8,9 @@ name: Port to other branch
 #
 # pull_request_target: the port needs a push-capable token, and the PR may come from a fork.
 # Nothing from the PR head is executed - the workspace is the base branch, and the merge
-# driver is copied out of it before any other tree is checked out. On merge_group the
-# workspace is the queued commit (base plus the approved PR); that job has read-only
-# permissions and uses no secret beyond GITHUB_TOKEN.
+# driver is copied out of it before any other tree is checked out. On merge_group the check
+# also checks out the base branch tip and fetches the queued commit only as data; the job has
+# read-only permissions and uses no secret beyond GITHUB_TOKEN.
 
 on:
   pull_request_target:
@@ -71,9 +71,12 @@ jobs:
           if [ "$port" != "true" ]; then
             echo "Nothing to check for #$PR_NUMBER: not a port candidate (base \`$base\`, label \`dev: into-stable\` $([ "$into_stable" = true ] && echo present || echo absent))" >> "$GITHUB_STEP_SUMMARY"
           fi
+      # The base branch tip, explicitly: on merge_group the event's ref is the queued commit, which
+      # contains the PR - the composite action and the merge driver must come from the trusted base.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: steps.pr.outputs.port == 'true'
         with:
+          ref: ${{ steps.pr.outputs.base }}
           fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
@@ -85,9 +88,8 @@ jobs:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           BASE_REF: ${{ steps.pr.outputs.base }}
           TARGET: ${{ steps.pr.outputs.target }}
-          # On merge_group, the queued commit is the PR merged onto the base; its diff to base_sha is the PR's change
           HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
-          QUEUE_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+          QUEUE_REF: ${{ github.event.merge_group.head_ref }}
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
@@ -98,9 +100,11 @@ jobs:
             echo "Branch \`$TARGET\` does not exist yet - nothing to check" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          if [ -n "$QUEUE_BASE_SHA" ]; then
-            git fetch --no-tags origin "$TARGET"
-            parent="$QUEUE_BASE_SHA"
+          if [ -n "$QUEUE_REF" ]; then
+            # The queued commit merges this PR onto the previous queue entry (or the base tip), so its
+            # first parent bounds exactly this PR's change even when several PRs are batched.
+            git fetch --no-tags origin "$TARGET" "$QUEUE_REF"
+            parent=$(git rev-parse "$HEAD_SHA^1")
           else
             git fetch --no-tags origin "$TARGET" "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
             parent=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
