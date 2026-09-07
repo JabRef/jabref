@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.ai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.OptionalLong;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -41,6 +42,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -801,9 +803,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         BackgroundTask.wrap(() -> embeddingModelMetadataService.getMetadata(modelName))
                       .onSuccess(metadataOpt -> {
                           if (modelName.equals(selectedEmbeddingModel.get())) {
-                              String text = metadataOpt.map(EmbeddingModelMetadata::sizeInfo)
-                                                       .filter(s -> !s.isBlank())
-                                                       .orElse(Localization.lang("Unknown"));
+                              String text = metadataOpt
+                                      .map(EmbeddingModelMetadata::downloadSizeBytes)
+                                      .filter(OptionalLong::isPresent)
+                                      .map(OptionalLong::getAsLong)
+                                      .map(FileUtils::byteCountToDisplaySize)
+                                      .orElse(Localization.lang("Unknown"));
                               selectedEmbeddingModelSize.set(text);
                           }
                       })

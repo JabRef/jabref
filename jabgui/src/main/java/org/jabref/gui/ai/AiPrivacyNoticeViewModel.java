@@ -1,6 +1,7 @@
 package org.jabref.gui.ai;
 
 import java.io.IOException;
+import java.util.OptionalLong;
 
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +18,7 @@ import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,10 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
         embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(modelName ->
                 embeddingModelMetadataService
                         .getMetadata(modelName)
-                        .map(EmbeddingModelMetadata::sizeInfo)
+                        .map(EmbeddingModelMetadata::downloadSizeBytes)
+                        .filter(OptionalLong::isPresent)
+                        .map(OptionalLong::getAsLong)
+                        .map(FileUtils::byteCountToDisplaySize)
                         .orElse("")));
     }
 
