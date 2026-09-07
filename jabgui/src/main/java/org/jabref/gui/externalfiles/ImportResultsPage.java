@@ -51,9 +51,9 @@ public class ImportResultsPage extends WizardPane {
         mainLayout.setMaxWidth(Double.MAX_VALUE);
         mainLayout.setMaxHeight(Double.MAX_VALUE);
 
-        /// Progress pane
-        progressPane = new VBox(10);
-        progressPane.getStyleClass().addAll("align-center", "padding-24");
+        // Progress pane
+        progressPane = new VBox(4);
+        progressPane.getStyleClass().addAll("align-center", "padding-4");
         progressPane.setMaxWidth(Double.MAX_VALUE);
         progressPane.setMaxHeight(Double.MAX_VALUE);
 
@@ -65,8 +65,8 @@ public class ImportResultsPage extends WizardPane {
 
         progressPane.getChildren().addAll(progressIndicator, progressLabel);
 
-        /// Content pane with proper sizing
-        contentPane = new VBox(10);
+        // Content pane with proper sizing
+        contentPane = new VBox(4);
         contentPane.setMaxWidth(Double.MAX_VALUE);
         contentPane.setMaxHeight(Double.MAX_VALUE);
         contentPane.setFillWidth(true);
@@ -75,7 +75,7 @@ public class ImportResultsPage extends WizardPane {
         summaryLabel = new Label();
         summaryLabel.getStyleClass().add("bold");
 
-        /// TableView with explicit size constraints
+        // TableView with explicit size constraints
         resultsTable = new TableView<>();
         resultsTable.setItems(viewModel.resultTableItems());
         resultsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

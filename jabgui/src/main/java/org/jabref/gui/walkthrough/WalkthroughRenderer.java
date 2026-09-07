@@ -80,12 +80,12 @@ public class WalkthroughRenderer {
         boolean isVertical = step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT;
 
         if (isVertical) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-24");
+            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-4");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
             step.maxWidth().ifPresent(panel::setMaxWidth);
         } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-24");
+            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-4");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
             step.maxHeight().ifPresent(panel::setMaxHeight);
@@ -126,7 +126,7 @@ public class WalkthroughRenderer {
     }
 
     private VBox makePanel() {
-        VBox container = new VBox(12);
+        VBox container = new VBox(4);
         container.getStyleClass().add("walkthrough-panel");
         return container;
     }
@@ -159,7 +159,7 @@ public class WalkthroughRenderer {
     }
 
     private VBox createContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox contentBox = new VBox(16);
+        VBox contentBox = new VBox(4);
         contentBox.getChildren().addAll(component.content().stream().map(block ->
                 switch (block) {
                     case TextBlock textBlock ->

@@ -311,7 +311,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
 
-        HBox container = new HBox(2);
+        HBox container = new HBox(4);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
@@ -456,4 +456,3 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         return 3;
     }
 }
-
