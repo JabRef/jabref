@@ -8,17 +8,20 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.BaseSearchQueryTransformer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
@@ -173,11 +176,11 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
             uriBuilder.addParameter("apikey", apiKey);
             URL testUrl = uriBuilder.build().toURL();
 
-            org.jabref.logic.net.URLDownload urlDownload = new org.jabref.logic.net.URLDownload(testUrl);
+            URLDownload urlDownload = new URLDownload(testUrl);
             String response = urlDownload.asString();
             JSONObject jsonObject = new JSONObject(response);
             return !jsonObject.has("error");
-        } catch (Exception e) {
+        } catch (URISyntaxException | MalformedURLException | FetcherException | JSONException e) {
             LOGGER.debug("BASE API key validation failed", e);
             return false;
         }
