@@ -12,6 +12,7 @@ import java.util.SequencedCollection;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -190,11 +191,29 @@ public class AllFieldsTab extends FieldsEditorTab {
                      .filter(setFields::contains)
                      .forEach(fields::add);
         });
+        // Added before the remaining set fields so the file editor heads its section.
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        if (isFilesAndLinksSectionOpen(entry)) {
+            fields.add(StandardField.FILE);
+        }
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
         return fields;
+    }
+
+    /// An open files-and-links section always shows the file editor: its own buttons
+    /// (add / search / download) are what a "+ File" chip could only reach by popping up a
+    /// file dialog. Mirrors the expanded state [#createSectionPane] derives, so both agree
+    /// on whether the section is open before any editor exists.
+    private boolean isFilesAndLinksSectionOpen(BibEntry entry) {
+        Boolean override = sectionExpandOverrides.get(FieldListSections.SectionType.FILES_AND_LINKS);
+        if (override != null) {
+            return override;
+        }
+        return Stream.concat(entry.getFields().stream(), userAddedFields.stream())
+                     .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS);
     }
 
     @Override
@@ -485,6 +504,13 @@ public class AllFieldsTab extends FieldsEditorTab {
         pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
         pane.expandedProperty().addListener((_, _, expanded) -> {
             sectionExpandOverrides.put(type, expanded);
+            // The file editor only exists once determineFieldsToShow has seen the section as
+            // open, so opening it for the first time needs a rebuild rather than mere population.
+            if (expanded && (type == FieldListSections.SectionType.FILES_AND_LINKS)
+                    && !editors.containsKey(StandardField.FILE)) {
+                rebuildPanel(bibDatabaseContext, entry);
+                return;
+            }
             if (expanded && content.getChildren().isEmpty()) {
                 populateContent.run();
             }
@@ -520,7 +546,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// All member fields of a section offered as add-chips; the comments section offers the
     /// general comment plus the current user's personal comment field (if enabled).
-    // [impl->req~entry-editor.main-tab.section-chips~1]
+    // [impl->req~entry-editor.main-tab.section-chips~2]
     private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
         if (type == FieldListSections.SectionType.COMMENTS) {
             SequencedSet<Field> commentFields = new LinkedHashSet<>();
@@ -626,11 +652,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                 return;
             }
             requestFocus(field);
-            // Adding the File field via its "+" chip should immediately open the add-file dialog,
-            // since an empty File editor has no other purpose than to receive a file.
-            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                linkedFilesEditor.addNewFile();
-            }
         });
     }
 

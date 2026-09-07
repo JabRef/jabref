@@ -194,4 +194,16 @@ class AllFieldsTabTest {
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
+
+    @Test
+    void fileEditorAppearsWhenFilesAndLinksSectionIsOpen() throws InterruptedException {
+        // A set URL opens the files and links section, which always shows the file editor.
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
 }
