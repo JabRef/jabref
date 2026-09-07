@@ -54,6 +54,11 @@ class AuthorListParserTest {
     }
 
     @Test
+    void etAlNormalizedToAndOthers() {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and others"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, et al."));
+    }
+
+    @Test
     void dashedNamesWithSpaceNormalized() {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W.-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
     }
@@ -66,6 +71,26 @@ class AuthorListParserTest {
                                 Author.OTHERS
                         ),
                         "Alexander Artemenko and others"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("Alexander", "A.", null, "Artemenko", null),
+                                Author.OTHERS
+                        ),
+                        "Alexander Artemenko et al."),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("John", "J.", null, "Smith", null),
+                                new Author("Jane", "J.", null, "Doe", null),
+                                Author.OTHERS
+                        ),
+                        "Smith, John and Doe, Jane, et al"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("J.", "J.", null, "Smith", null),
+                                new Author("A.", "A.", null, "Doe", null),
+                                Author.OTHERS
+                        ),
+                        "J. Smith and A. Doe ET AL."),
                 Arguments.of(
                         AuthorList.of(
                                 new Author("I.", "I.", null, "Podadera", null),

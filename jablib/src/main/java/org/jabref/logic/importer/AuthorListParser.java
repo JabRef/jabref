@@ -43,6 +43,8 @@ public class AuthorListParser {
 
     private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\\s*\\n\\s*");
 
+    private static final Pattern ET_AL_SUFFIX = Pattern.compile("[,;\\s]+et\\s+al\\.?$", Pattern.CASE_INSENSITIVE);
+
     /// the raw bibtex author/editor field
     private String original;
     /// index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2
@@ -99,9 +101,20 @@ public class AuthorListParser {
         // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS
         final String andOthersSuffix = " and others";
         final boolean andOthersPresent;
+        Matcher etAlMatcher = ET_AL_SUFFIX.matcher(listOfNames);
         if (StringUtil.endsWithIgnoreCase(listOfNames, andOthersSuffix)) {
             andOthersPresent = true;
             listOfNames = StringUtil.removeStringAtTheEnd(listOfNames, " and others");
+        } else if (etAlMatcher.find()) {
+            // Typeset bylines ("Smith, Doe, et al.") use "et al." where BibTeX expects "and others"
+            andOthersPresent = true;
+            listOfNames = listOfNames.substring(0, etAlMatcher.start());
+            // "Z. Yao, D. S. Weld, et al.": without the "et al." nothing marks the commas as name separators
+            String[] names = listOfNames.split(", ");
+            if (!listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ")
+                    && Arrays.stream(names).allMatch(name -> STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(name).find())) {
+                listOfNames = String.join(" and ", names);
+            }
         } else {
             andOthersPresent = false;
         }
