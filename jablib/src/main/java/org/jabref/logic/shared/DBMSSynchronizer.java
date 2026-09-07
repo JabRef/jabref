@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -458,6 +460,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Database worker
     private void insertSharedEntries(List<BibEntry> bibEntries) {
+        // A replayed entry carries the version of the shared row it was recorded against; the row
+        // it gets here is a new one, which the database starts at version 1
+        bibEntries.stream()
+                  .filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt() == -1)
+                  .forEach(bibEntry -> bibEntry.getSharedBibEntryData().setVersion(1));
         writeOrRecord("Could not insert entries into the shared database",
                 () -> dbmsProcessor.insertEntries(bibEntries),
                 () -> offlineChanges.recordInsert(bibEntries));
@@ -736,6 +743,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 if (!entriesToRemove.isEmpty()) {
                     removeSharedEntries(entriesToRemove);
                 }
+                reviveEntriesDeletedMeanwhile(entriesToWrite, entriesToInsert);
                 if (!entriesToInsert.isEmpty()) {
                     insertSharedEntries(entriesToInsert);
                 }
@@ -753,6 +761,41 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             });
         }));
         return true;
+    }
+
+    /// Database worker: a shared row deleted during the outage must not take the changes recorded
+    /// against it with it. Such an entry is re-inserted as a new shared entry instead of being
+    /// updated - an update would fail with [SharedEntryNotPresentException] and pull the deletion,
+    /// which removes the user's edited entry.
+    private void reviveEntriesDeletedMeanwhile(List<BibEntry> entriesToWrite, List<BibEntry> entriesToInsert) {
+        if (!connected.get() || entriesToWrite.isEmpty()) {
+            return;
+        }
+        Set<Integer> stillPresentIds;
+        try {
+            stillPresentIds = dbmsProcessor.partitionAndGetSharedEntries(entriesToWrite.stream()
+                                                                                       .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
+                                                                                       .toList())
+                                           .stream()
+                                           .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
+                                           .collect(Collectors.toSet());
+        } catch (SQLException e) {
+            LOGGER.error("Could not check which recorded entries are still present in the shared database", e);
+            return;
+        }
+        Iterator<BibEntry> iterator = entriesToWrite.iterator();
+        while (iterator.hasNext()) {
+            BibEntry bibEntry = iterator.next();
+            int sharedId = bibEntry.getSharedBibEntryData().getSharedIdAsInt();
+            if (stillPresentIds.contains(sharedId)) {
+                continue;
+            }
+            // Inserted below, which assigns a fresh shared id and version
+            bibEntry.getSharedBibEntryData().setSharedId(-1);
+            sharedIdsInConflict.remove(sharedId);
+            entriesToInsert.add(bibEntry);
+            iterator.remove();
+        }
     }
 
     private void withPullLock(Runnable work) {
