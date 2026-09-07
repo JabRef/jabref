@@ -339,7 +339,11 @@ val generateCommunityThemes = tasks.register("generateCommunityThemes") {
         target.deleteRecursively()
         target.mkdirs()
         val index = mutableListOf<String>()
-        source.listFiles { file -> file.isDirectory && file.name != "DarkTheme" && file.name != "LightTheme" }!!
+        val themeDirs = source.listFiles { file -> file.isDirectory && file.name != "DarkTheme" && file.name != "LightTheme" }
+        if (themeDirs == null) {
+            logger.warn("No community themes bundled: submodule {} is not checked out (git submodule update --init)", source)
+        }
+        (themeDirs ?: emptyArray())
             .sortedBy { it.name }
             .forEach { dir ->
                 val cssFiles = dir.listFiles { file -> file.extension == "css" }!!.sortedBy { it.name }
