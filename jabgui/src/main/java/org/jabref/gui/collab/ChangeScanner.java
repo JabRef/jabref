@@ -13,9 +13,11 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
@@ -51,6 +53,17 @@ public class ChangeScanner {
             LOGGER.warn("Error while parsing changed file.", e);
             return List.of();
         }
+    }
+
+    /// The differences between the in-memory library and the given file, e.g. a conflicted copy left by a sync client.
+    ///
+    /// @throws IOException when the file cannot be read or parsed; unlike for the library file itself, an unreadable copy must not pass as "nothing to merge"
+    public List<DatabaseChange> scanFile(Path file) throws IOException {
+        ParserResult result = OpenDatabase.loadDatabase(file, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        if (result.isInvalid()) {
+            throw new IOException("Could not parse " + file + ": " + result.getErrorMessage());
+        }
+        return DatabaseChangeList.compareAndGetChanges(database, result.getDatabaseContext(), databaseChangeResolverFactory);
     }
 
     /// @return the given external changes sorted by the side they happened on, see [LibraryBaseline#triage]
