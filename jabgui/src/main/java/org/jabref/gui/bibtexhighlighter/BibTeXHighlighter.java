@@ -163,8 +163,7 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         }
     }
 
-    /// Helper to add a text segment, splitting it if it intersects with search matches to apply
-    /// the `search-highlight-text` CSS class dynamically.
+    /// Helper to add a text segment, splitting it if it intersects with search matches.
     private void addSegmentWithSearchCheck(RichParagraph.Builder builder, String segmentText, int segmentStart, @org.jspecify.annotations.Nullable String baseStyleClass, List<Range> matches) {
         int segmentEnd = segmentStart + segmentText.length();
         int cursor = segmentStart;
@@ -207,9 +206,9 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
         if (isSearchMatch) {
             if (baseStyleClass != null) {
-                builder.addWithStyleNames(text, baseStyleClass, "search-highlight-text");
+                builder.addWithStyleNames(text, baseStyleClass);
             } else {
-                builder.addWithStyleNames(text, "search-highlight-text");
+                builder.addWithStyleNames(text);
             }
         } else {
             if (baseStyleClass != null) {
