@@ -187,7 +187,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
+            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

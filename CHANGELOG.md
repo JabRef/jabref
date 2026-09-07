@@ -117,6 +117,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We now keep changes made while the [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) connection is down and synchronize them once it is back. [#11211](https://github.com/JabRef/jabref/issues/11211)
 - We changed the full text document search to run as a cancelable background task instead of blocking JabRef with a modal dialog. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
 - We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
@@ -125,6 +126,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where main table columns could not be resized while "Fit table horizontally on screen" was enabled. Resizing a column now adjusts only the columns to its right, and column widths keep their proportions when the window is resized. [#10516](https://github.com/JabRef/jabref/issues/10516)
 - We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
 - We fixed an issue where the entry editor kept showing an entry of another library after switching libraries. [#16892](https://github.com/JabRef/jabref/pull/16892)
 - We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
@@ -226,6 +228,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
+- We fixed an issue where the "Jump to field" dialog only searched fields already shown in the entry editor. It now searches all known fields, adds the selected field if it is not yet visible, and creates the field if it does not exist yet. [#16593](https://github.com/JabRef/jabref/issues/16593)
 - We fixed an issue where deleting an entry removed the group filter and defaulted to the home view. [#16036](https://github.com/JabRef/jabref/issues/16036)
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
 - We fixed an issue where the main table showed a tooltip with the entry's full title even when the title was already fully visible; the tooltip now appears only when the title is truncated. [#16607](https://github.com/JabRef/jabref/issues/16607)
