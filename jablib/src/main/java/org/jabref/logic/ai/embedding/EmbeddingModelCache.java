@@ -31,13 +31,6 @@ public class EmbeddingModelCache implements AutoCloseable {
     public EmbeddingModelCache(
             AiPreferences aiPreferences,
             NotificationService notificationService,
-            TaskExecutor taskExecutor) {
-        this(aiPreferences, notificationService, taskExecutor, new EmbeddingModelMetadataService());
-    }
-
-    public EmbeddingModelCache(
-            AiPreferences aiPreferences,
-            NotificationService notificationService,
             TaskExecutor taskExecutor,
             EmbeddingModelMetadataService metadataService) {
         this.aiPreferences = aiPreferences;

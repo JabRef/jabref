@@ -25,10 +25,6 @@ public class UpdateEmbeddingModelTask extends BackgroundTask<DeepJavaEmbeddingMo
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
-    public UpdateEmbeddingModelTask(String embeddingModelName) {
-        this(embeddingModelName, new EmbeddingModelMetadataService());
-    }
-
     public UpdateEmbeddingModelTask(
             String embeddingModelName,
             EmbeddingModelMetadataService metadataService

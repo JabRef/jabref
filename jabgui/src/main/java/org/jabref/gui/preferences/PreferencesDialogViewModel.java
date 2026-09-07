@@ -42,6 +42,7 @@ import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -64,7 +65,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public PreferencesDialogViewModel(
+            DialogService dialogService,
+            GuiPreferences preferences,
+            EmbeddingModelMetadataService embeddingModelMetadataService
+    ) {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
@@ -77,7 +82,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new KeyBindingsTab(),
                 new GroupsTab(),
                 new WebSearchTab(workingAiPreferences),
-                new AiTab(workingAiPreferences),
+                new AiTab(workingAiPreferences, embeddingModelMetadataService),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

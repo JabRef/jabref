@@ -47,15 +47,6 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
             String modelName,
             AiPreferences aiPreferences,
             NotificationService notificationService,
-            TaskExecutor taskExecutor
-    ) {
-        this(modelName, aiPreferences, notificationService, taskExecutor, new EmbeddingModelMetadataService());
-    }
-
-    public AsyncEmbeddingModel(
-            String modelName,
-            AiPreferences aiPreferences,
-            NotificationService notificationService,
             TaskExecutor taskExecutor,
             EmbeddingModelMetadataService metadataService
     ) {

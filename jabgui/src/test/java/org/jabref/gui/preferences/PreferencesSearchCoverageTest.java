@@ -43,6 +43,7 @@ import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -118,7 +119,7 @@ class PreferencesSearchCoverageTest {
                 Named.of("Custom export formats", CustomExporterTab::new),
                 Named.of("Network", NetworkTab::new),
                 Named.of("Web search", () -> new WebSearchTab(AI_PREFERENCES)),
-                Named.of("AI", () -> new AiTab(AI_PREFERENCES)));
+                Named.of("AI", () -> new AiTab(AI_PREFERENCES, mock(EmbeddingModelMetadataService.class))));
     }
 
     @ParameterizedTest

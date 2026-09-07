@@ -31,7 +31,7 @@ class EmbeddingModelCacheTest {
         taskExecutor = mock(TaskExecutor.class);
         when(taskExecutor.execute(any())).thenReturn(mock(java.util.concurrent.Future.class));
 
-        cache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
+        cache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor, mock(EmbeddingModelMetadataService.class));
     }
 
     @Test

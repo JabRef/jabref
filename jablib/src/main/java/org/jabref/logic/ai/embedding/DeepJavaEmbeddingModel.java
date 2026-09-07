@@ -35,13 +35,6 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     public DeepJavaEmbeddingModel(
             String modelName,
-            ProgressCounter progressCounter
-    ) throws ModelNotFoundException, MalformedModelException, IOException {
-        this(modelName, progressCounter, new EmbeddingModelMetadataService());
-    }
-
-    public DeepJavaEmbeddingModel(
-            String modelName,
             ProgressCounter progressCounter,
             EmbeddingModelMetadataService metadataService
     ) throws ModelNotFoundException, MalformedModelException, IOException {

@@ -43,13 +43,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private TabPane templatesTabPane;
 
-    public AiTab(AiPreferences workingAiPreferences) {
+    public AiTab(
+            AiPreferences workingAiPreferences,
+            EmbeddingModelMetadataService embeddingModelMetadataService
+    ) {
         this.viewModel = new AiTabViewModel(
                 preferences.getAiPreferences(),
                 workingAiPreferences,
                 Injector.instantiateModelOrService(AiService.class).getModelService(),
                 taskExecutor,
-                Injector.instantiateModelOrService(EmbeddingModelMetadataService.class));
+                embeddingModelMetadataService);
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
