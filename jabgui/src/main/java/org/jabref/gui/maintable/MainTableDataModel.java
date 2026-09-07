@@ -65,7 +65,8 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
-    /// Bumped after each search result has been applied to the table rows, so that listeners see the final match categories
+    /// Bumped after each search result has been applied to the table rows, so that listeners see the final match categories.
+    /// Deliberately not bumped by the incremental index updates on entry edits: the table must not move while the user is editing an entry
     private final IntegerProperty searchResultsVersion = new SimpleIntegerProperty();
     @Nullable private final SearchContext searchContext;
 
@@ -217,6 +218,8 @@ public class MainTableDataModel {
     }
 
     public void unbind() {
+        // A search still running for this model must not apply its result (and notify the table) after the model is replaced
+        searchUpdateSequence.incrementAndGet();
         searchQuerySubscription.unsubscribe();
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
