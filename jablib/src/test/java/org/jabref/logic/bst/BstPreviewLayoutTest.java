@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -13,6 +14,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -60,6 +64,39 @@ class BstPreviewLayoutTest {
                                        .withField(StandardField.TITLE, "{{$\\Sigma$}}{{$\\Delta$}} Modulator");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O.\u00a0Kopp. \u03a3\u0394 modulator.", preview);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void generatePreviewHandlesInlineFormatting(String title, String expectedPreview) throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, title);
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals(expectedPreview, preview);
+    }
+
+    private static Stream<Arguments> generatePreviewHandlesInlineFormatting() {
+        return Stream.of(
+
+                // Small-caps forms that should be preserved in the preview output
+                Arguments.of("\\textsc{L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("{\\sc L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("\\textsc{Outer \\textsc{inner} text}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>"),
+
+                // Parser edge cases that should still keep the surrounding small-caps span intact
+                Arguments.of("\\textsc {L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
+                Arguments.of("\\textsc{A\\{B\\}C}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
+                Arguments.of("{\\scshape Lopez}", "O.\u00a0Kopp. Lopez."),
+
+                // Malformed input should fall back to the existing preview pipeline without failing
+                Arguments.of("\\textsc{L{\\'o}pez", "O.\u00a0Kopp. López."),
+                Arguments.of("{\\sc L{\\'o}pez", "O.\u00a0Kopp. lópez."),
+
+                // Existing superscript and subscript rendering should remain unchanged
+                Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium."),
+                Arguments.of("{H\\textsubscript{2}O}", "O.\u00a0Kopp. H₂O.")
+        );
     }
 
     @Test

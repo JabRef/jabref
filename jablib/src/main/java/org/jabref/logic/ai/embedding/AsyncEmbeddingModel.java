@@ -17,7 +17,7 @@ import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     }
 
     @Override
-    public Response<@NotNull List<Embedding>> embedAll(List<TextSegment> list) {
+    public Response<@NonNull List<Embedding>> embedAll(List<TextSegment> list) {
         if (predictorProperty.get().isEmpty()) {
             // The rationale for RuntimeException here:
             // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions

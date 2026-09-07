@@ -502,7 +502,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
-8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change. If an issue is identified or created later, switch the link to the issue per the precedence rule above.
+8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): create the PR with `--draft` (an automated review starts as soon as a PR is ready and would flag the placeholder), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change, then mark the PR ready (`gh pr ready <number>`). If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
 ---
 
@@ -552,6 +552,8 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/requirements/` — Requirements (OpenFastTrace)
 
 When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
+
+When adding or editing a `uses:` line in a workflow, follow [skills/developers/github-actions/SKILL.md](skills/developers/github-actions/SKILL.md) — external actions are pinned to a full commit SHA.
 
 ---
 

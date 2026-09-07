@@ -43,7 +43,6 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -91,7 +90,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private StateManager stateManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private DirectoryMonitor directoryMonitor;
-    @Inject private UndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
@@ -130,7 +128,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 stateManager,
                 fileMonitor,
                 directoryMonitor,
-                undoManager,
                 bibEntryTypesManager,
                 journalAbbreviationRepository,
                 keyBindingRepository,
@@ -143,7 +140,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 preferences,
                 taskExecutor,
                 dialogService,
-                undoManager,
                 journalAbbreviationRepository,
                 tabSupplier,
                 tabFactory);
@@ -381,7 +377,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         ContextMenu typeMenu = new ChangeEntryTypeMenu(
                 entry == null ? List.of() : List.of(entry),
                 tabSupplier.get().getBibDatabaseContext(),
-                undoManager,
+                tabSupplier.get().getUndoManager(),
                 bibEntryTypesManager
         ).asContextMenu();
 

@@ -10,16 +10,16 @@
 <?import javafx.scene.text.Text?>
 <fx:root
         type="ScrollPane"
-        styleClass="ai-tab"
+        styleClass="ai-tab,padding-20"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.ai.AiPrivacyNoticeView">
     <VBox spacing="20.0"
-          styleClass="gdpr-notice"
+          styleClass="gdpr-notice,h4,padding-12"
           fx:id="text">
         <Label wrapText="true"
                text="%Privacy notice"
-               styleClass="heading"/>
+               styleClass="h3,bold"/>
         <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider. As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service. By using this service you agree to the privacy policy of the selected AI provider."/>
         <Text text="%This setting may be changed in preferences at any time."/>
         <GridPane
