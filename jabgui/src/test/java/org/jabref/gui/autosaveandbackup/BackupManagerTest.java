@@ -243,6 +243,7 @@ class BackupManagerTest {
     }
 
     @Test
+    // [utest->req~jabgui.autosaveandbackup.backup-listens~1]
     void minorFieldChangeStillTriggersABackup(@TempDir Path customDir) throws IOException {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);

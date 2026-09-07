@@ -321,6 +321,7 @@ public class BackupManager {
     /// Every change counts, including the keystrokes the filter marks as minor: the filter exists to spare listeners
     /// expensive work per keystroke, but a flag is cheap and the timer throttles the backups anyway. Ignoring minor
     /// changes would leave a field the user only types in without backup until the user moves to another field.
+    /// [impl->req~jabgui.autosaveandbackup.backup-listens~1]
     @Subscribe
     public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
         needsBackup.set(true);
