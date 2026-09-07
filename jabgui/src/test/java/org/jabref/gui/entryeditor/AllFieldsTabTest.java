@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.Parent;
+import javafx.scene.control.TitledPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -27,6 +29,7 @@ import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -195,6 +198,29 @@ class AllFieldsTabTest {
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
+    private TitledPane filesAndLinksPane() {
+        return ((Parent) tab.getEditorContent()).getChildrenUnmodifiable().stream()
+                                                .filter(TitledPane.class::isInstance)
+                                                .map(TitledPane.class::cast)
+                                                .filter(pane -> Localization.lang("Files and links").equals(pane.getText()))
+                                                .findFirst()
+                                                .orElseThrow();
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorAppearsWhenEmptyFilesAndLinksSectionIsExpanded() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
+
+        runOnFxThreadAndWait(() -> filesAndLinksPane().setExpanded(true));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
     @Test
     void fileEditorAppearsWhenFilesAndLinksSectionIsOpen() throws InterruptedException {
         // A set URL opens the files and links section, which always shows the file editor.

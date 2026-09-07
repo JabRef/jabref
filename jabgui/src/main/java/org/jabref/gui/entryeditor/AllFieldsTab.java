@@ -208,12 +208,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// file dialog. Mirrors the expanded state [#createSectionPane] derives, so both agree
     /// on whether the section is open before any editor exists.
     private boolean isFilesAndLinksSectionOpen(BibEntry entry) {
-        Boolean override = sectionExpandOverrides.get(FieldListSections.SectionType.FILES_AND_LINKS);
-        if (override != null) {
-            return override;
-        }
-        return Stream.concat(entry.getFields().stream(), userAddedFields.stream())
-                     .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS);
+        return sectionExpandOverrides.getOrDefault(
+                FieldListSections.SectionType.FILES_AND_LINKS,
+                Stream.concat(entry.getFields().stream(), userAddedFields.stream())
+                      .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS));
     }
 
     @Override
@@ -242,7 +240,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// shows not-yet-linked files as auto-found suggestions
     /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
     /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
-    /// the search and renders the suggestion rows.
+    /// the search and renders the suggestion rows. An existing editor already scans on its
+    /// own, so the guard below is what keeps the two searches from running side by side.
     // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
     private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
         if (editors.containsKey(StandardField.FILE)
