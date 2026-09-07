@@ -28,6 +28,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +59,7 @@ class DatabaseChangeMonitorTest {
                 fileUpdateMonitor,
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
-                mock(GuiPreferences.class),
+                mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(LibraryTab.class));
