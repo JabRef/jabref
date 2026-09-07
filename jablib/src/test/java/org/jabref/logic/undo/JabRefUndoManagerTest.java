@@ -554,6 +554,48 @@ class JabRefUndoManagerTest {
         assertTrue(undoRedoManager.canRedo());
     }
 
+    /// A change the journal cannot take back is a saved position no position can reach: undoing
+    /// everything does not mean "back to what was saved", because that change is still there.
+    @Test
+    void aChangeTheJournalCannotTakeBackKeepsTheLibraryChanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+        assertFalse(undoRedoManager.hasChanged());
+
+        undoRedoManager.markChanged();
+        assertTrue(undoRedoManager.hasChanged());
+
+        undoRedoManager.undo();
+        assertTrue(undoRedoManager.hasChanged(), "undoing cleared a marker the journal cannot clear");
+        assertTrue(undoRedoManager.canRedo(), "the stack was discarded rather than left alone");
+
+        undoRedoManager.markUnchanged();
+        assertFalse(undoRedoManager.hasChanged(), "saving did not clear it");
+    }
+
+    @Test
+    void markingTheLibraryChangedNotifiesListeners() {
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        undoRedoManager.markChanged();
+
+        assertEquals(1, notifications.get());
+    }
+
+    /// A marker derived from the journal has to hear about the one moment the answer turns false.
+    @Test
+    void markingTheCurrentPositionSavedNotifiesListeners() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        undoRedoManager.markUnchanged();
+
+        assertFalse(undoRedoManager.hasChanged());
+        assertEquals(1, notifications.get(), "the saved position moved without telling anyone");
+    }
+
     @Test
     void aReservationMakesUndoAndRedoDecline() {
         // One step on each stack, so neither answer can be right for the wrong reason.

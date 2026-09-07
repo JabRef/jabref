@@ -25,6 +25,7 @@ public sealed interface BibChange permits
         UndoableModifySubtree,
         UndoablePreambleChange,
         UndoableStringChange,
+        UndoableReplaceStrings,
         UndoableInsertString,
         UndoableRemoveString {
 

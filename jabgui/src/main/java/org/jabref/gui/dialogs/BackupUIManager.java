@@ -125,10 +125,9 @@ public class BackupUIManager {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();
-                    } else {
-                        // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
-                        saveState.markBaseChanged();
                     }
+
+                    // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     return Optional.of(originalParserResult);
                 }

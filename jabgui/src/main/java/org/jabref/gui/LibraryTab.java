@@ -94,12 +94,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
@@ -129,7 +131,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
@@ -271,6 +272,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
                     updateTabTitle(changedProperty.getValue()));
@@ -322,7 +324,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private void onDatabaseLoadingSucceed(ParserResult result) {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         if (result.getChangedOnMigration()) {
-            this.markBaseChanged();
+            // Rewritten while loading, so there is no step to undo it with.
+            journal().markChanged();
         }
 
         setDatabaseContext(result.getDatabaseContext());
@@ -498,9 +501,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
+    /// Sets the marker for the changes the journal does not know about.
+    ///
+    /// Everything the user does through the GUI is recorded, and [#changedProperty] derives from
+    /// the journal, so an edit needs nothing here. Two kinds do not reach the journal: metadata
+    /// written by the library properties dialog, and entries arriving from a shared database.
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.changedProperty.setValue(true);
+        boolean journalled = !(event instanceof MetaDataChangedEvent)
+                && !((event instanceof EntriesEvent entriesEvent)
+                && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
+        if (!journalled) {
+            journal().markChanged();
+        }
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
@@ -558,7 +571,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.changedProperty.setValue(true);
+                journal().markChanged();
             }
         }
     }
@@ -606,13 +619,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Put an asterisk behind the filename to indicate the database has changed.
-    public synchronized void markChangedOrUnChanged() {
-        if (journal().hasChanged()) {
-            this.changedProperty.setValue(true);
-        } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
-            this.changedProperty.setValue(false);
-        }
-    }
 
     public BibDatabase getDatabase() {
         return bibDatabaseContext.getDatabase();
@@ -929,7 +935,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         importHandler.importCleanedEntries(null, entries);
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.
@@ -1091,8 +1096,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
-        markBaseChanged();
-
         // prevent the main table from loosing focus
         mainTable.requestFocus();
 
@@ -1103,15 +1106,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return changedProperty.getValue();
     }
 
-    public void markBaseChanged() {
-        this.changedProperty.setValue(true);
-    }
-
-    public void markNonUndoableBaseChanged() {
-        this.nonUndoableChangeProperty.setValue(true);
-        this.changedProperty.setValue(true);
-    }
-
     public void resetChangedProperties() {
         resetChangedProperties(null);
     }
@@ -1120,8 +1114,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     ///
     /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
     public void resetChangedProperties(@Nullable FileSnapshot diskState) {
-        this.nonUndoableChangeProperty.setValue(false);
-        this.changedProperty.setValue(false);
+        // The marker derives from the saved position, so stamping it is what clears the marker -
+        // including a change the journal could not have taken back.
+        journal().markUnchanged();
         changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 

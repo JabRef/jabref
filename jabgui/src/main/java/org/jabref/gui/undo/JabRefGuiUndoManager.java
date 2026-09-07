@@ -24,6 +24,7 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
 
     private final ReadOnlyBooleanWrapper undoable = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper redoable = new ReadOnlyBooleanWrapper(false);
+    private final ReadOnlyBooleanWrapper changed = new ReadOnlyBooleanWrapper(false);
 
     public JabRefGuiUndoManager() {
         // Subscribing to itself rather than refreshing inside the push: listeners are notified
@@ -43,6 +44,11 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
         return redoable.getReadOnlyProperty();
     }
 
+    @Override
+    public ReadOnlyBooleanProperty hasChangedProperty() {
+        return changed.getReadOnlyProperty();
+    }
+
     /// Reads the stacks on the JavaFX thread rather than where the notification arrived, so that
     /// what is written is what the journal holds at the moment of writing. Reading first and
     /// carrying the values over would let a thread that read an older state post after one that
@@ -59,6 +65,7 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
         UiTaskExecutor.runNowOrInJavaFXThread(() -> {
             undoable.set(canUndo());
             redoable.set(canRedo());
+            changed.set(hasChanged());
         });
     }
 }

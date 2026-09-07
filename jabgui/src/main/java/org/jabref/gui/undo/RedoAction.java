@@ -39,15 +39,12 @@ public class RedoAction extends SimpleCommand {
         // See UndoAction: a suspension makes canRedo() false without the stack being empty.
         undoManager.suspendedBy().ifPresentOrElse(
                 command -> dialogService.notify(Localization.lang("Cannot redo while %0 is running", command)),
-                () -> redo(libraryTab, undoManager));
+                () -> redo(undoManager));
     }
 
-    private void redo(LibraryTab libraryTab, GuiUndoManager undoManager) {
+    private void redo(GuiUndoManager undoManager) {
         undoManager.redo().ifPresentOrElse(
-                step -> {
-                    dialogService.notify(message(step));
-                    libraryTab.markChangedOrUnChanged();
-                },
+                step -> dialogService.notify(message(step)),
                 () -> dialogService.notify(Localization.lang("Nothing to redo") + '.'));
     }
 

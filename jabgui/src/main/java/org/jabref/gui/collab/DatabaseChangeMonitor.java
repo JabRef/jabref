@@ -207,8 +207,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         if (resolvedChangesMatchDisk) {
             libraryTab.resetChangedProperties();
-        } else {
-            libraryTab.markBaseChanged();
         }
     }
 

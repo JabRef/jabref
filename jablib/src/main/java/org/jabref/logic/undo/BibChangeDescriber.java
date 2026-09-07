@@ -16,6 +16,7 @@ import org.jabref.model.undo.UndoableModifySubtree;
 import org.jabref.model.undo.UndoablePreambleChange;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.undo.UndoableRemoveString;
+import org.jabref.model.undo.UndoableReplaceStrings;
 import org.jabref.model.undo.UndoableStringChange;
 
 import org.jspecify.annotations.NullMarked;
@@ -61,6 +62,8 @@ public class BibChangeDescriber {
                     Localization.lang("Change preamble");
             case UndoableStringChange stringChange ->
                     Localization.lang("Change string %0", stringChange.string().getName());
+            case UndoableReplaceStrings _ ->
+                    Localization.lang("Change string constants");
             case UndoableInsertString insert ->
                     Localization.lang("Insert string %0", insert.string().getName());
             case UndoableRemoveString remove ->

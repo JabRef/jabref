@@ -39,11 +39,11 @@ public interface GuiUndoManager extends UndoManager {
 
     boolean canRedo();
 
-    /// Whether the library differs from the last saved position.
-    boolean hasChanged();
-
     /// Marks the current position as saved.
     void markUnchanged();
+
+    /// Marks the library as changed by something the journal cannot take back.
+    void markChanged();
 
     /// Discards both stacks and the saved position.
     ///
@@ -61,4 +61,7 @@ public interface GuiUndoManager extends UndoManager {
 
     /// Whether there is anything to redo.
     ReadOnlyBooleanProperty redoableProperty();
+
+    /// Whether the library differs from the last saved position.
+    ReadOnlyBooleanProperty hasChangedProperty();
 }

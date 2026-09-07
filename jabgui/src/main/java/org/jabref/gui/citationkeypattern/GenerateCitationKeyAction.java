@@ -155,7 +155,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             undoManager.addEdit(compound.toChangeSet());
                         }
 
-                        libraryTab.markBaseChanged();
                         dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
                     } finally {
                         suspended.close();

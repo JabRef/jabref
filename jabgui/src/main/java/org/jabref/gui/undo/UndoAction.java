@@ -41,15 +41,12 @@ public class UndoAction extends SimpleCommand {
         // canUndo() false as well, and "nothing to undo" would then be untrue.
         undoManager.suspendedBy().ifPresentOrElse(
                 command -> dialogService.notify(Localization.lang("Cannot undo while %0 is running", command)),
-                () -> undo(libraryTab, undoManager));
+                () -> undo(undoManager));
     }
 
-    private void undo(LibraryTab libraryTab, GuiUndoManager undoManager) {
+    private void undo(GuiUndoManager undoManager) {
         undoManager.undo().ifPresentOrElse(
-                step -> {
-                    dialogService.notify(message(step));
-                    libraryTab.markChangedOrUnChanged();
-                },
+                step -> dialogService.notify(message(step)),
                 () -> dialogService.notify(Localization.lang("Nothing to undo") + '.'));
     }
 

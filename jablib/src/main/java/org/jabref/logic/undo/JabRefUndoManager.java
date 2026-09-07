@@ -68,6 +68,11 @@ public class JabRefUndoManager implements UndoManager {
     /// [#nextId] hands out, so "nothing has been done yet" is a position like any other.
     private static final long ORIGIN = 0L;
 
+    /// A saved position no position will ever match, so the library counts as changed until it is
+    /// saved again. [#markChanged] stamps it; ids only ever grow from [#ORIGIN], so no push can
+    /// reach it.
+    private static final long NEVER_SAVED = -1L;
+
     /// A change together with the identity of the position it occupies in the history.
     ///
     /// The id lives here rather than on the change because a [BibChange] is a value describing a
@@ -389,8 +394,27 @@ public class JabRefUndoManager implements UndoManager {
     }
 
     /// Marks the current position as saved.
-    public synchronized void markUnchanged() {
-        savedId = currentPosition();
+    ///
+    /// Notifies, like every other move of the saved position: a listener deriving the modified
+    /// marker from [#hasChanged] has to hear about the one moment the answer turns false.
+    public void markUnchanged() {
+        synchronized (this) {
+            savedId = currentPosition();
+        }
+        notifyListeners();
+    }
+
+    /// Marks the library as changed by something this journal cannot take back — a migration on
+    /// load, a shared-database update, a setting written without being recorded.
+    ///
+    /// The stack is left alone; what moves is the saved position, to one no position can equal.
+    /// Undoing every step therefore no longer means "back to what was saved", which is the truth:
+    /// the change is still there. Saving is what clears it.
+    public void markChanged() {
+        synchronized (this) {
+            savedId = NEVER_SAVED;
+        }
+        notifyListeners();
     }
 
     /// Whether the library differs from the last saved position.

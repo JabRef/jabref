@@ -212,7 +212,6 @@ class DatabaseChangeMonitorTest {
         assertEquals(1, database.getEntryCount());
         assertEquals("Merged title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
         assertTrue(undoManager.hasChanged());
-        verify(libraryTab).markBaseChanged();
         verify(libraryTab, never()).resetChangedProperties();
     }
 
@@ -245,7 +244,6 @@ class DatabaseChangeMonitorTest {
         assertEquals("Disk title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
         assertTrue(undoManager.hasChanged());
         verify(libraryTab).resetChangedProperties();
-        verify(libraryTab, never()).markBaseChanged();
     }
 
     @Test

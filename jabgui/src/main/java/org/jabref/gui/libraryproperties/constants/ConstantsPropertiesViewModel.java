@@ -19,8 +19,10 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.undo.UndoableReplaceStrings;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -34,12 +36,14 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
     private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
 
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences, UndoManager undoManager) {
         this.databaseContext = databaseContext;
+        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
 
@@ -89,7 +93,10 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         List<BibtexString> strings = stringsListProperty.stream()
                                                         .map(this::fromBibtexStringViewModel)
                                                         .toList();
-        databaseContext.getDatabase().setStrings(strings);
+        List<BibtexString> before = List.copyOf(databaseContext.getDatabase().getStringValues());
+        if (!before.equals(strings)) {
+            undoManager.applyEdit(new UndoableReplaceStrings(databaseContext.getDatabase(), before, strings));
+        }
     }
 
     private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {
