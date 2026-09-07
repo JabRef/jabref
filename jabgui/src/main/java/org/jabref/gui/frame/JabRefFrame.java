@@ -711,13 +711,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 continue;
             }
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
-            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup
+            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
             BackgroundTask.wrap(() -> manager.connect(connectionProperties))
-                          .onSuccess(bibDatabaseContext -> manager.openTab(bibDatabaseContext).getDatabase().setSharedDatabaseID(sharedDatabaseId))
+                          .onSuccess(bibDatabaseContext -> {
+                              if (!mainStage.isShowing()) {
+                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                                  return;
+                              }
+                              manager.openTab(bibDatabaseContext).getDatabase().setSharedDatabaseID(sharedDatabaseId);
+                          })
                           .onFailure(exception -> {
                               LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                              dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                      Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), exception);
+                              if (mainStage.isShowing()) {
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                                          Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), exception);
+                              }
                           })
                           .executeWith(taskExecutor);
         }
