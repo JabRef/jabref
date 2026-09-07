@@ -142,15 +142,15 @@ class GitMergeDriver implements Callable<Integer> {
             return CommandLine.ExitCode.SOFTWARE;
         }
 
-        if (conflicts.isEmpty()) {
-            if (!porcelain) {
-                System.out.println(Localization.lang("Merged %0 without conflicts.", currentFile));
-            }
-            return CommandLine.ExitCode.OK;
+        if (!conflicts.isEmpty()) {
+            reportConflicts(conflicts);
+            return CONFLICT;
         }
 
-        reportConflicts(conflicts);
-        return CONFLICT;
+        if (!porcelain) {
+            System.out.println(Localization.lang("Merged %0 without conflicts.", currentFile));
+        }
+        return CommandLine.ExitCode.OK;
     }
 
     /// Removes the given entries from the plan, so that they keep their CURRENT version.
