@@ -20,6 +20,7 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
@@ -75,8 +76,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
     private final ListProperty<String> embeddingModelsList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(
-                    EmbeddingModelMetadataService.getInstance().getAvailableModels()));
+            new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedEmbeddingModel = new SimpleStringProperty();
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
@@ -127,6 +127,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences workingAiPreferences;
     private final AiModelService aiModelService;
     private final TaskExecutor taskExecutor;
+    private final EmbeddingModelMetadataService embeddingModelMetadataService;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -147,7 +148,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             AiPreferences aiPreferences,
             AiPreferences workingAiPreferences,
             AiModelService aiModelService,
-            TaskExecutor taskExecutor
+            TaskExecutor taskExecutor,
+            EmbeddingModelMetadataService embeddingModelMetadataService
     ) {
         this.oldLocale = Locale.getDefault();
 
@@ -155,6 +157,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.workingAiPreferences = workingAiPreferences;
         this.aiModelService = aiModelService;
         this.taskExecutor = taskExecutor;
+        this.embeddingModelMetadataService = embeddingModelMetadataService;
+        this.embeddingModelsList.setAll(embeddingModelMetadataService.getAvailableModels());
 
         // The master switch needs no validation, and other tabs (web search) depend on it, so it
         // is mirrored into the working copy while the dialog is open. All validated fields are
@@ -771,5 +775,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty followUpQuestionsTemplateProperty() {
         return followUpQuestionsTemplate;
+    }
+
+    public String getEmbeddingModelDisplayLabel(String modelName) {
+        return embeddingModelMetadataService.getMetadata(modelName)
+                                            .map(EmbeddingModelMetadata::displayLabel)
+                                            .orElse(modelName);
     }
 }

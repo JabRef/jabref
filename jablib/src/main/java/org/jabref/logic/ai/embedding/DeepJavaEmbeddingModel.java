@@ -31,11 +31,22 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private final ZooModel<String, float[]> model;
     private final Predictor<String, float[]> predictor;
 
+    private final EmbeddingModelMetadataService metadataService;
+
     public DeepJavaEmbeddingModel(
             String modelName,
             ProgressCounter progressCounter
     ) throws ModelNotFoundException, MalformedModelException, IOException {
+        this(modelName, progressCounter, new EmbeddingModelMetadataService());
+    }
+
+    public DeepJavaEmbeddingModel(
+            String modelName,
+            ProgressCounter progressCounter,
+            EmbeddingModelMetadataService metadataService
+    ) throws ModelNotFoundException, MalformedModelException, IOException {
         this.modelName = modelName;
+        this.metadataService = metadataService;
         Criteria<String, float[]> criteria = makeCriteriaBuilder()
                 .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
                 .optProgress(progressCounter)
@@ -59,10 +70,9 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
                 LOGGER.debug("Could not parse maxLength property '{}'", prop, e);
             }
         }
-        return EmbeddingModelMetadataService.getInstance()
-                                            .getMetadata(modelName)
-                                            .map(EmbeddingModelMetadata::maxSnippetTokens)
-                                            .orElseGet(OptionalInt::empty);
+        return metadataService.getMetadata(modelName)
+                              .map(EmbeddingModelMetadata::maxSnippetTokens)
+                              .orElseGet(OptionalInt::empty);
     }
 
     public static boolean isDownloaded(String modelName) {

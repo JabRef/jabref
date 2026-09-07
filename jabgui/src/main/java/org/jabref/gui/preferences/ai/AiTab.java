@@ -24,7 +24,6 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -49,7 +48,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                 preferences.getAiPreferences(),
                 workingAiPreferences,
                 Injector.instantiateModelOrService(AiService.class).getModelService(),
-                taskExecutor);
+                taskExecutor,
+                Injector.instantiateModelOrService(EmbeddingModelMetadataService.class));
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
@@ -98,10 +98,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
-                                                        modelName -> EmbeddingModelMetadataService.getInstance()
-                                                                                                  .getMetadata(modelName)
-                                                                                                  .map(EmbeddingModelMetadata::displayLabel)
-                                                                                                  .orElse(modelName),
+                                                        viewModel::getEmbeddingModelDisplayLabel,
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.

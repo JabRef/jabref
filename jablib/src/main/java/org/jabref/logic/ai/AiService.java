@@ -86,6 +86,16 @@ public class AiService implements AutoCloseable {
             NotificationService notificationService,
             TaskExecutor taskExecutor
     ) {
+        this(aiPreferences, filePreferences, notificationService, taskExecutor, new org.jabref.logic.ai.embedding.EmbeddingModelMetadataService());
+    }
+
+    public AiService(
+            AiPreferences aiPreferences,
+            FilePreferences filePreferences,
+            NotificationService notificationService,
+            TaskExecutor taskExecutor,
+            org.jabref.logic.ai.embedding.EmbeddingModelMetadataService embeddingModelMetadataService
+    ) {
         this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
         this.notificationService = notificationService;
@@ -103,7 +113,7 @@ public class AiService implements AutoCloseable {
         this.modelService = new AiModelService();
 
         // Ingestion components
-        this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
+        this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor, embeddingModelMetadataService);
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(
                 Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME),
                 notificationService

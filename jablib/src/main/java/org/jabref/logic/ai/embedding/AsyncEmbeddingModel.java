@@ -36,6 +36,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private final String modelName;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
+    private final EmbeddingModelMetadataService metadataService;
 
     private final ObjectProperty<Optional<DeepJavaEmbeddingModel>> predictorProperty = new SimpleObjectProperty<>(Optional.empty());
 
@@ -48,9 +49,20 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
             NotificationService notificationService,
             TaskExecutor taskExecutor
     ) {
+        this(modelName, aiPreferences, notificationService, taskExecutor, new EmbeddingModelMetadataService());
+    }
+
+    public AsyncEmbeddingModel(
+            String modelName,
+            AiPreferences aiPreferences,
+            NotificationService notificationService,
+            TaskExecutor taskExecutor,
+            EmbeddingModelMetadataService metadataService
+    ) {
         this.modelName = modelName;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
+        this.metadataService = metadataService;
 
         if (aiPreferences.getAiFeaturesEnabled()) {
             startRebuildingTask();
@@ -60,7 +72,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     public void startRebuildingTask() {
         predictorProperty.set(Optional.empty());
 
-        new UpdateEmbeddingModelTask(modelName)
+        new UpdateEmbeddingModelTask(modelName, metadataService)
                 .onSuccess(model -> {
                     predictorProperty.set(Optional.of(model));
                     errorWhileBuildingModel = "";
@@ -85,7 +97,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     public OptionalInt getMaxSnippetTokens() {
         return predictorProperty.get()
                 .map(DeepJavaEmbeddingModel::getMaxSnippetTokens)
-                .orElseGet(() -> EmbeddingModelMetadataService.getInstance()
+                .orElseGet(() -> metadataService
                         .getMetadata(modelName)
                         .map(EmbeddingModelMetadata::maxSnippetTokens)
                         .orElseGet(OptionalInt::empty));

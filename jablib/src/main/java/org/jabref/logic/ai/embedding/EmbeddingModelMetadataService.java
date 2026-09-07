@@ -31,22 +31,13 @@ import org.slf4j.LoggerFactory;
 
 /// Service for discovering available AI embedding models and querying their download size
 /// and maximum snippet (token / sequence) limit dynamically at runtime from DJL and Hugging Face.
-// [impl->feat~ai.expert-settings.embedding-models~1]
+// [impl->feat~ai.expert-settings.embedding-model-size~1]
+// [impl->feat~ai.expert-settings.embedding-model-token-limit~1]
 @NullMarked
 public class EmbeddingModelMetadataService {
     public static final String DJL_PYTORCH_GROUP_ID = "ai.djl.huggingface.pytorch";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingModelMetadataService.class);
-
-    private static final List<String> FALLBACK_DEFAULT_MODELS = List.of(
-            "sentence-transformers/all-MiniLM-L12-v2",
-            "sentence-transformers/all-MiniLM-L6-v2",
-            "BAAI/bge-small-en-v1.5",
-            "BAAI/bge-base-en-v1.5",
-            "intfloat/e5-small-v2",
-            "intfloat/e5-base-v2",
-            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    );
 
     private static final Set<String> CONFIG_AND_TOKENIZER_FILES = Set.of(
             "config.json",
@@ -57,12 +48,9 @@ public class EmbeddingModelMetadataService {
             "sentence_bert_config.json"
     );
 
-    private static final EmbeddingModelMetadataService INSTANCE = new EmbeddingModelMetadataService();
-
     private final Map<String, EmbeddingModelMetadata> metadataCache = new ConcurrentHashMap<>();
 
-    public static EmbeddingModelMetadataService getInstance() {
-        return INSTANCE;
+    public EmbeddingModelMetadataService() {
     }
 
     /// Returns the list of available embedding models discovered from the DJL HuggingFace Model Zoo.
@@ -87,7 +75,7 @@ public class EmbeddingModelMetadataService {
             LOGGER.debug("Could not retrieve available embedding models from DJL ModelZoo", e);
         }
 
-        return FALLBACK_DEFAULT_MODELS;
+        return List.of();
     }
 
     /// Queries metadata (download size in bytes and maximum snippet length in tokens)

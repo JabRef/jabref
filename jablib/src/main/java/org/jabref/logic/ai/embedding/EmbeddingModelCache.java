@@ -26,14 +26,24 @@ public class EmbeddingModelCache implements AutoCloseable {
     private final AiPreferences aiPreferences;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
+    private final EmbeddingModelMetadataService metadataService;
 
     public EmbeddingModelCache(
             AiPreferences aiPreferences,
             NotificationService notificationService,
             TaskExecutor taskExecutor) {
+        this(aiPreferences, notificationService, taskExecutor, new EmbeddingModelMetadataService());
+    }
+
+    public EmbeddingModelCache(
+            AiPreferences aiPreferences,
+            NotificationService notificationService,
+            TaskExecutor taskExecutor,
+            EmbeddingModelMetadataService metadataService) {
         this.aiPreferences = aiPreferences;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
+        this.metadataService = metadataService;
     }
 
     /// Returns the cached [AsyncEmbeddingModel] for `modelName`, creating it on first access.
@@ -45,7 +55,7 @@ public class EmbeddingModelCache implements AutoCloseable {
     /// @return a (possibly still-loading) [AsyncEmbeddingModel] for `modelName`
     public AsyncEmbeddingModel getOrCreate(String modelName) {
         return cache.computeIfAbsent(modelName,
-                name -> new AsyncEmbeddingModel(name, aiPreferences, notificationService, taskExecutor));
+                name -> new AsyncEmbeddingModel(name, aiPreferences, notificationService, taskExecutor, metadataService));
     }
 
     /// Closes all cached [AsyncEmbeddingModel] instances and clears the cache.

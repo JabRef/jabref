@@ -31,29 +31,32 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     private final EntryEditorPreferences entryEditorPreferences;
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
+    private final EmbeddingModelMetadataService embeddingModelMetadataService;
 
     public AiPrivacyNoticeViewModel(
             AiPreferences aiPreferences,
             ExternalApplicationsPreferences externalApplicationsPreferences,
             EntryEditorPreferences entryEditorPreferences,
             GroupsPreferences groupsPreferences,
-            DialogService dialogService
+            DialogService dialogService,
+            EmbeddingModelMetadataService embeddingModelMetadataService
     ) {
         this.aiPreferences = aiPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.entryEditorPreferences = entryEditorPreferences;
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
+        this.embeddingModelMetadataService = embeddingModelMetadataService;
 
         setupBindings();
     }
 
     private void setupBindings() {
         embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(modelName ->
-                EmbeddingModelMetadataService.getInstance()
-                                            .getMetadata(modelName)
-                                            .map(EmbeddingModelMetadata::sizeInfo)
-                                            .orElse("")));
+                embeddingModelMetadataService
+                        .getMetadata(modelName)
+                        .map(EmbeddingModelMetadata::sizeInfo)
+                        .orElse("")));
     }
 
     public void onPrivacyAgree() {
