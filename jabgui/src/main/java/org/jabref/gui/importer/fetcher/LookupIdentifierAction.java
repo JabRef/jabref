@@ -16,6 +16,7 @@ import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.undo.CompoundEdit;
@@ -33,18 +34,15 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private final IdFetcher<T> fetcher;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
     public LookupIdentifierAction(IdFetcher<T> fetcher,
                                   StateManager stateManager,
-                                  UndoManager undoManager,
                                   DialogService dialogService,
                                   TaskExecutor taskExecutor) {
         this.fetcher = fetcher;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -54,8 +52,19 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     @Override
     public void execute() {
+        stateManager.getActiveDatabase().ifPresent(this::lookUpIn);
+    }
+
+    /// The journal and the entries are taken here rather than when the lookup runs: the work
+    /// belongs to the library the user started on, the state manager replaces its selection when
+    /// they switch away from it, and asking for a journal after that library closed would create
+    /// one nothing can reach.
+    private void lookUpIn(BibDatabaseContext databaseContext) {
+        UndoManager undoManager = stateManager.getUndoManager(databaseContext);
+        List<BibEntry> selectedEntries = List.copyOf(stateManager.getSelectedEntries());
+
         try {
-            BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
+            BackgroundTask.wrap(() -> lookupIdentifiers(undoManager, selectedEntries))
                           .onSuccess(dialogService::notify)
                           .executeWith(taskExecutor);
         } catch (Exception e) {
@@ -67,7 +76,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         return fetcher::getIdentifierName;
     }
 
-    private String lookupIdentifiers(List<BibEntry> bibEntries) {
+    private String lookupIdentifiers(UndoManager undoManager, List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
         CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;

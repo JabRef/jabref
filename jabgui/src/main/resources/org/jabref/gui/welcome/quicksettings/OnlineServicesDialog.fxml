@@ -12,7 +12,7 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.OnlineServicesDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container">
+        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
             <HBox alignment="CENTER_LEFT" spacing="4">
                 <Label text="%Configure online catalogues and services for importing entries. Enable web search, update checking, and metadata extraction services."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
@@ -39,7 +39,7 @@
 
             <ScrollPane fitToWidth="true" maxHeight="288"
                         hbarPolicy="NEVER">
-                <VBox fx:id="fetchersContainer" styleClass="fetchers-container"/>
+                <VBox fx:id="fetchersContainer" styleClass="padding-12,spacing-12"/>
             </ScrollPane>
         </VBox>
     </content>

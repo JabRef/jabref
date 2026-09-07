@@ -8,13 +8,13 @@
 <?import javafx.scene.layout.VBox?>
 <fx:root
         type="VBox"
-        styleClass="edit-field-content-pane"
+        styleClass="edit-field-content-pane,padding-0-12,spacing-12"
         xmlns="http://javafx.com/javafx/17"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.edit.automaticfieldeditor.renamefield.RenameFieldTabView">
-    <Label styleClass="sectionHeader"
+    <Label styleClass="h4,padding-top-12"
            text="%Rename field"/>
-    <HBox styleClass="actions">
+    <HBox styleClass="spacing-8,align-baseline-left">
         <ComboBox
                 fx:id="fieldComboBox"
                 editable="true"
