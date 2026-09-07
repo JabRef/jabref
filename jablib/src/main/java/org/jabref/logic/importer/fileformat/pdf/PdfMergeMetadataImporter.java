@@ -99,7 +99,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
         allCandidates.addAll(extractedCandidates);
-        BibEntry entry = mergeCandidates(allCandidates, PdfContentImporter.extractLeadingPagesText(document));
+        BibEntry entry = mergeCandidates(allCandidates, PdfAuthorCrossCheck.extractLeadingPagesText(document));
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
@@ -181,7 +181,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// [PdfContentImporter]); and keeps only online (URL) file links.
     ///
     /// @param candidates       candidate entries ordered by descending priority
-    /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfContentImporter]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched
+    /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfAuthorCrossCheck]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched
     @VisibleForTesting
     static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
         final BibEntry entry = new BibEntry();
@@ -197,7 +197,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                       .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
         }
 
-        PdfContentImporter.crossCheckAuthor(entry, candidates, leadingPagesText);
+        PdfAuthorCrossCheck.crossCheckAuthor(entry, candidates, leadingPagesText);
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
