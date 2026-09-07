@@ -46,7 +46,7 @@ The JavaFX layer *extends* the journal rather than wrapping it, and subscribes t
 
 ### Confirmation
 
-`JabRefUndoManagerTest` records, undoes and redoes with no toolkit started, which is the property that separates this design from `CountingUndoManager`. `JabRefGuiUndoManagerTest` starts one and covers the marshalling, including that a queued property update applies the state it finds when it runs. The two correctness rules are traced as `req~logic.undo.saved-position-identity~1` and `req~logic.undo.apply-and-record-atomically~1`. In jabgui, `JabRefUndoManager` is named only where `JabRefGuiUndoManager` extends it, and `JabRefGuiUndoManager` only in `JabRefGUI`, which creates the single instance.
+`JabRefUndoManagerTest` records, undoes and redoes with no toolkit started, which is the property that separates this design from `CountingUndoManager`. `JabRefGuiUndoManagerTest` starts one and covers the marshalling, including that a queued property update applies the state it finds when it runs. The correctness rules are traced as `req~logic.undo.saved-position-identity~1`, `req~logic.undo.apply-and-record-atomically~1` and `req~logic.undo.journal-per-library~1`. In jabgui, `JabRefUndoManager` is named only where `JabRefGuiUndoManager` extends it, and `JabRefGuiUndoManager` only in `JabRefGuiStateManager`, which creates one journal per open library and drops it when the library closes.
 
 ## Pros and Cons of the Options
 

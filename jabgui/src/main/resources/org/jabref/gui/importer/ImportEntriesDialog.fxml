@@ -11,8 +11,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import org.controlsfx.control.CheckListView?>
 <?import jfx.incubator.scene.control.richtext.CodeArea?>
+<?import org.controlsfx.control.CheckListView?>
 <DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportEntriesDialog"
             id="importEntriesDialog">
@@ -40,7 +40,7 @@
                     <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
                         <Label fx:id="bibTeXDataLabel"/>
                         <CodeArea fx:id="bibTeXData"
-                                styleClass="bibtex-code-area"
+                                styleClass="bibtex-code-area,font-size-090"
                                 editable="false"
                                 minHeight="30.0"
                                 prefHeight="200.0"

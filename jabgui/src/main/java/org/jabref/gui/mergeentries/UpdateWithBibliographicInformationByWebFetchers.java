@@ -13,8 +13,8 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class UpdateWithBibliographicInformationByWebFetchers extends SimpleCommand {
@@ -23,26 +23,25 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
     private final GuiPreferences guiPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
 
     public UpdateWithBibliographicInformationByWebFetchers(DialogService dialogService,
                                                            GuiPreferences preferences,
                                                            StateManager stateManager,
-                                                           TaskExecutor taskExecutor,
-                                                           UndoManager undoManager) {
+                                                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.guiPreferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
 
     @Override
     public void execute() {
-        assert stateManager.getActiveDatabase().isPresent();
+        stateManager.getActiveDatabase().ifPresent(this::updateSelectedEntryIn);
+    }
 
+    private void updateSelectedEntryIn(BibDatabaseContext databaseContext) {
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
@@ -53,7 +52,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
                 guiPreferences.getImporterPreferences(),
                 guiPreferences.getImportFormatPreferences(),
                 guiPreferences.getFilePreferences(),
-                stateManager.getActiveDatabase().get()
+                databaseContext
         );
 
         for (EntryBasedFetcher webFetcher : webFetchers) {
@@ -71,7 +70,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
                 originalEntry,
                 mergedEntry,
                 dialogService,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 Localization.lang("Merge entry with information"),
                 Localization.lang("Updated entry with merged information"))
                 .update();

@@ -37,7 +37,7 @@ jobs:
           printf 'PR Body:\n%s\n' "$PR_BODY"
       - name: Determine issue number
         id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
+        uses: koppor/ticket-check-action@5c5d28364fe8d3c2822611e0556fcacdde473b49 # add-output
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
@@ -90,7 +90,7 @@ jobs:
       issues: write
     steps:
       - name: Move issue to "In Progress" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -101,7 +101,7 @@ jobs:
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "In Progress" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@main
+        uses: m7kvqbe1/github-action-move-issues/@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -118,31 +118,73 @@ jobs:
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-slim
+    # The job posts comments and updates the STRANGE_USERS ledger with separate API calls; two runs of the same pull
+    # request must not interleave. Grouping per pull request keeps a busy repository from dropping other pull requests'
+    # runs - GitHub keeps only one pending run per group. A ledger update lost to a run of another pull request is
+    # re-applied on the next event of this pull request, because every effect below is keyed by pull request number.
+    concurrency:
+      group: link-issue-ensure-assignment-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     permissions:
       issues: write
       pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
-      - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Assign PR creator to issue
+      - name: Pin the issue, or warn about a pull request on somebody else's issue
+        id: assignment
         run: |
-          set -e
+          set -euo pipefail
 
-          echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
+          echo "warned=false" >> "$GITHUB_OUTPUT"
 
+          # Read and act in one step: assignees can change at any moment, and a decision made in an earlier step
+          # would pin or warn based on an assignment that no longer holds.
+          ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]' | jq -c '.')
+          echo "Assignees of issue #$ISSUE_NUMBER: $ASSIGNEES"
+
+          if [ "$(jq 'length' <<< "$ASSIGNEES")" -ne 0 ] && ! jq -e --arg u "$PR_AUTHOR" 'index($u)' <<< "$ASSIGNEES" > /dev/null; then
+            MENTIONS=$(jq -r 'map("@" + .) | join(", ")' <<< "$ASSIGNEES")
+
+            # The workflow also runs on "edited"/"synchronize", so each comment is posted only once. Both markers are
+            # checked separately: a run that failed after the first comment has to be able to catch up on the second one.
+            # Only comments written by this workflow itself count - anybody can post the marker text and would otherwise
+            # silence their own strike. The comments are collected before searching them, because "grep -q" closes the
+            # pipe on the first match, which would fail the paginating "gh api" under "pipefail".
+            PR_MARKER="<!-- pr-on-foreign-issue -->"
+            PR_COMMENTS=$(gh api "/repos/$REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+            if ! grep -qF "$PR_MARKER" <<< "$PR_COMMENTS"; then
+              gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$PR_MARKER
+          Hi @$PR_AUTHOR, issue #$ISSUE_NUMBER is assigned to $MENTIONS, not to you. Please only work on issues assigned to you - see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md). The issue stays with its assignee and this pull request may be closed without review."
+            fi
+
+            ISSUE_MARKER="<!-- pr-on-foreign-issue:$PR_NUMBER -->"
+            ISSUE_COMMENTS=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+            if ! grep -qF "$ISSUE_MARKER" <<< "$ISSUE_COMMENTS"; then
+              gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$ISSUE_MARKER
+          @$PR_AUTHOR opened #$PR_NUMBER for this issue without being assigned. $MENTIONS: this does not affect your assignment."
+            fi
+
+            echo "warned=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "📌 Pinned"
 
           # Copy over labels from issue to PR if they match good first/second/third/forth issue or component:* labels
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABELS=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/labels" --jq '.[].name')
 
           # Check for good first/second/.. issue label
           LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
@@ -154,13 +196,13 @@ jobs:
             SILENT=false
             if [ -n "$LABEL" ]; then
               echo "✅ Found label: $LABEL"
-              gh pr edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+              gh pr edit "$PR_NUMBER" --add-label "$LABEL"
             fi
             if [ -n "$COMPONENT_LABELS" ]; then
               echo "✅ Found component labels:"
               while IFS= read -r COMPONENT_LABEL; do
                 echo "   - $COMPONENT_LABEL"
-                gh pr edit "${{ github.event.pull_request.number }}" --add-label "$COMPONENT_LABEL"
+                gh pr edit "$PR_NUMBER" --add-label "$COMPONENT_LABEL"
               done <<< "$COMPONENT_LABELS"
             fi
           else
@@ -168,27 +210,57 @@ jobs:
             SILENT=true
           fi
 
-
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
+          # The "assignees" endpoint adds and is idempotent; PATCHing the full list would drop an assignee added since the read above.
+          echo "Assigning '$PR_AUTHOR' to issue #$ISSUE_NUMBER"
+          if [ "$SILENT" = true ]; then
+            gh api -X POST "/repos/$REPO/issues/$ISSUE_NUMBER/assignees" -f "assignees[]=$PR_AUTHOR" || true
+          else
+            gh api -X POST "/repos/$REPO/issues/$ISSUE_NUMBER/assignees" -f "assignees[]=$PR_AUTHOR"
+          fi
+      - name: Record incident in STRANGE_USERS
+        id: record
+        if: steps.assignment.outputs.warned == 'true'
+        env:
+          STRANGE_USERS: ${{ secrets.STRANGE_USERS }}
+          GH_TOKEN_STRANGE_USERS: ${{ secrets.GH_TOKEN_STRANGE_USERS }}
+        run: |
+          set -euo pipefail
+          STRANGE_USERS="${STRANGE_USERS:-}"
+          [ -n "$STRANGE_USERS" ] || STRANGE_USERS='{}'
 
-          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
-
-          # Check if the user is already assigned
-          if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
-            echo "User '${{ github.event.pull_request.user.login }}' is already an assignee. No update needed."
-            echo "Debug: $ASSIGNEES"
+          # One incident per pull request: a rerun after a partial failure records it, a rerun after success does not duplicate it.
+          if [ "$(jq --arg u "$PR_AUTHOR" --arg pr "$PR_NUMBER" 'any((.[$u] // [])[]; .pr == $pr)' <<< "$STRANGE_USERS")" = 'true' ]; then
+            echo "Incident of '$PR_AUTHOR' on #$PR_NUMBER is already recorded."
+            jq -r --arg u "$PR_AUTHOR" '"count=" + (.[$u] | length | tostring)' <<< "$STRANGE_USERS" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Append the new assignee
-          UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
-
-          # Update issue with the new assignee list
-          echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
-          if [ "$SILENT" = true ]; then
-            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
-          else
-            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+          # No "count" output unless the ledger was written: an incident that cannot be persisted must not close a pull request.
+          if [ -z "${GH_TOKEN_STRANGE_USERS:-}" ]; then
+            echo "::warning::Secret GH_TOKEN_STRANGE_USERS is not set - incident of '$PR_AUTHOR' not persisted."
+            exit 0
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          UPDATED=$(jq -c --arg u "$PR_AUTHOR" --arg d "$(date -u +%F)" --arg pr "$PR_NUMBER" --arg issue "$ISSUE_NUMBER" \
+            '.[$u] = ((.[$u] // []) + [{date: $d, pr: $pr, reason: ("PR on issue #" + $issue + " assigned to somebody else")}])' \
+            <<< "$STRANGE_USERS")
+          GH_TOKEN="$GH_TOKEN_STRANGE_USERS" gh secret set STRANGE_USERS --repo "$REPO" --body "$UPDATED"
+          jq -r --arg u "$PR_AUTHOR" '"count=" + (.[$u] | length | tostring)' <<< "$UPDATED" >> "$GITHUB_OUTPUT"
+      - name: Close the pull request causing the third incident
+        if: steps.record.outputs.count >= 3
+        run: |
+          set -euo pipefail
+
+          # The count is the ledger total, so it stays at three on later events of the same pull request. The
+          # notice is therefore posted at most once, while a reopened pull request is closed again.
+          CLOSE_MARKER="<!-- pr-closed-after-third-incident -->"
+          PR_COMMENTS=$(gh api "/repos/$REPO/issues/$PR_NUMBER/comments" --paginate --jq '.[] | select(.user.type == "Bot" and .user.login == "github-actions[bot]") | .body')
+          if ! grep -qF "$CLOSE_MARKER" <<< "$PR_COMMENTS"; then
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$CLOSE_MARKER
+          Hi @$PR_AUTHOR, this pull request is closed automatically, because three of your contributions did not follow our process (see [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)). Please reach out to the maintainers before opening further pull requests."
+          fi
+
+          if [ "$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')" = 'OPEN' ]; then
+            gh pr close "$PR_NUMBER" --repo "$REPO"
+          fi

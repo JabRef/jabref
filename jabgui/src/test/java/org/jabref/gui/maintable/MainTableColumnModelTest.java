@@ -1,13 +1,8 @@
 package org.jabref.gui.maintable;
 
-import org.jabref.logic.preferences.CliPreferences;
-
-import com.airhacks.afterburner.injection.Injector;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class MainTableColumnModelTest {
 
@@ -17,11 +12,6 @@ class MainTableColumnModelTest {
 
     private static final String TEST_TYPE_ONLY_NAME = "linked_id";
     private static final MainTableColumnModel.Type TEST_TYPE_ONLY_TYPE = MainTableColumnModel.Type.LINKED_IDENTIFIER;
-
-    @BeforeAll
-    static void setup() {
-        Injector.setModelOrService(CliPreferences.class, mock(CliPreferences.class));
-    }
 
     @Test
     void mainTableColumnModelParserRetrievesCorrectType() {
@@ -71,6 +61,16 @@ class MainTableColumnModelTest {
 
         assertEquals(MainTableColumnModel.Type.NORMALFIELD, testColumnModel.getType());
         assertEquals("", testColumnModel.getQualifier());
+    }
+
+    /// A special field's display name is the label of the action that sets it, which is static.
+    /// Nothing is registered with the injector here on purpose: preference migrations build column
+    /// models before the GUI starts, so a lookup at this point crashes startup.
+    @Test
+    void specialFieldColumnNamesItselfWithoutAnyRegisteredService() {
+        MainTableColumnModel testColumnModel = MainTableColumnModel.parse("field:printed");
+
+        assertEquals("Printed (Special)", testColumnModel.getDisplayName());
     }
 
     @Test
