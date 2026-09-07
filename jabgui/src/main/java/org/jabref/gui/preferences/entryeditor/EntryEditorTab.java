@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.StyleClasses;
@@ -281,9 +282,10 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         extractColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
         extractColumn.setCellFactory(_ -> new TableCell<>() {
             private final CheckBox checkBox = new CheckBox();
+            private final Tooltip tooltip = new Tooltip();
 
             {
-                checkBox.setTooltip(new Tooltip(Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")));
+                checkBox.setTooltip(tooltip);
                 checkBox.setOnAction(_ -> {
                     EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
                     if (tab != null) {
@@ -297,10 +299,19 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 super.updateItem(pattern, empty);
                 if (empty || (pattern == null)) {
                     setGraphic(null);
+                    setTooltip(null);
                     return;
                 }
                 EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
-                checkBox.setSelected((tab != null) && tab.isExtracted(pattern));
+                boolean onMainTab = EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern);
+                checkBox.setDisable(!onMainTab);
+                checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
+                tooltip.setText(onMainTab
+                                ? Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")
+                                : Localization.lang("Field not contained in the \"Main\" tab."));
+                // A disabled checkbox is mouse-transparent, so its tooltip never shows; the cell's
+                // tooltip covers that case (and the rest of the cell).
+                setTooltip(tooltip);
                 setGraphic(checkBox);
             }
         });

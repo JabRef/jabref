@@ -13,6 +13,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EntryEditorTabModelTest {
 
@@ -69,11 +71,31 @@ class EntryEditorTabModelTest {
 
     // [utest->req~entry-editor.custom-tabs.extract-field~1]
     @Test
-    void nonExtractedPatternsLeaveTheMainTabAlone() {
+    void nonExtractedKnownFieldsLeaveTheMainTabAlone() {
         List<EntryEditorTabModel> tabModels = List.of(
-                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "comment-.*")),
+                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "title")),
                 new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("url", "comment"), Set.of("comment")));
         assertEquals(Set.of(StandardField.COMMENT), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+    }
+
+    // [utest->req~entry-editor.custom-tabs.extract-field~1]
+    @Test
+    void regexAndUnknownFieldPatternsAreAlwaysExtracted() {
+        List<EntryEditorTabModel> tabModels = List.of(
+                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "comment-.*", "myfield")));
+        // author is a known field and not marked for extraction; the regex captures and the unknown
+        // field name are extracted regardless of the (empty) extracted set.
+        assertEquals(
+                Set.of(new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob"), new UnknownField("myfield")),
+                EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+    }
+
+    // [utest->req~entry-editor.custom-tabs.extract-field~1]
+    @Test
+    void extractChoiceOnlyAppliesToKnownPlainFieldNames() {
+        assertTrue(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("author"));
+        assertFalse(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("comment-.*"));
+        assertFalse(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("myfield"));
     }
 
     @Test

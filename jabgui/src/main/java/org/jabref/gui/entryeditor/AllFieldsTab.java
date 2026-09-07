@@ -125,6 +125,12 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
 
+    /// Fields extracted by the configured custom tabs ("Extract field" checked in the preferences);
+    /// the Main tab shows no editor and no add-chip for these. Recomputed in [#determineFieldsToShow]
+    /// — which every rebuild runs first — and reused by the chip-building paths, so the custom-tab
+    /// regexes are evaluated once per rebuild instead of once per chip bar.
+    private Set<Field> extractedCustomTabFields = Set.of();
+
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
     private Optional<BibEntry> subscribedEntry = Optional.empty();
@@ -196,17 +202,12 @@ public class AllFieldsTab extends FieldsEditorTab {
         // Fields a custom tab extracts are moved there, not displayed twice. Also dropped from
         // userAddedFields: a chip-added field whose value starts matching an extracted custom-tab
         // regex must not linger on the Main tab (its editor moves to the custom tab on that rebuild).
-        Set<Field> customFields = customTabFields(entry);
-        fields.removeAll(customFields);
-        userAddedFields.removeAll(customFields);
+        extractedCustomTabFields = EntryEditorTabModel.fieldsOnCustomTabs(
+                guiPreferences.getEntryEditorPreferences().getTabModels(), entry);
+        fields.removeAll(extractedCustomTabFields);
+        userAddedFields.removeAll(extractedCustomTabFields);
         fields.addAll(userAddedFields);
         return fields;
-    }
-
-    /// Fields extracted by the configured custom tabs ("Extract field" checked in the
-    /// preferences); the Main tab shows no editor and no add-chip for these.
-    private Set<Field> customTabFields(BibEntry entry) {
-        return EntryEditorTabModel.fieldsOnCustomTabs(guiPreferences.getEntryEditorPreferences().getTabModels(), entry);
     }
 
     @Override
@@ -521,7 +522,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
 
         Set<Field> hidden = new LinkedHashSet<>(editors.keySet());
-        hidden.addAll(customTabFields(entry));
+        hidden.addAll(extractedCustomTabFields);
         SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), hidden);
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
@@ -563,7 +564,7 @@ public class AllFieldsTab extends FieldsEditorTab {
             // Custom-tab fields get no chip here: clicking one would show the field on its
             // custom tab, not below this chip bar.
             Set<Field> shown = new LinkedHashSet<>(editors.keySet());
-            shown.addAll(customTabFields(entry));
+            shown.addAll(extractedCustomTabFields);
             FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));

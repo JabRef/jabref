@@ -3,8 +3,11 @@ package org.jabref.gui.entryeditor;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -12,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.UnknownField;
 
 /// Model of the tabs that appear in the entry editor.
 ///
@@ -127,6 +131,9 @@ public sealed interface EntryEditorTabModel
         /// A pattern without any regex metacharacter is a plain field name.
         private static final Pattern PLAIN_FIELD_NAME = Pattern.compile("[^\\\\^$.|?*+()\\[\\]{}]+");
 
+        /// See [#compiledRegex]; empty marks an invalid regex.
+        private static final Map<String, Optional<Pattern>> COMPILED_REGEXES = new ConcurrentHashMap<>();
+
         public CustomizedFieldsTab {
             fieldPatterns = List.copyOf(fieldPatterns);
             extractedFieldPatterns = Set.copyOf(extractedFieldPatterns);
@@ -157,7 +164,18 @@ public sealed interface EntryEditorTabModel
         /// Resolves only the *extracted* patterns — the fields the Main tab must no longer show.
         // [impl->req~entry-editor.custom-tabs.extract-field~1]
         public SequencedSet<Field> resolveExtractedFields(BibEntry entry) {
-            return resolve(fieldPatterns.stream().filter(extractedFieldPatterns::contains).toList(), entry);
+            return resolve(fieldPatterns.stream()
+                                        .filter(pattern -> extractedFieldPatterns.contains(pattern) || !appearsOnMainTab(pattern))
+                                        .toList(), entry);
+        }
+
+        /// Whether the "Extract field" choice applies to the pattern: only a plain name of a known
+        /// field is a field the Main tab shows on its own. A regex pattern or an unknown field name
+        /// is always extracted — the custom tab is the only place curating such fields — so the
+        /// preferences UI shows its checkbox checked and disabled.
+        public static boolean appearsOnMainTab(String fieldPattern) {
+            return PLAIN_FIELD_NAME.matcher(fieldPattern).matches()
+                    && !(FieldFactory.parseField(fieldPattern) instanceof UnknownField);
         }
 
         private SequencedSet<Field> resolve(List<String> patterns, BibEntry entry) {
@@ -167,18 +185,27 @@ public sealed interface EntryEditorTabModel
                     result.add(FieldFactory.parseField(entry.getType(), pattern));
                     continue;
                 }
+                compiledRegex(pattern).ifPresent(compiled ->
+                        entry.getFields().stream()
+                             .filter(field -> compiled.matcher(field.getName()).matches())
+                             .sorted(Comparator.comparing(Field::getName))
+                             .forEach(result::add));
+            }
+            return result;
+        }
+
+        /// Regex patterns are resolved on every Main-tab and custom-tab rebuild, so the compiled
+        /// form is cached (the cache stays small: it only ever holds the user's configured patterns).
+        private static Optional<Pattern> compiledRegex(String pattern) {
+            return COMPILED_REGEXES.computeIfAbsent(pattern, key -> {
                 try {
-                    Pattern compiled = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-                    entry.getFields().stream()
-                         .filter(field -> compiled.matcher(field.getName()).matches())
-                         .sorted(Comparator.comparing(Field::getName))
-                         .forEach(result::add);
+                    return Optional.of(Pattern.compile(key, Pattern.CASE_INSENSITIVE));
                 } catch (PatternSyntaxException _) {
                     // Invalid regex: resolves to no fields; the preferences UI accepts any string, so
                     // a broken pattern must not break rendering the tab.
+                    return Optional.empty();
                 }
-            }
-            return result;
+            });
         }
     }
 }

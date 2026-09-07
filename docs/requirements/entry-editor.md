@@ -94,7 +94,7 @@ Needs: impl
 ## Extracted custom-tab fields leave the Main tab
 `req~entry-editor.custom-tabs.extract-field~1`
 
-The "Fields" column offers an "Extract field" checkbox per field pattern, unchecked by default; its tooltip explains that a checked field is not shown in the "Main" tab anymore. The fields resolved by a checked pattern are moved to the custom tab: the "Main" tab shows neither an editor nor an add-chip for them. Unchecked patterns only mirror their fields on the custom tab, leaving the "Main" tab unchanged.
+The "Fields" column offers an "Extract field" checkbox per field pattern, unchecked by default; its tooltip explains that a checked field is not shown in the "Main" tab anymore. The fields resolved by a checked pattern are moved to the custom tab: the "Main" tab shows neither an editor nor an add-chip for them. Unchecked patterns only mirror their fields on the custom tab, leaving the "Main" tab unchanged. The choice exists only for plain names of known fields — fields the "Main" tab shows on its own. A regular expression or an unknown field name is always extracted; its checkbox is shown checked and disabled, with a tooltip stating that the field is not contained in the "Main" tab.
 
 Needs: impl, utest
 
