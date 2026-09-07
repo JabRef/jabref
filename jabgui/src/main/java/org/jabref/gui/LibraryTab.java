@@ -337,6 +337,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         restoreLastSelectedEntry();
     }
 
+    /// [impl->req~ux.startup.restore-position~1]
     /// Restores the entry that was selected in this library when JabRef was closed the last time. The selection is
     /// only written at shutdown, so a crash simply leaves the library without a restored selection.
     private void restoreLastSelectedEntry() {
