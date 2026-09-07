@@ -766,11 +766,11 @@ public class StringUtil {
     }
 
     /**
-     * Abbreviates a file path to a maximum length while keeping the file name intact.
+     * Abbreviates a file path by replacing middle directories with "...".
      *
-     * @param fullPath  the full path of the file to abbreviate
-     * @param maxLength the maximum allowed length of the resulting string
-     * @return the abbreviated path, or the original path if within length
+     * @param fullPath  the full file path to abbreviate
+     * @param maxLength the maximum allowed length
+     * @return the abbreviated path, or {@code null} if {@code fullPath} is null
      */
     public static String abbreviatePath(String fullPath, int maxLength) {
         if (fullPath == null || fullPath.length() <= maxLength) {
