@@ -35,7 +35,6 @@ public record ApplyResult(List<Failure> failures) {
         return new ApplyResult(List.of(new Failure(change, reason)));
     }
 
-    /// Named as [UndoResult#complete] is, since it answers the same question one layer up.
     public boolean complete() {
         return failures.isEmpty();
     }

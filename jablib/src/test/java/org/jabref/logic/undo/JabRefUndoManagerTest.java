@@ -246,9 +246,9 @@ class JabRefUndoManagerTest {
         database.addString(new BibtexString("label", "something else"));
         undoRedoManager.addEdit(removal);
 
-        UndoResult result = undoRedoManager.undo().orElseThrow();
+        UndoStep step = undoRedoManager.undo().orElseThrow();
 
-        assertFalse(result.complete());
+        assertFalse(step.complete());
         assertEquals("something else", database.getStringByName("label").orElseThrow().getContent(),
                 "the undo overwrote the string that took the name");
         assertFalse(undoRedoManager.canUndo());
@@ -546,9 +546,9 @@ class JabRefUndoManagerTest {
         undoRedoManager.addEdit(setAuthor("Bohr"));
         entry.setField(StandardField.AUTHOR, "Planck");
 
-        UndoResult result = undoRedoManager.undo().orElseThrow();
+        UndoStep step = undoRedoManager.undo().orElseThrow();
 
-        assertFalse(result.complete(), "the undo claimed to have taken the step back");
+        assertFalse(step.complete(), "the undo claimed to have taken the step back");
         assertEquals(Optional.of("Planck"), entry.getField(StandardField.AUTHOR), "undo wrote over the newer value");
         assertFalse(undoRedoManager.canUndo(), "the step was not consumed");
         assertTrue(undoRedoManager.canRedo());

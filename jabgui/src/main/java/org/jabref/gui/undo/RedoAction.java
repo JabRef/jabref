@@ -5,7 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoResult;
+import org.jabref.logic.undo.UndoStep;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -48,9 +48,9 @@ public class RedoAction extends SimpleCommand {
                 () -> dialogService.notify(Localization.lang("Nothing to redo") + '.'));
     }
 
-    private static String message(UndoResult result) {
-        return result.complete()
-                ? Localization.lang("Redone: %0", result.name())
-                : Localization.lang("Redone: %0 (some changes could not be applied)", result.name());
+    private static String message(UndoStep step) {
+        return step.complete()
+                ? Localization.lang("Redone: %0", step.name())
+                : Localization.lang("Redone: %0 (some changes could not be applied)", step.name());
     }
 }

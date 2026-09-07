@@ -5,7 +5,7 @@ import java.util.Optional;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.undo.UndoResult;
+import org.jabref.logic.undo.UndoStep;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -24,10 +24,10 @@ import org.jspecify.annotations.NullMarked;
 public interface GuiUndoManager extends UndoManager {
 
     /// Reverses the change on top of the undo stack.
-    Optional<UndoResult> undo();
+    Optional<UndoStep> undo();
 
     /// Re-applies the change last undone.
-    Optional<UndoResult> redo();
+    Optional<UndoStep> redo();
 
     boolean canUndo();
 

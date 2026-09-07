@@ -349,14 +349,14 @@ public class JabRefUndoManager implements UndoManager {
     ///         afterwards, it would describe whichever step another thread has since pushed.
     ///         Only a name leaves the journal, so nothing outside it starts reading the contents
     ///         of the stacks.
-    public Optional<UndoResult> undo() {
-        UndoResult result;
+    public Optional<UndoStep> undo() {
+        UndoStep step;
         synchronized (this) {
             if (!suspensions.isEmpty() || undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            result = new UndoResult(
+            step = new UndoStep(
                     BibChangeDescriber.describe(journalEntry.change()),
                     journalEntry.change().inverted().apply().complete());
             undoStack.pop();
@@ -365,26 +365,26 @@ public class JabRefUndoManager implements UndoManager {
             redoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(result);
+        return Optional.of(step);
     }
 
     /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
     ///         to redo or a command is holding the library
-    public Optional<UndoResult> redo() {
-        UndoResult result;
+    public Optional<UndoStep> redo() {
+        UndoStep step;
         synchronized (this) {
             if (!suspensions.isEmpty() || redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            result = new UndoResult(
+            step = new UndoStep(
                     BibChangeDescriber.describe(journalEntry.change()),
                     journalEntry.change().apply().complete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
-        return Optional.of(result);
+        return Optional.of(step);
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

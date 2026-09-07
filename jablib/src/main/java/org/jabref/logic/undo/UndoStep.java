@@ -7,5 +7,5 @@ import org.jspecify.annotations.NullMarked;
 /// @param name     the step, named as the user would recognise it — see [BibChangeDescriber]
 /// @param complete whether every change in the step could be applied
 @NullMarked
-public record UndoResult(String name, boolean complete) {
+public record UndoStep(String name, boolean complete) {
 }
