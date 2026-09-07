@@ -39,6 +39,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +113,13 @@ public class BackupManager {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         coarseChangeFilter.registerListener(backupManager);
+        // A save or an undo back to the saved state makes the disk current, so a backup scheduled by the
+        // change events before it would only duplicate the file.
+        EasyBind.subscribe(libraryTab.modifiedProperty(), modified -> {
+            if (!modified) {
+                backupManager.clearPendingBackup();
+            }
+        });
         RUNNING_INSTANCES.add(backupManager);
         return backupManager;
     }
@@ -326,6 +334,10 @@ public class BackupManager {
         }
     }
 
+    synchronized void clearPendingBackup() {
+        this.needsBackup = false;
+    }
+
     private void startBackupTask(Path backupDir) {
         fillQueue(backupDir);
 
@@ -351,7 +363,12 @@ public class BackupManager {
         coarseChangeFilter.unregisterListener(this);
         executor.shutdown();
 
-        if (createBackup) {
+        if (!libraryTab.isModified()) {
+            // Backups exist to recover from an unclean exit. After a clean close of a library with nothing
+            // unsaved there is nothing to recover, so the next start must not offer one.
+            // [impl->req~jabgui.autosaveandbackup.discard-on-clean-close~1]
+            discardBackup(backupDir);
+        } else if (createBackup) {
             // Ensure that backup is a recent one
             determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup);
         }

@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -29,6 +31,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /// Test for "discarded" flag
 class BackupManagerDiscardedTest {
@@ -60,7 +63,10 @@ class BackupManagerDiscardedTest {
         // We need a real CoarseChangeFilter to ensure that the BackupManager works correctly
         CoarseChangeFilter coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
 
-        backupManager = BackupManager.start(mock(LibraryTab.class), bibDatabaseContext, coarseChangeFilter, bibEntryTypesManager, preferences);
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        when(libraryTab.modifiedProperty()).thenReturn(new SimpleBooleanProperty(true));
+        when(libraryTab.isModified()).thenReturn(true);
+        backupManager = BackupManager.start(libraryTab, bibDatabaseContext, coarseChangeFilter, bibEntryTypesManager, preferences);
 
         makeBackup();
     }

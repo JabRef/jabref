@@ -18,6 +18,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -25,6 +26,7 @@ import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.undo.UndoableRemoveString;
 
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -573,5 +575,69 @@ class JabRefUndoManagerTest {
 
         undoRedoManager.clear();
         assertFalse(undoRedoManager.hasChanged());
+    }
+
+    /// Reacts to an author change the way the timestamp listener does: with a derived change.
+    private class YearStamper {
+        @Subscribe
+        public void listen(FieldChangedEvent event) {
+            if ((event.getField() == StandardField.AUTHOR) && !undoRedoManager.isReplaying()) {
+                undoRedoManager.addDerivedEdit(setField(StandardField.YEAR, "1905"));
+            }
+        }
+    }
+
+    // [utest->req~logic.undo.derived-changes-join-their-step~1]
+    @Test
+    void aDerivedChangeIsUndoneWithTheChangeThatCausedIt() {
+        entry.registerListener(new YearStamper());
+
+        undoRedoManager.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"));
+        assertEquals(Optional.of("1905"), entry.getField(StandardField.YEAR));
+
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+        assertFalse(undoRedoManager.canUndo());
+
+        undoRedoManager.redo();
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("1905"), entry.getField(StandardField.YEAR));
+    }
+
+    @Test
+    void aDerivedChangeJoinsTheEnclosingBlock() {
+        entry.registerListener(new YearStamper());
+
+        undoRedoManager.addEdit("Rename", edit -> edit.applyEdit(new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr")));
+        undoRedoManager.undo();
+
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+        assertFalse(undoRedoManager.canUndo());
+    }
+
+    @Test
+    void aDerivedChangeOutsideAStepIsNotRecorded() {
+        undoRedoManager.addDerivedEdit(setAuthor("Bohr"));
+
+        assertFalse(undoRedoManager.canUndo());
+    }
+
+    @Test
+    void replayingIsReportedWhileUndoing() {
+        AtomicBoolean replayingSeen = new AtomicBoolean();
+        entry.registerListener(new Object() {
+            @Subscribe
+            public void listen(FieldChangedEvent event) {
+                replayingSeen.set(undoRedoManager.isReplaying());
+            }
+        });
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        assertFalse(replayingSeen.get());
+
+        undoRedoManager.undo();
+
+        assertTrue(replayingSeen.get());
+        assertFalse(undoRedoManager.isReplaying());
     }
 }

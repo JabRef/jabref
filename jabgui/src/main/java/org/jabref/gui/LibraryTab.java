@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -263,7 +264,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.bibDatabaseContext.getDatabase().registerListener(this);
         this.bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
+        this.getDatabase().registerListener(new UpdateTimestampListener(preferences, getUndoManager()));
 
         autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
         coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
@@ -1101,6 +1102,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public boolean isModified() {
         return changedProperty.getValue();
+    }
+
+    public ReadOnlyBooleanProperty modifiedProperty() {
+        return changedProperty;
     }
 
     public void markBaseChanged() {

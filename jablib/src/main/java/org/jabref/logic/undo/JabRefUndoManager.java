@@ -110,6 +110,9 @@ public class JabRefUndoManager implements UndoManager {
     /// step, and would have two threads appending to one recorder's list.
     private final ThreadLocal<@Nullable CompoundEdit> active = new ThreadLocal<>();
 
+    /// Set while [#undo] or [#redo] applies a change on this thread. See [#isReplaying].
+    private final ThreadLocal<Boolean> replaying = ThreadLocal.withInitial(() -> false);
+
     /// Records a single change as its own undo step, or as part of the enclosing step when
     /// called inside [#addEdit].
     ///
@@ -117,6 +120,10 @@ public class JabRefUndoManager implements UndoManager {
     /// several changes together, and its name describes that grouping to the user.
     @Override
     public void addEdit(BibChange change) {
+        if (isReplaying()) {
+            LOGGER.debug("Dropping change recorded while undoing or redoing: {}", change);
+            return;
+        }
         CompoundEdit compound = active.get();
         if (compound != null) {
             compound.addEdit(change);
@@ -156,6 +163,12 @@ public class JabRefUndoManager implements UndoManager {
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
     public void applyEdit(BibChange change) {
+        if (isReplaying()) {
+            // Pushing here would put the change above the step being undone, and the pop that
+            // follows would remove it instead of that step.
+            LOGGER.debug("Dropping change applied while undoing or redoing: {}", change);
+            return;
+        }
         CompoundEdit compound = active.get();
         if (compound != null) {
             compound.applyEdit(change);
@@ -165,10 +178,34 @@ public class JabRefUndoManager implements UndoManager {
             return;
         }
         synchronized (this) {
-            change.apply();
-            push(change);
+            // A recorder is open while the change runs so that whatever listeners change in
+            // reaction (see addDerivedEdit) lands in this step rather than becoming a step of its own.
+            CompoundEdit step = new CompoundEdit("");
+            step.addEdit(change);
+            active.set(step);
+            try {
+                change.apply();
+            } finally {
+                active.remove();
+            }
+            ChangeSet changeSet = step.toChangeSet();
+            push(changeSet.changes().size() == 1 ? change : changeSet);
         }
         notifyListeners();
+    }
+
+    @Override
+    // [impl->req~logic.undo.derived-changes-join-their-step~1]
+    public void addDerivedEdit(BibChange change) {
+        CompoundEdit compound = active.get();
+        if (compound != null) {
+            compound.addEdit(change);
+        }
+    }
+
+    @Override
+    public boolean isReplaying() {
+        return replaying.get();
     }
 
     /// Whether `change` would be an undo step that does nothing.
@@ -257,7 +294,7 @@ public class JabRefUndoManager implements UndoManager {
                 return;
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            journalEntry.change().inverted().apply();
+            replay(journalEntry.change().inverted());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
@@ -272,11 +309,20 @@ public class JabRefUndoManager implements UndoManager {
                 return;
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            journalEntry.change().apply();
+            replay(journalEntry.change());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
+    }
+
+    private void replay(BibChange change) {
+        replaying.set(true);
+        try {
+            change.apply();
+        } finally {
+            replaying.remove();
+        }
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

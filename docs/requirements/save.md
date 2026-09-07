@@ -28,6 +28,14 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## A cleanly closed library leaves no backup to restore
+`req~jabgui.autosaveandbackup.discard-on-clean-close~1`
+
+When a library is closed normally while it holds no unsaved changes, the next start must not offer its backup for restoring.
+Backups exist to recover from an unclean exit; after a clean close, everything worth keeping is either saved or was deliberately reverted.
+
+Needs: impl, utest
+
 ## Autosave reacts to library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
