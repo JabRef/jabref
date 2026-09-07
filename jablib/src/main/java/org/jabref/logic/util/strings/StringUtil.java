@@ -764,4 +764,44 @@ public class StringUtil {
     public static String makeSafe(@Nullable String string) {
         return Optional.ofNullable(string).orElse("");
     }
+
+    /**
+     * Abbreviates a file path to a maximum length while keeping the file name intact.
+     *
+     * @param fullPath  the full path of the file to abbreviate
+     * @param maxLength the maximum allowed length of the resulting string
+     * @return the abbreviated path, or the original path if within length
+     */
+    public static String abbreviatePath(String fullPath, int maxLength) {
+        if (fullPath == null || fullPath.length() <= maxLength) {
+            return fullPath;
+        }
+
+        int lastSeparator = Math.max(fullPath.lastIndexOf('/'), fullPath.lastIndexOf('\\'));
+        if (lastSeparator == -1) {
+            return limitStringLength(fullPath, maxLength);
+        }
+
+        String parent = fullPath.substring(0, lastSeparator);
+        String fileName = fullPath.substring(lastSeparator + 1);
+        char separator = fullPath.charAt(lastSeparator);
+
+        if (fileName.length() >= maxLength) {
+            return maxLength > 3 ? fileName.substring(0, maxLength - 3) + "..." : fileName;
+        }
+
+        int availableLengthForParent = maxLength - fileName.length() - 1;
+
+        if (availableLengthForParent < 5) {
+            return "..." + separator + fileName;
+        }
+
+        String shortenedParent = abbreviateMiddle(parent, "...", availableLengthForParent);
+        return shortenedParent + separator + fileName;
+    }
+
+    @AllowedToUseApacheCommonsLang3("No Guava equivalent existing")
+    public static String abbreviateMiddle(String str, String middle, int length) {
+        return StringUtils.abbreviateMiddle(str, middle, length);
+    }
 }

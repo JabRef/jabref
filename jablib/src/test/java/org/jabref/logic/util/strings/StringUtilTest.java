@@ -485,4 +485,20 @@ class StringUtilTest {
 
         assertEquals(expected, StringUtil.alignStringTable(given));
     }
+
+    @Test
+    void abbreviatePathReturnsOriginalWhenShorterThanMax() {
+        String path = "folder/file.bib";
+        assertEquals("folder/file.bib", StringUtil.abbreviatePath(path, 30));
+    }
+
+    @Test
+    void abbreviatePathShortensParentDirectory() {
+        String path = "very/long/directory/structure/file.bib";
+        String result = StringUtil.abbreviatePath(path, 25);
+
+        assertTrue(result.length() <= 25);
+        assertTrue(result.endsWith("file.bib"));
+        assertTrue(result.contains("..."));
+    }
 }
