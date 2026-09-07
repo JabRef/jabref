@@ -386,21 +386,22 @@ public class MetaData {
         postChange();
     }
 
-    /// A detached copy of `other`: equal contents, its own identity, no listeners.
+    /// A new instance holding the contents of `other`, detached from it: editing either afterwards
+    /// leaves the other alone, and the copy carries no listeners.
     public static MetaData copyOf(@NonNull MetaData other) {
         MetaData copy = new MetaData();
-        copy.copyFrom(other);
+        copy.overwriteWith(other);
         return copy;
     }
 
-    /// Takes over the contents of `other`, leaving this instance's identity intact — and with it
-    /// everything registered on its [EventBus]. Installing `other` in the library instead would orphan
-    /// every listener of the instance it replaced.
+    /// Overwrites this instance's contents with those of `other`. **This object survives**, and with
+    /// it everything registered on its [EventBus] — which is the point: installing `other` in the
+    /// library instead would orphan every listener of the instance it replaced.
     ///
-    /// Event propagation is not taken over: whether this instance posts is a property of the live
+    /// Event propagation is not overwritten: whether this instance posts is a property of the live
     /// instance and its listeners, not of the contents. Posts a [MetaDataChangedEvent], and a
     /// [GroupUpdatedEvent] as well when `other` has groups.
-    public void copyFrom(@NonNull MetaData other) {
+    public void overwriteWith(@NonNull MetaData other) {
         citeKeyPatterns.clear();
         citeKeyPatterns.putAll(other.citeKeyPatterns);
         userFileDirectory.clear();

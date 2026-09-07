@@ -55,7 +55,7 @@ class MetaDataTest {
         other.setUserFileDirectory("user-host", "/tmp/files");
         other.markAsProtected();
 
-        metaData.copyFrom(other);
+        metaData.overwriteWith(other);
 
         assertEquals(other, metaData);
     }
@@ -69,7 +69,7 @@ class MetaDataTest {
         other.putUnknownMetaDataItem("unknown", List.of("value"));
         other.setContainsSearchGroups(true);
 
-        metaData.copyFrom(other);
+        metaData.overwriteWith(other);
 
         assertEquals(Optional.of(Version.parse("6.0")), metaData.getGroupSearchSyntaxVersion());
         assertEquals(Optional.of(Path.of("/tmp/library.blg")), metaData.getBlgFilePath("user-host"));
@@ -84,7 +84,7 @@ class MetaDataTest {
         MetaData other = new MetaData();
         other.setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ',')));
 
-        metaData.copyFrom(other);
+        metaData.overwriteWith(other);
         metaData.getGroups().orElseThrow().addSubgroup(new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','));
 
         assertEquals(List.of(), other.getGroups().orElseThrow().getChildren(), "the source tree was edited too");
@@ -113,7 +113,7 @@ class MetaDataTest {
         metaData.setMode(BibDatabaseMode.BIBTEX);
         metaData.setUserFileDirectory("user-host", "/tmp/files");
 
-        metaData.copyFrom(new MetaData());
+        metaData.overwriteWith(new MetaData());
 
         assertEquals(new MetaData(), metaData);
     }
@@ -130,7 +130,7 @@ class MetaDataTest {
 
         MetaData other = new MetaData();
         other.setMode(BibDatabaseMode.BIBLATEX);
-        metaData.copyFrom(other);
+        metaData.overwriteWith(other);
         assertEquals(1, events.size());
 
         metaData.setEncoding(StandardCharsets.ISO_8859_1);

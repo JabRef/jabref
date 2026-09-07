@@ -23,7 +23,7 @@ public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaDat
 
     @Override
     public ApplyResult apply() {
-        databaseContext.getMetaData().copyFrom(after);
+        databaseContext.getMetaData().overwriteWith(after);
         return ApplyResult.SUCCESS;
     }
 }

@@ -42,7 +42,6 @@ public class ContentSelectors {
         this.contentSelectors.add(contentSelector);
     }
 
-    /// Replaces the selectors with `selectors`.
     public void setAll(@NonNull Collection<ContentSelector> selectors) {
         this.contentSelectors.clear();
         this.contentSelectors.addAll(selectors);
