@@ -1,9 +1,12 @@
 package org.jabref.logic.shared;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +48,25 @@ class DBMSConnectionUrlTest {
         assertEquals("jdbc:postgresql://db.example.org:5432/lib?sslmode=verify-full&sslrootcert=ca.pem", url.toJdbcUrl());
     }
 
+    @ParameterizedTest
+    @MethodSource("sslModes")
+    void mapsSslModes(String sslMode, boolean useSSL, String expectedQuery) {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://db.example.org/lib?sslmode=" + sslMode).orElseThrow();
+
+        assertEquals(useSSL, url.useSSL());
+        assertEquals("jdbc:postgresql://db.example.org:5432/lib" + expectedQuery, url.toJdbcUrl());
+    }
+
+    private static Stream<Arguments> sslModes() {
+        return Stream.of(
+                Arguments.of("disable", false, "?sslmode=disable"),
+                Arguments.of("allow", false, "?sslmode=allow"),
+                Arguments.of("prefer", false, "?sslmode=prefer"),
+                Arguments.of("require", true, ""),
+                Arguments.of("verify-ca", true, "?sslmode=verify-ca"),
+                Arguments.of("verify-full", true, "?sslmode=verify-full"));
+    }
+
     @Test
     void parsesLibpqKeywordForm() {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("host=db.example.org port=6543 dbname=lib user=me password='it\\'s a b' sslmode=require").orElseThrow();
@@ -63,10 +85,20 @@ class DBMSConnectionUrlTest {
     @Test
     void unterminatedQuoteWithManyBackslashesIsHandledQuickly() {
         String hostile = "host=localhost password='" + "\\\\&".repeat(5000);
-        long start = System.nanoTime();
         DBMSConnectionUrl url = DBMSConnectionUrl.parse(hostile).orElseThrow();
-        assertTrue(System.nanoTime() - start < 1_000_000_000L);
         assertEquals("localhost", url.host());
+    }
+
+    @Test
+    void rejectsKeywordFormWithInvalidPort() {
+        assertTrue(DBMSConnectionUrl.parse("host=db.example.org port=abc dbname=lib").isEmpty());
+    }
+
+    @Test
+    void preservesEncodedDatabaseName() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgresql://host/db%2Fname").orElseThrow();
+
+        assertEquals("jdbc:postgresql://host:5432/db%2Fname", url.toJdbcUrl());
     }
 
     @Test

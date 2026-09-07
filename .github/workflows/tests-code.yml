@@ -239,6 +239,18 @@ jobs:
             *.md
             docs/**/*.md
 
+  yaml:
+    name: YAML
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: yamllint
+        run: pipx run yamllint==1.38.0 --strict .
+
   textlint:
     name: Textlint
     runs-on: ubuntu-slim

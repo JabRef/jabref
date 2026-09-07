@@ -72,13 +72,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 - We added an offer to initialize a Git repository when committing a library that is not yet version controlled. [#16722](https://github.com/JabRef/jabref/pull/16722)
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
-- The "Connect to shared database" dialog now fills itself from a pasted connection URL and hides rarely needed settings. [#16800](https://github.com/JabRef/jabref/pull/16800)
+- We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
+- We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 
 ### Changed
 
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
-- A remembered shared database password is now kept in the operating system's credential store instead of JabRef's preferences. [#16800](https://github.com/JabRef/jabref/pull/16800)
-- We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
+- We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)
 - We changed the default size of the "New Entry" dialog to improve visibility. [#11589](https://github.com/JabRef/jabref/issues/11589)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
@@ -116,19 +116,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
 - We changed the full text document search to run as a cancelable background task instead of blocking JabRef with a modal dialog. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
-
-### Fixed
-
-- We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - "Get fulltext", groups "Attach file", "Attach file from URL", "Open folder(s)" and "Open file" commands in right click menu have been moved into a "More file operations..." submenu. [#16829](https://github.com/JabRef/jabref/pull/16829)
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
+
+### Fixed
+
+- We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
+- We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first if autosave is enabled, and otherwise lets you choose between saving first and committing only the state on disk, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
+- We fixed the context menu of an automatically found file offering "Remove link" instead of linking the file. [#16898](https://github.com/JabRef/jabref/pull/16898)
 - We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
@@ -226,6 +228,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
+- We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
 
 ### Removed
 

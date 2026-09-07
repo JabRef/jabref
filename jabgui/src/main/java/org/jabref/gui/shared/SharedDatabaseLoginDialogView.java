@@ -67,6 +67,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    private boolean resizePending;
+    private long resizeGeneration;
 
     public SharedDatabaseLoginDialogView(LibraryTabContainer tabContainer) {
         this.tabContainer = tabContainer;
@@ -78,9 +80,18 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
+        Button btnClose = (Button) this.getDialogPane().lookupButton(ButtonType.CLOSE);
         // must be set here, because in initialize the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not().or(viewModel.loadingProperty()));
         btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> loading ? Localization.lang("Connecting...") : Localization.lang("Connect")));
+        btnClose.disableProperty().bind(viewModel.loadingProperty());
+        setOnCloseRequest(event -> {
+            if (viewModel.loadingProperty().get()) {
+                event.consume();
+            } else {
+                resizeGeneration++;
+            }
+        });
     }
 
     @FXML
@@ -135,11 +146,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         // Settings a pasted URL or the last login switched on must not stay hidden
         EasyBind.subscribe(viewModel.useSSLProperty(), this::expandAdvancedIf);
         EasyBind.subscribe(viewModel.expertModeProperty(), this::expandAdvancedIf);
-        EasyBind.subscribe(advancedPane.expandedProperty(), expanded -> Platform.runLater(() -> {
-            if (getDialogPane().getScene() != null) {
-                getDialogPane().getScene().getWindow().sizeToScene();
-            }
-        }));
+        EasyBind.subscribe(advancedPane.expandedProperty(), expanded -> scheduleResize());
 
         // Must be executed after the initialization of the view, otherwise it doesn't work
         Platform.runLater(() -> {
@@ -158,6 +165,27 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         if (active) {
             advancedPane.setExpanded(true);
         }
+    }
+
+    private void scheduleResize() {
+        long generation = ++resizeGeneration;
+        if (resizePending) {
+            return;
+        }
+        resizePending = true;
+        Platform.runLater(() -> {
+            resizePending = false;
+            if (!isShowing()) {
+                return;
+            }
+            if (generation != resizeGeneration) {
+                scheduleResize();
+                return;
+            }
+            if (getDialogPane().getScene() != null) {
+                getDialogPane().getScene().getWindow().sizeToScene();
+            }
+        });
     }
 
     @FXML
