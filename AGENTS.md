@@ -479,6 +479,10 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 - Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
 
+### Branches
+
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; maintainers label a PR `dev: into-stable` to have CI port it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See <https://devdocs.jabref.org/contributing.html#branching-strategy>.
+
 ### Commits
 
 - One logical change per commit

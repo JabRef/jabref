@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - main-release
+      - stable
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
@@ -307,9 +308,9 @@ jobs:
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            if [[ "${{ github.ref_name }}" == "main" ]]; then
-              echo "☁️ Push to \`main\` – will upload"
-              echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "stable" ]]; then
+              echo "☁️ Push to \`${{ github.ref_name }}\` – will upload"
+              echo "☁️ Push to \`${{ github.ref_name }}\` – will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi;
