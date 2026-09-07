@@ -6,10 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -68,19 +66,21 @@ public class OfflineChanges {
 
     /// Everything recorded up to a [#take]. New entries are keyed by their local entry id, so
     /// that a reconnect without restart finds them in the local library.
+    /// @param removedEntries the shared version each removed entry had when it was removed: the
+    ///                       optimistic lock needs it to notice that the shared entry moved on
     public record Recorded(Map<Integer, EntryState> changedEntries,
                            Map<String, EntryState> newEntries,
-                           Set<Integer> removedIds,
+                           Map<Integer, Integer> removedEntries,
                            @Nullable Map<String, String> metaData) {
         public boolean isEmpty() {
-            return changedEntries.isEmpty() && newEntries.isEmpty() && removedIds.isEmpty() && (metaData == null);
+            return changedEntries.isEmpty() && newEntries.isEmpty() && removedEntries.isEmpty() && (metaData == null);
         }
     }
 
     private final Path file;
     private final Map<Integer, EntryState> changedEntries = new LinkedHashMap<>();
     private final Map<String, EntryState> newEntries = new LinkedHashMap<>();
-    private final Set<Integer> removedIds = new LinkedHashSet<>();
+    private final Map<Integer, Integer> removedEntries = new LinkedHashMap<>();
     private @Nullable Map<String, String> metaData;
 
     private OfflineChanges(Path file) {
@@ -102,7 +102,7 @@ public class OfflineChanges {
             }
             changes.changedEntries.putAll(requireNonNullElse(recorded.changedEntries(), Map.of()));
             changes.newEntries.putAll(requireNonNullElse(recorded.newEntries(), Map.of()));
-            changes.removedIds.addAll(requireNonNullElse(recorded.removedIds(), Set.of()));
+            changes.removedEntries.putAll(requireNonNullElse(recorded.removedEntries(), Map.of()));
             changes.metaData = recorded.metaData();
         } catch (IOException | JsonParseException e) {
             LOGGER.error("Could not read the changes recorded for the shared database from {}", changes.file, e);
@@ -120,7 +120,7 @@ public class OfflineChanges {
     }
 
     public synchronized boolean isEmpty() {
-        return changedEntries.isEmpty() && newEntries.isEmpty() && removedIds.isEmpty() && (metaData == null);
+        return changedEntries.isEmpty() && newEntries.isEmpty() && removedEntries.isEmpty() && (metaData == null);
     }
 
     public synchronized void recordChange(BibEntry entry) {
@@ -151,8 +151,9 @@ public class OfflineChanges {
             }
             int sharedId = entry.getSharedBibEntryData().getSharedIdAsInt();
             if (sharedId != -1) {
-                changedEntries.remove(sharedId);
-                removedIds.add(sharedId);
+                EntryState recordedChange = changedEntries.remove(sharedId);
+                // The version of the first offline change, if any - the entry cannot move on while offline
+                removedEntries.put(sharedId, recordedChange == null ? entry.getSharedBibEntryData().getVersion() : recordedChange.baseVersion());
             }
         }
         save();
@@ -175,10 +176,10 @@ public class OfflineChanges {
     /// Hands out everything recorded so far and forgets it: the caller synchronizes the changes,
     /// and whatever fails again is recorded again
     public synchronized Recorded take() {
-        Recorded recorded = new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashSet<>(removedIds), metaData);
+        Recorded recorded = new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData);
         changedEntries.clear();
         newEntries.clear();
-        removedIds.clear();
+        removedEntries.clear();
         metaData = null;
         save();
         return recorded;
@@ -192,7 +193,7 @@ public class OfflineChanges {
             }
             Files.createDirectories(file.getParent());
             Path temporaryFile = Files.createTempFile(file.getParent(), "shared-database", ".json.tmp");
-            Files.writeString(temporaryFile, GSON.toJson(new Recorded(changedEntries, newEntries, removedIds, metaData)));
+            Files.writeString(temporaryFile, GSON.toJson(new Recorded(changedEntries, newEntries, removedEntries, metaData)));
             Files.move(temporaryFile, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             LOGGER.error("Could not save the changes made while the shared database was unavailable to {}", file, e);

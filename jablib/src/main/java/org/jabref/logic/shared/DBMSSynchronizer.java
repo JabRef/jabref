@@ -695,7 +695,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
             List<BibEntry> entriesToRemove = new ArrayList<>();
             List<BibEntry> locallyPresentRemovedEntries = new ArrayList<>();
-            for (int sharedId : recorded.removedIds()) {
+            recorded.removedEntries().forEach((sharedId, version) -> {
                 BibEntry localEntry = localEntriesById.get(sharedId);
                 if (localEntry != null) {
                     // Pulled back in by a fresh session
@@ -703,8 +703,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
                 BibEntry removedEntry = new BibEntry();
                 removedEntry.getSharedBibEntryData().setSharedId(sharedId);
+                removedEntry.getSharedBibEntryData().setVersion(version);
                 entriesToRemove.add(removedEntry);
-            }
+            });
             if (!locallyPresentRemovedEntries.isEmpty()) {
                 bibDatabase.removeEntries(locallyPresentRemovedEntries, EntriesEventSource.SHARED);
             }
@@ -740,8 +741,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
 
             syncExecutor.execute(() -> {
-                if (!entriesToRemove.isEmpty()) {
-                    removeSharedEntries(entriesToRemove);
+                List<BibEntry> stillUnchangedEntries = onlyUnchangedSharedEntries(entriesToRemove);
+                if (!stillUnchangedEntries.isEmpty()) {
+                    removeSharedEntries(stillUnchangedEntries);
                 }
                 reviveEntriesDeletedMeanwhile(entriesToWrite, entriesToInsert);
                 if (!entriesToInsert.isEmpty()) {
@@ -763,6 +765,49 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         return true;
     }
 
+    /// Database worker: the optimistic lock for a recorded removal, which [DBMSProcessor#removeEntries]
+    /// cannot express. An entry another client changed during the outage is kept - the pull that
+    /// ends the replay brings it back locally, rather than the collaborator losing their work.
+    ///
+    /// @return the entries whose shared version still is the one the removal was recorded against
+    private List<BibEntry> onlyUnchangedSharedEntries(List<BibEntry> entriesToRemove) {
+        if (!connected.get() || entriesToRemove.isEmpty()) {
+            return entriesToRemove;
+        }
+        Map<Integer, Integer> sharedVersions;
+        try {
+            sharedVersions = sharedVersionsOf(entriesToRemove);
+        } catch (SQLException e) {
+            LOGGER.error("Could not check which recorded removals are still up to date", e);
+            return List.of();
+        }
+        List<BibEntry> unchangedEntries = new ArrayList<>();
+        for (BibEntry bibEntry : entriesToRemove) {
+            Integer sharedVersion = sharedVersions.get(bibEntry.getSharedBibEntryData().getSharedIdAsInt());
+            if (sharedVersion == null) {
+                // Already gone from the shared database
+                continue;
+            }
+            if (sharedVersion == bibEntry.getSharedBibEntryData().getVersion()) {
+                unchangedEntries.add(bibEntry);
+            } else {
+                LOGGER.info("Keeping shared entry {}, which was changed while it was removed locally",
+                        bibEntry.getSharedBibEntryData().getSharedIdAsInt());
+            }
+        }
+        return unchangedEntries;
+    }
+
+    /// Database worker
+    private Map<Integer, Integer> sharedVersionsOf(List<BibEntry> bibEntries) throws SQLException {
+        return dbmsProcessor.partitionAndGetSharedEntries(bibEntries.stream()
+                                                                    .map(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt())
+                                                                    .toList())
+                            .stream()
+                            .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt(),
+                                    bibEntry -> bibEntry.getSharedBibEntryData().getVersion()));
+    }
+
     /// Database worker: a shared row deleted during the outage must not take the changes recorded
     /// against it with it. Such an entry is re-inserted as a new shared entry instead of being
     /// updated - an update would fail with [SharedEntryNotPresentException] and pull the deletion,
@@ -773,12 +818,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         Set<Integer> stillPresentIds;
         try {
-            stillPresentIds = dbmsProcessor.partitionAndGetSharedEntries(entriesToWrite.stream()
-                                                                                       .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
-                                                                                       .toList())
-                                           .stream()
-                                           .map(entry -> entry.getSharedBibEntryData().getSharedIdAsInt())
-                                           .collect(Collectors.toSet());
+            stillPresentIds = sharedVersionsOf(entriesToWrite).keySet();
         } catch (SQLException e) {
             LOGGER.error("Could not check which recorded entries are still present in the shared database", e);
             return;

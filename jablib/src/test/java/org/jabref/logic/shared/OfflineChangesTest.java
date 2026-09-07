@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -63,7 +62,7 @@ class OfflineChangesTest {
 
         assertEquals(Map.of(1, new OfflineChanges.EntryState(3, "article", Map.of("title", "Title 1"))), recorded.changedEntries());
         assertEquals(Map.of(added.getId(), new OfflineChanges.EntryState(1, "book", Map.of("author", "Ada"))), recorded.newEntries());
-        assertEquals(Set.of(2), recorded.removedIds());
+        assertEquals(Map.of(2, 1), recorded.removedEntries());
         assertEquals(Map.of("databaseType", "bibtex;"), recorded.metaData());
     }
 
