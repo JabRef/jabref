@@ -386,13 +386,21 @@ public class MetaData {
         postChange();
     }
 
-    /// Takes over the entire contents of `other`, leaving this instance's identity intact — and with it
+    /// A detached copy of `other`: equal contents, its own identity, no listeners.
+    public static MetaData copyOf(@NonNull MetaData other) {
+        MetaData copy = new MetaData();
+        copy.copyFrom(other);
+        return copy;
+    }
+
+    /// Takes over the contents of `other`, leaving this instance's identity intact — and with it
     /// everything registered on its [EventBus]. Installing `other` in the library instead would orphan
     /// every listener of the instance it replaced.
     ///
     /// Event propagation is not taken over: whether this instance posts is a property of the live
-    /// instance and its listeners, not of the contents. One [MetaDataChangedEvent] is posted at the end.
-    public void setContentsFrom(@NonNull MetaData other) {
+    /// instance and its listeners, not of the contents. Posts a [MetaDataChangedEvent], and a
+    /// [GroupUpdatedEvent] as well when `other` has groups.
+    public void copyFrom(@NonNull MetaData other) {
         citeKeyPatterns.clear();
         citeKeyPatterns.putAll(other.citeKeyPatterns);
         userFileDirectory.clear();
@@ -404,8 +412,7 @@ public class MetaData {
         unknownMetaData.clear();
         unknownMetaData.putAll(other.unknownMetaData);
 
-        contentSelectors.getContentSelectors().clear();
-        other.contentSelectors.getContentSelectors().forEach(contentSelectors::addContentSelector);
+        contentSelectors.setAll(other.contentSelectors.getContentSelectors());
 
         groupSearchSyntaxVersion = other.groupSearchSyntaxVersion;
         encoding = other.encoding;
@@ -425,8 +432,12 @@ public class MetaData {
         gitAutoCommit = other.gitAutoCommit;
         gitAutoPush = other.gitAutoPush;
 
-        // Last, since setGroups wires up the subscriptions this instance's listeners depend on
-        other.getGroups().ifPresentOrElse(this::setGroups, () -> groupsRoot.setValue(null));
+        // The tree is copied, not shared: group operations mutate nodes in place, so a shared tree
+        // would let a later edit rewrite what a recorded change is supposed to restore.
+        // Last, since setGroups wires up the subscriptions this instance's listeners depend on.
+        other.getGroups()
+             .map(GroupTreeNode::copySubtree)
+             .ifPresentOrElse(this::setGroups, () -> groupsRoot.setValue(null));
 
         postChange();
     }

@@ -87,6 +87,23 @@ class BibChangeTest {
         assertEquals(Optional.empty(), databaseContext.getMetaData().getMode());
     }
 
+    /// The change holds copies, so a group edit made after it was recorded cannot rewrite what
+    /// undoing it restores.
+    @Test
+    void aMetaDataChangeIsNotRewrittenByALaterGroupEdit() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        MetaData live = databaseContext.getMetaData();
+        live.setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ',')));
+        UndoableMetaDataChange change = new UndoableMetaDataChange(databaseContext, live, metaDataWithMode());
+
+        // The user edits the groups after the change was recorded, then takes the change back.
+        live.getGroups().orElseThrow().addSubgroup(new ExplicitGroup("Added later", GroupHierarchyType.INDEPENDENT, ','));
+        change.inverted().apply();
+
+        assertEquals(List.of(), live.getGroups().orElseThrow().getChildren(),
+                "undo restored a group tree the recorded state never held");
+    }
+
     @Test
     void applyingAMetaDataChangeKeepsTheMetaDataInstance() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
@@ -125,9 +142,6 @@ class BibChangeTest {
         assertEquals(List.of(), database.getEntries());
     }
 
-    /// A set applies best-effort, and best-effort is only honest if the caller is told what did
-    /// not make it - otherwise one implementation of the sealed interface reports a success its
-    /// siblings would have thrown on.
     @Test
     void aSetReportsTheChangesItCouldNotApplyAndKeepsGoing() {
         BibEntry entry = entry();
@@ -154,7 +168,6 @@ class BibChangeTest {
         assertTrue(changeSet.apply().isComplete());
     }
 
-    /// The failures of a nested set name the changes that failed, not the sets holding them.
     @Test
     void aNestedSetsFailuresTravelUp() {
         BibDatabase database = new BibDatabase();
@@ -194,24 +207,21 @@ class BibChangeTest {
         assertEquals(new UnknownEntryType("customtype"), entry.getType());
     }
 
-    /// Restoring removed entries must not look like adding them: the group listener in
-    /// `LibraryTab` skips auto-assignment only for `UNDO`.
     @Test
     void undoingARemovalReinsertsWithTheUndoEventSource() {
         BibDatabase database = new BibDatabase();
         UndoableRemoveEntries removal = new UndoableRemoveEntries(database, entry());
 
-        assertEquals(EntriesEventSource.UNDO, ((UndoableInsertEntries) removal.inverted()).source());
+        assertEquals(EntriesEventSource.UNDO, removal.inverted().source());
     }
 
-    /// Redoing an insertion is a normal local addition, as it was before the change model.
     @Test
     void redoingAnInsertionKeepsTheLocalEventSource() {
         BibDatabase database = new BibDatabase();
         UndoableInsertEntries insertion = new UndoableInsertEntries(database, entry());
 
         assertEquals(EntriesEventSource.LOCAL, insertion.source());
-        assertEquals(EntriesEventSource.LOCAL, ((UndoableInsertEntries) insertion.inverted().inverted()).source());
+        assertEquals(EntriesEventSource.LOCAL, insertion.inverted().inverted().source());
     }
 
     /// A record in the undo stack must keep the hash it was created with. BibDatabase hashes
@@ -249,8 +259,6 @@ class BibChangeTest {
         assertEquals(List.of("replacement"), childNames(root));
     }
 
-    /// The previous edit captured the "after" state lazily during undo, so redoing before
-    /// undoing cleared the subtree. A value knows both states from the start.
     @Test
     void redoingASubtreeReplacementWithoutUndoingFirstIsHarmless() {
         GroupTreeNode root = group("root");

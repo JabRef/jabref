@@ -5,22 +5,15 @@ import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Replaces the contents of a library's metadata as a whole, which is how the library's own settings —
-/// mode, encoding, citation key pattern, file directories, save actions, content selectors, protection —
-/// arrive when they are read from a file rather than edited field by field.
-///
-/// The metadata *instance* the library holds is never replaced: listeners are registered on it
-/// ([org.jabref.model.metadata.MetaData#registerListener]), and swapping it would leave them
-/// subscribed to a discarded object.
+/// Replaces a library's settings as a whole, which is how they arrive from a file rather than
+/// edited field by field. Only the contents are replaced, never the [MetaData] instance, to keep
+/// listeners registered on it.
 @NullMarked
 public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaData before, MetaData after) implements BibChange {
 
-    /// Both states are copied, because applying writes into the library's live metadata instance and
-    /// that instance is typically the `before` state. Holding it by reference would mean applying this
-    /// change overwrites the very state it has to be able to restore.
     public UndoableMetaDataChange {
-        before = copyOf(before);
-        after = copyOf(after);
+        before = MetaData.copyOf(before);
+        after = MetaData.copyOf(after);
     }
 
     @Override
@@ -30,13 +23,7 @@ public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaDat
 
     @Override
     public ApplyResult apply() {
-        databaseContext.getMetaData().setContentsFrom(after);
+        databaseContext.getMetaData().copyFrom(after);
         return ApplyResult.SUCCESS;
-    }
-
-    private static MetaData copyOf(MetaData metaData) {
-        MetaData copy = new MetaData();
-        copy.setContentsFrom(metaData);
-        return copy;
     }
 }

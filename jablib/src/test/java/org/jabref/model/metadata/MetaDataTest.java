@@ -1,11 +1,17 @@
 package org.jabref.model.metadata;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -13,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MetaDataTest {
 
@@ -48,9 +55,57 @@ class MetaDataTest {
         other.setUserFileDirectory("user-host", "/tmp/files");
         other.markAsProtected();
 
-        metaData.setContentsFrom(other);
+        metaData.copyFrom(other);
 
         assertEquals(other, metaData);
+    }
+
+    /// [MetaData#equals] ignores these four, so the test above would pass without them.
+    @Test
+    void takingOverContentsCopiesWhatEqualsDoesNotCompare() {
+        MetaData other = new MetaData();
+        other.setGroupSearchSyntaxVersion(Version.parse("6.0"));
+        other.setBlgFilePath("user-host", Path.of("/tmp/library.blg"));
+        other.putUnknownMetaDataItem("unknown", List.of("value"));
+        other.setContainsSearchGroups(true);
+
+        metaData.copyFrom(other);
+
+        assertEquals(Optional.of(Version.parse("6.0")), metaData.getGroupSearchSyntaxVersion());
+        assertEquals(Optional.of(Path.of("/tmp/library.blg")), metaData.getBlgFilePath("user-host"));
+        assertEquals(Map.of("unknown", List.of("value")), metaData.getUnknownMetaData());
+        assertTrue(metaData.containsSearchGroups());
+    }
+
+    /// Group operations mutate nodes in place, so a shared tree would let a later edit rewrite what
+    /// a recorded change is supposed to restore.
+    @Test
+    void takingOverContentsCopiesTheGroupTreeRatherThanSharingIt() {
+        MetaData other = new MetaData();
+        other.setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ',')));
+
+        metaData.copyFrom(other);
+        metaData.getGroups().orElseThrow().addSubgroup(new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','));
+
+        assertEquals(List.of(), other.getGroups().orElseThrow().getChildren(), "the source tree was edited too");
+    }
+
+    @Test
+    void aCopyHoldsTheSameContentsAndItsOwnListeners() {
+        metaData.setMode(BibDatabaseMode.BIBLATEX);
+        List<MetaDataChangedEvent> events = new ArrayList<>();
+        metaData.registerListener(new Object() {
+            @Subscribe
+            public void listen(MetaDataChangedEvent event) {
+                events.add(event);
+            }
+        });
+
+        MetaData copy = MetaData.copyOf(metaData);
+        copy.setEncoding(StandardCharsets.ISO_8859_1);
+
+        assertEquals(BibDatabaseMode.BIBLATEX, copy.getMode().orElseThrow());
+        assertEquals(List.of(), events, "the copy notified the source's listeners");
     }
 
     @Test
@@ -58,14 +113,11 @@ class MetaDataTest {
         metaData.setMode(BibDatabaseMode.BIBTEX);
         metaData.setUserFileDirectory("user-host", "/tmp/files");
 
-        metaData.setContentsFrom(new MetaData());
+        metaData.copyFrom(new MetaData());
 
         assertEquals(new MetaData(), metaData);
     }
 
-    /// Listeners are registered on the instance, so taking over another's contents has to keep
-    /// them subscribed - `LibraryTab` and `CoarseChangeFilter` depend on it for the modified
-    /// marker, autosave and backups.
     @Test
     void takingOverContentsKeepsListenersSubscribed() {
         List<MetaDataChangedEvent> events = new ArrayList<>();
@@ -78,7 +130,7 @@ class MetaDataTest {
 
         MetaData other = new MetaData();
         other.setMode(BibDatabaseMode.BIBLATEX);
-        metaData.setContentsFrom(other);
+        metaData.copyFrom(other);
         assertEquals(1, events.size());
 
         metaData.setEncoding(StandardCharsets.ISO_8859_1);
