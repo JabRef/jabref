@@ -3,9 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -15,7 +16,9 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.BaseSearchQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
@@ -86,7 +89,7 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
         return inputStream -> {
             String response;
             try {
-                response = new String(inputStream.readAllBytes());
+                response = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             } catch (java.io.IOException e) {
                 throw new ParseException("Could not read response from BASE", e);
             }
@@ -97,58 +100,81 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
                 return List.of();
             }
 
-            List<BibEntry> entries = new ArrayList<>();
-            JSONObject responseObject = jsonObject.optJSONObject("response");
-            JSONObject result = (responseObject != null) ? responseObject.optJSONObject("result") : null;
-            if (result != null) {
-                JSONArray docs = result.optJSONArray("docs");
-                if (docs != null) {
-                    for (int i = 0; i < docs.length(); i++) {
-                        entries.add(parseEntry(docs.getJSONObject(i)));
-                    }
-                }
-            }
-            return entries;
+            return getDocs(jsonObject)
+                    .stream()
+                    .flatMap(docs -> IntStream.range(0, docs.length()).mapToObj(docs::getJSONObject))
+                    .map(this::parseEntry)
+                    .toList();
         };
     }
 
+    private Optional<JSONArray> getDocs(JSONObject jsonObject) {
+        return Optional.ofNullable(jsonObject.optJSONObject("response"))
+                       .flatMap(responseObject -> Optional.ofNullable(responseObject.optJSONArray("docs"))
+                                                          .or(() -> Optional.ofNullable(responseObject.optJSONObject("result"))
+                                                                            .map(result -> result.optJSONArray("docs"))));
+    }
+
     private BibEntry parseEntry(JSONObject doc) {
-        BibEntry entry = new BibEntry();
+        BibEntry entry = new BibEntry(mapEntryType(doc));
+        entry = withFieldIfPresent(entry, StandardField.TITLE, getFirstValue(doc, "dctitle"));
+        entry = withFieldIfPresent(entry, StandardField.YEAR, getFirstValue(doc, "dcyear"));
+        entry = withFieldIfPresent(entry, StandardField.PUBLISHER, getFirstValue(doc, "dcpublisher"));
+        entry = withFieldIfPresent(entry, StandardField.DOI, getFirstValue(doc, "dcdoi"));
+        entry = withFieldIfPresent(entry, StandardField.URL, getFirstValue(doc, "dclink"));
+        entry = withFieldIfPresent(entry, StandardField.AUTHOR, getJoinedValues(doc, "dccreator", " and "));
 
-        entry.setType(mapEntryType(doc));
-
-        entry.setField(StandardField.TITLE, doc.optString("dctitle"));
-        entry.setField(StandardField.YEAR, doc.optString("dcyear"));
-        entry.setField(StandardField.PUBLISHER, doc.optString("dcpublisher"));
-        entry.setField(StandardField.DOI, doc.optString("dcdoi"));
-        entry.setField(StandardField.URL, doc.optString("dclink"));
-
-        JSONArray creators = doc.optJSONArray("dccreator");
-        if (creators != null) {
-            List<String> authorList = new ArrayList<>();
-            for (int i = 0; i < creators.length(); i++) {
-                authorList.add(creators.getString(i));
-            }
-            entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
-        }
-
-        JSONArray subjects = doc.optJSONArray("dcsubject");
-        if (subjects != null) {
-            for (int i = 0; i < subjects.length(); i++) {
-                entry.addKeyword(subjects.getString(i), ',');
-            }
+        for (String subject : getValues(doc, "dcsubject")) {
+            entry.addKeyword(subject, ',');
         }
 
         return entry;
     }
 
-    private StandardEntryType mapEntryType(JSONObject doc) {
-        JSONArray typeNorm = doc.optJSONArray("dctypenorm");
-        if (typeNorm == null || typeNorm.isEmpty()) {
-            return StandardEntryType.Misc;
-        }
-        String code = typeNorm.getString(0);
+    private BibEntry withFieldIfPresent(BibEntry entry, Field field, Optional<String> value) {
+        return value.map(fieldValue -> entry.withField(field, fieldValue))
+                    .orElse(entry);
+    }
 
+    private Optional<String> getFirstValue(JSONObject doc, String key) {
+        return getValues(doc, key).stream()
+                                  .findFirst();
+    }
+
+    private Optional<String> getJoinedValues(JSONObject doc, String key, String delimiter) {
+        List<String> values = getValues(doc, key);
+        if (values.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(String.join(delimiter, values));
+    }
+
+    private List<String> getValues(JSONObject doc, String key) {
+        Object value = doc.opt(key);
+        return switch (value) {
+            case JSONArray array ->
+                    IntStream.range(0, array.length())
+                             .mapToObj(array::optString)
+                             .filter(StringUtil::isNotBlank)
+                             .toList();
+            case Number number ->
+                    List.of(number.toString());
+            case String string when StringUtil.isNotBlank(string) ->
+                    List.of(string);
+            case null ->
+                    List.of();
+            default ->
+                    List.of();
+        };
+    }
+
+    private StandardEntryType mapEntryType(JSONObject doc) {
+        return getFirstValue(doc, "dctypenorm")
+                .map(this::mapEntryType)
+                .orElse(StandardEntryType.Misc);
+    }
+
+    private StandardEntryType mapEntryType(String code) {
         return switch (code) {
             case String c when c.startsWith(TYPE_CODE_PHD_THESIS) ->
                     StandardEntryType.PhdThesis;

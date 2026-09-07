@@ -20,7 +20,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.OperatorNode;
 import org.jabref.model.search.query.SearchQueryNode;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
@@ -37,7 +37,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-@FetcherTest
 class BaseSearchFetcherTest {
 
     private BaseSearchFetcher fetcher;
@@ -128,10 +127,10 @@ class BaseSearchFetcherTest {
     @Test
     void parserReturnsEmptyListOnMissingResponseOrResultOrDocs() throws ParseException {
         String jsonEmptyResponse = "{}";
-        String jsonMissingResult = "{\"response\": {}}";
-        String jsonMissingDocs = "{\"response\": {\"result\": {}}}";
+        String jsonMissingDocs = "{\"response\": {}}";
+        String jsonMissingNestedDocs = "{\"response\": {\"result\": {}}}";
 
-        for (String json : List.of(jsonEmptyResponse, jsonMissingResult, jsonMissingDocs)) {
+        for (String json : List.of(jsonEmptyResponse, jsonMissingDocs, jsonMissingNestedDocs)) {
             InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
             List<BibEntry> entries = fetcher.getParser().parseEntries(inputStream);
             assertEquals(List.of(), entries);
@@ -139,24 +138,22 @@ class BaseSearchFetcherTest {
     }
 
     @Test
-    void parserParsesArticleEntryFromSampleResponse() throws ParseException {
+    void parserParsesArticleEntryFromLiveResponseShape() throws ParseException {
         String json = """
                 {
                   "response": {
-                    "result": {
-                      "docs": [
-                        {
-                          "dctitle": "A Study on Reference Management",
-                          "dcyear": "2023",
-                          "dcpublisher": "Springer",
-                          "dcdoi": "10.1000/example.doi",
-                          "dclink": "https://example.org/paper",
-                          "dccreator": ["Doe, Jane", "Smith, John"],
-                          "dcsubject": ["bibliography", "software"],
-                          "dctypenorm": ["121"]
-                        }
-                      ]
-                    }
+                    "docs": [
+                      {
+                        "dctitle": "A Study on Reference Management",
+                        "dcyear": 2023,
+                        "dcpublisher": ["Springer"],
+                        "dcdoi": ["10.1000/example.doi"],
+                        "dclink": "https://example.org/paper",
+                        "dccreator": ["Doe, Jane", "Smith, John"],
+                        "dcsubject": ["bibliography", "software"],
+                        "dctypenorm": ["121"]
+                      }
+                    ]
                   }
                 }
                 """;
@@ -175,18 +172,39 @@ class BaseSearchFetcherTest {
     }
 
     @Test
-    void parserDefaultsToMiscWhenNoTypeCode() throws ParseException {
+    void parserParsesLegacyNestedResultShape() throws ParseException {
         String json = """
                 {
                   "response": {
                     "result": {
                       "docs": [
                         {
-                          "dctitle": "Untyped Document",
-                          "dcyear": "2020"
+                          "dctitle": "Nested response entry",
+                          "dctypenorm": ["121"]
                         }
                       ]
                     }
+                  }
+                }
+                """;
+        InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
+        List<BibEntry> entries = fetcher.getParser().parseEntries(inputStream);
+
+        assertEquals(1, entries.size());
+        assertEquals(Optional.of("Nested response entry"), entries.getFirst().getField(StandardField.TITLE));
+    }
+
+    @Test
+    void parserDefaultsToMiscWhenNoTypeCode() throws ParseException {
+        String json = """
+                {
+                  "response": {
+                    "docs": [
+                      {
+                        "dctitle": "Untyped Document",
+                        "dcyear": "2020"
+                      }
+                    ]
                   }
                 }
                 """;
@@ -209,14 +227,12 @@ class BaseSearchFetcherTest {
         String json = """
                 {
                   "response": {
-                    "result": {
-                      "docs": [
-                        {
-                          "dctitle": "Sample Title",
-                          "dctypenorm": ["%s"]
-                        }
-                      ]
-                    }
+                    "docs": [
+                      {
+                        "dctitle": "Sample Title",
+                        "dctypenorm": ["%s"]
+                      }
+                    ]
                   }
                 }
                 """.formatted(typeCode);
@@ -229,6 +245,7 @@ class BaseSearchFetcherTest {
     }
 
     @Test
+    @ExternalServicesTest
     void isValidKeyReturnsFalseForMalformedResponse() {
         assertFalse(fetcher.isValidKey("obviously-invalid-key"));
     }
