@@ -28,6 +28,7 @@ import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -40,9 +41,14 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiTabViewModel.class);
 
     private final Locale oldLocale;
 
@@ -78,6 +84,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<String> embeddingModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedEmbeddingModel = new SimpleStringProperty();
+    private final StringProperty selectedEmbeddingModelSize = new SimpleStringProperty("");
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // HuggingFaceChatModel and GoogleAiGeminiChatModel don't support setting an API base URL
@@ -175,6 +182,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.customizeExpertSettings.addListener((_, _, newValue) ->
                 disableExpertSettings.set(!newValue || !enableAi.get())
         );
+
+        this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelSize(newValue));
 
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
             List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
@@ -382,6 +391,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
 
         selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
+        updateSelectedEmbeddingModelSize(selectedEmbeddingModel.get());
 
         chattingSystemMessageTemplate.set(workingAiPreferences.getChattingSystemMessageTemplate());
         chattingUserMessageTemplate.set(workingAiPreferences.getChattingUserMessageTemplate());
@@ -777,9 +787,32 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return followUpQuestionsTemplate;
     }
 
-    public String getEmbeddingModelDisplayLabel(String modelName) {
-        return embeddingModelMetadataService.getMetadata(modelName)
-                                            .map(EmbeddingModelMetadata::displayLabel)
-                                            .orElse(modelName);
+    public StringProperty selectedEmbeddingModelSizeProperty() {
+        return selectedEmbeddingModelSize;
+    }
+
+    private void updateSelectedEmbeddingModelSize(@Nullable String modelName) {
+        if (StringUtil.isBlank(modelName)) {
+            selectedEmbeddingModelSize.set("");
+            return;
+        }
+
+        selectedEmbeddingModelSize.set(Localization.lang("Loading..."));
+        BackgroundTask.wrap(() -> embeddingModelMetadataService.getMetadata(modelName))
+                      .onSuccess(metadataOpt -> {
+                          if (modelName.equals(selectedEmbeddingModel.get())) {
+                              String text = metadataOpt.map(EmbeddingModelMetadata::sizeInfo)
+                                                       .filter(s -> !s.isBlank())
+                                                       .orElse(Localization.lang("Unknown"));
+                              selectedEmbeddingModelSize.set(text);
+                          }
+                      })
+                      .onFailure(e -> {
+                          LOGGER.warn("Failed to fetch embedding model metadata for {}", modelName, e);
+                          if (modelName.equals(selectedEmbeddingModel.get())) {
+                              selectedEmbeddingModelSize.set(Localization.lang("Unknown"));
+                          }
+                      })
+                      .executeWith(taskExecutor);
     }
 }

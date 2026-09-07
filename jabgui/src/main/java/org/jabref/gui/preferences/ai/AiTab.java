@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -61,6 +62,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
+        Label embeddingModelSizeLabel = new Label();
+        embeddingModelSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
+
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
@@ -98,8 +102,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
-                                                        viewModel::getEmbeddingModelDisplayLabel,
+                                                        model -> model != null ? model : "",
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
+                                                .field(Localization.lang("Embedding model size"), embeddingModelSizeLabel)
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]

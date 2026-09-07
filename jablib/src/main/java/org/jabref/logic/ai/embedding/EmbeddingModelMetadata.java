@@ -15,14 +15,15 @@ public record EmbeddingModelMetadata(
         OptionalInt maxSnippetTokens
 ) {
     public String sizeInfo() {
-        return downloadSizeBytes.isPresent()
+        String size = downloadSizeBytes.isPresent()
                 ? FileUtils.byteCountToDisplaySize(downloadSizeBytes.orElseThrow())
                 : "";
-    }
-
-    public String displayLabel() {
-        String sizePrefix = downloadSizeBytes.isPresent() ? "[" + sizeInfo() + "] " : "";
-        String tokenSuffix = maxSnippetTokens.isPresent() ? " (max " + maxSnippetTokens.orElseThrow() + " tokens)" : "";
-        return sizePrefix + modelName + tokenSuffix;
+        String tokenSuffix = maxSnippetTokens.isPresent()
+                ? "(max " + maxSnippetTokens.orElseThrow() + " tokens)"
+                : "";
+        if (!size.isEmpty() && !tokenSuffix.isEmpty()) {
+            return size + " " + tokenSuffix;
+        }
+        return size.isEmpty() ? tokenSuffix : size;
     }
 }
