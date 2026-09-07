@@ -145,12 +145,11 @@ This behavior streamlines the process of creating new entries by allowing users 
 Needs: impl
 
 ### Restore the working position on startup
-
 `req~ux.startup.restore-position~1`
 
 When JabRef reopens the libraries of the last session, it selects the library tab that was in front when JabRef was closed, and in each library the entry that was selected there.
 
-The position is written while closing, so a JabRef that did not close normally simply restores no position.
+The position is written while closing, so a session that did not close normally leaves the position of the last regular close in place.
 
 Needs: impl
 

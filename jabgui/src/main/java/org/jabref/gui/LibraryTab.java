@@ -338,16 +338,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// [impl->req~ux.startup.restore-position~1]
-    /// Restores the entry that was selected in this library when JabRef was closed the last time. The selection is
-    /// only written at shutdown, so a crash simply leaves the library without a restored selection.
+    /// Restores the entry that was selected in this library when JabRef was closed the last time. A citation key is
+    /// the only identity an entry keeps across reloads, so a key held by several entries restores nothing rather than
+    /// picking one of them.
     private void restoreLastSelectedEntry() {
         bibDatabaseContext.getDatabasePath()
                           .map(Path::toAbsolutePath)
                           .flatMap(path -> preferences.getLastFilesOpenedPreferences().getLastSelectedEntry(path))
-                          .flatMap(citationKey -> bibDatabaseContext.getDatabase().getEntries().stream()
-                                                                    .filter(entry -> entry.getCitationKey().filter(citationKey::equals).isPresent())
-                                                                    .findFirst())
-                          .ifPresent(this::clearAndSelect);
+                          .map(citationKey -> bibDatabaseContext.getDatabase().getEntriesByCitationKey(citationKey))
+                          .filter(entries -> entries.size() == 1)
+                          .ifPresent(entries -> clearAndSelect(entries.getFirst()));
     }
 
     public void createSearchContext() {
