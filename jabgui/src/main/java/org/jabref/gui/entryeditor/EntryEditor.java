@@ -147,7 +147,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
 
-        this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
+        this.focusUtils = new EntryEditorFocusUtils(tabbed, this, dialogService);
 
         setupKeyBindings();
         setupDragAndDrop();
@@ -250,10 +250,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                     }
-                    case JUMP_TO_FIELD -> {
-                        openJumpToFieldDialog();
-                        event.consume();
-                    }
                     case HELP -> {
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -294,7 +290,9 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         openJumpToFieldDialog();
     }
 
-    private void openJumpToFieldDialog() {
+    /// Shows the jump-to-field dialog for the currently edited entry.
+    /// Handled globally in [org.jabref.gui.frame.JabRefFrame] so that it works regardless of where the keyboard focus lies.
+    public void openJumpToFieldDialog() {
         if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
             BaseDialog.bringToFront(jumpToFieldDialog);
             return;
@@ -325,10 +323,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     public @Nullable BibEntry getCurrentlyEditedEntry() {
         return viewModel.getCurrentlyEditedEntry();
-    }
-
-    public List<EntryEditorTab> getAllPossibleTabs() {
-        return viewModel.getAllPossibleTabs();
     }
 
     private void onEntryChanged(@NonNull BibEntry entry) {
@@ -395,7 +389,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     public void selectField(String fieldName) {
-        focusUtils.setFocusToField(FieldFactory.parseField(fieldName));
+        Optional.ofNullable(viewModel.getCurrentlyEditedEntry())
+                .ifPresent(entry -> {
+                    focusUtils.focusOrAddField(FieldFactory.parseField(entry.getType(), fieldName));
+                });
     }
 
     public void setFocusToField(Field field) {
