@@ -15,6 +15,7 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
@@ -378,20 +379,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     /// Search matches are sorted to the top (or are the only rows left), so a table scrolled down before searching shows none of them.
     /// The table stays where it is as long as at least one match is in view, and otherwise moves the minimal distance, to avoid jumping around while a query is typed.
     private void showSearchMatchesIfNoneVisible() {
-        int lastMatchIndex = -1;
-        for (BibEntryTableViewModel entry : getItems()) {
-            if (!entry.isMatchedBySearch().get()) {
-                break;
+        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow")).ifPresent(flow -> {
+            int firstVisible = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(0);
+            if (firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch().get()) {
+                return;
             }
-            lastMatchIndex++;
-        }
-        if (lastMatchIndex < 0) {
-            return;
-        }
-        int lastMatch = lastMatchIndex;
-        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
-                .filter(flow -> Optional.ofNullable(flow.getFirstVisibleCell()).map(cell -> cell.getIndex() > lastMatch).orElse(false))
-                .ifPresent(flow -> flow.scrollTo(lastMatch));
+            // Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it
+            int lastMatch = -1;
+            for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch().get(); i++) {
+                lastMatch = i;
+            }
+            if (lastMatch >= 0) {
+                flow.scrollTo(lastMatch);
+            }
+        });
     }
 
     private void scrollToNextMatchCategory() {
