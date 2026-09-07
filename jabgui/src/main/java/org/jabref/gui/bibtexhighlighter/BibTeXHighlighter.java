@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.search.Highlighter;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.gui.search.SearchType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.Range;
@@ -222,13 +222,12 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
     /// Finds search matches in the current line.
     private List<Range> getSearchMatches(String text, int lineStart) {
-        String query = stateManager.searchQueryProperty().get();
-        if (StringUtil.isBlank(query)) {
+        Optional<SearchQuery> searchQuery = stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get();
+        if (searchQuery.isEmpty()) {
             return List.of();
         }
 
-        SearchQuery searchQuery = new SearchQuery(query);
-        Map<Optional<Field>, List<String>> termsMap = Highlighter.groupTermsByField(searchQuery);
+        Map<Optional<Field>, List<String>> termsMap = Highlighter.groupTermsByField(searchQuery.get());
         Map<Field, Range> fieldPositions = fieldPositionsProvider.get();
 
         List<Range> matches = new ArrayList<>();

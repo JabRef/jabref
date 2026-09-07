@@ -17,7 +17,6 @@ import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -27,7 +26,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
     public SearchResultsTable(SearchResultsTableDataModel model,
                               BibDatabaseContext database,
                               GuiPreferences preferences,
-                              UndoManager undoManager,
                               DialogService dialogService,
                               StateManager stateManager,
                               TaskExecutor taskExecutor) {
@@ -41,7 +39,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                 database,
                 preferences,
                 preferences.getSearchDialogColumnPreferences(),
-                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor).createColumns();

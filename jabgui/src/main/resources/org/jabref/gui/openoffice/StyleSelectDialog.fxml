@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
@@ -27,7 +26,7 @@
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addCslButton" text="%Add .csl file" onAction="#addCslStyleFile"/>
                         </HBox>
@@ -43,7 +42,7 @@
                             </columnResizePolicy>
                         </TableView>
                         <VBox spacing="4.0">
-                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="200.0" spacing="4.0"/>
                         </VBox>
                     </VBox>
@@ -54,7 +53,7 @@
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addJStyleButton" text="%Add .jstyle file" onAction="#addJStyleFile"/>
                         </HBox>
@@ -70,7 +69,7 @@
                             </columnResizePolicy>
                         </TableView>
                         <VBox spacing="4.0">
-                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="jStylePreviewBox" prefHeight="200.0" prefWidth="665.0"/>
                         </VBox>
                     </VBox>
@@ -81,7 +80,7 @@
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addBstStyleButton" text="%Add .bst file" onAction="#addBstStyleFile"/>
                         </HBox>
@@ -104,7 +103,7 @@
                             <RadioButton fx:id="styleDefinedFormatButton" text="%Style-defined"/>
                         </HBox>
                         <VBox spacing="4.0">
-                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="bstPreviewBox" prefHeight="150.0" spacing="4.0"/>
                         </VBox>
                     </VBox>
@@ -114,8 +113,8 @@
                 <padding>
                     <Insets left="10.0" right="10.0" bottom="10.0"/>
                 </padding>
-                <Label text="%Currently set style:" styleClass="currentStyleLabel"/>
-                <Label fx:id="currentStyleNameLabel" styleClass="currentStyleNameLabel"/>
+                <Label text="%Currently set style:"/>
+                <Label fx:id="currentStyleNameLabel" styleClass="currentStyleNameLabel,bold"/>
             </HBox>
         </VBox>
     </content>
