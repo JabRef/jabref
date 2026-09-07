@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -17,20 +18,18 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -44,7 +43,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
@@ -57,6 +55,7 @@ import org.slf4j.LoggerFactory;
 public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
+    private static final Pattern MODIFICATION_DATE_LINE = Pattern.compile("\\s*" + StandardField.MODIFICATIONDATE.getName() + "\\s*=", Pattern.CASE_INSENSITIVE);
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
@@ -150,7 +149,7 @@ public class BackupManager {
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
     /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
     /// In the case of an exception `true` is returned to ensure that the user checks the output.
-    public static boolean backupFileDiffers(Path originalPath, Path backupDir, ImportFormatPreferences importFormatPreferences) {
+    public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
         Path discardedFile = determineDiscardedFile(originalPath, backupDir);
         if (Files.exists(discardedFile)) {
             try {
@@ -187,7 +186,7 @@ public class BackupManager {
                 if (Files.mismatch(originalPath, latestBackupPath) == -1L) {
                     return false;
                 }
-                if (differsOnlyInModificationDate(originalPath, latestBackupPath, importFormatPreferences)) {
+                if (differsOnlyInModificationDate(originalPath, latestBackupPath)) {
                     LOGGER.info("Backup file {} differs from current file {} only in modification dates", latestBackupPath, originalPath);
                     return false;
                 }
@@ -202,19 +201,27 @@ public class BackupManager {
     }
 
     /// An edit that was reverted still leaves a new `modificationdate` behind, so the backup written afterwards differs
-    /// from the file without containing anything worth restoring. Parsing both files is only done once the bytes are
-    /// known to differ, so that the common case of opening a library stays cheap. An invalid `% Encoding:` line makes
-    /// the parser throw an unchecked charset exception; the caller treats that like an I/O failure.
+    /// from the file without containing anything worth restoring. The files are compared line by line with the
+    /// `modificationdate` lines left out; no parsing, so a library of any size costs one pass over both files. Any
+    /// other difference, even a reformatted line, keeps the dialog: better one dialog too many than a lost change.
     /// [impl->req~jabgui.autosaveandbackup.ignore-modification-date~1]
-    private static boolean differsOnlyInModificationDate(Path originalPath, Path backupPath, ImportFormatPreferences importFormatPreferences) throws IOException {
-        ParserResult original = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
-        ParserResult backup = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor());
-        // Custom entry type definitions live in the parser result, not in the database context
-        if (original.isInvalid() || backup.isInvalid() || !original.getEntryTypes().equals(backup.getEntryTypes())) {
-            return false;
+    private static boolean differsOnlyInModificationDate(Path originalPath, Path backupPath) throws IOException {
+        // ISO-8859-1 maps every byte to one char, so files of any encoding are compared byte for byte
+        try (Stream<String> original = Files.lines(originalPath, StandardCharsets.ISO_8859_1);
+             Stream<String> backup = Files.lines(backupPath, StandardCharsets.ISO_8859_1)) {
+            Iterator<String> originalLines = original.filter(BackupManager::isNotModificationDate).iterator();
+            Iterator<String> backupLines = backup.filter(BackupManager::isNotModificationDate).iterator();
+            while (originalLines.hasNext() && backupLines.hasNext()) {
+                if (!originalLines.next().equals(backupLines.next())) {
+                    return false;
+                }
+            }
+            return !originalLines.hasNext() && !backupLines.hasNext();
         }
-        return BibDatabaseDiff.compare(original.getDatabaseContext(), backup.getDatabaseContext())
-                              .differsOnlyInFields(Set.of(StandardField.MODIFICATIONDATE));
+    }
+
+    private static boolean isNotModificationDate(String line) {
+        return !MODIFICATION_DATE_LINE.matcher(line).lookingAt();
     }
 
     /// Restores the backup file by copying and overwriting the original one.

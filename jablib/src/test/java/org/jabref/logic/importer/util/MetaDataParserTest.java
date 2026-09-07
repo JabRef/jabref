@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.util;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,10 +28,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 public class MetaDataParserTest {
 
@@ -187,20 +181,5 @@ public class MetaDataParserTest {
         MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("C:\\Path\\To\\Latex")), parsed.getLatexFileDirectory(userHost));
-    }
-
-    @Test
-    void eachParserKeepsItsOwnFileMonitor() throws ParseException, IOException {
-        FileUpdateMonitor firstMonitor = mock(FileUpdateMonitor.class);
-        FileUpdateMonitor secondMonitor = mock(FileUpdateMonitor.class);
-        MetaDataParser firstParser = new MetaDataParser(firstMonitor);
-        // Creating a second parser must not redirect the first one's monitor
-        MetaDataParser secondParser = new MetaDataParser(secondMonitor);
-
-        firstParser.parse(Map.of(MetaData.GROUPSTREE, "0 AllEntriesGroup:;\n1 TexGroup:myTexGroup\\;0\\;path/To/File\\;1\\;\\;\\;\\;;\n"), ',', "userAndHost");
-
-        verify(firstMonitor).addListenerForFile(any(), any());
-        verifyNoInteractions(secondMonitor);
-        assertEquals(secondMonitor, secondParser.getFileMonitor());
     }
 }

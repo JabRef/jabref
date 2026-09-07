@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -42,11 +41,8 @@ class BackupManagerTest {
 
     Path backupDir;
 
-    private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-
     @BeforeEach
     void setup(@TempDir Path tempDir) {
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         backupDir = tempDir.resolve("backup");
     }
 
@@ -63,7 +59,7 @@ class BackupManagerTest {
     @Test
     void backupFileIsEqualForNonExistingBackup() throws URISyntaxException {
         Path originalFile = Path.of(BackupManagerTest.class.getResource("no-autosave.bib").toURI());
-        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
@@ -74,7 +70,7 @@ class BackupManagerTest {
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 
         Path originalFile = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
-        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
@@ -85,41 +81,41 @@ class BackupManagerTest {
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 
         Path originalFile = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
-        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     // [utest->req~jabgui.autosaveandbackup.ignore-modification-date~1]
     @Test
     void backupDifferingOnlyInModificationDateIsNoDifference(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
-        Files.writeString(originalFile, "@Article{key, title = {Title}, modificationdate = {2026-09-01T10:00:00}}");
+        Files.writeString(originalFile, "@Article{key,\n  title = {Title},\n  modificationdate = {2026-09-01T10:00:00},\n}\n");
         Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
-        Files.writeString(backup, "@Article{key, title = {Title}, modificationdate = {2026-09-01T11:00:00}}");
+        Files.writeString(backup, "@Article{key,\n  title = {Title},\n  modificationdate = {2026-09-01T11:00:00},\n}\n");
         Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
 
-        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
     void backupDifferingInModificationDateAndCustomEntryTypeIsDifference(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
-        Files.writeString(originalFile, "@Article{key, title = {Title}, modificationdate = {2026-09-01T10:00:00}}\n@Comment{jabref-entrytype: Custom: req[title] opt[]}\n");
+        Files.writeString(originalFile, "@Article{key,\n  title = {Title},\n  modificationdate = {2026-09-01T10:00:00},\n}\n\n@Comment{jabref-entrytype: Custom: req[title] opt[]}\n");
         Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
-        Files.writeString(backup, "@Article{key, title = {Title}, modificationdate = {2026-09-01T11:00:00}}\n@Comment{jabref-entrytype: Custom: req[title;author] opt[]}\n");
+        Files.writeString(backup, "@Article{key,\n  title = {Title},\n  modificationdate = {2026-09-01T11:00:00},\n}\n\n@Comment{jabref-entrytype: Custom: req[title;author] opt[]}\n");
         Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
 
-        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
     void backupDifferingInModificationDateAndContentIsDifference(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
-        Files.writeString(originalFile, "@Article{key, title = {Title}, modificationdate = {2026-09-01T10:00:00}}");
+        Files.writeString(originalFile, "@Article{key,\n  title = {Title},\n  modificationdate = {2026-09-01T10:00:00},\n}\n");
         Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
-        Files.writeString(backup, "@Article{key, title = {Other title}, modificationdate = {2026-09-01T11:00:00}}");
+        Files.writeString(backup, "@Article{key,\n  title = {Other title},\n  modificationdate = {2026-09-01T11:00:00},\n}\n");
         Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
 
-        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
@@ -130,7 +126,7 @@ class BackupManagerTest {
         Files.writeString(backup, "% Encoding: no-such-charset\n@Article{key, title = {Title}}");
         Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(originalFile).toMillis() + 10_000));
 
-        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
@@ -153,7 +149,7 @@ class BackupManagerTest {
         }
 
         Path originalFile = noChangesBib;
-        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir, importFormatPreferences));
+        assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
@@ -164,7 +160,7 @@ class BackupManagerTest {
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(changesBib, BackupFileType.BACKUP, backupDir);
         Files.copy(changesBibBackup, target, StandardCopyOption.REPLACE_EXISTING);
 
-        assertTrue(BackupManager.backupFileDiffers(changesBib, backupDir, importFormatPreferences));
+        assertTrue(BackupManager.backupFileDiffers(changesBib, backupDir));
     }
 
     @Test
@@ -178,7 +174,7 @@ class BackupManagerTest {
         // Make backup file very old
         Files.setLastModifiedTime(target, FileTime.fromMillis(0));
 
-        assertFalse(BackupManager.backupFileDiffers(changesBib, backupDir, importFormatPreferences));
+        assertFalse(BackupManager.backupFileDiffers(changesBib, backupDir));
     }
 
     @Test
