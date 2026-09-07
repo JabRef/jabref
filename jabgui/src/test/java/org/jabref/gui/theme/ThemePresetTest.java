@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ThemePresetTest {
 
     /// The submodule, relative to the module directory Gradle runs the tests in.
-    private static final Path THEMES_JABREF_ORG = Path.of("themes.jabref.org", "themes");
+    private static final Path THEMES_JABREF_ORG = Path.of("src", "main", "themes.jabref.org", "themes");
 
     /// The community constants of [ThemePreset] are written by hand so that the set of themes is
     /// fixed at compile time. This test is what keeps them in step with the submodule: after a

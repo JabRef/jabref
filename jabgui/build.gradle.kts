@@ -327,7 +327,7 @@ tasks.test {
 // flat under org/jabref/gui/theme/community/; ThemePreset lists them, ThemePresetTest keeps both in sync.
 // DarkTheme/ and LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
 tasks.processResources {
-    from(layout.projectDirectory.dir("themes.jabref.org/themes")) {
+    from(layout.projectDirectory.dir("src/main/themes.jabref.org/themes")) {
         include("*/*.css")
         exclude("DarkTheme/**", "LightTheme/**")
         // `path` is relative to the task's destination, so the target directory is part of it.

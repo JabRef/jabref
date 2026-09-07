@@ -6,7 +6,7 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 
 /// A theme the user can select: one of the two built-in themes, or one of the community themes
-/// from <https://themes.jabref.org/> that the build bundles from the `jabgui/themes.jabref.org`
+/// from <https://themes.jabref.org/> that the build bundles from the `jabgui/src/main/themes.jabref.org`
 /// submodule (see `processResources` in `jabgui/build.gradle.kts`).
 ///
 /// The community constants are a hand-maintained mirror of that submodule -- `ThemePresetTest`
