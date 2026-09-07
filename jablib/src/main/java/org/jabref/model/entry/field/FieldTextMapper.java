@@ -32,9 +32,17 @@ public class FieldTextMapper {
                 default ->
                         StringUtil.capitalizeFirst(field.getName());
             };
-        } else if (field instanceof InternalField) {
-            // Internal fields are JabRef's own names, not user-defined ones, so they get the same casing as standard fields
-            return StringUtil.capitalizeFirst(field.getName());
+        } else if (field instanceof InternalField internalField) {
+            // Display names are never parsed back into a field (persistence uses getName()), so they may contain spaces.
+            // Other internal fields keep their exact name, e.g. the "JabRef" brand casing in INTERNAL_ID_FIELD.
+            return switch (internalField) {
+                case KEY_FIELD ->
+                        "Citation key";
+                case TYPE_HEADER ->
+                        "Entry type";
+                default ->
+                        field.getName();
+            };
         }
 
         return field.getName();
