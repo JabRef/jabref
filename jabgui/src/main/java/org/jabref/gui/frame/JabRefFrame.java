@@ -60,8 +60,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DBMSConnectionProperties;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -702,30 +701,25 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         // [impl->req~shared-database.reopen-on-startup~1]
-        for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
-            SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences(sharedDatabaseId);
-            DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(sharedDatabasePreferences);
-            if (!sharedDatabasePreferences.getRememberPassword()) {
-                // Without the password the attempt can only fail; the user connects via the login dialog instead
-                dialogService.notify(Localization.lang("Shared database %0 was not reconnected because its password is not remembered.", connectionProperties.getDatabase()));
-                continue;
-            }
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
+            String sharedDatabaseId = reconnection.sharedDatabaseId();
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
             // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
             // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
-            BackgroundTask.wrap(() -> manager.connect(connectionProperties))
+            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
                           .onSuccess(bibDatabaseContext -> {
                               if (!mainStage.isShowing()) {
                                   bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
                                   return;
                               }
-                              manager.openTab(bibDatabaseContext).getDatabase().setSharedDatabaseID(sharedDatabaseId);
+                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
                           })
                           .onFailure(exception -> {
                               LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
                               if (mainStage.isShowing()) {
                                   dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                          Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), exception);
+                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
                               }
                           })
                           .executeWith(taskExecutor);

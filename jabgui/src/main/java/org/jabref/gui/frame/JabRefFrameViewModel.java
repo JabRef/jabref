@@ -47,7 +47,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -165,7 +165,7 @@ public class JabRefFrameViewModel {
             return false;
         }
 
-        sharedDatabases.forEach((id, connectionProperties) -> new SharedDatabasePreferences(id).putAllDBMSConnectionProperties(connectionProperties));
+        new SharedDatabaseSessionService().persistConnections(sharedDatabases);
         storeLastOpenedFiles(openedLibraries, focusedLibraries, List.copyOf(sharedDatabases.keySet())); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
