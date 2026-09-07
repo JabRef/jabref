@@ -49,17 +49,25 @@ public final class ConflictedCopies {
     }
 
     public static boolean isConflictedCopy(Path library, Path candidate) {
-        return patternFor(library).matcher(candidate.getFileName().toString()).matches();
+        return isConflictedCopy(library, candidate, localComputerName());
+    }
+
+    static boolean isConflictedCopy(Path library, Path candidate, Optional<String> computerName) {
+        return patternFor(library, computerName).matcher(candidate.getFileName().toString()).matches();
     }
 
     private static Pattern patternFor(Path library) {
+        return patternFor(library, localComputerName());
+    }
+
+    private static Pattern patternFor(Path library, Optional<String> computerName) {
         String fileName = library.getFileName().toString();
         String extension = FileUtil.getFileExtension(fileName).map(ext -> "." + ext).orElse("");
         String baseName = Pattern.quote(FileUtil.getBaseName(fileName));
         String quotedExtension = Pattern.quote(extension);
         String alternatives = baseName + " \\(.*conflicted copy.*\\)" + quotedExtension
                 + "|" + baseName + "\\.sync-conflict-\\d{8}-\\d{6}-[A-Z0-9]+" + quotedExtension
-                + localComputerName().map(name -> "|" + baseName + "-" + Pattern.quote(name) + "(-\\d+)?" + quotedExtension).orElse("");
+                + computerName.map(name -> "|" + baseName + "-" + Pattern.quote(name) + "(-\\d+)?" + quotedExtension).orElse("");
         return Pattern.compile(alternatives, Pattern.CASE_INSENSITIVE);
     }
 

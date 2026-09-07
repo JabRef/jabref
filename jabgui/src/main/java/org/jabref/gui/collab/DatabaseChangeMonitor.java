@@ -121,7 +121,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private void notifyExternalChanges(List<DatabaseChange> changes, String description) {
         Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
 
-        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes, description, () -> {
+        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes, description, true, () -> {
         });
         dialogService.notify(notification);
         activeNotification = notification;
@@ -134,8 +134,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
-        /// @param afterReview run once all changes have been reviewed and applied
-        public ExternalLibraryChangeNotification(List<DatabaseChange> changes, String description, Runnable afterReview) {
+        /// @param fromLibraryFile whether the changes come from the library file itself; only then can a fully accepted review leave the library matching its file and therefore clean
+        /// @param afterReview     run once all changes have been reviewed and applied
+        public ExternalLibraryChangeNotification(List<DatabaseChange> changes, String description, boolean fromLibraryFile, Runnable afterReview) {
             super(Localization.lang("External changes detected"), description);
             setOnClick(_ -> OnClickBehaviour.NONE);
 
@@ -153,7 +154,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 if (areAllChangesResolved.orElse(false)) {
                     applyResolvedChanges(
                             databaseChangesResolverDialog.getResolvedChanges(),
-                            databaseChangesResolverDialog.resolvedChangesMatchDisk());
+                            fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk());
 
                     clearActiveNotification(this);
                     afterReview.run();
@@ -319,7 +320,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Applies what changed on disk only, and offers the review for what changed on both sides.
     private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage) {
         synchronize(scannedBaseline, triage, Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())), null);
-        mergeConflictedCopies(scannedBaseline);
     }
 
     /// @param conflictedCopy the merged file when it is a conflicted copy rather than the library file itself; its changes needing review are announced as such, and the copy is offered for deletion once nothing of it is left to review
@@ -347,6 +347,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             // Shown next to, not instead of, a pending review of the library file itself
             dialogService.notify(new ExternalLibraryChangeNotification(triage.bothSides(),
                     Localization.lang("The conflicted copy '%0' contains changes that need review.", conflictedCopy.getFileName().toString()),
+                    false,
                     () -> dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy))));
         } else {
             dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy));
@@ -411,7 +412,13 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             super(Localization.lang("Conflicted copy merged"),
                     Localization.lang("All changes of '%0' are in the library.", copy.getFileName().toString()));
             setOnClick(_ -> OnClickBehaviour.REMOVE);
+            // The sync client may replace the copy while the notification is showing; only the merged state is deleted
+            FileSnapshot mergedState = mergedConflictedCopies.get(copy);
             getActions().add(new NotificationAction<>(Localization.lang("Delete copy"), _ -> {
+                if (mergedState == null || !mergedState.matches(copy)) {
+                    dialogService.notify(Localization.lang("'%0' has changed since it was merged and was not deleted.", copy.getFileName().toString()));
+                    return OnClickBehaviour.REMOVE;
+                }
                 try {
                     Files.deleteIfExists(copy);
                 } catch (IOException e) {

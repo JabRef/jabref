@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,9 +57,11 @@ class ConflictedCopiesTest {
 
     @Test
     void recognizesOneDriveCopyOfTheLocalComputerOnly() {
-        ConflictedCopies.localComputerName().ifPresent(computerName -> {
-            assertTrue(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-" + computerName + ".bib")));
-            assertFalse(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-OTHER-PC.bib")));
-        });
+        Optional<String> computerName = Optional.of("DESKTOP-AB12CD");
+
+        assertTrue(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-DESKTOP-AB12CD.bib"), computerName));
+        assertTrue(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-DESKTOP-AB12CD-2.bib"), computerName));
+        assertFalse(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-OTHER-PC.bib"), computerName));
+        assertFalse(ConflictedCopies.isConflictedCopy(LIBRARY, LIBRARY.resolveSibling("library-DESKTOP-AB12CD.bib"), Optional.empty()));
     }
 }
