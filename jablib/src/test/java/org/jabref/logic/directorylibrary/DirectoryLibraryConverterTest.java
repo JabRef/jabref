@@ -18,6 +18,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
@@ -69,6 +71,7 @@ class DirectoryLibraryConverterTest {
     }
 
     @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "obstacle messages embed OS-specific path separators")
     void missingAndOutsideFilesAreObstacles(@TempDir Path elsewhere) throws IOException {
         Files.createFile(elsewhere.resolve("outside.pdf"));
         BibEntry missing = new BibEntry(StandardEntryType.Article)
