@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
@@ -17,6 +18,9 @@ import org.jabref.logic.importer.fetcher.transformers.BaseSearchQueryTransformer
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.OperatorNode;
 import org.jabref.model.search.query.SearchQueryNode;
@@ -27,7 +31,8 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -214,15 +219,42 @@ class BaseSearchFetcherTest {
         assertEquals(StandardEntryType.Misc, entries.getFirst().getType());
     }
 
+    private static Stream<Arguments> provideTypeCodes() {
+        return Stream.of(
+                Arguments.of("1", StandardEntryType.Misc),
+                Arguments.of("11", StandardEntryType.Book),
+                Arguments.of("111", StandardEntryType.InBook),
+                Arguments.of("12", IEEETranEntryType.Periodical),
+                Arguments.of("121", StandardEntryType.Article),
+                Arguments.of("122", StandardEntryType.SuppPeriodical),
+                Arguments.of("13", StandardEntryType.InProceedings),
+                Arguments.of("14", StandardEntryType.TechReport),
+                Arguments.of("15", BiblatexNonStandardEntryType.Review),
+                Arguments.of("16", StandardEntryType.Misc),
+                Arguments.of("17", StandardEntryType.Unpublished),
+                Arguments.of("18", StandardEntryType.Thesis),
+                Arguments.of("181", StandardEntryType.Thesis),
+                Arguments.of("182", StandardEntryType.MastersThesis),
+                Arguments.of("183", StandardEntryType.PhdThesis),
+                Arguments.of("19", StandardEntryType.Unpublished),
+                Arguments.of("1A", IEEETranEntryType.Patent),
+                Arguments.of("1a", IEEETranEntryType.Patent),
+                Arguments.of("2", BiblatexNonStandardEntryType.Music),
+                Arguments.of("3", StandardEntryType.Misc),
+                Arguments.of("4", BiblatexNonStandardEntryType.Audio),
+                Arguments.of("5", BiblatexNonStandardEntryType.Image),
+                Arguments.of("51", BiblatexNonStandardEntryType.Image),
+                Arguments.of("52", BiblatexNonStandardEntryType.Video),
+                Arguments.of("6", StandardEntryType.Software),
+                Arguments.of("7", StandardEntryType.Dataset),
+                Arguments.of("F", StandardEntryType.Misc),
+                Arguments.of("f", StandardEntryType.Misc)
+        );
+    }
+
     @ParameterizedTest
-    @CsvSource({
-            "11,  Book",
-            "121, Article",
-            "13,  InProceedings",
-            "14,  TechReport",
-            "18,  PhdThesis"
-    })
-    void parserMapsTypeCodeToCorrectEntryType(String typeCode, StandardEntryType expectedType) throws ParseException {
+    @MethodSource("provideTypeCodes")
+    void parserMapsTypeCodeToCorrectEntryType(String typeCode, EntryType expectedType) throws ParseException {
         String json = """
                 {
                   "response": {

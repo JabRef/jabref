@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -20,6 +21,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
@@ -44,12 +48,33 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
     private static final FetcherRateLimiter RATE_LIMITER =
             FetcherRateLimiter.ofRequestsPerSecond(FETCHER_NAME, 1.0);
 
-    private static final Map<String, StandardEntryType> ENTRY_TYPES_BY_CODE = Map.of(
-            "11", StandardEntryType.Book,
-            "13", StandardEntryType.InProceedings,
-            "14", StandardEntryType.TechReport,
-            "18", StandardEntryType.PhdThesis,
-            "121", StandardEntryType.Article);
+    private static final Map<String, EntryType> ENTRY_TYPES_BY_CODE = Map.ofEntries(
+            Map.entry("1", StandardEntryType.Misc),
+            Map.entry("11", StandardEntryType.Book),
+            Map.entry("111", StandardEntryType.InBook),
+            Map.entry("12", IEEETranEntryType.Periodical),
+            Map.entry("121", StandardEntryType.Article),
+            Map.entry("122", StandardEntryType.SuppPeriodical),
+            Map.entry("13", StandardEntryType.InProceedings),
+            Map.entry("14", StandardEntryType.TechReport),
+            Map.entry("15", BiblatexNonStandardEntryType.Review),
+            Map.entry("16", StandardEntryType.Misc),
+            Map.entry("17", StandardEntryType.Unpublished),
+            Map.entry("18", StandardEntryType.Thesis),
+            Map.entry("181", StandardEntryType.Thesis),
+            Map.entry("182", StandardEntryType.MastersThesis),
+            Map.entry("183", StandardEntryType.PhdThesis),
+            Map.entry("19", StandardEntryType.Unpublished),
+            Map.entry("1A", IEEETranEntryType.Patent),
+            Map.entry("2", BiblatexNonStandardEntryType.Music),
+            Map.entry("3", StandardEntryType.Misc),
+            Map.entry("4", BiblatexNonStandardEntryType.Audio),
+            Map.entry("5", BiblatexNonStandardEntryType.Image),
+            Map.entry("51", BiblatexNonStandardEntryType.Image),
+            Map.entry("52", BiblatexNonStandardEntryType.Video),
+            Map.entry("6", StandardEntryType.Software),
+            Map.entry("7", StandardEntryType.Dataset),
+            Map.entry("F", StandardEntryType.Misc));
 
     private final ImporterPreferences importerPreferences;
 
@@ -153,14 +178,14 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
         };
     }
 
-    private StandardEntryType mapEntryType(JSONObject doc) {
+    private EntryType mapEntryType(JSONObject doc) {
         return getFirstValue(doc, "dctypenorm")
                 .map(this::mapEntryType)
                 .orElse(StandardEntryType.Misc);
     }
 
-    private StandardEntryType mapEntryType(String code) {
-        return ENTRY_TYPES_BY_CODE.getOrDefault(code, StandardEntryType.Misc);
+    private EntryType mapEntryType(String code) {
+        return ENTRY_TYPES_BY_CODE.getOrDefault(code.toUpperCase(Locale.ROOT), StandardEntryType.Misc);
     }
 
     URL getValidationUrl(String apiKey) throws URISyntaxException, MalformedURLException {
