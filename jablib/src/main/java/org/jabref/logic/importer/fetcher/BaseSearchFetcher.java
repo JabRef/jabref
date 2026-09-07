@@ -5,10 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -44,11 +44,12 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
     private static final FetcherRateLimiter RATE_LIMITER =
             FetcherRateLimiter.ofRequestsPerSecond(FETCHER_NAME, 1.0);
 
-    private static final String TYPE_CODE_BOOK = "11";
-    private static final String TYPE_CODE_ARTICLE = "121";
-    private static final String TYPE_CODE_IN_PROCEEDINGS = "13";
-    private static final String TYPE_CODE_TECH_REPORT = "14";
-    private static final String TYPE_CODE_PHD_THESIS = "18";
+    private static final Map<String, StandardEntryType> ENTRY_TYPES_BY_CODE = Map.of(
+            "11", StandardEntryType.Book,
+            "13", StandardEntryType.InProceedings,
+            "14", StandardEntryType.TechReport,
+            "18", StandardEntryType.PhdThesis,
+            "121", StandardEntryType.Article);
 
     private final ImporterPreferences importerPreferences;
 
@@ -62,26 +63,10 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
     }
 
     @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.empty();
-    }
-
-    @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
-        RATE_LIMITER.acquire(FETCHER_NAME);
-
         BaseSearchQueryTransformer transformer = new BaseSearchQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
-
-        URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("func", "PerformSearch");
-        uriBuilder.addParameter("format", "json");
-        uriBuilder.addParameter("query", query);
-        uriBuilder.addParameter("hits", String.valueOf(getPageSize()));
-        uriBuilder.addParameter("offset", String.valueOf(getPageSize() * pageNumber));
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
-
-        return uriBuilder.build().toURL();
+        return buildSearchUrl(query, getPageSize(), getPageSize() * pageNumber);
     }
 
     @Override
@@ -175,37 +160,42 @@ public class BaseSearchFetcher implements PagedSearchBasedParserFetcher, Customi
     }
 
     private StandardEntryType mapEntryType(String code) {
-        return switch (code) {
-            case String c when c.startsWith(TYPE_CODE_PHD_THESIS) ->
-                    StandardEntryType.PhdThesis;
-            case String c when c.startsWith(TYPE_CODE_IN_PROCEEDINGS) ->
-                    StandardEntryType.InProceedings;
-            case String c when c.startsWith(TYPE_CODE_TECH_REPORT) ->
-                    StandardEntryType.TechReport;
-            case String c when c.startsWith(TYPE_CODE_ARTICLE) ->
-                    StandardEntryType.Article;
-            case String c when c.startsWith(TYPE_CODE_BOOK) ->
-                    StandardEntryType.Book;
-            default ->
-                    StandardEntryType.Misc;
-        };
+        return ENTRY_TYPES_BY_CODE.getOrDefault(code, StandardEntryType.Misc);
+    }
+
+    URL getValidationUrl(String apiKey) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(buildSearchUrl("test", 0, 0).toString());
+        uriBuilder.setParameter("apikey", apiKey);
+        return uriBuilder.build().toURL();
+    }
+
+    private URL buildSearchUrl(String query, int hits, int offset) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        uriBuilder.addParameter("func", "PerformSearch");
+        uriBuilder.addParameter("format", "json");
+        uriBuilder.addParameter("query", query);
+        uriBuilder.addParameter("hits", String.valueOf(hits));
+        uriBuilder.addParameter("offset", String.valueOf(offset));
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URLDownload getUrlDownload(URL url) {
+        RATE_LIMITER.acquire(url.toString());
+        return new URLDownload(url);
+    }
+
+    boolean isValidKeyResponse(String response) {
+        JSONObject jsonObject = new JSONObject(response);
+        return !jsonObject.has("error");
     }
 
     @Override
     public boolean isValidKey(String apiKey) {
         try {
-            URIBuilder uriBuilder = new URIBuilder(API_URL);
-            uriBuilder.addParameter("func", "PerformSearch");
-            uriBuilder.addParameter("format", "json");
-            uriBuilder.addParameter("query", "test");
-            uriBuilder.addParameter("hits", "0");
-            uriBuilder.addParameter("apikey", apiKey);
-            URL testUrl = uriBuilder.build().toURL();
-
-            URLDownload urlDownload = new URLDownload(testUrl);
-            String response = urlDownload.asString();
-            JSONObject jsonObject = new JSONObject(response);
-            return !jsonObject.has("error");
+            URLDownload urlDownload = getUrlDownload(getValidationUrl(apiKey));
+            return isValidKeyResponse(urlDownload.asString());
         } catch (URISyntaxException | MalformedURLException | FetcherException | JSONException e) {
             LOGGER.debug("BASE API key validation failed", e);
             return false;

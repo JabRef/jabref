@@ -20,7 +20,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.OperatorNode;
 import org.jabref.model.search.query.SearchQueryNode;
-import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
@@ -245,8 +244,38 @@ class BaseSearchFetcherTest {
     }
 
     @Test
-    @ExternalServicesTest
-    void isValidKeyReturnsFalseForMalformedResponse() {
-        assertFalse(fetcher.isValidKey("obviously-invalid-key"));
+    void getValidationUrlContainsApiKeyAndValidationParameters() throws Exception {
+        URL url = fetcher.getValidationUrl("dummy-test-key");
+
+        Map<String, String> params = new URIBuilder(url.toURI())
+                .getQueryParams()
+                .stream()
+                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue, (v1, v2) -> v1));
+
+        assertEquals("PerformSearch", params.get("func"));
+        assertEquals("json", params.get("format"));
+        assertEquals("test", params.get("query"));
+        assertEquals("0", params.get("hits"));
+        assertEquals("dummy-test-key", params.get("apikey"));
+    }
+
+    @Test
+    void isValidKeyResponseReturnsFalseWhenErrorFieldPresent() {
+        assertFalse(fetcher.isValidKeyResponse("""
+                {
+                  "error": "invalid key"
+                }
+                """));
+    }
+
+    @Test
+    void isValidKeyResponseReturnsTrueForSuccessfulResponse() {
+        assertTrue(fetcher.isValidKeyResponse("""
+                {
+                  "response": {
+                    "docs": []
+                  }
+                }
+                """));
     }
 }
