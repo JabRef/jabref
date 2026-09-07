@@ -92,4 +92,3 @@ jobs:
             if (approvers.length < 2) {
               core.setFailed(`PR #${pullNumber} has label "${requiredLabel}" but only ${approvers.length} approval(s). It will be removed from the merge queue.`);
             }
-    

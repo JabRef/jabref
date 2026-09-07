@@ -146,7 +146,7 @@ public class AiChatView extends StackPane {
         followUpQuestionsSimpleListView.itemsProperty().bind(viewModel.followUpQuestionsProperty());
         followUpQuestionsSimpleListView.setRenderer(question -> {
             Button button = new Button(question);
-            button.getStyleClass().add("exampleQuestionStyle");
+            button.getStyleClass().addAll("exampleQuestionStyle", "padding-4-12");
             button.setOnAction(_ -> viewModel.sendFollowUpMessage(question));
             return button;
         });

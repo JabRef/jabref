@@ -47,10 +47,9 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
-    @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
         ViewLoader.view(this)
                   .root(this)
                   .load();

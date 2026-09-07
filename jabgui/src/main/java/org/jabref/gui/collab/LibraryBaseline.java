@@ -94,16 +94,9 @@ public final class LibraryBaseline {
         for (DatabaseChange change : pairSplitEntries(changes, local, resolverFactory)) {
             Side side = switch (change) {
                 case EntryChange entryChange -> {
-                    BibEntry base = entriesById.get(entryChange.getOldEntry().getId());
-                    Side entrySide = sideOf(base, entryChange.getOldEntry(), entryChange.getNewEntry(), LibraryBaseline::sameContent);
-                    if (entrySide == Side.BOTH) {
-                        Optional<BibEntry> merged = mergeFields(base, entryChange.getOldEntry(), entryChange.getNewEntry());
-                        if (merged.isPresent()) {
-                            change = new EntryChange(entryChange.getOldEntry(), merged.get(), local, resolverFactory);
-                            entrySide = Side.DISK;
-                        }
-                    }
-                    yield entrySide;
+                    Classified classified = classifyEntryChange(entryChange, local, resolverFactory);
+                    change = classified.change();
+                    yield classified.side();
                 }
                 // No in-memory counterpart: either new on disk, or deleted in memory (and possibly modified on disk)
                 case EntryAdd entryAdd ->
@@ -246,6 +239,21 @@ public final class LibraryBaseline {
             }
         });
         return Optional.of(merged);
+    }
+
+    private record Classified(Side side, DatabaseChange change) {
+    }
+
+    /// An entry changed on both sides in different fields is merged field by field into a new, accepted change.
+    private Classified classifyEntryChange(EntryChange entryChange, BibDatabaseContext local, @Nullable DatabaseChangeResolverFactory resolverFactory) {
+        BibEntry base = entriesById.get(entryChange.getOldEntry().getId());
+        Side side = sideOf(base, entryChange.getOldEntry(), entryChange.getNewEntry(), LibraryBaseline::sameContent);
+        if (side != Side.BOTH) {
+            return new Classified(side, entryChange);
+        }
+        return mergeFields(base, entryChange.getOldEntry(), entryChange.getNewEntry())
+                .map(merged -> new Classified(Side.DISK, new EntryChange(entryChange.getOldEntry(), merged, local, resolverFactory)))
+                .orElse(new Classified(Side.BOTH, entryChange));
     }
 
     private static boolean sameContent(BibEntry one, BibEntry other) {

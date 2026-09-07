@@ -86,15 +86,14 @@ public class ErrorConsoleView extends BaseDialog<Void> {
             private final Label stacktrace;
 
             {
-                graphic = new HBox();
+                graphic = new HBox(12);
                 heading = new Label();
                 stacktrace = new Label();
-                message = new VBox();
+                message = new VBox(4);
                 message.setAlignment(Pos.CENTER_LEFT);
                 message.getChildren().setAll(heading, stacktrace);
-                message.getStyleClass().add("message-box");
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                getStyleClass().add("error-console-cell");
+                getStyleClass().addAll("error-console-cell", "padding-8");
             }
 
             @Override

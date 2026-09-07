@@ -46,7 +46,7 @@ public final class EntryChange extends DatabaseChange {
     @Override
     public void applyChange(CompoundEdit undoEdit) {
         CompoundEdit entryEdit = new CompoundEdit(getName());
-        if (!oldEntry.getType().equals(newEntry.getType())) {
+        if (!Objects.equals(oldEntry.getType(), newEntry.getType())) {
             entryEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
         }
         Set<Field> fields = new LinkedHashSet<>(oldEntry.getFields());

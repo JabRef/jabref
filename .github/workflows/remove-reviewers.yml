@@ -20,8 +20,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ci-running-message: >
-            Do not request reviews while the CI is running.
-            CI checks need to be completed and passed.
+            Do not request reviews while the CI or the automatic review is running.
+            They need to be completed and passed.
           changes-required-message: |
             Do not request reviews if changes are required.
             Address the changes first.
