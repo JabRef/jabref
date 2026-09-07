@@ -1,10 +1,12 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -52,6 +55,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -176,6 +180,38 @@ class AllFieldsTabTest {
         runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    /// Every entry switch drops the whole editor set and builds a new one, so a discarded editor
+    /// must not stay reachable from the entry - otherwise arrow-keying through a library would pile
+    /// up editor generations. Guards the reasoning documented in `FieldsEditorTab#setupPanel`.
+    @Test
+    void discardedEditorsAreNotRetainedAfterRebuild() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2021")
+                .withField(StandardField.TITLE, "start")
+                .withField(StandardField.AUTHOR, "Smith, John")
+                .withField(StandardField.JOURNAL, "Journal")
+                .withField(StandardField.YEAR, "2021");
+
+        List<WeakReference<FieldEditorFX>> editorsEverCreated = new ArrayList<>();
+        for (int rebuild = 0; rebuild < 10; rebuild++) {
+            runOnFxThreadAndWait(() -> {
+                tab.bindToEntry(entry);
+                tab.editors.values().forEach(editor -> editorsEverCreated.add(new WeakReference<>(editor)));
+            });
+        }
+        int currentGeneration = tab.editors.size();
+
+        long stillAlive = editorsEverCreated.size();
+        for (int attempt = 0; (attempt < 20) && (stillAlive > currentGeneration); attempt++) {
+            System.gc();
+            Thread.sleep(50);
+            stillAlive = editorsEverCreated.stream().map(WeakReference::get).filter(Objects::nonNull).count();
+        }
+
+        assertEquals(currentGeneration, stillAlive,
+                "only the editors currently shown may survive; " + (editorsEverCreated.size() - currentGeneration) + " were discarded");
     }
 
     @Test

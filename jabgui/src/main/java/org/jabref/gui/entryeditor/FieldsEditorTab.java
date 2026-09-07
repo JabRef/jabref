@@ -94,6 +94,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             return;
         }
 
+        // The dropped editors need no explicit disposal: their only link to the entry is the
+        // binding in AbstractEditorViewModel, and EasyBind's valueAt registers a weak listener on
+        // the entry's field map - so a discarded generation becomes unreachable here and is collected.
+        // Verified by AllFieldsTabTest#discardedEditorsAreNotRetainedAfterRebuild.
         editors.clear();
         gridPane.getChildren().clear();
         gridPane.getColumnConstraints().clear();
