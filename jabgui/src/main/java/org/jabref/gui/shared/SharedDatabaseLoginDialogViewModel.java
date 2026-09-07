@@ -263,10 +263,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void handleSharedDatabaseConnectionSuccess(LibraryTab libraryTab,
-                                                        DBMSConnectionProperties connectionProperties,
-                                                        boolean shouldRememberPassword,
-                                                        boolean shouldAutosave,
-                                                        String autosavePath) {
+                                                       DBMSConnectionProperties connectionProperties,
+                                                       boolean shouldRememberPassword,
+                                                       boolean shouldAutosave,
+                                                       String autosavePath) {
         dialogService.notify(Localization.lang("Connection to %0 server established.", connectionProperties.getType().toString()));
         setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
         if (!autosavePath.isEmpty() && shouldAutosave) {

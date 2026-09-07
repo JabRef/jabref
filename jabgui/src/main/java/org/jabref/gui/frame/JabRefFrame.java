@@ -733,9 +733,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void handleSharedDatabaseReconnectionSuccess(SharedDatabaseSessionService sessionService,
-                                                          SharedDatabaseSessionService.Reconnection reconnection,
-                                                          LibraryTab tab,
-                                                          BibDatabaseContext bibDatabaseContext) {
+                                                         SharedDatabaseSessionService.Reconnection reconnection,
+                                                         LibraryTab tab,
+                                                         BibDatabaseContext bibDatabaseContext) {
         if (!mainStage.isShowing()) {
             closeTab(tab);
             return;
