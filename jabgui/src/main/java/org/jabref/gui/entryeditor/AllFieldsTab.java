@@ -321,6 +321,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
+        // Every layout pass builds fresh TitledPanes, so the ones tracked from the previous pass are
+        // detached from the scene graph: expanding one (requestFocus) would do nothing visible.
         sectionPanes.clear();
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
